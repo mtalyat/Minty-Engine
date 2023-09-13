@@ -22,6 +22,11 @@ Who doesn't love playing with your friends? The Minty engine will have built-in 
 #### Ease of Use
 After the base of the engine has been designed, a user interface will be created to help advance the creation of games using the engine.
 
+### Inspiration
+There are multiple sources that inspired this project.
+* [John Lin's Sandbox](https://www.youtube.com/@johnlin9665), a stunningly beautfil voxel tech demo.
+* [Teardown](https://teardowngame.com), a well made voxel game about destroying the environment.
+
 ### Technology
 The Minty Engine will use a multitude of advanced and new technologies to make the most of the computer being used. This includes, but is not limited to:
 
