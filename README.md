@@ -16,6 +16,9 @@ Performace, in terms of the CPU and the GPU. On the CPU, libraries such as [EnTT
 #### Portability
 The engine itself will be portable to many devices. This is to allow for all sorts of people to use the engine. All libraries and dependencies of this project will also be portable.
 
+#### Networking
+Who doesn't love playing with your friends? The Minty engine will have built-in networking capabilities to make it easy (easier- its not easy) to implement multiplayer games.
+
 #### Ease of Use
 After the base of the engine has been designed, a user interface will be created to help advance the creation of games using the engine.
 
