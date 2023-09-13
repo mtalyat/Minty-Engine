@@ -1,6 +1,8 @@
 # Minty Engine
 A dynamic and advanced voxel engine.
 
+NOTE: This project is in development. More info on how to use, etc. will come in due time.
+
 ## About
 
 ### Motivation
