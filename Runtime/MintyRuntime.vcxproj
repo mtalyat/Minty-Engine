@@ -185,6 +185,7 @@
     <ClInclude Include="Minty.h" />
     <ClInclude Include="M_CommandLineParser.h" />
     <ClInclude Include="M_GameEngine.h" />
+    <ClInclude Include="M_Project.h" />
     <ClInclude Include="M_RenderEngine.h" />
     <ClInclude Include="M_Runtime.h" />
     <ClInclude Include="pch.h" />
@@ -193,6 +194,7 @@
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="M_CommandLineParser.cpp" />
     <ClCompile Include="M_GameEngine.cpp" />
+    <ClCompile Include="M_Project.cpp" />
     <ClCompile Include="M_RenderEngine.cpp" />
     <ClCompile Include="M_Runtime.cpp" />
     <ClCompile Include="pch.cpp">
