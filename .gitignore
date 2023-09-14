@@ -399,3 +399,6 @@ FodyWeavers.xsd
 
 # Management folder
 Management/
+
+# Project tests folder
+Projects/Tests

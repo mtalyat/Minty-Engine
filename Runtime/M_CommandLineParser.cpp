@@ -25,8 +25,6 @@ void CommandLineParser::parse(int argc, char const* argv[])
 	// iterate through all arguments
 	for (int i = 0; i < argc; i++)
 	{
-		std::cout << "Checking " << argv[i] << std::endl;
-
 		// find positional argument or flag argument, flag takes priority
 		auto flagFound = _flagParams.find(argv[i]);
 		auto posFound = _positionalParams.find(i);
@@ -43,8 +41,6 @@ void CommandLineParser::parse(int argc, char const* argv[])
 		}
 		else
 		{
-			std::cout << "No param found..." << std::endl;
-
 			// no arg found at this position
 			continue;
 		}
