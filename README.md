@@ -34,3 +34,13 @@ The Minty Engine will use a multitude of advanced and new technologies to make t
 * [GLFW](https://www.glfw.org), for windows.
 * [GLM](https://github.com/g-truc/glm), for linear mathematics.
 * [EnTT](https://github.com/skypjack/entt), for the entity component system.
+
+## Structure
+
+### Minty Engine
+
+The Minty Engine is the actual application that allows you to create the games.
+
+### Minty Runtime
+
+The Minty Runtime is a dynamic link library (DLL) that allows you to run a game.
