@@ -79,7 +79,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\VulkanSDK\1.3.261.1\Include;C:\GL\GLM\glm;C:\GL\GLFW\glfw-3.3.8.bin.WIN64\include;C:\GL\STB;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Libraries\VulkanSDK\1.3.261.1\Include;C:\Libraries\GLM\glm;C:\Libraries\GLFW\glfw-3.3.8.bin.WIN64\include;C:\Libraries\STB;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -89,13 +89,14 @@
       <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>cd C:\Users\mitch\source\repos\Minty-Engine\Runtime\shaders &amp;&amp; call compile_shaders.bat</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <Lib>
       <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>C:\VulkanSDK\1.3.261.1\Lib;C:\GL\GLFW\glfw-3.3.8.bin.WIN64\lib-vc2022;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Libraries\VulkanSDK\1.3.261.1\Lib;C:\Libraries\GLFW\glfw-3.3.8.bin.WIN64\lib-vc2022;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -133,7 +134,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>C:\VulkanSDK\1.3.261.1\Include;C:\GL\GLM\glm;C:\GL\GLFW\glfw-3.3.8.bin.WIN64\include;C:\GL\STB;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Libraries\VulkanSDK\1.3.261.1\Include;C:\Libraries\GLM\glm;C:\Libraries\GLFW\glfw-3.3.8.bin.WIN64\include;C:\Libraries\STB;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Windows</SubSystem>
@@ -143,13 +144,14 @@
       <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
     <PreBuildEvent>
-      <Command>cd C:\Users\mitch\source\repos\Minty-Engine\Runtime\shaders &amp;&amp; call compile_shaders.bat</Command>
+      <Command>
+      </Command>
     </PreBuildEvent>
     <Lib>
       <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>C:\VulkanSDK\1.3.261.1\Lib;C:\GL\GLFW\glfw-3.3.8.bin.WIN64\lib-vc2022;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>C:\Libraries\VulkanSDK\1.3.261.1\Lib;C:\Libraries\GLFW\glfw-3.3.8.bin.WIN64\lib-vc2022;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
