@@ -1,6 +1,8 @@
 #pragma once
 
+#include "M_CommandLineParser.h"
 #include "M_GameEngine.h"
+#include <iostream>
 
 namespace minty
 {
@@ -10,14 +12,45 @@ namespace minty
 	class Runtime
 	{
 	public:
-		void run()
+		void run(int argc, char const* argv[])
 		{
-			GameEngine engine;
+			// parse command line arguments...
 
-			// TODO: load game
+			// add parameters
+			CommandLineParser parser;
+			parser.addParameter(CommandLineParser::Parameter("path", 1));
+			parser.addParameter(CommandLineParser::Parameter("debug", "-d", 0));
 
-			// run in engine
-			engine.run();
+			// parse the args
+			parser.parse(argc, argv);
+
+			// check for args
+			CommandLineParser::Argument arg;
+
+			if (parser.getArgument("path", arg))
+			{
+				std::cout << "Path argument: " << arg.args[0] << std::endl;
+			}
+			else
+			{
+				std::cout << "Path argument not found." << std::endl;
+			}
+
+			if (parser.getArgument("debug"))
+			{
+				std::cout << "Debug mode true" << std::endl;
+			}
+			else
+			{
+				std::cout << "Debug mode false" << std::endl;
+			}
+
+			//GameEngine engine;
+
+			//// TODO: load game
+
+			//// run in engine
+			//engine.run();
 		}
 	};
 }
