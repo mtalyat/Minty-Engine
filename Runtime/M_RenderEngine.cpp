@@ -1,4 +1,5 @@
-#include "RenderEngine.h"
+#include "pch.h"
+#include "M_RenderEngine.h"
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -11,6 +12,7 @@
 #include <algorithm> // Necessary for std::clamp
 #include <fstream> // Necessary for loading data from files
 #include <chrono>
+#include <filesystem>
 
 using namespace minty;
 
@@ -248,7 +250,7 @@ void RenderEngine::createImage(uint32_t width, uint32_t height, VkFormat format,
 
 void RenderEngine::createTextureImage() {
 	int texWidth, texHeight, texChannels;
-	stbi_uc* pixels = stbi_load("textures/texture.jpg", &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+	stbi_uc* pixels = stbi_load("../Runtime/textures/texture.jpg", &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
 	VkDeviceSize imageSize = texWidth * texHeight * 4;
 
 	if (!pixels) {
@@ -1017,6 +1019,11 @@ VKAPI_ATTR VkBool32 VKAPI_CALL RenderEngine::debugCallback(VkDebugUtilsMessageSe
 }
 
 std::vector<char> RenderEngine::readFile(const std::string& filename) {
+	if (!std::filesystem::exists(filename))
+	{
+		throw std::runtime_error(std::string("failed to find file! ").append(filename));
+	}
+
 	std::ifstream file(filename, std::ios::ate | std::ios::binary);
 
 	if (!file.is_open()) {
@@ -1124,8 +1131,8 @@ void RenderEngine::createRenderPass()
 void RenderEngine::createGraphicsPipeline()
 {
 	// get shader code after compilation
-	auto vertShaderCode = readFile("shaders/vert.spv");
-	auto fragShaderCode = readFile("shaders/frag.spv");
+	auto vertShaderCode = readFile("../Runtime/shaders/vert.spv");
+	auto fragShaderCode = readFile("../Runtime/shaders/frag.spv");
 
 	// create shader modules
 	VkShaderModule vertShaderModule = createShaderModule(vertShaderCode);

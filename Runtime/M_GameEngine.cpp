@@ -1,12 +1,13 @@
-#include "GameEngine.h"
+#include "pch.h"
+#include "M_GameEngine.h"
 
-#include "RenderEngine.h"
+#include "M_RenderEngine.h"
 
 using namespace minty;
 
 GameEngine::GameEngine()
 {
-	
+
 }
 
 GameEngine::~GameEngine()

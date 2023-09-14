@@ -4,13 +4,13 @@
 
 ***********************/
 
-#include "application.h"
+#include "ME_Application.h"
 #include <exception>	// for exception catching
 #include <iostream>		// for cout, endl, etc.
 
 int main()
 {
-	minty::Application app;
+	mintye::Application app;
 
 	try
 	{
