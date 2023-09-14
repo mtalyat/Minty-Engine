@@ -402,3 +402,8 @@ Management/
 
 # Project tests folder
 Projects/Tests
+
+# cmake
+Engine/cmake/doc
+Engine/cmake/share
+Engine/cmake/man
