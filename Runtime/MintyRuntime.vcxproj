@@ -183,6 +183,7 @@
   <ItemGroup>
     <ClInclude Include="framework.h" />
     <ClInclude Include="Minty.h" />
+    <ClInclude Include="M_CommandLineParser.h" />
     <ClInclude Include="M_GameEngine.h" />
     <ClInclude Include="M_RenderEngine.h" />
     <ClInclude Include="M_Runtime.h" />
@@ -190,6 +191,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="M_CommandLineParser.cpp" />
     <ClCompile Include="M_GameEngine.cpp" />
     <ClCompile Include="M_RenderEngine.cpp" />
     <ClCompile Include="M_Runtime.cpp" />

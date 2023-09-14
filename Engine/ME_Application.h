@@ -10,10 +10,10 @@ namespace mintye
 	class Application
 	{
 	public:
-		void run()
+		void run(int argc, char const* argv[])
 		{
 			minty::Runtime runtime;
-			runtime.run();
+			runtime.run(argc, argv);
 		}
 	};
 }
