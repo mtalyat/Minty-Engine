@@ -9,16 +9,22 @@ namespace mintye
 	/// </summary>
 	class Application
 	{
+	private:
+		struct Info
+		{
+			minty::Project const& project;
+			bool debug;
+		};
 	public:
 		Application();
 
 		void run(int argc, char const* argv[]);
 	private:
-		void clean(minty::Project const& project);
+		void clean(Info const& info);
 
-		void build(minty::Project const& project);
+		void build(Info const& info);
 
-		void run(minty::Project const& project);
+		void run(Info const& info);
 
 		void run_command(std::string const& command);
 	};

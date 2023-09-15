@@ -52,11 +52,19 @@ void Application::run(int argc, char const* argv[])
 		return;
 	}
 
+	// create new project with path
+	minty::Project project(path);
+
+	Info info
+	{
+		.project = project,
+		.debug = true, // debug by default
+	};
+
 	// set current working directory to project folder
 	//std::filesystem::current_path(path);
 
 	bool running = true;
-	bool debug = true; // debug by default
 	while (running)
 	{
 		std::cout << std::endl << "Enter command(s):" << std::endl <<
@@ -81,49 +89,45 @@ void Application::run(int argc, char const* argv[])
 
 		command = commands.at(0);
 
-		// create new project with path
-		minty::Project project(path);
-
 		// run commands
 		for (std::string const& c : commands)
 		{
 			if (c.compare("debug") == 0)
 			{
-				debug = true;
+				info.debug = true;
 			}
 			else if (c.compare("release") == 0)
 			{
-				debug = false;
+				info.debug = false;
 			} 
 			else if (c.compare("clean") == 0)
 			{
-				clean(project);
+				clean(info);
 			}
 			else if (c.compare("build") == 0)
 			{
-				build(project);
+				build(info);
 
 			}
 			else if (c.compare("rebuild") == 0)
 			{
-				clean(project);
-				build(project);
-
+				clean(info);
+				build(info);
 			}
 			else if (c.compare("run") == 0)
 			{
-				run(project);
+				run(info);
 			}
 			else if (c.compare("rerun") == 0)
 			{
-				build(project);
-				run(project);
+				build(info);
+				run(info);
 			}
 			else if(c.compare("all") == 0)
 			{
-				clean(project);
-				build(project);
-				run(project);
+				clean(info);
+				build(info);
+				run(info);
 			}
 			else if (c.compare("quit") == 0)
 			{
@@ -138,15 +142,15 @@ void Application::run(int argc, char const* argv[])
 	}
 }
 
-void Application::clean(Project const& project)
+void Application::clean(Info const& info)
 {
 	// clean the build
-	run_command("cd " + project.getBuildPath() + " && " + std::filesystem::absolute(CMAKE_PATH).string() + " --build . --target clean");
+	run_command("cd " + info.project.getBuildPath() + " && " + std::filesystem::absolute(CMAKE_PATH).string() + " --build . --target clean");
 }
 
-void Application::build(Project const& project)
+void Application::build(Info const& info)
 {
-	std::string command = "cd " + project.getBuildPath() + " && " + std::filesystem::absolute(CMAKE_PATH).string();
+	std::string command = "cd " + info.project.getBuildPath() + " && " + std::filesystem::absolute(CMAKE_PATH).string();
 
 	// make cmake files if needed
 	run_command(command + " .");
@@ -155,10 +159,10 @@ void Application::build(Project const& project)
 	run_command(command + " --build . --config Debug");
 }
 
-void Application::run(Project const& project)
+void Application::run(Info const& info)
 {
 	// call executable, pass in project path as argument for the runtime, so it knows what to run
-	run_command("cd " + project.getBuildPath() + " && cd Debug && start " + EXE_NAME + " " + project.getBasePath());
+	run_command("cd " + info.project.getBuildPath() + " && cd Debug && start " + EXE_NAME + " " + info.project.getBasePath());
 }
 
 //https://stackoverflow.com/questions/478898/how-do-i-execute-a-command-and-get-the-output-of-the-command-within-c-using-po
