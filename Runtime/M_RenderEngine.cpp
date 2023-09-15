@@ -250,7 +250,7 @@ void RenderEngine::createImage(uint32_t width, uint32_t height, VkFormat format,
 
 void RenderEngine::createTextureImage() {
 	int texWidth, texHeight, texChannels;
-	stbi_uc* pixels = stbi_load("../Runtime/textures/texture.jpg", &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+	stbi_uc* pixels = stbi_load("Assets/Textures/texture.jpg", &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
 	VkDeviceSize imageSize = texWidth * texHeight * 4;
 
 	if (!pixels) {
@@ -1021,7 +1021,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL RenderEngine::debugCallback(VkDebugUtilsMessageSe
 std::vector<char> RenderEngine::readFile(const std::string& filename) {
 	if (!std::filesystem::exists(filename))
 	{
-		throw std::runtime_error(std::string("failed to find file! ").append(filename));
+		throw std::runtime_error(std::string("failed to find file! cwd: ") + std::filesystem::current_path().string() + ", " + filename + " -> " + std::filesystem::absolute(filename).string());
 	}
 
 	std::ifstream file(filename, std::ios::ate | std::ios::binary);
@@ -1131,8 +1131,8 @@ void RenderEngine::createRenderPass()
 void RenderEngine::createGraphicsPipeline()
 {
 	// get shader code after compilation
-	auto vertShaderCode = readFile("../Runtime/shaders/vert.spv");
-	auto fragShaderCode = readFile("../Runtime/shaders/frag.spv");
+	auto vertShaderCode = readFile("Assets/Shaders/vert.spv");
+	auto fragShaderCode = readFile("Assets/Shaders/frag.spv");
 
 	// create shader modules
 	VkShaderModule vertShaderModule = createShaderModule(vertShaderCode);

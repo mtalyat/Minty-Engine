@@ -45,12 +45,12 @@ namespace minty
 				std::cout << "Debug mode false" << std::endl;
 			}
 
-			//GameEngine engine;
+			GameEngine engine;
 
 			//// TODO: load game
 
-			//// run in engine
-			//engine.run();
+			// run in engine
+			engine.run();
 		}
 	};
 }
