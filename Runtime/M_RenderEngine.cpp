@@ -63,9 +63,9 @@ RenderEngine::~RenderEngine()
 	cleanup();
 }
 
-void RenderEngine::run()
+void RenderEngine::renderFrame()
 {
-	mainLoop();
+	drawFrame();
 }
 
 bool RenderEngine::isRunning()
@@ -520,7 +520,7 @@ void RenderEngine::createImageViews()
 void RenderEngine::createSurface()
 {
 	// create window surface
-	if (glfwCreateWindowSurface(instance, (GLFWwindow*)_window, nullptr, &surface) != VK_SUCCESS) {
+	if (glfwCreateWindowSurface(instance, _window->getRaw(), nullptr, &surface) != VK_SUCCESS) {
 		throw std::runtime_error("Failed to create window surface.");
 	}
 }
@@ -673,9 +673,9 @@ void RenderEngine::recreateSwapChain()
 {
 	// on window minimize, pause program until un-minimized
 	int width = 0, height = 0;
-	_window->getFramebufferSize(width, height);
+	_window->getFramebufferSize(&width, &height);
 	while (width == 0 || height == 0) {
-		_window->getFramebufferSize(width, height);
+		_window->getFramebufferSize(&width, &height);
 		glfwWaitEvents();
 	}
 
@@ -697,7 +697,7 @@ VkExtent2D RenderEngine::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabi
 	}
 	else {
 		int width, height;
-		_window->getFramebufferSize(width, height);
+		_window->getFramebufferSize(&width, &height);
 
 		VkExtent2D actualExtent = {
 			static_cast<uint32_t>(width),
@@ -858,19 +858,6 @@ void RenderEngine::createLogicalDevice()
 
 	vkGetDeviceQueue(device, indices.graphicsFamily.value(), 0, &graphicsQueue);
 	vkGetDeviceQueue(device, indices.presentFamily.value(), 0, &presentQueue);
-}
-
-void RenderEngine::mainLoop()
-{
-	// keep looping while window should be open
-	while (_window->isOpen())
-	{
-		glfwPollEvents();
-		drawFrame();
-	}
-
-	// wait for logical device to finish rendering before closing program
-	vkDeviceWaitIdle(device);
 }
 
 void RenderEngine::drawFrame()
@@ -1752,6 +1739,9 @@ void RenderEngine::createSyncObjects()
 
 void RenderEngine::cleanup()
 {
+	// wait for logical device to finish rendering before closing program
+	vkDeviceWaitIdle(device);
+
 	// clean up vulkan
 	cleanupSwapChain();
 	vkDestroySampler(device, textureSampler, nullptr);

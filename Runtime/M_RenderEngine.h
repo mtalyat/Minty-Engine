@@ -108,8 +108,15 @@ namespace minty
 
 		~RenderEngine();
 
-		void run();
+		/// <summary>
+		/// Draws a frame to the screen.
+		/// </summary>
+		void renderFrame();
 
+		/// <summary>
+		/// Checks if the render engine is still running.
+		/// </summary>
+		/// <returns>True if the engine is still running.</returns>
 		bool isRunning();
 	private:
 		Window* _window;
@@ -352,11 +359,6 @@ namespace minty
 		/// Pick the software side of the GPU to use (driver).
 		/// </summary>
 		void createLogicalDevice();
-
-		/// <summary>
-		/// The main rendering loop.
-		/// </summary>
-		void mainLoop();
 
 		/// <summary>
 		/// Draw a single frame to the screen.

@@ -2,6 +2,7 @@
 #include "M_GameEngine.h"
 
 #include "M_RenderEngine.h"
+#include <iostream>
 
 using namespace minty;
 
@@ -18,5 +19,13 @@ GameEngine::~GameEngine()
 void GameEngine::run()
 {
 	RenderEngine engine;
-	engine.run();
+
+	while (engine.isRunning())
+	{
+		glfwPollEvents();
+		engine.renderFrame();
+	}
+
+	std::string str;
+	std::getline(std::cin, str);
 }

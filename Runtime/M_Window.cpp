@@ -53,9 +53,14 @@ bool minty::Window::isOpen() const
 	return !glfwWindowShouldClose(_window);
 }
 
-void minty::Window::getFramebufferSize(int& width, int& height) const
+void minty::Window::getFramebufferSize(int* const width, int* const height) const
 {
-	glfwGetFramebufferSize(_window, &width, &height);
+	glfwGetFramebufferSize(_window, width, height);
+}
+
+GLFWwindow* minty::Window::getRaw() const
+{
+	return _window;
 }
 
 void Window::resizeCallback(GLFWwindow* const window, int const width, int const height)

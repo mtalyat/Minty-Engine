@@ -32,9 +32,18 @@ namespace minty
 		/// <returns>True if the Window is not closed.</returns>
 		bool isOpen() const;
 
-		void getFramebufferSize(int& width, int& height) const;
+		/// <summary>
+		/// Gets the size of the Window, in pixels.
+		/// </summary>
+		/// <param name="width">The width in pixels.</param>
+		/// <param name="height">The height in pixels.</param>
+		void getFramebufferSize(int* const width, int* const height) const;
 
-		operator GLFWwindow* () const { return _window; }
+		/// <summary>
+		/// Gets the raw GLFWwindow component.
+		/// </summary>
+		/// <returns>The raw window.</returns>
+		GLFWwindow* getRaw() const;
 
 	private:
 		static void resizeCallback(GLFWwindow* const window, int const width, int const height);

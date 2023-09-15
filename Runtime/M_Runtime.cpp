@@ -47,10 +47,10 @@ int Runtime::run(int argc, char const* argv[])
 		std::cout << "Debug mode false" << std::endl;
 	}
 
-	GameEngine engine;
-
 	try
 	{
+		GameEngine engine;
+
 		// TODO: load game
 
 		engine.run();

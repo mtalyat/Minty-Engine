@@ -82,17 +82,18 @@ void Application::run(int argc, char const* argv[])
 
 		// print commands
 		std::cout << std::endl <<
-			"_____________ Commands _____________" << std::endl <<
-			"debug ........ set config to debug" << std::endl <<
-			"release ...... set config to release" << std::endl <<
-			"clean ........ clean project" << std::endl <<
-			"build ........ build the project" << std::endl <<
-			"rebuild ...... clean and build" << std::endl <<
-			"run .......... run the executable" << std::endl <<
-			"rerun ........ build and run" << std::endl <<
-			"all .......... clean, build, and run" << std::endl <<
-			"quit ......... quit the program" << std::endl <<
-			"____________________________________" << std::endl << std::endl;
+			" ______________ Commands ______________ " << std::endl <<
+			"| test ......... test run the runtime  |" << std::endl <<
+			"| debug ........ set config to debug   |" << std::endl <<
+			"| release ...... set config to release |" << std::endl <<
+			"| clean ........ clean project         |" << std::endl <<
+			"| build ........ build the project     |" << std::endl <<
+			"| rebuild ...... clean and build       |" << std::endl <<
+			"| run .......... run the executable    |" << std::endl <<
+			"| rerun ........ build and run         |" << std::endl <<
+			"| all .......... clean, build, and run |" << std::endl <<
+			"| quit ......... quit the program      |" << std::endl <<
+			"|______________________________________|" << std::endl << std::endl;
 		std::string command;
 		std::getline(std::cin, command);
 		std::vector<std::string> commands = splitString(command);
@@ -108,7 +109,21 @@ void Application::run(int argc, char const* argv[])
 		// run commands
 		for (std::string const& c : commands)
 		{
-			if (c.compare("debug") == 0)
+			if (c.compare("test") == 0)
+			{
+				// pass in executable name, then project name
+				char path[256];
+				strcpy_s(path, info.project.getBasePath().c_str());
+				char const* runtimeArgs[2]
+				{
+					argv[0],
+					path
+				};
+
+				Runtime runtime;
+				runtime.run(2, runtimeArgs);
+			}
+			else if (c.compare("debug") == 0)
 			{
 				if (!info.debug)
 				{
