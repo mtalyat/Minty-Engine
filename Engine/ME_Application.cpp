@@ -146,23 +146,32 @@ void Application::run_command(std::string const& cmd)
 	// print file contents as a different color
 	
 	std::string result;
+	bool changeColor = true;
 	while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
 		//result += buffer.data();
 		//std::cout << buffer.data();
 		result = buffer.data();
 
-		if (result.find("error") != std::string::npos)
+		if (changeColor)
 		{
-			std::cout << "\033[31;40m"; // red
-		} else if (result.find("warning") != std::string::npos)
-		{
-			std::cout << "\033[33;40m"; // yellow
+			if (result.find("error") != std::string::npos)
+			{
+				std::cout << "\033[31;40m"; // red
+			}
+			else if (result.find("warning") != std::string::npos)
+			{
+				std::cout << "\033[33;40m"; // yellow
+			}
+			else
+			{
+				std::cout << "\033[90;40m"; // gray
+			}
 		}
-		else
-		{
-			std::cout << "\033[90;40m"; // gray
-		}
+		
 		std::cout << result;
+
+		// if newline, it was the end of the inputted line, so update the color for the next line
+		changeColor = result.ends_with('\n');
 	}
 	// reset colors and add newline
 	std::cout << "\033[0m";

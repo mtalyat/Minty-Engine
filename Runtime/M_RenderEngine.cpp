@@ -1237,13 +1237,13 @@ void RenderEngine::createGraphicsPipeline()
 		.depthClampEnable = VK_FALSE, // if true, near and var fragments are clamped instead of discarded
 		.rasterizerDiscardEnable = VK_FALSE, // if true, disables geometry shader, so nothing goes through the framebuffer
 		.polygonMode = VK_POLYGON_MODE_FILL, // fill polygon area with fragments (can also do line or point mode for frames/points)
-		// .lineWidth = 1.0f, // use with anything other than fill
 		.cullMode = VK_CULL_MODE_BACK_BIT, // cull back faces
 		.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE, // how to determine front face/direction to rotate around on triangle vertices
 		.depthBiasEnable = VK_FALSE,
 		.depthBiasConstantFactor = 0.0f, // Optional
 		.depthBiasClamp = 0.0f, // Optional
 		.depthBiasSlopeFactor = 0.0f, // Optional
+		.lineWidth = 1.0f, // use with anything other than fill
 	};
 
 	// multisampling
