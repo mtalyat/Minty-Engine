@@ -88,28 +88,51 @@ void RenderEngine::initWindow()
 
 void RenderEngine::initVulkan()
 {
+	//std::cout << "initVulkan: createInstance" << std::endl;
 	createInstance();
+	//std::cout << "initVulkan: setupDebugMessenger" << std::endl;
 	setupDebugMessenger();
+	//std::cout << "initVulkan: createSurface" << std::endl;
 	createSurface();
+	//std::cout << "initVulkan: pickPhysicalDevice" << std::endl;
 	pickPhysicalDevice();
+	//std::cout << "initVulkan: createLogicalDevice" << std::endl;
 	createLogicalDevice();
+	//std::cout << "initVulkan: createSwapChain" << std::endl;
 	createSwapChain();
+	//std::cout << "initVulkan: createImageViews" << std::endl;
 	createImageViews();
+	//std::cout << "initVulkan: createRenderPass" << std::endl;
 	createRenderPass();
+	//std::cout << "initVulkan: createDescriptorSetLayout" << std::endl;
 	createDescriptorSetLayout();
+	//std::cout << "initVulkan: createGraphicsPipeline" << std::endl;
 	createGraphicsPipeline();
+	//std::cout << "initVulkan: createCommandPool" << std::endl;
 	createCommandPool();
+	//std::cout << "initVulkan: createDepthResources" << std::endl;
 	createDepthResources();
+	//std::cout << "initVulkan: createFramebuffers" << std::endl;
 	createFramebuffers();
+	//std::cout << "initVulkan: createTextureImage" << std::endl;
 	createTextureImage();
+	//std::cout << "initVulkan: createTextureImageView" << std::endl;
 	createTextureImageView();
+	//std::cout << "initVulkan: createTextureSampler" << std::endl;
 	createTextureSampler();
+	//std::cout << "initVulkan: createVertexBuffer" << std::endl;
 	createVertexBuffer();
+	//std::cout << "initVulkan: createIndexBuffer" << std::endl;
 	createIndexBuffer();
+	//std::cout << "initVulkan: createUniformBuffers" << std::endl;
 	createUniformBuffers();
+	//std::cout << "initVulkan: createDescriptorPool" << std::endl;
 	createDescriptorPool();
+	//std::cout << "initVulkan: createDescriptorSets" << std::endl;
 	createDescriptorSets();
+	//std::cout << "initVulkan: createCommandBuffers" << std::endl;
 	createCommandBuffers();
+	//std::cout << "initVulkan: createSyncObjects" << std::endl;
 	createSyncObjects();
 }
 
@@ -1013,7 +1036,27 @@ void RenderEngine::setupDebugMessenger() {
 }
 
 VKAPI_ATTR VkBool32 VKAPI_CALL RenderEngine::debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData) {
+	// change colors based on severity
+	if (messageSeverity & VkDebugUtilsMessageSeverityFlagBitsEXT::VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
+	{
+		std::cout << "\033[31;40m"; // red
+	}
+	else if (messageSeverity & VkDebugUtilsMessageSeverityFlagBitsEXT::VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
+	{
+		std::cout << "\033[33;40m"; // yellow
+	}
+	else if (messageSeverity & VkDebugUtilsMessageSeverityFlagBitsEXT::VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT)
+	{
+		std::cout << "\033[37;40m"; // white
+	}
+	else
+	{
+		std::cout << "\033[90;40m"; // gray
+	}
+	
 	std::cerr << "validation layer: " << pCallbackData->pMessage << std::endl;
+
+	std::cerr << "\033[0m"; // reset to white
 
 	return VK_FALSE;
 }
@@ -1026,7 +1069,8 @@ std::vector<char> RenderEngine::readFile(const std::string& filename) {
 
 	std::ifstream file(filename, std::ios::ate | std::ios::binary);
 
-	if (!file.is_open()) {
+	if (!file.is_open())
+	{
 		throw std::runtime_error("failed to open file!");
 	}
 

@@ -39,8 +39,10 @@ Application::Application()
 void Application::run(int argc, char const* argv[])
 {
 	std::cout << "Enter path to project: " << std::endl;
-	std::string path;
-	std::getline(std::cin, path);
+	//std::string path;
+	//std::getline(std::cin, path);
+	std::string path = "C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject"; // hard coded for now, for testing purposes only
+	std::cout << path << std::endl;
 	path = std::filesystem::absolute(path).string();
 
 	// if folder does not exist, do nothing
@@ -51,12 +53,12 @@ void Application::run(int argc, char const* argv[])
 	}
 
 	// set current working directory to project folder
-	std::filesystem::current_path(path);
+	//std::filesystem::current_path(path);
 
 	bool running = true;
 	while (running)
 	{
-		std::cout << std::endl << "Enter command(s): (clean | build | rebuild | run | all | quit)" << std::endl;
+		std::cout << std::endl << "Enter command(s): (clean | build | rebuild | run | rerun | all | quit)" << std::endl;
 		std::string command;
 		std::getline(std::cin, command);
 		std::vector<std::string> commands = split_string(command);
@@ -84,8 +86,19 @@ void Application::run(int argc, char const* argv[])
 				build(project);
 
 			}
+			else if (c.compare("rebuild") == 0)
+			{
+				clean(project);
+				build(project);
+
+			}
 			else if (c.compare("run") == 0)
 			{
+				run(project);
+			}
+			else if (c.compare("rerun") == 0)
+			{
+				build(project);
 				run(project);
 			}
 			else if(c.compare("all") == 0)
@@ -105,9 +118,6 @@ void Application::run(int argc, char const* argv[])
 			}
 		}
 	}
-
-	minty::Runtime runtime;
-	runtime.run(argc, argv);
 }
 
 void Application::clean(Project const& project)
