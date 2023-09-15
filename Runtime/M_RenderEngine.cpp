@@ -88,28 +88,51 @@ void RenderEngine::initWindow()
 
 void RenderEngine::initVulkan()
 {
+	//std::cout << "initVulkan: createInstance" << std::endl;
 	createInstance();
+	//std::cout << "initVulkan: setupDebugMessenger" << std::endl;
 	setupDebugMessenger();
+	//std::cout << "initVulkan: createSurface" << std::endl;
 	createSurface();
+	//std::cout << "initVulkan: pickPhysicalDevice" << std::endl;
 	pickPhysicalDevice();
+	//std::cout << "initVulkan: createLogicalDevice" << std::endl;
 	createLogicalDevice();
+	//std::cout << "initVulkan: createSwapChain" << std::endl;
 	createSwapChain();
+	//std::cout << "initVulkan: createImageViews" << std::endl;
 	createImageViews();
+	//std::cout << "initVulkan: createRenderPass" << std::endl;
 	createRenderPass();
+	//std::cout << "initVulkan: createDescriptorSetLayout" << std::endl;
 	createDescriptorSetLayout();
+	//std::cout << "initVulkan: createGraphicsPipeline" << std::endl;
 	createGraphicsPipeline();
+	//std::cout << "initVulkan: createCommandPool" << std::endl;
 	createCommandPool();
+	//std::cout << "initVulkan: createDepthResources" << std::endl;
 	createDepthResources();
+	//std::cout << "initVulkan: createFramebuffers" << std::endl;
 	createFramebuffers();
+	//std::cout << "initVulkan: createTextureImage" << std::endl;
 	createTextureImage();
+	//std::cout << "initVulkan: createTextureImageView" << std::endl;
 	createTextureImageView();
+	//std::cout << "initVulkan: createTextureSampler" << std::endl;
 	createTextureSampler();
+	//std::cout << "initVulkan: createVertexBuffer" << std::endl;
 	createVertexBuffer();
+	//std::cout << "initVulkan: createIndexBuffer" << std::endl;
 	createIndexBuffer();
+	//std::cout << "initVulkan: createUniformBuffers" << std::endl;
 	createUniformBuffers();
+	//std::cout << "initVulkan: createDescriptorPool" << std::endl;
 	createDescriptorPool();
+	//std::cout << "initVulkan: createDescriptorSets" << std::endl;
 	createDescriptorSets();
+	//std::cout << "initVulkan: createCommandBuffers" << std::endl;
 	createCommandBuffers();
+	//std::cout << "initVulkan: createSyncObjects" << std::endl;
 	createSyncObjects();
 }
 
@@ -250,7 +273,7 @@ void RenderEngine::createImage(uint32_t width, uint32_t height, VkFormat format,
 
 void RenderEngine::createTextureImage() {
 	int texWidth, texHeight, texChannels;
-	stbi_uc* pixels = stbi_load("../Runtime/textures/texture.jpg", &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
+	stbi_uc* pixels = stbi_load("Assets/Textures/texture.jpg", &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
 	VkDeviceSize imageSize = texWidth * texHeight * 4;
 
 	if (!pixels) {
@@ -1013,7 +1036,27 @@ void RenderEngine::setupDebugMessenger() {
 }
 
 VKAPI_ATTR VkBool32 VKAPI_CALL RenderEngine::debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData) {
+	// change colors based on severity
+	if (messageSeverity & VkDebugUtilsMessageSeverityFlagBitsEXT::VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
+	{
+		std::cout << "\033[31;40m"; // red
+	}
+	else if (messageSeverity & VkDebugUtilsMessageSeverityFlagBitsEXT::VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
+	{
+		std::cout << "\033[33;40m"; // yellow
+	}
+	else if (messageSeverity & VkDebugUtilsMessageSeverityFlagBitsEXT::VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT)
+	{
+		std::cout << "\033[37;40m"; // white
+	}
+	else
+	{
+		std::cout << "\033[90;40m"; // gray
+	}
+	
 	std::cerr << "validation layer: " << pCallbackData->pMessage << std::endl;
+
+	std::cerr << "\033[0m"; // reset to white
 
 	return VK_FALSE;
 }
@@ -1021,12 +1064,13 @@ VKAPI_ATTR VkBool32 VKAPI_CALL RenderEngine::debugCallback(VkDebugUtilsMessageSe
 std::vector<char> RenderEngine::readFile(const std::string& filename) {
 	if (!std::filesystem::exists(filename))
 	{
-		throw std::runtime_error(std::string("failed to find file! ").append(filename));
+		throw std::runtime_error(std::string("failed to find file! cwd: ") + std::filesystem::current_path().string() + ", " + filename + " -> " + std::filesystem::absolute(filename).string());
 	}
 
 	std::ifstream file(filename, std::ios::ate | std::ios::binary);
 
-	if (!file.is_open()) {
+	if (!file.is_open())
+	{
 		throw std::runtime_error("failed to open file!");
 	}
 
@@ -1131,8 +1175,8 @@ void RenderEngine::createRenderPass()
 void RenderEngine::createGraphicsPipeline()
 {
 	// get shader code after compilation
-	auto vertShaderCode = readFile("../Runtime/shaders/vert.spv");
-	auto fragShaderCode = readFile("../Runtime/shaders/frag.spv");
+	auto vertShaderCode = readFile("Assets/Shaders/vert.spv");
+	auto fragShaderCode = readFile("Assets/Shaders/frag.spv");
 
 	// create shader modules
 	VkShaderModule vertShaderModule = createShaderModule(vertShaderCode);
@@ -1237,13 +1281,13 @@ void RenderEngine::createGraphicsPipeline()
 		.depthClampEnable = VK_FALSE, // if true, near and var fragments are clamped instead of discarded
 		.rasterizerDiscardEnable = VK_FALSE, // if true, disables geometry shader, so nothing goes through the framebuffer
 		.polygonMode = VK_POLYGON_MODE_FILL, // fill polygon area with fragments (can also do line or point mode for frames/points)
-		// .lineWidth = 1.0f, // use with anything other than fill
 		.cullMode = VK_CULL_MODE_BACK_BIT, // cull back faces
 		.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE, // how to determine front face/direction to rotate around on triangle vertices
 		.depthBiasEnable = VK_FALSE,
 		.depthBiasConstantFactor = 0.0f, // Optional
 		.depthBiasClamp = 0.0f, // Optional
 		.depthBiasSlopeFactor = 0.0f, // Optional
+		.lineWidth = 1.0f, // use with anything other than fill
 	};
 
 	// multisampling
