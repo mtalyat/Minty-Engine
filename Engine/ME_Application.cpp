@@ -56,9 +56,19 @@ void Application::run(int argc, char const* argv[])
 	//std::filesystem::current_path(path);
 
 	bool running = true;
+	bool debug = true; // debug by default
 	while (running)
 	{
-		std::cout << std::endl << "Enter command(s): (clean | build | rebuild | run | rerun | all | quit)" << std::endl;
+		std::cout << std::endl << "Enter command(s):" << std::endl <<
+			"debug ........ set debug mode true" << std::endl <<
+			"release ...... set debug mode false" << std::endl <<
+			"clean ........ clean project" << std::endl <<
+			"build ........ build the project" << std::endl <<
+			"rebuild ...... clean and build" << std::endl <<
+			"run .......... run the executable" << std::endl <<
+			"rerun ........ build and run" << std::endl <<
+			"all .......... clean, build, and run" << std::endl <<
+			"quit ......... quit the program" << std::endl;
 		std::string command;
 		std::getline(std::cin, command);
 		std::vector<std::string> commands = split_string(command);
@@ -77,7 +87,15 @@ void Application::run(int argc, char const* argv[])
 		// run commands
 		for (std::string const& c : commands)
 		{
-			if (c.compare("clean") == 0)
+			if (c.compare("debug") == 0)
+			{
+				debug = true;
+			}
+			else if (c.compare("release") == 0)
+			{
+				debug = false;
+			} 
+			else if (c.compare("clean") == 0)
 			{
 				clean(project);
 			}
