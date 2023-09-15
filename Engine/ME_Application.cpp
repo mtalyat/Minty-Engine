@@ -6,6 +6,10 @@
 #include <cstring>
 #include <cstdlib>
 #include <string>
+#include <filesystem> // for accessing file system
+#include <fstream> // for accessing files
+#include <chrono> // for time
+#include <format>
 
 #include <cstdio>
 //#include <iostream>
@@ -15,13 +19,14 @@
 #include <array>
 
 #define CMAKE_PATH "C:/Users/mitch/source/repos/Minty-Engine/Engine/cmake/bin/cmake.exe"
-#define EXE_NAME "MyProgram.exe"
+#define APPLICATION_NAME "TestProject"
+#define EXE_NAME std::string(APPLICATION_NAME).append(".exe")
 
 using namespace mintye;
 using namespace minty;
 
 // A quick way to split strings separated via spaces.
-std::vector<std::string> split_string(std::string s)
+std::vector<std::string> splitString(std::string s)
 {
 	std::stringstream ss(s);
 	std::string word;
@@ -55,11 +60,15 @@ void Application::run(int argc, char const* argv[])
 	// create new project with path
 	minty::Project project(path);
 
+	// create info for commands
 	Info info
 	{
 		.project = project,
 		.debug = true, // debug by default
 	};
+
+	// create cmake file for building and other commands
+	generate_cmake(info);
 
 	// set current working directory to project folder
 	//std::filesystem::current_path(path);
@@ -67,19 +76,26 @@ void Application::run(int argc, char const* argv[])
 	bool running = true;
 	while (running)
 	{
-		std::cout << std::endl << "Enter command(s):" << std::endl <<
-			"debug ........ set debug mode true" << std::endl <<
-			"release ...... set debug mode false" << std::endl <<
+		// print info
+		std::cout << std::endl << "Info:" << std::endl <<
+			"Config: " << info.getConfig() << std::endl;
+
+		// print commands
+		std::cout << std::endl <<
+			"_____________ Commands _____________" << std::endl <<
+			"debug ........ set config to debug" << std::endl <<
+			"release ...... set config to release" << std::endl <<
 			"clean ........ clean project" << std::endl <<
 			"build ........ build the project" << std::endl <<
 			"rebuild ...... clean and build" << std::endl <<
 			"run .......... run the executable" << std::endl <<
 			"rerun ........ build and run" << std::endl <<
 			"all .......... clean, build, and run" << std::endl <<
-			"quit ......... quit the program" << std::endl;
+			"quit ......... quit the program" << std::endl <<
+			"____________________________________" << std::endl << std::endl;
 		std::string command;
 		std::getline(std::cin, command);
-		std::vector<std::string> commands = split_string(command);
+		std::vector<std::string> commands = splitString(command);
 		
 		if (commands.size() == 0)
 		{
@@ -94,11 +110,23 @@ void Application::run(int argc, char const* argv[])
 		{
 			if (c.compare("debug") == 0)
 			{
-				info.debug = true;
+				if (!info.debug)
+				{
+					info.debug = true;
+
+					// regenrate cmake file
+					generate_cmake(info);
+				}
 			}
 			else if (c.compare("release") == 0)
 			{
-				info.debug = false;
+				if (info.debug)
+				{
+					info.debug = false;
+
+					// regenerate cmake file
+					generate_cmake(info);
+				}
 			} 
 			else if (c.compare("clean") == 0)
 			{
@@ -142,6 +170,38 @@ void Application::run(int argc, char const* argv[])
 	}
 }
 
+void Application::generate_cmake(Info const& info)
+{
+	// get path to cmake file
+	std::string path = (std::filesystem::path(info.project.getBuildPath()) / "CMakeLists.txt").string();
+
+	// open file to overwrite
+	std::ofstream file(path, std::ios::trunc);
+
+	// if not open, error
+	if (!file.is_open())
+	{
+		std::cerr << "could not open cmake file: " << path << std::endl;
+		return;
+	}
+
+	// get timestamp
+	const auto now = std::chrono::system_clock::now();
+
+	// write contents
+	file <<
+		"# " << std::format("{:%Y-%m-%d %H:%M:%OS}", now) << std::endl <<
+		"cmake_minimum_required(VERSION 3.16)" << std::endl <<
+		"project(" << APPLICATION_NAME << " LANGUAGES CXX)" << std::endl <<
+		"set(CMAKE_CXX_STANDARD 20)" << std::endl <<
+		"set(CMAKE_CXX_STANDARD_REQUIRED ON)" << std::endl <<
+		"set(CMAKE_CXX_EXTENSIONS OFF)" << std::endl <<
+		"set(CMAKE_EXE_LINKER_FLAGS /NODEFAULTLIB:\\\"MSVCRT\\\")" << std::endl <<
+		"add_executable(${PROJECT_NAME} main.cpp)" << std::endl <<
+		"target_include_directories(${PROJECT_NAME} PUBLIC C:/Users/mitch/source/repos/Minty-Engine/Runtime)" << std::endl <<
+		"target_link_libraries(${PROJECT_NAME} C:/Users/mitch/source/repos/Minty-Engine/Runtime/x64/" << info.getConfig() << "/MintyRuntime.lib)" << std::endl;
+}
+
 void Application::clean(Info const& info)
 {
 	// clean the build
@@ -156,13 +216,13 @@ void Application::build(Info const& info)
 	run_command(command + " .");
 
 	// build program
-	run_command(command + " --build . --config Debug");
+	run_command(command + " --build . --config " + info.getConfig());
 }
 
 void Application::run(Info const& info)
 {
 	// call executable, pass in project path as argument for the runtime, so it knows what to run
-	run_command("cd " + info.project.getBuildPath() + " && cd Debug && start " + EXE_NAME + " " + info.project.getBasePath());
+	run_command("cd " + info.project.getBuildPath() + " && cd " + info.getConfig() + " && start " + EXE_NAME + " " + info.project.getBasePath());
 }
 
 //https://stackoverflow.com/questions/478898/how-do-i-execute-a-command-and-get-the-output-of-the-command-within-c-using-po
