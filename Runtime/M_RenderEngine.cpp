@@ -68,22 +68,18 @@ void RenderEngine::run()
 	mainLoop();
 }
 
+bool RenderEngine::isRunning()
+{
+	return _window->isOpen();
+}
+
 void RenderEngine::initWindow()
 {
 	// init GLFW
 	glfwInit();
 
-	// do not use OpenGL
-	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-
-	// resizability
-	glfwWindowHint(GLFW_RESIZABLE, GLFW_TRUE);
-
-	// create window
-	window = glfwCreateWindow(WIDTH, HEIGHT, "Vulkan", nullptr, nullptr);
-
-	// set a callback for when the window is resized
-	glfwSetFramebufferSizeCallback(window, framebufferResizeCallback);
+	// init window
+	_window = new Window("Minty", WIDTH, HEIGHT);
 }
 
 void RenderEngine::initVulkan()
@@ -134,16 +130,6 @@ void RenderEngine::initVulkan()
 	createCommandBuffers();
 	//std::cout << "initVulkan: createSyncObjects" << std::endl;
 	createSyncObjects();
-}
-
-void RenderEngine::framebufferResizeCallback(GLFWwindow* window, int width, int height)
-{
-	// check if resized, and set value if it has been resized
-	auto app = reinterpret_cast<RenderEngine*>(glfwGetWindowUserPointer(window));
-	if (app)
-	{
-		app->framebufferResized = true;
-	}
 }
 
 void RenderEngine::createInstance()
@@ -534,7 +520,7 @@ void RenderEngine::createImageViews()
 void RenderEngine::createSurface()
 {
 	// create window surface
-	if (glfwCreateWindowSurface(instance, window, nullptr, &surface) != VK_SUCCESS) {
+	if (glfwCreateWindowSurface(instance, (GLFWwindow*)_window, nullptr, &surface) != VK_SUCCESS) {
 		throw std::runtime_error("Failed to create window surface.");
 	}
 }
@@ -687,9 +673,9 @@ void RenderEngine::recreateSwapChain()
 {
 	// on window minimize, pause program until un-minimized
 	int width = 0, height = 0;
-	glfwGetFramebufferSize(window, &width, &height);
+	_window->getFramebufferSize(width, height);
 	while (width == 0 || height == 0) {
-		glfwGetFramebufferSize(window, &width, &height);
+		_window->getFramebufferSize(width, height);
 		glfwWaitEvents();
 	}
 
@@ -711,7 +697,7 @@ VkExtent2D RenderEngine::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabi
 	}
 	else {
 		int width, height;
-		glfwGetFramebufferSize(window, &width, &height);
+		_window->getFramebufferSize(width, height);
 
 		VkExtent2D actualExtent = {
 			static_cast<uint32_t>(width),
@@ -877,7 +863,7 @@ void RenderEngine::createLogicalDevice()
 void RenderEngine::mainLoop()
 {
 	// keep looping while window should be open
-	while (!glfwWindowShouldClose(window))
+	while (_window->isOpen())
 	{
 		glfwPollEvents();
 		drawFrame();
@@ -1766,6 +1752,7 @@ void RenderEngine::createSyncObjects()
 
 void RenderEngine::cleanup()
 {
+	// clean up vulkan
 	cleanupSwapChain();
 	vkDestroySampler(device, textureSampler, nullptr);
 	vkDestroyImageView(device, textureImageView, nullptr);
@@ -1781,7 +1768,6 @@ void RenderEngine::cleanup()
 	vkFreeMemory(device, indexBufferMemory, nullptr);
 	vkDestroyBuffer(device, vertexBuffer, nullptr);
 	vkFreeMemory(device, vertexBufferMemory, nullptr);
-	// clean up vulkan
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
 		vkDestroySemaphore(device, renderFinishedSemaphores[i], nullptr);
 		vkDestroySemaphore(device, imageAvailableSemaphores[i], nullptr);
@@ -1795,8 +1781,7 @@ void RenderEngine::cleanup()
 	vkDestroySurfaceKHR(instance, surface, nullptr);
 	vkDestroyInstance(instance, nullptr);
 
-	// destroy window
-	glfwDestroyWindow(window);
+	delete _window;
 
 	// close GLFW
 	glfwTerminate();

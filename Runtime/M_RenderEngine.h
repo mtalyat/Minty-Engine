@@ -2,6 +2,8 @@
 
 // Graphics pipeline: https://vulkan-tutorial.com/en/Drawing_a_triangle/Graphics_pipeline_basics/Introduction
 
+#include "M_Window.h"
+
 //#include <vulkan/vulkan.h>
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -107,8 +109,10 @@ namespace minty
 		~RenderEngine();
 
 		void run();
+
+		bool isRunning();
 	private:
-		GLFWwindow* window;
+		Window* _window;
 
 		VkInstance instance;
 		VkDebugUtilsMessengerEXT debugMessenger;
@@ -160,14 +164,6 @@ namespace minty
 		/// Initializes the Vulkan framework and all necessary components to render things to the window.
 		/// </summary>
 		void initVulkan();
-
-		/// <summary>
-		/// Called when the framebuffer has been resizes, eg. when the window is resized, minimizes, maximized, etc.
-		/// </summary>
-		/// <param name="window">The GLFW window that was resized.</param>
-		/// <param name="width">The new width.</param>
-		/// <param name="height">The new height.</param>
-		static void framebufferResizeCallback(GLFWwindow* window, int width, int height);
 
 		/// <summary>
 		/// Creates a Vulkan instance.
