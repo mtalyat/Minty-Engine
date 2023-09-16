@@ -233,7 +233,8 @@ void RenderEngine::createImage(uint32_t width, uint32_t height, VkFormat format,
 
 void RenderEngine::createTextureImage()
 {
-	_texture = Texture::load("Assets/Textures/texture.jpg", *this);
+	_texture = Texture::load("Assets/Textures/cube.png", *this);
+	//_texture = Texture::load("Assets/Textures/texture.jpg", *this);
 }
 
 VkImageView RenderEngine::createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags) {
@@ -260,8 +261,10 @@ void RenderEngine::createTextureSampler()
 {
 	VkSamplerCreateInfo samplerInfo{};
 	samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-	samplerInfo.magFilter = VK_FILTER_LINEAR;
-	samplerInfo.minFilter = VK_FILTER_LINEAR;
+	samplerInfo.magFilter = VK_FILTER_NEAREST;
+	samplerInfo.minFilter = VK_FILTER_NEAREST;
+	//samplerInfo.magFilter = VK_FILTER_LINEAR;
+	//samplerInfo.minFilter = VK_FILTER_LINEAR;
 
 	// how to draw if size is too small or big, etc.
 	samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
@@ -877,7 +880,7 @@ void RenderEngine::drawFrame()
 		recreateSwapChain();
 	}
 	else if (result != VK_SUCCESS) {
-		throw std::runtime_error("failed to present swap chain _image!");
+		throw std::runtime_error("failed to present swap chain image!");
 	}
 
 	// move to next frame
@@ -1362,8 +1365,8 @@ void RenderEngine::updateUniformBuffer(uint32_t currentImage)
 
 	// set uniform values
 	UniformBufferObject ubo{};
-	ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 0.0f, 1.0f));
-	ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 0.0f, 1.0f));
+	ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	ubo.proj = glm::perspective(glm::radians(45.0f), swapChainExtent.width / (float)swapChainExtent.height, 0.1f, 10.0f);
 	ubo.proj[1][1] *= -1; // flip upside down, since OpenGL is opposite of Vulkan
 

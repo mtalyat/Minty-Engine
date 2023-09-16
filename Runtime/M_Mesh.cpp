@@ -107,49 +107,88 @@ minty::Mesh minty::Mesh::createCube(RenderEngine& engine)
 
 	glm::vec3 color = { 1.0f, 1.0f, 1.0f };
 
-	glm::vec2 topLeft = { 0.0f, 0.0f };
-	glm::vec2 topRight = { 1.0f, 0.0f };
-	glm::vec2 bottomLeft = { 0.0f, 1.0f };
-	glm::vec2 bottomRight = { 1.0f, 1.0f };
-
 	std::vector<Vertex> vertices =
 	{
 		// up?
-		{ leftTopBack, color, bottomLeft },
-		{ leftTopFront, color, topLeft },
-		{ rightTopFront, color, topRight },
-		{ rightTopBack, color, bottomRight },
+		{ leftTopBack, color, {0.25f, 0.25f} },
+		{ leftTopFront, color, {0.25f, 0.0f} },
+		{ rightTopFront, color,{0.5f, 0.0f} },
+		{ rightTopBack, color,  {0.5f, 0.25f}},
 
 		// down?
-		{ rightBottomBack, color, bottomLeft },
-		{ rightBottomFront, color, topLeft },
-		{ leftBottomFront, color, topRight },
-		{ leftBottomBack, color, bottomRight },
+		{ rightBottomBack, color, {0.25f, 0.5f} },
+		{ rightBottomFront, color, {0.25f, 0.25f} },
+		{ leftBottomFront, color, {0.5f, 0.25f} },
+		{ leftBottomBack, color, {0.5f, 0.5f} },
 
 		// right?
-		{ rightBottomBack, color, bottomLeft },
-		{ rightTopBack, color, topLeft },
-		{ rightTopFront, color, topRight },
-		{ rightBottomFront, color, bottomRight },
+		{ rightBottomBack, color, {0.0f, 0.25f} },
+		{ rightTopBack, color, {0.0f, 0.0f} },
+		{ rightTopFront, color, {0.25f, 0.0f} },
+		{ rightBottomFront, color, {0.25f, 0.25f} },
 
 		// left?
-		{ leftBottomFront, color, bottomLeft },
-		{ leftTopFront, color, topLeft },
-		{ leftTopBack, color, topRight },
-		{ leftBottomBack, color, bottomRight },
+		{ leftBottomFront, color, {0.0f, 0.5f} },
+		{ leftTopFront, color, {0.0f, 0.25f}},
+		{ leftTopBack, color, {0.25f, 0.25f} },
+		{ leftBottomBack, color, {0.25f, 0.5f} },
 
 		// front?
-		{ rightBottomFront, color, bottomLeft },
-		{ rightTopFront, color, topLeft },
-		{ leftTopFront, color, topRight },
-		{ leftBottomFront, color, bottomRight },
+		{ rightBottomFront, color, {0.5f, 0.25f} },
+		{ rightTopFront, color, {0.5f, 0.0f} },
+		{ leftTopFront, color, {0.75f, 0.0f} },
+		{ leftBottomFront, color, {0.75f, 0.25f} },
 
 		// back?
-		{ leftBottomBack, color, bottomLeft },
-		{ leftTopBack, color, topLeft },
-		{ rightTopBack, color, topRight },
-		{ rightBottomBack, color, bottomRight },
+		{ leftBottomBack, color, {0.5f, 0.5f} },
+		{ leftTopBack, color, {0.5f, 0.25f}},
+		{ rightTopBack, color, {0.75f, 0.25f} },
+		{ rightBottomBack, color, {0.75f, 0.5f} },
 	};
+
+	//glm::vec2 topLeft = { 0.0f, 0.0f };
+	//glm::vec2 topRight = { 1.0f, 0.0f };
+	//glm::vec2 bottomLeft = { 0.0f, 1.0f };
+	//glm::vec2 bottomRight = { 1.0f, 1.0f };
+
+	//std::vector<Vertex> vertices =
+	//{
+	//	// up?
+	//	{ leftTopBack, color, bottomLeft },
+	//	{ leftTopFront, color, topLeft },
+	//	{ rightTopFront, color, topRight },
+	//	{ rightTopBack, color, bottomRight },
+
+	//	// down?
+	//	{ rightBottomBack, color, bottomLeft },
+	//	{ rightBottomFront, color, topLeft },
+	//	{ leftBottomFront, color, topRight },
+	//	{ leftBottomBack, color, bottomRight },
+
+	//	// right?
+	//	{ rightBottomBack, color, bottomLeft },
+	//	{ rightTopBack, color, topLeft },
+	//	{ rightTopFront, color, topRight },
+	//	{ rightBottomFront, color, bottomRight },
+
+	//	// left?
+	//	{ leftBottomFront, color, bottomLeft },
+	//	{ leftTopFront, color, topLeft },
+	//	{ leftTopBack, color, topRight },
+	//	{ leftBottomBack, color, bottomRight },
+
+	//	// front?
+	//	{ rightBottomFront, color, bottomLeft },
+	//	{ rightTopFront, color, topLeft },
+	//	{ leftTopFront, color, topRight },
+	//	{ leftBottomFront, color, bottomRight },
+
+	//	// back?
+	//	{ leftBottomBack, color, bottomLeft },
+	//	{ leftTopBack, color, topLeft },
+	//	{ rightTopBack, color, topRight },
+	//	{ rightBottomBack, color, bottomRight },
+	//};
 
 	std::vector<uint16_t> indices =
 	{
