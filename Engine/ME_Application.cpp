@@ -67,8 +67,8 @@ void Application::run(int argc, char const* argv[])
 		.debug = true, // debug by default
 	};
 
-	// create cmake file for building and other commands
-	generate_cmake(info);
+	// create files that are needed to build and run
+	generate(info);
 
 	// set current working directory to project folder
 	//std::filesystem::current_path(path);
@@ -185,6 +185,12 @@ void Application::run(int argc, char const* argv[])
 	}
 }
 
+void Application::generate(Info const& info)
+{
+	generate_main(info);
+	generate_cmake(info);
+}
+
 void Application::generate_cmake(Info const& info)
 {
 	// get path to cmake file
@@ -196,7 +202,7 @@ void Application::generate_cmake(Info const& info)
 	// if not open, error
 	if (!file.is_open())
 	{
-		std::cerr << "could not open cmake file: " << path << std::endl;
+		std::cerr << "Could not open cmake file: " << path << std::endl;
 		return;
 	}
 
@@ -205,16 +211,60 @@ void Application::generate_cmake(Info const& info)
 
 	// write contents
 	file <<
+		// show generation time
 		"# " << std::format("{:%Y-%m-%d %H:%M:%OS}", now) << std::endl <<
+		// cmake version requirement
 		"cmake_minimum_required(VERSION 3.16)" << std::endl <<
+		// project name, c++ settings
 		"project(" << APPLICATION_NAME << " LANGUAGES CXX)" << std::endl <<
 		"set(CMAKE_CXX_STANDARD 20)" << std::endl <<
 		"set(CMAKE_CXX_STANDARD_REQUIRED ON)" << std::endl <<
-		"set(CMAKE_CXX_EXTENSIONS OFF)" << std::endl <<
-		"set(CMAKE_EXE_LINKER_FLAGS /NODEFAULTLIB:\\\"MSVCRT\\\")" << std::endl <<
+		"set(CMAKE_CXX_EXTENSIONS OFF)" << std::endl;
+
+	if (info.debug)
+	{
+		// only ignore if in debug mode
+		file << "set(CMAKE_EXE_LINKER_FLAGS /NODEFAULTLIB:\\\"LIBCMT\\\")" << std::endl;
+	}
+
+	file <<
 		"add_executable(${PROJECT_NAME} main.cpp)" << std::endl <<
-		"target_include_directories(${PROJECT_NAME} PUBLIC C:/Users/mitch/source/repos/Minty-Engine/Runtime)" << std::endl <<
-		"target_link_libraries(${PROJECT_NAME} C:/Users/mitch/source/repos/Minty-Engine/Runtime/x64/" << info.getConfig() << "/MintyRuntime.lib)" << std::endl;
+		"set_property(TARGET ${PROJECT_NAME} PROPERTY INTERPROCEDURAL_OPTIMIZATION_RELEASE TRUE)" << std::endl <<
+		"set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY \"MultiThreaded$<$<CONFIG:Debug>:Debug>\")" << std::endl <<
+		"target_include_directories(${PROJECT_NAME} PRIVATE C:/Users/mitch/source/repos/Minty-Engine/Runtime)" << std::endl <<
+		"target_link_libraries(${PROJECT_NAME} C:/Users/mitch/source/repos/Minty-Engine/Runtime/x64/" << info.getConfig() << "/MintyRuntime.lib)";
+
+	file.close();
+}
+
+void Application::generate_main(Info const& info)
+{
+	// get path to cmake file
+	std::string path = (std::filesystem::path(info.project.getBuildPath()) / "main.cpp").string();
+
+	// open file to overwrite
+	std::ofstream file(path, std::ios::trunc);
+
+	// if not open, error
+	if (!file.is_open())
+	{
+		std::cerr << "Could not open main file: " << path << std::endl;
+		return;
+	}
+
+	// get timestamp
+	const auto now = std::chrono::system_clock::now();
+
+	// write contents
+	file <<
+		"// " << std::format("{:%Y-%m-%d %H:%M:%OS}", now) << std::endl <<
+		"#include <Minty.h>" << std::endl <<
+		"int main(int argc, char const* argv[]) {" << std::endl <<
+		"    minty::Runtime rt;" << std::endl <<
+		"    return rt.run(argc, argv);" << std::endl <<
+		"}";
+
+	file.close();
 }
 
 void Application::clean(Info const& info)
