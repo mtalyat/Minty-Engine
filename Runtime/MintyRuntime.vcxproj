@@ -221,6 +221,7 @@
     <ClInclude Include="M_Project.h" />
     <ClInclude Include="M_RenderEngine.h" />
     <ClInclude Include="M_Runtime.h" />
+    <ClInclude Include="M_Stopwatch.h" />
     <ClInclude Include="M_Types.h" />
     <ClInclude Include="M_Window.h" />
     <ClInclude Include="pch.h" />
@@ -238,6 +239,7 @@
     <ClCompile Include="M_Project.cpp" />
     <ClCompile Include="M_RenderEngine.cpp" />
     <ClCompile Include="M_Runtime.cpp" />
+    <ClCompile Include="M_Stopwatch.cpp" />
     <ClCompile Include="M_Window.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
