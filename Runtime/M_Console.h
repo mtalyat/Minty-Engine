@@ -2,12 +2,12 @@
 
 #include <string>
 
-namespace minty
+namespace minty::console
 {
 	/// <summary>
 	/// Defines a color that can be printed to the console.
 	/// </summary>
-	enum ConsoleColor
+	enum Color
 	{
 		Black = 0,
 		Red = 1,
@@ -39,7 +39,7 @@ namespace minty
 	/// </summary>
 	/// <param name="message">The string to print.</param>
 	/// <param name="color">The color to print the message.</param>
-	void print(std::string const& message, ConsoleColor const color);
+	void print(std::string const& message, Color const color);
 
 	/// <summary>
 	/// Debug log prints the given message to the screen.
