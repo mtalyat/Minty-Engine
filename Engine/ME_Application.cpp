@@ -53,7 +53,7 @@ void Application::run(int argc, char const* argv[])
 	// if folder does not exist, do nothing
 	if (!std::filesystem::exists(path))
 	{
-		std::cout << "Path does not exist: " << path << std::endl;
+		minty::debug_error(std::string("Path does not exist: ") + path);
 		return;
 	}
 
@@ -179,7 +179,7 @@ void Application::run(int argc, char const* argv[])
 			}
 			else
 			{
-				std::cout << "Did not recognize command: " << command << std::endl;
+				minty::debug_error(std::string("Did not recognize command: ") + c);
 			}
 		}
 	}
@@ -202,7 +202,7 @@ void Application::generate_cmake(Info const& info)
 	// if not open, error
 	if (!file.is_open())
 	{
-		std::cerr << "Could not open cmake file: " << path << std::endl;
+		minty::debug_error(std::string("Could not open cmake file: ") + path);
 		return;
 	}
 
@@ -248,7 +248,7 @@ void Application::generate_main(Info const& info)
 	// if not open, error
 	if (!file.is_open())
 	{
-		std::cerr << "Could not open main file: " << path << std::endl;
+		minty::debug_error(std::string("Could not open main file: ") + path);
 		return;
 	}
 
@@ -293,44 +293,34 @@ void Application::run(Info const& info)
 //https://stackoverflow.com/questions/478898/how-do-i-execute-a-command-and-get-the-output-of-the-command-within-c-using-po
 void Application::run_command(std::string const& cmd)
 {
-	std::cout << std::endl << cmd << std::endl;
+	minty::debug_log(cmd);
 	std::array<char, 128> buffer;
-	//std::string result;
 	std::unique_ptr<FILE, decltype(&_pclose)> pipe(_popen(cmd.c_str(), "r"), _pclose);
 	if (!pipe) {
 		throw std::runtime_error("popen() failed!");
 	}
-	// print file contents as a different color
-	
 	std::string result;
 	bool changeColor = true;
 	while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
-		//result += buffer.data();
-		//std::cout << buffer.data();
 		result = buffer.data();
 
 		if (changeColor)
 		{
 			if (result.find("error") != std::string::npos)
 			{
-				std::cout << "\033[31;40m"; // red
+				minty::debug_error(result);
 			}
 			else if (result.find("warning") != std::string::npos)
 			{
-				std::cout << "\033[33;40m"; // yellow
+				minty::debug_warn(result);
 			}
 			else
 			{
-				std::cout << "\033[90;40m"; // gray
+				minty::debug_info(result);
 			}
 		}
-		
-		std::cout << result;
 
 		// if newline, it was the end of the inputted line, so update the color for the next line
 		changeColor = result.ends_with('\n');
 	}
-	// reset colors and add newline
-	std::cout << "\033[0m";
-	//return result;
 }
