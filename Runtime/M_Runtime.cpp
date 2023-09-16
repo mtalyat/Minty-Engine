@@ -2,12 +2,21 @@
 #include "M_Runtime.h"
 
 #include "M_CommandLineParser.h"
-#include "M_GameEngine.h"
 #include <filesystem>
 #include <iostream>
 #include <exception>
 
 using namespace minty;
+
+Runtime::Runtime()
+	: _engine(new GameEngine())
+{
+}
+
+Runtime::~Runtime()
+{
+	delete _engine;
+}
 
 int Runtime::run(int argc, char const* argv[])
 {
@@ -16,7 +25,6 @@ int Runtime::run(int argc, char const* argv[])
 	// add parameters
 	CommandLineParser parser;
 	parser.addParameter(CommandLineParser::Parameter("path", 1));
-	parser.addParameter(CommandLineParser::Parameter("debug", "-d", 0));
 
 	// parse the args
 	parser.parse(argc, argv);
@@ -38,22 +46,11 @@ int Runtime::run(int argc, char const* argv[])
 		return EXIT_FAILURE;
 	}
 
-	if (parser.getArgument("debug"))
-	{
-		std::cout << "Debug mode true" << std::endl;
-	}
-	else
-	{
-		std::cout << "Debug mode false" << std::endl;
-	}
-
-	GameEngine engine;
-
 	try
 	{
 		// TODO: load game
 
-		engine.run();
+		_engine->run();
 	}
 	catch (const std::exception& e)
 	{
@@ -63,4 +60,9 @@ int Runtime::run(int argc, char const* argv[])
 	}
 
 	return EXIT_SUCCESS;
+}
+
+GameEngine* Runtime::getEngine() const
+{
+	return _engine;
 }
