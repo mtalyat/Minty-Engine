@@ -1,12 +1,14 @@
 #pragma once
 
 #include "M_Types.h"
+#include "M_Object.h"
 
 namespace minty
 {
 	typedef unsigned int color_t;
 
 	struct Color
+		: public Object
 	{
 	public:
 		/// <summary>
