@@ -15,6 +15,7 @@ ONLY include files that somebody writing a game would use.
 #include "M_CommandLineParser.h"
 #include "M_Console.h"
 #include "M_Event.h"
+#include "M_File.h"
 #include "M_GameEngine.h"
 #include "M_Math.h"
 #include "M_Object.h"

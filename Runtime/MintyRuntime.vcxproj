@@ -214,6 +214,7 @@
     <ClInclude Include="M_CommandLineParser.h" />
     <ClInclude Include="M_Console.h" />
     <ClInclude Include="M_Event.h" />
+    <ClInclude Include="M_File.h" />
     <ClInclude Include="M_GameEngine.h" />
     <ClInclude Include="M_Math.h" />
     <ClInclude Include="M_Object.h" />
@@ -235,6 +236,7 @@
     <ClCompile Include="M_CommandLineParser.cpp" />
     <ClCompile Include="M_Console.cpp" />
     <ClCompile Include="M_Event.cpp" />
+    <ClCompile Include="M_File.cpp" />
     <ClCompile Include="M_GameEngine.cpp" />
     <ClCompile Include="M_Math.cpp" />
     <ClCompile Include="M_Object.cpp" />
