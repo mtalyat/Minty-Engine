@@ -100,9 +100,9 @@ namespace minty
             return Vector2Int(x / scale, y / scale);
         }
 
-        operator Vector2() const;
+        operator minty::Vector2() const;
 
-        operator Vector3Int() const;
+        operator minty::Vector3Int() const;
 
         std::string const toString() const override;
 
