@@ -62,26 +62,26 @@ Texture minty::Texture::load(std::string const& path, RenderEngine& engine)
     Texture texture;
 
     // image data
-    VkFormat format = VK_FORMAT_R8G8B8A8_SRGB;
+    texture._format = VK_FORMAT_R8G8B8A8_SRGB;
 
     // create the image on gpu
-    engine.createImage(width, height, format, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, texture._image, texture._memory);
+    engine.createImage(width, height, texture._format, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, texture._image, texture._memory);
 
     // prep texture for copying
-    engine.transitionImageLayout(texture._image, format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+    engine.transitionImageLayout(texture._image, texture._format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
     
     // copy pixel data to image
     engine.copyBufferToImage(stagingBuffer, texture._image, width, height);
 
     // prep texture for rendering
-    engine.transitionImageLayout(texture._image, format, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+    engine.transitionImageLayout(texture._image, texture._format, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
     // cleanup staging buffer, no longer needed
     vkDestroyBuffer(engine.device, stagingBuffer, nullptr);
     vkFreeMemory(engine.device, stagingMemory, nullptr);
 
     // create view, so the shaders can access the image data
-    texture._view = engine.createImageView(texture._image, format, VK_IMAGE_ASPECT_COLOR_BIT);
+    texture._view = engine.createImageView(texture._image, texture._format, VK_IMAGE_ASPECT_COLOR_BIT);
 
     return texture;
 }
