@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "M_RenderEngine.h"
 
+#include "M_Console.h"
+
 #include <iostream>
 #include <stdexcept>
 #include <cstdlib>
@@ -81,49 +83,26 @@ void RenderEngine::initWindow()
 
 void RenderEngine::initVulkan()
 {
-	//std::cout << "initVulkan: createInstance" << std::endl;
 	createInstance();
-	//std::cout << "initVulkan: setupDebugMessenger" << std::endl;
 	setupDebugMessenger();
-	//std::cout << "initVulkan: createSurface" << std::endl;
 	createSurface();
-	//std::cout << "initVulkan: pickPhysicalDevice" << std::endl;
 	pickPhysicalDevice();
-	//std::cout << "initVulkan: createLogicalDevice" << std::endl;
 	createLogicalDevice();
-	//std::cout << "initVulkan: createSwapChain" << std::endl;
 	createSwapChain();
-	//std::cout << "initVulkan: createImageViews" << std::endl;
 	createImageViews();
-	//std::cout << "initVulkan: createRenderPass" << std::endl;
 	createRenderPass();
-	//std::cout << "initVulkan: createDescriptorSetLayout" << std::endl;
 	createDescriptorSetLayout();
-	//std::cout << "initVulkan: createGraphicsPipeline" << std::endl;
 	createGraphicsPipeline();
-	//std::cout << "initVulkan: createCommandPool" << std::endl;
 	createCommandPool();
-	//std::cout << "initVulkan: createDepthResources" << std::endl;
 	createDepthResources();
-	//std::cout << "initVulkan: createFramebuffers" << std::endl;
 	createFramebuffers();
-	//std::cout << "initVulkan: createTextureImage" << std::endl;
 	createTextureImage();
-	//std::cout << "initVulkan: createTextureSampler" << std::endl;
 	createTextureSampler();
-	//std::cout << "initVulkan: createVertexBuffer" << std::endl;
-	createVertexBuffer();
-	//std::cout << "initVulkan: createIndexBuffer" << std::endl;
-	createIndexBuffer();
-	//std::cout << "initVulkan: createUniformBuffers" << std::endl;
+	createMesh();
 	createUniformBuffers();
-	//std::cout << "initVulkan: createDescriptorPool" << std::endl;
 	createDescriptorPool();
-	//std::cout << "initVulkan: createDescriptorSets" << std::endl;
 	createDescriptorSets();
-	//std::cout << "initVulkan: createCommandBuffers" << std::endl;
 	createCommandBuffers();
-	//std::cout << "initVulkan: createSyncObjects" << std::endl;
 	createSyncObjects();
 }
 
@@ -1352,12 +1331,9 @@ void RenderEngine::createFramebuffers()
 	}
 }
 
-void RenderEngine::createVertexBuffer() {
-	_mesh.setVertices(static_cast<void const*>(vertices.data()), sizeof(vertices[0]) * vertices.size(), *this);
-}
-
-void RenderEngine::createIndexBuffer() {
-	_mesh.setIndices(static_cast<void const*>(indices.data()), sizeof(indices[0]) * indices.size(), *this);
+void minty::RenderEngine::createMesh()
+{
+	_mesh = Mesh::createCube(*this);
 }
 
 void RenderEngine::createUniformBuffers()
@@ -1617,9 +1593,11 @@ void RenderEngine::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t i
 	scissor.extent = swapChainExtent;
 	vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
+	minty::console::warn("Hard coded draw indexed!");
+	uint32_t indexCount = 36u;
 	// draw command
 	//vkCmdDraw(commandBuffer, static_cast<uint32_t>(vertices.size()), 1, 0, 0);
-	vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(indices.size()), 1, 0, 0, 0);
+	vkCmdDrawIndexed(commandBuffer, indexCount, 1, 0, 0, 0);
 
 	// done rendering
 	vkCmdEndRenderPass(commandBuffer);

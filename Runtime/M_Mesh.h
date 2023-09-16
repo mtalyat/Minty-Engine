@@ -38,6 +38,18 @@ namespace minty
 		void setIndices(void const* const indices, size_t const deviceSize, RenderEngine& engine);
 		
 		void dispose(RenderEngine& engine);
+
+		/// <summary>
+		/// Creates a cube mesh.
+		/// </summary>
+		/// <returns>A Mesh with cube data.</returns>
+		static Mesh createCube(RenderEngine& engine);
+		
+		/// <summary>
+		/// Creates a quad mesh.
+		/// </summary>
+		/// <returns>A Mesh with quad data.</returns>
+		static Mesh createQuad(RenderEngine& engine);
 	private:
 		void disposeVertices(RenderEngine& engine);
 
