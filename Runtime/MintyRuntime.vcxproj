@@ -219,6 +219,8 @@
     <ClInclude Include="M_Point.h" />
     <ClInclude Include="M_PointF.h" />
     <ClInclude Include="M_Project.h" />
+    <ClInclude Include="M_Rect.h" />
+    <ClInclude Include="M_RectF.h" />
     <ClInclude Include="M_RenderEngine.h" />
     <ClInclude Include="M_Runtime.h" />
     <ClInclude Include="M_Stopwatch.h" />
@@ -237,6 +239,8 @@
     <ClCompile Include="M_Point.cpp" />
     <ClCompile Include="M_PointF.cpp" />
     <ClCompile Include="M_Project.cpp" />
+    <ClCompile Include="M_Rect.cpp" />
+    <ClCompile Include="M_RectF.cpp" />
     <ClCompile Include="M_RenderEngine.cpp" />
     <ClCompile Include="M_Runtime.cpp" />
     <ClCompile Include="M_Stopwatch.cpp" />

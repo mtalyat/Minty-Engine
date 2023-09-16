@@ -20,6 +20,8 @@ ONLY include files that somebody writing a game would use.
 #include "M_Point.h"
 #include "M_PointF.h"
 #include "M_Project.h"
+#include "M_Rect.h"
+#include "M_RectF.h"
 #include "M_Runtime.h"
 #include "M_Stopwatch.h"
 #include "M_Types.h"

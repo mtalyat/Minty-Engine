@@ -66,6 +66,12 @@
     <ClInclude Include="M_Stopwatch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="M_Rect.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="M_RectF.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -111,6 +117,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_Stopwatch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_Rect.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_RectF.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
