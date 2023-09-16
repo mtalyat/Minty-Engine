@@ -57,10 +57,10 @@
     <ClInclude Include="M_Console.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="M_Point.h">
+    <ClInclude Include="M_Vector2Int.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="M_PointF.h">
+    <ClInclude Include="M_Vector2.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="M_Stopwatch.h">
@@ -76,6 +76,18 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="M_File.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Mesh.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Vector3.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Vector3Int.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -116,10 +128,10 @@
     <ClCompile Include="M_Console.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="M_Point.cpp">
+    <ClCompile Include="M_Vector2Int.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="M_PointF.cpp">
+    <ClCompile Include="M_Vector2.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_Stopwatch.cpp">
@@ -135,6 +147,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_File.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_Mesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_Vector3.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_Vector3Int.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_Texture.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

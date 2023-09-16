@@ -1,9 +1,6 @@
 #include "pch.h"
 #include "M_RenderEngine.h"
 
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
-
 #include <iostream>
 #include <stdexcept>
 #include <cstdlib>
@@ -112,8 +109,6 @@ void RenderEngine::initVulkan()
 	createFramebuffers();
 	//std::cout << "initVulkan: createTextureImage" << std::endl;
 	createTextureImage();
-	//std::cout << "initVulkan: createTextureImageView" << std::endl;
-	createTextureImageView();
 	//std::cout << "initVulkan: createTextureSampler" << std::endl;
 	createTextureSampler();
 	//std::cout << "initVulkan: createVertexBuffer" << std::endl;
@@ -257,40 +252,9 @@ void RenderEngine::createImage(uint32_t width, uint32_t height, VkFormat format,
 	vkBindImageMemory(device, image, imageMemory, 0);
 }
 
-void RenderEngine::createTextureImage() {
-	int texWidth, texHeight, texChannels;
-	stbi_uc* pixels = stbi_load("Assets/Textures/texture.jpg", &texWidth, &texHeight, &texChannels, STBI_rgb_alpha);
-	VkDeviceSize imageSize = texWidth * texHeight * 4;
-
-	if (!pixels) {
-		throw std::runtime_error("failed to load texture image!");
-	}
-
-	VkBuffer stagingBuffer;
-	VkDeviceMemory stagingBufferMemory;
-	createBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
-
-	void* data;
-	vkMapMemory(device, stagingBufferMemory, 0, imageSize, 0, &data);
-	memcpy(data, pixels, static_cast<size_t>(imageSize));
-	vkUnmapMemory(device, stagingBufferMemory);
-
-	stbi_image_free(pixels);
-
-	createImage(texWidth, texHeight, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, textureImage, textureImageMemory);
-
-	// prep texture to copy data
-	transitionImageLayout(textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
-	// copy data
-	copyBufferToImage(stagingBuffer, textureImage, static_cast<uint32_t>(texWidth), static_cast<uint32_t>(texHeight));
-	// prep image for rendering
-	transitionImageLayout(textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-
-	// cleanup
-	transitionImageLayout(textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
-
-	vkDestroyBuffer(device, stagingBuffer, nullptr);
-	vkFreeMemory(device, stagingBufferMemory, nullptr);
+void RenderEngine::createTextureImage()
+{
+	_texture = Texture::load("Assets/Textures/texture.jpg", *this);
 }
 
 VkImageView RenderEngine::createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags) {
@@ -311,11 +275,6 @@ VkImageView RenderEngine::createImageView(VkImage image, VkFormat format, VkImag
 	}
 
 	return imageView;
-}
-
-void RenderEngine::createTextureImageView()
-{
-	textureImageView = createImageView(textureImage, VK_FORMAT_R8G8B8A8_SRGB, VK_IMAGE_ASPECT_COLOR_BIT);
 }
 
 void RenderEngine::createTextureSampler()
@@ -1516,7 +1475,7 @@ void RenderEngine::createDescriptorSets()
 
 		VkDescriptorImageInfo imageInfo{};
 		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-		imageInfo.imageView = textureImageView;
+		imageInfo.imageView = _texture.view;
 		imageInfo.sampler = textureSampler;
 
 		std::array<VkWriteDescriptorSet, 2> descriptorWrites{};
@@ -1744,9 +1703,7 @@ void RenderEngine::cleanup()
 	// clean up vulkan
 	cleanupSwapChain();
 	vkDestroySampler(device, textureSampler, nullptr);
-	vkDestroyImageView(device, textureImageView, nullptr);
-	vkDestroyImage(device, textureImage, nullptr);
-	vkFreeMemory(device, textureImageMemory, nullptr);
+	_texture.dispose(*this);
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
 		vkDestroyBuffer(device, uniformBuffers[i], nullptr);
 		vkFreeMemory(device, uniformBuffersMemory[i], nullptr);

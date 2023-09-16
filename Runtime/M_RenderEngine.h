@@ -3,6 +3,7 @@
 // Graphics pipeline: https://vulkan-tutorial.com/en/Drawing_a_triangle/Graphics_pipeline_basics/Introduction
 
 #include "M_Window.h"
+#include "M_Texture.h"
 
 //#include <vulkan/vulkan.h>
 #define GLFW_INCLUDE_VULKAN
@@ -118,8 +119,11 @@ namespace minty
 		/// </summary>
 		/// <returns>True if the engine is still running.</returns>
 		bool isRunning();
-	private:
+	//private:
+	public: // TODO: TEMPORARILY ALL PUBLIC FOR TESTING/REFACTORING PURPOSES
 		Window* _window;
+
+		Texture _texture;
 
 		VkInstance instance;
 		VkDebugUtilsMessengerEXT debugMessenger;
@@ -154,9 +158,6 @@ namespace minty
 		std::vector<void*> uniformBuffersMapped;
 		VkDescriptorPool descriptorPool;
 		std::vector<VkDescriptorSet> descriptorSets;
-		VkImage textureImage;
-		VkDeviceMemory textureImageMemory;
-		VkImageView textureImageView;
 		VkSampler textureSampler;
 		VkImage depthImage;
 		VkDeviceMemory depthImageMemory;
@@ -230,11 +231,6 @@ namespace minty
 		/// <param name="aspectFlags">The aspect flags of the image.</param>
 		/// <returns>The created image view.</returns>
 		VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
-
-		/// <summary>
-		/// Creates the texture image view.
-		/// </summary>
-		void createTextureImageView();
 
 		/// <summary>
 		/// Creates the texture sampler for the GPU.

@@ -5,7 +5,7 @@
 
 namespace minty
 {
-	typedef unsigned int color_t;
+	typedef int color_t;
 
 	struct Color
 		: public Object
@@ -67,7 +67,7 @@ namespace minty
 		Color(Color&& color) noexcept;
 
 		// cast to int
-		inline operator color_t() const;
+		operator color_t() const;
 
 		// assignment operator
 		Color& operator=(const Color& color);
