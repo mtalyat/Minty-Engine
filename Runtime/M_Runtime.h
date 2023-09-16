@@ -1,5 +1,7 @@
 #pragma once
 
+#include "M_GameEngine.h"
+
 namespace minty
 {
 	/// <summary>
@@ -7,7 +9,16 @@ namespace minty
 	/// </summary>
 	class Runtime
 	{
+	private:
+		GameEngine* const _engine;
+
 	public:
+		Runtime();
+
+		~Runtime();
+
 		int run(int argc, char const* argv[]);
+
+		GameEngine* getEngine() const;
 	};
 }
