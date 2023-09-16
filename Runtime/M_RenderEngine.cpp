@@ -234,7 +234,7 @@ void RenderEngine::createImage(uint32_t width, uint32_t height, VkFormat format,
 	imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
 	if (vkCreateImage(device, &imageInfo, nullptr, &image) != VK_SUCCESS) {
-		throw std::runtime_error("failed to create image!");
+		throw std::runtime_error("failed to create _image!");
 	}
 
 	VkMemoryRequirements memRequirements;
@@ -246,7 +246,7 @@ void RenderEngine::createImage(uint32_t width, uint32_t height, VkFormat format,
 	allocInfo.memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits, properties);
 
 	if (vkAllocateMemory(device, &allocInfo, nullptr, &imageMemory) != VK_SUCCESS) {
-		throw std::runtime_error("failed to allocate image memory!");
+		throw std::runtime_error("failed to allocate _image memory!");
 	}
 
 	vkBindImageMemory(device, image, imageMemory, 0);
@@ -271,7 +271,7 @@ VkImageView RenderEngine::createImageView(VkImage image, VkFormat format, VkImag
 
 	VkImageView imageView;
 	if (vkCreateImageView(device, &viewInfo, nullptr, &imageView) != VK_SUCCESS) {
-		throw std::runtime_error("failed to create texture image view!");
+		throw std::runtime_error("failed to create texture _image view!");
 	}
 
 	return imageView;
@@ -478,7 +478,7 @@ void RenderEngine::createImageViews()
 
 void RenderEngine::createSurface()
 {
-	// create window surface
+	// create window surface that vulkan can use to draw
 	if (glfwCreateWindowSurface(instance, _window->getRaw(), nullptr, &surface) != VK_SUCCESS) {
 		throw std::runtime_error("Failed to create window surface.");
 	}
@@ -832,7 +832,7 @@ void RenderEngine::drawFrame()
 		return;
 	}
 	else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
-		throw std::runtime_error("failed to acquire swap chain image!");
+		throw std::runtime_error("failed to acquire swap chain _image!");
 	}
 
 	// reset the fence states so they can be used to wait again
@@ -898,7 +898,7 @@ void RenderEngine::drawFrame()
 		recreateSwapChain();
 	}
 	else if (result != VK_SUCCESS) {
-		throw std::runtime_error("failed to present swap chain image!");
+		throw std::runtime_error("failed to present swap chain _image!");
 	}
 
 	// move to next frame
@@ -1353,43 +1353,11 @@ void RenderEngine::createFramebuffers()
 }
 
 void RenderEngine::createVertexBuffer() {
-	VkDeviceSize bufferSize = sizeof(vertices[0]) * vertices.size();
-
-	VkBuffer stagingBuffer;
-	VkDeviceMemory stagingBufferMemory;
-	createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
-
-	void* data;
-	vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
-	memcpy(data, vertices.data(), (size_t)bufferSize);
-	vkUnmapMemory(device, stagingBufferMemory);
-
-	createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, vertexBuffer, vertexBufferMemory);
-
-	copyBuffer(stagingBuffer, vertexBuffer, bufferSize);
-
-	vkDestroyBuffer(device, stagingBuffer, nullptr);
-	vkFreeMemory(device, stagingBufferMemory, nullptr);
+	_mesh.setVertices(static_cast<void const*>(vertices.data()), sizeof(vertices[0]) * vertices.size(), *this);
 }
 
 void RenderEngine::createIndexBuffer() {
-	VkDeviceSize bufferSize = sizeof(indices[0]) * indices.size();
-
-	VkBuffer stagingBuffer;
-	VkDeviceMemory stagingBufferMemory;
-	createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
-
-	void* data;
-	vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
-	memcpy(data, indices.data(), (size_t)bufferSize);
-	vkUnmapMemory(device, stagingBufferMemory);
-
-	createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, indexBuffer, indexBufferMemory);
-
-	copyBuffer(stagingBuffer, indexBuffer, bufferSize);
-
-	vkDestroyBuffer(device, stagingBuffer, nullptr);
-	vkFreeMemory(device, stagingBufferMemory, nullptr);
+	_mesh.setIndices(static_cast<void const*>(indices.data()), sizeof(indices[0]) * indices.size(), *this);
 }
 
 void RenderEngine::createUniformBuffers()
@@ -1475,7 +1443,7 @@ void RenderEngine::createDescriptorSets()
 
 		VkDescriptorImageInfo imageInfo{};
 		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-		imageInfo.imageView = _texture.view;
+		imageInfo.imageView = _texture._view;
 		imageInfo.sampler = textureSampler;
 
 		std::array<VkWriteDescriptorSet, 2> descriptorWrites{};
@@ -1627,10 +1595,10 @@ void RenderEngine::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t i
 	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
 
 	// bind vertex data
-	VkBuffer vertexBuffers[] = { vertexBuffer };
+	VkBuffer vertexBuffers[] = { _mesh._vertexBuffer };
 	VkDeviceSize offsets[] = { 0 };
 	vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
-	vkCmdBindIndexBuffer(commandBuffer, indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+	vkCmdBindIndexBuffer(commandBuffer, _mesh._indexBuffer, 0, VK_INDEX_TYPE_UINT16);
 
 	// update uniform data
 	vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[currentFrame], 0, nullptr);
@@ -1710,10 +1678,7 @@ void RenderEngine::cleanup()
 	}
 	vkDestroyDescriptorPool(device, descriptorPool, nullptr);
 	vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
-	vkDestroyBuffer(device, indexBuffer, nullptr);
-	vkFreeMemory(device, indexBufferMemory, nullptr);
-	vkDestroyBuffer(device, vertexBuffer, nullptr);
-	vkFreeMemory(device, vertexBufferMemory, nullptr);
+	_mesh.dispose(*this);
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
 		vkDestroySemaphore(device, renderFinishedSemaphores[i], nullptr);
 		vkDestroySemaphore(device, imageAvailableSemaphores[i], nullptr);

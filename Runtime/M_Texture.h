@@ -11,9 +11,9 @@ namespace minty
 		public Object
 	{
 	public: // TODO: TESTING, SET TO PRIVATE LATER
-		VkImage image;
-		VkDeviceMemory memory;
-		VkImageView view;
+		VkImage _image;
+		VkDeviceMemory _memory;
+		VkImageView _view;
 
 	public:
 
