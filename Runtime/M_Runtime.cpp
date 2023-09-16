@@ -16,7 +16,6 @@ int Runtime::run(int argc, char const* argv[])
 	// add parameters
 	CommandLineParser parser;
 	parser.addParameter(CommandLineParser::Parameter("path", 1));
-	parser.addParameter(CommandLineParser::Parameter("debug", "-d", 0));
 
 	// parse the args
 	parser.parse(argc, argv);
@@ -36,15 +35,6 @@ int Runtime::run(int argc, char const* argv[])
 		std::cerr << "Path argument not found." << std::endl;
 
 		return EXIT_FAILURE;
-	}
-
-	if (parser.getArgument("debug"))
-	{
-		std::cout << "Debug mode true" << std::endl;
-	}
-	else
-	{
-		std::cout << "Debug mode false" << std::endl;
 	}
 
 	try
