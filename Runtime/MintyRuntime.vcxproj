@@ -210,18 +210,27 @@
   <ItemGroup>
     <ClInclude Include="framework.h" />
     <ClInclude Include="Minty.h" />
+    <ClInclude Include="M_Color.h" />
     <ClInclude Include="M_CommandLineParser.h" />
+    <ClInclude Include="M_Console.h" />
     <ClInclude Include="M_GameEngine.h" />
+    <ClInclude Include="M_Math.h" />
+    <ClInclude Include="M_Object.h" />
     <ClInclude Include="M_Project.h" />
     <ClInclude Include="M_RenderEngine.h" />
     <ClInclude Include="M_Runtime.h" />
+    <ClInclude Include="M_Types.h" />
     <ClInclude Include="M_Window.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="M_Color.cpp" />
     <ClCompile Include="M_CommandLineParser.cpp" />
+    <ClCompile Include="M_Console.cpp" />
     <ClCompile Include="M_GameEngine.cpp" />
+    <ClCompile Include="M_Math.cpp" />
+    <ClCompile Include="M_Object.cpp" />
     <ClCompile Include="M_Project.cpp" />
     <ClCompile Include="M_RenderEngine.cpp" />
     <ClCompile Include="M_Runtime.cpp" />
