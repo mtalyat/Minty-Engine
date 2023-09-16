@@ -112,14 +112,14 @@ namespace minty
         /// </summary>
         /// <param name="polar">The polar coordinates.</param>
         /// <returns>The cartesian coordinates.</returns>
-        static Point polarToCartesian(Point& const polar);
+        static Point polarToCartesian(Point const& polar);
 
         /// <summary>
         /// Converts the given cartesian coordinates to polar coordinates.
         /// </summary>
         /// <param name="cartesian">The cartesian coordinates.</param>
         /// <returns>The polar coordinates.</returns>
-        static Point cartesianToPolar(Point& const cartesian);
+        static Point cartesianToPolar(Point const& cartesian);
     };
 }
 

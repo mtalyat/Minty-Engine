@@ -35,12 +35,12 @@ inline std::string const minty::Point::toString() const
     return std::format("Point({0}, {1})", x, y);
 }
 
-Point minty::Point::polarToCartesian(Point& const polar)
+Point minty::Point::polarToCartesian(Point const& polar)
 {
     return Point(cos(polar.x) * polar.y, sin(polar.x) * polar.y);
 }
 
-Point minty::Point::cartesianToPolar(Point& const cartesian)
+Point minty::Point::cartesianToPolar(Point const& cartesian)
 {
     return Point(angle(cartesian.x, cartesian.y), magnitude(cartesian.x, cartesian.y));
 }
