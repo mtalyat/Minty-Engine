@@ -11,7 +11,9 @@ ONLY include files that somebody writing a game would use.
 
 */
 
+#include "M_Color.h"
 #include "M_CommandLineParser.h"
+#include "M_Math.h"
 #include "M_Project.h"
 #include "M_Runtime.h"
 #include "M_Window.h"
