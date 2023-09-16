@@ -51,7 +51,7 @@ void GameEngine::run()
 	}
 
 	// print elapsed time
-	std::cout << "Elapsed time: " << std::chrono::duration_cast<std::chrono::seconds>(getNow() - _start) << std::endl;
+	std::cout << "Elapsed time: " << (std::chrono::duration_cast<std::chrono::milliseconds>(getNow() - _start).count() / 1000.0f) << "s" << std::endl;
 }
 
 time_point_t minty::GameEngine::getNow() const
