@@ -53,7 +53,7 @@ void Application::run(int argc, char const* argv[])
 	// if folder does not exist, do nothing
 	if (!std::filesystem::exists(path))
 	{
-		minty::debug_error(std::string("Path does not exist: ") + path);
+		minty::console::error(std::string("Path does not exist: ") + path);
 		return;
 	}
 
@@ -179,7 +179,7 @@ void Application::run(int argc, char const* argv[])
 			}
 			else
 			{
-				minty::debug_error(std::string("Did not recognize command: ") + c);
+				minty::console::error(std::string("Did not recognize command: ") + c);
 			}
 		}
 	}
@@ -202,7 +202,7 @@ void Application::generate_cmake(Info const& info)
 	// if not open, error
 	if (!file.is_open())
 	{
-		minty::debug_error(std::string("Could not open cmake file: ") + path);
+		minty::console::error(std::string("Could not open cmake file: ") + path);
 		return;
 	}
 
@@ -248,7 +248,7 @@ void Application::generate_main(Info const& info)
 	// if not open, error
 	if (!file.is_open())
 	{
-		minty::debug_error(std::string("Could not open main file: ") + path);
+		minty::console::error(std::string("Could not open main file: ") + path);
 		return;
 	}
 
@@ -293,7 +293,7 @@ void Application::run(Info const& info)
 //https://stackoverflow.com/questions/478898/how-do-i-execute-a-command-and-get-the-output-of-the-command-within-c-using-po
 void Application::run_command(std::string const& cmd)
 {
-	minty::debug_log(cmd);
+	minty::console::log(cmd);
 	std::array<char, 128> buffer;
 	std::unique_ptr<FILE, decltype(&_pclose)> pipe(_popen(cmd.c_str(), "r"), _pclose);
 	if (!pipe) {
@@ -308,15 +308,15 @@ void Application::run_command(std::string const& cmd)
 		{
 			if (result.find("error") != std::string::npos)
 			{
-				minty::debug_error(result);
+				minty::console::error(result);
 			}
 			else if (result.find("warning") != std::string::npos)
 			{
-				minty::debug_warn(result);
+				minty::console::warn(result);
 			}
 			else
 			{
-				minty::debug_info(result);
+				minty::console::info(result);
 			}
 		}
 
