@@ -94,20 +94,20 @@ inline Color Color::lighten(float const percent) const
 	return Color();
 }
 
-Color minty::Color::lerp(Color const left, Color const right, float const t)
+Color Color::lerp(Color const left, Color const right, float const t)
 {
 	return Color(
-		static_cast<byte>(minty::lerp(left.r, right.r, t)),
-		static_cast<byte>(minty::lerp(left.g, right.g, t)),
-		static_cast<byte>(minty::lerp(left.b, right.b, t)),
+		static_cast<byte>(math::lerp(left.r, right.r, t)),
+		static_cast<byte>(math::lerp(left.g, right.g, t)),
+		static_cast<byte>(math::lerp(left.b, right.b, t)),
 		left.a);
 }
 
-Color minty::Color::lerpa(Color const left, Color const right, float const t)
+Color Color::lerpa(Color const left, Color const right, float const t)
 {
 	return Color(
-		static_cast<byte>(minty::lerp(left.r, right.r, t)),
-		static_cast<byte>(minty::lerp(left.g, right.g, t)),
-		static_cast<byte>(minty::lerp(left.b, right.b, t)),
-		static_cast<byte>(minty::lerp(left.a, right.a, t)));
+		static_cast<byte>(math::lerp(left.r, right.r, t)),
+		static_cast<byte>(math::lerp(left.g, right.g, t)),
+		static_cast<byte>(math::lerp(left.b, right.b, t)),
+		static_cast<byte>(math::lerp(left.a, right.a, t)));
 }

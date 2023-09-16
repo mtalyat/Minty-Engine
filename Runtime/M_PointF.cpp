@@ -26,7 +26,7 @@ PointF::PointF(PointF const& other)
 
 Point PointF::toPoint() const
 {
-    return Point(roundToInt(x), roundToInt(y));
+    return Point(math::roundToInt(x), math::roundToInt(y));
 }
 
 std::string const minty::PointF::toString() const
@@ -41,5 +41,5 @@ PointF minty::PointF::polarToCartesian(PointF const& polar)
 
 PointF minty::PointF::cartesianToPolar(PointF const& cartesian)
 {
-    return PointF(angle(cartesian.x, cartesian.y), magnitude(cartesian.x, cartesian.y));
+    return PointF(math::angle(cartesian.x, cartesian.y), math::magnitude(cartesian.x, cartesian.y));
 }

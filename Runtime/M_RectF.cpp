@@ -70,11 +70,11 @@ bool RectF::overlaps(RectF const& other) const
 
 RectF RectF::overlap(RectF const& other) const
 {
-	float xMin = clamp(other.x - x, 0.0f, width);
-	float yMin = clamp(other.y - y, 0.0f, height);
+	float xMin = math::clamp(other.x - x, 0.0f, width);
+	float yMin = math::clamp(other.y - y, 0.0f, height);
 
-	float xMax = clamp(other.x + other.width - x, 0.0f, width);
-	float yMax = clamp(other.y + other.height - y, 0.0f, height);
+	float xMax = math::clamp(other.x + other.width - x, 0.0f, width);
+	float yMax = math::clamp(other.y + other.height - y, 0.0f, height);
 
 	return RectF(xMin, yMin, xMax - xMin, yMax - yMin);
 }
@@ -91,15 +91,15 @@ RectF RectF::bounds(float const left, float const right, float const top, float 
 
 Rect RectF::floor(RectF const& rect)
 {
-	return Rect(floorToInt(rect.x), floorToInt(rect.y), floorToInt(rect.width), floorToInt(rect.height));
+	return Rect(math::floorToInt(rect.x), math::floorToInt(rect.y), math::floorToInt(rect.width), math::floorToInt(rect.height));
 }
 
 Rect RectF::round(RectF const& rect)
 {
-	return Rect(roundToInt(rect.x), roundToInt(rect.y), roundToInt(rect.width), roundToInt(rect.height));
+	return Rect(math::roundToInt(rect.x), math::roundToInt(rect.y), math::roundToInt(rect.width), math::roundToInt(rect.height));
 }
 
 Rect RectF::ceil(RectF const& rect)
 {
-	return Rect(ceilToInt(rect.x), ceilToInt(rect.y), ceilToInt(rect.width), ceilToInt(rect.height));
+	return Rect(math::ceilToInt(rect.x), math::ceilToInt(rect.y), math::ceilToInt(rect.width), math::ceilToInt(rect.height));
 }

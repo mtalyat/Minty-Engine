@@ -16,8 +16,8 @@ minty::Point::Point(int const _x, int const _y)
 {}
 
 minty::Point::Point(float const _x, float const _y)
-    : x(roundToInt(_x))
-    , y(roundToInt(_y))
+    : x(math::roundToInt(_x))
+    , y(math::roundToInt(_y))
 {}
 
 minty::Point::Point(Point const& other)
@@ -37,10 +37,10 @@ inline std::string const minty::Point::toString() const
 
 Point minty::Point::polarToCartesian(Point const& polar)
 {
-    return Point(cos(polar.x) * polar.y, sin(polar.x) * polar.y);
+    return Point(math::cos(polar.x) * polar.y, math::sin(polar.x) * polar.y);
 }
 
 Point minty::Point::cartesianToPolar(Point const& cartesian)
 {
-    return Point(angle(cartesian.x, cartesian.y), magnitude(cartesian.x, cartesian.y));
+    return Point(math::angle(cartesian.x, cartesian.y), math::magnitude(cartesian.x, cartesian.y));
 }

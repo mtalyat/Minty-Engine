@@ -1,6 +1,6 @@
 #pragma once
 
-namespace minty
+namespace minty::math
 {
 	float const PI = 3.14159265359f;
 
