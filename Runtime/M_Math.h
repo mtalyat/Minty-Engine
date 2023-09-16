@@ -56,6 +56,21 @@ namespace minty
 	inline float round(float const value, float const precision);
 
 	/// <summary>
+	/// Rounds the value to the nearest integer.
+	/// </summary>
+	/// <param name="value">The value to round.</param>
+	/// <returns>The rounded value.</returns>
+	inline int roundToInt(float const value);
+
+	/// <summary>
+	/// Rounds the value to the nearest value, using the given precision.
+	/// </summary>
+	/// <param name="value">The value to round.</param>
+	/// <param name="precision">The precision to round to.</param>
+	/// <returns>The rounded value.</returns>
+	inline int roundToInt(float const value, float const precision);
+
+	/// <summary>
 	/// Rounds down to the nearest integer.
 	/// </summary>
 	/// <param name="value">The value to floor.</param>
@@ -63,11 +78,25 @@ namespace minty
 	inline float floor(float const value);
 
 	/// <summary>
+	/// Rounds down to the nearest integer.
+	/// </summary>
+	/// <param name="value">The value to floor.</param>
+	/// <returns>The floored value.</returns>
+	inline int floorToInt(float const value);
+
+	/// <summary>
 	/// Rounds up to the nearest integer.
 	/// </summary>
 	/// <param name="value">The value to ceil.</param>
 	/// <returns>The ceiled value.</returns>
 	inline float ceil(float const value);
+
+	/// <summary>
+	/// Rounds up to the nearest integer.
+	/// </summary>
+	/// <param name="value">The value to ceil.</param>
+	/// <returns>The ceiled value.</returns>
+	inline int ceilToInt(float const value);
 
 	/// <summary>
 	/// Gets the positive value of the given value.
