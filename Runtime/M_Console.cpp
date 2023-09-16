@@ -22,28 +22,28 @@ void minty::console::print(std::string const& message, Color const color)
 	}
 }
 
-void minty::console::debug_log(std::string const& message)
+void minty::console::log(std::string const& message)
 {
 #ifndef NDEBUG
 	print(message);
 #endif
 }
 
-void minty::console::debug_info(std::string const& message)
+void minty::console::info(std::string const& message)
 {
 #ifndef NDEBUG
 	print(message, Color::Gray);
 #endif
 }
 
-void minty::console::debug_warn(std::string const& message)
+void minty::console::warn(std::string const& message)
 {
 #ifndef NDEBUG
 	print(message, Color::Yellow);
 #endif
 }
 
-void minty::console::debug_error(std::string const& message)
+void minty::console::error(std::string const& message)
 {
 #ifndef NDEBUG
 	print(message, Color::Red);
