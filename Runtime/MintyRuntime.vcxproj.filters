@@ -57,6 +57,12 @@
     <ClInclude Include="M_Console.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="M_Point.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="M_PointF.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -93,6 +99,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_Console.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_Point.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_PointF.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
