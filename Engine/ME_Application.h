@@ -23,6 +23,11 @@ namespace mintye
 	public:
 		Application();
 
+		/// <summary>
+		/// Runs the game engine application.
+		/// </summary>
+		/// <param name="argc">The command line argument count.</param>
+		/// <param name="argv">The command line arguments.</param>
 		void run(int argc, char const* argv[]);
 	private:
 		/// <summary>
