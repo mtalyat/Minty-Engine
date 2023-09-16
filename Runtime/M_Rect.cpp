@@ -21,7 +21,7 @@ minty::Rect::Rect(int const width, int const height)
 	, height(height)
 {}
 
-minty::Rect::Rect(Point const size)
+minty::Rect::Rect(Vector2Int const size)
 	: x(0)
 	, y(0)
 	, width(size.x)
@@ -35,7 +35,7 @@ minty::Rect::Rect(int const x, int const y, int const width, int const height)
 	, height(height)
 {}
 
-minty::Rect::Rect(Point const position, Point const size)
+minty::Rect::Rect(Vector2Int const position, Vector2Int const size)
 	: x(position.x)
 	, y(position.y)
 	, width(size.x)
@@ -64,7 +64,7 @@ Rect Rect::overlap(Rect const& other) const
 	return Rect(xMin, yMin, xMax - xMin, yMax - yMin);
 }
 
-bool Rect::contains(Point const& other) const
+bool Rect::contains(Vector2Int const& other) const
 {
 	return other.x >= x && other.x < x + width && other.y >= y && other.y < y + height;
 }

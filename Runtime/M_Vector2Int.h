@@ -5,12 +5,13 @@
 
 namespace minty
 {
-    struct PointF;
+    struct Vector2;
+    struct Vector3Int;
 
     /// <summary>
     /// Holds X and Y coordinates for a point in space.
     /// </summary>
-    struct Point :
+    struct Vector2Int :
         public Object
     {
         /// <summary>
@@ -24,35 +25,35 @@ namespace minty
         int y;
 
         /// <summary>
-        /// Creates a new Point at (0, 0).
+        /// Creates a new Vector2Int at (0, 0).
         /// </summary>
-        Point();
+        Vector2Int();
 
         /// <summary>
-        /// Creates a new Point using the given X and Y values.
+        /// Creates a new Vector2Int using the given X and Y values.
         /// </summary>
-        /// <param name="_x"></param>
-        /// <param name="_y"></param>
-        Point(int const _x, int const _y);
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        Vector2Int(int const x, int const y);
 
         /// <summary>
-        /// Creates a Point using the given X and Y values, floored.
+        /// Creates a Vector2Int using the given X and Y values, floored.
         /// </summary>
-        /// <param name="_x"></param>
-        /// <param name="_y"></param>
-        Point(float const _x, float const _y);
+        /// <param name="x"></param>
+        /// <param name="y"></param>
+        Vector2Int(float const x, float const y);
 
         // copy constructor
-        Point(Point const& other);
+        Vector2Int(Vector2Int const& other);
 
         // equals operator
-        bool operator ==(Point const& other) const
+        bool operator ==(Vector2Int const& other) const
         {
             return x == other.x && y == other.y;
         }
 
         // less than operator
-        bool operator < (Point const& other) const
+        bool operator < (Vector2Int const& other) const
         {
             if (y == other.y)
             {
@@ -64,46 +65,44 @@ namespace minty
         }
 
         // add operator
-        Point operator +(Point const& other) const
+        Vector2Int operator +(Vector2Int const& other) const
         {
-            return Point(x + other.x, y + other.y);
+            return Vector2Int(x + other.x, y + other.y);
         }
 
         // subtract operator
-        Point operator -(Point const& other) const
+        Vector2Int operator -(Vector2Int const& other) const
         {
-            return Point(x - other.x, y - other.y);
+            return Vector2Int(x - other.x, y - other.y);
         }
 
         // multiplication operator
-        Point operator *(Point const& other) const
+        Vector2Int operator *(Vector2Int const& other) const
         {
-            return Point(x * other.x, y * other.y);
+            return Vector2Int(x * other.x, y * other.y);
         }
 
         // multiplication scaling operator
-        Point operator *(int const scale) const
+        Vector2Int operator *(int const scale) const
         {
-            return Point(x * scale, y * scale);
+            return Vector2Int(x * scale, y * scale);
         }
 
         // division operator
-        Point operator /(Point const& other) const
+        Vector2Int operator /(Vector2Int const& other) const
         {
-            return Point(x / other.x, y / other.y);
+            return Vector2Int(x / other.x, y / other.y);
         }
 
         // division scaling operator
-        Point operator /(int const scale) const
+        Vector2Int operator /(int const scale) const
         {
-            return Point(x / scale, y / scale);
+            return Vector2Int(x / scale, y / scale);
         }
 
-        /// <summary>
-        /// Converts this Point to a PointF.
-        /// </summary>
-        /// <returns>A PointF containing this Point's values.</returns>
-        PointF toPointF() const;
+        operator Vector2() const;
+
+        operator Vector3Int() const;
 
         std::string const toString() const override;
 
@@ -112,23 +111,23 @@ namespace minty
         /// </summary>
         /// <param name="polar">The polar coordinates.</param>
         /// <returns>The cartesian coordinates.</returns>
-        static Point polarToCartesian(Point const& polar);
+        static Vector2Int polarToCartesian(Vector2Int const& polar);
 
         /// <summary>
         /// Converts the given cartesian coordinates to polar coordinates.
         /// </summary>
         /// <param name="cartesian">The cartesian coordinates.</param>
         /// <returns>The polar coordinates.</returns>
-        static Point cartesianToPolar(Point const& cartesian);
+        static Vector2Int cartesianToPolar(Vector2Int const& cartesian);
     };
 }
 
 namespace std
 {
     template<>
-    struct hash<minty::Point>
+    struct hash<minty::Vector2Int>
     {
-        std::size_t operator()(const minty::Point& obj) const
+        std::size_t operator()(const minty::Vector2Int& obj) const
         {
             return hash<int>()(obj.x) ^ (hash<int>()(obj.y) << 1);
         }

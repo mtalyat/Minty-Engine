@@ -1,7 +1,7 @@
 #pragma once
 
 #include "M_Object.h"
-#include "M_PointF.h"
+#include "M_Vector2.h"
 
 namespace minty
 {
@@ -45,10 +45,10 @@ namespace minty
 		RectF(float const width, float const height);
 
 		/// <summary>
-		/// Creates a new Rectangle using the given Point size.
+		/// Creates a new Rectangle using the given Vector2Int size.
 		/// </summary>
 		/// <param name="size">The size of the Rectangle.</param>
-		RectF(PointF const size);
+		RectF(Vector2 const size);
 
 		/// <summary>
 		/// Creates a new Rectangle using the given X and Y position, width and height.
@@ -73,14 +73,14 @@ namespace minty
 		/// </summary>
 		/// <param name="position">The position of the Rectangle.</param>
 		/// <param name="size">The size of the Rectangle.</param>
-		RectF(PointF const position, PointF const size);
+		RectF(Vector2 const position, Vector2 const size);
 
 		/// <summary>
 		/// Creates a new Rectangle using the given position and size.
 		/// </summary>
 		/// <param name="position">The position of the Rectangle.</param>
 		/// <param name="size">The size of the Rectangle.</param>
-		RectF(Point const position, Point const size);
+		RectF(Vector2Int const position, Vector2Int const size);
 
 		// equals operator
 		bool operator ==(RectF const& other) const
@@ -95,13 +95,13 @@ namespace minty
 		}
 
 		// add operator
-		RectF operator +(PointF const& point) const
+		RectF operator +(Vector2 const& point) const
 		{
 			return RectF(x + point.x, y + point.y, width, height);
 		}
 
 		// subtract operator
-		RectF operator -(PointF const& point) const
+		RectF operator -(Vector2 const& point) const
 		{
 			return RectF(x - point.x, y - point.y, width, height);
 		}
@@ -134,20 +134,20 @@ namespace minty
 		constexpr float area() const { return width * height; }
 
 		/// <summary>
-		/// Gets the position of the Rectangle, as a Point.
+		/// Gets the position of the Rectangle, as a Vector2Int.
 		/// </summary>
 		/// <returns>The X and Y position.</returns>
-		inline PointF position() const { return PointF(x, y); }
+		inline Vector2 position() const { return Vector2(x, y); }
 		/// <summary>
-		/// Gets the size of the Rectangle, as a Point.
+		/// Gets the size of the Rectangle, as a Vector2Int.
 		/// </summary>
 		/// <returns>The size.</returns>
-		inline PointF size() const { return PointF(width, height); }
+		inline Vector2 size() const { return Vector2(width, height); }
 		/// <summary>
-		/// Gets the center position of the Rectangle, as a Point.
+		/// Gets the center position of the Rectangle, as a Vector2Int.
 		/// </summary>
 		/// <returns>The center position.</returns>
-		inline PointF center() const { return PointF(x + width / 2.0f, y + height / 2.0f); }
+		inline Vector2 center() const { return Vector2(x + width / 2.0f, y + height / 2.0f); }
 
 		/// <summary>
 		/// Checks if this RectF overlaps with the given RectF.
@@ -164,11 +164,11 @@ namespace minty
 		RectF overlap(RectF const& other) const;
 
 		/// <summary>
-		/// Checks if this RectF contains the given Point.
+		/// Checks if this RectF contains the given Vector2Int.
 		/// </summary>
 		/// <param name="other"></param>
 		/// <returns></returns>
-		bool contains(PointF const& other) const;
+		bool contains(Vector2 const& other) const;
 
 		/// <summary>
 		/// Creates a Rect using the given bounds of each size of the Rect.

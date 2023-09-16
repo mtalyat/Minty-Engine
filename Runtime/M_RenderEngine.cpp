@@ -812,7 +812,6 @@ QueueFamilyIndices RenderEngine::findQueueFamilies(VkPhysicalDevice device)
 }
 
 // pick the software GPU to use (driver)
-
 void RenderEngine::createLogicalDevice()
 {
 	QueueFamilyIndices indices = findQueueFamilies(physicalDevice);

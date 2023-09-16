@@ -21,7 +21,7 @@ minty::RectF::RectF(float const width, float const height)
 	, height(height)
 {}
 
-minty::RectF::RectF(PointF const size)
+minty::RectF::RectF(Vector2 const size)
 	: x(0)
 	, y(0)
 	, width(size.x)
@@ -42,14 +42,14 @@ minty::RectF::RectF(int const x, int const y, int const width, int const height)
 	, height(static_cast<float>(height))
 {}
 
-minty::RectF::RectF(PointF const position, PointF const size)
+minty::RectF::RectF(Vector2 const position, Vector2 const size)
 	: x(position.x)
 	, y(position.y)
 	, width(size.x)
 	, height(size.y)
 {}
 
-minty::RectF::RectF(Point const position, Point const size)
+minty::RectF::RectF(Vector2Int const position, Vector2Int const size)
 	: x(static_cast<float>(position.x))
 	, y(static_cast<float>(position.y))
 	, width(static_cast<float>(size.x))
@@ -79,7 +79,7 @@ RectF RectF::overlap(RectF const& other) const
 	return RectF(xMin, yMin, xMax - xMin, yMax - yMin);
 }
 
-bool RectF::contains(PointF const& other) const
+bool RectF::contains(Vector2 const& other) const
 {
 	return other.x >= x && other.x < x + width && other.y >= y && other.y < y + height;
 }

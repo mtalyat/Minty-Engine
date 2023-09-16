@@ -1,7 +1,7 @@
 #pragma once
 
 #include "M_Object.h"
-#include "M_Point.h"
+#include "M_Vector2Int.h"
 
 namespace minty
 {
@@ -45,10 +45,10 @@ namespace minty
 		Rect(int const width, int const height);
 
 		/// <summary>
-		/// Creates a new Rectangle using the given Point size.
+		/// Creates a new Rectangle using the given Vector2Int size.
 		/// </summary>
 		/// <param name="size">The size of the Rectangle.</param>
-		Rect(Point const size);
+		Rect(Vector2Int const size);
 
 		/// <summary>
 		/// Creates a new Rectangle using the given X and Y position, width and height.
@@ -64,7 +64,7 @@ namespace minty
 		/// </summary>
 		/// <param name="position">The position of the Rectangle.</param>
 		/// <param name="size">The size of the Rectangle.</param>
-		Rect(Point const position, Point const size);
+		Rect(Vector2Int const position, Vector2Int const size);
 
 		// equals operator
 		bool operator ==(Rect const& other) const
@@ -79,13 +79,13 @@ namespace minty
 		}
 
 		// add operator
-		Rect operator +(Point const& point) const
+		Rect operator +(Vector2Int const& point) const
 		{
 			return Rect(x + point.x, y + point.y, width, height);
 		}
 
 		// subtract operator
-		Rect operator -(Point const& point) const
+		Rect operator -(Vector2Int const& point) const
 		{
 			return Rect(x - point.x, y - point.y, width, height);
 		}
@@ -118,20 +118,20 @@ namespace minty
 		constexpr int area() const { return width * height; }
 
 		/// <summary>
-		/// Gets the position of the Rectangle, as a Point.
+		/// Gets the position of the Rectangle, as a Vector2Int.
 		/// </summary>
 		/// <returns>The X and Y position.</returns>
-		inline Point position() const { return Point(x, y); }
+		inline Vector2Int position() const { return Vector2Int(x, y); }
 		/// <summary>
-		/// Gets the size of the Rectangle, as a Point.
+		/// Gets the size of the Rectangle, as a Vector2Int.
 		/// </summary>
 		/// <returns>The size.</returns>
-		inline Point size() const { return Point(width, height); }
+		inline Vector2Int size() const { return Vector2Int(width, height); }
 		/// <summary>
-		/// Gets the center position of the Rectangle, as a Point.
+		/// Gets the center position of the Rectangle, as a Vector2Int.
 		/// </summary>
 		/// <returns>The center position.</returns>
-		inline Point center() const { return Point(x + width / 2, y + height / 2); }
+		inline Vector2Int center() const { return Vector2Int(x + width / 2, y + height / 2); }
 
 		/// <summary>
 		/// Checks if this Rect overlaps with the given Rect.
@@ -148,11 +148,11 @@ namespace minty
 		Rect overlap(Rect const& other) const;
 
 		/// <summary>
-		/// Checks if this Rect contains the given Point.
+		/// Checks if this Rect contains the given Vector2Int.
 		/// </summary>
 		/// <param name="other"></param>
 		/// <returns></returns>
-		bool contains(Point const& other) const;
+		bool contains(Vector2Int const& other) const;
 
 		/// <summary>
 		/// Converts this Rect to a RectF.
