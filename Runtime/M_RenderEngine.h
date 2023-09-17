@@ -93,6 +93,8 @@ namespace minty
 	private:
 		Window* const _window;
 
+		Texture _texture;
+		Mesh _mesh;
 	public:
 		RenderEngine(Window* const window, GameEngine& engine);
 
@@ -110,9 +112,6 @@ namespace minty
 		bool isRunning();
 	//private:
 	public: // TODO: TEMPORARILY ALL PUBLIC FOR TESTING/REFACTORING PURPOSES
-		Texture _texture;
-		Mesh _mesh;
-
 		VkInstance instance;
 		VkDebugUtilsMessengerEXT debugMessenger;
 		VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
