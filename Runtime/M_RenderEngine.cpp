@@ -589,6 +589,9 @@ void RenderEngine::createSwapChain()
 
 	swapChainImageFormat = surfaceFormat.format;
 	swapChainExtent = extent;
+
+	// update viewport and scissor
+	_viewport.setExtent(extent.width, extent.height);
 }
 
 void RenderEngine::cleanupSwapChain()
@@ -1585,19 +1588,9 @@ void RenderEngine::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t i
 	// update uniform data
 	vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[currentFrame], 0, nullptr);
 
-	VkViewport viewport{};
-	viewport.x = 0.0f;
-	viewport.y = 0.0f;
-	viewport.width = static_cast<float>(swapChainExtent.width);
-	viewport.height = static_cast<float>(swapChainExtent.height);
-	viewport.minDepth = 0.0f;
-	viewport.maxDepth = 1.0f;
-	vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
-
-	VkRect2D scissor{};
-	scissor.offset = { 0, 0 };
-	scissor.extent = swapChainExtent;
-	vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
+	// set viewport
+	vkCmdSetViewport(commandBuffer, 0, 1, &_viewport._viewport);
+	vkCmdSetScissor(commandBuffer, 0, 1, &_viewport._scissor);
 
 	uint32_t indexCount = 36u;
 	// draw command

@@ -1,9 +1,14 @@
 #include "pch.h"
 #include "M_Viewport.h"
 
+minty::Viewport::Viewport()
+	: _viewport({0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f})
+	, _scissor({{0, 0}, {0u, 0u}})
+{}
+
 minty::Viewport::Viewport(int const x, int const y, unsigned int const width, unsigned int const height, float const minDepth, float const maxDepth)
 	: _viewport({static_cast<float>(x), static_cast<float>(y), static_cast<float>(width), static_cast<float>(height), minDepth, maxDepth})
-	, _scissor({VkOffset2D{x, y}, VkExtent2D{width, height}})
+	, _scissor({{x, y}, {width, height}})
 {}
 
 void minty::Viewport::setOffset(int const x, int const y)

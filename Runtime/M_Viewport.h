@@ -13,6 +13,8 @@ namespace minty
 		VkRect2D _scissor;
 
 	public:
+		Viewport();
+
 		Viewport(int const x, int const y, unsigned int const width, unsigned int const height, float const minDepth, float const maxDepth);
 
 		void setOffset(int const x, int const y);

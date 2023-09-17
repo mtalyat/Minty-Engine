@@ -5,6 +5,7 @@
 #include "M_Window.h"
 #include "M_Texture.h"
 #include "M_Mesh.h"
+#include "M_Viewport.h"
 
 //#include <vulkan/vulkan.h>
 #define GLFW_INCLUDE_VULKAN
@@ -96,6 +97,7 @@ namespace minty
 		Texture* _texture;
 		Material* _material;
 		Mesh* _mesh;
+		Viewport _viewport;
 	public:
 		RenderEngine(Window* const window, GameEngine& engine);
 
