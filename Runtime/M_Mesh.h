@@ -1,6 +1,7 @@
 #pragma once
 #include "M_Object.h"
 
+#include "M_Material.h"
 #include <vulkan/vulkan.h>
 #include <vector>
 
@@ -20,8 +21,12 @@ namespace minty
 		VkBuffer _indexBuffer;
 		VkDeviceMemory _indexMemory;
 
+		Material* _material;
+
 	public:
 		//Mesh();
+
+		void dispose(RenderEngine& engine);
 
 		/// <summary>
 		/// Sets the vertex data.
@@ -36,8 +41,8 @@ namespace minty
 		/// <param name="indices">The index data.</param>
 		/// <param name="deviceSize">The size in bytes of the index data.</param>
 		void setIndices(void const* const indices, size_t const deviceSize, RenderEngine& engine);
-		
-		void dispose(RenderEngine& engine);
+
+		void setMaterial(Material* const material);
 
 		/// <summary>
 		/// Creates a cube mesh.

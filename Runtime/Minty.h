@@ -18,6 +18,7 @@ ONLY include files that somebody writing a game would use.
 #include "M_File.h"
 #include "M_GameEngine.h"
 #include "M_InputMap.h"
+#include "M_Material.h"
 #include "M_Math.h"
 #include "M_Mesh.h"
 #include "M_Object.h"

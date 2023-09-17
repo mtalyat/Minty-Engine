@@ -93,8 +93,9 @@ namespace minty
 	private:
 		Window* const _window;
 
-		Texture _texture;
-		Mesh _mesh;
+		Texture* _texture;
+		Material* _material;
+		Mesh* _mesh;
 	public:
 		RenderEngine(Window* const window, GameEngine& engine);
 
@@ -201,6 +202,8 @@ namespace minty
 		/// Creates the texture image that will be rendered to the screen.
 		/// </summary>
 		void createTextureImage();
+
+		void createMaterial();
 
 		/// <summary>
 		/// Creates an image view, so the image can be seen.

@@ -51,6 +51,9 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
 
 RenderEngine::RenderEngine(Window* const window, GameEngine& engine)
 	: _window(window)
+	, _texture()
+	, _material()
+	, _mesh()
 {
 	initVulkan();
 }
@@ -87,6 +90,7 @@ void RenderEngine::initVulkan()
 	createFramebuffers();
 	createTextureImage();
 	createTextureSampler();
+	createMaterial();
 	createMesh();
 	createUniformBuffers();
 	createDescriptorPool();
@@ -222,7 +226,13 @@ void RenderEngine::createImage(uint32_t width, uint32_t height, VkFormat format,
 
 void RenderEngine::createTextureImage()
 {
-	_texture = Texture::load("Assets/Textures/funny.jpg", *this);
+	_texture = new Texture();
+	*_texture = Texture::load("Assets/Textures/funny.jpg", *this);
+}
+
+void minty::RenderEngine::createMaterial()
+{
+	_material = new Material(_texture);
 }
 
 VkImageView RenderEngine::createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags) {
@@ -1324,7 +1334,8 @@ void RenderEngine::createFramebuffers()
 
 void minty::RenderEngine::createMesh()
 {
-	_mesh = Mesh::createCube(*this);
+	_mesh = new Mesh();
+	*_mesh = Mesh::createCube(*this);
 }
 
 void RenderEngine::createUniformBuffers()
@@ -1414,7 +1425,7 @@ void RenderEngine::createDescriptorSets()
 
 		VkDescriptorImageInfo imageInfo{};
 		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-		imageInfo.imageView = _texture._view;
+		imageInfo.imageView = _texture->_view;
 		imageInfo.sampler = textureSampler;
 
 		std::array<VkWriteDescriptorSet, 2> descriptorWrites{};
@@ -1566,10 +1577,10 @@ void RenderEngine::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t i
 	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipeline);
 
 	// bind vertex data
-	VkBuffer vertexBuffers[] = { _mesh._vertexBuffer };
+	VkBuffer vertexBuffers[] = { _mesh->_vertexBuffer };
 	VkDeviceSize offsets[] = { 0 };
 	vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
-	vkCmdBindIndexBuffer(commandBuffer, _mesh._indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+	vkCmdBindIndexBuffer(commandBuffer, _mesh->_indexBuffer, 0, VK_INDEX_TYPE_UINT16);
 
 	// update uniform data
 	vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, pipelineLayout, 0, 1, &descriptorSets[currentFrame], 0, nullptr);
@@ -1643,14 +1654,17 @@ void RenderEngine::cleanup()
 	// clean up vulkan
 	cleanupSwapChain();
 	vkDestroySampler(device, textureSampler, nullptr);
-	_texture.dispose(*this);
+	_texture->dispose(*this);
+	delete _texture;
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
 		vkDestroyBuffer(device, uniformBuffers[i], nullptr);
 		vkFreeMemory(device, uniformBuffersMemory[i], nullptr);
 	}
 	vkDestroyDescriptorPool(device, descriptorPool, nullptr);
 	vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
-	_mesh.dispose(*this);
+	delete _material;
+	_mesh->dispose(*this);
+	delete _mesh;
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
 		vkDestroySemaphore(device, renderFinishedSemaphores[i], nullptr);
 		vkDestroySemaphore(device, imageAvailableSemaphores[i], nullptr);
