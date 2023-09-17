@@ -1361,8 +1361,8 @@ void RenderEngine::updateUniformBuffer(uint32_t currentImage)
 
 	// current time elapsed since start
 	auto currentTime = std::chrono::high_resolution_clock::now();
-	//float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
-	float time = 0.0f;
+	float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+	//float time = 0.0f;
 
 	// set uniform values
 	UniformBufferObject ubo{};
