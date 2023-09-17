@@ -9,23 +9,17 @@ namespace minty
 	/// <summary>
 	/// Handles the core part of the engine, which includes running a game.
 	/// </summary>
-	class GameEngine
+	class Engine
 	{
-	private:
-		time_point_t _start;
-		time_point_t _frameTick;
-		unsigned int _frameCount;
-
 	public:
-		GameEngine();
+		Engine();
 
-		~GameEngine();
+		~Engine();
 
 		/// <summary>
 		/// Runs the game.
 		/// </summary>
 		void run();
-
 	private:
 		time_point_t getNow() const;
 	};

@@ -53,7 +53,7 @@ void Application::run(int argc, char const* argv[])
 	// if folder does not exist, do nothing
 	if (!std::filesystem::exists(path))
 	{
-		std::cout << "Path does not exist: " << path << std::endl;
+		minty::console::error(std::string("Path does not exist: ") + path);
 		return;
 	}
 
@@ -179,7 +179,7 @@ void Application::run(int argc, char const* argv[])
 			}
 			else
 			{
-				std::cout << "Did not recognize command: " << command << std::endl;
+				minty::console::error(std::string("Did not recognize command: ") + c);
 			}
 		}
 	}
@@ -202,7 +202,7 @@ void Application::generate_cmake(Info const& info)
 	// if not open, error
 	if (!file.is_open())
 	{
-		std::cerr << "Could not open cmake file: " << path << std::endl;
+		minty::console::error(std::string("Could not open cmake file: ") + path);
 		return;
 	}
 
@@ -217,6 +217,7 @@ void Application::generate_cmake(Info const& info)
 		"cmake_minimum_required(VERSION 3.16)" << std::endl <<
 		// project name, c++ settings
 		"project(" << APPLICATION_NAME << " LANGUAGES CXX)" << std::endl <<
+		"find_package(Vulkan REQUIRED)" << std::endl <<
 		"set(CMAKE_CXX_STANDARD 20)" << std::endl <<
 		"set(CMAKE_CXX_STANDARD_REQUIRED ON)" << std::endl <<
 		"set(CMAKE_CXX_EXTENSIONS OFF)" << std::endl;
@@ -231,8 +232,10 @@ void Application::generate_cmake(Info const& info)
 		"add_executable(${PROJECT_NAME} main.cpp)" << std::endl <<
 		"set_property(TARGET ${PROJECT_NAME} PROPERTY INTERPROCEDURAL_OPTIMIZATION_RELEASE TRUE)" << std::endl <<
 		"set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY \"MultiThreaded$<$<CONFIG:Debug>:Debug>\")" << std::endl <<
-		"target_include_directories(${PROJECT_NAME} PRIVATE C:/Users/mitch/source/repos/Minty-Engine/Runtime)" << std::endl <<
-		"target_link_libraries(${PROJECT_NAME} C:/Users/mitch/source/repos/Minty-Engine/Runtime/x64/" << info.getConfig() << "/MintyRuntime.lib)";
+		"target_include_directories(${PROJECT_NAME} PRIVATE C:/Users/mitch/source/repos/Minty-Engine/Runtime PUBLIC ${VULKAN_INCLUDE_DIRS})" << std::endl <<
+		"include_directories(${Vulkan_INCLUDE_DIRS})" << std::endl <<
+		"target_link_libraries(${PROJECT_NAME} C:/Users/mitch/source/repos/Minty-Engine/Runtime/x64/" << info.getConfig() << "/MintyRuntime.lib)" << std::endl <<
+		"target_link_libraries(${PROJECT_NAME} ${Vulkan_LIBRARIES})";
 
 	file.close();
 }
@@ -248,7 +251,7 @@ void Application::generate_main(Info const& info)
 	// if not open, error
 	if (!file.is_open())
 	{
-		std::cerr << "Could not open main file: " << path << std::endl;
+		minty::console::error(std::string("Could not open main file: ") + path);
 		return;
 	}
 
@@ -293,44 +296,34 @@ void Application::run(Info const& info)
 //https://stackoverflow.com/questions/478898/how-do-i-execute-a-command-and-get-the-output-of-the-command-within-c-using-po
 void Application::run_command(std::string const& cmd)
 {
-	std::cout << std::endl << cmd << std::endl;
+	minty::console::log(cmd);
 	std::array<char, 128> buffer;
-	//std::string result;
 	std::unique_ptr<FILE, decltype(&_pclose)> pipe(_popen(cmd.c_str(), "r"), _pclose);
 	if (!pipe) {
 		throw std::runtime_error("popen() failed!");
 	}
-	// print file contents as a different color
-	
 	std::string result;
 	bool changeColor = true;
 	while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
-		//result += buffer.data();
-		//std::cout << buffer.data();
 		result = buffer.data();
 
 		if (changeColor)
 		{
 			if (result.find("error") != std::string::npos)
 			{
-				std::cout << "\033[31;40m"; // red
+				minty::console::error(result);
 			}
 			else if (result.find("warning") != std::string::npos)
 			{
-				std::cout << "\033[33;40m"; // yellow
+				minty::console::warn(result);
 			}
 			else
 			{
-				std::cout << "\033[90;40m"; // gray
+				minty::console::info(result);
 			}
 		}
-		
-		std::cout << result;
 
 		// if newline, it was the end of the inputted line, so update the color for the next line
 		changeColor = result.ends_with('\n');
 	}
-	// reset colors and add newline
-	std::cout << "\033[0m";
-	//return result;
 }

@@ -3,6 +3,10 @@
 // Graphics pipeline: https://vulkan-tutorial.com/en/Drawing_a_triangle/Graphics_pipeline_basics/Introduction
 
 #include "M_Window.h"
+#include "M_Texture.h"
+#include "M_Mesh.h"
+#include "M_Viewport.h"
+#include "M_Color.h"
 
 //#include <vulkan/vulkan.h>
 #define GLFW_INCLUDE_VULKAN
@@ -21,6 +25,8 @@
 
 namespace minty
 {
+	class Engine;
+
 	// https://vulkan-tutorial.com/en/Vertex_buffers/Vertex_input_description
 	struct Vertex
 	{
@@ -59,23 +65,6 @@ namespace minty
 		}
 	};
 
-	const std::vector<Vertex> vertices = {
-		{{-0.5f, -0.5f, 0.0f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
-		{{0.5f, -0.5f, 0.0f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
-		{{0.5f, 0.5f, 0.0f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
-		{{-0.5f, 0.5f, 0.0f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}},
-
-		{{-0.5f, -0.5f, -0.5f}, {1.0f, 0.0f, 0.0f}, {0.0f, 0.0f}},
-		{{0.5f, -0.5f, -0.5f}, {0.0f, 1.0f, 0.0f}, {1.0f, 0.0f}},
-		{{0.5f, 0.5f, -0.5f}, {0.0f, 0.0f, 1.0f}, {1.0f, 1.0f}},
-		{{-0.5f, 0.5f, -0.5f}, {1.0f, 1.0f, 1.0f}, {0.0f, 1.0f}}
-	};
-
-	const std::vector<uint16_t> indices = {
-		0, 1, 2, 2, 3, 0,
-		4, 5, 6, 6, 7, 4
-	};
-
 	struct QueueFamilyIndices {
 		std::optional<uint32_t> graphicsFamily;
 		std::optional<uint32_t> presentFamily;
@@ -101,12 +90,20 @@ namespace minty
 	/// <summary>
 	/// Handles rendering for the game engine.
 	/// </summary>
-	class RenderEngine
+	class Renderer
 	{
-	public:
-		RenderEngine();
+	private:
+		Window* const _window;
 
-		~RenderEngine();
+		Texture* _texture;
+		Material* _material;
+		Mesh* _mesh;
+		Viewport _viewport;
+		Color _backgroundColor;
+	public:
+		Renderer(Window* const window, Engine& engine);
+
+		~Renderer();
 
 		/// <summary>
 		/// Draws a frame to the screen.
@@ -118,9 +115,8 @@ namespace minty
 		/// </summary>
 		/// <returns>True if the engine is still running.</returns>
 		bool isRunning();
-	private:
-		Window* _window;
-
+	//private:
+	public: // TODO: TEMPORARILY ALL PUBLIC FOR TESTING/REFACTORING PURPOSES
 		VkInstance instance;
 		VkDebugUtilsMessengerEXT debugMessenger;
 		VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
@@ -134,9 +130,7 @@ namespace minty
 		VkExtent2D swapChainExtent;
 		std::vector<VkImageView> swapChainImageViews;
 		VkDescriptorSetLayout descriptorSetLayout;
-		VkPipelineLayout pipelineLayout;
 		VkRenderPass renderPass;
-		VkPipeline graphicsPipeline;
 		std::vector<VkFramebuffer> swapChainFramebuffers;
 		VkCommandPool commandPool;
 		std::vector<VkCommandBuffer> commandBuffers;
@@ -145,27 +139,16 @@ namespace minty
 		std::vector<VkFence> inFlightFences;
 		bool framebufferResized = false;
 		uint32_t currentFrame = 0;
-		VkBuffer vertexBuffer;
-		VkDeviceMemory vertexBufferMemory;
-		VkBuffer indexBuffer;
-		VkDeviceMemory indexBufferMemory;
+		
 		std::vector<VkBuffer> uniformBuffers;
 		std::vector<VkDeviceMemory> uniformBuffersMemory;
 		std::vector<void*> uniformBuffersMapped;
 		VkDescriptorPool descriptorPool;
 		std::vector<VkDescriptorSet> descriptorSets;
-		VkImage textureImage;
-		VkDeviceMemory textureImageMemory;
-		VkImageView textureImageView;
 		VkSampler textureSampler;
 		VkImage depthImage;
 		VkDeviceMemory depthImageMemory;
 		VkImageView depthImageView;
-
-		/// <summary>
-		/// Initializes the GLFW window on the screen.
-		/// </summary>
-		void initWindow();
 
 		/// <summary>
 		/// Initializes the Vulkan framework and all necessary components to render things to the window.
@@ -230,11 +213,6 @@ namespace minty
 		/// <param name="aspectFlags">The aspect flags of the image.</param>
 		/// <returns>The created image view.</returns>
 		VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
-
-		/// <summary>
-		/// Creates the texture image view.
-		/// </summary>
-		void createTextureImageView();
 
 		/// <summary>
 		/// Creates the texture sampler for the GPU.
@@ -406,21 +384,23 @@ namespace minty
 		static std::vector<char> readFile(const std::string& filename);
 
 		/// <summary>
-		/// Creates the shader module, given the shader code.
+		/// Loads a shader from the disk.
 		/// </summary>
-		/// <param name="code">The shader code.</param>
-		/// <returns>The created shader module.</returns>
-		VkShaderModule createShaderModule(const std::vector<char>& code);
+		/// <param name="path">The path to the .spv shader file. .spv files come from a compiled GLSL file.</param>
+		/// <returns>The shader module.</returns>
+		VkShaderModule loadShaderModule(std::string const& path);
 
 		/// <summary>
 		/// Creates the render pass.
 		/// </summary>
 		void createRenderPass();
 
+		Material* createMaterial(std::string const& vertexPath, std::string const& fragmentPath);
+
 		/// <summary>
 		/// Creates the graphics pipeline.
 		/// </summary>
-		void createGraphicsPipeline();
+		void createMainMaterial();
 
 		/// <summary>
 		/// Creates the frame buffers.
@@ -428,14 +408,9 @@ namespace minty
 		void createFramebuffers();
 
 		/// <summary>
-		/// Creates the vertex buffer.
+		/// Creates the mesh to render.
 		/// </summary>
-		void createVertexBuffer();
-
-		/// <summary>
-		/// Creates the index buffer.
-		/// </summary>
-		void createIndexBuffer();
+		void createMesh();
 
 		/// <summary>
 		/// Creates the uniform buffers.
@@ -446,7 +421,7 @@ namespace minty
 		/// Updates the uniform buffer with new rotation values.
 		/// </summary>
 		/// <param name="currentImage">The image in which to update the buffer for.</param>
-		void updateUniformBuffer(uint32_t currentImage);
+		void updateUniformBuffer(float const rotation);
 
 		/// <summary>
 		/// Creates the descriptor pool.

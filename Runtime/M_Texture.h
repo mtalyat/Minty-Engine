@@ -1,0 +1,31 @@
+#pragma once
+#include "M_Object.h"
+
+#include <vulkan/vulkan.h>
+
+namespace minty
+{
+	class Renderer;
+
+	class Texture :
+		public Object
+	{
+	public: // TODO: TESTING, SET TO PRIVATE LATER
+		VkFormat _format;
+		VkImage _image;
+		VkDeviceMemory _memory;
+		VkImageView _view;
+
+	public:
+
+		void dispose(Renderer& engine);
+
+		/// <summary>
+		/// Loads a texture from a file at the given path.
+		/// </summary>
+		/// <param name="path">An image file to load.</param>
+		/// <returns>The loaded texture/</returns>
+		static Texture load(std::string const& path, Renderer& engine);
+	};
+}
+
