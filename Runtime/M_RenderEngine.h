@@ -90,8 +90,11 @@ namespace minty
 	/// </summary>
 	class RenderEngine
 	{
+	private:
+		Window* const _window;
+
 	public:
-		RenderEngine(GameEngine& engine);
+		RenderEngine(Window* const window, GameEngine& engine);
 
 		~RenderEngine();
 
@@ -107,8 +110,6 @@ namespace minty
 		bool isRunning();
 	//private:
 	public: // TODO: TEMPORARILY ALL PUBLIC FOR TESTING/REFACTORING PURPOSES
-		Window* _window;
-
 		Texture _texture;
 		Mesh _mesh;
 
@@ -146,11 +147,6 @@ namespace minty
 		VkImage depthImage;
 		VkDeviceMemory depthImageMemory;
 		VkImageView depthImageView;
-
-		/// <summary>
-		/// Initializes the GLFW window on the screen.
-		/// </summary>
-		void initWindow();
 
 		/// <summary>
 		/// Initializes the Vulkan framework and all necessary components to render things to the window.

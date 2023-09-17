@@ -7,26 +7,32 @@
 
 using namespace minty;
 
-GameEngine::GameEngine()
-	: _start()
-	, _frameTick()
-	, _frameCount()
-{
+uint32_t const WIDTH = 800;
+uint32_t const HEIGHT = 600;
 
+GameEngine::GameEngine()
+{
+	// init GLFW
+	glfwInit();
 }
 
 GameEngine::~GameEngine()
 {
+	// close GLFW
+	glfwTerminate();
 }
 
 void GameEngine::run()
 {
 	// record start time, and last frame tick
-	_start = getNow();
-	_frameTick = _start;
+	time_point_t start = getNow();
+	time_point_t frameTick = start;
+	unsigned int frameCount = 0u;
+
+	Window window("Minty", WIDTH, HEIGHT);
 
 	// start the render engine
-	RenderEngine engine(*this);
+	RenderEngine engine(&window, *this);
 
 	float rotation = 0.0f;
 	float* rotationPtr = &rotation;
@@ -46,7 +52,7 @@ void GameEngine::run()
 		}
 	});
 
-	engine._window->setInput(&input);
+	window.setInput(&input);
 
 	time_point_t now;
 
@@ -57,22 +63,22 @@ void GameEngine::run()
 		engine.updateUniformBuffer(rotation);
 		engine.renderFrame();
 
-		_frameCount++;
+		frameCount++;
 
 		now = getNow();
 
 		// if frame tick >= 1 second
-		if (std::chrono::duration_cast<std::chrono::nanoseconds>(now - _frameTick).count() >= 1000000000ll)
+		if (std::chrono::duration_cast<std::chrono::nanoseconds>(now - frameTick).count() >= 1000000000ll)
 		{
-			std::cout << _frameCount << '\r' << std::endl;
+			std::cout << frameCount << '\r' << std::endl;
 
-			_frameCount = 0u;
-			_frameTick = now;
+			frameCount = 0u;
+			frameTick = now;
 		}
 	}
 
 	// print elapsed time
-	std::cout << "Elapsed time: " << (std::chrono::duration_cast<std::chrono::milliseconds>(getNow() - _start).count() / 1000.0f) << "s" << std::endl;
+	std::cout << "Elapsed time: " << (std::chrono::duration_cast<std::chrono::milliseconds>(getNow() - start).count() / 1000.0f) << "s" << std::endl;
 }
 
 time_point_t minty::GameEngine::getNow() const

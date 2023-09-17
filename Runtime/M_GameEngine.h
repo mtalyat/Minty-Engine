@@ -11,11 +11,6 @@ namespace minty
 	/// </summary>
 	class GameEngine
 	{
-	private:
-		time_point_t _start;
-		time_point_t _frameTick;
-		unsigned int _frameCount;
-
 	public:
 		GameEngine();
 

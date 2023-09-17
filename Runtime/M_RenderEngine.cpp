@@ -16,9 +16,6 @@
 
 using namespace minty;
 
-uint32_t const WIDTH = 800;
-uint32_t const HEIGHT = 600;
-
 const std::vector<const char*> validationLayers = {
 	"VK_LAYER_KHRONOS_validation"
 };
@@ -52,9 +49,9 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
 	}
 }
 
-RenderEngine::RenderEngine(GameEngine& engine)
+RenderEngine::RenderEngine(Window* const window, GameEngine& engine)
+	: _window(window)
 {
-	initWindow();
 	initVulkan();
 }
 
@@ -71,15 +68,6 @@ void RenderEngine::renderFrame()
 bool RenderEngine::isRunning()
 {
 	return _window->isOpen();
-}
-
-void RenderEngine::initWindow()
-{
-	// init GLFW
-	glfwInit();
-
-	// init window
-	_window = new Window("Minty", WIDTH, HEIGHT);
 }
 
 void RenderEngine::initVulkan()
@@ -1675,9 +1663,4 @@ void RenderEngine::cleanup()
 	vkDestroyDevice(device, nullptr);
 	vkDestroySurfaceKHR(instance, surface, nullptr);
 	vkDestroyInstance(instance, nullptr);
-
-	delete _window;
-
-	// close GLFW
-	glfwTerminate();
 }
