@@ -42,7 +42,6 @@ void GameEngine::run()
 			break;
 		case KeyAction::Hold:
 			*rotationPtr += 0.01f;
-			console::log(std::format("Rotation: {}", *rotationPtr));
 			break;
 		}
 	});
