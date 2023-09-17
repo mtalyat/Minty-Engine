@@ -1,6 +1,6 @@
 #pragma once
 
-#include "M_GameEngine.h"
+#include "M_Engine.h"
 
 namespace minty
 {
@@ -10,7 +10,7 @@ namespace minty
 	class Runtime
 	{
 	private:
-		GameEngine* const _engine;
+		Engine* const _engine;
 
 	public:
 		Runtime();
@@ -19,6 +19,6 @@ namespace minty
 
 		int run(int argc, char const* argv[]);
 
-		GameEngine* getEngine() const;
+		Engine* getEngine() const;
 	};
 }

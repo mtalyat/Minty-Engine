@@ -2,7 +2,7 @@
 #include "M_Renderer.h"
 
 #include "M_Console.h"
-#include "M_GameEngine.h"
+#include "M_Engine.h"
 
 #include <iostream>
 #include <stdexcept>
@@ -49,7 +49,7 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
 	}
 }
 
-Renderer::Renderer(Window* const window, GameEngine& engine)
+Renderer::Renderer(Window* const window, Engine& engine)
 	: _window(window)
 	, _texture()
 	, _material()

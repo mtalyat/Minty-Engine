@@ -9,7 +9,7 @@
 using namespace minty;
 
 Runtime::Runtime()
-	: _engine(new GameEngine())
+	: _engine(new Engine())
 {
 }
 
@@ -62,7 +62,7 @@ int Runtime::run(int argc, char const* argv[])
 	return EXIT_SUCCESS;
 }
 
-GameEngine* Runtime::getEngine() const
+Engine* Runtime::getEngine() const
 {
 	return _engine;
 }

@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "M_GameEngine.h"
+#include "M_Engine.h"
 
 #include "M_Console.h"
 #include "M_Renderer.h"
@@ -10,19 +10,19 @@ using namespace minty;
 uint32_t const WIDTH = 800;
 uint32_t const HEIGHT = 600;
 
-GameEngine::GameEngine()
+Engine::Engine()
 {
 	// init GLFW
 	glfwInit();
 }
 
-GameEngine::~GameEngine()
+Engine::~Engine()
 {
 	// close GLFW
 	glfwTerminate();
 }
 
-void GameEngine::run()
+void Engine::run()
 {
 	// record start time, and last frame tick
 	time_point_t start = getNow();
@@ -99,7 +99,7 @@ void GameEngine::run()
 	std::cout << "Elapsed time: " << (std::chrono::duration_cast<std::chrono::milliseconds>(getNow() - start).count() / 1000.0f) << "s" << std::endl;
 }
 
-time_point_t minty::GameEngine::getNow() const
+time_point_t minty::Engine::getNow() const
 {
 	return std::chrono::steady_clock::now();
 }

@@ -25,7 +25,7 @@
 
 namespace minty
 {
-	class GameEngine;
+	class Engine;
 
 	// https://vulkan-tutorial.com/en/Vertex_buffers/Vertex_input_description
 	struct Vertex
@@ -101,7 +101,7 @@ namespace minty
 		Viewport _viewport;
 		Color _backgroundColor;
 	public:
-		Renderer(Window* const window, GameEngine& engine);
+		Renderer(Window* const window, Engine& engine);
 
 		~Renderer();
 

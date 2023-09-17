@@ -9,12 +9,12 @@ namespace minty
 	/// <summary>
 	/// Handles the core part of the engine, which includes running a game.
 	/// </summary>
-	class GameEngine
+	class Engine
 	{
 	public:
-		GameEngine();
+		Engine();
 
-		~GameEngine();
+		~Engine();
 
 		/// <summary>
 		/// Runs the game.

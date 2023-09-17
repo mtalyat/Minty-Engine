@@ -27,7 +27,7 @@
     <ClInclude Include="M_Renderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="M_GameEngine.h">
+    <ClInclude Include="M_Engine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Minty.h">
@@ -137,7 +137,7 @@
     <ClCompile Include="M_Renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="M_GameEngine.cpp">
+    <ClCompile Include="M_Engine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_CommandLineParser.cpp">
