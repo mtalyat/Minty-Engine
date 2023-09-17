@@ -1645,7 +1645,6 @@ void RenderEngine::cleanup()
 	}
 	vkDestroyDescriptorPool(device, descriptorPool, nullptr);
 	vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
-	delete _material;
 	_mesh->dispose(*this);
 	delete _mesh;
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
