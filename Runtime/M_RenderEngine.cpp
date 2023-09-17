@@ -54,6 +54,8 @@ RenderEngine::RenderEngine(Window* const window, GameEngine& engine)
 	, _texture()
 	, _material()
 	, _mesh()
+	, _viewport()
+	, _backgroundColor({250, 220, 192, 255}) // light tan color
 {
 	initVulkan();
 }
@@ -1139,25 +1141,6 @@ void RenderEngine::createGraphicsPipeline()
 		.primitiveRestartEnable = VK_FALSE
 	};
 
-	//// define viewport (rendering area)
-	//VkViewport viewport
-	//{
-	//	.x = 0.0f,
-	//	.y = 0.0f,
-	//	.width = (float)swapChainExtent.width,
-	//	.height = (float)swapChainExtent.height,
-	//	.minDepth = 0.0f,
-	//	.maxDepth = 0.0f,
-	//};
-
-	//// define scissor (area to actually render, rest is ignored) (think mask)
-	//// render whole viewport
-	//VkRect2D scissor
-	//{
-	//	.offset = {0, 0},
-	//	.extent = swapChainExtent
-	//};
-
 	// define dynamic states for viewport and scissor
 	std::vector<VkDynamicState> dynamicStates = {
 		VK_DYNAMIC_STATE_VIEWPORT,
@@ -1567,7 +1550,14 @@ void RenderEngine::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t i
 	renderPassInfo.renderArea.extent = swapChainExtent;
 
 	std::array<VkClearValue, 2> clearValues{};
-	clearValues[0].color = { { 0.0f, 0.0f, 0.0f, 1.0f } };
+	clearValues[0].color = { 
+		{
+			_backgroundColor.rf(),
+			_backgroundColor.gf(),
+			_backgroundColor.bf(),
+			_backgroundColor.af()
+		}
+	};
 	clearValues[1].depthStencil = { 1.0f, 0 };
 
 	renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());

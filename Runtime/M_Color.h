@@ -73,18 +73,42 @@ namespace minty
 		Color& operator=(const Color& color);
 
 		/// <summary>
+		/// Gets the red value as a scale from 0.0f to 1.0f.
+		/// </summary>
+		/// <returns>A float representing the value.</returns>
+		float rf() const;
+
+		/// <summary>
+		/// Gets the green value as a scale from 0.0f to 1.0f.
+		/// </summary>
+		/// <returns>A float representing the value.</returns>
+		float gf() const;
+
+		/// <summary>
+		/// Gets the blue value as a scale from 0.0f to 1.0f.
+		/// </summary>
+		/// <returns>A float representing the value.</returns>
+		float bf() const;
+
+		/// <summary>
+		/// Gets the alpha value as a scale from 0.0f to 1.0f.
+		/// </summary>
+		/// <returns>A float representing the value.</returns>
+		float af() const;
+
+		/// <summary>
 		/// Darkens the color by the given percentage.
 		/// </summary>
 		/// <param name="percent">The percent to darken the color by.</param>
 		/// <returns>A new darkened color.</returns>
-		inline Color darken(float const percent) const;
+		Color darken(float const percent) const;
 
 		/// <summary>
 		/// Lightens the color by the given percentage.
 		/// </summary>
 		/// <param name="percent">The percentage to lighten the color by.</param>
 		/// <returns>A new lightened color.</returns>
-		inline Color lighten(float const percent) const;
+		Color lighten(float const percent) const;
 
 		/// <summary>
 		/// Lerps two colors using the red, green and blue. The alpha value is set to the left argument alpha.

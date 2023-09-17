@@ -84,6 +84,26 @@ Color& Color::operator=(const Color& color)
 	return *this;
 }
 
+float minty::Color::rf() const
+{
+	return static_cast<float>(r) / 255.0f;
+}
+
+float minty::Color::gf() const
+{
+	return static_cast<float>(g) / 255.0f;
+}
+
+float minty::Color::bf() const
+{
+	return static_cast<float>(b) / 255.0f;
+}
+
+float minty::Color::af() const
+{
+	return static_cast<float>(a) / 255.0f;
+}
+
 inline Color Color::darken(float const percent) const
 {
 	return Color();
