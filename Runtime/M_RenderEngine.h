@@ -130,9 +130,7 @@ namespace minty
 		VkExtent2D swapChainExtent;
 		std::vector<VkImageView> swapChainImageViews;
 		VkDescriptorSetLayout descriptorSetLayout;
-		VkPipelineLayout pipelineLayout;
 		VkRenderPass renderPass;
-		VkPipeline graphicsPipeline;
 		std::vector<VkFramebuffer> swapChainFramebuffers;
 		VkCommandPool commandPool;
 		std::vector<VkCommandBuffer> commandBuffers;
@@ -206,8 +204,6 @@ namespace minty
 		/// Creates the texture image that will be rendered to the screen.
 		/// </summary>
 		void createTextureImage();
-
-		void createMaterial();
 
 		/// <summary>
 		/// Creates an image view, so the image can be seen.
@@ -388,21 +384,23 @@ namespace minty
 		static std::vector<char> readFile(const std::string& filename);
 
 		/// <summary>
-		/// Creates the shader module, given the shader code.
+		/// Loads a shader from the disk.
 		/// </summary>
-		/// <param name="code">The shader code.</param>
-		/// <returns>The created shader module.</returns>
-		VkShaderModule createShaderModule(const std::vector<char>& code);
+		/// <param name="path">The path to the .spv shader file. .spv files come from a compiled GLSL file.</param>
+		/// <returns>The shader module.</returns>
+		VkShaderModule loadShaderModule(std::string const& path);
 
 		/// <summary>
 		/// Creates the render pass.
 		/// </summary>
 		void createRenderPass();
 
+		Material* createMaterial(std::string const& vertexPath, std::string const& fragmentPath);
+
 		/// <summary>
 		/// Creates the graphics pipeline.
 		/// </summary>
-		void createGraphicsPipeline();
+		void createMainMaterial();
 
 		/// <summary>
 		/// Creates the frame buffers.

@@ -114,6 +114,12 @@
     <ClInclude Include="M_Viewport.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="M_Shader.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="M_ShaderPass.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -192,6 +198,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_Viewport.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_Shader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_ShaderPass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

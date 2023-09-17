@@ -2,15 +2,23 @@
 #include "M_Object.h"
 
 #include "M_Texture.h"
+#include <vulkan/vulkan.h>
 
 namespace minty
 {
+	class RenderEngine;
+
 	class Material :
 		public Object
 	{
 	public: // TODO: TEMP PUBLIC
-		Texture* const _texture;
+		VkPipelineLayout _layout;
+		VkPipeline _pipeline;
+		Texture* _texture;
+
 	public:
-		Material(Texture* const tex);
+		Material(VkPipelineLayout const& layout, VkPipeline const& pipeline);
+
+		void dispose(RenderEngine& engine);
 	};
 }
