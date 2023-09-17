@@ -550,7 +550,7 @@ void RenderEngine::createSwapChain()
 		.imageColorSpace = surfaceFormat.colorSpace,
 		.imageExtent = extent,
 		.imageArrayLayers = 1,
-		.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT
+		.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
 	};
 
 	QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
@@ -1195,7 +1195,7 @@ void RenderEngine::createGraphicsPipeline()
 		.rasterizerDiscardEnable = VK_FALSE, // if true, disables geometry shader, so nothing goes through the framebuffer
 		.polygonMode = VK_POLYGON_MODE_FILL, // fill polygon area with fragments (can also do line or point mode for frames/points)
 		.cullMode = VK_CULL_MODE_BACK_BIT, // cull back faces
-		.frontFace = VK_FRONT_FACE_COUNTER_CLOCKWISE, // how to determine front face/direction to rotate around on triangle vertices
+		.frontFace = VK_FRONT_FACE_CLOCKWISE, // how to determine front face/direction to rotate around on triangle vertices
 		.depthBiasEnable = VK_FALSE,
 		.depthBiasConstantFactor = 0.0f, // Optional
 		.depthBiasClamp = 0.0f, // Optional
@@ -1361,14 +1361,18 @@ void RenderEngine::updateUniformBuffer(uint32_t currentImage)
 
 	// current time elapsed since start
 	auto currentTime = std::chrono::high_resolution_clock::now();
-	float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+	//float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+	float time = 0.0f;
 
 	// set uniform values
 	UniformBufferObject ubo{};
-	ubo.model = glm::rotate(glm::mat4(1.0f), time * glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	ubo.model = glm::rotate(glm::mat4(1.0f), time * 0.5f * glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	ubo.proj = glm::perspective(glm::radians(45.0f), swapChainExtent.width / (float)swapChainExtent.height, 0.1f, 10.0f);
-	ubo.proj[1][1] *= -1; // flip upside down, since OpenGL is opposite of Vulkan
+	// flip y and x so that we have a left handed coordinates system
+	// pos x is right, pos y is up, pos z is forward
+	ubo.proj[1][1] *= -1.0f;
+	ubo.proj[0][0] *= -1.0f;
 
 	memcpy(uniformBuffersMapped[currentImage], &ubo, sizeof(ubo));
 }

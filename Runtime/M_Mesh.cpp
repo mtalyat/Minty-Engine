@@ -113,7 +113,7 @@ minty::Mesh minty::Mesh::createCube(RenderEngine& engine)
 		{ leftTopBack, color, {0.25f, 0.25f} },
 		{ leftTopFront, color, {0.25f, 0.0f} },
 		{ rightTopFront, color,{0.5f, 0.0f} },
-		{ rightTopBack, color,  {0.5f, 0.25f}},
+		{ rightTopBack, color,  {0.5f, 0.25f} },
 
 		// down?
 		{ rightBottomBack, color, {0.25f, 0.5f} },
@@ -141,11 +141,52 @@ minty::Mesh minty::Mesh::createCube(RenderEngine& engine)
 
 		// back?
 		{ leftBottomBack, color, {0.5f, 0.5f} },
-		{ leftTopBack, color, {0.5f, 0.25f}},
+		{ leftTopBack, color, {0.5f, 0.25f} },
 		{ rightTopBack, color, {0.75f, 0.25f} },
 		{ rightBottomBack, color, {0.75f, 0.5f} },
 	};
 
+	// backwards X uv:
+	//std::vector<Vertex> vertices =
+	//{
+	//	// up?
+	//	{ leftTopBack, color, {0.5f, 0.25f} },
+	//	{ leftTopFront, color, {0.5f, 0.0f} },
+	//	{ rightTopFront, color,{0.25f, 0.0f} },
+	//	{ rightTopBack, color,  {0.25f, 0.25f} },
+
+	//	// down?
+	//	{ rightBottomBack, color, {0.5f, 0.5f} },
+	//	{ rightBottomFront, color, {0.5f, 0.25f} },
+	//	{ leftBottomFront, color, {0.25f, 0.25f} },
+	//	{ leftBottomBack, color, {0.25f, 0.5f} },
+
+	//	// right?
+	//	{ rightBottomBack, color, {0.250f, 0.25f} },
+	//	{ rightTopBack, color, {0.250f, 0.0f} },
+	//	{ rightTopFront, color, {0.0f, 0.0f} },
+	//	{ rightBottomFront, color, {0.0f, 0.25f} },
+
+	//	// left?
+	//	{ leftBottomFront, color, {0.250f, 0.5f} },
+	//	{ leftTopFront, color, {0.250f, 0.25f}},
+	//	{ leftTopBack, color, {0.0f, 0.25f} },
+	//	{ leftBottomBack, color, {0.0f, 0.5f} },
+
+	//	// front?
+	//	{ rightBottomFront, color, {0.75f, 0.25f} },
+	//	{ rightTopFront, color, {0.75f, 0.0f} },
+	//	{ leftTopFront, color, {0.5f, 0.0f} },
+	//	{ leftBottomFront, color, {0.5f, 0.25f} },
+
+	//	// back?
+	//	{ leftBottomBack, color, {0.75f, 0.5f} },
+	//	{ leftTopBack, color, {0.75f, 0.25f} },
+	//	{ rightTopBack, color, {0.5f, 0.25f} },
+	//	{ rightBottomBack, color, {0.5f, 0.5f} },
+	//};
+
+	// normal cube:
 	//glm::vec2 topLeft = { 0.0f, 0.0f };
 	//glm::vec2 topRight = { 1.0f, 0.0f };
 	//glm::vec2 bottomLeft = { 0.0f, 1.0f };
