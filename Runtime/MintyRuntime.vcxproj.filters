@@ -90,6 +90,9 @@
     <ClInclude Include="M_Texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="entt.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

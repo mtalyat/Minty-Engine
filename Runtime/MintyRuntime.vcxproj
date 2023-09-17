@@ -208,6 +208,7 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="entt.hpp" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="Minty.h" />
     <ClInclude Include="M_Color.h" />
