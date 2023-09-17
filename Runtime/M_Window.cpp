@@ -72,6 +72,11 @@ bool minty::Window::isOpen() const
 	return !glfwWindowShouldClose(_window);
 }
 
+void minty::Window::close()
+{
+	glfwSetWindowShouldClose(_window, GLFW_TRUE);
+}
+
 void minty::Window::getFramebufferSize(int* const width, int* const height) const
 {
 	glfwGetFramebufferSize(_window, width, height);

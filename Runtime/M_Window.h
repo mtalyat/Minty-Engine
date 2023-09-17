@@ -40,6 +40,11 @@ namespace minty
 		bool isOpen() const;
 
 		/// <summary>
+		/// Closes the window.
+		/// </summary>
+		void close();
+
+		/// <summary>
 		/// Gets the size of the Window, in pixels.
 		/// </summary>
 		/// <param name="width">The width in pixels.</param>

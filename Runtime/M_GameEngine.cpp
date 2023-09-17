@@ -30,27 +30,33 @@ void GameEngine::run()
 	unsigned int frameCount = 0u;
 
 	Window window("Minty", WIDTH, HEIGHT);
+	Window* windowPtr = &window;
 
 	// start the render engine
-	RenderEngine engine(&window, *this);
+	RenderEngine engine(windowPtr, *this);
 
 	float rotation = 0.0f;
 	float* rotationPtr = &rotation;
 
 	// input
 	InputMap input;
-	input.emplaceKey(Key::Space, [rotationPtr](KeyPressEventArgs const& args){
-		switch (args.action)
+	input.emplaceKey(Key::Space, [rotationPtr](KeyPressEventArgs const& args)
 		{
-		case KeyAction::Down:
-			break;
-		case KeyAction::Up:
-			break;
-		case KeyAction::Hold:
-			*rotationPtr += 0.01f;
-			break;
-		}
-	});
+			switch (args.action)
+			{
+			case KeyAction::Down:
+				break;
+			case KeyAction::Up:
+				break;
+			case KeyAction::Hold:
+				*rotationPtr += 0.01f;
+				break;
+			}
+		});
+	input.emplaceKeyDown(Key::Escape, [windowPtr](KeyPressEventArgs const& args)
+		{
+			windowPtr->close();
+		});
 
 	window.setInput(&input);
 
