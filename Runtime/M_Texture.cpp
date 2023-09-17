@@ -2,7 +2,7 @@
 #include "M_Texture.h"
 
 #include "M_Color.h"
-#include "M_RenderEngine.h"
+#include "M_Renderer.h"
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 #include <stdexcept>
@@ -10,14 +10,14 @@
 
 using namespace minty;
 
-void minty::Texture::dispose(RenderEngine& engine)
+void minty::Texture::dispose(Renderer& engine)
 {
     vkDestroyImageView(engine.device, _view, nullptr);
     vkDestroyImage(engine.device, _image, nullptr);
     vkFreeMemory(engine.device, _memory, nullptr);
 }
 
-Texture minty::Texture::load(std::string const& path, RenderEngine& engine)
+Texture minty::Texture::load(std::string const& path, Renderer& engine)
 {
     // get data from file: pixels, width, height, color channels
     int width, height, channels;

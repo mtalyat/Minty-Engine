@@ -5,7 +5,7 @@
 
 namespace minty
 {
-	class RenderEngine;
+	class Renderer;
 
 	class Texture :
 		public Object
@@ -18,14 +18,14 @@ namespace minty
 
 	public:
 
-		void dispose(RenderEngine& engine);
+		void dispose(Renderer& engine);
 
 		/// <summary>
 		/// Loads a texture from a file at the given path.
 		/// </summary>
 		/// <param name="path">An image file to load.</param>
 		/// <returns>The loaded texture/</returns>
-		static Texture load(std::string const& path, RenderEngine& engine);
+		static Texture load(std::string const& path, Renderer& engine);
 	};
 }
 

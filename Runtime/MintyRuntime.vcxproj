@@ -211,6 +211,7 @@
     <ClInclude Include="entt.hpp" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="M_Material.h" />
+    <ClInclude Include="M_MaterialInstance.h" />
     <ClInclude Include="M_MouseButton.h" />
     <ClInclude Include="M_KeyModifiers.h" />
     <ClInclude Include="M_KeyAction.h" />
@@ -234,7 +235,7 @@
     <ClInclude Include="M_Project.h" />
     <ClInclude Include="M_Rect.h" />
     <ClInclude Include="M_RectF.h" />
-    <ClInclude Include="M_RenderEngine.h" />
+    <ClInclude Include="M_Renderer.h" />
     <ClInclude Include="M_Runtime.h" />
     <ClInclude Include="M_Stopwatch.h" />
     <ClInclude Include="M_Types.h" />
@@ -254,6 +255,7 @@
     <ClCompile Include="M_GameEngine.cpp" />
     <ClCompile Include="M_InputMap.cpp" />
     <ClCompile Include="M_Material.cpp" />
+    <ClCompile Include="M_MaterialInstance.cpp" />
     <ClCompile Include="M_Math.cpp" />
     <ClCompile Include="M_Mesh.cpp" />
     <ClCompile Include="M_Object.cpp" />
@@ -265,7 +267,7 @@
     <ClCompile Include="M_Project.cpp" />
     <ClCompile Include="M_Rect.cpp" />
     <ClCompile Include="M_RectF.cpp" />
-    <ClCompile Include="M_RenderEngine.cpp" />
+    <ClCompile Include="M_Renderer.cpp" />
     <ClCompile Include="M_Runtime.cpp" />
     <ClCompile Include="M_Stopwatch.cpp" />
     <ClCompile Include="M_Vector3.cpp" />

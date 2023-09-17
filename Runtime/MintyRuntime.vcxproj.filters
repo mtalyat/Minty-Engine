@@ -24,7 +24,7 @@
     <ClInclude Include="M_Runtime.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="M_RenderEngine.h">
+    <ClInclude Include="M_Renderer.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="M_GameEngine.h">
@@ -120,6 +120,9 @@
     <ClInclude Include="M_ShaderPass.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="M_MaterialInstance.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -131,7 +134,7 @@
     <ClCompile Include="M_Runtime.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="M_RenderEngine.cpp">
+    <ClCompile Include="M_Renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_GameEngine.cpp">
@@ -204,6 +207,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_ShaderPass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_MaterialInstance.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

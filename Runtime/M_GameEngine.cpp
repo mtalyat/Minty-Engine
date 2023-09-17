@@ -2,7 +2,7 @@
 #include "M_GameEngine.h"
 
 #include "M_Console.h"
-#include "M_RenderEngine.h"
+#include "M_Renderer.h"
 #include <iostream>
 
 using namespace minty;
@@ -33,13 +33,14 @@ void GameEngine::run()
 	Window* windowPtr = &window;
 
 	// start the render engine
-	RenderEngine engine(windowPtr, *this);
+	Renderer engine(windowPtr, *this);
 
 	float rotation = 0.0f;
 	float* rotationPtr = &rotation;
 
 	// input
 	InputMap input;
+	// rotate when space held
 	input.emplaceKey(Key::Space, [rotationPtr](KeyPressEventArgs const& args)
 		{
 			switch (args.action)
@@ -49,10 +50,21 @@ void GameEngine::run()
 			case KeyAction::Up:
 				break;
 			case KeyAction::Hold:
-				*rotationPtr += 0.01f;
+				if (static_cast<int>(args.mods) & static_cast<int>(KeyModifiers::Shift))
+				{
+					// rotate backwards
+					*rotationPtr -= 0.01f;
+				}
+				else
+				{
+					// rotate forwards
+					*rotationPtr += 0.01f;
+				}
+				
 				break;
 			}
 		});
+	// quit on key close
 	input.emplaceKeyDown(Key::Escape, [windowPtr](KeyPressEventArgs const& args)
 		{
 			windowPtr->close();

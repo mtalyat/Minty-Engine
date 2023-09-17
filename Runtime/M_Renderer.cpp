@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "M_RenderEngine.h"
+#include "M_Renderer.h"
 
 #include "M_Console.h"
 #include "M_GameEngine.h"
@@ -49,7 +49,7 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
 	}
 }
 
-RenderEngine::RenderEngine(Window* const window, GameEngine& engine)
+Renderer::Renderer(Window* const window, GameEngine& engine)
 	: _window(window)
 	, _texture()
 	, _material()
@@ -60,22 +60,22 @@ RenderEngine::RenderEngine(Window* const window, GameEngine& engine)
 	initVulkan();
 }
 
-RenderEngine::~RenderEngine()
+Renderer::~Renderer()
 {
 	cleanup();
 }
 
-void RenderEngine::renderFrame()
+void Renderer::renderFrame()
 {
 	drawFrame();
 }
 
-bool RenderEngine::isRunning()
+bool Renderer::isRunning()
 {
 	return _window->isOpen();
 }
 
-void RenderEngine::initVulkan()
+void Renderer::initVulkan()
 {
 	createInstance();
 	setupDebugMessenger();
@@ -100,7 +100,7 @@ void RenderEngine::initVulkan()
 	createSyncObjects();
 }
 
-void RenderEngine::createInstance()
+void Renderer::createInstance()
 {
 	// check if we can use validation layers
 	if (enableValidationLayers && !checkValidationLayerSupport())
@@ -154,7 +154,7 @@ void RenderEngine::createInstance()
 	}
 }
 
-VkFormat RenderEngine::findDepthFormat() {
+VkFormat Renderer::findDepthFormat() {
 	return findSupportedFormat(
 		{ VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT },
 		VK_IMAGE_TILING_OPTIMAL,
@@ -162,11 +162,11 @@ VkFormat RenderEngine::findDepthFormat() {
 	);
 }
 
-bool RenderEngine::hasStencilComponent(VkFormat format) {
+bool Renderer::hasStencilComponent(VkFormat format) {
 	return format == VK_FORMAT_D32_SFLOAT_S8_UINT || format == VK_FORMAT_D24_UNORM_S8_UINT;
 }
 
-VkFormat RenderEngine::findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features) {
+VkFormat Renderer::findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features) {
 	for (VkFormat format : candidates) {
 		VkFormatProperties props;
 		vkGetPhysicalDeviceFormatProperties(physicalDevice, format, &props);
@@ -182,7 +182,7 @@ VkFormat RenderEngine::findSupportedFormat(const std::vector<VkFormat>& candidat
 	throw std::runtime_error("failed to find supported format!");
 }
 
-void RenderEngine::createDepthResources()
+void Renderer::createDepthResources()
 {
 	VkFormat depthFormat = findDepthFormat();
 
@@ -190,7 +190,7 @@ void RenderEngine::createDepthResources()
 	depthImageView = createImageView(depthImage, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT);
 }
 
-void RenderEngine::createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory) {
+void Renderer::createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory) {
 	VkImageCreateInfo imageInfo{};
 	imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
 	imageInfo.imageType = VK_IMAGE_TYPE_2D;
@@ -225,13 +225,13 @@ void RenderEngine::createImage(uint32_t width, uint32_t height, VkFormat format,
 	vkBindImageMemory(device, image, imageMemory, 0);
 }
 
-void RenderEngine::createTextureImage()
+void Renderer::createTextureImage()
 {
 	_texture = new Texture();
 	*_texture = Texture::load("Assets/Textures/funny.jpg", *this);
 }
 
-VkImageView RenderEngine::createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags) {
+VkImageView Renderer::createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags) {
 	VkImageViewCreateInfo viewInfo{};
 	viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 	viewInfo.image = image;
@@ -251,7 +251,7 @@ VkImageView RenderEngine::createImageView(VkImage image, VkFormat format, VkImag
 	return imageView;
 }
 
-void RenderEngine::createTextureSampler()
+void Renderer::createTextureSampler()
 {
 	VkSamplerCreateInfo samplerInfo{};
 	samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -291,7 +291,7 @@ void RenderEngine::createTextureSampler()
 	}
 }
 
-VkCommandBuffer RenderEngine::beginSingleTimeCommands() {
+VkCommandBuffer Renderer::beginSingleTimeCommands() {
 	VkCommandBufferAllocateInfo allocInfo{};
 	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
@@ -310,7 +310,7 @@ VkCommandBuffer RenderEngine::beginSingleTimeCommands() {
 	return commandBuffer;
 }
 
-void RenderEngine::endSingleTimeCommands(VkCommandBuffer commandBuffer) {
+void Renderer::endSingleTimeCommands(VkCommandBuffer commandBuffer) {
 	vkEndCommandBuffer(commandBuffer);
 
 	VkSubmitInfo submitInfo{};
@@ -324,7 +324,7 @@ void RenderEngine::endSingleTimeCommands(VkCommandBuffer commandBuffer) {
 	vkFreeCommandBuffers(device, commandPool, 1, &commandBuffer);
 }
 
-void RenderEngine::transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout) {
+void Renderer::transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout) {
 	VkCommandBuffer commandBuffer = beginSingleTimeCommands();
 
 	VkImageMemoryBarrier barrier{};
@@ -378,7 +378,7 @@ void RenderEngine::transitionImageLayout(VkImage image, VkFormat format, VkImage
 	endSingleTimeCommands(commandBuffer);
 }
 
-void RenderEngine::copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height) {
+void Renderer::copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height) {
 	VkCommandBuffer commandBuffer = beginSingleTimeCommands();
 
 	VkBufferImageCopy region{};
@@ -410,7 +410,7 @@ void RenderEngine::copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t wi
 	endSingleTimeCommands(commandBuffer);
 }
 
-void RenderEngine::createDescriptorSetLayout()
+void Renderer::createDescriptorSetLayout()
 {
 	VkDescriptorSetLayoutBinding uboLayoutBinding{};
 	uboLayoutBinding.binding = 0;
@@ -442,7 +442,7 @@ void RenderEngine::createDescriptorSetLayout()
 	}
 }
 
-void RenderEngine::createImageViews()
+void Renderer::createImageViews()
 {
 	// resize to fit all image views
 	swapChainImageViews.resize(swapChainImages.size());
@@ -452,7 +452,7 @@ void RenderEngine::createImageViews()
 	}
 }
 
-void RenderEngine::createSurface()
+void Renderer::createSurface()
 {
 	// create window surface that vulkan can use to draw
 	if (glfwCreateWindowSurface(instance, _window->getRaw(), nullptr, &surface) != VK_SUCCESS) {
@@ -460,7 +460,7 @@ void RenderEngine::createSurface()
 	}
 }
 
-void RenderEngine::pickPhysicalDevice()
+void Renderer::pickPhysicalDevice()
 {
 	// find number of hardware GPUs
 	uint32_t deviceCount = 0;
@@ -490,7 +490,7 @@ void RenderEngine::pickPhysicalDevice()
 	}
 }
 
-bool RenderEngine::isDeviceSuitable(VkPhysicalDevice device)
+bool Renderer::isDeviceSuitable(VkPhysicalDevice device)
 {
 	// define requirements for the GPU we want
 
@@ -518,7 +518,7 @@ bool RenderEngine::isDeviceSuitable(VkPhysicalDevice device)
 	return indices.isComplete() && extensionsSupported && swapChainAdequate && supportedFeatures.samplerAnisotropy;
 }
 
-void RenderEngine::createSwapChain()
+void Renderer::createSwapChain()
 {
 	SwapChainSupportDetails swapChainSupport = querySwapChainSupport(physicalDevice);
 
@@ -590,7 +590,7 @@ void RenderEngine::createSwapChain()
 	_viewport.setExtent(extent.width, extent.height);
 }
 
-void RenderEngine::cleanupSwapChain()
+void Renderer::cleanupSwapChain()
 {
 	vkDestroyImageView(device, depthImageView, nullptr);
 	vkDestroyImage(device, depthImage, nullptr);
@@ -607,7 +607,7 @@ void RenderEngine::cleanupSwapChain()
 	vkDestroySwapchainKHR(device, swapChain, nullptr);
 }
 
-void RenderEngine::recreateSwapChain()
+void Renderer::recreateSwapChain()
 {
 	// on window minimize, pause program until un-minimized
 	int width = 0, height = 0;
@@ -629,7 +629,7 @@ void RenderEngine::recreateSwapChain()
 	createFramebuffers();
 }
 
-VkExtent2D RenderEngine::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities) {
+VkExtent2D Renderer::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities) {
 	if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
 		return capabilities.currentExtent;
 	}
@@ -649,7 +649,7 @@ VkExtent2D RenderEngine::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabi
 	}
 }
 
-VkPresentModeKHR RenderEngine::chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes) {
+VkPresentModeKHR Renderer::chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes) {
 	// essentially, check if v-sync exists, then use it
 	for (const auto& availablePresentMode : availablePresentModes) {
 		if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
@@ -660,7 +660,7 @@ VkPresentModeKHR RenderEngine::chooseSwapPresentMode(const std::vector<VkPresent
 	return VK_PRESENT_MODE_FIFO_KHR; // v-sync
 }
 
-VkSurfaceFormatKHR RenderEngine::chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats) {
+VkSurfaceFormatKHR Renderer::chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats) {
 	for (const auto& availableFormat : availableFormats) {
 		// VK_FORMAT_R8G8B8A8_UINT?
 		if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
@@ -671,7 +671,7 @@ VkSurfaceFormatKHR RenderEngine::chooseSwapSurfaceFormat(const std::vector<VkSur
 	return availableFormats[0];
 }
 
-SwapChainSupportDetails RenderEngine::querySwapChainSupport(VkPhysicalDevice device) {
+SwapChainSupportDetails Renderer::querySwapChainSupport(VkPhysicalDevice device) {
 	SwapChainSupportDetails details;
 
 	vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, surface, &details.capabilities);
@@ -695,7 +695,7 @@ SwapChainSupportDetails RenderEngine::querySwapChainSupport(VkPhysicalDevice dev
 	return details;
 }
 
-bool RenderEngine::checkDeviceExtensionSupport(VkPhysicalDevice device)
+bool Renderer::checkDeviceExtensionSupport(VkPhysicalDevice device)
 {
 	// check if all required extensions are there
 	uint32_t extensionCount;
@@ -713,7 +713,7 @@ bool RenderEngine::checkDeviceExtensionSupport(VkPhysicalDevice device)
 	return requiredExtensions.empty();
 }
 
-QueueFamilyIndices RenderEngine::findQueueFamilies(VkPhysicalDevice device)
+QueueFamilyIndices Renderer::findQueueFamilies(VkPhysicalDevice device)
 {
 	// find graphics familes for queueing up commands
 	QueueFamilyIndices indices;
@@ -750,7 +750,7 @@ QueueFamilyIndices RenderEngine::findQueueFamilies(VkPhysicalDevice device)
 }
 
 // pick the software GPU to use (driver)
-void RenderEngine::createLogicalDevice()
+void Renderer::createLogicalDevice()
 {
 	QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
 
@@ -797,7 +797,7 @@ void RenderEngine::createLogicalDevice()
 	vkGetDeviceQueue(device, indices.presentFamily.value(), 0, &presentQueue);
 }
 
-void RenderEngine::drawFrame()
+void Renderer::drawFrame()
 {
 	// wait until previous draw has completed
 	vkWaitForFences(device, 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
@@ -885,7 +885,7 @@ void RenderEngine::drawFrame()
 
 }
 
-bool RenderEngine::checkValidationLayerSupport()
+bool Renderer::checkValidationLayerSupport()
 {
 	uint32_t layerCount;
 	vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
@@ -911,7 +911,7 @@ bool RenderEngine::checkValidationLayerSupport()
 	return true;
 }
 
-std::vector<const char*> RenderEngine::getRequiredExtensions() {
+std::vector<const char*> Renderer::getRequiredExtensions() {
 	uint32_t glfwExtensionCount = 0;
 	const char** glfwExtensions;
 	glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
@@ -925,7 +925,7 @@ std::vector<const char*> RenderEngine::getRequiredExtensions() {
 	return extensions;
 }
 
-void RenderEngine::populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo) {
+void Renderer::populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo) {
 	createInfo = {
 		.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
 		.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
@@ -934,7 +934,7 @@ void RenderEngine::populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateI
 	};
 }
 
-void RenderEngine::setupDebugMessenger() {
+void Renderer::setupDebugMessenger() {
 	if (!enableValidationLayers) return;
 
 	VkDebugUtilsMessengerCreateInfoEXT createInfo;
@@ -945,7 +945,7 @@ void RenderEngine::setupDebugMessenger() {
 	}
 }
 
-VKAPI_ATTR VkBool32 VKAPI_CALL RenderEngine::debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData) {
+VKAPI_ATTR VkBool32 VKAPI_CALL Renderer::debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData) {
 	// change colors based on severity
 	if (messageSeverity & VkDebugUtilsMessageSeverityFlagBitsEXT::VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
 	{
@@ -971,7 +971,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL RenderEngine::debugCallback(VkDebugUtilsMessageSe
 	return VK_FALSE;
 }
 
-std::vector<char> RenderEngine::readFile(const std::string& filename) {
+std::vector<char> Renderer::readFile(const std::string& filename) {
 	if (!std::filesystem::exists(filename))
 	{
 		throw std::runtime_error(std::string("failed to find file! cwd: ") + std::filesystem::current_path().string() + ", " + filename + " -> " + std::filesystem::absolute(filename).string());
@@ -995,7 +995,7 @@ std::vector<char> RenderEngine::readFile(const std::string& filename) {
 	return buffer;
 }
 
-VkShaderModule minty::RenderEngine::loadShaderModule(std::string const& path)
+VkShaderModule minty::Renderer::loadShaderModule(std::string const& path)
 {
 	auto code = readFile(path);
 
@@ -1014,7 +1014,7 @@ VkShaderModule minty::RenderEngine::loadShaderModule(std::string const& path)
 	return shaderModule;
 }
 
-void RenderEngine::createRenderPass()
+void Renderer::createRenderPass()
 {
 	// need to tell vulkan how much of what to use for rendering
 
@@ -1084,7 +1084,7 @@ void RenderEngine::createRenderPass()
 	}
 }
 
-Material* minty::RenderEngine::createMaterial(std::string const& vertexPath, std::string const& fragmentPath)
+Material* minty::Renderer::createMaterial(std::string const& vertexPath, std::string const& fragmentPath)
 {
 	// load shaders from disk
 	VkShaderModule vertShaderModule = loadShaderModule("Assets/Shaders/vert.spv");
@@ -1281,7 +1281,7 @@ Material* minty::RenderEngine::createMaterial(std::string const& vertexPath, std
 	return new Material(layout, pipeline);
 }
 
-void RenderEngine::createMainMaterial()
+void Renderer::createMainMaterial()
 {
 	if (_material)
 	{
@@ -1292,7 +1292,7 @@ void RenderEngine::createMainMaterial()
 	_material = createMaterial("Assets/Shaders/vert.spv", "Assets/Shaders/frag.spv");
 }
 
-void RenderEngine::createFramebuffers()
+void Renderer::createFramebuffers()
 {
 	// resize to hold all framebuffers
 	swapChainFramebuffers.resize(swapChainImageViews.size());
@@ -1318,13 +1318,13 @@ void RenderEngine::createFramebuffers()
 	}
 }
 
-void minty::RenderEngine::createMesh()
+void minty::Renderer::createMesh()
 {
 	_mesh = new Mesh();
 	*_mesh = Mesh::createCube(*this);
 }
 
-void RenderEngine::createUniformBuffers()
+void Renderer::createUniformBuffers()
 {
 	VkDeviceSize bufferSize = sizeof(UniformBufferObject);
 
@@ -1339,7 +1339,7 @@ void RenderEngine::createUniformBuffers()
 	}
 }
 
-void RenderEngine::updateUniformBuffer(float const rotation)
+void Renderer::updateUniformBuffer(float const rotation)
 {
 	//// start time of program
 	//static auto startTime = std::chrono::high_resolution_clock::now();
@@ -1362,7 +1362,7 @@ void RenderEngine::updateUniformBuffer(float const rotation)
 	memcpy(uniformBuffersMapped[currentFrame], &ubo, sizeof(ubo));
 }
 
-void RenderEngine::createDescriptorPool()
+void Renderer::createDescriptorPool()
 {
 	VkDescriptorPoolSize poolSize{};
 	poolSize.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -1388,7 +1388,7 @@ void RenderEngine::createDescriptorPool()
 	}
 }
 
-void RenderEngine::createDescriptorSets()
+void Renderer::createDescriptorSets()
 {
 	std::vector<VkDescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT, descriptorSetLayout);
 	VkDescriptorSetAllocateInfo allocInfo{};
@@ -1436,7 +1436,7 @@ void RenderEngine::createDescriptorSets()
 	}
 }
 
-void RenderEngine::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory) {
+void Renderer::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory) {
 	VkBufferCreateInfo bufferInfo{};
 	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 	bufferInfo.size = size;
@@ -1462,7 +1462,7 @@ void RenderEngine::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkM
 	vkBindBufferMemory(device, buffer, bufferMemory, 0);
 }
 
-void RenderEngine::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) {
+void Renderer::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) {
 	VkCommandBuffer commandBuffer = beginSingleTimeCommands();
 
 	VkBufferCopy copyRegion{};
@@ -1472,7 +1472,7 @@ void RenderEngine::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSi
 	endSingleTimeCommands(commandBuffer);
 }
 
-uint32_t RenderEngine::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties)
+uint32_t Renderer::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties)
 {
 	VkPhysicalDeviceMemoryProperties memProperties;
 	vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
@@ -1486,7 +1486,7 @@ uint32_t RenderEngine::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags
 	throw std::runtime_error("failed to find suitable memory type!");
 }
 
-void RenderEngine::createCommandPool()
+void Renderer::createCommandPool()
 {
 	// get queue families
 	QueueFamilyIndices queueFamilyIndices = findQueueFamilies(physicalDevice);
@@ -1504,7 +1504,7 @@ void RenderEngine::createCommandPool()
 	}
 }
 
-void RenderEngine::createCommandBuffers()
+void Renderer::createCommandBuffers()
 {
 	// create space for all the buffers
 	commandBuffers.resize(MAX_FRAMES_IN_FLIGHT);
@@ -1523,7 +1523,7 @@ void RenderEngine::createCommandBuffers()
 	}
 }
 
-void RenderEngine::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex)
+void Renderer::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex)
 {
 	VkCommandBufferBeginInfo beginInfo
 	{
@@ -1595,7 +1595,7 @@ void RenderEngine::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t i
 	}
 }
 
-void RenderEngine::createSyncObjects()
+void Renderer::createSyncObjects()
 {
 	// resize to number of frames in flight
 	imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
@@ -1629,7 +1629,7 @@ void RenderEngine::createSyncObjects()
 	}
 }
 
-void RenderEngine::cleanup()
+void Renderer::cleanup()
 {
 	// wait for logical device to finish rendering before closing program
 	vkDeviceWaitIdle(device);

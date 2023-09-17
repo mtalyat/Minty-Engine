@@ -7,7 +7,7 @@
 
 namespace minty
 {
-	class RenderEngine;
+	class Renderer;
 
 	class Mesh :
 		public Object
@@ -26,21 +26,21 @@ namespace minty
 	public:
 		//Mesh();
 
-		void dispose(RenderEngine& engine);
+		void dispose(Renderer& engine);
 
 		/// <summary>
 		/// Sets the vertex data.
 		/// </summary>
 		/// <param name="vertices">The vertex data.</param>
 		/// <param name="deviceSize">The size in bytes of the vertex data.</param>
-		void setVertices(void const* const vertices, size_t const deviceSize, RenderEngine& engine);
+		void setVertices(void const* const vertices, size_t const deviceSize, Renderer& engine);
 
 		/// <summary>
 		/// Sets the index data.
 		/// </summary>
 		/// <param name="indices">The index data.</param>
 		/// <param name="deviceSize">The size in bytes of the index data.</param>
-		void setIndices(void const* const indices, size_t const deviceSize, RenderEngine& engine);
+		void setIndices(void const* const indices, size_t const deviceSize, Renderer& engine);
 
 		void setMaterial(Material* const material);
 
@@ -48,17 +48,17 @@ namespace minty
 		/// Creates a cube mesh.
 		/// </summary>
 		/// <returns>A Mesh with cube data.</returns>
-		static Mesh createCube(RenderEngine& engine);
+		static Mesh createCube(Renderer& engine);
 		
 		/// <summary>
 		/// Creates a quad mesh.
 		/// </summary>
 		/// <returns>A Mesh with quad data.</returns>
-		static Mesh createQuad(RenderEngine& engine);
+		static Mesh createQuad(Renderer& engine);
 	private:
-		void disposeVertices(RenderEngine& engine);
+		void disposeVertices(Renderer& engine);
 
-		void disposeIndices(RenderEngine& engine);
+		void disposeIndices(Renderer& engine);
 	};
 }
 

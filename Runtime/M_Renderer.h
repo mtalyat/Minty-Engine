@@ -90,7 +90,7 @@ namespace minty
 	/// <summary>
 	/// Handles rendering for the game engine.
 	/// </summary>
-	class RenderEngine
+	class Renderer
 	{
 	private:
 		Window* const _window;
@@ -101,9 +101,9 @@ namespace minty
 		Viewport _viewport;
 		Color _backgroundColor;
 	public:
-		RenderEngine(Window* const window, GameEngine& engine);
+		Renderer(Window* const window, GameEngine& engine);
 
-		~RenderEngine();
+		~Renderer();
 
 		/// <summary>
 		/// Draws a frame to the screen.

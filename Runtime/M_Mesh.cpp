@@ -1,9 +1,9 @@
 #include "pch.h"
 #include "M_Mesh.h"
 
-#include "M_RenderEngine.h"
+#include "M_Renderer.h"
 
-void minty::Mesh::setVertices(void const* const vertices, size_t const deviceSize, RenderEngine& engine)
+void minty::Mesh::setVertices(void const* const vertices, size_t const deviceSize, Renderer& engine)
 {
 	if (_vertexSet)
 	{
@@ -35,7 +35,7 @@ void minty::Mesh::setVertices(void const* const vertices, size_t const deviceSiz
 	vkFreeMemory(engine.device, stagingBufferMemory, nullptr);
 }
 
-void minty::Mesh::setIndices(void const* const indices, size_t const deviceSize, RenderEngine& engine)
+void minty::Mesh::setIndices(void const* const indices, size_t const deviceSize, Renderer& engine)
 {
 	if (_indexSet)
 	{
@@ -72,14 +72,14 @@ void minty::Mesh::setMaterial(Material* const material)
 	_material = material;
 }
 
-void minty::Mesh::dispose(RenderEngine& engine)
+void minty::Mesh::dispose(Renderer& engine)
 {
 	// maybe swap order?
 	disposeVertices(engine);
 	disposeIndices(engine);
 }
 
-minty::Mesh minty::Mesh::createCube(RenderEngine& engine)
+minty::Mesh minty::Mesh::createCube(Renderer& engine)
 {
 	// create mesh data
 	const float SIZE = 0.5f;
@@ -158,18 +158,18 @@ minty::Mesh minty::Mesh::createCube(RenderEngine& engine)
 	return mesh;
 }
 
-minty::Mesh minty::Mesh::createQuad(RenderEngine& engine)
+minty::Mesh minty::Mesh::createQuad(Renderer& engine)
 {
 	return Mesh();
 }
 
-void minty::Mesh::disposeVertices(RenderEngine& engine)
+void minty::Mesh::disposeVertices(Renderer& engine)
 {
 	vkDestroyBuffer(engine.device, _vertexBuffer, nullptr);
 	vkFreeMemory(engine.device, _vertexMemory, nullptr);
 }
 
-void minty::Mesh::disposeIndices(RenderEngine& engine)
+void minty::Mesh::disposeIndices(Renderer& engine)
 {
 	vkDestroyBuffer(engine.device, _indexBuffer, nullptr);
 	vkFreeMemory(engine.device, _indexMemory, nullptr);

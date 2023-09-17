@@ -3,10 +3,11 @@
 
 #include "M_Texture.h"
 #include <vulkan/vulkan.h>
+#include <vector>
 
 namespace minty
 {
-	class RenderEngine;
+	class Renderer;
 
 	class Material :
 		public Object
@@ -14,11 +15,11 @@ namespace minty
 	public: // TODO: TEMP PUBLIC
 		VkPipelineLayout _layout;
 		VkPipeline _pipeline;
-		Texture* _texture;
+		std::vector<Texture> _textures;
 
 	public:
 		Material(VkPipelineLayout const& layout, VkPipeline const& pipeline);
 
-		void dispose(RenderEngine& engine);
+		void dispose(Renderer& engine);
 	};
 }
