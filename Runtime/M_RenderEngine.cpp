@@ -1370,9 +1370,9 @@ void RenderEngine::updateUniformBuffer(uint32_t currentImage)
 	ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	ubo.proj = glm::perspective(glm::radians(45.0f), swapChainExtent.width / (float)swapChainExtent.height, 0.1f, 10.0f);
 	// flip y and x so that we have a left handed coordinates system
-	// pos x is right, pos y is up, pos z is forward
 	ubo.proj[1][1] *= -1.0f;
 	ubo.proj[0][0] *= -1.0f;
+	// pos x is right, pos y is up, pos z is forward
 
 	memcpy(uniformBuffersMapped[currentImage], &ubo, sizeof(ubo));
 }
