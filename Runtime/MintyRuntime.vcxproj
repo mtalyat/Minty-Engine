@@ -238,6 +238,7 @@
     <ClInclude Include="M_Types.h" />
     <ClInclude Include="M_Vector3.h" />
     <ClInclude Include="M_Vector3Int.h" />
+    <ClInclude Include="M_Viewport.h" />
     <ClInclude Include="M_Window.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
@@ -265,6 +266,7 @@
     <ClCompile Include="M_Stopwatch.cpp" />
     <ClCompile Include="M_Vector3.cpp" />
     <ClCompile Include="M_Vector3Int.cpp" />
+    <ClCompile Include="M_Viewport.cpp" />
     <ClCompile Include="M_Window.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
