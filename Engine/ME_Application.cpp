@@ -217,6 +217,7 @@ void Application::generate_cmake(Info const& info)
 		"cmake_minimum_required(VERSION 3.16)" << std::endl <<
 		// project name, c++ settings
 		"project(" << APPLICATION_NAME << " LANGUAGES CXX)" << std::endl <<
+		"find_package(Vulkan REQUIRED)" << std::endl <<
 		"set(CMAKE_CXX_STANDARD 20)" << std::endl <<
 		"set(CMAKE_CXX_STANDARD_REQUIRED ON)" << std::endl <<
 		"set(CMAKE_CXX_EXTENSIONS OFF)" << std::endl;
@@ -231,8 +232,10 @@ void Application::generate_cmake(Info const& info)
 		"add_executable(${PROJECT_NAME} main.cpp)" << std::endl <<
 		"set_property(TARGET ${PROJECT_NAME} PROPERTY INTERPROCEDURAL_OPTIMIZATION_RELEASE TRUE)" << std::endl <<
 		"set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY \"MultiThreaded$<$<CONFIG:Debug>:Debug>\")" << std::endl <<
-		"target_include_directories(${PROJECT_NAME} PRIVATE C:/Users/mitch/source/repos/Minty-Engine/Runtime)" << std::endl <<
-		"target_link_libraries(${PROJECT_NAME} C:/Users/mitch/source/repos/Minty-Engine/Runtime/x64/" << info.getConfig() << "/MintyRuntime.lib)";
+		"target_include_directories(${PROJECT_NAME} PRIVATE C:/Users/mitch/source/repos/Minty-Engine/Runtime PUBLIC ${VULKAN_INCLUDE_DIRS})" << std::endl <<
+		"include_directories(${Vulkan_INCLUDE_DIRS})" << std::endl <<
+		"target_link_libraries(${PROJECT_NAME} C:/Users/mitch/source/repos/Minty-Engine/Runtime/x64/" << info.getConfig() << "/MintyRuntime.lib)" << std::endl <<
+		"target_link_libraries(${PROJECT_NAME} ${Vulkan_LIBRARIES})";
 
 	file.close();
 }
