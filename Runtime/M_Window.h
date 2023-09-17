@@ -1,6 +1,9 @@
 #pragma once
 
-#include <string>
+#include "M_Object.h"
+#include "M_Event.h"
+#include "M_InputMap.h"
+#include <map>
 
 struct GLFWwindow;
 
@@ -10,10 +13,14 @@ namespace minty
 	/// A window on the screen.
 	/// </summary>
 	class Window
+		: public Object
 	{
 	private:
 		GLFWwindow* _window;
 		bool _resized;
+		InputMap const* _activeInputMap;
+		float _lastMouseX, _lastMouseY;
+		bool _mouseOutOfBounds;
 
 	public:
 		Window(std::string const& title, int const width, int const height);
@@ -45,8 +52,30 @@ namespace minty
 		/// <returns>The raw window.</returns>
 		GLFWwindow* getRaw() const;
 
+		void setInput(InputMap const* const inputMap);
 	private:
+		void triggerKey(Key const key, KeyAction const action, KeyModifiers const mods);
+
+		void triggerButton(MouseButton const button, KeyAction const action, KeyModifiers const mods);
+
+		void triggerScroll(float dx, float dy);
+
+		void triggerCursor(float x, float y);
+
+		// window resize
 		static void resizeCallback(GLFWwindow* const window, int const width, int const height);
+
+		// keyboard key
+		static void keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods);
+
+		// mouse button
+		static void buttonCallback(GLFWwindow* window, int button, int action, int mods);
+
+		// mouse scroll
+		static void scrollCallback(GLFWwindow* window, double xoffset, double yoffset);
+
+		// cursor position
+		static void cursorCallback(GLFWwindow* window, double xpos, double ypos);
 	};
 }
 

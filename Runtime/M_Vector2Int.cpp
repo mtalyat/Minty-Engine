@@ -17,8 +17,8 @@ minty::Vector2Int::Vector2Int(int const x, int const y)
 {}
 
 minty::Vector2Int::Vector2Int(float const x, float const y)
-    : x(math::roundToInt(x))
-    , y(math::roundToInt(y))
+    : x(math::floorToInt(x))
+    , y(math::floorToInt(y))
 {}
 
 minty::Vector2Int::Vector2Int(Vector2Int const& other)
@@ -39,14 +39,4 @@ minty::Vector2Int::operator Vector3Int() const
 inline std::string const minty::Vector2Int::toString() const
 {
     return std::format("Vector2Int({0}, {1})", x, y);
-}
-
-Vector2Int minty::Vector2Int::polarToCartesian(Vector2Int const& polar)
-{
-    return Vector2Int(math::cos(polar.x) * polar.y, math::sin(polar.x) * polar.y);
-}
-
-Vector2Int minty::Vector2Int::cartesianToPolar(Vector2Int const& cartesian)
-{
-    return Vector2Int(math::angle(cartesian.x, cartesian.y), math::magnitude(cartesian.x, cartesian.y));
 }

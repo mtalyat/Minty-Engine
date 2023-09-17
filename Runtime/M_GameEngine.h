@@ -25,7 +25,6 @@ namespace minty
 		/// Runs the game.
 		/// </summary>
 		void run();
-
 	private:
 		time_point_t getNow() const;
 	};

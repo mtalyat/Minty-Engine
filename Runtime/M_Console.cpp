@@ -49,3 +49,16 @@ void minty::console::error(std::string const& message)
 	print(message, Color::Red);
 #endif
 }
+
+bool minty::console::ass(bool const value, std::string const& errorMessage)
+{
+#ifndef NDEBUG
+	if (!value)
+	{
+		console::error(errorMessage);
+	}
+	return value;
+#else
+	return true;
+#endif
+}

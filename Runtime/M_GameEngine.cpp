@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "M_GameEngine.h"
 
+#include "M_Console.h"
 #include "M_RenderEngine.h"
 #include <iostream>
 
@@ -16,7 +17,6 @@ GameEngine::GameEngine()
 
 GameEngine::~GameEngine()
 {
-
 }
 
 void GameEngine::run()
@@ -26,7 +26,28 @@ void GameEngine::run()
 	_frameTick = _start;
 
 	// start the render engine
-	RenderEngine engine;
+	RenderEngine engine(*this);
+
+	float rotation = 0.0f;
+	float* rotationPtr = &rotation;
+
+	// input
+	InputMap input;
+	input.emplaceKey(Key::Space, [rotationPtr](KeyPressEventArgs const& args){
+		switch (args.action)
+		{
+		case KeyAction::Down:
+			break;
+		case KeyAction::Up:
+			break;
+		case KeyAction::Hold:
+			*rotationPtr += 0.01f;
+			console::log(std::format("Rotation: {}", *rotationPtr));
+			break;
+		}
+	});
+
+	engine._window->setInput(&input);
 
 	time_point_t now;
 
@@ -34,6 +55,7 @@ void GameEngine::run()
 	while (engine.isRunning())
 	{
 		glfwPollEvents();
+		engine.updateUniformBuffer(rotation);
 		engine.renderFrame();
 
 		_frameCount++;

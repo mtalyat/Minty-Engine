@@ -40,12 +40,12 @@ std::string const minty::Vector2::toString() const
     return std::format("Vector2({0}, {1})", x, y);
 }
 
-Vector2 minty::Vector2::polarToCartesian(Vector2 const& polar)
+minty::Vector2 minty::Vector2::polarToCartesian(minty::Vector2 const& polar)
 {
-    return Vector2(cos(polar.x) * polar.y, sin(polar.x) * polar.y);
+    return minty::Vector2(math::cos(polar.x) * polar.y, math::sin(polar.x) * polar.y);
 }
 
-Vector2 minty::Vector2::cartesianToPolar(Vector2 const& cartesian)
+minty::Vector2 minty::Vector2::cartesianToPolar(minty::Vector2 const& cartesian)
 {
-    return Vector2(math::angle(cartesian.x, cartesian.y), math::magnitude(cartesian.x, cartesian.y));
+    return minty::Vector2(math::angle(cartesian.x, cartesian.y), math::magnitude(cartesian.x, cartesian.y));
 }

@@ -23,6 +23,8 @@
 
 namespace minty
 {
+	class GameEngine;
+
 	// https://vulkan-tutorial.com/en/Vertex_buffers/Vertex_input_description
 	struct Vertex
 	{
@@ -89,7 +91,7 @@ namespace minty
 	class RenderEngine
 	{
 	public:
-		RenderEngine();
+		RenderEngine(GameEngine& engine);
 
 		~RenderEngine();
 
@@ -419,7 +421,7 @@ namespace minty
 		/// Updates the uniform buffer with new rotation values.
 		/// </summary>
 		/// <param name="currentImage">The image in which to update the buffer for.</param>
-		void updateUniformBuffer(uint32_t currentImage);
+		void updateUniformBuffer(float const rotation);
 
 		/// <summary>
 		/// Creates the descriptor pool.

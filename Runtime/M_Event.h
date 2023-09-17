@@ -20,7 +20,7 @@ namespace minty
 
 	private:
 		// the list of functions to be called
-		std::vector<func>* mp_functions;
+		std::vector<func>* _functions;
 
 	public:
 
@@ -28,12 +28,12 @@ namespace minty
 		/// Creates a new Event.
 		/// </summary>
 		Event()
-			: mp_functions(new std::vector<func>())
+			: _functions(new std::vector<func>())
 		{}
 
 		~Event()
 		{
-			delete mp_functions;
+			delete _functions;
 		}
 
 		// () operator
@@ -42,13 +42,41 @@ namespace minty
 			invoke(arg);
 		}
 
+		Event<T>& operator +=(func const& f)
+		{
+			emplace(f);
+			return *this;
+		}
+
+		Event<T>& operator -=(func const& f)
+		{
+			erase(f);
+			return *this;
+		}
+
 		/// <summary>
 		/// Add a new function to be ran when this event is invoked.
 		/// </summary>
 		/// <param name="f"></param>
 		void emplace(func const& f)
 		{
-			mp_functions->push_back(f);
+			_functions->push_back(f);
+		}
+
+		/// <summary>
+		/// Remove a function from the invokation list.
+		/// </summary>
+		/// <param name="f"></param>
+		void erase(func const& f)
+		{
+			for (size_t i = 0; i < _functions->size(); i++)
+			{
+				// probably not the best way to check if equal
+				if (&_functions->at(i) == &f)
+				{
+					_functions->erase(_functions->begin() + i);
+				}
+			}
 		}
 
 		/// <summary>
@@ -57,60 +85,9 @@ namespace minty
 		/// <param name="arg"></param>
 		void invoke(T const arg) const
 		{
-			for (func f : *mp_functions)
+			for (func f : *_functions)
 			{
 				f(arg);
-			}
-		}
-	};
-
-	template<>
-	class Event<void>
-		: public Object
-	{
-	public:
-		typedef std::function<void(void)> func;
-
-	private:
-		std::vector<func>* mp_functions;
-
-	public:
-
-		/// <summary>
-		/// Creates a new Event.
-		/// </summary>
-		Event()
-			: mp_functions(new std::vector<func>())
-		{}
-
-		~Event()
-		{
-			delete mp_functions;
-		}
-
-		// () operator
-		void operator()() const
-		{
-			invoke();
-		}
-
-		/// <summary>
-		/// Add a new function to be ran when this event is invoked.
-		/// </summary>
-		/// <param name="f"></param>
-		inline void emplace(func const& f)
-		{
-			mp_functions->push_back(f);
-		}
-
-		/// <summary>
-		/// Run the functions within this Event.
-		/// </summary>
-		void invoke() const
-		{
-			for (func f : *mp_functions)
-			{
-				f();
 			}
 		}
 	};

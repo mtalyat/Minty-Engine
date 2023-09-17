@@ -210,6 +210,9 @@
   <ItemGroup>
     <ClInclude Include="entt.hpp" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="M_MouseButton.h" />
+    <ClInclude Include="M_KeyModifiers.h" />
+    <ClInclude Include="M_KeyAction.h" />
     <ClInclude Include="Minty.h" />
     <ClInclude Include="M_Color.h" />
     <ClInclude Include="M_CommandLineParser.h" />
@@ -217,6 +220,8 @@
     <ClInclude Include="M_Event.h" />
     <ClInclude Include="M_File.h" />
     <ClInclude Include="M_GameEngine.h" />
+    <ClInclude Include="M_InputMap.h" />
+    <ClInclude Include="M_Key.h" />
     <ClInclude Include="M_Math.h" />
     <ClInclude Include="M_Mesh.h" />
     <ClInclude Include="M_Object.h" />
@@ -243,6 +248,7 @@
     <ClCompile Include="M_Event.cpp" />
     <ClCompile Include="M_File.cpp" />
     <ClCompile Include="M_GameEngine.cpp" />
+    <ClCompile Include="M_InputMap.cpp" />
     <ClCompile Include="M_Math.cpp" />
     <ClCompile Include="M_Mesh.cpp" />
     <ClCompile Include="M_Object.cpp" />

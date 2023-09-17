@@ -1,6 +1,7 @@
 #pragma once
 
 #include <string>
+#include <format>
 
 namespace minty
 {
@@ -66,5 +67,14 @@ namespace minty
 		/// </summary>
 		/// <param name="message">The string to print.</param>
 		void error(std::string const& message);
+
+		/// <summary>
+		/// Prints an error message if the given condition is false.
+		/// Short for assert.
+		/// </summary>
+		/// <param name="value">The value to check.</param>
+		/// <param name="errorMessage">The error message.</param>
+		/// <return>True if the value passed, or if not in debug mode.</return>
+		bool ass(bool const value, std::string const& errorMessage);
 	}
 }

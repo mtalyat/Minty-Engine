@@ -2,6 +2,7 @@
 #include "M_RenderEngine.h"
 
 #include "M_Console.h"
+#include "M_GameEngine.h"
 
 #include <iostream>
 #include <stdexcept>
@@ -51,7 +52,7 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
 	}
 }
 
-RenderEngine::RenderEngine()
+RenderEngine::RenderEngine(GameEngine& engine)
 {
 	initWindow();
 	initVulkan();
@@ -233,8 +234,7 @@ void RenderEngine::createImage(uint32_t width, uint32_t height, VkFormat format,
 
 void RenderEngine::createTextureImage()
 {
-	_texture = Texture::load("Assets/Textures/cube.png", *this);
-	//_texture = Texture::load("Assets/Textures/texture.jpg", *this);
+	_texture = Texture::load("Assets/Textures/funny.jpg", *this);
 }
 
 VkImageView RenderEngine::createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags) {
@@ -827,7 +827,7 @@ void RenderEngine::drawFrame()
 	recordCommandBuffer(commandBuffers[currentFrame], imageIndex);
 
 	// update uniform information
-	updateUniformBuffer(currentFrame);
+	//updateUniformBuffer();
 
 	// submit the command buffer
 	VkSubmitInfo submitInfo
@@ -1354,19 +1354,19 @@ void RenderEngine::createUniformBuffers()
 	}
 }
 
-void RenderEngine::updateUniformBuffer(uint32_t currentImage)
+void RenderEngine::updateUniformBuffer(float const rotation)
 {
-	// start time of program
-	static auto startTime = std::chrono::high_resolution_clock::now();
+	//// start time of program
+	//static auto startTime = std::chrono::high_resolution_clock::now();
 
-	// current time elapsed since start
-	auto currentTime = std::chrono::high_resolution_clock::now();
-	float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
-	//float time = 0.0f;
+	//// current time elapsed since start
+	//auto currentTime = std::chrono::high_resolution_clock::now();
+	//float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+	////float time = 0.0f;
 
 	// set uniform values
 	UniformBufferObject ubo{};
-	ubo.model = glm::rotate(glm::mat4(1.0f), time * 0.5f * glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	ubo.model = glm::rotate(glm::mat4(1.0f), rotation * glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	ubo.proj = glm::perspective(glm::radians(45.0f), swapChainExtent.width / (float)swapChainExtent.height, 0.1f, 10.0f);
 	// flip y and x so that we have a left handed coordinates system
@@ -1374,7 +1374,7 @@ void RenderEngine::updateUniformBuffer(uint32_t currentImage)
 	ubo.proj[0][0] *= -1.0f;
 	// pos x is right, pos y is up, pos z is forward
 
-	memcpy(uniformBuffersMapped[currentImage], &ubo, sizeof(ubo));
+	memcpy(uniformBuffersMapped[currentFrame], &ubo, sizeof(ubo));
 }
 
 void RenderEngine::createDescriptorPool()
@@ -1600,7 +1600,6 @@ void RenderEngine::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t i
 	scissor.extent = swapChainExtent;
 	vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 
-	minty::console::warn("Hard coded draw indexed!");
 	uint32_t indexCount = 36u;
 	// draw command
 	//vkCmdDraw(commandBuffer, static_cast<uint32_t>(vertices.size()), 1, 0, 0);

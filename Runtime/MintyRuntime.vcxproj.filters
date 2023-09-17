@@ -93,6 +93,21 @@
     <ClInclude Include="entt.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="M_InputMap.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Key.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="M_KeyAction.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="M_KeyModifiers.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="M_MouseButton.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -162,6 +177,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_Texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_InputMap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
