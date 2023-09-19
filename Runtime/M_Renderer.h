@@ -90,6 +90,25 @@ namespace minty
 	};
 
 	constexpr int MAX_FRAMES_IN_FLIGHT = 2;
+	constexpr int MAX_SETS_PER_FRAME = 1;
+	constexpr int MAX_SETS = MAX_FRAMES_IN_FLIGHT * MAX_SETS_PER_FRAME;
+
+	// 100 is arbitrary
+	constexpr int MAX_TEXTURES = 4;
+	constexpr int MAX_MATERIALS = 4;
+	constexpr int MAX_SHADERS = 1;
+
+	struct MaterialInfo
+	{
+		alignas(4) glm::vec3 color;
+		alignas(4) int textureId;
+	};
+
+	struct MeshInfo
+	{
+		alignas (16) glm::mat4 transform;
+		alignas (16) ID materialId;
+	};
 
 	/// <summary>
 	/// Handles rendering for the game engine.
@@ -135,7 +154,7 @@ namespace minty
 		VkFormat swapChainImageFormat;
 		VkExtent2D swapChainExtent;
 		std::vector<VkImageView> swapChainImageViews;
-		VkDescriptorSetLayout descriptorSetLayout;
+		std::vector<VkDescriptorSetLayout> descriptorSetLayouts;
 		VkRenderPass renderPass;
 		std::vector<VkFramebuffer> swapChainFramebuffers;
 		VkCommandPool commandPool;
@@ -203,6 +222,19 @@ namespace minty
 		void setMaterialForMainMesh(ID const materialId);
 
 #pragma endregion
+
+#pragma region Drawing
+
+		void renderMesh(VkCommandBuffer commandBuffer, Mesh const* const mesh);
+
+#pragma endregion
+
+		/// <summary>
+		/// Throws a runtime exception if the given result is anything but VkResult::SUCCESS.
+		/// </summary>
+		/// <param name="result">The result to check.</param>
+		/// <param name="errorMessage">The message to print if not a success.</param>
+		bool vkAssert(VkResult const result);
 
 		/// <summary>
 		/// Initializes the Vulkan framework and all necessary components to render things to the window.
@@ -444,18 +476,16 @@ namespace minty
 		void updateUniformBuffer();
 
 		/// <summary>
+		/// Creates the descriptor set layout for uniform objects.
+		/// </summary>
+		void createDescriptorSetLayouts();
+
+		/// <summary>
 		/// Creates the descriptor pool.
 		/// </summary>
 		void createDescriptorPool();
 
-		/// <summary>
-		/// Creates the descriptor set layout for uniform objects.
-		/// </summary>
-		void createDescriptorSetLayout();
-
 		void createDescriptorSets();
-
-		void updateDescriptorSets(ID const materialId);
 
 		/// <summary>
 		/// Creates a buffer.
@@ -492,8 +522,6 @@ namespace minty
 		/// Creates the command buffers.
 		/// </summary>
 		void createCommandBuffers();
-
-		void renderMesh(VkCommandBuffer commandBuffer, Mesh const* const mesh);
 
 		/// <summary>
 		/// Records the command buffer.

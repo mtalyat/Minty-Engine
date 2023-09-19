@@ -2,8 +2,12 @@
 #include "M_Runtime.h"
 
 #include "M_CommandLineParser.h"
+#include "M_Console.h"
 #include <filesystem>
 #include <iostream>
+#include <exception>
+#include <typeinfo>
+#include <stdexcept>
 #include <exception>
 
 using namespace minty;
@@ -52,11 +56,14 @@ int Runtime::run(int argc, char const* argv[])
 
 		_engine->run();
 	}
-	catch (const std::exception& e)
+	catch (std::exception const& e)
 	{
-		std::cerr << e.what() << std::endl;
-		std::cout << e.what() << std::endl;
+		console::error(e.what());
 		return EXIT_FAILURE;
+	}
+	catch (...)
+	{
+		console::error("An uncaught exception occured.");
 	}
 
 	return EXIT_SUCCESS;

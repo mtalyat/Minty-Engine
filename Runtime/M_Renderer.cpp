@@ -15,6 +15,7 @@
 #include <fstream> // Necessary for loading data from files
 #include <chrono>
 #include <filesystem>
+#include <format>
 
 using namespace minty;
 
@@ -57,6 +58,12 @@ Renderer::Renderer(Window* const window, Engine& engine)
 	, _viewport()
 	, _backgroundColor({250, 220, 192, 255}) // light tan color
 {
+	// init fields
+	_textures.reserve(MAX_TEXTURES);
+	_materials.reserve(MAX_MATERIALS);
+	_shaders.reserve(MAX_SHADERS);
+
+	// init vulkan
 	initVulkan();
 }
 
@@ -75,6 +82,18 @@ bool Renderer::isRunning()
 	return _window->isOpen();
 }
 
+bool minty::Renderer::vkAssert(VkResult const result)
+{
+	if (result != VK_SUCCESS)
+	{
+		console::error(std::format("VkResult: {}", static_cast<int>(result)));
+
+		return true;
+	}
+
+	return false;
+}
+
 void Renderer::initVulkan()
 {
 	createInstance();
@@ -85,19 +104,19 @@ void Renderer::initVulkan()
 	createSwapChain();
 	createImageViews();
 	createRenderPass();
-	createDescriptorSetLayout();
+	createDescriptorSetLayouts();
 	createCommandPool();
 	createDepthResources();
 	createFramebuffers();
-
-	createUniformBuffers();
-	createDescriptorPool();
-	createDescriptorSets();
 
 	createMainTexture();
 	createMainShader();
 	createMainMaterial();
 	createMainMesh();
+
+	createUniformBuffers();
+	createDescriptorPool();
+	createDescriptorSets();
 
 	createCommandBuffers();
 	createSyncObjects();
@@ -230,6 +249,14 @@ void Renderer::createImage(uint32_t width, uint32_t height, VkFormat format, VkI
 
 ID minty::Renderer::loadTexture(std::string const& path)
 {
+	ID id = static_cast<ID>(_textures.size());
+
+	if (id >= MAX_TEXTURES)
+	{
+		console::error(std::format("Cannot load another texture. {0}/{0} textures loaded.", MAX_TEXTURES));
+		return ERROR_ID;
+	}
+
 	// get data from file: pixels, width, height, color channels
 	int width, height, channels;
 
@@ -335,7 +362,6 @@ ID minty::Renderer::loadTexture(std::string const& path)
 	}
 
 	// add to array and return id
-	ID id = static_cast<ID>(_textures.size());
 	_textures.push_back(Texture(image, format, view, memory, sampler));
 	return id;
 }
@@ -366,6 +392,14 @@ VkShaderModule minty::Renderer::loadShaderModule(std::string const& path)
 
 ID minty::Renderer::loadShader(std::string const& vertexPath, std::string const& fragmentPath)
 {
+	ID id = static_cast<ID>(_shaders.size());
+
+	if (id >= MAX_SHADERS)
+	{
+		console::error(std::format("Cannot load another shader. {0}/{0} shaders loaded.", MAX_SHADERS));
+		return ERROR_ID;
+	}
+
 	// load shaders from disk
 	VkShaderModule vertShaderModule = loadShaderModule("Assets/Shaders/vert.spv");
 	VkShaderModule fragShaderModule = loadShaderModule("Assets/Shaders/frag.spv");
@@ -508,14 +542,22 @@ ID minty::Renderer::loadShader(std::string const& vertexPath, std::string const&
 	//colorBlending.blendConstants[2] = 0.0f; // Optional
 	//colorBlending.blendConstants[3] = 0.0f; // Optional
 
+	// push constants
+	VkPushConstantRange pushConstantRange =
+	{
+		.stageFlags = VK_SHADER_STAGE_VERTEX_BIT,
+		.offset = 0,
+		.size = sizeof(MeshInfo),
+	};
+
 	// create the layout of the pipeline
 	VkPipelineLayoutCreateInfo pipelineLayoutInfo
 	{
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
-		.setLayoutCount = 1,
-		.pSetLayouts = &descriptorSetLayout,
-		.pushConstantRangeCount = 0, // Optional
-		.pPushConstantRanges = nullptr, // Optional
+		.setLayoutCount = static_cast<uint32_t>(descriptorSetLayouts.size()),
+		.pSetLayouts = descriptorSetLayouts.data(),
+		.pushConstantRangeCount = 1,
+		.pPushConstantRanges = &pushConstantRange,
 	};
 
 	VkPipelineLayout layout;
@@ -557,7 +599,6 @@ ID minty::Renderer::loadShader(std::string const& vertexPath, std::string const&
 	vkDestroyShaderModule(device, fragShaderModule, nullptr);
 	vkDestroyShaderModule(device, vertShaderModule, nullptr);
 
-	ID id = static_cast<ID>(_shaders.size());
 	_shaders.push_back(Shader(layout, pipeline));
 	return id;
 }
@@ -570,7 +611,33 @@ Shader& minty::Renderer::getShader(ID const id)
 ID minty::Renderer::createMaterial(ID const shaderId, ID const textureId)
 {
 	ID id = static_cast<ID>(_materials.size());
+
+	if (id >= MAX_TEXTURES)
+	{
+		console::error(std::format("Cannot load another texture. {0}/{0} textures loaded.", MAX_TEXTURES));
+		return ERROR_ID;
+	}
+
 	_materials.push_back(Material(shaderId, textureId));
+
+	// allocate buffers and map memory so we can apply changes
+	VkDeviceSize bufferSize = sizeof(MaterialInfo);
+
+	Material& mat = getMaterial(id);
+
+	mat._buffers.resize(MAX_FRAMES_IN_FLIGHT);
+	mat._memories.resize(MAX_FRAMES_IN_FLIGHT);
+	mat._mapped.resize(MAX_FRAMES_IN_FLIGHT);
+
+	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+		createBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, mat._buffers[i], mat._memories[i]);
+
+		vkMapMemory(device, mat._memories[i], 0, bufferSize, 0, &mat._mapped[i]);
+	}
+
+	// now that memory is mapped, apply initial values
+	mat.apply();
+
 	return id;
 }
 
@@ -727,72 +794,104 @@ void Renderer::copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width,
 	endSingleTimeCommands(commandBuffer);
 }
 
-void Renderer::createDescriptorSetLayout()
+void Renderer::createDescriptorSetLayouts()
 {
+	descriptorSetLayouts.resize(MAX_SETS_PER_FRAME);
+
+	// UniformBufferObject
 	VkDescriptorSetLayoutBinding uboLayoutBinding{};
 	uboLayoutBinding.binding = 0;
 	uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 	uboLayoutBinding.descriptorCount = 1;
-
-	// set where the uniform data is (vertex shader)
 	uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
-	// image sampling
-	uboLayoutBinding.pImmutableSamplers = nullptr;
+	// MaterialsBufferObject
+	VkDescriptorSetLayoutBinding mboLayoutBinding{};
+	mboLayoutBinding.binding = 1;
+	mboLayoutBinding.descriptorCount = static_cast<uint32_t>(MAX_MATERIALS);
+	mboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	mboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
-	// create layout
+	// texSamplers[]
 	VkDescriptorSetLayoutBinding samplerLayoutBinding{};
-	samplerLayoutBinding.binding = 1;
-	samplerLayoutBinding.descriptorCount = 1;
+	samplerLayoutBinding.binding = 2;
+	samplerLayoutBinding.descriptorCount = static_cast<uint32_t>(MAX_TEXTURES);
 	samplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 	samplerLayoutBinding.pImmutableSamplers = nullptr;
 	samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
 
-	std::array<VkDescriptorSetLayoutBinding, 2> bindings = { uboLayoutBinding, samplerLayoutBinding };
+	std::array<VkDescriptorSetLayoutBinding, 3> bindings = { uboLayoutBinding, mboLayoutBinding, samplerLayoutBinding };
+
 	VkDescriptorSetLayoutCreateInfo layoutInfo{};
 	layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
 	layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
 	layoutInfo.pBindings = bindings.data();
 
-	if (vkCreateDescriptorSetLayout(device, &layoutInfo, nullptr, &descriptorSetLayout) != VK_SUCCESS) {
+	if (vkCreateDescriptorSetLayout(device, &layoutInfo, nullptr, &descriptorSetLayouts[0]) != VK_SUCCESS) {
 		throw std::runtime_error("Failed to create descriptor set layout.");
+	}
+}
+
+void Renderer::createDescriptorPool()
+{
+	//VkDescriptorPoolSize poolSize{};
+	//poolSize.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	//poolSize.descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
+
+	std::array<VkDescriptorPoolSize, 3> poolSizes{};
+	poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	poolSizes[0].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT); // UBO
+	poolSizes[1].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	poolSizes[1].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * MAX_MATERIALS); // MBO
+	poolSizes[2].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+	poolSizes[2].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * MAX_TEXTURES); // samplers
+
+	VkDescriptorPoolCreateInfo poolInfo{};
+	poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+	poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
+	poolInfo.pPoolSizes = poolSizes.data();
+	poolInfo.maxSets = static_cast<uint32_t>(MAX_SETS);
+
+	if (vkCreateDescriptorPool(device, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS)
+	{
+		throw std::runtime_error("Failed to create descriptor pool.");
 	}
 }
 
 void minty::Renderer::createDescriptorSets()
 {
-	std::vector<VkDescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT, descriptorSetLayout);
-	VkDescriptorSetAllocateInfo allocInfo{};
-	allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-	allocInfo.descriptorPool = descriptorPool;
-	allocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
-	allocInfo.pSetLayouts = layouts.data();
+	descriptorSets.resize(MAX_SETS);
 
-	descriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
-	if (vkAllocateDescriptorSets(device, &allocInfo, descriptorSets.data()) != VK_SUCCESS)
+	size_t i = 0;
+
+	for (auto& setLayout : descriptorSetLayouts)
 	{
-		throw std::runtime_error("Failed to allocate descriptor sets.");
+		std::vector<VkDescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT, setLayout);
+
+		VkDescriptorSetAllocateInfo allocInfo{};
+		allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+		allocInfo.descriptorPool = descriptorPool;
+		allocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
+		allocInfo.pSetLayouts = layouts.data();
+
+		if (vkAssert(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSets[i * MAX_FRAMES_IN_FLIGHT])))
+		{
+			throw std::runtime_error(std::format("Failed to allocate descriptor sets for descriptor set layout {}.", i));
+		}
+		i++;
 	}
-}
 
-void minty::Renderer::updateDescriptorSets(ID const materialId)
-{
-	Material const& mat = getMaterial(materialId);
+	for (i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+		std::vector<VkDescriptorBufferInfo> bufferInfos;
+		std::vector<VkDescriptorImageInfo> imageInfos;
 
-	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-		VkDescriptorBufferInfo bufferInfo{};
-		bufferInfo.buffer = uniformBuffers[i];
-		bufferInfo.offset = 0;
-		bufferInfo.range = sizeof(UniformBufferObject);
+		std::array<VkWriteDescriptorSet, 3> descriptorWrites = {};
 
-		Texture const& tex = getTexture(mat._textureId);
-
-		VkDescriptorImageInfo imageInfo{};
-		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-		imageInfo.imageView = tex._view;
-		imageInfo.sampler = tex._sampler;
-
-		std::array<VkWriteDescriptorSet, 2> descriptorWrites{};
+		// UBO
+		VkDescriptorBufferInfo uboBufferInfo = {};
+		uboBufferInfo.buffer = uniformBuffers[i];
+		uboBufferInfo.offset = 0;
+		uboBufferInfo.range = sizeof(UniformBufferObject);
 
 		descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 		descriptorWrites[0].dstSet = descriptorSets[i];
@@ -800,15 +899,59 @@ void minty::Renderer::updateDescriptorSets(ID const materialId)
 		descriptorWrites[0].dstArrayElement = 0;
 		descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 		descriptorWrites[0].descriptorCount = 1;
-		descriptorWrites[0].pBufferInfo = &bufferInfo;
+		descriptorWrites[0].pBufferInfo = &uboBufferInfo;
+
+		// MBO
+		bufferInfos.resize(MAX_MATERIALS);
+		for (size_t j = 0; j < MAX_MATERIALS; j++)
+		{
+			if (j < _materials.size())
+			{
+				Material const& mat = getMaterial(j);
+
+				bufferInfos[j].buffer = mat._buffers[i];
+				bufferInfos[j].offset = 0;
+				bufferInfos[j].range = sizeof(MaterialInfo);
+			}
+			else
+			{
+				// nothing?
+			}
+		}
 
 		descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 		descriptorWrites[1].dstSet = descriptorSets[i];
 		descriptorWrites[1].dstBinding = 1;
 		descriptorWrites[1].dstArrayElement = 0;
-		descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-		descriptorWrites[1].descriptorCount = 1;
-		descriptorWrites[1].pImageInfo = &imageInfo;
+		descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		descriptorWrites[1].descriptorCount = static_cast<uint32_t>(_materials.size());
+		descriptorWrites[1].pBufferInfo = bufferInfos.data();
+
+		// TEX
+		imageInfos.resize(MAX_TEXTURES);
+		for (size_t j = 0; j < MAX_TEXTURES; j++)
+		{
+			if (j < _textures.size())
+			{
+				Texture const& tex = getTexture(j);
+
+				imageInfos[j].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+				imageInfos[j].imageView = tex._view;
+				imageInfos[j].sampler = tex._sampler;
+			}
+			else
+			{
+				imageInfos[j].imageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+			}
+		}
+
+		descriptorWrites[2].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		descriptorWrites[2].dstSet = descriptorSets[i];
+		descriptorWrites[2].dstBinding = 2;
+		descriptorWrites[2].dstArrayElement = 0;
+		descriptorWrites[2].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		descriptorWrites[2].descriptorCount = static_cast<uint32_t>(_textures.size());
+		descriptorWrites[2].pImageInfo = imageInfos.data();
 
 		vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
 	}
@@ -1487,7 +1630,7 @@ void minty::Renderer::createMainMesh()
 void minty::Renderer::setMaterialForMainMesh(ID const materialId)
 {
 	_mesh->setMaterial(materialId);
-	updateDescriptorSets(materialId);
+	//updateDescriptorSets(materialId);
 }
 
 void Renderer::createUniformBuffers()
@@ -1526,30 +1669,6 @@ void Renderer::updateUniformBuffer()
 	// pos x is right, pos y is up, pos z is forward
 
 	memcpy(uniformBuffersMapped[currentFrame], &ubo, sizeof(ubo));
-}
-
-void Renderer::createDescriptorPool()
-{
-	//VkDescriptorPoolSize poolSize{};
-	//poolSize.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	//poolSize.descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
-
-	std::array<VkDescriptorPoolSize, 2> poolSizes{};
-	poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	poolSizes[0].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
-	poolSizes[1].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-	poolSizes[1].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
-
-	VkDescriptorPoolCreateInfo poolInfo{};
-	poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-	poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
-	poolInfo.pPoolSizes = poolSizes.data();
-	poolInfo.maxSets = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
-
-	if (vkCreateDescriptorPool(device, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS)
-	{
-		throw std::runtime_error("Failed to create descriptor pool.");
-	}
 }
 
 void Renderer::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory) {
@@ -1642,7 +1761,7 @@ void Renderer::createCommandBuffers()
 void minty::Renderer::renderMesh(VkCommandBuffer commandBuffer, Mesh const* const mesh)
 {
 	// update descriptor data
-	updateDescriptorSets(mesh->_materialId);
+	//updateDescriptorSets(mesh->_materialId);
 
 	Material const& mat = getMaterial(mesh->_materialId);
 	Shader const& shader = getShader(mat._shaderId);
@@ -1658,6 +1777,14 @@ void minty::Renderer::renderMesh(VkCommandBuffer commandBuffer, Mesh const* cons
 	VkDeviceSize offsets[] = { 0 };
 	vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
 	vkCmdBindIndexBuffer(commandBuffer, mesh->_indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+
+	// send push constants so we know where to draw, what material to use, etc.
+	MeshInfo info
+	{
+		.transform = glm::mat4(1.0f),
+		.materialId = mesh->_materialId,
+	};
+	vkCmdPushConstants(commandBuffer, shader._layout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(MeshInfo), &info);
 
 	// draw
 	vkCmdDrawIndexed(commandBuffer, mesh->_indexCount, 1, 0, 0, 0);
@@ -1770,7 +1897,10 @@ void Renderer::cleanup()
 		vkFreeMemory(device, uniformBuffersMemory[i], nullptr);
 	}
 	vkDestroyDescriptorPool(device, descriptorPool, nullptr);
-	vkDestroyDescriptorSetLayout(device, descriptorSetLayout, nullptr);
+	for (size_t i = 0; i < descriptorSetLayouts.size(); i++)
+	{
+		vkDestroyDescriptorSetLayout(device, descriptorSetLayouts[i], nullptr);
+	}
 	_mesh->dispose(*this);
 	delete _mesh;
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
