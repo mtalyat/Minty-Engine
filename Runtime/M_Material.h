@@ -2,8 +2,10 @@
 #include "M_Object.h"
 
 #include "M_Texture.h"
+#include "M_Shader.h"
 #include <vulkan/vulkan.h>
 #include <vector>
+#include <array>
 
 namespace minty
 {
@@ -13,12 +15,13 @@ namespace minty
 		public Object
 	{
 	public: // TODO: TEMP PUBLIC
-		VkPipelineLayout _layout;
-		VkPipeline _pipeline;
-		std::vector<Texture> _textures;
+		ID const _shaderId;
+		ID _textureId;
 
 	public:
-		Material(VkPipelineLayout const& layout, VkPipeline const& pipeline);
+		Material(ID const shaderId, ID const textureId = -1);
+
+		void setTexture(ID const textureId);
 
 		void dispose(Renderer& engine);
 	};

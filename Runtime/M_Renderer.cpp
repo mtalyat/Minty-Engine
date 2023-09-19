@@ -4,6 +4,8 @@
 #include "M_Console.h"
 #include "M_Engine.h"
 
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
 #include <iostream>
 #include <stdexcept>
 #include <cstdlib>
@@ -30,8 +32,6 @@ bool const enableValidationLayers = false;
 bool const enableValidationLayers = true;
 #endif
 
-const int MAX_FRAMES_IN_FLIGHT = 2;
-
 VkResult CreateDebugUtilsMessengerEXT(VkInstance instance, const VkDebugUtilsMessengerCreateInfoEXT* pCreateInfo, const VkAllocationCallbacks* pAllocator, VkDebugUtilsMessengerEXT* pDebugMessenger) {
 	auto func = (PFN_vkCreateDebugUtilsMessengerEXT)vkGetInstanceProcAddr(instance, "vkCreateDebugUtilsMessengerEXT");
 	if (func != nullptr) {
@@ -51,8 +51,8 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
 
 Renderer::Renderer(Window* const window, Engine& engine)
 	: _window(window)
-	, _texture()
-	, _material()
+	, _textures()
+	, _materials()
 	, _mesh()
 	, _viewport()
 	, _backgroundColor({250, 220, 192, 255}) // light tan color
@@ -86,16 +86,19 @@ void Renderer::initVulkan()
 	createImageViews();
 	createRenderPass();
 	createDescriptorSetLayout();
-	createMainMaterial();
 	createCommandPool();
 	createDepthResources();
 	createFramebuffers();
-	createTextureImage();
-	createTextureSampler();
-	createMesh();
+
 	createUniformBuffers();
 	createDescriptorPool();
 	createDescriptorSets();
+
+	createMainTexture();
+	createMainShader();
+	createMainMaterial();
+	createMainMesh();
+
 	createCommandBuffers();
 	createSyncObjects();
 }
@@ -225,34 +228,75 @@ void Renderer::createImage(uint32_t width, uint32_t height, VkFormat format, VkI
 	vkBindImageMemory(device, image, imageMemory, 0);
 }
 
-void Renderer::createTextureImage()
+ID minty::Renderer::loadTexture(std::string const& path)
 {
-	_texture = new Texture();
-	*_texture = Texture::load("Assets/Textures/funny.jpg", *this);
-}
+	// get data from file: pixels, width, height, color channels
+	int width, height, channels;
 
-VkImageView Renderer::createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags) {
-	VkImageViewCreateInfo viewInfo{};
-	viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
-	viewInfo.image = image;
-	viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
-	viewInfo.format = format;
-	viewInfo.subresourceRange.aspectMask = aspectFlags;
-	viewInfo.subresourceRange.baseMipLevel = 0;
-	viewInfo.subresourceRange.levelCount = 1;
-	viewInfo.subresourceRange.baseArrayLayer = 0;
-	viewInfo.subresourceRange.layerCount = 1;
+	// load a texture with r g b and a
+	stbi_uc* pixels = stbi_load(path.c_str(), &width, &height, &channels, STBI_rgb_alpha);
 
-	VkImageView imageView;
-	if (vkCreateImageView(device, &viewInfo, nullptr, &imageView) != VK_SUCCESS) {
-		throw std::runtime_error("failed to create texture _image view!");
+	// if no pixels, error
+	if (!pixels)
+	{
+		throw std::runtime_error(std::format("Failed to load texture: {}", path));
 	}
 
-	return imageView;
-}
+	// get size needed to store the texture
+	VkDeviceSize imageSize = width * height * sizeof(color_t);
 
-void Renderer::createTextureSampler()
-{
+	// copy to device via a staging buffer
+
+	VkBuffer stagingBuffer;
+	VkDeviceMemory stagingMemory;
+
+	// create a buffer that can be used as the source of a transfer command
+	// the memory can be mapped, and specify that flush is not needed (we do not need to flush to make writes)
+	createBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingMemory);
+
+	// map memory and copy it to buffer memory
+
+	// map memory: get pointer where we can actually copy data to
+	void* data;
+	vkMapMemory(device, stagingMemory, 0, imageSize, 0, &data);
+
+	// copy data over
+	memcpy(data, pixels, static_cast<size_t>(imageSize));
+
+	// no longer need access to the data
+	vkUnmapMemory(device, stagingMemory);
+
+	// done with the pixels from file
+	stbi_image_free(pixels);
+
+	// image data
+	VkFormat format = VK_FORMAT_R8G8B8A8_SRGB;
+	VkImage image;
+	VkImageView view;
+	VkDeviceMemory memory;
+	VkSampler sampler;
+
+	// create the image on gpu
+	createImage(width, height, format, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, image, memory);
+
+	// prep texture for copying
+	transitionImageLayout(image, format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+
+	// copy pixel data to image
+	copyBufferToImage(stagingBuffer, image, width, height);
+
+	// prep texture for rendering
+	transitionImageLayout(image, format, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
+	// cleanup staging buffer, no longer needed
+	vkDestroyBuffer(device, stagingBuffer, nullptr);
+	vkFreeMemory(device, stagingMemory, nullptr);
+
+	// create view, so the shaders can access the image data
+	view = createImageView(image, format, VK_IMAGE_ASPECT_COLOR_BIT);
+
+	// create sampler
+	// create the sampler in constructor for now
 	VkSamplerCreateInfo samplerInfo{};
 	samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
 	samplerInfo.magFilter = VK_FILTER_NEAREST;
@@ -286,9 +330,282 @@ void Renderer::createTextureSampler()
 	samplerInfo.minLod = 0.0f;
 	samplerInfo.maxLod = 0.0f;
 
-	if (vkCreateSampler(device, &samplerInfo, nullptr, &textureSampler) != VK_SUCCESS) {
-		throw std::runtime_error("failed to create texture sampler!");
+	if (vkCreateSampler(device, &samplerInfo, nullptr, &sampler) != VK_SUCCESS) {
+		throw std::runtime_error("Failed to create texture sampler.");
 	}
+
+	// add to array and return id
+	ID id = static_cast<ID>(_textures.size());
+	_textures.push_back(Texture(image, format, view, memory, sampler));
+	return id;
+}
+
+Texture& minty::Renderer::getTexture(ID const id)
+{
+	return _textures.at(id);
+}
+
+VkShaderModule minty::Renderer::loadShaderModule(std::string const& path)
+{
+	auto code = readFile(path);
+
+	VkShaderModuleCreateInfo createInfo
+	{
+		.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
+		.codeSize = code.size(),
+		.pCode = reinterpret_cast<const uint32_t*>(code.data())
+	};
+
+	VkShaderModule shaderModule;
+	if (vkCreateShaderModule(device, &createInfo, nullptr, &shaderModule) != VK_SUCCESS) {
+		throw std::runtime_error("failed to create shader module!");
+	}
+
+	return shaderModule;
+}
+
+ID minty::Renderer::loadShader(std::string const& vertexPath, std::string const& fragmentPath)
+{
+	// load shaders from disk
+	VkShaderModule vertShaderModule = loadShaderModule("Assets/Shaders/vert.spv");
+	VkShaderModule fragShaderModule = loadShaderModule("Assets/Shaders/frag.spv");
+
+	// create info for vertex shader
+	VkPipelineShaderStageCreateInfo vertShaderStageInfo
+	{
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
+		.stage = VK_SHADER_STAGE_VERTEX_BIT,
+		.module = vertShaderModule,
+		.pName = "main"
+	};
+
+	// create info for fragment shader
+	VkPipelineShaderStageCreateInfo fragShaderStageInfo
+	{
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
+		.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
+		.module = fragShaderModule,
+		.pName = "main"
+	};
+
+	// stick into one array
+	VkPipelineShaderStageCreateInfo shaderStages[] = { vertShaderStageInfo, fragShaderStageInfo };
+
+	// set vertex buffer attributes, so GPU can map values to buffer
+
+	// get the vertex attribute description data
+	auto bindingDescription = Vertex::getBindingDescription();
+	auto attributeDescriptions = Vertex::getAttributeDescriptions();
+
+	// define how vertex data is passed in
+	VkPipelineVertexInputStateCreateInfo vertexInputInfo
+	{
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
+		.vertexBindingDescriptionCount = 1,
+		.pVertexBindingDescriptions = &bindingDescription,
+		.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size()),
+		.pVertexAttributeDescriptions = attributeDescriptions.data(),
+	};
+
+	// define how triangle data used
+	VkPipelineInputAssemblyStateCreateInfo inputAssembly
+	{
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
+		.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
+		.primitiveRestartEnable = VK_FALSE
+	};
+
+	// define dynamic states for viewport and scissor
+	std::vector<VkDynamicState> dynamicStates = {
+		VK_DYNAMIC_STATE_VIEWPORT,
+		VK_DYNAMIC_STATE_SCISSOR
+	};
+
+	// create dynamic state info
+	VkPipelineDynamicStateCreateInfo dynamicState
+	{
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO,
+		.dynamicStateCount = static_cast<uint32_t>(dynamicStates.size()),
+		.pDynamicStates = dynamicStates.data()
+	};
+
+	// create viewport state create info (only 1, for now)
+	VkPipelineViewportStateCreateInfo viewportState
+	{
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
+		.viewportCount = 1,
+		.scissorCount = 1,
+	};
+
+	// create rasterizer info
+	VkPipelineRasterizationStateCreateInfo rasterizer
+	{
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
+		.depthClampEnable = VK_FALSE, // if true, near and var fragments are clamped instead of discarded
+		.rasterizerDiscardEnable = VK_FALSE, // if true, disables geometry shader, so nothing goes through the framebuffer
+		.polygonMode = VK_POLYGON_MODE_FILL, // fill polygon area with fragments (can also do line or point mode for frames/points)
+		.cullMode = VK_CULL_MODE_BACK_BIT, // cull back faces
+		.frontFace = VK_FRONT_FACE_CLOCKWISE, // how to determine front face/direction to rotate around on triangle vertices
+		.depthBiasEnable = VK_FALSE,
+		.depthBiasConstantFactor = 0.0f, // Optional
+		.depthBiasClamp = 0.0f, // Optional
+		.depthBiasSlopeFactor = 0.0f, // Optional
+		.lineWidth = 1.0f, // use with anything other than fill
+	};
+
+	// create multisampling info
+	VkPipelineMultisampleStateCreateInfo multisampling
+	{
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO,
+		.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT,
+		.sampleShadingEnable = VK_FALSE,
+		.minSampleShading = 1.0f, // Optional
+		.pSampleMask = nullptr, // Optional
+		.alphaToCoverageEnable = VK_FALSE, // Optional
+		.alphaToOneEnable = VK_FALSE, // Optional
+	};
+
+	// create depth stencil info
+	VkPipelineDepthStencilStateCreateInfo depthStencil
+	{
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
+		.depthTestEnable = VK_TRUE,
+		.depthWriteEnable = VK_TRUE,
+		.depthCompareOp = VK_COMPARE_OP_LESS,
+		.depthBoundsTestEnable = VK_FALSE,
+		.stencilTestEnable = VK_FALSE,
+		.front = {},
+		.back = {},
+		.minDepthBounds = 0.0f,
+		.maxDepthBounds = 1.0f,
+	};
+
+	// create color blend info, based on alpha
+	VkPipelineColorBlendAttachmentState colorBlendAttachment
+	{
+		.blendEnable = VK_FALSE,
+		.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA,
+		.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,
+		.colorBlendOp = VK_BLEND_OP_ADD,
+		.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE, // Optional
+		.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO, // Optional
+		.alphaBlendOp = VK_BLEND_OP_ADD, // Optional
+		.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT,
+	};
+
+	// more color blending logic
+	VkPipelineColorBlendStateCreateInfo colorBlending
+	{
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
+		.logicOpEnable = VK_FALSE,
+		.logicOp = VK_LOGIC_OP_COPY, // Optional
+		.attachmentCount = 1,
+		.pAttachments = &colorBlendAttachment,
+	};
+
+	//colorBlending.blendConstants[0] = 0.0f; // Optional
+	//colorBlending.blendConstants[1] = 0.0f; // Optional
+	//colorBlending.blendConstants[2] = 0.0f; // Optional
+	//colorBlending.blendConstants[3] = 0.0f; // Optional
+
+	// create the layout of the pipeline
+	VkPipelineLayoutCreateInfo pipelineLayoutInfo
+	{
+		.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
+		.setLayoutCount = 1,
+		.pSetLayouts = &descriptorSetLayout,
+		.pushConstantRangeCount = 0, // Optional
+		.pPushConstantRanges = nullptr, // Optional
+	};
+
+	VkPipelineLayout layout;
+
+	// create the pipeline layout
+	if (vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &layout) != VK_SUCCESS) {
+		throw std::runtime_error("failed to create pipeline layout!");
+	}
+
+	// compile all of the information to create the pipeline
+	VkGraphicsPipelineCreateInfo pipelineInfo
+	{
+		.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
+		.stageCount = 2,
+		.pStages = shaderStages,
+		.pVertexInputState = &vertexInputInfo,
+		.pInputAssemblyState = &inputAssembly,
+		.pViewportState = &viewportState,
+		.pRasterizationState = &rasterizer,
+		.pMultisampleState = &multisampling,
+		.pDepthStencilState = &depthStencil,
+		.pColorBlendState = &colorBlending,
+		.pDynamicState = &dynamicState,
+		.layout = layout,
+		.renderPass = renderPass,
+		.subpass = 0,
+		.basePipelineHandle = VK_NULL_HANDLE, // Optional, derive from another existing pipeline
+		.basePipelineIndex = -1, // Optional
+	};
+
+	VkPipeline pipeline;
+
+	// create the pipeline
+	if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &pipeline) != VK_SUCCESS) {
+		throw std::runtime_error("failed to create graphics pipeline!");
+	}
+
+	// cleanup shader modules
+	vkDestroyShaderModule(device, fragShaderModule, nullptr);
+	vkDestroyShaderModule(device, vertShaderModule, nullptr);
+
+	ID id = static_cast<ID>(_shaders.size());
+	_shaders.push_back(Shader(layout, pipeline));
+	return id;
+}
+
+Shader& minty::Renderer::getShader(ID const id)
+{
+	return _shaders.at(id);
+}
+
+ID minty::Renderer::createMaterial(ID const shaderId, ID const textureId)
+{
+	ID id = static_cast<ID>(_materials.size());
+	_materials.push_back(Material(shaderId, textureId));
+	return id;
+}
+
+Material& minty::Renderer::getMaterial(ID const id)
+{
+	return _materials.at(id);
+}
+
+void Renderer::createMainTexture()
+{
+	// load 4 textures
+	loadTexture("Assets/Textures/pattern.png");
+	loadTexture("Assets/Textures/funny.jpg");
+	loadTexture("Assets/Textures/texture.jpg");
+	loadTexture("Assets/Textures/brian.png");
+}
+
+VkImageView Renderer::createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags) {
+	VkImageViewCreateInfo viewInfo{};
+	viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
+	viewInfo.image = image;
+	viewInfo.viewType = VK_IMAGE_VIEW_TYPE_2D;
+	viewInfo.format = format;
+	viewInfo.subresourceRange.aspectMask = aspectFlags;
+	viewInfo.subresourceRange.baseMipLevel = 0;
+	viewInfo.subresourceRange.levelCount = 1;
+	viewInfo.subresourceRange.baseArrayLayer = 0;
+	viewInfo.subresourceRange.layerCount = 1;
+
+	VkImageView imageView;
+	if (vkCreateImageView(device, &viewInfo, nullptr, &imageView) != VK_SUCCESS) {
+		throw std::runtime_error("failed to create texture _image view!");
+	}
+
+	return imageView;
 }
 
 VkCommandBuffer Renderer::beginSingleTimeCommands() {
@@ -438,7 +755,62 @@ void Renderer::createDescriptorSetLayout()
 	layoutInfo.pBindings = bindings.data();
 
 	if (vkCreateDescriptorSetLayout(device, &layoutInfo, nullptr, &descriptorSetLayout) != VK_SUCCESS) {
-		throw std::runtime_error("failed to create descriptor set layout!");
+		throw std::runtime_error("Failed to create descriptor set layout.");
+	}
+}
+
+void minty::Renderer::createDescriptorSets()
+{
+	std::vector<VkDescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT, descriptorSetLayout);
+	VkDescriptorSetAllocateInfo allocInfo{};
+	allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+	allocInfo.descriptorPool = descriptorPool;
+	allocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
+	allocInfo.pSetLayouts = layouts.data();
+
+	descriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
+	if (vkAllocateDescriptorSets(device, &allocInfo, descriptorSets.data()) != VK_SUCCESS)
+	{
+		throw std::runtime_error("Failed to allocate descriptor sets.");
+	}
+}
+
+void minty::Renderer::updateDescriptorSets(ID const materialId)
+{
+	Material const& mat = getMaterial(materialId);
+
+	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+		VkDescriptorBufferInfo bufferInfo{};
+		bufferInfo.buffer = uniformBuffers[i];
+		bufferInfo.offset = 0;
+		bufferInfo.range = sizeof(UniformBufferObject);
+
+		Texture const& tex = getTexture(mat._textureId);
+
+		VkDescriptorImageInfo imageInfo{};
+		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+		imageInfo.imageView = tex._view;
+		imageInfo.sampler = tex._sampler;
+
+		std::array<VkWriteDescriptorSet, 2> descriptorWrites{};
+
+		descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		descriptorWrites[0].dstSet = descriptorSets[i];
+		descriptorWrites[0].dstBinding = 0;
+		descriptorWrites[0].dstArrayElement = 0;
+		descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+		descriptorWrites[0].descriptorCount = 1;
+		descriptorWrites[0].pBufferInfo = &bufferInfo;
+
+		descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+		descriptorWrites[1].dstSet = descriptorSets[i];
+		descriptorWrites[1].dstBinding = 1;
+		descriptorWrites[1].dstArrayElement = 0;
+		descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
+		descriptorWrites[1].descriptorCount = 1;
+		descriptorWrites[1].pImageInfo = &imageInfo;
+
+		vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
 	}
 }
 
@@ -995,25 +1367,6 @@ std::vector<char> Renderer::readFile(const std::string& filename) {
 	return buffer;
 }
 
-VkShaderModule minty::Renderer::loadShaderModule(std::string const& path)
-{
-	auto code = readFile(path);
-
-	VkShaderModuleCreateInfo createInfo
-	{
-		.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
-		.codeSize = code.size(),
-		.pCode = reinterpret_cast<const uint32_t*>(code.data())
-	};
-
-	VkShaderModule shaderModule;
-	if (vkCreateShaderModule(device, &createInfo, nullptr, &shaderModule) != VK_SUCCESS) {
-		throw std::runtime_error("failed to create shader module!");
-	}
-
-	return shaderModule;
-}
-
 void Renderer::createRenderPass()
 {
 	// need to tell vulkan how much of what to use for rendering
@@ -1084,212 +1437,17 @@ void Renderer::createRenderPass()
 	}
 }
 
-Material* minty::Renderer::createMaterial(std::string const& vertexPath, std::string const& fragmentPath)
+void minty::Renderer::createMainShader()
 {
-	// load shaders from disk
-	VkShaderModule vertShaderModule = loadShaderModule("Assets/Shaders/vert.spv");
-	VkShaderModule fragShaderModule = loadShaderModule("Assets/Shaders/frag.spv");
-
-	// create info for vertex shader
-	VkPipelineShaderStageCreateInfo vertShaderStageInfo
-	{
-		.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
-		.stage = VK_SHADER_STAGE_VERTEX_BIT,
-		.module = vertShaderModule,
-		.pName = "main"
-	};
-
-	// create info for fragment shader
-	VkPipelineShaderStageCreateInfo fragShaderStageInfo
-	{
-		.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO,
-		.stage = VK_SHADER_STAGE_FRAGMENT_BIT,
-		.module = fragShaderModule,
-		.pName = "main"
-	};
-
-	// stick into one array
-	VkPipelineShaderStageCreateInfo shaderStages[] = { vertShaderStageInfo, fragShaderStageInfo };
-
-	// set vertex buffer attributes, so GPU can map values to buffer
-
-	// get the vertex attribute description data
-	auto bindingDescription = Vertex::getBindingDescription();
-	auto attributeDescriptions = Vertex::getAttributeDescriptions();
-
-	// define how vertex data is passed in
-	VkPipelineVertexInputStateCreateInfo vertexInputInfo
-	{
-		.sType = VK_STRUCTURE_TYPE_PIPELINE_VERTEX_INPUT_STATE_CREATE_INFO,
-		.vertexBindingDescriptionCount = 1,
-		.pVertexBindingDescriptions = &bindingDescription,
-		.vertexAttributeDescriptionCount = static_cast<uint32_t>(attributeDescriptions.size()),
-		.pVertexAttributeDescriptions = attributeDescriptions.data(),
-	};
-
-	// define how triangle data used
-	VkPipelineInputAssemblyStateCreateInfo inputAssembly
-	{
-		.sType = VK_STRUCTURE_TYPE_PIPELINE_INPUT_ASSEMBLY_STATE_CREATE_INFO,
-		.topology = VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST,
-		.primitiveRestartEnable = VK_FALSE
-	};
-
-	// define dynamic states for viewport and scissor
-	std::vector<VkDynamicState> dynamicStates = {
-		VK_DYNAMIC_STATE_VIEWPORT,
-		VK_DYNAMIC_STATE_SCISSOR
-	};
-
-	// create dynamic state info
-	VkPipelineDynamicStateCreateInfo dynamicState
-	{
-		.sType = VK_STRUCTURE_TYPE_PIPELINE_DYNAMIC_STATE_CREATE_INFO,
-		.dynamicStateCount = static_cast<uint32_t>(dynamicStates.size()),
-		.pDynamicStates = dynamicStates.data()
-	};
-
-	// create viewport state create info (only 1, for now)
-	VkPipelineViewportStateCreateInfo viewportState
-	{
-		.sType = VK_STRUCTURE_TYPE_PIPELINE_VIEWPORT_STATE_CREATE_INFO,
-		.viewportCount = 1,
-		.scissorCount = 1,
-	};
-
-	// create rasterizer info
-	VkPipelineRasterizationStateCreateInfo rasterizer
-	{
-		.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
-		.depthClampEnable = VK_FALSE, // if true, near and var fragments are clamped instead of discarded
-		.rasterizerDiscardEnable = VK_FALSE, // if true, disables geometry shader, so nothing goes through the framebuffer
-		.polygonMode = VK_POLYGON_MODE_FILL, // fill polygon area with fragments (can also do line or point mode for frames/points)
-		.cullMode = VK_CULL_MODE_BACK_BIT, // cull back faces
-		.frontFace = VK_FRONT_FACE_CLOCKWISE, // how to determine front face/direction to rotate around on triangle vertices
-		.depthBiasEnable = VK_FALSE,
-		.depthBiasConstantFactor = 0.0f, // Optional
-		.depthBiasClamp = 0.0f, // Optional
-		.depthBiasSlopeFactor = 0.0f, // Optional
-		.lineWidth = 1.0f, // use with anything other than fill
-	};
-
-	// create multisampling info
-	VkPipelineMultisampleStateCreateInfo multisampling
-	{
-		.sType = VK_STRUCTURE_TYPE_PIPELINE_MULTISAMPLE_STATE_CREATE_INFO,
-		.rasterizationSamples = VK_SAMPLE_COUNT_1_BIT,
-		.sampleShadingEnable = VK_FALSE,
-		.minSampleShading = 1.0f, // Optional
-		.pSampleMask = nullptr, // Optional
-		.alphaToCoverageEnable = VK_FALSE, // Optional
-		.alphaToOneEnable = VK_FALSE, // Optional
-	};
-
-	// create depth stencil info
-	VkPipelineDepthStencilStateCreateInfo depthStencil
-	{
-		.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
-		.depthTestEnable = VK_TRUE,
-		.depthWriteEnable = VK_TRUE,
-		.depthCompareOp = VK_COMPARE_OP_LESS,
-		.depthBoundsTestEnable = VK_FALSE,
-		.stencilTestEnable = VK_FALSE,
-		.front = {},
-		.back = {},
-		.minDepthBounds = 0.0f,
-		.maxDepthBounds = 1.0f,
-	};
-
-	// create color blend info, based on alpha
-	VkPipelineColorBlendAttachmentState colorBlendAttachment
-	{
-		.blendEnable = VK_FALSE,
-		.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA,
-		.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,
-		.colorBlendOp = VK_BLEND_OP_ADD,
-		.srcAlphaBlendFactor = VK_BLEND_FACTOR_ONE, // Optional
-		.dstAlphaBlendFactor = VK_BLEND_FACTOR_ZERO, // Optional
-		.alphaBlendOp = VK_BLEND_OP_ADD, // Optional
-		.colorWriteMask = VK_COLOR_COMPONENT_R_BIT | VK_COLOR_COMPONENT_G_BIT | VK_COLOR_COMPONENT_B_BIT | VK_COLOR_COMPONENT_A_BIT,
-	};
-
-	// more color blending logic
-	VkPipelineColorBlendStateCreateInfo colorBlending
-	{
-		.sType = VK_STRUCTURE_TYPE_PIPELINE_COLOR_BLEND_STATE_CREATE_INFO,
-		.logicOpEnable = VK_FALSE,
-		.logicOp = VK_LOGIC_OP_COPY, // Optional
-		.attachmentCount = 1,
-		.pAttachments = &colorBlendAttachment,
-	};
-
-	//colorBlending.blendConstants[0] = 0.0f; // Optional
-	//colorBlending.blendConstants[1] = 0.0f; // Optional
-	//colorBlending.blendConstants[2] = 0.0f; // Optional
-	//colorBlending.blendConstants[3] = 0.0f; // Optional
-
-	// create the layout of the pipeline
-	VkPipelineLayoutCreateInfo pipelineLayoutInfo
-	{
-		.sType = VK_STRUCTURE_TYPE_PIPELINE_LAYOUT_CREATE_INFO,
-		.setLayoutCount = 1,
-		.pSetLayouts = &descriptorSetLayout,
-		.pushConstantRangeCount = 0, // Optional
-		.pPushConstantRanges = nullptr, // Optional
-	};
-
-	VkPipelineLayout layout;
-
-	// create the pipeline layout
-	if (vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &layout) != VK_SUCCESS) {
-		throw std::runtime_error("failed to create pipeline layout!");
-	}
-
-	// compile all of the information to create the pipeline
-	VkGraphicsPipelineCreateInfo pipelineInfo
-	{
-		.sType = VK_STRUCTURE_TYPE_GRAPHICS_PIPELINE_CREATE_INFO,
-		.stageCount = 2,
-		.pStages = shaderStages,
-		.pVertexInputState = &vertexInputInfo,
-		.pInputAssemblyState = &inputAssembly,
-		.pViewportState = &viewportState,
-		.pRasterizationState = &rasterizer,
-		.pMultisampleState = &multisampling,
-		.pDepthStencilState = &depthStencil,
-		.pColorBlendState = &colorBlending,
-		.pDynamicState = &dynamicState,
-		.layout = layout,
-		.renderPass = renderPass,
-		.subpass = 0,
-		.basePipelineHandle = VK_NULL_HANDLE, // Optional, derive from another existing pipeline
-		.basePipelineIndex = -1, // Optional
-	};
-
-	VkPipeline pipeline;
-
-	// create the pipeline
-	if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &pipeline) != VK_SUCCESS) {
-		throw std::runtime_error("failed to create graphics pipeline!");
-	}
-
-	// cleanup shader modules
-	vkDestroyShaderModule(device, fragShaderModule, nullptr);
-	vkDestroyShaderModule(device, vertShaderModule, nullptr);
-
-	// create material
-	return new Material(layout, pipeline);
+	loadShader("Assets/Shaders/vert.spv", "Assets/Shaders/frag.spv");
 }
 
 void Renderer::createMainMaterial()
 {
-	if (_material)
-	{
-		_material->dispose(*this);
-		_material = nullptr;
-	}
-
-	_material = createMaterial("Assets/Shaders/vert.spv", "Assets/Shaders/frag.spv");
+	createMaterial(0, 0);
+	createMaterial(0, 1);
+	createMaterial(0, 2);
+	createMaterial(0, 3);
 }
 
 void Renderer::createFramebuffers()
@@ -1318,10 +1476,18 @@ void Renderer::createFramebuffers()
 	}
 }
 
-void minty::Renderer::createMesh()
+void minty::Renderer::createMainMesh()
 {
 	_mesh = new Mesh();
 	*_mesh = Mesh::createCube(*this);
+
+	setMaterialForMainMesh(0);
+}
+
+void minty::Renderer::setMaterialForMainMesh(ID const materialId)
+{
+	_mesh->setMaterial(materialId);
+	updateDescriptorSets(materialId);
 }
 
 void Renderer::createUniformBuffers()
@@ -1339,19 +1505,19 @@ void Renderer::createUniformBuffers()
 	}
 }
 
-void Renderer::updateUniformBuffer(float const rotation)
+void Renderer::updateUniformBuffer()
 {
-	//// start time of program
-	//static auto startTime = std::chrono::high_resolution_clock::now();
+	// start time of program
+	static auto startTime = std::chrono::high_resolution_clock::now();
 
-	//// current time elapsed since start
-	//auto currentTime = std::chrono::high_resolution_clock::now();
-	//float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
-	////float time = 0.0f;
+	// current time elapsed since start
+	auto currentTime = std::chrono::high_resolution_clock::now();
+	float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+	//float time = 0.0f;
 
 	// set uniform values
 	UniformBufferObject ubo{};
-	ubo.model = glm::rotate(glm::mat4(1.0f), rotation * glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	ubo.model = glm::rotate(glm::mat4(1.0f), time * 0.5f * glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
 	ubo.proj = glm::perspective(glm::radians(45.0f), swapChainExtent.width / (float)swapChainExtent.height, 0.1f, 10.0f);
 	// flip y and x so that we have a left handed coordinates system
@@ -1364,9 +1530,9 @@ void Renderer::updateUniformBuffer(float const rotation)
 
 void Renderer::createDescriptorPool()
 {
-	VkDescriptorPoolSize poolSize{};
-	poolSize.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	poolSize.descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
+	//VkDescriptorPoolSize poolSize{};
+	//poolSize.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
+	//poolSize.descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
 
 	std::array<VkDescriptorPoolSize, 2> poolSizes{};
 	poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -1380,59 +1546,9 @@ void Renderer::createDescriptorPool()
 	poolInfo.pPoolSizes = poolSizes.data();
 	poolInfo.maxSets = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
 
-	poolInfo.maxSets = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
-
 	if (vkCreateDescriptorPool(device, &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS)
 	{
-		throw std::runtime_error("failed to create descriptor pool!");
-	}
-}
-
-void Renderer::createDescriptorSets()
-{
-	std::vector<VkDescriptorSetLayout> layouts(MAX_FRAMES_IN_FLIGHT, descriptorSetLayout);
-	VkDescriptorSetAllocateInfo allocInfo{};
-	allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-	allocInfo.descriptorPool = descriptorPool;
-	allocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
-	allocInfo.pSetLayouts = layouts.data();
-
-	descriptorSets.resize(MAX_FRAMES_IN_FLIGHT);
-	if (vkAllocateDescriptorSets(device, &allocInfo, descriptorSets.data()) != VK_SUCCESS)
-	{
-		throw std::runtime_error("failed to allocate descriptor sets!");
-	}
-
-	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-		VkDescriptorBufferInfo bufferInfo{};
-		bufferInfo.buffer = uniformBuffers[i];
-		bufferInfo.offset = 0;
-		bufferInfo.range = sizeof(UniformBufferObject);
-
-		VkDescriptorImageInfo imageInfo{};
-		imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-		imageInfo.imageView = _texture->_view;
-		imageInfo.sampler = textureSampler;
-
-		std::array<VkWriteDescriptorSet, 2> descriptorWrites{};
-
-		descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		descriptorWrites[0].dstSet = descriptorSets[i];
-		descriptorWrites[0].dstBinding = 0;
-		descriptorWrites[0].dstArrayElement = 0;
-		descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-		descriptorWrites[0].descriptorCount = 1;
-		descriptorWrites[0].pBufferInfo = &bufferInfo;
-
-		descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-		descriptorWrites[1].dstSet = descriptorSets[i];
-		descriptorWrites[1].dstBinding = 1;
-		descriptorWrites[1].dstArrayElement = 0;
-		descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-		descriptorWrites[1].descriptorCount = 1;
-		descriptorWrites[1].pImageInfo = &imageInfo;
-
-		vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+		throw std::runtime_error("Failed to create descriptor pool.");
 	}
 }
 
@@ -1523,6 +1639,30 @@ void Renderer::createCommandBuffers()
 	}
 }
 
+void minty::Renderer::renderMesh(VkCommandBuffer commandBuffer, Mesh const* const mesh)
+{
+	// update descriptor data
+	updateDescriptorSets(mesh->_materialId);
+
+	Material const& mat = getMaterial(mesh->_materialId);
+	Shader const& shader = getShader(mat._shaderId);
+
+	// update uniform data
+	vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, shader._layout, 0, 1, &descriptorSets[currentFrame], 0, nullptr);
+
+	// bind pipeline
+	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, shader._pipeline);
+
+	// bind vertex data
+	VkBuffer vertexBuffers[] = { mesh->_vertexBuffer };
+	VkDeviceSize offsets[] = { 0 };
+	vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+	vkCmdBindIndexBuffer(commandBuffer, mesh->_indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+
+	// draw
+	vkCmdDrawIndexed(commandBuffer, mesh->_indexCount, 1, 0, 0, 0);
+}
+
 void Renderer::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex)
 {
 	VkCommandBufferBeginInfo beginInfo
@@ -1549,8 +1689,9 @@ void Renderer::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t image
 	renderPassInfo.renderArea.offset = { 0, 0 };
 	renderPassInfo.renderArea.extent = swapChainExtent;
 
+	// clear the background
 	std::array<VkClearValue, 2> clearValues{};
-	clearValues[0].color = { 
+	clearValues[0].color = {
 		{
 			_backgroundColor.rf(),
 			_backgroundColor.gf(),
@@ -1559,33 +1700,17 @@ void Renderer::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t image
 		}
 	};
 	clearValues[1].depthStencil = { 1.0f, 0 };
-
 	renderPassInfo.clearValueCount = static_cast<uint32_t>(clearValues.size());
 	renderPassInfo.pClearValues = clearValues.data();
 
 	// begin pass
 	vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
-	// bind pipeline
-	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _material->_pipeline);
-
-	// bind vertex data
-	VkBuffer vertexBuffers[] = { _mesh->_vertexBuffer };
-	VkDeviceSize offsets[] = { 0 };
-	vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
-	vkCmdBindIndexBuffer(commandBuffer, _mesh->_indexBuffer, 0, VK_INDEX_TYPE_UINT16);
-
-	// update uniform data
-	vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _material->_layout, 0, 1, &descriptorSets[currentFrame], 0, nullptr);
-
 	// set viewport
 	vkCmdSetViewport(commandBuffer, 0, 1, &_viewport._viewport);
 	vkCmdSetScissor(commandBuffer, 0, 1, &_viewport._scissor);
 
-	uint32_t indexCount = 36u;
-	// draw command
-	//vkCmdDraw(commandBuffer, static_cast<uint32_t>(vertices.size()), 1, 0, 0);
-	vkCmdDrawIndexed(commandBuffer, indexCount, 1, 0, 0, 0);
+	renderMesh(commandBuffer, _mesh);
 
 	// done rendering
 	vkCmdEndRenderPass(commandBuffer);
@@ -1636,9 +1761,10 @@ void Renderer::cleanup()
 
 	// clean up vulkan
 	cleanupSwapChain();
-	vkDestroySampler(device, textureSampler, nullptr);
-	_texture->dispose(*this);
-	delete _texture;
+	for (auto& tex : _textures)
+	{
+		tex.dispose(*this);
+	}
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
 		vkDestroyBuffer(device, uniformBuffers[i], nullptr);
 		vkFreeMemory(device, uniformBuffersMemory[i], nullptr);
@@ -1653,8 +1779,14 @@ void Renderer::cleanup()
 		vkDestroyFence(device, inFlightFences[i], nullptr);
 	}
 	vkDestroyCommandPool(device, commandPool, nullptr);
-	_material->dispose(*this);
-	delete _material;
+	for (auto& mat : _materials)
+	{
+		mat.dispose(*this);
+	}
+	for (auto& shader : _shaders)
+	{
+		shader.dispose(*this);
+	}
 	vkDestroyRenderPass(device, renderPass, nullptr);
 	vkDestroyDevice(device, nullptr);
 	vkDestroySurfaceKHR(instance, surface, nullptr);

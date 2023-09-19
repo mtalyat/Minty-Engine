@@ -1,5 +1,6 @@
 #pragma once
 
+#include "M_Types.h"
 #include <string>
 
 namespace minty

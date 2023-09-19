@@ -3,16 +3,19 @@
 
 #include "M_Renderer.h"
 
-void minty::Mesh::setVertices(void const* const vertices, size_t const deviceSize, Renderer& engine)
+void minty::Mesh::setVertices(void const* const vertices, size_t const elementCount, size_t const elementSize, Renderer& engine)
 {
-	if (_vertexSet)
+	if (_vertexCount > 0)
 	{
 		// if data already set, get rid of the old data
 		disposeVertices(engine);
 	}
 
+	_vertexCount = elementCount;
+	_vertexSize = elementSize;
+
 	// get buffer size
-	VkDeviceSize bufferSize = static_cast<VkDeviceSize>(deviceSize);
+	VkDeviceSize bufferSize = static_cast<VkDeviceSize>(elementCount * elementSize);
 
 	// use buffer to copy data into device memory
 	VkBuffer stagingBuffer;
@@ -35,16 +38,19 @@ void minty::Mesh::setVertices(void const* const vertices, size_t const deviceSiz
 	vkFreeMemory(engine.device, stagingBufferMemory, nullptr);
 }
 
-void minty::Mesh::setIndices(void const* const indices, size_t const deviceSize, Renderer& engine)
+void minty::Mesh::setIndices(void const* const indices, size_t const elementCount, size_t const elementSize, Renderer& engine)
 {
-	if (_indexSet)
+	if (_indexCount > 0)
 	{
 		// if data already set, get rid of the old data
 		disposeIndices(engine);
 	}
 
+	_indexCount = elementCount;
+	_indexSize = elementSize;
+
 	// get buffer size
-	VkDeviceSize bufferSize = static_cast<VkDeviceSize>(deviceSize);
+	VkDeviceSize bufferSize = static_cast<VkDeviceSize>(elementCount * elementSize);
 
 	// use buffer to copy data into device memory
 	VkBuffer stagingBuffer;
@@ -67,9 +73,9 @@ void minty::Mesh::setIndices(void const* const indices, size_t const deviceSize,
 	vkFreeMemory(engine.device, stagingBufferMemory, nullptr);
 }
 
-void minty::Mesh::setMaterial(Material* const material)
+void minty::Mesh::setMaterial(ID const materialId)
 {
-	_material = material;
+	_materialId = materialId;
 }
 
 void minty::Mesh::dispose(Renderer& engine)
@@ -151,8 +157,8 @@ minty::Mesh minty::Mesh::createCube(Renderer& engine)
 
 	// set mesh data
 	Mesh mesh;
-	mesh.setVertices(static_cast<void const*>(vertices.data()), sizeof(Vertex) * vertices.size(), engine);
-	mesh.setIndices(static_cast<void const*>(indices.data()), sizeof(uint16_t) * indices.size(), engine);
+	mesh.setVertices(static_cast<void const*>(vertices.data()), vertices.size(), sizeof(Vertex), engine);
+	mesh.setIndices(static_cast<void const*>(indices.data()), indices.size(), sizeof(uint16_t), engine);
 
 	// done
 	return mesh;
@@ -167,10 +173,12 @@ void minty::Mesh::disposeVertices(Renderer& engine)
 {
 	vkDestroyBuffer(engine.device, _vertexBuffer, nullptr);
 	vkFreeMemory(engine.device, _vertexMemory, nullptr);
+	_vertexCount = 0;
 }
 
 void minty::Mesh::disposeIndices(Renderer& engine)
 {
 	vkDestroyBuffer(engine.device, _indexBuffer, nullptr);
 	vkFreeMemory(engine.device, _indexMemory, nullptr);
+	_indexCount = 0;
 }

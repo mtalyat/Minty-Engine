@@ -33,36 +33,27 @@ void Engine::run()
 	Window* windowPtr = &window;
 
 	// start the render engine
-	Renderer engine(windowPtr, *this);
-
-	float rotation = 0.0f;
-	float* rotationPtr = &rotation;
+	Renderer renderer(windowPtr, *this);
+	Renderer* rendererPtr = &renderer;
 
 	// input
 	InputMap input;
 	// rotate when space held
-	input.emplaceKey(Key::Space, [rotationPtr](KeyPressEventArgs const& args)
+	input.emplaceKeyDown(Key::D1, [rendererPtr](KeyPressEventArgs const& args)
 		{
-			switch (args.action)
-			{
-			case KeyAction::Down:
-				break;
-			case KeyAction::Up:
-				break;
-			case KeyAction::Hold:
-				if (static_cast<int>(args.mods) & static_cast<int>(KeyModifiers::Shift))
-				{
-					// rotate backwards
-					*rotationPtr -= 0.01f;
-				}
-				else
-				{
-					// rotate forwards
-					*rotationPtr += 0.01f;
-				}
-				
-				break;
-			}
+			rendererPtr->setMaterialForMainMesh(0);
+		});
+	input.emplaceKeyDown(Key::D2, [rendererPtr](KeyPressEventArgs const& args)
+		{
+			rendererPtr->setMaterialForMainMesh(1);
+		});
+	input.emplaceKeyDown(Key::D3, [rendererPtr](KeyPressEventArgs const& args)
+		{
+			rendererPtr->setMaterialForMainMesh(2);
+		});
+	input.emplaceKeyDown(Key::D4, [rendererPtr](KeyPressEventArgs const& args)
+		{
+			rendererPtr->setMaterialForMainMesh(3);
 		});
 	// quit on key close
 	input.emplaceKeyDown(Key::Escape, [windowPtr](KeyPressEventArgs const& args)
@@ -75,11 +66,11 @@ void Engine::run()
 	time_point_t now;
 
 	// main loop
-	while (engine.isRunning())
+	while (renderer.isRunning())
 	{
 		glfwPollEvents();
-		engine.updateUniformBuffer(rotation);
-		engine.renderFrame();
+		renderer.updateUniformBuffer();
+		renderer.renderFrame();
 
 		frameCount++;
 

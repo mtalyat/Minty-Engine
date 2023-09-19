@@ -117,9 +117,6 @@
     <ClInclude Include="M_Shader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="M_ShaderPass.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="M_MaterialInstance.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -204,9 +201,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_Shader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="M_ShaderPass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_MaterialInstance.cpp">

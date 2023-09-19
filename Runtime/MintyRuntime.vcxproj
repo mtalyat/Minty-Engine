@@ -228,7 +228,6 @@
     <ClInclude Include="M_Mesh.h" />
     <ClInclude Include="M_Object.h" />
     <ClInclude Include="M_Shader.h" />
-    <ClInclude Include="M_ShaderPass.h" />
     <ClInclude Include="M_Texture.h" />
     <ClInclude Include="M_Vector2Int.h" />
     <ClInclude Include="M_Vector2.h" />
@@ -260,7 +259,6 @@
     <ClCompile Include="M_Mesh.cpp" />
     <ClCompile Include="M_Object.cpp" />
     <ClCompile Include="M_Shader.cpp" />
-    <ClCompile Include="M_ShaderPass.cpp" />
     <ClCompile Include="M_Texture.cpp" />
     <ClCompile Include="M_Vector2Int.cpp" />
     <ClCompile Include="M_Vector2.cpp" />

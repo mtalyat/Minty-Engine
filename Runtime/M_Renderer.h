@@ -7,6 +7,8 @@
 #include "M_Mesh.h"
 #include "M_Viewport.h"
 #include "M_Color.h"
+#include "M_Shader.h"
+#include "M_Material.h"
 
 //#include <vulkan/vulkan.h>
 #define GLFW_INCLUDE_VULKAN
@@ -49,17 +51,17 @@ namespace minty
 			attributeDescriptions[0].binding = 0;
 			attributeDescriptions[0].location = 0;
 			attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
-			attributeDescriptions[0].offset = offsetof(Vertex, pos);
+			attributeDescriptions[0].offset = 0;
 
 			attributeDescriptions[1].binding = 0;
 			attributeDescriptions[1].location = 1;
 			attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
-			attributeDescriptions[1].offset = offsetof(Vertex, color);
+			attributeDescriptions[1].offset = sizeof(glm::vec3);
 
 			attributeDescriptions[2].binding = 0;
 			attributeDescriptions[2].location = 2;
 			attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
-			attributeDescriptions[2].offset = offsetof(Vertex, texCoord);
+			attributeDescriptions[2].offset = sizeof(glm::vec3) * 2;
 
 			return attributeDescriptions;
 		}
@@ -87,16 +89,20 @@ namespace minty
 		alignas(16) glm::mat4 proj;
 	};
 
+	constexpr int MAX_FRAMES_IN_FLIGHT = 2;
+
 	/// <summary>
 	/// Handles rendering for the game engine.
 	/// </summary>
 	class Renderer
 	{
-	private:
+	public: // TODO: set to private
 		Window* const _window;
+		
+		std::vector<Texture> _textures;
+		std::vector<Material> _materials;
+		std::vector<Shader> _shaders;
 
-		Texture* _texture;
-		Material* _material;
 		Mesh* _mesh;
 		Viewport _viewport;
 		Color _backgroundColor;
@@ -145,10 +151,58 @@ namespace minty
 		std::vector<void*> uniformBuffersMapped;
 		VkDescriptorPool descriptorPool;
 		std::vector<VkDescriptorSet> descriptorSets;
-		VkSampler textureSampler;
 		VkImage depthImage;
 		VkDeviceMemory depthImageMemory;
 		VkImageView depthImageView;
+
+#pragma region Components
+
+		ID loadTexture(std::string const& path);
+
+		Texture& getTexture(ID const id);
+
+		/// <summary>
+		/// Loads a shader from the disk.
+		/// </summary>
+		/// <param name="path">The path to the .spv shader file. .spv files come from a compiled GLSL file.</param>
+		/// <returns>The shader module.</returns>
+		VkShaderModule loadShaderModule(std::string const& path);
+
+		ID loadShader(std::string const& vertexPath, std::string const& fragmentPath);
+
+		Shader& getShader(ID const id);
+
+		ID createMaterial(ID const shaderId, ID const textureId);
+
+		Material& getMaterial(ID const id);
+
+#pragma endregion
+
+#pragma region Main
+
+		/// <summary>
+		/// Creates the texture image that will be rendered to the screen.
+		/// </summary>
+		void createMainTexture();
+
+		/// <summary>
+		/// 
+		/// </summary>
+		void createMainShader();
+
+		/// <summary>
+		/// 
+		/// </summary>
+		void createMainMaterial();
+
+		/// <summary>
+		/// Creates the mesh to render.
+		/// </summary>
+		void createMainMesh();
+
+		void setMaterialForMainMesh(ID const materialId);
+
+#pragma endregion
 
 		/// <summary>
 		/// Initializes the Vulkan framework and all necessary components to render things to the window.
@@ -201,11 +255,6 @@ namespace minty
 		void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
 
 		/// <summary>
-		/// Creates the texture image that will be rendered to the screen.
-		/// </summary>
-		void createTextureImage();
-
-		/// <summary>
 		/// Creates an image view, so the image can be seen.
 		/// </summary>
 		/// <param name="image">The image to view.</param>
@@ -213,11 +262,6 @@ namespace minty
 		/// <param name="aspectFlags">The aspect flags of the image.</param>
 		/// <returns>The created image view.</returns>
 		VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
-
-		/// <summary>
-		/// Creates the texture sampler for the GPU.
-		/// </summary>
-		void createTextureSampler();
 
 		/// <summary>
 		/// Start the command buffer.
@@ -248,11 +292,6 @@ namespace minty
 		/// <param name="width">The width of the image.</param>
 		/// <param name="height">The height of the image.</param>
 		void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
-
-		/// <summary>
-		/// Creates the descriptor set layout for uniform objects.
-		/// </summary>
-		void createDescriptorSetLayout();
 
 		/// <summary>
 		/// Creates the image views in the swap chain.
@@ -384,33 +423,14 @@ namespace minty
 		static std::vector<char> readFile(const std::string& filename);
 
 		/// <summary>
-		/// Loads a shader from the disk.
-		/// </summary>
-		/// <param name="path">The path to the .spv shader file. .spv files come from a compiled GLSL file.</param>
-		/// <returns>The shader module.</returns>
-		VkShaderModule loadShaderModule(std::string const& path);
-
-		/// <summary>
 		/// Creates the render pass.
 		/// </summary>
 		void createRenderPass();
-
-		Material* createMaterial(std::string const& vertexPath, std::string const& fragmentPath);
-
-		/// <summary>
-		/// Creates the graphics pipeline.
-		/// </summary>
-		void createMainMaterial();
 
 		/// <summary>
 		/// Creates the frame buffers.
 		/// </summary>
 		void createFramebuffers();
-
-		/// <summary>
-		/// Creates the mesh to render.
-		/// </summary>
-		void createMesh();
 
 		/// <summary>
 		/// Creates the uniform buffers.
@@ -421,7 +441,7 @@ namespace minty
 		/// Updates the uniform buffer with new rotation values.
 		/// </summary>
 		/// <param name="currentImage">The image in which to update the buffer for.</param>
-		void updateUniformBuffer(float const rotation);
+		void updateUniformBuffer();
 
 		/// <summary>
 		/// Creates the descriptor pool.
@@ -429,9 +449,13 @@ namespace minty
 		void createDescriptorPool();
 
 		/// <summary>
-		/// Creates the descriptor sets.
+		/// Creates the descriptor set layout for uniform objects.
 		/// </summary>
+		void createDescriptorSetLayout();
+
 		void createDescriptorSets();
+
+		void updateDescriptorSets(ID const materialId);
 
 		/// <summary>
 		/// Creates a buffer.
@@ -468,6 +492,8 @@ namespace minty
 		/// Creates the command buffers.
 		/// </summary>
 		void createCommandBuffers();
+
+		void renderMesh(VkCommandBuffer commandBuffer, Mesh const* const mesh);
 
 		/// <summary>
 		/// Records the command buffer.
