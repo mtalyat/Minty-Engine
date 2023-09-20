@@ -17,6 +17,8 @@
 #include <filesystem>
 #include <format>
 
+#define VK_ASSERT(result, func, message) VkResult result = func; if(result != VkResult::VK_SUCCESS) throw std::runtime_error(std::format("[{}] {}", result, message));
+
 using namespace minty;
 
 const std::vector<const char*> validationLayers = {
@@ -82,18 +84,6 @@ bool Renderer::isRunning()
 	return _window->isOpen();
 }
 
-bool minty::Renderer::vkAssert(VkResult const result)
-{
-	if (result != VK_SUCCESS)
-	{
-		console::error(std::format("VkResult: {}", static_cast<int>(result)));
-
-		return true;
-	}
-
-	return false;
-}
-
 void Renderer::initVulkan()
 {
 	createInstance();
@@ -137,7 +127,7 @@ void Renderer::createInstance()
 		.applicationVersion = VK_MAKE_VERSION(1, 0, 0),
 		.pEngineName = "Unknown Engine",
 		.engineVersion = VK_MAKE_VERSION(1, 0, 0),
-		.apiVersion = VK_API_VERSION_1_0
+		.apiVersion = VK_API_VERSION_1_1
 	};
 
 	// get glfw extensions
@@ -229,7 +219,7 @@ void Renderer::createImage(uint32_t width, uint32_t height, VkFormat format, VkI
 	imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
 	if (vkCreateImage(device, &imageInfo, nullptr, &image) != VK_SUCCESS) {
-		throw std::runtime_error("failed to create _image!");
+		throw std::runtime_error("Failed to create image!");
 	}
 
 	VkMemoryRequirements memRequirements;
@@ -1288,6 +1278,7 @@ void Renderer::createLogicalDevice()
 	{
 		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT,
 		.shaderSampledImageArrayNonUniformIndexing = VK_TRUE,
+		.descriptorBindingPartiallyBound = VK_TRUE,
 		.descriptorBindingVariableDescriptorCount = VK_TRUE,
 		.runtimeDescriptorArray = VK_TRUE,
 	};
@@ -1307,11 +1298,11 @@ void Renderer::createLogicalDevice()
 
 	VkDeviceCreateInfo createInfo{};
 	createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
+	//createInfo.pEnabledFeatures = &deviceFeatures;
+	createInfo.pEnabledFeatures = nullptr; // must be null if using VkPhysicalDeviceFeatures2
 	createInfo.pNext = &deviceFeatures2;
 	createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
 	createInfo.pQueueCreateInfos = queueCreateInfos.data();
-	//createInfo.pEnabledFeatures = &deviceFeatures;
-	createInfo.pEnabledFeatures = nullptr; // must be null if using VkPhysicalDeviceFeatures2
 	
 	createInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
 	createInfo.ppEnabledExtensionNames = deviceExtensions.data();
@@ -1384,10 +1375,7 @@ void Renderer::drawFrame()
 	submitInfo.pSignalSemaphores = signalSemaphores;
 
 	// submit the buffer
-	if (vkQueueSubmit(graphicsQueue, 1, &submitInfo, inFlightFences[currentFrame]) != VK_SUCCESS)
-	{
-		throw std::runtime_error("failed to submit draw command buffer!");
-	}
+	VK_ASSERT(result, vkQueueSubmit(graphicsQueue, 1, &submitInfo, inFlightFences[currentFrame]), "Failed to submit draw command buffer.")
 
 	// submit to swap chain so it will show up on the screen
 	VkPresentInfoKHR presentInfo

@@ -100,8 +100,8 @@ namespace minty
 
 	struct MaterialInfo
 	{
-		alignas(4) glm::vec3 color;
-		alignas(4) int textureId;
+		glm::vec4 color;
+		int textureId;
 	};
 
 	struct MeshInfo
@@ -228,13 +228,6 @@ namespace minty
 		void renderMesh(VkCommandBuffer commandBuffer, Mesh const* const mesh);
 
 #pragma endregion
-
-		/// <summary>
-		/// Throws a runtime exception if the given result is anything but VkResult::SUCCESS.
-		/// </summary>
-		/// <param name="result">The result to check.</param>
-		/// <param name="errorMessage">The message to print if not a success.</param>
-		bool vkAssert(VkResult const result);
 
 		/// <summary>
 		/// Initializes the Vulkan framework and all necessary components to render things to the window.

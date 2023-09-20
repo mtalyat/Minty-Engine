@@ -36,7 +36,7 @@ void minty::Material::apply() const
 	// create info to set on gpu
 	MaterialInfo info =
 	{
-		.color = glm::vec3(_color.rf(), _color.gf(), _color.bf()),
+		.color = glm::vec4(_color.rf(), _color.gf(), _color.bf(), _color.af()),
 		.textureId = _textureId
 	};
 
