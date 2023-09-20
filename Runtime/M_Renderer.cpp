@@ -1600,9 +1600,9 @@ void Renderer::createMainMaterial()
 	}
 
 	createMaterial(0, 0, Color(255, 255, 255));
-	createMaterial(0, 1, Color(255, 127, 127));
-	createMaterial(0, 2, Color(127, 255, 127));
-	createMaterial(0, 3, Color(127, 127, 255));
+	createMaterial(0, 1, Color(255, 0, 0));
+	createMaterial(0, 2, Color(0, 255, 0));
+	createMaterial(0, 3, Color(0, 0, 255));
 }
 
 void Renderer::createFramebuffers()
