@@ -874,7 +874,7 @@ void minty::Renderer::createDescriptorSets()
 		allocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
 		allocInfo.pSetLayouts = layouts.data();
 
-		if (vkAssert(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSets[i * MAX_FRAMES_IN_FLIGHT])))
+		if (vkAssert(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSets[i])))
 		{
 			throw std::runtime_error(std::format("Failed to allocate descriptor sets for descriptor set layout {}.", i));
 		}
@@ -941,7 +941,8 @@ void minty::Renderer::createDescriptorSets()
 			}
 			else
 			{
-				imageInfos[j].imageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+				// nothing?
+				//imageInfos[j].imageLayout = VK_IMAGE_LAYOUT_UNDEFINED;
 			}
 		}
 
@@ -951,6 +952,7 @@ void minty::Renderer::createDescriptorSets()
 		descriptorWrites[2].dstArrayElement = 0;
 		descriptorWrites[2].descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 		descriptorWrites[2].descriptorCount = static_cast<uint32_t>(_textures.size());
+		descriptorWrites[2].pBufferInfo = 0;
 		descriptorWrites[2].pImageInfo = imageInfos.data();
 
 		vkUpdateDescriptorSets(device, static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
