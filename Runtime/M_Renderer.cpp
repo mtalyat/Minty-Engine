@@ -1032,7 +1032,7 @@ bool Renderer::isDeviceSuitable(VkPhysicalDevice device)
 	VkPhysicalDeviceFeatures supportedFeatures;
 	vkGetPhysicalDeviceFeatures(device, &supportedFeatures);
 
-	return indices.isComplete() && extensionsSupported && swapChainAdequate && supportedFeatures.samplerAnisotropy;
+	return indices.isComplete() && extensionsSupported && swapChainAdequate && supportedFeatures.samplerAnisotropy && supportedFeatures.shaderSampledImageArrayDynamicIndexing;
 }
 
 void Renderer::createSwapChain()
@@ -1284,17 +1284,35 @@ void Renderer::createLogicalDevice()
 		queueCreateInfos.push_back(queueCreateInfo);
 	}
 
-	VkPhysicalDeviceFeatures deviceFeatures{};
-	deviceFeatures.samplerAnisotropy = VK_TRUE;
+	VkPhysicalDeviceDescriptorIndexingFeaturesEXT deviceIndexingFeatures
+	{
+		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT,
+		.shaderSampledImageArrayNonUniformIndexing = VK_TRUE,
+		.descriptorBindingVariableDescriptorCount = VK_TRUE,
+		.runtimeDescriptorArray = VK_TRUE,
+	};
+
+	VkPhysicalDeviceFeatures const deviceFeatures
+	{
+		.samplerAnisotropy = VK_TRUE,
+		.shaderSampledImageArrayDynamicIndexing = VK_TRUE
+	};
+
+	VkPhysicalDeviceFeatures2 const deviceFeatures2
+	{
+		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_FEATURES_2,
+		.pNext = &deviceIndexingFeatures,
+		.features = deviceFeatures
+	};
 
 	VkDeviceCreateInfo createInfo{};
 	createInfo.sType = VK_STRUCTURE_TYPE_DEVICE_CREATE_INFO;
-
+	createInfo.pNext = &deviceFeatures2;
 	createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
 	createInfo.pQueueCreateInfos = queueCreateInfos.data();
-
-	createInfo.pEnabledFeatures = &deviceFeatures;
-
+	//createInfo.pEnabledFeatures = &deviceFeatures;
+	createInfo.pEnabledFeatures = nullptr; // must be null if using VkPhysicalDeviceFeatures2
+	
 	createInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
 	createInfo.ppEnabledExtensionNames = deviceExtensions.data();
 
