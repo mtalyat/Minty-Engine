@@ -17,7 +17,7 @@
 #include <filesystem>
 #include <format>
 
-#define VK_ASSERT(result, func, message) VkResult result = func; if(result != VkResult::VK_SUCCESS) throw std::runtime_error(std::format("[{}] {}", static_cast<int>(result), message));
+#define VK_ASSERT(result, func, message) VkResult result = func; if(result != VkResult::VK_SUCCESS) throw std::runtime_error(std::format("[{}] {}", result, message));
 
 using namespace minty;
 
@@ -864,7 +864,10 @@ void minty::Renderer::createDescriptorSets()
 		allocInfo.descriptorSetCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
 		allocInfo.pSetLayouts = layouts.data();
 
-		VK_ASSERT(result, vkAllocateDescriptorSets(device, &allocInfo, &descriptorSets[i]), std::format("Failed to allocate descriptor sets for descriptor set layout {}.", i))
+		if (vkAssert(vkAllocateDescriptorSets(device, &allocInfo, &descriptorSets[i])))
+		{
+			throw std::runtime_error(std::format("Failed to allocate descriptor sets for descriptor set layout {}.", i));
+		}
 		i++;
 	}
 
@@ -1372,7 +1375,7 @@ void Renderer::drawFrame()
 	submitInfo.pSignalSemaphores = signalSemaphores;
 
 	// submit the buffer
-	VK_ASSERT(submitResult, vkQueueSubmit(graphicsQueue, 1, &submitInfo, inFlightFences[currentFrame]), "Failed to submit draw command buffer.")
+	VK_ASSERT(result, vkQueueSubmit(graphicsQueue, 1, &submitInfo, inFlightFences[currentFrame]), "Failed to submit draw command buffer.")
 
 	// submit to swap chain so it will show up on the screen
 	VkPresentInfoKHR presentInfo
