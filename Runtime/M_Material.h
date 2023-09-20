@@ -20,9 +20,7 @@ namespace minty
 		ID _textureId;
 		Color _color;
 
-		std::vector<VkBuffer> _buffers;
-		std::vector<VkDeviceMemory> _memories;
-		std::vector<void*> _mapped;
+
 	public:
 		Material(ID const shaderId, ID const textureId = -1, Color const color = Color::white());
 
@@ -31,8 +29,6 @@ namespace minty
 		void setColor(Color const color);
 
 		Color getColor() const;
-
-		void apply() const;
 
 		void dispose(Renderer& renderer);
 	};

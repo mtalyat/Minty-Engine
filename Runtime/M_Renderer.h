@@ -100,8 +100,8 @@ namespace minty
 
 	struct MaterialInfo
 	{
-		glm::vec4 color;
-		int textureId;
+		alignas(16) int textureId;
+		alignas(16) glm::vec4 color;
 	};
 
 	struct MeshInfo
@@ -164,10 +164,15 @@ namespace minty
 		std::vector<VkFence> inFlightFences;
 		bool framebufferResized = false;
 		uint32_t currentFrame = 0;
-		
+
 		std::vector<VkBuffer> uniformBuffers;
 		std::vector<VkDeviceMemory> uniformBuffersMemory;
 		std::vector<void*> uniformBuffersMapped;
+		
+		std::vector<VkBuffer> materialBuffers;
+		std::vector<VkDeviceMemory> materialBuffersMemory;
+		std::vector<void*> materialBuffersMapped;
+
 		VkDescriptorPool descriptorPool;
 		std::vector<VkDescriptorSet> descriptorSets;
 		VkImage depthImage;
@@ -191,7 +196,7 @@ namespace minty
 
 		Shader& getShader(ID const id);
 
-		ID createMaterial(ID const shaderId, ID const textureId);
+		ID createMaterial(ID const shaderId, ID const textureId, Color const color);
 
 		Material& getMaterial(ID const id);
 

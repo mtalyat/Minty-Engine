@@ -127,7 +127,7 @@ void Renderer::createInstance()
 		.applicationVersion = VK_MAKE_VERSION(1, 0, 0),
 		.pEngineName = "Unknown Engine",
 		.engineVersion = VK_MAKE_VERSION(1, 0, 0),
-		.apiVersion = VK_API_VERSION_1_1
+		.apiVersion = VK_API_VERSION_1_2
 	};
 
 	// get glfw extensions
@@ -598,7 +598,7 @@ Shader& minty::Renderer::getShader(ID const id)
 	return _shaders.at(id);
 }
 
-ID minty::Renderer::createMaterial(ID const shaderId, ID const textureId)
+ID minty::Renderer::createMaterial(ID const shaderId, ID const textureId, Color const color)
 {
 	ID id = static_cast<ID>(_materials.size());
 
@@ -608,25 +608,28 @@ ID minty::Renderer::createMaterial(ID const shaderId, ID const textureId)
 		return ERROR_ID;
 	}
 
-	_materials.push_back(Material(shaderId, textureId));
+	_materials.push_back(Material(shaderId, textureId, color));
 
 	// allocate buffers and map memory so we can apply changes
-	VkDeviceSize bufferSize = sizeof(MaterialInfo);
-
 	Material& mat = getMaterial(id);
 
-	mat._buffers.resize(MAX_FRAMES_IN_FLIGHT);
-	mat._memories.resize(MAX_FRAMES_IN_FLIGHT);
-	mat._mapped.resize(MAX_FRAMES_IN_FLIGHT);
-
-	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-		createBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, mat._buffers[i], mat._memories[i]);
-
-		vkMapMemory(device, mat._memories[i], 0, bufferSize, 0, &mat._mapped[i]);
-	}
-
 	// now that memory is mapped, apply initial values
-	mat.apply();
+	// create info to set on gpu
+	MaterialInfo info =
+	{
+		.textureId = textureId,
+		.color = glm::vec4(color.rf(), color.gf(), color.bf(), color.af()),
+	};
+
+	// set it to all mapped buffers
+	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+	{
+		MaterialInfo* location = static_cast<MaterialInfo*>(materialBuffersMapped.at(i));
+
+		location += id;
+
+		memcpy(location, &info, sizeof(info));
+	}
 
 	return id;
 }
@@ -798,7 +801,7 @@ void Renderer::createDescriptorSetLayouts()
 	// MaterialsBufferObject
 	VkDescriptorSetLayoutBinding mboLayoutBinding{};
 	mboLayoutBinding.binding = 1;
-	mboLayoutBinding.descriptorCount = static_cast<uint32_t>(MAX_MATERIALS);
+	mboLayoutBinding.descriptorCount = 1;
 	mboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 	mboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
@@ -869,7 +872,6 @@ void minty::Renderer::createDescriptorSets()
 	}
 
 	for (i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-		std::vector<VkDescriptorBufferInfo> bufferInfos;
 		std::vector<VkDescriptorImageInfo> imageInfos;
 
 		std::array<VkWriteDescriptorSet, 3> descriptorWrites = {};
@@ -878,7 +880,7 @@ void minty::Renderer::createDescriptorSets()
 		VkDescriptorBufferInfo uboBufferInfo = {};
 		uboBufferInfo.buffer = uniformBuffers[i];
 		uboBufferInfo.offset = 0;
-		uboBufferInfo.range = sizeof(UniformBufferObject);
+		uboBufferInfo.range = VK_WHOLE_SIZE;
 
 		descriptorWrites[0].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 		descriptorWrites[0].dstSet = descriptorSets[i];
@@ -887,32 +889,22 @@ void minty::Renderer::createDescriptorSets()
 		descriptorWrites[0].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 		descriptorWrites[0].descriptorCount = 1;
 		descriptorWrites[0].pBufferInfo = &uboBufferInfo;
+		descriptorWrites[0].pImageInfo = 0;
 
 		// MBO
-		bufferInfos.resize(MAX_MATERIALS);
-		for (size_t j = 0; j < MAX_MATERIALS; j++)
-		{
-			if (j < _materials.size())
-			{
-				Material const& mat = getMaterial(j);
-
-				bufferInfos[j].buffer = mat._buffers[i];
-				bufferInfos[j].offset = 0;
-				bufferInfos[j].range = sizeof(MaterialInfo);
-			}
-			else
-			{
-				// nothing?
-			}
-		}
+		VkDescriptorBufferInfo mboBufferInfo = {};
+		mboBufferInfo.buffer = materialBuffers[i];
+		mboBufferInfo.offset = 0;
+		mboBufferInfo.range = VK_WHOLE_SIZE;
 
 		descriptorWrites[1].sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 		descriptorWrites[1].dstSet = descriptorSets[i];
 		descriptorWrites[1].dstBinding = 1;
 		descriptorWrites[1].dstArrayElement = 0;
 		descriptorWrites[1].descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-		descriptorWrites[1].descriptorCount = static_cast<uint32_t>(_materials.size());
-		descriptorWrites[1].pBufferInfo = bufferInfos.data();
+		descriptorWrites[1].descriptorCount = 1;
+		descriptorWrites[1].pBufferInfo = &mboBufferInfo;
+		descriptorWrites[1].pImageInfo = 0;
 
 		// TEX
 		imageInfos.resize(MAX_TEXTURES);
@@ -1274,7 +1266,9 @@ void Renderer::createLogicalDevice()
 	VkPhysicalDeviceDescriptorIndexingFeaturesEXT deviceIndexingFeatures
 	{
 		.sType = VK_STRUCTURE_TYPE_PHYSICAL_DEVICE_DESCRIPTOR_INDEXING_FEATURES_EXT,
+		.shaderUniformBufferArrayNonUniformIndexing = VK_TRUE,
 		.shaderSampledImageArrayNonUniformIndexing = VK_TRUE,
+		.shaderStorageBufferArrayNonUniformIndexing = VK_TRUE,
 		.descriptorBindingPartiallyBound = VK_TRUE,
 		.descriptorBindingVariableDescriptorCount = VK_TRUE,
 		.runtimeDescriptorArray = VK_TRUE,
@@ -1592,10 +1586,23 @@ void minty::Renderer::createMainShader()
 
 void Renderer::createMainMaterial()
 {
-	createMaterial(0, 0);
-	createMaterial(0, 1);
-	createMaterial(0, 2);
-	createMaterial(0, 3);
+	// allocate space for materials
+	VkDeviceSize bufferSize = sizeof(MaterialInfo) * MAX_MATERIALS;
+
+	materialBuffers.resize(MAX_FRAMES_IN_FLIGHT);
+	materialBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
+	materialBuffersMapped.resize(MAX_FRAMES_IN_FLIGHT);
+
+	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+		createBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, materialBuffers[i], materialBuffersMemory[i]);
+
+		vkMapMemory(device, materialBuffersMemory[i], 0, bufferSize, 0, &materialBuffersMapped[i]);
+	}
+
+	createMaterial(0, 0, Color(255, 255, 255));
+	createMaterial(0, 1, Color(255, 127, 127));
+	createMaterial(0, 2, Color(127, 255, 127));
+	createMaterial(0, 3, Color(127, 127, 255));
 }
 
 void Renderer::createFramebuffers()
@@ -1914,6 +1921,11 @@ void Renderer::cleanup()
 		vkDestroyFence(device, inFlightFences[i], nullptr);
 	}
 	vkDestroyCommandPool(device, commandPool, nullptr);
+	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+	{
+		vkDestroyBuffer(device, materialBuffers[i], nullptr);
+		vkFreeMemory(device, materialBuffersMemory[i], nullptr);
+	}
 	for (auto& mat : _materials)
 	{
 		mat.dispose(*this);

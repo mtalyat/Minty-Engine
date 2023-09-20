@@ -2,6 +2,7 @@
 
 #include "M_Types.h"
 #include <string>
+#include <format>
 
 namespace minty
 {
