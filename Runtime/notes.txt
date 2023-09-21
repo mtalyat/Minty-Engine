@@ -1,10 +1,4 @@
 
-SETS:
-
-0. Data set not very often, often rendering data (material info, textures, etc.)
-
-1. Data set every frame, for all shaders.
-
 NOTES:
 
 Instead of storing each Material memory, buffer, etc. individually, maybe better to store all of them in one large buffer, then reference that?
