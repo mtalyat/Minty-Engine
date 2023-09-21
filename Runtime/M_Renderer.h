@@ -200,6 +200,8 @@ namespace minty
 
 		Material& getMaterial(ID const id);
 
+		void updateMaterial(ID const id);
+
 #pragma endregion
 
 #pragma region Main
