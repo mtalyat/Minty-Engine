@@ -10,15 +10,25 @@ namespace minty
 	class Runtime
 	{
 	private:
-		Engine* const _engine;
+		// the engine that this runtime uses
+		Engine _engine;
 
 	public:
+		/// <summary>
+		/// Creates a new Runtime.
+		/// </summary>
 		Runtime();
 
 		~Runtime();
-
+		
+		/// <summary>
+		/// Runs the Runtime using the given arguments.
+		/// 
+		/// The arguments should be: executable name, project path.
+		/// </summary>
+		/// <param name="argc">The number of arguments.</param>
+		/// <param name="argv">The arguments.</param>
+		/// <returns></returns>
 		int run(int argc, char const* argv[]);
-
-		Engine* getEngine() const;
 	};
 }

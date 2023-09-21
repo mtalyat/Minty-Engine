@@ -13,13 +13,13 @@
 using namespace minty;
 
 Runtime::Runtime()
-	: _engine(new Engine())
+	: _engine()
 {
 }
 
 Runtime::~Runtime()
 {
-	delete _engine;
+	
 }
 
 int Runtime::run(int argc, char const* argv[])
@@ -54,7 +54,7 @@ int Runtime::run(int argc, char const* argv[])
 	{
 		// TODO: load game
 
-		_engine->run();
+		_engine.run();
 	}
 	catch (std::exception const& e)
 	{
@@ -67,9 +67,4 @@ int Runtime::run(int argc, char const* argv[])
 	}
 
 	return EXIT_SUCCESS;
-}
-
-Engine* Runtime::getEngine() const
-{
-	return _engine;
 }
