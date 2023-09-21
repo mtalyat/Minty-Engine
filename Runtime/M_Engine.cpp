@@ -36,24 +36,55 @@ void Engine::run()
 	Renderer renderer(windowPtr, *this);
 	Renderer* rendererPtr = &renderer;
 
+	ID matId = 0;
+	ID* matIdPtr = &matId;
+
 	// input
 	InputMap input;
 	// rotate when space held
-	input.emplaceKeyDown(Key::D1, [rendererPtr](KeyPressEventArgs const& args)
+	input.emplaceKeyDown(Key::D1, [rendererPtr, matIdPtr](KeyPressEventArgs const& args)
 		{
-			rendererPtr->setMaterialForMainMesh(0);
+			*matIdPtr = 0;
+			rendererPtr->setMaterialForMainMesh(*matIdPtr);
 		});
-	input.emplaceKeyDown(Key::D2, [rendererPtr](KeyPressEventArgs const& args)
+	input.emplaceKeyDown(Key::D2, [rendererPtr, matIdPtr](KeyPressEventArgs const& args)
 		{
-			rendererPtr->setMaterialForMainMesh(1);
+			*matIdPtr = 1;
+			rendererPtr->setMaterialForMainMesh(*matIdPtr);
 		});
-	input.emplaceKeyDown(Key::D3, [rendererPtr](KeyPressEventArgs const& args)
+	input.emplaceKeyDown(Key::D3, [rendererPtr, matIdPtr](KeyPressEventArgs const& args)
 		{
-			rendererPtr->setMaterialForMainMesh(2);
+			*matIdPtr = 2;
+			rendererPtr->setMaterialForMainMesh(*matIdPtr);
 		});
-	input.emplaceKeyDown(Key::D4, [rendererPtr](KeyPressEventArgs const& args)
+	input.emplaceKeyDown(Key::D4, [rendererPtr, matIdPtr](KeyPressEventArgs const& args)
 		{
-			rendererPtr->setMaterialForMainMesh(3);
+			*matIdPtr = 3;
+			rendererPtr->setMaterialForMainMesh(*matIdPtr);
+		});
+	input.emplaceKeyDown(Key::Q, [rendererPtr, matIdPtr](KeyPressEventArgs const& args)
+		{
+			Material& mat = rendererPtr->getMaterial(*matIdPtr);
+			mat.setColor(Color(255, 255, 255));
+			rendererPtr->updateMaterial(*matIdPtr);
+		});
+	input.emplaceKeyDown(Key::W, [rendererPtr, matIdPtr](KeyPressEventArgs const& args)
+		{
+			Material& mat = rendererPtr->getMaterial(*matIdPtr);
+			mat.setColor(Color(255, 0, 0));
+			rendererPtr->updateMaterial(*matIdPtr);
+		});
+	input.emplaceKeyDown(Key::E, [rendererPtr, matIdPtr](KeyPressEventArgs const& args)
+		{
+			Material& mat = rendererPtr->getMaterial(*matIdPtr);
+			mat.setColor(Color(0, 255, 0));
+			rendererPtr->updateMaterial(*matIdPtr);
+		});
+	input.emplaceKeyDown(Key::R, [rendererPtr, matIdPtr](KeyPressEventArgs const& args)
+		{
+			Material& mat = rendererPtr->getMaterial(*matIdPtr);
+			mat.setColor(Color(0, 0, 255));
+			rendererPtr->updateMaterial(*matIdPtr);
 		});
 	// quit on key close
 	input.emplaceKeyDown(Key::Escape, [windowPtr](KeyPressEventArgs const& args)

@@ -707,15 +707,28 @@ ID minty::Renderer::createMaterial(ID const shaderId, ID const textureId, Color 
 
 	_materials.push_back(Material(shaderId, textureId, color));
 
-	// allocate buffers and map memory so we can apply changes
-	Material& mat = getMaterial(id);
-
 	// now that memory is mapped, apply initial values
+	updateMaterial(id);
+
+	return id;
+}
+
+Material& minty::Renderer::getMaterial(ID const id)
+{
+	return _materials.at(id);
+}
+
+void minty::Renderer::updateMaterial(ID const id)
+{
+	// set data in mapped memory so we can apply changes
+
+	Material const& mat = getMaterial(id);
+
 	// create info to set on gpu
 	MaterialInfo info =
 	{
-		.textureId = textureId,
-		.color = glm::vec4(color.rf(), color.gf(), color.bf(), color.af()),
+		.textureId = mat._textureId,
+		.color = glm::vec4(mat._color.rf(), mat._color.gf(), mat._color.bf(), mat._color.af()),
 	};
 
 	// set it to all mapped buffers
@@ -727,13 +740,6 @@ ID minty::Renderer::createMaterial(ID const shaderId, ID const textureId, Color 
 
 		memcpy(location, &info, sizeof(info));
 	}
-
-	return id;
-}
-
-Material& minty::Renderer::getMaterial(ID const id)
-{
-	return _materials.at(id);
 }
 
 void Renderer::createMainTexture()
@@ -891,8 +897,8 @@ void Renderer::createDescriptorSetLayouts()
 	// UniformBufferObject
 	VkDescriptorSetLayoutBinding uboLayoutBinding{};
 	uboLayoutBinding.binding = 0;
-	uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 	uboLayoutBinding.descriptorCount = 1;
+	uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 	uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
 
 	// MaterialsBufferObject
@@ -1946,6 +1952,7 @@ void Renderer::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t image
 	vkCmdSetViewport(commandBuffer, 0, 1, &_viewport._viewport);
 	vkCmdSetScissor(commandBuffer, 0, 1, &_viewport._scissor);
 
+	// render meshes
 	renderMesh(commandBuffer, _mesh);
 
 	// done rendering
