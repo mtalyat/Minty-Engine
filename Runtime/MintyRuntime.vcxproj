@@ -211,7 +211,6 @@
     <ClInclude Include="entt.hpp" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="M_Material.h" />
-    <ClInclude Include="M_MaterialInstance.h" />
     <ClInclude Include="M_MouseButton.h" />
     <ClInclude Include="M_KeyModifiers.h" />
     <ClInclude Include="M_KeyAction.h" />
@@ -253,7 +252,6 @@
     <ClCompile Include="M_Engine.cpp" />
     <ClCompile Include="M_InputMap.cpp" />
     <ClCompile Include="M_Material.cpp" />
-    <ClCompile Include="M_MaterialInstance.cpp" />
     <ClCompile Include="M_Math.cpp" />
     <ClCompile Include="M_Mesh.cpp" />
     <ClCompile Include="M_Object.cpp" />
