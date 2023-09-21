@@ -6,13 +6,13 @@
 
 namespace minty
 {
+	typedef std::filesystem::path filepath;
+
 	/// <summary>
 	/// Holds information for a project, which will be ran in the engine.
 	/// </summary>
 	class Project
 	{
-		typedef std::filesystem::path filepath;
-
 	private:
 		// the base filepath of the project
 		filepath const _base;
@@ -56,6 +56,12 @@ namespace minty
 		/// </summary>
 		/// <returns></returns>
 		filepath const getBuildPath() const;
+
+		std::set<filepath> const& getAssetsHeaderPaths() const;
+
+		std::set<filepath> const& getAssetsSourcePaths() const;
+
+		std::set<filepath> const& getAssetsScenePaths() const;
 
 	private:
 		// searches through the project assets folder and finds all files of certain types

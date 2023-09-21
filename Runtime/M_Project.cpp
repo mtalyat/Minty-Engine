@@ -10,19 +10,34 @@ Project::Project(std::string const& path)
 	collectAssets();
 }
 
-Project::filepath const Project::getBasePath() const
+filepath const Project::getBasePath() const
 {
 	return _base;
 }
 
-Project::filepath const Project::getAssetsPath() const
+filepath const Project::getAssetsPath() const
 {
 	return (_base / "Assets");
 }
 
-Project::filepath const Project::getBuildPath() const
+filepath const Project::getBuildPath() const
 {
 	return (_base / "Build");
+}
+
+std::set<filepath> const& minty::Project::getAssetsHeaderPaths() const
+{
+	return _headers;
+}
+
+std::set<filepath> const& minty::Project::getAssetsSourcePaths() const
+{
+	return _sources;
+}
+
+std::set<filepath> const& minty::Project::getAssetsScenePaths() const
+{
+	return _scenes;
 }
 
 void minty::Project::collectAssets()
