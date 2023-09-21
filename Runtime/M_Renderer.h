@@ -100,7 +100,7 @@ namespace minty
 
 	struct MaterialInfo
 	{
-		alignas(16) int textureId;
+		alignas(16) int textureID;
 		alignas(16) glm::vec4 color;
 	};
 
@@ -196,7 +196,7 @@ namespace minty
 
 		Shader& getShader(ID const id);
 
-		ID createMaterial(ID const shaderId, ID const textureId, Color const color);
+		ID createMaterial(ID const shaderId, ID const textureID, Color const color);
 
 		Material& getMaterial(ID const id);
 

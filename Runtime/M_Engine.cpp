@@ -65,25 +65,25 @@ void Engine::run()
 	input.emplaceKeyDown(Key::Q, [rendererPtr, matIdPtr](KeyPressEventArgs const& args)
 		{
 			Material& mat = rendererPtr->getMaterial(*matIdPtr);
-			mat.setColor(Color(255, 255, 255));
+			mat.color = Color(255, 255, 255);
 			rendererPtr->updateMaterial(*matIdPtr);
 		});
 	input.emplaceKeyDown(Key::W, [rendererPtr, matIdPtr](KeyPressEventArgs const& args)
 		{
 			Material& mat = rendererPtr->getMaterial(*matIdPtr);
-			mat.setColor(Color(255, 0, 0));
+			mat.color = Color(255, 0, 0);
 			rendererPtr->updateMaterial(*matIdPtr);
 		});
 	input.emplaceKeyDown(Key::E, [rendererPtr, matIdPtr](KeyPressEventArgs const& args)
 		{
 			Material& mat = rendererPtr->getMaterial(*matIdPtr);
-			mat.setColor(Color(0, 255, 0));
+			mat.color = Color(0, 255, 0);
 			rendererPtr->updateMaterial(*matIdPtr);
 		});
 	input.emplaceKeyDown(Key::R, [rendererPtr, matIdPtr](KeyPressEventArgs const& args)
 		{
 			Material& mat = rendererPtr->getMaterial(*matIdPtr);
-			mat.setColor(Color(0, 0, 255));
+			mat.color = Color(0, 0, 255);
 			rendererPtr->updateMaterial(*matIdPtr);
 		});
 	// quit on key close

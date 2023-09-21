@@ -695,7 +695,7 @@ Shader& minty::Renderer::getShader(ID const id)
 	return _shaders.at(id);
 }
 
-ID minty::Renderer::createMaterial(ID const shaderId, ID const textureId, Color const color)
+ID minty::Renderer::createMaterial(ID const shaderId, ID const textureID, Color const color)
 {
 	ID id = static_cast<ID>(_materials.size());
 
@@ -705,7 +705,7 @@ ID minty::Renderer::createMaterial(ID const shaderId, ID const textureId, Color 
 		return ERROR_ID;
 	}
 
-	_materials.push_back(Material(shaderId, textureId, color));
+	_materials.push_back(Material(shaderId, textureID, color));
 
 	// now that memory is mapped, apply initial values
 	updateMaterial(id);
@@ -727,8 +727,8 @@ void minty::Renderer::updateMaterial(ID const id)
 	// create info to set on gpu
 	MaterialInfo info =
 	{
-		.textureId = mat._textureId,
-		.color = glm::vec4(mat._color.rf(), mat._color.gf(), mat._color.bf(), mat._color.af()),
+		.textureID = mat.textureID,
+		.color = glm::vec4(mat.color.rf(), mat.color.gf(), mat.color.bf(), mat.color.af()),
 	};
 
 	// set it to all mapped buffers
@@ -1879,7 +1879,7 @@ void minty::Renderer::renderMesh(VkCommandBuffer commandBuffer, Mesh const* cons
 	//updateDescriptorSets(mesh->_materialId);
 
 	Material const& mat = getMaterial(mesh->_materialId);
-	Shader const& shader = getShader(mat._shaderId);
+	Shader const& shader = getShader(mat.shaderID);
 
 	// update uniform data
 	vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, shader._layout, 0, 1, &descriptorSets[currentFrame], 0, nullptr);
@@ -2029,10 +2029,6 @@ void Renderer::cleanup()
 	{
 		vkDestroyBuffer(device, materialBuffers[i], nullptr);
 		vkFreeMemory(device, materialBuffersMemory[i], nullptr);
-	}
-	for (auto& mat : _materials)
-	{
-		mat.dispose(*this);
 	}
 	for (auto& shader : _shaders)
 	{

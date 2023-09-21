@@ -12,24 +12,22 @@ namespace minty
 {
 	class Renderer;
 
-	class Material :
+	/// <summary>
+	/// Holds graphics information.
+	/// </summary>
+	struct Material :
 		public Object
 	{
-	public: // TODO: TEMP PUBLIC
-		ID const _shaderId;
-		ID _textureId;
-		Color _color;
+		ID const shaderID;
+		ID textureID;
+		Color color;
 
-
-	public:
-		Material(ID const shaderId, ID const textureId = -1, Color const color = Color::white());
-
-		void setTexture(ID const textureId);
-
-		void setColor(Color const color);
-
-		Color getColor() const;
-
-		void dispose(Renderer& renderer);
+		/// <summary>
+		/// Creates a new Material that corresponds to the given Shader ID.
+		/// </summary>
+		/// <param name="shaderId">The shader ID.</param>
+		/// <param name="textureId">The inital Texture ID used for this Material.</param>
+		/// <param name="color">The initial Color used for this Material.</param>
+		Material(ID const shaderId, ID const textureID = -1, Color const color = Color::white());
 	};
 }
