@@ -2,6 +2,9 @@
 
 namespace minty
 {
+	/// <summary>
+	/// The modifer keys that can be held.
+	/// </summary>
 	enum class KeyModifiers
 	{
 		Shift =			0b000001,
