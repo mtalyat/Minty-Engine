@@ -27,10 +27,7 @@ namespace minty
 		/// Creates a new System.
 		/// </summary>
 		/// <param name="registry">The entity registry belonging to this System.</param>
-		System(Registry* const registry)
-			: _enabled(true)
-			, _registry(registry)
-		{}
+		System(Registry* const registry);
 
 		virtual ~System() {}
 

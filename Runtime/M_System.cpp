@@ -3,10 +3,29 @@
 
 using namespace minty;
 
-void minty::System::enable() { _enabled = true; }
+inline minty::System::System(Registry* const registry)
+	: _enabled(true)
+	, _registry(registry)
+{
 
-void minty::System::disable() { _enabled = false; }
+}
 
-void minty::System::setEnabled(bool const enabled) { _enabled = enabled; }
+void minty::System::enable()
+{
+	_enabled = true;
+}
 
-constexpr bool minty::System::isEnabled() const { return _enabled; }
+void minty::System::disable()
+{
+	_enabled = false;
+}
+
+void minty::System::setEnabled(bool const enabled)
+{
+	_enabled = enabled;
+}
+
+constexpr bool minty::System::isEnabled() const
+{
+	return _enabled;
+}
