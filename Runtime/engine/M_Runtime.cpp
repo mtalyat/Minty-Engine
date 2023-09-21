@@ -15,6 +15,8 @@ using namespace minty;
 Runtime::Runtime()
 	: _engine()
 {
+	// registry all built-in systems and components
+	
 }
 
 Runtime::~Runtime()
@@ -32,7 +34,7 @@ void minty::Runtime::registerComponent(std::string const& name, ComponentFunc co
 	_componentTypes.emplace(name, func);
 }
 
-System* minty::Runtime::createSystem(std::string const& name) const
+System* minty::Runtime::createSystem(std::string const& name, Registry& registry) const
 {
 	auto const& found = _systemTypes.find(name);
 	if (found == _systemTypes.end())
@@ -43,7 +45,7 @@ System* minty::Runtime::createSystem(std::string const& name) const
 	else
 	{
 		// name found
-		return found->second();
+		return found->second(registry);
 	}
 }
 

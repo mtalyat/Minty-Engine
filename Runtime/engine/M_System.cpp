@@ -3,12 +3,10 @@
 
 using namespace minty;
 
-inline minty::System::System(Registry* const registry)
+minty::System::System(Registry& registry)
 	: _enabled(true)
 	, _registry(registry)
-{
-
-}
+{}
 
 void minty::System::enable()
 {

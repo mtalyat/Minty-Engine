@@ -129,9 +129,6 @@
     <ClInclude Include="M_SystemManager.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="M_Factory.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="M_Component.h">
       <Filter>Header Files</Filter>
     </ClInclude>

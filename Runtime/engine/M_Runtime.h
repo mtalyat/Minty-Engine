@@ -15,7 +15,7 @@ namespace minty
 	class Runtime
 	{
 	public:
-		typedef std::function<System* ()> SystemFunc;
+		typedef std::function<System* (Registry&)> SystemFunc;
 		typedef std::function<Component*(Registry&, Entity const)> ComponentFunc;
 
 	private:
@@ -37,7 +37,7 @@ namespace minty
 
 		void registerComponent(std::string const& name, ComponentFunc const& func);
 
-		System* createSystem(std::string const& name) const;
+		System* createSystem(std::string const& name, Registry& registry) const;
 
 		Component* createComponent(std::string const& name, Entity const entity, Registry& registry) const;
 		
