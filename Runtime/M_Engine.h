@@ -21,6 +21,7 @@ namespace minty
 		/// </summary>
 		void run();
 	private:
+		// gets the current time as a time point
 		time_point_t getNow() const;
 	};
 }
