@@ -58,7 +58,24 @@ void Application::run(int argc, char const* argv[])
 	}
 
 	// create new project with path
-	minty::Project project(path);
+	Project project(path);
+
+	// test
+	console::log("Headers:");
+	for (auto const& p : project.getAssetsHeaderPaths())
+	{
+		console::log(p.string());
+	}
+	console::log("Sources:");
+	for (auto const& p : project.getAssetsSourcePaths())
+	{
+		console::log(p.string());
+	}
+	console::log("Scenes:");
+	for (auto const& p : project.getAssetsScenePaths())
+	{
+		console::log(p.string());
+	}
 
 	// create info for commands
 	Info info
@@ -112,12 +129,11 @@ void Application::run(int argc, char const* argv[])
 			if (c.compare("test") == 0)
 			{
 				// pass in executable name, then project name
-				char path[256];
-				strcpy_s(path, info.project.getBasePath().c_str());
+				std::string path = info.project.getBasePath().string();
 				char const* runtimeArgs[2]
 				{
 					argv[0],
-					path
+					path.c_str()
 				};
 
 				Runtime runtime;
@@ -229,10 +245,18 @@ void Application::generate_cmake(Info const& info)
 	}
 
 	file <<
-		"add_executable(${PROJECT_NAME} main.cpp)" << std::endl <<
+		// add source files for project
+		"file(GLOB_RECURSE SOURCES \"..\\\\Assets\\\\*.h\"  \"..\\\\Assets\\\\*.cpp\")" << std::endl <<
+		// add main
+		"set(SOURCES ${SOURCES} main.cpp CACHE INTERNAL STRINGS)" << std::endl <<
+		// make executable with the source files
+		"add_executable(${PROJECT_NAME} ${SOURCES})" << std::endl <<
+		// set to MT building so it works with the static runtime library
 		"set_property(TARGET ${PROJECT_NAME} PROPERTY INTERPROCEDURAL_OPTIMIZATION_RELEASE TRUE)" << std::endl <<
 		"set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY \"MultiThreaded$<$<CONFIG:Debug>:Debug>\")" << std::endl <<
+		// include the runtime dir
 		"target_include_directories(${PROJECT_NAME} PRIVATE C:/Users/mitch/source/repos/Minty-Engine/Runtime PUBLIC ${VULKAN_INCLUDE_DIRS})" << std::endl <<
+		// include and link Vulkan
 		"include_directories(${Vulkan_INCLUDE_DIRS})" << std::endl <<
 		"target_link_libraries(${PROJECT_NAME} C:/Users/mitch/source/repos/Minty-Engine/Runtime/x64/" << info.getConfig() << "/MintyRuntime.lib)" << std::endl <<
 		"target_link_libraries(${PROJECT_NAME} ${Vulkan_LIBRARIES})";
@@ -273,12 +297,12 @@ void Application::generate_main(Info const& info)
 void Application::clean(Info const& info)
 {
 	// clean the build
-	run_command("cd " + info.project.getBuildPath() + " && " + std::filesystem::absolute(CMAKE_PATH).string() + " --build . --target clean");
+	run_command("cd " + info.project.getBuildPath().string() + " && " + std::filesystem::absolute(CMAKE_PATH).string() + " --build . --target clean");
 }
 
 void Application::build(Info const& info)
 {
-	std::string command = "cd " + info.project.getBuildPath() + " && " + std::filesystem::absolute(CMAKE_PATH).string();
+	std::string command = "cd " + info.project.getBuildPath().string() + " && " + std::filesystem::absolute(CMAKE_PATH).string();
 
 	// make cmake files if needed
 	run_command(command + " .");
@@ -290,7 +314,7 @@ void Application::build(Info const& info)
 void Application::run(Info const& info)
 {
 	// call executable, pass in project path as argument for the runtime, so it knows what to run
-	run_command("cd " + info.project.getBuildPath() + " && cd " + info.getConfig() + " && start " + EXE_NAME + " " + info.project.getBasePath());
+	run_command("cd " + info.project.getBuildPath().string() + " && cd " + info.getConfig() + " && start " + EXE_NAME + " " + info.project.getBasePath().string());
 }
 
 //https://stackoverflow.com/questions/478898/how-do-i-execute-a-command-and-get-the-output-of-the-command-within-c-using-po

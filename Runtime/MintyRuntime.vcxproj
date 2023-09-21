@@ -210,7 +210,9 @@
   <ItemGroup>
     <ClInclude Include="entt.hpp" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="M_Component.h" />
     <ClInclude Include="M_Entities.h" />
+    <ClInclude Include="M_Factory.h" />
     <ClInclude Include="M_Material.h" />
     <ClInclude Include="M_MouseButton.h" />
     <ClInclude Include="M_KeyModifiers.h" />

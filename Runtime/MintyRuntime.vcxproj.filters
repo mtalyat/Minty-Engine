@@ -123,6 +123,18 @@
     <ClInclude Include="M_Entities.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="M_System.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="M_SystemManager.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Factory.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Component.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -204,6 +216,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_Scene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_System.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_SystemManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

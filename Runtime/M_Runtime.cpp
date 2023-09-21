@@ -22,6 +22,46 @@ Runtime::~Runtime()
 	
 }
 
+void minty::Runtime::registerSystem(std::string const& name, SystemFunc const& func)
+{
+	_systemTypes.emplace(name, func);
+}
+
+void minty::Runtime::registerComponent(std::string const& name, ComponentFunc const& func)
+{
+	_componentTypes.emplace(name, func);
+}
+
+System* minty::Runtime::createSystem(std::string const& name) const
+{
+	auto const& found = _systemTypes.find(name);
+	if (found == _systemTypes.end())
+	{
+		// name not found
+		return nullptr;
+	}
+	else
+	{
+		// name found
+		return found->second();
+	}
+}
+
+Component* minty::Runtime::createComponent(std::string const& name, Entity const entity, Registry& registry) const
+{
+	auto const& found = _componentTypes.find(name);
+	if (found == _componentTypes.end())
+	{
+		// name not found
+		return nullptr;
+	}
+	else
+	{
+		// name found
+		return found->second(registry, entity);
+	}
+}
+
 int Runtime::run(int argc, char const* argv[])
 {
 	// parse command line arguments...

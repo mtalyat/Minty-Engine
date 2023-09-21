@@ -1,6 +1,11 @@
 #pragma once
 
 #include "M_Engine.h"
+#include "M_Entities.h"
+#include "M_Component.h"
+#include "M_System.h"
+#include <functional>
+#include <map>
 
 namespace minty
 {
@@ -9,10 +14,17 @@ namespace minty
 	/// </summary>
 	class Runtime
 	{
+	public:
+		typedef std::function<System* ()> SystemFunc;
+		typedef std::function<Component*(Registry&, Entity const)> ComponentFunc;
+
 	private:
 		// the engine that this runtime uses
 		Engine _engine;
 
+		std::map<std::string const, SystemFunc const> _systemTypes;
+
+		std::map<std::string const, ComponentFunc const> _componentTypes;
 	public:
 		/// <summary>
 		/// Creates a new Runtime.
@@ -20,6 +32,14 @@ namespace minty
 		Runtime();
 
 		~Runtime();
+
+		void registerSystem(std::string const& name, SystemFunc const& func);
+
+		void registerComponent(std::string const& name, ComponentFunc const& func);
+
+		System* createSystem(std::string const& name) const;
+
+		Component* createComponent(std::string const& name, Entity const entity, Registry& registry) const;
 		
 		/// <summary>
 		/// Runs the Runtime using the given arguments.
