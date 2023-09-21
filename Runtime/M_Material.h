@@ -18,8 +18,19 @@ namespace minty
 	struct Material :
 		public Object
 	{
+		/// <summary>
+		/// The ID of the Shader that this Material uses.
+		/// </summary>
 		ID const shaderID;
+
+		/// <summary>
+		/// The ID of the Texture that this Material uses.
+		/// </summary>
 		ID textureID;
+
+		/// <summary>
+		/// The color of this Material.
+		/// </summary>
 		Color color;
 
 		/// <summary>
