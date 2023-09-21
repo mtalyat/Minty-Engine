@@ -2,13 +2,13 @@
 #include "M_Viewport.h"
 
 minty::Viewport::Viewport()
-	: _viewport({0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f})
-	, _scissor({{0, 0}, {0u, 0u}})
+	: view({0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f})
+	, scissor({{0, 0}, {0u, 0u}})
 {}
 
 minty::Viewport::Viewport(int const x, int const y, unsigned int const width, unsigned int const height, float const minDepth, float const maxDepth)
-	: _viewport({static_cast<float>(x), static_cast<float>(y), static_cast<float>(width), static_cast<float>(height), minDepth, maxDepth})
-	, _scissor({{x, y}, {width, height}})
+	: view({static_cast<float>(x), static_cast<float>(y), static_cast<float>(width), static_cast<float>(height), minDepth, maxDepth})
+	, scissor({{x, y}, {width, height}})
 {}
 
 void minty::Viewport::setOffset(int const x, int const y)
@@ -19,13 +19,13 @@ void minty::Viewport::setOffset(int const x, int const y)
 
 void minty::Viewport::setViewOffset(int const x, int const y)
 {
-	_viewport.x = static_cast<float>(x);
-	_viewport.y = static_cast<float>(y);
+	view.x = static_cast<float>(x);
+	view.y = static_cast<float>(y);
 }
 
 void minty::Viewport::setScissorOffset(int const x, int const y)
 {
-	_scissor.offset = VkOffset2D
+	scissor.offset = VkOffset2D
 	{
 		.x = x,
 		.y = y
@@ -40,13 +40,13 @@ void minty::Viewport::setExtent(unsigned int width, unsigned int height)
 
 void minty::Viewport::setViewExtent(unsigned int const width, unsigned int const height)
 {
-	_viewport.width = static_cast<float>(width);
-	_viewport.height = static_cast<float>(height);
+	view.width = static_cast<float>(width);
+	view.height = static_cast<float>(height);
 }
 
 void minty::Viewport::setScissorExtent(unsigned int const width, unsigned int const height)
 {
-	_scissor.extent = VkExtent2D{ 
+	scissor.extent = VkExtent2D{ 
 		.width = width,
 		.height = height 
 	};

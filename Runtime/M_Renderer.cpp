@@ -154,7 +154,7 @@ Renderer::Renderer(Window* const window, Engine& engine)
 	, _textures()
 	, _materials()
 	, _mesh()
-	, _viewport()
+	, view()
 	, _backgroundColor({250, 220, 192, 255}) // light tan color
 {
 	// init fields
@@ -1186,7 +1186,7 @@ void Renderer::createSwapChain()
 	swapChainExtent = extent;
 
 	// update viewport and scissor
-	_viewport.setExtent(extent.width, extent.height);
+	view.setExtent(extent.width, extent.height);
 }
 
 void Renderer::cleanupSwapChain()
@@ -1949,8 +1949,8 @@ void Renderer::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t image
 	vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 	// set viewport
-	vkCmdSetViewport(commandBuffer, 0, 1, &_viewport._viewport);
-	vkCmdSetScissor(commandBuffer, 0, 1, &_viewport._scissor);
+	vkCmdSetViewport(commandBuffer, 0, 1, &view.view);
+	vkCmdSetScissor(commandBuffer, 0, 1, &view.scissor);
 
 	// render meshes
 	renderMesh(commandBuffer, _mesh);

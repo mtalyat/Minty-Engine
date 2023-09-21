@@ -123,7 +123,7 @@ namespace minty
 		std::vector<Shader> _shaders;
 
 		Mesh* _mesh;
-		Viewport _viewport;
+		Viewport view;
 		Color _backgroundColor;
 	public:
 		Renderer(Window* const window, Engine& engine);
