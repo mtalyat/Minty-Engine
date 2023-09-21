@@ -9,6 +9,9 @@ namespace minty
 {
 	class Renderer;
 
+	/// <summary>
+	/// Holds data for an object to be rendered to the screen.
+	/// </summary>
 	class Mesh :
 		public Object
 	{
