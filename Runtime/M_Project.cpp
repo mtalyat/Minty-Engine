@@ -1,5 +1,7 @@
 #include "pch.h"
 #include "M_Project.h"
+
+#include "M_Console.h"
 #include <vector>
 
 using namespace minty;
@@ -43,37 +45,37 @@ std::set<filepath> const& minty::Project::getAssetsScenePaths() const
 void minty::Project::collectAssets()
 {
 	// list of directories to collect from
-	std::vector<filepath> pathsToCollect;
+	std::vector<filepath> directoriesToCollect;
 
 	// add base directory to get started
-	pathsToCollect.push_back(getAssetsPath());
+	directoriesToCollect.push_back(getAssetsPath());
 
-	filepath path;
+	filepath directory;
 
 	// keep collecting while paths to collect has something in it
-	while (pathsToCollect.size())
+	while (directoriesToCollect.size())
 	{
 		// get last element
-		path = pathsToCollect.back();
+		directory = directoriesToCollect.back();
 
 		// remove it
-		pathsToCollect.pop_back();
+		directoriesToCollect.pop_back();
 
 		// search the path
-		for (const auto& entry : std::filesystem::directory_iterator(path))
+		for (const auto& entry : std::filesystem::directory_iterator(directory))
 		{
-			filepath p = entry.path();
+			filepath path = entry.path();
 
 			if (entry.is_directory())
 			{
 				// if another directory, we want to search it later
-				pathsToCollect.push_back(p);
+				directoriesToCollect.push_back(path);
 			}
 			else
 			{
 				// if a file, check the file type and add where necessary
 				std::string extension = path.extension().string();
-
+				
 				// add to appropriate collection of file names
 				if (_headerExtensions.contains(extension))
 				{

@@ -57,12 +57,23 @@ namespace minty
 		/// <returns></returns>
 		filepath const getBuildPath() const;
 
+		/// <summary>
+		/// Returns a set of all header files in this Project.
+		/// </summary>
+		/// <returns></returns>
 		std::set<filepath> const& getAssetsHeaderPaths() const;
 
+		/// <summary>
+		/// Returns a set of all source files in this Project.
+		/// </summary>
+		/// <returns></returns>
 		std::set<filepath> const& getAssetsSourcePaths() const;
 
+		/// <summary>
+		/// Returns a set of all scene files in this Project.
+		/// </summary>
+		/// <returns></returns>
 		std::set<filepath> const& getAssetsScenePaths() const;
-
 	private:
 		// searches through the project assets folder and finds all files of certain types
 		void collectAssets();
