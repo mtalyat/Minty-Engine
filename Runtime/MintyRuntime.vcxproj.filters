@@ -117,7 +117,10 @@
     <ClInclude Include="M_Shader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="M_MaterialInstance.h">
+    <ClInclude Include="M_Scene.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Entities.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -200,7 +203,7 @@
     <ClCompile Include="M_Shader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="M_MaterialInstance.cpp">
+    <ClCompile Include="M_Scene.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

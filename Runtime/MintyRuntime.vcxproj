@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -210,6 +210,7 @@
   <ItemGroup>
     <ClInclude Include="entt.hpp" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="M_Entities.h" />
     <ClInclude Include="M_Material.h" />
     <ClInclude Include="M_MouseButton.h" />
     <ClInclude Include="M_KeyModifiers.h" />
@@ -226,7 +227,10 @@
     <ClInclude Include="M_Math.h" />
     <ClInclude Include="M_Mesh.h" />
     <ClInclude Include="M_Object.h" />
+    <ClInclude Include="M_Scene.h" />
     <ClInclude Include="M_Shader.h" />
+    <ClInclude Include="M_System.h" />
+    <ClInclude Include="M_SystemManager.h" />
     <ClInclude Include="M_Texture.h" />
     <ClInclude Include="M_Vector2Int.h" />
     <ClInclude Include="M_Vector2.h" />
@@ -255,7 +259,10 @@
     <ClCompile Include="M_Math.cpp" />
     <ClCompile Include="M_Mesh.cpp" />
     <ClCompile Include="M_Object.cpp" />
+    <ClCompile Include="M_Scene.cpp" />
     <ClCompile Include="M_Shader.cpp" />
+    <ClCompile Include="M_System.cpp" />
+    <ClCompile Include="M_SystemManager.cpp" />
     <ClCompile Include="M_Texture.cpp" />
     <ClCompile Include="M_Vector2Int.cpp" />
     <ClCompile Include="M_Vector2.cpp" />
