@@ -4,12 +4,12 @@
 #include "M_Renderer.h"
 
 minty::Shader::Shader(VkPipelineLayout const& layout, VkPipeline const& pipeline)
-	: _layout(layout)
-	, _pipeline(pipeline)
+	: layout(layout)
+	, pipeline(pipeline)
 {}
 
 void minty::Shader::dispose(Renderer& renderer)
 {
-	vkDestroyPipeline(renderer.device, _pipeline, nullptr);
-	vkDestroyPipelineLayout(renderer.device, _layout, nullptr);
+	vkDestroyPipeline(renderer.device, pipeline, nullptr);
+	vkDestroyPipelineLayout(renderer.device, layout, nullptr);
 }

@@ -1882,10 +1882,10 @@ void minty::Renderer::renderMesh(VkCommandBuffer commandBuffer, Mesh const* cons
 	Shader const& shader = getShader(mat.shaderID);
 
 	// update uniform data
-	vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, shader._layout, 0, 1, &descriptorSets[currentFrame], 0, nullptr);
+	vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, shader.layout, 0, 1, &descriptorSets[currentFrame], 0, nullptr);
 
 	// bind pipeline
-	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, shader._pipeline);
+	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, shader.pipeline);
 
 	// bind vertex data
 	VkBuffer vertexBuffers[] = { mesh->_vertexBuffer };
@@ -1899,7 +1899,7 @@ void minty::Renderer::renderMesh(VkCommandBuffer commandBuffer, Mesh const* cons
 		.transform = glm::mat4(1.0f),
 		.materialId = mesh->_materialId,
 	};
-	vkCmdPushConstants(commandBuffer, shader._layout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(MeshInfo), &info);
+	vkCmdPushConstants(commandBuffer, shader.layout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(MeshInfo), &info);
 
 	// draw
 	vkCmdDrawIndexed(commandBuffer, mesh->_indexCount, 1, 0, 0, 0);

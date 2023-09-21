@@ -7,16 +7,34 @@ namespace minty
 {
 	class Renderer;
 	
-	class Shader :
+	/// <summary>
+	/// Holds data for a Shader.
+	/// </summary>
+	struct Shader :
 		public Object
 	{
-	public: // TODO: set to private
-		VkPipelineLayout _layout;
-		VkPipeline _pipeline;
+		/// <summary>
+		/// The PipelineLayout for this Shader.
+		/// </summary>
+		VkPipelineLayout layout;
+
+		/// <summary>
+		/// The Pipeline for this Shader.
+		/// </summary>
+		VkPipeline pipeline;
 
 	public:
+		/// <summary>
+		/// Creates a new Shader with the given layout and pipeline.
+		/// </summary>
+		/// <param name="layout"></param>
+		/// <param name="pipeline"></param>
 		Shader(VkPipelineLayout const& layout, VkPipeline const& pipeline);
 
+		/// <summary>
+		/// Disposes of any resources this Shader is using.
+		/// </summary>
+		/// <param name="renderer"></param>
 		void dispose(Renderer& renderer);
 	};
 }
