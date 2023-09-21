@@ -233,6 +233,7 @@
     <ClInclude Include="M_System.h" />
     <ClInclude Include="M_SystemManager.h" />
     <ClInclude Include="M_Texture.h" />
+    <ClInclude Include="M_TransformComponent.h" />
     <ClInclude Include="M_Vector2Int.h" />
     <ClInclude Include="M_Vector2.h" />
     <ClInclude Include="M_Project.h" />
@@ -246,6 +247,7 @@
     <ClInclude Include="M_Vector3Int.h" />
     <ClInclude Include="M_Viewport.h" />
     <ClInclude Include="M_Window.h" />
+    <ClInclude Include="M_NameComponent.h" />
     <ClInclude Include="pch.h" />
   </ItemGroup>
   <ItemGroup>
