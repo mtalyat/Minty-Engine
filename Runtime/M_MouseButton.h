@@ -2,6 +2,9 @@
 
 namespace minty
 {
+	/// <summary>
+	/// A button on the mouse.
+	/// </summary>
 	enum class MouseButton
 	{
 		Button1 = 0,
