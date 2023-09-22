@@ -6,6 +6,8 @@
 
 namespace minty
 {
+	class Engine;
+
 	/// <summary>
 	/// The base class for systems, which provide functionality and conduct the behavior of the ECS engine.
 	/// </summary>
@@ -17,6 +19,8 @@ namespace minty
 		bool _enabled;
 
 	protected:
+		Engine* const _engine;
+
 		/// <summary>
 		/// The registry that this System is part of.
 		/// </summary>
@@ -26,8 +30,9 @@ namespace minty
 		/// <summary>
 		/// Creates a new System.
 		/// </summary>
-		/// <param name="registry">The entity registry belonging to this System.</param>
-		System(Registry* const registry);
+		/// <param name="engine">The Engine that this System belongs to.</param>
+		/// <param name="registry">The Registry that this System manipulates.</param>
+		System(Engine& engine, Registry& registry);
 
 		virtual ~System() {}
 

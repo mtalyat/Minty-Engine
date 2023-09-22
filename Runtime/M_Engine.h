@@ -17,6 +17,7 @@ namespace minty
 		Window _window;
 		Renderer _renderer;
 
+
 	public:
 		Engine();
 

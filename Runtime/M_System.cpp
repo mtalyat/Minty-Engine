@@ -1,12 +1,21 @@
 #include "pch.h"
 #include "M_System.h"
 
+#include "M_Engine.h"
+
 using namespace minty;
 
 minty::System::System(Registry* const registry)
 	: _enabled(true)
 	, _registry(registry)
 {}
+
+minty::System::System(Engine& engine, Registry& registry)
+	: _enabled(true)
+	, _engine(&engine)
+	, _registry(&registry)
+{
+}
 
 void minty::System::set_enabled(bool const enabled)
 {

@@ -229,7 +229,9 @@
     <ClInclude Include="M_Math.h" />
     <ClInclude Include="M_Mesh.h" />
     <ClInclude Include="M_Object.h" />
+    <ClInclude Include="M_RendererSystem.h" />
     <ClInclude Include="M_Scene.h" />
+    <ClInclude Include="M_SceneManager.h" />
     <ClInclude Include="M_SerializedNode.h" />
     <ClInclude Include="M_Serializer.h" />
     <ClInclude Include="M_Shader.h" />
@@ -268,6 +270,7 @@
     <ClCompile Include="M_Mesh.cpp" />
     <ClCompile Include="M_Object.cpp" />
     <ClCompile Include="M_Scene.cpp" />
+    <ClCompile Include="M_SceneManager.cpp" />
     <ClCompile Include="M_SerializedNode.cpp" />
     <ClCompile Include="M_Serializer.cpp" />
     <ClCompile Include="M_Shader.cpp" />
