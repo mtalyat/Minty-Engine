@@ -5,16 +5,17 @@
 
 using namespace minty;
 
-minty::System::System(Registry* const registry)
+minty::System::System()
 	: _enabled(true)
-	, _registry(registry)
-{}
-
-minty::System::System(Engine& engine, Registry& registry)
-	: _enabled(true)
-	, _engine(&engine)
-	, _registry(&registry)
+	, _engine()
+	, _registry()
 {
+}
+
+void minty::System::init(Engine& engine, EntityRegistry& registry)
+{
+	_engine = &engine;
+	_registry = &registry;
 }
 
 void minty::System::set_enabled(bool const enabled)

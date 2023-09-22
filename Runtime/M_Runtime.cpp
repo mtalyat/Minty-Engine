@@ -45,46 +45,6 @@ Runtime::~Runtime()
 	
 }
 
-void minty::Runtime::register_system(std::string const& name, SystemFunc const& func)
-{
-	_systemTypes.emplace(name, func);
-}
-
-void minty::Runtime::register_component(std::string const& name, ComponentFunc const& func)
-{
-	_componentTypes.emplace(name, func);
-}
-
-System* minty::Runtime::create_system(std::string const& name, Registry& registry) const
-{
-	auto const& found = _systemTypes.find(name);
-	if (found == _systemTypes.end())
-	{
-		// name not found
-		return nullptr;
-	}
-	else
-	{
-		// name found
-		return found->second(registry);
-	}
-}
-
-Component* minty::Runtime::create_component(std::string const& name, Entity const entity, Registry& registry) const
-{
-	auto const& found = _componentTypes.find(name);
-	if (found == _componentTypes.end())
-	{
-		// name not found
-		return nullptr;
-	}
-	else
-	{
-		// name found
-		return found->second(registry, entity);
-	}
-}
-
 Engine& minty::Runtime::get_engine()
 {
 	return _engine;

@@ -1,13 +1,15 @@
 #include "pch.h"
-#include "M_SystemManager.h"
+#include "M_SystemRegistry.h"
+
+#include "M_Console.h"
 
 namespace minty
 {
-	SystemManager::SystemManager()
+	SystemRegistry::SystemRegistry()
 		: _systems()
 	{}
 
-	SystemManager::~SystemManager()
+	SystemRegistry::~SystemRegistry()
 	{
 		// delete each system
 		for (auto& pair : _systems)
@@ -21,7 +23,7 @@ namespace minty
 		//delete _systems;
 	}
 
-	void SystemManager::emplace(System* const system, int const priority)
+	void SystemRegistry::emplace(System* const system, int const priority)
 	{
 		auto found = _systems.find(priority);
 
@@ -38,7 +40,22 @@ namespace minty
 		}
 	}
 
-	void SystemManager::erase(System* const system)
+	void SystemRegistry::emplace_by_name(std::string const& name, int const priority)
+	{
+		auto const& found = _systemTypes.find(name);
+		if (found == _systemTypes.end())
+		{
+			// name not found
+			console::error(std::format("Cannot emplace System \"{}\". It has not been registered with the SystemRegistry.", name));
+		}
+		else
+		{
+			// name found
+			emplace(found->second(), priority);
+		}
+	}
+
+	void SystemRegistry::erase(System* const system)
 	{
 		// find system, remove it from list
 		for (auto& pair : _systems)
@@ -51,7 +68,7 @@ namespace minty
 		}
 	}
 
-	void SystemManager::load()
+	void SystemRegistry::load()
 	{
 		for (auto& pair : _systems)
 		{
@@ -62,7 +79,7 @@ namespace minty
 		}
 	}
 
-	void SystemManager::update()
+	void SystemRegistry::update()
 	{
 		for (auto& pair : _systems)
 		{
@@ -76,7 +93,7 @@ namespace minty
 		}
 	}
 
-	void SystemManager::fixed_update()
+	void SystemRegistry::fixed_update()
 	{
 		for (auto& pair : _systems)
 		{
@@ -90,7 +107,7 @@ namespace minty
 		}
 	}
 
-	void SystemManager::unload()
+	void SystemRegistry::unload()
 	{
 		for (auto& pair : _systems)
 		{
@@ -99,5 +116,9 @@ namespace minty
 				system->unload();
 			}
 		}
+	}
+	void SystemRegistry::register_system(std::string const& name, SystemFunc const& func)
+	{
+		_systemTypes.emplace(name, func);
 	}
 }

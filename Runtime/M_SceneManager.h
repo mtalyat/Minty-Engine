@@ -6,6 +6,8 @@
 
 namespace minty
 {
+	class Runtime;
+
 	class SceneManager
 		: public Object
 	{
@@ -17,7 +19,7 @@ namespace minty
 
 		ID create_scene();
 
-		ID load_scene(std::string const& path);
+		ID load_scene(std::string const& path, Runtime const& runtime);
 
 		Scene& get_scene(ID const id);
 	};

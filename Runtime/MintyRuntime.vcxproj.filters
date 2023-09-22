@@ -19,6 +19,12 @@
     <Filter Include="Header Files\Systems">
       <UniqueIdentifier>{333ffc79-93f5-40de-b949-f3eb61d39194}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Serialization">
+      <UniqueIdentifier>{f2703310-d6eb-4ff6-8630-c12dc7d7e570}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Scenes">
+      <UniqueIdentifier>{3b42ed31-ba77-47ef-9a37-fb2447ae9ff2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -123,28 +129,7 @@
     <ClInclude Include="M_Shader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="M_Scene.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="M_Entities.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="M_System.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="M_SystemManager.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="M_Component.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="M_ISerializable.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="M_SerializedNode.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="M_Serializer.h">
+    <ClInclude Include="M_EntityRegistry.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="M_Vertex.h">
@@ -159,8 +144,29 @@
     <ClInclude Include="M_RendererSystem.h">
       <Filter>Header Files\Systems</Filter>
     </ClInclude>
+    <ClInclude Include="M_SerializedNode.h">
+      <Filter>Header Files\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Serializer.h">
+      <Filter>Header Files\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="M_ISerializable.h">
+      <Filter>Header Files\Serialization</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Component.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="M_System.h">
+      <Filter>Header Files\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="M_SystemRegistry.h">
+      <Filter>Header Files\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Scene.h">
+      <Filter>Header Files\Scenes</Filter>
+    </ClInclude>
     <ClInclude Include="M_SceneManager.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Scenes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -257,7 +263,7 @@
     <ClCompile Include="M_Serializer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="M_Entities.cpp">
+    <ClCompile Include="M_EntityRegistry.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_SceneManager.cpp">

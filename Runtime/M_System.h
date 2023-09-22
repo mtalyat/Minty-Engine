@@ -1,7 +1,7 @@
 #pragma once
 
 #include "M_Object.h"
-#include "M_Entities.h"
+#include "M_EntityRegistry.h"
 #include <set>
 
 namespace minty
@@ -19,22 +19,30 @@ namespace minty
 		bool _enabled;
 
 	protected:
-		Engine* const _engine;
+		/// <summary>
+		/// The Engine that this System belongs to.
+		/// </summary>
+		Engine* _engine;
 
 		/// <summary>
 		/// The registry that this System is part of.
 		/// </summary>
-		Registry* const _registry;
+		EntityRegistry* _registry;
 
 	public:
 		/// <summary>
 		/// Creates a new System.
 		/// </summary>
-		/// <param name="engine">The Engine that this System belongs to.</param>
-		/// <param name="registry">The Registry that this System manipulates.</param>
-		System(Engine& engine, Registry& registry);
+		System();
 
 		virtual ~System() {}
+
+		/// <summary>
+		/// Initializes the System with the Engine and EntityRegistry.
+		/// </summary>
+		/// <param name="engine"></param>
+		/// <param name="registry"></param>
+		void init(Engine& engine, EntityRegistry& registry);
 
 		/// <summary>
 		/// Sets the enabled state of this System.

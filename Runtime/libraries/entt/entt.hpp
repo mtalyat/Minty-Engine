@@ -19285,7 +19285,7 @@ template<typename ILhs, typename IRhs>
  *
  * Tiny wrapper around a registry and an entity.
  *
- * @tparam Registry Basic registry type.
+ * @tparam EntityRegistry Basic registry type.
  * @tparam Scope Types to which to restrict the scope of a handle.
  */
 template<typename Registry, typename... Scope>
@@ -23157,7 +23157,7 @@ namespace entt {
 
 /**
  * @brief Converts a registry to a view.
- * @tparam Registry Basic registry type.
+ * @tparam EntityRegistry Basic registry type.
  */
 template<typename Registry>
 class as_view {
@@ -23196,7 +23196,7 @@ private:
 
 /**
  * @brief Converts a registry to a group.
- * @tparam Registry Basic registry type.
+ * @tparam EntityRegistry Basic registry type.
  */
 template<typename Registry>
 class as_group {
@@ -23241,7 +23241,7 @@ private:
 /**
  * @brief Helper to create a listener that directly invokes a member function.
  * @tparam Member Member function to invoke on a component of the given type.
- * @tparam Registry Basic registry type.
+ * @tparam EntityRegistry Basic registry type.
  * @param reg A registry that contains the given entity and its components.
  * @param entt Entity from which to get the component.
  */
@@ -23260,7 +23260,7 @@ void invoke(Registry &reg, const typename Registry::entity_type entt) {
  * Currently, this function only works correctly with the default pool as it
  * makes assumptions about how the components are laid out.
  *
- * @tparam Registry Basic registry type.
+ * @tparam EntityRegistry Basic registry type.
  * @tparam Component Type of component.
  * @param reg A registry that contains the given entity and its components.
  * @param instance A valid component instance.
@@ -23289,11 +23289,11 @@ struct sigh_helper;
 
 /**
  * @brief Signal connection helper for registries.
- * @tparam Registry Basic registry type.
+ * @tparam EntityRegistry Basic registry type.
  */
 template<typename Registry>
 struct sigh_helper<Registry> {
-    /*! @brief Registry type. */
+    /*! @brief EntityRegistry type. */
     using registry_type = Registry;
 
     /**
@@ -23328,12 +23328,12 @@ private:
 
 /**
  * @brief Signal connection helper for registries.
- * @tparam Registry Basic registry type.
+ * @tparam EntityRegistry Basic registry type.
  * @tparam Type Type of signal to connect listeners to.
  */
 template<typename Registry, typename Type>
 struct sigh_helper<Registry, Type> final: sigh_helper<Registry> {
-    /*! @brief Registry type. */
+    /*! @brief EntityRegistry type. */
     using registry_type = Registry;
 
     /**
@@ -23390,7 +23390,7 @@ private:
 
 /**
  * @brief Deduction guide.
- * @tparam Registry Basic registry type.
+ * @tparam EntityRegistry Basic registry type.
  */
 template<typename Registry>
 sigh_helper(Registry &) -> sigh_helper<Registry>;
@@ -24684,7 +24684,7 @@ inline constexpr basic_collector<> collector{};
  * from the registry before being destroyed to avoid crashes due to dangling
  * pointers.
  *
- * @tparam Registry Basic registry type.
+ * @tparam EntityRegistry Basic registry type.
  * @tparam Mask Mask type.
  * @tparam Allocator Type of allocator used to manage memory and elements.
  */
@@ -32768,7 +32768,7 @@ namespace entt {
 
 /**
  * @brief Converts a registry to a view.
- * @tparam Registry Basic registry type.
+ * @tparam EntityRegistry Basic registry type.
  */
 template<typename Registry>
 class as_view {
@@ -32807,7 +32807,7 @@ private:
 
 /**
  * @brief Converts a registry to a group.
- * @tparam Registry Basic registry type.
+ * @tparam EntityRegistry Basic registry type.
  */
 template<typename Registry>
 class as_group {
@@ -32852,7 +32852,7 @@ private:
 /**
  * @brief Helper to create a listener that directly invokes a member function.
  * @tparam Member Member function to invoke on a component of the given type.
- * @tparam Registry Basic registry type.
+ * @tparam EntityRegistry Basic registry type.
  * @param reg A registry that contains the given entity and its components.
  * @param entt Entity from which to get the component.
  */
@@ -32871,7 +32871,7 @@ void invoke(Registry &reg, const typename Registry::entity_type entt) {
  * Currently, this function only works correctly with the default pool as it
  * makes assumptions about how the components are laid out.
  *
- * @tparam Registry Basic registry type.
+ * @tparam EntityRegistry Basic registry type.
  * @tparam Component Type of component.
  * @param reg A registry that contains the given entity and its components.
  * @param instance A valid component instance.
@@ -32900,11 +32900,11 @@ struct sigh_helper;
 
 /**
  * @brief Signal connection helper for registries.
- * @tparam Registry Basic registry type.
+ * @tparam EntityRegistry Basic registry type.
  */
 template<typename Registry>
 struct sigh_helper<Registry> {
-    /*! @brief Registry type. */
+    /*! @brief EntityRegistry type. */
     using registry_type = Registry;
 
     /**
@@ -32939,12 +32939,12 @@ private:
 
 /**
  * @brief Signal connection helper for registries.
- * @tparam Registry Basic registry type.
+ * @tparam EntityRegistry Basic registry type.
  * @tparam Type Type of signal to connect listeners to.
  */
 template<typename Registry, typename Type>
 struct sigh_helper<Registry, Type> final: sigh_helper<Registry> {
-    /*! @brief Registry type. */
+    /*! @brief EntityRegistry type. */
     using registry_type = Registry;
 
     /**
@@ -33001,7 +33001,7 @@ private:
 
 /**
  * @brief Deduction guide.
- * @tparam Registry Basic registry type.
+ * @tparam EntityRegistry Basic registry type.
  */
 template<typename Registry>
 sigh_helper(Registry &) -> sigh_helper<Registry>;
@@ -33100,7 +33100,7 @@ resource_traits<type_list<std::remove_reference_t<Args>...>, type_list<Req...>> 
  * goal of the tool. Instead, they are returned to the user in the form of a
  * graph that allows for safe execution.
  *
- * @tparam Registry Basic registry type.
+ * @tparam EntityRegistry Basic registry type.
  */
 template<typename Registry>
 class basic_organizer final {
@@ -38033,7 +38033,7 @@ public:
 
     /**
      * @brief Exchanges the contents with those of a given registry.
-     * @param other Registry to exchange the content with.
+     * @param other EntityRegistry to exchange the content with.
      */
     void swap(basic_registry &other) {
         using std::swap;
@@ -39387,7 +39387,7 @@ void orphans(Registry &registry) {
  * This type can be used in both cases if provided with a correctly configured
  * output archive.
  *
- * @tparam Registry Basic registry type.
+ * @tparam EntityRegistry Basic registry type.
  */
 template<typename Registry>
 class basic_snapshot {
@@ -39529,7 +39529,7 @@ private:
  * originally had.<br/>
  * An example of use is the implementation of a save/restore utility.
  *
- * @tparam Registry Basic registry type.
+ * @tparam EntityRegistry Basic registry type.
  */
 template<typename Registry>
 class basic_snapshot_loader {
@@ -39670,7 +39670,7 @@ private:
  * the requirement of transferring somehow parts of the representation side to
  * side.
  *
- * @tparam Registry Basic registry type.
+ * @tparam EntityRegistry Basic registry type.
  */
 template<typename Registry>
 class basic_continuous_loader {

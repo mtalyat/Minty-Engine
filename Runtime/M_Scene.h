@@ -1,7 +1,8 @@
 #pragma once
 #include "M_Object.h"
 
-#include "M_Entities.h"
+#include "M_EntityRegistry.h"
+#include "M_SystemRegistry.h"
 
 namespace minty
 {
@@ -12,7 +13,8 @@ namespace minty
 		public Object
 	{
 	private:
-		Registry _registry;
+		EntityRegistry _entities;
+		SystemRegistry _systems;
 
 	public:
 		/// <summary>
@@ -21,9 +23,15 @@ namespace minty
 		Scene();
 
 		/// <summary>
-		/// Gets the registry used in the Scene.
+		/// Gets the EntityRegistry used in the Scene.
 		/// </summary>
 		/// <returns></returns>
-		Registry& get_registry();
+		EntityRegistry& get_entity_registry();
+
+		/// <summary>
+		/// Gets the SystemRegistry used in the Scene.
+		/// </summary>
+		/// <returns></returns>
+		SystemRegistry& get_system_registry();
 	};
 }

@@ -211,7 +211,7 @@
     <ClInclude Include="entt.hpp" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="M_Component.h" />
-    <ClInclude Include="M_Entities.h" />
+    <ClInclude Include="M_EntityRegistry.h" />
     <ClInclude Include="M_ISerializable.h" />
     <ClInclude Include="M_Material.h" />
     <ClInclude Include="M_MouseButton.h" />
@@ -236,7 +236,7 @@
     <ClInclude Include="M_Serializer.h" />
     <ClInclude Include="M_Shader.h" />
     <ClInclude Include="M_System.h" />
-    <ClInclude Include="M_SystemManager.h" />
+    <ClInclude Include="M_SystemRegistry.h" />
     <ClInclude Include="M_Texture.h" />
     <ClInclude Include="M_TransformComponent.h" />
     <ClInclude Include="M_Vector2Int.h" />
@@ -261,7 +261,7 @@
     <ClCompile Include="M_Color.cpp" />
     <ClCompile Include="M_CommandLineParser.cpp" />
     <ClCompile Include="M_Console.cpp" />
-    <ClCompile Include="M_Entities.cpp" />
+    <ClCompile Include="M_EntityRegistry.cpp" />
     <ClCompile Include="M_File.cpp" />
     <ClCompile Include="M_Engine.cpp" />
     <ClCompile Include="M_InputMap.cpp" />

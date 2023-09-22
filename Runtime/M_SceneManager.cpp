@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "M_SceneManager.h"
 
+#include "M_Runtime.h"
 #include "M_Serializer.h"
 
 using namespace minty;
@@ -16,7 +17,7 @@ ID minty::SceneManager::create_scene()
 	return id;
 }
 
-ID minty::SceneManager::load_scene(std::string const& path)
+ID minty::SceneManager::load_scene(std::string const& path, Runtime const& runtime)
 {
 	// create the scene
 	ID id = create_scene();
@@ -30,7 +31,7 @@ ID minty::SceneManager::load_scene(std::string const& path)
 	// if "Systems" exists, load systems based on name
 	if (node.children.find("Systems") != node.children.end())
 	{
-
+		
 	}
 
 	// if "Entities" exists, create entities based on their components
@@ -38,6 +39,8 @@ ID minty::SceneManager::load_scene(std::string const& path)
 	{
 
 	}
+
+	return id;
 }
 
 Scene& minty::SceneManager::get_scene(ID const id)

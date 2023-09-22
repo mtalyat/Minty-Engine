@@ -4,10 +4,17 @@
 using namespace minty;
 
 minty::Scene::Scene()
+	: _entities()
+	, _systems()
 {
 }
 
-Registry& minty::Scene::get_registry()
+EntityRegistry& minty::Scene::get_entity_registry()
 {
-	return _registry;
+	return _entities;
+}
+
+SystemRegistry& minty::Scene::get_system_registry()
+{
+	return _systems;
 }
