@@ -11,6 +11,6 @@ namespace minty
 		/// <summary>
 		/// Disposes any resources connected to this Component.
 		/// </summary>
-		virtual void dispose() = 0;
+		virtual void dispose() {}
 	};
 }
