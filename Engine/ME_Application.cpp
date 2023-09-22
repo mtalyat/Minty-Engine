@@ -282,9 +282,9 @@ void Application::generate_main(Info const& info)
 		"#include <Minty.h>" << std::endl <<
 		"#include \"../Assets/Scripts/init.h\"" << std::endl <<
 		"int main(int argc, char const* argv[]) {" << std::endl <<
-		"    minty::Runtime rt;" << std::endl <<
+		"    minty::Runtime rt(argc, argv);" << std::endl <<
 		"    init(rt);" << std::endl <<
-		"    int result = rt.run(argc, argv);" << std::endl <<
+		"    int result = rt.run();" << std::endl <<
 		"    destroy(rt);" << std::endl <<
 		"    return result;" << std::endl <<
 		"}";

@@ -27,9 +27,9 @@ namespace minty
 		std::map<std::string const, ComponentFunc const> _componentTypes;
 	public:
 		/// <summary>
-		/// Creates a new Runtime.
+		/// Creates a new Runtime based on the given arguments.
 		/// </summary>
-		Runtime();
+		Runtime(int argc, char const* argv[]);
 
 		~Runtime();
 
@@ -44,13 +44,9 @@ namespace minty
 		Engine& getEngine();
 
 		/// <summary>
-		/// Runs the Runtime using the given arguments.
-		/// 
-		/// The arguments should be: executable name, project path.
+		/// Runs the Runtime.
 		/// </summary>
-		/// <param name="argc">The number of arguments.</param>
-		/// <param name="argv">The arguments.</param>
 		/// <returns></returns>
-		int run(int argc, char const* argv[]);
+		int run();
 	};
 }

@@ -12,11 +12,32 @@
 
 using namespace minty;
 
-Runtime::Runtime()
+minty::Runtime::Runtime(int argc, char const* argv[])
 	: _engine()
 {
-	// registry all built-in systems and components
-	
+	// parse command line arguments...
+
+	// add parameters
+	CommandLineParser parser;
+	parser.addParameter(CommandLineParser::Parameter("path", 1));
+
+	// parse the args
+	parser.parse(argc, argv);
+
+	// check for args
+	CommandLineParser::Argument arg;
+
+	if (parser.getArgument("path", arg))
+	{
+		std::cout << "Path argument: " << arg.args[0] << std::endl;
+
+		// change working directory to project path
+		std::filesystem::current_path(arg.args[0]);
+	}
+	else
+	{
+		std::cerr << "Path argument not found." << std::endl;
+	}
 }
 
 Runtime::~Runtime()
@@ -69,34 +90,8 @@ Engine& minty::Runtime::getEngine()
 	return _engine;
 }
 
-int Runtime::run(int argc, char const* argv[])
+int Runtime::run()
 {
-	// parse command line arguments...
-
-	// add parameters
-	CommandLineParser parser;
-	parser.addParameter(CommandLineParser::Parameter("path", 1));
-
-	// parse the args
-	parser.parse(argc, argv);
-
-	// check for args
-	CommandLineParser::Argument arg;
-
-	if (parser.getArgument("path", arg))
-	{
-		std::cout << "Path argument: " << arg.args[0] << std::endl;
-
-		// change working directory to project path
-		std::filesystem::current_path(arg.args[0]);
-	}
-	else
-	{
-		std::cerr << "Path argument not found." << std::endl;
-
-		return EXIT_FAILURE;
-	}
-
 	try
 	{
 		// TODO: load game
