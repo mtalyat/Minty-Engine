@@ -212,6 +212,7 @@
     <ClInclude Include="framework.h" />
     <ClInclude Include="M_Component.h" />
     <ClInclude Include="M_Entities.h" />
+    <ClInclude Include="M_ISerializable.h" />
     <ClInclude Include="M_Material.h" />
     <ClInclude Include="M_MouseButton.h" />
     <ClInclude Include="M_KeyModifiers.h" />
@@ -229,6 +230,8 @@
     <ClInclude Include="M_Mesh.h" />
     <ClInclude Include="M_Object.h" />
     <ClInclude Include="M_Scene.h" />
+    <ClInclude Include="M_SerializedNode.h" />
+    <ClInclude Include="M_Serializer.h" />
     <ClInclude Include="M_Shader.h" />
     <ClInclude Include="M_System.h" />
     <ClInclude Include="M_SystemManager.h" />
@@ -263,6 +266,8 @@
     <ClCompile Include="M_Mesh.cpp" />
     <ClCompile Include="M_Object.cpp" />
     <ClCompile Include="M_Scene.cpp" />
+    <ClCompile Include="M_SerializedNode.cpp" />
+    <ClCompile Include="M_Serializer.cpp" />
     <ClCompile Include="M_Shader.cpp" />
     <ClCompile Include="M_System.cpp" />
     <ClCompile Include="M_SystemManager.cpp" />

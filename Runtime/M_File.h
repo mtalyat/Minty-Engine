@@ -21,6 +21,8 @@ namespace minty
 		/// <returns>The lines from the file.</returns>
 		std::vector<std::string> readAllLines(std::string const& path);
 
+		
+
 		/// <summary>
 		/// Checks if the given path exists.
 		/// </summary>
