@@ -40,7 +40,9 @@ namespace minty
 		System* createSystem(std::string const& name, Registry& registry) const;
 
 		Component* createComponent(std::string const& name, Entity const entity, Registry& registry) const;
-		
+
+		constexpr Engine& getEngine();
+
 		/// <summary>
 		/// Runs the Runtime using the given arguments.
 		/// 

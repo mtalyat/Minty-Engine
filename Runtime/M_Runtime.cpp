@@ -64,6 +64,11 @@ Component* minty::Runtime::createComponent(std::string const& name, Entity const
 	}
 }
 
+constexpr Engine& minty::Runtime::getEngine()
+{
+	return _engine;
+}
+
 int Runtime::run(int argc, char const* argv[])
 {
 	// parse command line arguments...

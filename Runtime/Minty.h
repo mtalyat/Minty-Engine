@@ -30,6 +30,7 @@ ONLY include files that somebody writing a game would use.
 #include "M_Project.h"
 #include "M_Rect.h"
 #include "M_RectF.h"
+#include "M_Renderer.h"
 #include "M_Runtime.h"
 #include "M_SerializedNode.h"
 #include "M_Serializer.h"

@@ -149,7 +149,7 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
 	}
 }
 
-Renderer::Renderer(Window* const window, Engine& engine)
+Renderer::Renderer(Window* const window)
 	: _window(window)
 	, _textures()
 	, _materials()

@@ -18,6 +18,13 @@ Window::Window(std::string const& title, int const width, int const height)
 	, _lastMouseY()
 	, _mouseOutOfBounds(true) // start as "out of bounds"
 {
+	// if no windows have been made yet, init glfw
+	if (_windowCount == 0)
+	{
+		glfwInit();
+	}
+	_windowCount++;
+
 	// do not use OpenGL
 	glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 
@@ -52,6 +59,13 @@ Window::~Window()
 {
 	// destroy window
 	glfwDestroyWindow(_window);
+
+	// if no windows left, destroy glfw
+	_windowCount--;
+	if (_windowCount == 0)
+	{
+		glfwTerminate();
+	}
 }
 
 bool minty::Window::isResized()

@@ -126,7 +126,7 @@ namespace minty
 		Viewport view;
 		Color _backgroundColor;
 	public:
-		Renderer(Window* const window, Engine& engine);
+		Renderer(Window* const window);
 
 		~Renderer();
 

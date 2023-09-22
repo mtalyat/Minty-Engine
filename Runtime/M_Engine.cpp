@@ -11,15 +11,20 @@ uint32_t const WIDTH = 800;
 uint32_t const HEIGHT = 600;
 
 Engine::Engine()
+	: _window("Minty", WIDTH, HEIGHT)
+	, _renderer(&_window)
 {
-	// init GLFW
-	glfwInit();
+
 }
 
 Engine::~Engine()
 {
-	// close GLFW
-	glfwTerminate();
+
+}
+
+constexpr Window& minty::Engine::getWindow()
+{
+	return _window;
 }
 
 void Engine::run()
@@ -29,70 +34,13 @@ void Engine::run()
 	time_point_t frameTick = start;
 	unsigned int frameCount = 0u;
 
-	Window window("Minty", WIDTH, HEIGHT);
-	Window* windowPtr = &window;
+	Window* windowPtr = &_window;
 
 	// start the render engine
 	Renderer renderer(windowPtr, *this);
 	Renderer* rendererPtr = &renderer;
 
-	ID matId = 0;
-	ID* matIdPtr = &matId;
-
-	// input
-	InputMap input;
-	// rotate when space held
-	input.emplaceKeyDown(Key::D1, [rendererPtr, matIdPtr](KeyPressEventArgs const& args)
-		{
-			*matIdPtr = 0;
-			rendererPtr->setMaterialForMainMesh(*matIdPtr);
-		});
-	input.emplaceKeyDown(Key::D2, [rendererPtr, matIdPtr](KeyPressEventArgs const& args)
-		{
-			*matIdPtr = 1;
-			rendererPtr->setMaterialForMainMesh(*matIdPtr);
-		});
-	input.emplaceKeyDown(Key::D3, [rendererPtr, matIdPtr](KeyPressEventArgs const& args)
-		{
-			*matIdPtr = 2;
-			rendererPtr->setMaterialForMainMesh(*matIdPtr);
-		});
-	input.emplaceKeyDown(Key::D4, [rendererPtr, matIdPtr](KeyPressEventArgs const& args)
-		{
-			*matIdPtr = 3;
-			rendererPtr->setMaterialForMainMesh(*matIdPtr);
-		});
-	input.emplaceKeyDown(Key::Q, [rendererPtr, matIdPtr](KeyPressEventArgs const& args)
-		{
-			Material& mat = rendererPtr->getMaterial(*matIdPtr);
-			mat.color = Color(255, 255, 255);
-			rendererPtr->updateMaterial(*matIdPtr);
-		});
-	input.emplaceKeyDown(Key::W, [rendererPtr, matIdPtr](KeyPressEventArgs const& args)
-		{
-			Material& mat = rendererPtr->getMaterial(*matIdPtr);
-			mat.color = Color(255, 0, 0);
-			rendererPtr->updateMaterial(*matIdPtr);
-		});
-	input.emplaceKeyDown(Key::E, [rendererPtr, matIdPtr](KeyPressEventArgs const& args)
-		{
-			Material& mat = rendererPtr->getMaterial(*matIdPtr);
-			mat.color = Color(0, 255, 0);
-			rendererPtr->updateMaterial(*matIdPtr);
-		});
-	input.emplaceKeyDown(Key::R, [rendererPtr, matIdPtr](KeyPressEventArgs const& args)
-		{
-			Material& mat = rendererPtr->getMaterial(*matIdPtr);
-			mat.color = Color(0, 0, 255);
-			rendererPtr->updateMaterial(*matIdPtr);
-		});
-	// quit on key close
-	input.emplaceKeyDown(Key::Escape, [windowPtr](KeyPressEventArgs const& args)
-		{
-			windowPtr->close();
-		});
-
-	window.setInput(&input);
+	
 
 	time_point_t now;
 

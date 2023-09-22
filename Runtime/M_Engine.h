@@ -1,5 +1,6 @@
 #pragma once
 
+#include "M_Window.h"
 #include <chrono>
 
 typedef std::chrono::steady_clock::time_point time_point_t;
@@ -11,10 +12,16 @@ namespace minty
 	/// </summary>
 	class Engine
 	{
+	private:
+		Window _window;
+		Renderer _renderer;
+
 	public:
 		Engine();
 
 		~Engine();
+
+		constexpr Window& getWindow();
 
 		/// <summary>
 		/// Runs the game.
