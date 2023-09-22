@@ -155,21 +155,6 @@ namespace minty
 #pragma region Main
 
 		/// <summary>
-		/// Creates the texture image that will be rendered to the screen.
-		/// </summary>
-		void createMainTexture();
-
-		/// <summary>
-		/// 
-		/// </summary>
-		void createMainShader();
-
-		/// <summary>
-		/// 
-		/// </summary>
-		void createMainMaterial();
-
-		/// <summary>
 		/// Creates the mesh to render.
 		/// </summary>
 		void createMainMesh();

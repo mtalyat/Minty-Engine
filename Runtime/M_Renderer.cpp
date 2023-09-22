@@ -793,15 +793,6 @@ void minty::Renderer::updateMaterial(ID const id)
 	}
 }
 
-void Renderer::createMainTexture()
-{
-	// load 4 textures
-	loadTexture("../../Assets/Textures/pattern.png");
-	loadTexture("../../Assets/Textures/funny.jpg");
-	loadTexture("../../Assets/Textures/texture.jpg");
-	loadTexture("../../Assets/Textures/brian.png");
-}
-
 VkImageView Renderer::createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags) {
 	VkImageViewCreateInfo viewInfo{};
 	viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -1731,21 +1722,6 @@ void Renderer::createRenderPass()
 	if (vkCreateRenderPass(device, &renderPassInfo, nullptr, &renderPass) != VK_SUCCESS) {
 		throw std::runtime_error("failed to create render pass!");
 	}
-}
-
-void minty::Renderer::createMainShader()
-{
-	loadShader("../../Assets/Shaders/vert.spv", "../../Assets/Shaders/frag.spv");
-}
-
-void Renderer::createMainMaterial()
-{
-
-
-	createMaterial(0, 0, Color(255, 255, 255));
-	createMaterial(0, 1, Color(255, 127, 127));
-	createMaterial(0, 2, Color(127, 255, 127));
-	createMaterial(0, 3, Color(127, 127, 255));
 }
 
 void Renderer::createFramebuffers()
