@@ -219,6 +219,7 @@ void minty::Renderer::init()
 	createCommandPool();
 	createDepthResources();
 	createFramebuffers();
+	createMaterialBuffers();
 }
 
 void Renderer::renderFrame()
@@ -1739,18 +1740,7 @@ void minty::Renderer::createMainShader()
 
 void Renderer::createMainMaterial()
 {
-	// allocate space for materials
-	VkDeviceSize bufferSize = sizeof(MaterialInfo) * MAX_MATERIALS;
 
-	materialBuffers.resize(MAX_FRAMES_IN_FLIGHT);
-	materialBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
-	materialBuffersMapped.resize(MAX_FRAMES_IN_FLIGHT);
-
-	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-		createBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, materialBuffers[i], materialBuffersMemory[i]);
-
-		vkMapMemory(device, materialBuffersMemory[i], 0, bufferSize, 0, &materialBuffersMapped[i]);
-	}
 
 	createMaterial(0, 0, Color(255, 255, 255));
 	createMaterial(0, 1, Color(255, 127, 127));
@@ -1953,6 +1943,22 @@ void minty::Renderer::renderMesh(VkCommandBuffer commandBuffer, Mesh const* cons
 
 	// draw
 	vkCmdDrawIndexed(commandBuffer, mesh->_indexCount, 1, 0, 0, 0);
+}
+
+void minty::Renderer::createMaterialBuffers()
+{
+	// allocate space for materials
+	VkDeviceSize bufferSize = sizeof(MaterialInfo) * MAX_MATERIALS;
+
+	materialBuffers.resize(MAX_FRAMES_IN_FLIGHT);
+	materialBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
+	materialBuffersMapped.resize(MAX_FRAMES_IN_FLIGHT);
+
+	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+		createBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, materialBuffers[i], materialBuffersMemory[i]);
+
+		vkMapMemory(device, materialBuffersMemory[i], 0, bufferSize, 0, &materialBuffersMapped[i]);
+	}
 }
 
 void Renderer::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex)

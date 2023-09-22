@@ -184,6 +184,8 @@ namespace minty
 
 #pragma endregion
 
+		void createMaterialBuffers();
+
 		/// <summary>
 		/// Creates a Vulkan instance.
 		/// </summary>
