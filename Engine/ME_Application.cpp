@@ -102,7 +102,6 @@ void Application::run(int argc, char const* argv[])
 		// print commands
 		std::cout << std::endl <<
 			" ______________ Commands ______________ " << std::endl <<
-			"| test ......... test run the runtime  |" << std::endl <<
 			"| debug ........ set config to debug   |" << std::endl <<
 			"| release ...... set config to release |" << std::endl <<
 			"| clean ........ clean project         |" << std::endl <<
@@ -128,20 +127,7 @@ void Application::run(int argc, char const* argv[])
 		// run commands
 		for (std::string const& c : commands)
 		{
-			if (c.compare("test") == 0)
-			{
-				// pass in executable name, then project name
-				std::string path = info.project.getBasePath().string();
-				char const* runtimeArgs[2]
-				{
-					argv[0],
-					path.c_str()
-				};
-
-				Runtime runtime;
-				runtime.run(2, runtimeArgs);
-			}
-			else if (c.compare("debug") == 0)
+			if (c.compare("debug") == 0)
 			{
 				if (!info.debug)
 				{
