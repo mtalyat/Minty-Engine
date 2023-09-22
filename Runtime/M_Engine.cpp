@@ -5,6 +5,9 @@
 #include "M_Renderer.h"
 #include <iostream>
 
+#define GLFW_INCLUDE_VULKAN
+#include <GLFW/glfw3.h>
+
 using namespace minty;
 
 uint32_t const WIDTH = 800;
@@ -22,34 +25,34 @@ Engine::~Engine()
 
 }
 
-constexpr Window& minty::Engine::getWindow()
+Window& minty::Engine::getWindow()
 {
 	return _window;
 }
 
+Renderer& minty::Engine::getRenderer()
+{
+	return _renderer;
+}
+
 void Engine::run()
 {
+	// initialize
+	_renderer.init();
+
 	// record start time, and last frame tick
 	time_point_t start = getNow();
 	time_point_t frameTick = start;
 	unsigned int frameCount = 0u;
 
-	Window* windowPtr = &_window;
-
-	// start the render engine
-	Renderer renderer(windowPtr, *this);
-	Renderer* rendererPtr = &renderer;
-
-	
-
 	time_point_t now;
 
 	// main loop
-	while (renderer.isRunning())
+	while (_renderer.isRunning())
 	{
 		glfwPollEvents();
-		renderer.updateUniformBuffer();
-		renderer.renderFrame();
+		_renderer.updateUniformBuffer();
+		_renderer.renderFrame();
 
 		frameCount++;
 

@@ -64,7 +64,7 @@ Component* minty::Runtime::createComponent(std::string const& name, Entity const
 	}
 }
 
-constexpr Engine& minty::Runtime::getEngine()
+Engine& minty::Runtime::getEngine()
 {
 	return _engine;
 }

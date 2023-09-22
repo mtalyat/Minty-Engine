@@ -1,6 +1,7 @@
 #pragma once
 
 #include "M_Window.h"
+#include "M_Renderer.h"
 #include <chrono>
 
 typedef std::chrono::steady_clock::time_point time_point_t;
@@ -21,7 +22,9 @@ namespace minty
 
 		~Engine();
 
-		constexpr Window& getWindow();
+		Window& getWindow();
+
+		Renderer& getRenderer();
 
 		/// <summary>
 		/// Runs the game.

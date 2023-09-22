@@ -10,6 +10,8 @@
 
 using namespace minty;
 
+int Window::_windowCount = 0;
+
 Window::Window(std::string const& title, int const width, int const height)
 	: _window()
 	, _resized(true) // start as "resized" so render engine regenerates data on start

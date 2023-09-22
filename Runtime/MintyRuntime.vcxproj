@@ -252,6 +252,7 @@
     <ClInclude Include="M_Window.h" />
     <ClInclude Include="M_NameComponent.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="M_Vertex.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />

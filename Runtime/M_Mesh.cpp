@@ -2,6 +2,7 @@
 #include "M_Mesh.h"
 
 #include "M_Renderer.h"
+#include "M_Vertex.h"
 
 void minty::Mesh::setVertices(void const* const vertices, size_t const elementCount, size_t const elementSize, Renderer& engine)
 {

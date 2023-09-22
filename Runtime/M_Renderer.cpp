@@ -3,9 +3,20 @@
 
 #include "M_Console.h"
 #include "M_Engine.h"
+#include "M_Vertex.h"
+
+//#include <vulkan/vulkan.h>
+#define GLFW_INCLUDE_VULKAN
+#include <GLFW/glfw3.h>
+
+#define GLM_FORCE_RADIANS
+#define GLM_FORCE_DEPTH_ZERO_TO_ONE
+#include <glm/glm.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
+
 #include <iostream>
 #include <stdexcept>
 #include <cstdlib>
@@ -20,6 +31,27 @@
 #define VK_ASSERT(result, func, message) VkResult result = func; if(result != VkResult::VK_SUCCESS) throw std::runtime_error(std::format("[{}] {}", vkResultToString(result), message));
 
 using namespace minty;
+
+namespace minty
+{
+	struct UniformBufferObject {
+		alignas(16) glm::mat4 model;
+		alignas(16) glm::mat4 view;
+		alignas(16) glm::mat4 proj;
+	};
+
+	struct MaterialInfo
+	{
+		alignas(16) int textureID;
+		alignas(16) glm::vec4 color;
+	};
+
+	struct MeshInfo
+	{
+		alignas (16) glm::mat4 transform;
+		alignas (16) ID materialId;
+	};
+}
 
 const std::vector<const char*> validationLayers = {
 	"VK_LAYER_KHRONOS_validation"
@@ -161,9 +193,6 @@ Renderer::Renderer(Window* const window)
 	_textures.reserve(MAX_TEXTURES);
 	_materials.reserve(MAX_MATERIALS);
 	_shaders.reserve(MAX_SHADERS);
-
-	// init vulkan
-	initVulkan();
 }
 
 Renderer::~Renderer()
@@ -171,17 +200,7 @@ Renderer::~Renderer()
 	cleanup();
 }
 
-void Renderer::renderFrame()
-{
-	drawFrame();
-}
-
-bool Renderer::isRunning()
-{
-	return _window->isOpen();
-}
-
-void Renderer::initVulkan()
+void minty::Renderer::init()
 {
 	createInstance();
 	setupDebugMessenger();
@@ -207,6 +226,16 @@ void Renderer::initVulkan()
 
 	createCommandBuffers();
 	createSyncObjects();
+}
+
+void Renderer::renderFrame()
+{
+	drawFrame();
+}
+
+bool Renderer::isRunning()
+{
+	return _window->isOpen();
 }
 
 void Renderer::createInstance()

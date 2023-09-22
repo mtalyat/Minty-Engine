@@ -10,14 +10,6 @@
 #include "M_Shader.h"
 #include "M_Material.h"
 
-//#include <vulkan/vulkan.h>
-#define GLFW_INCLUDE_VULKAN
-#include <GLFW/glfw3.h>
-#define GLM_FORCE_RADIANS
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-
 #include <array>
 #include <vector>
 #include <set>
@@ -27,46 +19,6 @@
 
 namespace minty
 {
-	class Engine;
-
-	// https://vulkan-tutorial.com/en/Vertex_buffers/Vertex_input_description
-	struct Vertex
-	{
-		glm::vec3 pos;
-		glm::vec3 color;
-		glm::vec2 texCoord;
-
-		static VkVertexInputBindingDescription getBindingDescription() {
-			VkVertexInputBindingDescription bindingDescription{};
-			bindingDescription.binding = 0;
-			bindingDescription.stride = sizeof(Vertex);
-			bindingDescription.inputRate = VK_VERTEX_INPUT_RATE_VERTEX;
-
-			return bindingDescription;
-		}
-
-		static std::array<VkVertexInputAttributeDescription, 3> getAttributeDescriptions() {
-			std::array<VkVertexInputAttributeDescription, 3> attributeDescriptions{};
-
-			attributeDescriptions[0].binding = 0;
-			attributeDescriptions[0].location = 0;
-			attributeDescriptions[0].format = VK_FORMAT_R32G32B32_SFLOAT;
-			attributeDescriptions[0].offset = 0;
-
-			attributeDescriptions[1].binding = 0;
-			attributeDescriptions[1].location = 1;
-			attributeDescriptions[1].format = VK_FORMAT_R32G32B32_SFLOAT;
-			attributeDescriptions[1].offset = sizeof(glm::vec3);
-
-			attributeDescriptions[2].binding = 0;
-			attributeDescriptions[2].location = 2;
-			attributeDescriptions[2].format = VK_FORMAT_R32G32_SFLOAT;
-			attributeDescriptions[2].offset = sizeof(glm::vec3) * 2;
-
-			return attributeDescriptions;
-		}
-	};
-
 	struct QueueFamilyIndices {
 		std::optional<uint32_t> graphicsFamily;
 		std::optional<uint32_t> presentFamily;
@@ -83,12 +35,6 @@ namespace minty
 		std::vector<VkPresentModeKHR> presentModes;
 	};
 
-	struct UniformBufferObject {
-		alignas(16) glm::mat4 model;
-		alignas(16) glm::mat4 view;
-		alignas(16) glm::mat4 proj;
-	};
-
 	constexpr int MAX_FRAMES_IN_FLIGHT = 2;
 	constexpr int MAX_SETS_PER_FRAME = 1;
 	constexpr int MAX_SETS = MAX_FRAMES_IN_FLIGHT * MAX_SETS_PER_FRAME;
@@ -98,17 +44,9 @@ namespace minty
 	constexpr int MAX_MATERIALS = 4;
 	constexpr int MAX_SHADERS = 1;
 
-	struct MaterialInfo
-	{
-		alignas(16) int textureID;
-		alignas(16) glm::vec4 color;
-	};
-
-	struct MeshInfo
-	{
-		alignas (16) glm::mat4 transform;
-		alignas (16) ID materialId;
-	};
+	struct UniformBufferObject;
+	struct MaterialInfo;
+	struct MeshInfo;
 
 	/// <summary>
 	/// Handles rendering for the game engine.
@@ -129,6 +67,11 @@ namespace minty
 		Renderer(Window* const window);
 
 		~Renderer();
+
+		/// <summary>
+		/// Initializes the Renderer.
+		/// </summary>
+		void init();
 
 		/// <summary>
 		/// Draws a frame to the screen.
@@ -235,11 +178,6 @@ namespace minty
 		void renderMesh(VkCommandBuffer commandBuffer, Mesh const* const mesh);
 
 #pragma endregion
-
-		/// <summary>
-		/// Initializes the Vulkan framework and all necessary components to render things to the window.
-		/// </summary>
-		void initVulkan();
 
 		/// <summary>
 		/// Creates a Vulkan instance.

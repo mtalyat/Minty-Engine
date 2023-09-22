@@ -22,6 +22,13 @@ void minty::console::print(std::string const& message, Color const color)
 	}
 }
 
+void minty::console::wait()
+{
+	print("\nPress enter to continue...");
+	std::string temp;
+	std::getline(std::cin, temp);
+}
+
 void minty::console::log(std::string const& message)
 {
 #ifndef NDEBUG
