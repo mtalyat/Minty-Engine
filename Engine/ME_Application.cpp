@@ -97,7 +97,7 @@ void Application::run(int argc, char const* argv[])
 	{
 		// print info
 		std::cout << std::endl << "Info:" << std::endl <<
-			"Config: " << info.getConfig() << std::endl;
+			"Config: " << info.get_config() << std::endl;
 
 		// print commands
 		std::cout << std::endl <<
@@ -252,7 +252,7 @@ void Application::generate_cmake(Info const& info)
 		"target_include_directories(${PROJECT_NAME} PRIVATE C:/Users/mitch/source/repos/Minty-Engine/Runtime PUBLIC ${VULKAN_INCLUDE_DIRS})" << std::endl <<
 		// include and link Vulkan
 		"include_directories(${Vulkan_INCLUDE_DIRS})" << std::endl <<
-		"target_link_libraries(${PROJECT_NAME} C:/Users/mitch/source/repos/Minty-Engine/Runtime/x64/" << info.getConfig() << "/MintyRuntime.lib)" << std::endl <<
+		"target_link_libraries(${PROJECT_NAME} C:/Users/mitch/source/repos/Minty-Engine/Runtime/x64/" << info.get_config() << "/MintyRuntime.lib)" << std::endl <<
 		"target_link_libraries(${PROJECT_NAME} ${Vulkan_LIBRARIES})";
 
 	file.close();
@@ -306,13 +306,13 @@ void Application::build(Info const& info)
 	run_command(command + " .");
 
 	// build program
-	run_command(command + " --build . --config " + info.getConfig());
+	run_command(command + " --build . --config " + info.get_config());
 }
 
 void Application::run(Info const& info)
 {
 	// call executable, pass in project path as argument for the runtime, so it knows what to run
-	run_command("cd " + info.project.get_build_path().string() + " && cd " + info.getConfig() + " && start " + EXE_NAME + " " + info.project.get_base_path().string());
+	run_command("cd " + info.project.get_build_path().string() + " && cd " + info.get_config() + " && start " + EXE_NAME + " " + info.project.get_base_path().string());
 }
 
 //https://stackoverflow.com/questions/478898/how-do-i-execute-a-command-and-get-the-output-of-the-command-within-c-using-po

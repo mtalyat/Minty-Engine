@@ -15,7 +15,7 @@ namespace mintye
 			minty::Project const& project;
 			bool debug;
 
-			std::string const getConfig() const
+			std::string const get_config() const
 			{
 				return debug ? "Debug" : "Release";
 			}
