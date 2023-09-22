@@ -7,7 +7,7 @@ minty::Scene::Scene()
 {
 }
 
-Registry& minty::Scene::getRegistry()
+Registry& minty::Scene::get_registry()
 {
 	return _registry;
 }

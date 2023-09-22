@@ -19,7 +19,7 @@ minty::Runtime::Runtime(int argc, char const* argv[])
 
 	// add parameters
 	CommandLineParser parser;
-	parser.addParameter(CommandLineParser::Parameter("path", 1));
+	parser.add_parameter(CommandLineParser::Parameter("path", 1));
 
 	// parse the args
 	parser.parse(argc, argv);
@@ -27,7 +27,7 @@ minty::Runtime::Runtime(int argc, char const* argv[])
 	// check for args
 	CommandLineParser::Argument arg;
 
-	if (parser.getArgument("path", arg))
+	if (parser.get_argument("path", arg))
 	{
 		std::cout << "Path argument: " << arg.args[0] << std::endl;
 
@@ -45,17 +45,17 @@ Runtime::~Runtime()
 	
 }
 
-void minty::Runtime::registerSystem(std::string const& name, SystemFunc const& func)
+void minty::Runtime::register_system(std::string const& name, SystemFunc const& func)
 {
 	_systemTypes.emplace(name, func);
 }
 
-void minty::Runtime::registerComponent(std::string const& name, ComponentFunc const& func)
+void minty::Runtime::register_component(std::string const& name, ComponentFunc const& func)
 {
 	_componentTypes.emplace(name, func);
 }
 
-System* minty::Runtime::createSystem(std::string const& name, Registry& registry) const
+System* minty::Runtime::create_system(std::string const& name, Registry& registry) const
 {
 	auto const& found = _systemTypes.find(name);
 	if (found == _systemTypes.end())
@@ -70,7 +70,7 @@ System* minty::Runtime::createSystem(std::string const& name, Registry& registry
 	}
 }
 
-Component* minty::Runtime::createComponent(std::string const& name, Entity const entity, Registry& registry) const
+Component* minty::Runtime::create_component(std::string const& name, Entity const entity, Registry& registry) const
 {
 	auto const& found = _componentTypes.find(name);
 	if (found == _componentTypes.end())
@@ -85,7 +85,7 @@ Component* minty::Runtime::createComponent(std::string const& name, Entity const
 	}
 }
 
-Engine& minty::Runtime::getEngine()
+Engine& minty::Runtime::get_engine()
 {
 	return _engine;
 }

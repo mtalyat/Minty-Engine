@@ -118,7 +118,7 @@ void minty::Window::triggerKey(Key const key, KeyAction const action, KeyModifie
 			.mods = mods
 		};
 
-		_activeInputMap->invokeKey(args);
+		_activeInputMap->invoke_key(args);
 	}
 }
 
@@ -134,7 +134,7 @@ void minty::Window::triggerButton(MouseButton const button, KeyAction const acti
 			.y = _lastMouseY
 		};
 
-		_activeInputMap->invokeMouseClick(args);
+		_activeInputMap->invoke_mouse_click(args);
 	}
 }
 
@@ -147,7 +147,7 @@ void minty::Window::triggerScroll(float dx, float dy)
 			.dy = dy
 		};
 
-		_activeInputMap->invokeMouseScroll(args);
+		_activeInputMap->invoke_mouse_scroll(args);
 	}
 }
 
@@ -176,7 +176,7 @@ void minty::Window::triggerCursor(float x, float y)
 			.dy = dy
 		};
 
-		_activeInputMap->invokeMouseMove(args);
+		_activeInputMap->invoke_mouse_move(args);
 	}
 
 	// update mouse positions

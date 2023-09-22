@@ -207,35 +207,35 @@ Renderer::~Renderer()
 
 void minty::Renderer::init()
 {
-	createInstance();
-	setupDebugMessenger();
-	createSurface();
-	pickPhysicalDevice();
-	createLogicalDevice();
-	createSwapChain();
-	createImageViews();
-	createRenderPass();
-	createDescriptorSetLayouts();
-	createCommandPool();
-	createDepthResources();
-	createFramebuffers();
-	createMaterialBuffers();
+	create_instance();
+	setup_debug_messenger();
+	create_surface();
+	pick_physical_device();
+	create_logical_device();
+	create_swap_chain();
+	create_image_views();
+	create_render_pass();
+	create_descriptor_set_layouts();
+	create_command_pool();
+	create_depth_resources();
+	create_framebuffers();
+	create_material_buffers();
 }
 
 void Renderer::renderFrame()
 {
-	drawFrame();
+	draw_frame();
 }
 
-bool Renderer::isRunning()
+bool Renderer::running()
 {
 	return _window->isOpen();
 }
 
-void Renderer::createInstance()
+void Renderer::create_instance()
 {
 	// check if we can use validation layers
-	if (enableValidationLayers && !checkValidationLayerSupport())
+	if (enableValidationLayers && !check_validation_layer_support())
 	{
 		throw std::runtime_error("Validation layers requested, but not available.");
 	}
@@ -262,7 +262,7 @@ void Renderer::createInstance()
 		.pApplicationInfo = &appInfo,
 	};
 
-	auto extensions = getRequiredExtensions();
+	auto extensions = get_required_extensions();
 	createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
 	createInfo.ppEnabledExtensionNames = extensions.data();
 
@@ -271,7 +271,7 @@ void Renderer::createInstance()
 		createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
 		createInfo.ppEnabledLayerNames = validationLayers.data();
 
-		populateDebugMessengerCreateInfo(debugCreateInfo);
+		populate_debug_messenger_create_info(debugCreateInfo);
 		createInfo.pNext = (VkDebugUtilsMessengerCreateInfoEXT*)&debugCreateInfo;
 	}
 	else {
@@ -286,19 +286,19 @@ void Renderer::createInstance()
 	}
 }
 
-VkFormat Renderer::findDepthFormat() {
-	return findSupportedFormat(
+VkFormat Renderer::find_depth_format() {
+	return find_supported_format(
 		{ VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT },
 		VK_IMAGE_TILING_OPTIMAL,
 		VK_FORMAT_FEATURE_DEPTH_STENCIL_ATTACHMENT_BIT
 	);
 }
 
-bool Renderer::hasStencilComponent(VkFormat format) {
+bool Renderer::has_stencil_component(VkFormat format) {
 	return format == VK_FORMAT_D32_SFLOAT_S8_UINT || format == VK_FORMAT_D24_UNORM_S8_UINT;
 }
 
-VkFormat Renderer::findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features) {
+VkFormat Renderer::find_supported_format(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features) {
 	for (VkFormat format : candidates) {
 		VkFormatProperties props;
 		vkGetPhysicalDeviceFormatProperties(physicalDevice, format, &props);
@@ -314,15 +314,15 @@ VkFormat Renderer::findSupportedFormat(const std::vector<VkFormat>& candidates, 
 	throw std::runtime_error("failed to find supported format!");
 }
 
-void Renderer::createDepthResources()
+void Renderer::create_depth_resources()
 {
-	VkFormat depthFormat = findDepthFormat();
+	VkFormat depthFormat = find_depth_format();
 
-	createImage(swapChainExtent.width, swapChainExtent.height, depthFormat, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, depthImage, depthImageMemory);
-	depthImageView = createImageView(depthImage, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT);
+	create_image(swapChainExtent.width, swapChainExtent.height, depthFormat, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, depthImage, depthImageMemory);
+	depthImageView = create_image_view(depthImage, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT);
 }
 
-void Renderer::createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory) {
+void Renderer::create_image(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory) {
 	VkImageCreateInfo imageInfo{};
 	imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
 	imageInfo.imageType = VK_IMAGE_TYPE_2D;
@@ -348,7 +348,7 @@ void Renderer::createImage(uint32_t width, uint32_t height, VkFormat format, VkI
 	VkMemoryAllocateInfo allocInfo{};
 	allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 	allocInfo.allocationSize = memRequirements.size;
-	allocInfo.memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits, properties);
+	allocInfo.memoryTypeIndex = find_memory_type(memRequirements.memoryTypeBits, properties);
 
 	if (vkAllocateMemory(device, &allocInfo, nullptr, &imageMemory) != VK_SUCCESS) {
 		throw std::runtime_error("failed to allocate _image memory!");
@@ -359,15 +359,15 @@ void Renderer::createImage(uint32_t width, uint32_t height, VkFormat format, VkI
 
 void minty::Renderer::start()
 {
-	createUniformBuffers();
-	createDescriptorPool();
-	createDescriptorSets();
+	create_uniform_buffers();
+	create_descriptor_pool();
+	create_descriptor_sets();
 
-	createCommandBuffers();
-	createSyncObjects();
+	create_command_buffers();
+	create_sync_objects();
 }
 
-ID minty::Renderer::loadTexture(std::string const& path)
+ID minty::Renderer::create_texture(std::string const& path)
 {
 	if (!file::exists(path))
 	{
@@ -405,7 +405,7 @@ ID minty::Renderer::loadTexture(std::string const& path)
 
 	// create a buffer that can be used as the source of a transfer command
 	// the memory can be mapped, and specify that flush is not needed (we do not need to flush to make writes)
-	createBuffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingMemory);
+	create_buffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingMemory);
 
 	// map memory and copy it to buffer memory
 
@@ -430,23 +430,23 @@ ID minty::Renderer::loadTexture(std::string const& path)
 	VkSampler sampler;
 
 	// create the image on gpu
-	createImage(width, height, format, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, image, memory);
+	create_image(width, height, format, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, image, memory);
 
 	// prep texture for copying
-	transitionImageLayout(image, format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+	transition_image_layout(image, format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
 	// copy pixel data to image
-	copyBufferToImage(stagingBuffer, image, width, height);
+	copy_buffer_to_image(stagingBuffer, image, width, height);
 
 	// prep texture for rendering
-	transitionImageLayout(image, format, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+	transition_image_layout(image, format, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
 	// cleanup staging buffer, no longer needed
 	vkDestroyBuffer(device, stagingBuffer, nullptr);
 	vkFreeMemory(device, stagingMemory, nullptr);
 
 	// create view, so the shaders can access the image data
-	view = createImageView(image, format, VK_IMAGE_ASPECT_COLOR_BIT);
+	view = create_image_view(image, format, VK_IMAGE_ASPECT_COLOR_BIT);
 
 	// create sampler
 	// create the sampler in constructor for now
@@ -492,14 +492,14 @@ ID minty::Renderer::loadTexture(std::string const& path)
 	return id;
 }
 
-Texture& minty::Renderer::getTexture(ID const id)
+Texture& minty::Renderer::get_texture(ID const id)
 {
 	return _textures.at(id);
 }
 
-VkShaderModule minty::Renderer::loadShaderModule(std::string const& path)
+VkShaderModule minty::Renderer::load_shader_module(std::string const& path)
 {
-	auto code = readFile(path);
+	auto code = read_file(path);
 
 	VkShaderModuleCreateInfo createInfo
 	{
@@ -516,7 +516,7 @@ VkShaderModule minty::Renderer::loadShaderModule(std::string const& path)
 	return shaderModule;
 }
 
-ID minty::Renderer::loadShader(std::string const& vertexPath, std::string const& fragmentPath)
+ID minty::Renderer::create_shader(std::string const& vertexPath, std::string const& fragmentPath)
 {
 	if (!file::exists(vertexPath))
 	{
@@ -539,8 +539,8 @@ ID minty::Renderer::loadShader(std::string const& vertexPath, std::string const&
 	}
 
 	// load shaders from disk
-	VkShaderModule vertShaderModule = loadShaderModule(vertexPath);
-	VkShaderModule fragShaderModule = loadShaderModule(fragmentPath);
+	VkShaderModule vertShaderModule = load_shader_module(vertexPath);
+	VkShaderModule fragShaderModule = load_shader_module(fragmentPath);
 
 	// create info for vertex shader
 	VkPipelineShaderStageCreateInfo vertShaderStageInfo
@@ -566,8 +566,8 @@ ID minty::Renderer::loadShader(std::string const& vertexPath, std::string const&
 	// set vertex buffer attributes, so GPU can map values to buffer
 
 	// get the vertex attribute description data
-	auto bindingDescription = Vertex::getBindingDescription();
-	auto attributeDescriptions = Vertex::getAttributeDescriptions();
+	auto bindingDescription = Vertex::get_binding_description();
+	auto attributeDescriptions = Vertex::get_attribute_descriptions();
 
 	// define how vertex data is passed in
 	VkPipelineVertexInputStateCreateInfo vertexInputInfo
@@ -741,12 +741,12 @@ ID minty::Renderer::loadShader(std::string const& vertexPath, std::string const&
 	return id;
 }
 
-Shader& minty::Renderer::getShader(ID const id)
+Shader& minty::Renderer::get_shader(ID const id)
 {
 	return _shaders.at(id);
 }
 
-ID minty::Renderer::createMaterial(ID const shaderId, ID const textureID, Color const color)
+ID minty::Renderer::create_material(ID const shaderId, ID const textureID, Color const color)
 {
 	ID id = static_cast<ID>(_materials.size());
 
@@ -759,21 +759,21 @@ ID minty::Renderer::createMaterial(ID const shaderId, ID const textureID, Color 
 	_materials.push_back(Material(shaderId, textureID, color));
 
 	// now that memory is mapped, apply initial values
-	updateMaterial(id);
+	update_material(id);
 
 	return id;
 }
 
-Material& minty::Renderer::getMaterial(ID const id)
+Material& minty::Renderer::get_material(ID const id)
 {
 	return _materials.at(id);
 }
 
-void minty::Renderer::updateMaterial(ID const id)
+void minty::Renderer::update_material(ID const id)
 {
 	// set data in mapped memory so we can apply changes
 
-	Material const& mat = getMaterial(id);
+	Material const& mat = get_material(id);
 
 	// create info to set on gpu
 	MaterialInfo info =
@@ -793,7 +793,7 @@ void minty::Renderer::updateMaterial(ID const id)
 	}
 }
 
-VkImageView Renderer::createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags) {
+VkImageView Renderer::create_image_view(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags) {
 	VkImageViewCreateInfo viewInfo{};
 	viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 	viewInfo.image = image;
@@ -813,7 +813,7 @@ VkImageView Renderer::createImageView(VkImage image, VkFormat format, VkImageAsp
 	return imageView;
 }
 
-VkCommandBuffer Renderer::beginSingleTimeCommands() {
+VkCommandBuffer Renderer::begin_single_time_commands() {
 	VkCommandBufferAllocateInfo allocInfo{};
 	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
@@ -832,7 +832,7 @@ VkCommandBuffer Renderer::beginSingleTimeCommands() {
 	return commandBuffer;
 }
 
-void Renderer::endSingleTimeCommands(VkCommandBuffer commandBuffer) {
+void Renderer::end_single_time_commands(VkCommandBuffer commandBuffer) {
 	vkEndCommandBuffer(commandBuffer);
 
 	VkSubmitInfo submitInfo{};
@@ -846,8 +846,8 @@ void Renderer::endSingleTimeCommands(VkCommandBuffer commandBuffer) {
 	vkFreeCommandBuffers(device, commandPool, 1, &commandBuffer);
 }
 
-void Renderer::transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout) {
-	VkCommandBuffer commandBuffer = beginSingleTimeCommands();
+void Renderer::transition_image_layout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout) {
+	VkCommandBuffer commandBuffer = begin_single_time_commands();
 
 	VkImageMemoryBarrier barrier{};
 	barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -897,11 +897,11 @@ void Renderer::transitionImageLayout(VkImage image, VkFormat format, VkImageLayo
 		1, &barrier
 	);
 
-	endSingleTimeCommands(commandBuffer);
+	end_single_time_commands(commandBuffer);
 }
 
-void Renderer::copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height) {
-	VkCommandBuffer commandBuffer = beginSingleTimeCommands();
+void Renderer::copy_buffer_to_image(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height) {
+	VkCommandBuffer commandBuffer = begin_single_time_commands();
 
 	VkBufferImageCopy region{};
 	region.bufferOffset = 0;
@@ -929,10 +929,10 @@ void Renderer::copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width,
 		&region
 	);
 
-	endSingleTimeCommands(commandBuffer);
+	end_single_time_commands(commandBuffer);
 }
 
-void Renderer::createDescriptorSetLayouts()
+void Renderer::create_descriptor_set_layouts()
 {
 	descriptorSetLayouts.resize(MAX_SETS_PER_FRAME);
 
@@ -970,7 +970,7 @@ void Renderer::createDescriptorSetLayouts()
 	}
 }
 
-void Renderer::createDescriptorPool()
+void Renderer::create_descriptor_pool()
 {
 	//VkDescriptorPoolSize poolSize{};
 	//poolSize.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
@@ -996,7 +996,7 @@ void Renderer::createDescriptorPool()
 	}
 }
 
-void minty::Renderer::createDescriptorSets()
+void minty::Renderer::create_descriptor_sets()
 {
 	descriptorSets.resize(MAX_SETS);
 
@@ -1057,7 +1057,7 @@ void minty::Renderer::createDescriptorSets()
 		{
 			if (j < _textures.size())
 			{
-				Texture const& tex = getTexture(j);
+				Texture const& tex = get_texture(j);
 
 				imageInfos[j].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 				imageInfos[j].imageView = tex._view;
@@ -1083,17 +1083,17 @@ void minty::Renderer::createDescriptorSets()
 	}
 }
 
-void Renderer::createImageViews()
+void Renderer::create_image_views()
 {
 	// resize to fit all image views
 	swapChainImageViews.resize(swapChainImages.size());
 
 	for (uint32_t i = 0; i < swapChainImages.size(); i++) {
-		swapChainImageViews[i] = createImageView(swapChainImages[i], swapChainImageFormat, VK_IMAGE_ASPECT_COLOR_BIT);
+		swapChainImageViews[i] = create_image_view(swapChainImages[i], swapChainImageFormat, VK_IMAGE_ASPECT_COLOR_BIT);
 	}
 }
 
-void Renderer::createSurface()
+void Renderer::create_surface()
 {
 	// create window surface that vulkan can use to draw
 	if (glfwCreateWindowSurface(instance, _window->getRaw(), nullptr, &surface) != VK_SUCCESS) {
@@ -1101,7 +1101,7 @@ void Renderer::createSurface()
 	}
 }
 
-void Renderer::pickPhysicalDevice()
+void Renderer::pick_physical_device()
 {
 	// find number of hardware GPUs
 	uint32_t deviceCount = 0;
@@ -1119,7 +1119,7 @@ void Renderer::pickPhysicalDevice()
 
 	// find a suitable device, pick the first one
 	for (const auto& device : devices) {
-		if (isDeviceSuitable(device)) {
+		if (is_device_suitable(device)) {
 			physicalDevice = device;
 			break;
 		}
@@ -1131,7 +1131,7 @@ void Renderer::pickPhysicalDevice()
 	}
 }
 
-bool Renderer::isDeviceSuitable(VkPhysicalDevice device)
+bool Renderer::is_device_suitable(VkPhysicalDevice device)
 {
 	// define requirements for the GPU we want
 
@@ -1143,13 +1143,13 @@ bool Renderer::isDeviceSuitable(VkPhysicalDevice device)
 	// for ANY GPU, return true
 
 	// find GPU that supports queue families
-	QueueFamilyIndices indices = findQueueFamilies(device);
+	QueueFamilyIndices indices = find_queue_families(device);
 
-	bool extensionsSupported = checkDeviceExtensionSupport(device);
+	bool extensionsSupported = check_device_extension_support(device);
 
 	bool swapChainAdequate = false;
 	if (extensionsSupported) {
-		SwapChainSupportDetails swapChainSupport = querySwapChainSupport(device);
+		SwapChainSupportDetails swapChainSupport = query_swap_chain_support(device);
 		swapChainAdequate = !swapChainSupport.formats.empty() && !swapChainSupport.presentModes.empty();
 	}
 
@@ -1159,14 +1159,14 @@ bool Renderer::isDeviceSuitable(VkPhysicalDevice device)
 	return indices.isComplete() && extensionsSupported && swapChainAdequate && supportedFeatures.samplerAnisotropy && supportedFeatures.shaderSampledImageArrayDynamicIndexing;
 }
 
-void Renderer::createSwapChain()
+void Renderer::create_swap_chain()
 {
-	SwapChainSupportDetails swapChainSupport = querySwapChainSupport(physicalDevice);
+	SwapChainSupportDetails swapChainSupport = query_swap_chain_support(physicalDevice);
 
 	// get settings
-	VkSurfaceFormatKHR surfaceFormat = chooseSwapSurfaceFormat(swapChainSupport.formats);
-	VkPresentModeKHR presentMode = chooseSwapPresentMode(swapChainSupport.presentModes);
-	VkExtent2D extent = chooseSwapExtent(swapChainSupport.capabilities);
+	VkSurfaceFormatKHR surfaceFormat = choose_swap_surface_format(swapChainSupport.formats);
+	VkPresentModeKHR presentMode = choose_swap_present_mode(swapChainSupport.presentModes);
+	VkExtent2D extent = choose_swap_extent(swapChainSupport.capabilities);
 
 	// how many images in swap chain
 	uint32_t imageCount = swapChainSupport.capabilities.minImageCount + 1; // recommended to have min + 1
@@ -1188,7 +1188,7 @@ void Renderer::createSwapChain()
 		.imageUsage = VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT,
 	};
 
-	QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
+	QueueFamilyIndices indices = find_queue_families(physicalDevice);
 	uint32_t queueFamilyIndices[] = { indices.graphicsFamily.value(), indices.presentFamily.value() };
 
 	if (indices.graphicsFamily != indices.presentFamily) {
@@ -1228,10 +1228,10 @@ void Renderer::createSwapChain()
 	swapChainExtent = extent;
 
 	// update viewport and scissor
-	view.setExtent(extent.width, extent.height);
+	view.set_extent(extent.width, extent.height);
 }
 
-void Renderer::cleanupSwapChain()
+void Renderer::cleanup_swap_chain()
 {
 	vkDestroyImageView(device, depthImageView, nullptr);
 	vkDestroyImage(device, depthImage, nullptr);
@@ -1248,7 +1248,7 @@ void Renderer::cleanupSwapChain()
 	vkDestroySwapchainKHR(device, swapChain, nullptr);
 }
 
-void Renderer::recreateSwapChain()
+void Renderer::recreate_swap_chain()
 {
 	// on window minimize, pause program until un-minimized
 	int width = 0, height = 0;
@@ -1261,16 +1261,16 @@ void Renderer::recreateSwapChain()
 	// wait for device to be done rendering
 	vkDeviceWaitIdle(device);
 
-	cleanupSwapChain();
+	cleanup_swap_chain();
 
 	// recreate the swap chain
-	createSwapChain();
-	createImageViews();
-	createDepthResources();
-	createFramebuffers();
+	create_swap_chain();
+	create_image_views();
+	create_depth_resources();
+	create_framebuffers();
 }
 
-VkExtent2D Renderer::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities) {
+VkExtent2D Renderer::choose_swap_extent(const VkSurfaceCapabilitiesKHR& capabilities) {
 	if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
 		return capabilities.currentExtent;
 	}
@@ -1290,7 +1290,7 @@ VkExtent2D Renderer::chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabiliti
 	}
 }
 
-VkPresentModeKHR Renderer::chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes) {
+VkPresentModeKHR Renderer::choose_swap_present_mode(const std::vector<VkPresentModeKHR>& availablePresentModes) {
 	// essentially, check if v-sync exists, then use it
 	for (const auto& availablePresentMode : availablePresentModes) {
 		if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
@@ -1301,7 +1301,7 @@ VkPresentModeKHR Renderer::chooseSwapPresentMode(const std::vector<VkPresentMode
 	return VK_PRESENT_MODE_FIFO_KHR; // v-sync
 }
 
-VkSurfaceFormatKHR Renderer::chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats) {
+VkSurfaceFormatKHR Renderer::choose_swap_surface_format(const std::vector<VkSurfaceFormatKHR>& availableFormats) {
 	for (const auto& availableFormat : availableFormats) {
 		// VK_FORMAT_R8G8B8A8_UINT?
 		if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
@@ -1312,7 +1312,7 @@ VkSurfaceFormatKHR Renderer::chooseSwapSurfaceFormat(const std::vector<VkSurface
 	return availableFormats[0];
 }
 
-SwapChainSupportDetails Renderer::querySwapChainSupport(VkPhysicalDevice device) {
+SwapChainSupportDetails Renderer::query_swap_chain_support(VkPhysicalDevice device) {
 	SwapChainSupportDetails details;
 
 	vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, surface, &details.capabilities);
@@ -1336,7 +1336,7 @@ SwapChainSupportDetails Renderer::querySwapChainSupport(VkPhysicalDevice device)
 	return details;
 }
 
-bool Renderer::checkDeviceExtensionSupport(VkPhysicalDevice device)
+bool Renderer::check_device_extension_support(VkPhysicalDevice device)
 {
 	// check if all required extensions are there
 	uint32_t extensionCount;
@@ -1354,7 +1354,7 @@ bool Renderer::checkDeviceExtensionSupport(VkPhysicalDevice device)
 	return requiredExtensions.empty();
 }
 
-QueueFamilyIndices Renderer::findQueueFamilies(VkPhysicalDevice device)
+QueueFamilyIndices Renderer::find_queue_families(VkPhysicalDevice device)
 {
 	// find graphics familes for queueing up commands
 	QueueFamilyIndices indices;
@@ -1391,9 +1391,9 @@ QueueFamilyIndices Renderer::findQueueFamilies(VkPhysicalDevice device)
 }
 
 // pick the software GPU to use (driver)
-void Renderer::createLogicalDevice()
+void Renderer::create_logical_device()
 {
-	QueueFamilyIndices indices = findQueueFamilies(physicalDevice);
+	QueueFamilyIndices indices = find_queue_families(physicalDevice);
 
 	std::vector<VkDeviceQueueCreateInfo> queueCreateInfos;
 	std::set<uint32_t> uniqueQueueFamilies = { indices.graphicsFamily.value(), indices.presentFamily.value() };
@@ -1459,7 +1459,7 @@ void Renderer::createLogicalDevice()
 	vkGetDeviceQueue(device, indices.presentFamily.value(), 0, &presentQueue);
 }
 
-void Renderer::drawFrame()
+void Renderer::draw_frame()
 {
 	// wait until previous draw has completed
 	vkWaitForFences(device, 1, &inFlightFences[currentFrame], VK_TRUE, UINT64_MAX);
@@ -1469,7 +1469,7 @@ void Renderer::drawFrame()
 	VkResult result = vkAcquireNextImageKHR(device, swapChain, UINT64_MAX, imageAvailableSemaphores[currentFrame], VK_NULL_HANDLE, &imageIndex);
 
 	if (result == VK_ERROR_OUT_OF_DATE_KHR) {
-		recreateSwapChain();
+		recreate_swap_chain();
 		return;
 	}
 	else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
@@ -1483,10 +1483,10 @@ void Renderer::drawFrame()
 	vkResetCommandBuffer(commandBuffers[currentFrame], 0);
 
 	// record the command buffer so we know what to do to render stuff to the screen
-	recordCommandBuffer(commandBuffers[currentFrame], imageIndex);
+	record_command_buffer(commandBuffers[currentFrame], imageIndex);
 
 	// update uniform information
-	//updateUniformBuffer();
+	//update_uniform_buffer();
 
 	// submit the command buffer
 	VkSubmitInfo submitInfo
@@ -1533,7 +1533,7 @@ void Renderer::drawFrame()
 
 	if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || framebufferResized) {
 		framebufferResized = false;
-		recreateSwapChain();
+		recreate_swap_chain();
 	}
 	else if (result != VK_SUCCESS) {
 		throw std::runtime_error("failed to present swap chain image!");
@@ -1544,7 +1544,7 @@ void Renderer::drawFrame()
 
 }
 
-bool Renderer::checkValidationLayerSupport()
+bool Renderer::check_validation_layer_support()
 {
 	uint32_t layerCount;
 	vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
@@ -1570,7 +1570,7 @@ bool Renderer::checkValidationLayerSupport()
 	return true;
 }
 
-std::vector<const char*> Renderer::getRequiredExtensions() {
+std::vector<const char*> Renderer::get_required_extensions() {
 	uint32_t glfwExtensionCount = 0;
 	const char** glfwExtensions;
 	glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
@@ -1584,27 +1584,27 @@ std::vector<const char*> Renderer::getRequiredExtensions() {
 	return extensions;
 }
 
-void Renderer::populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo) {
+void Renderer::populate_debug_messenger_create_info(VkDebugUtilsMessengerCreateInfoEXT& createInfo) {
 	createInfo = {
 		.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
 		.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
 		.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT,
-		.pfnUserCallback = debugCallback
+		.pfnUserCallback = debug_callback
 	};
 }
 
-void Renderer::setupDebugMessenger() {
+void Renderer::setup_debug_messenger() {
 	if (!enableValidationLayers) return;
 
 	VkDebugUtilsMessengerCreateInfoEXT createInfo;
-	populateDebugMessengerCreateInfo(createInfo);
+	populate_debug_messenger_create_info(createInfo);
 
 	if (CreateDebugUtilsMessengerEXT(instance, &createInfo, nullptr, &debugMessenger) != VK_SUCCESS) {
 		throw std::runtime_error("failed to set up debug messenger!");
 	}
 }
 
-VKAPI_ATTR VkBool32 VKAPI_CALL Renderer::debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData) {
+VKAPI_ATTR VkBool32 VKAPI_CALL Renderer::debug_callback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData) {
 	// change colors based on severity
 	if (messageSeverity & VkDebugUtilsMessageSeverityFlagBitsEXT::VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
 	{
@@ -1630,7 +1630,7 @@ VKAPI_ATTR VkBool32 VKAPI_CALL Renderer::debugCallback(VkDebugUtilsMessageSeveri
 	return VK_FALSE;
 }
 
-std::vector<char> Renderer::readFile(const std::string& filename) {
+std::vector<char> Renderer::read_file(const std::string& filename) {
 	if (!std::filesystem::exists(filename))
 	{
 		throw std::runtime_error(std::string("failed to find file! cwd: ") + std::filesystem::current_path().string() + ", " + filename + " -> " + std::filesystem::absolute(filename).string());
@@ -1654,7 +1654,7 @@ std::vector<char> Renderer::readFile(const std::string& filename) {
 	return buffer;
 }
 
-void Renderer::createRenderPass()
+void Renderer::create_render_pass()
 {
 	// need to tell vulkan how much of what to use for rendering
 
@@ -1677,7 +1677,7 @@ void Renderer::createRenderPass()
 	};
 
 	VkAttachmentDescription depthAttachment{};
-	depthAttachment.format = findDepthFormat();
+	depthAttachment.format = find_depth_format();
 	depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
 	depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
 	depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
@@ -1724,7 +1724,7 @@ void Renderer::createRenderPass()
 	}
 }
 
-void Renderer::createFramebuffers()
+void Renderer::create_framebuffers()
 {
 	// resize to hold all framebuffers
 	swapChainFramebuffers.resize(swapChainImageViews.size());
@@ -1750,21 +1750,21 @@ void Renderer::createFramebuffers()
 	}
 }
 
-void minty::Renderer::createMainMesh()
+void minty::Renderer::create_main_mesh()
 {
 	_mesh = new Mesh();
-	*_mesh = Mesh::createCube(*this);
+	*_mesh = Mesh::create_cube(*this);
 
-	setMaterialForMainMesh(0);
+	set_material_for_main_mesh(0);
 }
 
-void minty::Renderer::setMaterialForMainMesh(ID const materialId)
+void minty::Renderer::set_material_for_main_mesh(ID const materialId)
 {
-	_mesh->setMaterial(materialId);
+	_mesh->set_material(materialId);
 	//updateDescriptorSets(materialId);
 }
 
-void Renderer::createUniformBuffers()
+void Renderer::create_uniform_buffers()
 {
 	VkDeviceSize bufferSize = sizeof(UniformBufferObject);
 
@@ -1773,13 +1773,13 @@ void Renderer::createUniformBuffers()
 	uniformBuffersMapped.resize(MAX_FRAMES_IN_FLIGHT);
 
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-		createBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffers[i], uniformBuffersMemory[i]);
+		create_buffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffers[i], uniformBuffersMemory[i]);
 
 		vkMapMemory(device, uniformBuffersMemory[i], 0, bufferSize, 0, &uniformBuffersMapped[i]);
 	}
 }
 
-void Renderer::updateUniformBuffer()
+void Renderer::update_uniform_buffer()
 {
 	// start time of program
 	static auto startTime = std::chrono::high_resolution_clock::now();
@@ -1802,7 +1802,7 @@ void Renderer::updateUniformBuffer()
 	memcpy(uniformBuffersMapped[currentFrame], &ubo, sizeof(ubo));
 }
 
-void Renderer::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory) {
+void Renderer::create_buffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory) {
 	VkBufferCreateInfo bufferInfo{};
 	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 	bufferInfo.size = size;
@@ -1819,7 +1819,7 @@ void Renderer::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemor
 	VkMemoryAllocateInfo allocInfo{};
 	allocInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
 	allocInfo.allocationSize = memRequirements.size;
-	allocInfo.memoryTypeIndex = findMemoryType(memRequirements.memoryTypeBits, properties);
+	allocInfo.memoryTypeIndex = find_memory_type(memRequirements.memoryTypeBits, properties);
 
 	if (vkAllocateMemory(device, &allocInfo, nullptr, &bufferMemory) != VK_SUCCESS) {
 		throw std::runtime_error("failed to allocate buffer memory!");
@@ -1828,17 +1828,17 @@ void Renderer::createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemor
 	vkBindBufferMemory(device, buffer, bufferMemory, 0);
 }
 
-void Renderer::copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) {
-	VkCommandBuffer commandBuffer = beginSingleTimeCommands();
+void Renderer::copy_buffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) {
+	VkCommandBuffer commandBuffer = begin_single_time_commands();
 
 	VkBufferCopy copyRegion{};
 	copyRegion.size = size;
 	vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
 
-	endSingleTimeCommands(commandBuffer);
+	end_single_time_commands(commandBuffer);
 }
 
-uint32_t Renderer::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties)
+uint32_t Renderer::find_memory_type(uint32_t typeFilter, VkMemoryPropertyFlags properties)
 {
 	VkPhysicalDeviceMemoryProperties memProperties;
 	vkGetPhysicalDeviceMemoryProperties(physicalDevice, &memProperties);
@@ -1852,10 +1852,10 @@ uint32_t Renderer::findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags pro
 	throw std::runtime_error("failed to find suitable memory type!");
 }
 
-void Renderer::createCommandPool()
+void Renderer::create_command_pool()
 {
 	// get queue families
-	QueueFamilyIndices queueFamilyIndices = findQueueFamilies(physicalDevice);
+	QueueFamilyIndices queueFamilyIndices = find_queue_families(physicalDevice);
 
 	// create info for command pool
 	VkCommandPoolCreateInfo poolInfo
@@ -1870,7 +1870,7 @@ void Renderer::createCommandPool()
 	}
 }
 
-void Renderer::createCommandBuffers()
+void Renderer::create_command_buffers()
 {
 	// create space for all the buffers
 	commandBuffers.resize(MAX_FRAMES_IN_FLIGHT);
@@ -1889,13 +1889,13 @@ void Renderer::createCommandBuffers()
 	}
 }
 
-void minty::Renderer::renderMesh(VkCommandBuffer commandBuffer, Mesh const* const mesh)
+void minty::Renderer::render_mesh(VkCommandBuffer commandBuffer, Mesh const* const mesh)
 {
 	// update descriptor data
 	//updateDescriptorSets(mesh->_materialId);
 
-	Material const& mat = getMaterial(mesh->_materialId);
-	Shader const& shader = getShader(mat.shaderID);
+	Material const& mat = get_material(mesh->_materialId);
+	Shader const& shader = get_shader(mat.shaderID);
 
 	// update uniform data
 	vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, shader.layout, 0, 1, &descriptorSets[currentFrame], 0, nullptr);
@@ -1921,7 +1921,7 @@ void minty::Renderer::renderMesh(VkCommandBuffer commandBuffer, Mesh const* cons
 	vkCmdDrawIndexed(commandBuffer, mesh->_indexCount, 1, 0, 0, 0);
 }
 
-void minty::Renderer::createMaterialBuffers()
+void minty::Renderer::create_material_buffers()
 {
 	// allocate space for materials
 	VkDeviceSize bufferSize = sizeof(MaterialInfo) * MAX_MATERIALS;
@@ -1931,13 +1931,13 @@ void minty::Renderer::createMaterialBuffers()
 	materialBuffersMapped.resize(MAX_FRAMES_IN_FLIGHT);
 
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-		createBuffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, materialBuffers[i], materialBuffersMemory[i]);
+		create_buffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, materialBuffers[i], materialBuffersMemory[i]);
 
 		vkMapMemory(device, materialBuffersMemory[i], 0, bufferSize, 0, &materialBuffersMapped[i]);
 	}
 }
 
-void Renderer::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex)
+void Renderer::record_command_buffer(VkCommandBuffer commandBuffer, uint32_t imageIndex)
 {
 	VkCommandBufferBeginInfo beginInfo
 	{
@@ -1985,7 +1985,7 @@ void Renderer::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t image
 	vkCmdSetScissor(commandBuffer, 0, 1, &view.scissor);
 
 	// render meshes
-	renderMesh(commandBuffer, _mesh);
+	render_mesh(commandBuffer, _mesh);
 
 	// done rendering
 	vkCmdEndRenderPass(commandBuffer);
@@ -1995,7 +1995,7 @@ void Renderer::recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t image
 	}
 }
 
-void Renderer::createSyncObjects()
+void Renderer::create_sync_objects()
 {
 	// resize to number of frames in flight
 	imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
@@ -2035,7 +2035,7 @@ void Renderer::cleanup()
 	vkDeviceWaitIdle(device);
 
 	// clean up vulkan
-	cleanupSwapChain();
+	cleanup_swap_chain();
 	for (auto& tex : _textures)
 	{
 		tex.dispose(*this);

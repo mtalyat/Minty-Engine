@@ -62,20 +62,20 @@ void Application::run(int argc, char const* argv[])
 
 	// test
 	console::log("Headers:");
-	for (auto const& p : project.getAssetsHeaderPaths())
+	for (auto const& p : project.get_assets_header_paths())
 	{
 		console::log(p.string());
 	}
 	console::log("Sources:");
-	for (auto const& p : project.getAssetsSourcePaths())
+	for (auto const& p : project.get_assets_source_paths())
 	{
 		console::log(p.string());
 	}
 	console::log("Scenes:");
-	for (auto const& p : project.getAssetsScenePaths())
+	for (auto const& p : project.get_assets_scene_paths())
 	{
 		console::log(p.string());
-		SerializedNode sceneNode = Serializer::parseFile(p.string());
+		SerializedNode sceneNode = Serializer::parse_file(p.string());
 		sceneNode.print();
 	}
 
@@ -198,7 +198,7 @@ void Application::generate(Info const& info)
 void Application::generate_cmake(Info const& info)
 {
 	// get path to cmake file
-	std::string path = (std::filesystem::path(info.project.getBuildPath()) / "CMakeLists.txt").string();
+	std::string path = (std::filesystem::path(info.project.get_build_path()) / "CMakeLists.txt").string();
 
 	// open file to overwrite
 	std::ofstream file(path, std::ios::trunc);
@@ -234,8 +234,8 @@ void Application::generate_cmake(Info const& info)
 
 	// get all local paths for source files
 	std::stringstream pathsStream;
-	filepath buildPath = info.project.getBuildPath();
-	for (filepath const& path : info.project.getAssetsSourcePaths())
+	filepath buildPath = info.project.get_build_path();
+	for (filepath const& path : info.project.get_assets_source_paths())
 	{
 		pathsStream << " " << std::filesystem::relative(path, buildPath).generic_string();
 	}
@@ -261,7 +261,7 @@ void Application::generate_cmake(Info const& info)
 void Application::generate_main(Info const& info)
 {
 	// get path to cmake file
-	std::string path = (std::filesystem::path(info.project.getBuildPath()) / "main.cpp").string();
+	std::string path = (std::filesystem::path(info.project.get_build_path()) / "main.cpp").string();
 
 	// open file to overwrite
 	std::ofstream file(path, std::ios::trunc);
@@ -295,12 +295,12 @@ void Application::generate_main(Info const& info)
 void Application::clean(Info const& info)
 {
 	// clean the build
-	run_command("cd " + info.project.getBuildPath().string() + " && " + std::filesystem::absolute(CMAKE_PATH).string() + " --build . --target clean");
+	run_command("cd " + info.project.get_build_path().string() + " && " + std::filesystem::absolute(CMAKE_PATH).string() + " --build . --target clean");
 }
 
 void Application::build(Info const& info)
 {
-	std::string command = "cd " + info.project.getBuildPath().string() + " && " + std::filesystem::absolute(CMAKE_PATH).string();
+	std::string command = "cd " + info.project.get_build_path().string() + " && " + std::filesystem::absolute(CMAKE_PATH).string();
 
 	// make cmake files if needed
 	run_command(command + " .");
@@ -312,7 +312,7 @@ void Application::build(Info const& info)
 void Application::run(Info const& info)
 {
 	// call executable, pass in project path as argument for the runtime, so it knows what to run
-	run_command("cd " + info.project.getBuildPath().string() + " && cd " + info.getConfig() + " && start " + EXE_NAME + " " + info.project.getBasePath().string());
+	run_command("cd " + info.project.get_build_path().string() + " && cd " + info.getConfig() + " && start " + EXE_NAME + " " + info.project.get_base_path().string());
 }
 
 //https://stackoverflow.com/questions/478898/how-do-i-execute-a-command-and-get-the-output-of-the-command-within-c-using-po

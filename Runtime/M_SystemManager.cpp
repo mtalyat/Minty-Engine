@@ -68,7 +68,7 @@ namespace minty
 		{
 			for (auto system : pair.second)
 			{
-				if (system->isEnabled())
+				if (system->is_enabled())
 				{
 					system->update();
 				}
@@ -76,15 +76,15 @@ namespace minty
 		}
 	}
 
-	void SystemManager::fixedUpdate()
+	void SystemManager::fixed_update()
 	{
 		for (auto& pair : _systems)
 		{
 			for (auto system : pair.second)
 			{
-				if (system->isEnabled())
+				if (system->is_enabled())
 				{
-					system->fixedUpdate();
+					system->fixed_update();
 				}
 			}
 		}

@@ -5,7 +5,7 @@
 
 using namespace minty;
 
-std::string const Object::toString() const
+std::string const Object::to_string() const
 {
 	// return the name of this object
 	return typeid(*this).name();

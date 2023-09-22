@@ -24,6 +24,6 @@ namespace minty
 		/// Gets the registry used in the Scene.
 		/// </summary>
 		/// <returns></returns>
-		Registry& getRegistry();
+		Registry& get_registry();
 	};
 }

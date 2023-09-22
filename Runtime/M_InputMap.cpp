@@ -4,14 +4,14 @@
 using namespace minty;
 
 minty::InputMap::InputMap()
-	: _keyDownEvents(new std::map<Key, key_event_t>())
-	, _keyUpEvents(new std::map<Key, key_event_t>())
-	, _keyEvents(new std::map<Key, key_event_t>())
-	, _mouseDownEvents(new std::map<MouseButton, click_event_t>())
-	, _mouseUpEvents(new std::map<MouseButton, click_event_t>())
-	, _mouseEvents(new std::map<MouseButton, click_event_t>())
-	, _mouseMoveEvent(new move_event_t())
-	, _mouseScrollEvent(new scroll_event_t())
+	: _keyDownEvents(new std::map<Key, KeyEvent_t>())
+	, _keyUpEvents(new std::map<Key, KeyEvent_t>())
+	, _keyEvents(new std::map<Key, KeyEvent_t>())
+	, _mouseDownEvents(new std::map<MouseButton, ClickEvent_t>())
+	, _mouseUpEvents(new std::map<MouseButton, ClickEvent_t>())
+	, _mouseEvents(new std::map<MouseButton, ClickEvent_t>())
+	, _mouseMoveEvent(new MoveEvent_t())
+	, _mouseScrollEvent(new ScrollEvent_t())
 {}
 
 minty::InputMap::~InputMap()
@@ -26,47 +26,47 @@ minty::InputMap::~InputMap()
 	delete _mouseScrollEvent;
 }
 
-void minty::InputMap::emplaceKeyDown(Key const key, key_event_t::func const& func)
+void minty::InputMap::emplace_key_down(Key const key, KeyEvent_t::func const& func)
 {
 	(*_keyDownEvents)[key].emplace(func);
 }
 
-void minty::InputMap::emplaceKeyUp(Key const key, key_event_t::func const& func)
+void minty::InputMap::emplace_key_up(Key const key, KeyEvent_t::func const& func)
 {
 	(*_keyUpEvents)[key].emplace(func);
 }
 
-void minty::InputMap::emplaceKey(Key const key, key_event_t::func const& func)
+void minty::InputMap::emplace_key(Key const key, KeyEvent_t::func const& func)
 {
 	(*_keyEvents)[key].emplace(func);
 }
 
-void minty::InputMap::emplaceMouseDown(MouseButton const button, click_event_t::func const& func)
+void minty::InputMap::emplace_mouse_down(MouseButton const button, ClickEvent_t::func const& func)
 {
 	(*_mouseDownEvents)[button].emplace(func);
 }
 
-void minty::InputMap::emplaceMouseUp(MouseButton const button, click_event_t::func const& func)
+void minty::InputMap::emplace_mouse_up(MouseButton const button, ClickEvent_t::func const& func)
 {
 	(*_mouseUpEvents)[button].emplace(func);
 }
 
-void minty::InputMap::emplaceMouse(MouseButton const button, click_event_t::func const& func)
+void minty::InputMap::emplace_mouse(MouseButton const button, ClickEvent_t::func const& func)
 {
 	(*_mouseEvents)[button].emplace(func);
 }
 
-void minty::InputMap::emplaceMouseMove(move_event_t::func const& func)
+void minty::InputMap::emplace_mouse_move(MoveEvent_t::func const& func)
 {
 	_mouseMoveEvent->emplace(func);
 }
 
-void minty::InputMap::emplaceMouseScroll(scroll_event_t::func const& func)
+void minty::InputMap::emplace_mouse_scroll(ScrollEvent_t::func const& func)
 {
 	_mouseScrollEvent->emplace(func);
 }
 
-void minty::InputMap::eraseKeyDown(Key const key, key_event_t::func const& func)
+void minty::InputMap::erase_key_down(Key const key, KeyEvent_t::func const& func)
 {
 	auto found = _keyDownEvents->find(key);
 	if (found != _keyDownEvents->end())
@@ -75,7 +75,7 @@ void minty::InputMap::eraseKeyDown(Key const key, key_event_t::func const& func)
 	}
 }
 
-void minty::InputMap::eraseKeyUp(Key const key, key_event_t::func const& func)
+void minty::InputMap::erase_key_up(Key const key, KeyEvent_t::func const& func)
 {
 	auto found = _keyUpEvents->find(key);
 	if (found != _keyUpEvents->end())
@@ -84,7 +84,7 @@ void minty::InputMap::eraseKeyUp(Key const key, key_event_t::func const& func)
 	}
 }
 
-void minty::InputMap::eraseKey(Key const key, key_event_t::func const& func)
+void minty::InputMap::erase_key(Key const key, KeyEvent_t::func const& func)
 {
 	auto found = _keyEvents->find(key);
 	if (found != _keyEvents->end())
@@ -93,7 +93,7 @@ void minty::InputMap::eraseKey(Key const key, key_event_t::func const& func)
 	}
 }
 
-void minty::InputMap::eraseMouseDown(MouseButton const button, click_event_t::func const& func)
+void minty::InputMap::erase_mouse_down(MouseButton const button, ClickEvent_t::func const& func)
 {
 	auto found = _mouseDownEvents->find(button);
 	if (found != _mouseDownEvents->end())
@@ -102,7 +102,7 @@ void minty::InputMap::eraseMouseDown(MouseButton const button, click_event_t::fu
 	}
 }
 
-void minty::InputMap::eraseMouseUp(MouseButton const button, click_event_t::func const& func)
+void minty::InputMap::erase_mouse_up(MouseButton const button, ClickEvent_t::func const& func)
 {
 	auto found = _mouseUpEvents->find(button);
 	if (found != _mouseUpEvents->end())
@@ -111,7 +111,7 @@ void minty::InputMap::eraseMouseUp(MouseButton const button, click_event_t::func
 	}
 }
 
-void minty::InputMap::eraseMouse(MouseButton const button, click_event_t::func const& func)
+void minty::InputMap::erase_mouse(MouseButton const button, ClickEvent_t::func const& func)
 {
 	auto found = _mouseEvents->find(button);
 	if (found != _mouseEvents->end())
@@ -120,17 +120,17 @@ void minty::InputMap::eraseMouse(MouseButton const button, click_event_t::func c
 	}
 }
 
-void minty::InputMap::eraseMouseMove(move_event_t::func const& func)
+void minty::InputMap::erase_mouse_move(MoveEvent_t::func const& func)
 {
 	_mouseMoveEvent->erase(func);
 }
 
-void minty::InputMap::eraseMouseScroll(scroll_event_t::func const& func)
+void minty::InputMap::erase_mouse_scroll(ScrollEvent_t::func const& func)
 {
 	_mouseScrollEvent->erase(func);
 }
 
-void minty::InputMap::invokeKey(KeyPressEventArgs const& args) const
+void minty::InputMap::invoke_key(KeyPressEventArgs const& args) const
 {
 	switch (args.action)
 	{
@@ -162,7 +162,7 @@ void minty::InputMap::invokeKey(KeyPressEventArgs const& args) const
 	}
 }
 
-void minty::InputMap::invokeMouseClick(MouseClickEventArgs const& args) const
+void minty::InputMap::invoke_mouse_click(MouseClickEventArgs const& args) const
 {
 	switch (args.action)
 	{
@@ -194,12 +194,12 @@ void minty::InputMap::invokeMouseClick(MouseClickEventArgs const& args) const
 	}
 }
 
-void minty::InputMap::invokeMouseMove(MouseMoveEventArgs const& args) const
+void minty::InputMap::invoke_mouse_move(MouseMoveEventArgs const& args) const
 {
 	_mouseMoveEvent->invoke(args);
 }
 
-void minty::InputMap::invokeMouseScroll(MouseScrollEventArgs const& args) const
+void minty::InputMap::invoke_mouse_scroll(MouseScrollEventArgs const& args) const
 {
 	_mouseScrollEvent->invoke(args);
 }

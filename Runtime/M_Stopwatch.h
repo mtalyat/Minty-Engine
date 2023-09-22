@@ -59,7 +59,7 @@ namespace minty
         /// Checks if this Stopwatch is recording time.
         /// </summary>
         /// <returns></returns>
-        constexpr bool isRunning() const { return m_running; }
+        constexpr bool running() const { return m_running; }
 
         /// <summary>
         /// Attempts to lap. Returns the number of laps that have occured.
@@ -95,8 +95,8 @@ namespace minty
         /// Creates a new Stopwatch, and starts it immediately after.
         /// </summary>
         /// <returns></returns>
-        inline static Stopwatch startNew() { Stopwatch watch; watch.start(); return watch; }
+        inline static Stopwatch start_new() { Stopwatch watch; watch.start(); return watch; }
 
-        std::string const toString() const override;
+        std::string const to_string() const override;
     };
 }

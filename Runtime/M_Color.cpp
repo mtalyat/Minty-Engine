@@ -114,7 +114,7 @@ inline Color Color::lighten(float const percent) const
 	return Color();
 }
 
-std::string const minty::Color::toString() const
+std::string const minty::Color::to_string() const
 {
 	return std::format("Color({}, {}, {}, {})", r, g, b, a);
 }

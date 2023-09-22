@@ -8,22 +8,12 @@ minty::System::System(Registry* const registry)
 	, _registry(registry)
 {}
 
-void minty::System::enable()
-{
-	_enabled = true;
-}
-
-void minty::System::disable()
-{
-	_enabled = false;
-}
-
-void minty::System::setEnabled(bool const enabled)
+void minty::System::set_enabled(bool const enabled)
 {
 	_enabled = enabled;
 }
 
-constexpr bool minty::System::isEnabled() const
+constexpr bool minty::System::is_enabled() const
 {
 	return _enabled;
 }

@@ -31,7 +31,7 @@ minty::Vector3::operator minty::Vector2() const
 	return Vector2(x, y);
 }
 
-std::string const minty::Vector3::toString() const
+std::string const minty::Vector3::to_string() const
 {
 	return std::format("Vector3({}, {}, {})", x, y, z);
 }

@@ -33,15 +33,15 @@ namespace minty
 
 		~Runtime();
 
-		void registerSystem(std::string const& name, SystemFunc const& func);
+		void register_system(std::string const& name, SystemFunc const& func);
 
-		void registerComponent(std::string const& name, ComponentFunc const& func);
+		void register_component(std::string const& name, ComponentFunc const& func);
 
-		System* createSystem(std::string const& name, Registry& registry) const;
+		System* create_system(std::string const& name, Registry& registry) const;
 
-		Component* createComponent(std::string const& name, Entity const entity, Registry& registry) const;
+		Component* create_component(std::string const& name, Entity const entity, Registry& registry) const;
 
-		Engine& getEngine();
+		Engine& get_engine();
 
 		/// <summary>
 		/// Runs the Runtime.

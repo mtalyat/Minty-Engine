@@ -9,46 +9,46 @@ using namespace minty;
 Project::Project(std::string const& path)
 	: _base(std::filesystem::absolute(path))
 {
-	collectAssets();
+	collect_assets();
 }
 
-filepath const Project::getBasePath() const
+filepath const Project::get_base_path() const
 {
 	return _base;
 }
 
-filepath const Project::getAssetsPath() const
+filepath const Project::get_assets_path() const
 {
 	return (_base / "Assets");
 }
 
-filepath const Project::getBuildPath() const
+filepath const Project::get_build_path() const
 {
 	return (_base / "Build");
 }
 
-std::set<filepath> const& minty::Project::getAssetsHeaderPaths() const
+std::set<filepath> const& minty::Project::get_assets_header_paths() const
 {
 	return _headers;
 }
 
-std::set<filepath> const& minty::Project::getAssetsSourcePaths() const
+std::set<filepath> const& minty::Project::get_assets_source_paths() const
 {
 	return _sources;
 }
 
-std::set<filepath> const& minty::Project::getAssetsScenePaths() const
+std::set<filepath> const& minty::Project::get_assets_scene_paths() const
 {
 	return _scenes;
 }
 
-void minty::Project::collectAssets()
+void minty::Project::collect_assets()
 {
 	// list of directories to collect from
 	std::vector<filepath> directoriesToCollect;
 
 	// add base directory to get started
-	directoriesToCollect.push_back(getAssetsPath());
+	directoriesToCollect.push_back(get_assets_path());
 
 	filepath directory;
 

@@ -34,19 +34,19 @@ namespace minty
 
 #pragma region Read
 
-		void readObject(std::string const& name, ISerializable& value) const;
+		void read_object(std::string const& name, ISerializable& value) const;
 
-		std::string readString(std::string const& name, std::string const& defaultValue = "") const;
+		std::string read_string(std::string const& name, std::string const& defaultValue = "") const;
 
-		int readInt(std::string const& name, int const defaultValue = 0) const;
+		int read_int(std::string const& name, int const defaultValue = 0) const;
 
-		byte readByte(std::string const& name, byte const defaultValue = 0) const;
+		byte read_byte(std::string const& name, byte const defaultValue = 0) const;
 
 #pragma endregion
 
 #pragma region Static
 		
-		static SerializedNode parseFile(std::string const& path);
+		static SerializedNode parse_file(std::string const& path);
 
 #pragma endregion
 	};

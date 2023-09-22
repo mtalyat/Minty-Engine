@@ -43,39 +43,39 @@ namespace minty
 		/// Gets the base file path for this project.
 		/// </summary>
 		/// <returns></returns>
-		filepath const getBasePath() const;
+		filepath const get_base_path() const;
 
 		/// <summary>
 		/// Gets the Assets folder path for this project.
 		/// </summary>
 		/// <returns></returns>
-		filepath const getAssetsPath() const;
+		filepath const get_assets_path() const;
 
 		/// <summary>
 		/// Gets the Build folder path for this project.
 		/// </summary>
 		/// <returns></returns>
-		filepath const getBuildPath() const;
+		filepath const get_build_path() const;
 
 		/// <summary>
 		/// Returns a set of all header files in this Project.
 		/// </summary>
 		/// <returns></returns>
-		std::set<filepath> const& getAssetsHeaderPaths() const;
+		std::set<filepath> const& get_assets_header_paths() const;
 
 		/// <summary>
 		/// Returns a set of all source files in this Project.
 		/// </summary>
 		/// <returns></returns>
-		std::set<filepath> const& getAssetsSourcePaths() const;
+		std::set<filepath> const& get_assets_source_paths() const;
 
 		/// <summary>
 		/// Returns a set of all scene files in this Project.
 		/// </summary>
 		/// <returns></returns>
-		std::set<filepath> const& getAssetsScenePaths() const;
+		std::set<filepath> const& get_assets_scene_paths() const;
 	private:
 		// searches through the project assets folder and finds all files of certain types
-		void collectAssets();
+		void collect_assets();
 	};
 }

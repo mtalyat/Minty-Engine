@@ -158,9 +158,9 @@ namespace minty
 		/// Converts this Rect to a RectF.
 		/// </summary>
 		/// <returns>A RectF with this Rect's values.</returns>
-		RectF toRectF() const;
+		RectF to_RectF() const;
 
-		std::string const toString() const override;
+		std::string const to_string() const override;
 
 		/// <summary>
 		/// Creates a Rect using the given bounds of each size of the Rect.

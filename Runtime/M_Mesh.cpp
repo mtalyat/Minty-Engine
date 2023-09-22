@@ -4,12 +4,12 @@
 #include "M_Renderer.h"
 #include "M_Vertex.h"
 
-void minty::Mesh::setVertices(void const* const vertices, size_t const elementCount, size_t const elementSize, Renderer& engine)
+void minty::Mesh::set_vertices(void const* const vertices, size_t const elementCount, size_t const elementSize, Renderer& engine)
 {
 	if (_vertexCount > 0)
 	{
 		// if data already set, get rid of the old data
-		disposeVertices(engine);
+		dispose_vertices(engine);
 	}
 
 	_vertexCount = elementCount;
@@ -21,7 +21,7 @@ void minty::Mesh::setVertices(void const* const vertices, size_t const elementCo
 	// use buffer to copy data into device memory
 	VkBuffer stagingBuffer;
 	VkDeviceMemory stagingBufferMemory;
-	engine.createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+	engine.create_buffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
 
 	// copy into staging buffer
 	void* data;
@@ -30,21 +30,21 @@ void minty::Mesh::setVertices(void const* const vertices, size_t const elementCo
 	vkUnmapMemory(engine.device, stagingBufferMemory);
 
 	// copy into device memory
-	engine.createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, _vertexBuffer, _vertexMemory);
+	engine.create_buffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, _vertexBuffer, _vertexMemory);
 
-	engine.copyBuffer(stagingBuffer, _vertexBuffer, bufferSize);
+	engine.copy_buffer(stagingBuffer, _vertexBuffer, bufferSize);
 
 	// clean up
 	vkDestroyBuffer(engine.device, stagingBuffer, nullptr);
 	vkFreeMemory(engine.device, stagingBufferMemory, nullptr);
 }
 
-void minty::Mesh::setIndices(void const* const indices, size_t const elementCount, size_t const elementSize, Renderer& engine)
+void minty::Mesh::set_indices(void const* const indices, size_t const elementCount, size_t const elementSize, Renderer& engine)
 {
 	if (_indexCount > 0)
 	{
 		// if data already set, get rid of the old data
-		disposeIndices(engine);
+		dispose_indices(engine);
 	}
 
 	_indexCount = elementCount;
@@ -56,7 +56,7 @@ void minty::Mesh::setIndices(void const* const indices, size_t const elementCoun
 	// use buffer to copy data into device memory
 	VkBuffer stagingBuffer;
 	VkDeviceMemory stagingBufferMemory;
-	engine.createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+	engine.create_buffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
 
 	// copy into staging buffer
 	void* data;
@@ -65,16 +65,16 @@ void minty::Mesh::setIndices(void const* const indices, size_t const elementCoun
 	vkUnmapMemory(engine.device, stagingBufferMemory);
 
 	// copy into device memory
-	engine.createBuffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, _indexBuffer, _indexMemory);
+	engine.create_buffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, _indexBuffer, _indexMemory);
 
-	engine.copyBuffer(stagingBuffer, _indexBuffer, bufferSize);
+	engine.copy_buffer(stagingBuffer, _indexBuffer, bufferSize);
 
 	// clean up
 	vkDestroyBuffer(engine.device, stagingBuffer, nullptr);
 	vkFreeMemory(engine.device, stagingBufferMemory, nullptr);
 }
 
-void minty::Mesh::setMaterial(ID const materialId)
+void minty::Mesh::set_material(ID const materialId)
 {
 	_materialId = materialId;
 }
@@ -82,11 +82,11 @@ void minty::Mesh::setMaterial(ID const materialId)
 void minty::Mesh::dispose(Renderer& engine)
 {
 	// maybe swap order?
-	disposeVertices(engine);
-	disposeIndices(engine);
+	dispose_vertices(engine);
+	dispose_indices(engine);
 }
 
-minty::Mesh minty::Mesh::createCube(Renderer& engine)
+minty::Mesh minty::Mesh::create_cube(Renderer& engine)
 {
 	// create mesh data
 	const float SIZE = 0.5f;
@@ -158,26 +158,26 @@ minty::Mesh minty::Mesh::createCube(Renderer& engine)
 
 	// set mesh data
 	Mesh mesh;
-	mesh.setVertices(static_cast<void const*>(vertices.data()), vertices.size(), sizeof(Vertex), engine);
-	mesh.setIndices(static_cast<void const*>(indices.data()), indices.size(), sizeof(uint16_t), engine);
+	mesh.set_vertices(static_cast<void const*>(vertices.data()), vertices.size(), sizeof(Vertex), engine);
+	mesh.set_indices(static_cast<void const*>(indices.data()), indices.size(), sizeof(uint16_t), engine);
 
 	// done
 	return mesh;
 }
 
-minty::Mesh minty::Mesh::createQuad(Renderer& engine)
+minty::Mesh minty::Mesh::create_quad(Renderer& engine)
 {
 	return Mesh();
 }
 
-void minty::Mesh::disposeVertices(Renderer& engine)
+void minty::Mesh::dispose_vertices(Renderer& engine)
 {
 	vkDestroyBuffer(engine.device, _vertexBuffer, nullptr);
 	vkFreeMemory(engine.device, _vertexMemory, nullptr);
 	_vertexCount = 0;
 }
 
-void minty::Mesh::disposeIndices(Renderer& engine)
+void minty::Mesh::dispose_indices(Renderer& engine)
 {
 	vkDestroyBuffer(engine.device, _indexBuffer, nullptr);
 	vkFreeMemory(engine.device, _indexMemory, nullptr);

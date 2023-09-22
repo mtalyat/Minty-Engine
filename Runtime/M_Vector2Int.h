@@ -104,7 +104,7 @@ namespace minty
 
         operator minty::Vector3Int() const;
 
-        std::string const toString() const override;
+        std::string const to_string() const override;
     };
 }
 

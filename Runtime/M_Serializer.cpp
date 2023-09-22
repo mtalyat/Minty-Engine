@@ -38,7 +38,7 @@ void minty::Serializer::write(std::string const& name, byte const value)
 	write(name, std::to_string(value));
 }
 
-void minty::Serializer::readObject(std::string const& name, ISerializable& value) const
+void minty::Serializer::read_object(std::string const& name, ISerializable& value) const
 {
 	auto const& found = _node.children.find(name);
 	if (found != _node.children.end())
@@ -53,7 +53,7 @@ void minty::Serializer::readObject(std::string const& name, ISerializable& value
 	// do nothing if not found
 }
 
-std::string minty::Serializer::readString(std::string const& name, std::string const& defaultValue) const
+std::string minty::Serializer::read_string(std::string const& name, std::string const& defaultValue) const
 {
 	auto const& found = _node.children.find(name);
 	if (found != _node.children.end())
@@ -64,7 +64,7 @@ std::string minty::Serializer::readString(std::string const& name, std::string c
 	return defaultValue;
 }
 
-int minty::Serializer::readInt(std::string const& name, int const defaultValue) const
+int minty::Serializer::read_int(std::string const& name, int const defaultValue) const
 {
 	auto const& found = _node.children.find(name);
 	if (found != _node.children.end())
@@ -75,7 +75,7 @@ int minty::Serializer::readInt(std::string const& name, int const defaultValue) 
 	return defaultValue;
 }
 
-byte minty::Serializer::readByte(std::string const& name, byte const defaultValue) const
+byte minty::Serializer::read_byte(std::string const& name, byte const defaultValue) const
 {
 	auto const& found = _node.children.find(name);
 	if (found != _node.children.end())
@@ -86,9 +86,9 @@ byte minty::Serializer::readByte(std::string const& name, byte const defaultValu
 	return defaultValue;
 }
 
-SerializedNode minty::Serializer::parseFile(std::string const& path)
+SerializedNode minty::Serializer::parse_file(std::string const& path)
 {
-	std::vector<std::string> lines = file::readAllLines(path);
+	std::vector<std::string> lines = file::read_all_lines(path);
 
 	int indent = 0;
 	std::string key;

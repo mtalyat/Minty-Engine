@@ -7,7 +7,7 @@
 #include <format>
 #include <filesystem>
 
-std::string minty::file::readAllText(std::string const& path)
+std::string minty::file::read_all_text(std::string const& path)
 {
     if (!exists(path))
     {
@@ -44,7 +44,7 @@ std::string minty::file::readAllText(std::string const& path)
     return ss.str();
 }
 
-std::vector<std::string> minty::file::readAllLines(std::string const& path)
+std::vector<std::string> minty::file::read_all_lines(std::string const& path)
 {
     if (!exists(path))
     {
@@ -85,7 +85,7 @@ bool minty::file::exists(std::string const& path)
     return std::filesystem::exists(path);
 }
 
-bool minty::file::writeAllText(std::string const& path, std::string const& text)
+bool minty::file::write_all_text(std::string const& path, std::string const& text)
 {
     std::fstream file(path, std::ios::out);
 
@@ -104,7 +104,7 @@ bool minty::file::writeAllText(std::string const& path, std::string const& text)
     return true;
 }
 
-bool minty::file::writeAllLines(std::string const& path, std::vector<std::string> const& lines)
+bool minty::file::write_all_lines(std::string const& path, std::vector<std::string> const& lines)
 {
     std::fstream file(path, std::ios::out);
 

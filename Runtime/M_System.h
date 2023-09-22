@@ -32,26 +32,16 @@ namespace minty
 		virtual ~System() {}
 
 		/// <summary>
-		/// Enables this System. The System will run update() or fixedUpdate() when enabled.
-		/// </summary>
-		void enable();
-
-		/// <summary>
-		/// Disables this System. The System will not run update() or fixedUpdate() when disabled.
-		/// </summary>
-		void disable();
-
-		/// <summary>
 		/// Sets the enabled state of this System.
 		/// </summary>
 		/// <param name="enabled"></param>
-		void setEnabled(bool const enabled);
+		void set_enabled(bool const enabled);
 
 		/// <summary>
 		/// Checks if this System is enabled or not.
 		/// </summary>
 		/// <returns></returns>
-		constexpr bool isEnabled() const;
+		constexpr bool is_enabled() const;
 
 		/// <summary>
 		/// Called when the Scene is being loaded.
@@ -66,7 +56,7 @@ namespace minty
 		/// <summary>
 		/// Does one fixed frame of work on the System.
 		/// </summary>
-		virtual void fixedUpdate() {}
+		virtual void fixed_update() {}
 
 		/// <summary>
 		/// Called when the Scene is being unloaded.

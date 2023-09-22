@@ -77,7 +77,7 @@ namespace minty
 		/// Checks if the render engine is still running.
 		/// </summary>
 		/// <returns>True if the engine is still running.</returns>
-		bool isRunning();
+		bool running();
 	//private:
 	public: // TODO: TEMPORARILY ALL PUBLIC FOR TESTING/REFACTORING PURPOSES
 		VkInstance instance;
@@ -129,26 +129,26 @@ namespace minty
 
 #pragma region Components
 
-		ID loadTexture(std::string const& path);
+		ID create_texture(std::string const& path);
 
-		Texture& getTexture(ID const id);
+		Texture& get_texture(ID const id);
 
 		/// <summary>
 		/// Loads a shader from the disk.
 		/// </summary>
 		/// <param name="path">The path to the .spv shader file. .spv files come from a compiled GLSL file.</param>
 		/// <returns>The shader module.</returns>
-		VkShaderModule loadShaderModule(std::string const& path);
+		VkShaderModule load_shader_module(std::string const& path);
 
-		ID loadShader(std::string const& vertexPath, std::string const& fragmentPath);
+		ID create_shader(std::string const& vertexPath, std::string const& fragmentPath);
 
-		Shader& getShader(ID const id);
+		Shader& get_shader(ID const id);
 
-		ID createMaterial(ID const shaderId, ID const textureID, Color const color);
+		ID create_material(ID const shaderId, ID const textureID, Color const color);
 
-		Material& getMaterial(ID const id);
+		Material& get_material(ID const id);
 
-		void updateMaterial(ID const id);
+		void update_material(ID const id);
 
 #pragma endregion
 
@@ -157,37 +157,37 @@ namespace minty
 		/// <summary>
 		/// Creates the mesh to render.
 		/// </summary>
-		void createMainMesh();
+		void create_main_mesh();
 
-		void setMaterialForMainMesh(ID const materialId);
+		void set_material_for_main_mesh(ID const materialId);
 
 #pragma endregion
 
 #pragma region Drawing
 
-		void renderMesh(VkCommandBuffer commandBuffer, Mesh const* const mesh);
+		void render_mesh(VkCommandBuffer commandBuffer, Mesh const* const mesh);
 
 #pragma endregion
 
-		void createMaterialBuffers();
+		void create_material_buffers();
 
 		/// <summary>
 		/// Creates a Vulkan instance.
 		/// </summary>
-		void createInstance();
+		void create_instance();
 
 		/// <summary>
 		/// Finds the depth rendering format that can be used.
 		/// </summary>
 		/// <returns>The depth format.</returns>
-		VkFormat findDepthFormat();
+		VkFormat find_depth_format();
 
 		/// <summary>
 		/// Checks if the given format has a stencil component.
 		/// </summary>
 		/// <param name="format">The format to check.</param>
 		/// <returns>True if the format has a stencil component.</returns>
-		bool hasStencilComponent(VkFormat format);
+		bool has_stencil_component(VkFormat format);
 
 		/// <summary>
 		/// Finds the supported format that allows for the given image tiling and format feature flags.
@@ -196,12 +196,12 @@ namespace minty
 		/// <param name="tiling">The image tiling data.</param>
 		/// <param name="features">The feature flags.</param>
 		/// <returns>The found format.</returns>
-		VkFormat findSupportedFormat(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
+		VkFormat find_supported_format(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
 
 		/// <summary>
 		/// Creates the depth buffer resources.
 		/// </summary>
-		void createDepthResources();
+		void create_depth_resources();
 
 		/// <summary>
 		/// Creates an image.
@@ -214,7 +214,7 @@ namespace minty
 		/// <param name="properties">The properties of the image.</param>
 		/// <param name="image">The image object to update/create values in.</param>
 		/// <param name="imageMemory">The memory location of where the image is stored.</param>
-		void createImage(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
+		void create_image(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
 
 		/// <summary>
 		/// Creates an image view, so the image can be seen.
@@ -223,19 +223,19 @@ namespace minty
 		/// <param name="format">The format of the image.</param>
 		/// <param name="aspectFlags">The aspect flags of the image.</param>
 		/// <returns>The created image view.</returns>
-		VkImageView createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
+		VkImageView create_image_view(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
 
 		/// <summary>
 		/// Start the command buffer.
 		/// </summary>
 		/// <returns>The command buffer that has began, and is ready for use.</returns>
-		VkCommandBuffer beginSingleTimeCommands();
+		VkCommandBuffer begin_single_time_commands();
 
 		/// <summary>
 		/// Ends the command buffer.
 		/// </summary>
 		/// <param name="commandBuffer">The command buffer to end, and will be no longer used.</param>
-		void endSingleTimeCommands(VkCommandBuffer commandBuffer);
+		void end_single_time_commands(VkCommandBuffer commandBuffer);
 
 		/// <summary>
 		/// Changes the image layout.
@@ -244,7 +244,7 @@ namespace minty
 		/// <param name="format">The format of the image.</param>
 		/// <param name="oldLayout">The old layout of the image.</param>
 		/// <param name="newLayout">The new layout of the image.</param>
-		void transitionImageLayout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
+		void transition_image_layout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
 
 		/// <summary>
 		/// Coppies the buffer to the image data.
@@ -253,119 +253,119 @@ namespace minty
 		/// <param name="image">The image to copy the data to.</param>
 		/// <param name="width">The width of the image.</param>
 		/// <param name="height">The height of the image.</param>
-		void copyBufferToImage(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
+		void copy_buffer_to_image(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
 
 		/// <summary>
 		/// Creates the image views in the swap chain.
 		/// </summary>
-		void createImageViews();
+		void create_image_views();
 
 		/// <summary>
 		/// Creates the rendering surface.
 		/// </summary>
-		void createSurface();
+		void create_surface();
 
 		/// <summary>
 		/// Picks the hardware (GPU) to use.
 		/// </summary>
-		void pickPhysicalDevice();
+		void pick_physical_device();
 
 		/// <summary>
 		/// Checks if the given device is able to do the operations we want.
 		/// </summary>
 		/// <param name="device">The device to check.</param>
 		/// <returns>True if it is suitable.</returns>
-		bool isDeviceSuitable(VkPhysicalDevice device);
+		bool is_device_suitable(VkPhysicalDevice device);
 
 		/// <summary>
 		/// Creates the swap chain.
 		/// </summary>
-		void createSwapChain();
+		void create_swap_chain();
 
 		/// <summary>
 		/// Cleans up any resources in the current swap chain.
 		/// </summary>
-		void cleanupSwapChain();
+		void cleanup_swap_chain();
 
 		/// <summary>
 		/// Recreates the swap chain. Important for window changing events, such as a resize.
 		/// </summary>
-		void recreateSwapChain();
+		void recreate_swap_chain();
 
 		/// <summary>
 		/// Chooses the swap extent, given the capabilities of the surface.
 		/// </summary>
 		/// <param name="capabilities">The surface capabilities.</param>
 		/// <returns>The chosen extent.</returns>
-		VkExtent2D chooseSwapExtent(const VkSurfaceCapabilitiesKHR& capabilities);
+		VkExtent2D choose_swap_extent(const VkSurfaceCapabilitiesKHR& capabilities);
 
 		/// <summary>
 		/// Chooses the swap present mode, given the available modes.
 		/// </summary>
 		/// <param name="availablePresentModes">The available present modes.</param>
 		/// <returns>The chosen mode.</returns>
-		VkPresentModeKHR chooseSwapPresentMode(const std::vector<VkPresentModeKHR>& availablePresentModes);
+		VkPresentModeKHR choose_swap_present_mode(const std::vector<VkPresentModeKHR>& availablePresentModes);
 
 		/// <summary>
 		/// Chooses the swap surface format, givent the available formats.
 		/// </summary>
 		/// <param name="availableFormats">The available surface formats.</param>
 		/// <returns>The chosen format.</returns>
-		VkSurfaceFormatKHR chooseSwapSurfaceFormat(const std::vector<VkSurfaceFormatKHR>& availableFormats);
+		VkSurfaceFormatKHR choose_swap_surface_format(const std::vector<VkSurfaceFormatKHR>& availableFormats);
 
 		/// <summary>
 		/// Checks if the given device supports a swap chain.
 		/// </summary>
 		/// <param name="device">The device to check.</param>
 		/// <returns>Details on swap chain support.</returns>
-		SwapChainSupportDetails querySwapChainSupport(VkPhysicalDevice device);
+		SwapChainSupportDetails query_swap_chain_support(VkPhysicalDevice device);
 
 		/// <summary>
 		/// Checks if the given device has extension support.
 		/// </summary>
 		/// <param name="device">The device to check.</param>
 		/// <returns>True if the device has extension support.</returns>
-		bool checkDeviceExtensionSupport(VkPhysicalDevice device);
+		bool check_device_extension_support(VkPhysicalDevice device);
 
 		/// <summary>
 		/// Finds the queue families.
 		/// </summary>
 		/// <param name="device">The device to grab the queue families from.</param>
 		/// <returns>The indices of the queue families.</returns>
-		QueueFamilyIndices findQueueFamilies(VkPhysicalDevice device);
+		QueueFamilyIndices find_queue_families(VkPhysicalDevice device);
 
 		/// <summary>
 		/// Pick the software side of the GPU to use (driver).
 		/// </summary>
-		void createLogicalDevice();
+		void create_logical_device();
 
 		/// <summary>
 		/// Draw a single frame to the screen.
 		/// </summary>
-		void drawFrame();
+		void draw_frame();
 
 		/// <summary>
 		/// Check if all validation layers are available for debugging.
 		/// </summary>
 		/// <returns>True if all validation layers are available for debugging.</returns>
-		bool checkValidationLayerSupport();
+		bool check_validation_layer_support();
 
 		/// <summary>
 		/// Gets the names of the required extensions.
 		/// </summary>
 		/// <returns>A vector of all of the extensions.</returns>
-		std::vector<const char*> getRequiredExtensions();
+		std::vector<const char*> get_required_extensions();
 
 		/// <summary>
 		/// Fills in the create info for the debug messenger.
 		/// </summary>
 		/// <param name="createInfo">The create info to populate.</param>
-		void populateDebugMessengerCreateInfo(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
+		void populate_debug_messenger_create_info(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
 
 		/// <summary>
 		/// Initializes the debug messenger.
 		/// </summary>
-		void setupDebugMessenger();
+		void setup_debug_messenger();
 
 		/// <summary>
 		/// Called when a debug message has been "printed" from Vulkan.
@@ -375,47 +375,47 @@ namespace minty
 		/// <param name="pCallbackData">The extra callback data.</param>
 		/// <param name="pUserData">The user data.</param>
 		/// <returns>???</returns>
-		static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData);
+		static VKAPI_ATTR VkBool32 VKAPI_CALL debug_callback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData);
 
 		/// <summary>
 		/// Reads the file into a char vector.
 		/// </summary>
 		/// <param name="filename">The path fo the file.</param>
 		/// <returns>The text from the file.</returns>
-		static std::vector<char> readFile(const std::string& filename);
+		static std::vector<char> read_file(const std::string& filename);
 
 		/// <summary>
 		/// Creates the render pass.
 		/// </summary>
-		void createRenderPass();
+		void create_render_pass();
 
 		/// <summary>
 		/// Creates the frame buffers.
 		/// </summary>
-		void createFramebuffers();
+		void create_framebuffers();
 
 		/// <summary>
 		/// Creates the uniform buffers.
 		/// </summary>
-		void createUniformBuffers();
+		void create_uniform_buffers();
 
 		/// <summary>
 		/// Updates the uniform buffer with new rotation values.
 		/// </summary>
 		/// <param name="currentImage">The image in which to update the buffer for.</param>
-		void updateUniformBuffer();
+		void update_uniform_buffer();
 
 		/// <summary>
 		/// Creates the descriptor set layout for uniform objects.
 		/// </summary>
-		void createDescriptorSetLayouts();
+		void create_descriptor_set_layouts();
 
 		/// <summary>
 		/// Creates the descriptor pool.
 		/// </summary>
-		void createDescriptorPool();
+		void create_descriptor_pool();
 
-		void createDescriptorSets();
+		void create_descriptor_sets();
 
 		/// <summary>
 		/// Creates a buffer.
@@ -425,7 +425,7 @@ namespace minty
 		/// <param name="properties">The memory properties.</param>
 		/// <param name="buffer">The buffer to create.</param>
 		/// <param name="bufferMemory">The memory to be associated with the buffer.</param>
-		void createBuffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
+		void create_buffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
 
 		/// <summary>
 		/// Copies the buffer from source to destination.
@@ -433,7 +433,7 @@ namespace minty
 		/// <param name="srcBuffer">The buffer to copy from.</param>
 		/// <param name="dstBuffer">The buffer to copy to.</param>
 		/// <param name="size">The size of the buffer to copy.</param>
-		void copyBuffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
+		void copy_buffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
 
 		/// <summary>
 		/// Finds the memory type.
@@ -441,29 +441,29 @@ namespace minty
 		/// <param name="typeFilter">The filter for what types are acceptable.</param>
 		/// <param name="properties">The memory properties.</param>
 		/// <returns>The found type. ???</returns>
-		uint32_t findMemoryType(uint32_t typeFilter, VkMemoryPropertyFlags properties);
+		uint32_t find_memory_type(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
 		/// <summary>
 		/// Creates the command pool.
 		/// </summary>
-		void createCommandPool();
+		void create_command_pool();
 
 		/// <summary>
 		/// Creates the command buffers.
 		/// </summary>
-		void createCommandBuffers();
+		void create_command_buffers();
 
 		/// <summary>
 		/// Records the command buffer.
 		/// </summary>
 		/// <param name="commandBuffer">The command buffer to record.</param>
 		/// <param name="imageIndex">The image to send the commands to.</param>
-		void recordCommandBuffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
+		void record_command_buffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
 
 		/// <summary>
 		/// Create the sync objects.
 		/// </summary>
-		void createSyncObjects();
+		void create_sync_objects();
 
 		/// <summary>
 		/// Cleans up all of the render engine resources.

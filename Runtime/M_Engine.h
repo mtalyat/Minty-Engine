@@ -22,9 +22,9 @@ namespace minty
 
 		~Engine();
 
-		Window& getWindow();
+		Window& get_window();
 
-		Renderer& getRenderer();
+		Renderer& get_renderer();
 
 		/// <summary>
 		/// Runs the game.
@@ -32,6 +32,6 @@ namespace minty
 		void run();
 	private:
 		// gets the current time as a time point
-		time_point_t getNow() const;
+		time_point_t get_now() const;
 	};
 }
