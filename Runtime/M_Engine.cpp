@@ -37,8 +37,7 @@ Renderer& minty::Engine::getRenderer()
 
 void Engine::run()
 {
-	// initialize
-	_renderer.init();
+	_renderer.start();
 
 	// record start time, and last frame tick
 	time_point_t start = getNow();

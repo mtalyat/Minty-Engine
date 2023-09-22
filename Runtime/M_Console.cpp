@@ -32,7 +32,14 @@ void minty::console::wait()
 void minty::console::log(std::string const& message)
 {
 #ifndef NDEBUG
-	print(message);
+	print(message, Color::White);
+#endif
+}
+
+void minty::console::test(std::string const& message)
+{
+#ifndef NDEBUG
+	print(message, Color::Cyan);
 #endif
 }
 

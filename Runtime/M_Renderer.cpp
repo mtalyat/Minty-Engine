@@ -4,6 +4,7 @@
 #include "M_Console.h"
 #include "M_Engine.h"
 #include "M_Vertex.h"
+#include "M_File.h"
 
 //#include <vulkan/vulkan.h>
 #define GLFW_INCLUDE_VULKAN
@@ -193,6 +194,10 @@ Renderer::Renderer(Window* const window)
 	_textures.reserve(MAX_TEXTURES);
 	_materials.reserve(MAX_MATERIALS);
 	_shaders.reserve(MAX_SHADERS);
+
+	init();
+
+	console::log("renderer init");
 }
 
 Renderer::~Renderer()
@@ -214,18 +219,6 @@ void minty::Renderer::init()
 	createCommandPool();
 	createDepthResources();
 	createFramebuffers();
-
-	createMainTexture();
-	createMainShader();
-	createMainMaterial();
-	createMainMesh();
-
-	createUniformBuffers();
-	createDescriptorPool();
-	createDescriptorSets();
-
-	createCommandBuffers();
-	createSyncObjects();
 }
 
 void Renderer::renderFrame()
@@ -363,8 +356,24 @@ void Renderer::createImage(uint32_t width, uint32_t height, VkFormat format, VkI
 	vkBindImageMemory(device, image, imageMemory, 0);
 }
 
+void minty::Renderer::start()
+{
+	createUniformBuffers();
+	createDescriptorPool();
+	createDescriptorSets();
+
+	createCommandBuffers();
+	createSyncObjects();
+}
+
 ID minty::Renderer::loadTexture(std::string const& path)
 {
+	if (!file::exists(path))
+	{
+		console::error(std::format("Cannot load texture. File not found at: {}", path));
+		return ERROR_ID;
+	}
+
 	ID id = static_cast<ID>(_textures.size());
 
 	if (id >= MAX_TEXTURES)
@@ -508,6 +517,18 @@ VkShaderModule minty::Renderer::loadShaderModule(std::string const& path)
 
 ID minty::Renderer::loadShader(std::string const& vertexPath, std::string const& fragmentPath)
 {
+	if (!file::exists(vertexPath))
+	{
+		console::error(std::format("Cannot load shader. Cannot find file: {}", vertexPath));
+		return ERROR_ID;
+	}
+
+	if (!file::exists(fragmentPath))
+	{
+		console::error(std::format("Cannot load shader. Cannot find file: {}", fragmentPath));
+		return ERROR_ID;
+	}
+
 	ID id = static_cast<ID>(_shaders.size());
 
 	if (id >= MAX_SHADERS)
@@ -517,8 +538,8 @@ ID minty::Renderer::loadShader(std::string const& vertexPath, std::string const&
 	}
 
 	// load shaders from disk
-	VkShaderModule vertShaderModule = loadShaderModule("Assets/Shaders/vert.spv");
-	VkShaderModule fragShaderModule = loadShaderModule("Assets/Shaders/frag.spv");
+	VkShaderModule vertShaderModule = loadShaderModule(vertexPath);
+	VkShaderModule fragShaderModule = loadShaderModule(fragmentPath);
 
 	// create info for vertex shader
 	VkPipelineShaderStageCreateInfo vertShaderStageInfo
@@ -774,10 +795,10 @@ void minty::Renderer::updateMaterial(ID const id)
 void Renderer::createMainTexture()
 {
 	// load 4 textures
-	loadTexture("Assets/Textures/pattern.png");
-	loadTexture("Assets/Textures/funny.jpg");
-	loadTexture("Assets/Textures/texture.jpg");
-	loadTexture("Assets/Textures/brian.png");
+	loadTexture("../../Assets/Textures/pattern.png");
+	loadTexture("../../Assets/Textures/funny.jpg");
+	loadTexture("../../Assets/Textures/texture.jpg");
+	loadTexture("../../Assets/Textures/brian.png");
 }
 
 VkImageView Renderer::createImageView(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags) {
@@ -1713,7 +1734,7 @@ void Renderer::createRenderPass()
 
 void minty::Renderer::createMainShader()
 {
-	loadShader("Assets/Shaders/vert.spv", "Assets/Shaders/frag.spv");
+	loadShader("../../Assets/Shaders/vert.spv", "../../Assets/Shaders/frag.spv");
 }
 
 void Renderer::createMainMaterial()

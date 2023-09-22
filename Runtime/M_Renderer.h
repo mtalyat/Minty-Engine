@@ -69,11 +69,6 @@ namespace minty
 		~Renderer();
 
 		/// <summary>
-		/// Initializes the Renderer.
-		/// </summary>
-		void init();
-
-		/// <summary>
 		/// Draws a frame to the screen.
 		/// </summary>
 		void renderFrame();
@@ -121,6 +116,16 @@ namespace minty
 		VkImage depthImage;
 		VkDeviceMemory depthImageMemory;
 		VkImageView depthImageView;
+
+		/// <summary>
+		/// Initializes the Renderer.
+		/// </summary>
+		void init();
+
+		/// <summary>
+		/// Starts the Renderer.
+		/// </summary>
+		void start();
 
 #pragma region Components
 
