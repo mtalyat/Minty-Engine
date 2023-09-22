@@ -20,14 +20,14 @@ namespace minty
 		/// <summary>
 		/// The registry that this System is part of.
 		/// </summary>
-		Registry& _registry;
+		Registry* const _registry;
 
 	public:
 		/// <summary>
 		/// Creates a new System.
 		/// </summary>
 		/// <param name="registry">The entity registry belonging to this System.</param>
-		System(Registry& registry);
+		System(Registry* const registry);
 
 		virtual ~System() {}
 

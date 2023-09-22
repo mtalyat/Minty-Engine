@@ -3,7 +3,7 @@
 
 using namespace minty;
 
-minty::System::System(Registry& registry)
+minty::System::System(Registry* const registry)
 	: _enabled(true)
 	, _registry(registry)
 {}
