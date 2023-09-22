@@ -319,7 +319,7 @@ void Application::run(Info const& info)
 void Application::run_command(std::string const& cmd)
 {
 	minty::console::log(cmd);
-	std::array<char, 128> buffer;
+	std::array<char, 4096> buffer;
 	std::unique_ptr<FILE, decltype(&_pclose)> pipe(_popen(cmd.c_str(), "r"), _pclose);
 	if (!pipe) {
 		throw std::runtime_error("popen() failed!");

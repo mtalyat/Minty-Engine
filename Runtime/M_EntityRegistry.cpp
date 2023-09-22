@@ -6,6 +6,8 @@
 
 using namespace minty;
 
+std::map<std::string const, EntityRegistry::ComponentFunc const> EntityRegistry::_componentTypes = std::map<std::string const, EntityRegistry::ComponentFunc const>();
+
 minty::EntityRegistry::EntityRegistry()
 	: entt::registry()
 {
@@ -44,6 +46,6 @@ Component* minty::EntityRegistry::emplace_by_name(std::string const& name, Entit
 	else
 	{
 		// name found
-		return found->second(*this, entity);
+		return found->second(this, entity);
 	}
 }

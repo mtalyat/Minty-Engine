@@ -25,6 +25,9 @@
     <Filter Include="Header Files\Scenes">
       <UniqueIdentifier>{3b42ed31-ba77-47ef-9a37-fb2447ae9ff2}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Entities">
+      <UniqueIdentifier>{32232c6e-b02c-45b9-bad9-2384634ccb46}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -129,9 +132,6 @@
     <ClInclude Include="M_Shader.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="M_EntityRegistry.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="M_Vertex.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -167,6 +167,9 @@
     </ClInclude>
     <ClInclude Include="M_SceneManager.h">
       <Filter>Header Files\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="M_EntityRegistry.h">
+      <Filter>Header Files\Entities</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

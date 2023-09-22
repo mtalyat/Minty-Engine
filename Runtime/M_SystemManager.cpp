@@ -5,6 +5,8 @@
 
 namespace minty
 {
+	std::map<std::string const, SystemRegistry::SystemFunc const> SystemRegistry::_systemTypes = std::map<std::string const, SystemRegistry::SystemFunc const>();
+
 	SystemRegistry::SystemRegistry()
 		: _systems()
 	{}

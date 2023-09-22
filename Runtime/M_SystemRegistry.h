@@ -19,8 +19,6 @@ namespace minty
 	private:
 		static std::map<std::string const, SystemFunc const> _systemTypes;
 
-
-
 		// the systems to manage
 		std::map<int, std::set<System*>> _systems;
 

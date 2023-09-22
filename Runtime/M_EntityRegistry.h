@@ -11,7 +11,7 @@ namespace minty
 		: public entt::registry
 	{
 	public:
-		typedef std::function<Component* (EntityRegistry&, Entity const)> ComponentFunc;
+		typedef std::function<Component* (EntityRegistry* const, Entity const)> ComponentFunc;
 
 	private:
 		static std::map<std::string const, ComponentFunc const> _componentTypes;
