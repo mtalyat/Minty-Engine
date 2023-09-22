@@ -75,6 +75,8 @@ void Application::run(int argc, char const* argv[])
 	for (auto const& p : project.getAssetsScenePaths())
 	{
 		console::log(p.string());
+		SerializedNode sceneNode = Serializer::parseFile(p.string());
+		sceneNode.print();
 	}
 
 	// create info for commands

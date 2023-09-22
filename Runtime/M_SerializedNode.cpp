@@ -13,11 +13,11 @@ void minty::SerializedNode::print(int const indent) const
 	{
 		if (pair.second.data.size())
 		{
-			console::print(std::format("{}{}: {}", std::string('\t', indent), pair.first, pair.second.data));
+			console::print(std::format("{}{}: {}", std::string(indent, '\t'), pair.first, pair.second.data));
 		}
 		else
 		{
-			console::print(std::format("{}{}", std::string('\t', indent), pair.first));
+			console::print(std::format("{}{}", std::string(indent, '\t'), pair.first));
 		}
 
 		// if child has children, print those, recusrively

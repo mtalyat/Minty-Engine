@@ -3,6 +3,7 @@
 
 #include "M_ISerializable.h"
 #include "M_File.h"
+#include "M_Console.h"
 
 using namespace minty;
 
@@ -95,10 +96,11 @@ SerializedNode minty::Serializer::parseFile(std::string const& path)
 
 	SerializedNode root;
 	
-	std::vector<SerializedNode> nodeStack;
-	nodeStack.push_back(root);
-	
-	SerializedNode& node = root;
+	std::vector<SerializedNode*> nodeStack;
+	nodeStack.push_back(&root);
+	SerializedNode* node = nodeStack.back();
+
+	int const SPACES_PER_TAB = 4;
 
 	for (std::string line : lines)
 	{
@@ -109,14 +111,26 @@ SerializedNode minty::Serializer::parseFile(std::string const& path)
 		}
 
 		// count number of tabs (indents)
-		int i = 0;
-		for (; i < line.size() && line.at(i) != '\t'; i++);
+		int spaces = 0;
+		for (char const c : line)
+		{
+			if (c == ' ' || c == '\t')
+			{
+				spaces++;
+			}
+			else
+			{
+				break;
+			}
+		}
+		int i = spaces / SPACES_PER_TAB;
 
 		int indentChange = i - indent;
 
 		// if new indent is too deep, ignore
 		if (indentChange > 1)
 		{
+			console::warn(std::format("Discarding line, invalid indent change of {}: {}", indentChange, line));
 			continue;
 		}
 
@@ -124,7 +138,7 @@ SerializedNode minty::Serializer::parseFile(std::string const& path)
 		if (indentChange > 0)
 		{
 			// add last child to node stack
-			nodeStack.push_back(node.children.at(key));
+			nodeStack.push_back(&node->children.at(key));
 
 			// start using that as active node
 			node = nodeStack.back();
@@ -148,28 +162,31 @@ SerializedNode minty::Serializer::parseFile(std::string const& path)
 		}
 
 		// remove indents for parsing
-		if (i > 0)
+		if (spaces > 0)
 		{
-			line = line.substr(0, i);
+			line = line.substr(static_cast<size_t>(spaces), line.size() - spaces);
 		}
 
 		// split by colon, if there is one
 		size_t split = line.find_first_of(':');
 
-		if (split != std::string::npos)
+		if (split == std::string::npos)
 		{
 			// no split, just key
 			key = line;
+
+			// add as child
+			node->children.emplace(key, SerializedNode());
 		}
 		else
 		{
 			// split: implies key: value
 			key = line.substr(0, split);
 			value = line.substr(split + 2, line.size() - split - 2); // ignore ": "
-		}
 
-		// add as child
-		node.children.emplace(key, SerializedNode{ .data = value });
+			// add as child
+			node->children.emplace(key, SerializedNode{ .data = value });
+		}
 	}
 
 	// root node should contain everything
