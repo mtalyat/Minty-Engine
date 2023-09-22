@@ -246,11 +246,17 @@ void Application::generate_cmake(Info const& info)
 		file << "set(CMAKE_EXE_LINKER_FLAGS /NODEFAULTLIB:\\\"LIBCMT\\\")" << std::endl;
 	}
 
+	// get all local paths for source files
+	std::stringstream pathsStream;
+	filepath buildPath = info.project.getBuildPath();
+	for (filepath const& path : info.project.getAssetsSourcePaths())
+	{
+		pathsStream << " " << std::filesystem::relative(path, buildPath).generic_string();
+	}
+
 	file <<
 		// add source files for project
-		"file(GLOB_RECURSE SOURCES \"..\\\\Assets\\\\*.h\"  \"..\\\\Assets\\\\*.cpp\")" << std::endl <<
-		// add main
-		"set(SOURCES ${SOURCES} main.cpp CACHE INTERNAL STRINGS)" << std::endl <<
+		"set(SOURCES main.cpp" << pathsStream.str() << ")" << std::endl <<
 		// make executable with the source files
 		"add_executable(${PROJECT_NAME} ${SOURCES})" << std::endl <<
 		// set to MT building so it works with the static runtime library
@@ -288,9 +294,13 @@ void Application::generate_main(Info const& info)
 	file <<
 		"// " << std::format("{:%Y-%m-%d %H:%M:%OS}", now) << std::endl <<
 		"#include <Minty.h>" << std::endl <<
+		"#include \"../Assets/Scripts/init.h\"" << std::endl <<
 		"int main(int argc, char const* argv[]) {" << std::endl <<
 		"    minty::Runtime rt;" << std::endl <<
-		"    return rt.run(argc, argv);" << std::endl <<
+		"    init(rt);" << std::endl <<
+		"    int result = rt.run(argc, argv);" << std::endl <<
+		"    destroy(rt);" << std::endl <<
+		"    return result;" << std::endl <<
 		"}";
 
 	file.close();
