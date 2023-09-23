@@ -47,5 +47,5 @@ Component* minty::EntityRegistry::emplace_by_name(std::string const& name, Entit
 
 std::string const minty::EntityRegistry::to_string() const
 {
-	return std::format("[{}({})]", typeid(*this).name(), storage<Entity>()->size());
+	return std::format("[EntityRegistry({})]", storage<Entity>()->size());
 }

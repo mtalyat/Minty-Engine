@@ -124,12 +124,12 @@ namespace minty
 		// if no systems in registry
 		if (_systems.size() == 0)
 		{
-			return std::format("[{}()]", typeid(*this).name());
+			return "[SystemRegistry()]";
 		}
 
 		// if at least one system in registry
 		std::stringstream stream;
-		stream << "[" << typeid(*this).name() << "(";
+		stream << "[SystemRegistry(";
 
 		size_t i = 0;
 		for (auto const& pair : _systems)
