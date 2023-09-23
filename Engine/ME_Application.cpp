@@ -75,7 +75,7 @@ void Application::run(int argc, char const* argv[])
 	for (auto const& p : project.get_assets_scene_paths())
 	{
 		console::log(p.string());
-		SerializedNode sceneNode = Serializer::parse_file(p.string());
+		SerializedNode sceneNode = SerializedNode::parse_file(p.string());
 		sceneNode.print();
 	}
 
