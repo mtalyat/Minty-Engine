@@ -229,6 +229,7 @@
     <ClInclude Include="M_Math.h" />
     <ClInclude Include="M_Mesh.h" />
     <ClInclude Include="M_Object.h" />
+    <ClInclude Include="M_Parse.h" />
     <ClInclude Include="M_PositionComponent.h" />
     <ClInclude Include="M_Reader.h" />
     <ClInclude Include="M_RendererSystem.h" />
@@ -273,6 +274,7 @@
     <ClCompile Include="M_Mesh.cpp" />
     <ClCompile Include="M_NameComponent.cpp" />
     <ClCompile Include="M_Object.cpp" />
+    <ClCompile Include="M_Parse.cpp" />
     <ClCompile Include="M_PositionComponent.cpp" />
     <ClCompile Include="M_Reader.cpp" />
     <ClCompile Include="M_RotationComponent.cpp" />

@@ -180,6 +180,9 @@
     <ClInclude Include="M_Reader.h">
       <Filter>Header Files\Serialization</Filter>
     </ClInclude>
+    <ClInclude Include="M_Parse.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -294,6 +297,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_Writer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_Parse.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
