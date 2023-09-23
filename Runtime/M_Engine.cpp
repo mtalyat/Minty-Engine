@@ -35,9 +35,18 @@ Renderer& minty::Engine::get_renderer()
 	return _renderer;
 }
 
+SceneManager& minty::Engine::get_scene_manager()
+{
+	return _sceneManager;
+}
+
 void Engine::run()
 {
+	// start the renderer
 	_renderer.start();
+
+	// start the scene(s)
+
 
 	// record start time, and last frame tick
 	time_point_t start = get_now();

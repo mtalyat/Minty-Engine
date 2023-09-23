@@ -2,6 +2,7 @@
 #include "M_SystemRegistry.h"
 
 #include "M_Console.h"
+#include <sstream>
 
 namespace minty
 {
@@ -120,5 +121,35 @@ namespace minty
 	void SystemRegistry::register_system(std::string const& name, SystemFunc const& func)
 	{
 		_systemTypes.emplace(name, func);
+	}
+
+	std::string const SystemRegistry::to_string() const
+	{
+		// if no systems in registry
+		if (_systems.size() == 0)
+		{
+			return std::format("[{}()]", typeid(*this).name());
+		}
+
+		// if at least one system in registry
+		std::stringstream stream;
+		stream << "[" << typeid(*this).name() << "(";
+
+		size_t i = 0;
+		for (auto const& pair : _systems)
+		{
+			for (auto const& system : pair.second)
+			{
+				if (i > 0) stream << ' ';
+
+				stream << typeid(&system).name();
+
+				i++;
+			}
+		}
+
+		stream << "]";
+
+		return stream.str();
 	}
 }

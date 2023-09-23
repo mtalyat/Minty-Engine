@@ -76,5 +76,7 @@ namespace minty
 		/// <param name="name">The name of the System class.</param>
 		/// <param name="func">A func that creates a new System and returns it.</param>
 		static void register_system(std::string const& name, SystemFunc const& func);
+
+		std::string const to_string() const override;
 	};
 }

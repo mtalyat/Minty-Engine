@@ -33,5 +33,25 @@ namespace minty
 		/// </summary>
 		/// <returns></returns>
 		SystemRegistry& get_system_registry();
+
+		/// <summary>
+		/// Loads the Scene.
+		/// </summary>
+		void load();
+
+		/// <summary>
+		/// Updates the Scene.
+		/// </summary>
+		void update();
+
+		/// <summary>
+		/// Fixed updates the Scene.
+		/// </summary>
+		void fixed_update();
+
+		/// <summary>
+		/// Unloads the Scene.
+		/// </summary>
+		void unload();
 	};
 }

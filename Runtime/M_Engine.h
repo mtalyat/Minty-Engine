@@ -28,6 +28,8 @@ namespace minty
 
 		Renderer& get_renderer();
 
+		SceneManager& get_scene_manager();
+
 		/// <summary>
 		/// Runs the game.
 		/// </summary>
