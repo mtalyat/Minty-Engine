@@ -86,6 +86,6 @@ namespace minty
 	{
 		_systemTypes.emplace(name, []() { return new T(); });
 
-		console::log(std::format("Registered system {}", name));
+		console::info(std::format("Registered system {}", name));
 	}
 }

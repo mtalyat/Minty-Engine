@@ -58,6 +58,6 @@ namespace minty
 	{
 		_componentTypes.emplace(name, [](EntityRegistry* const registry, Entity const entity) { return &registry->emplace<T>(entity); });
 
-		console::log(std::format("Registered component {}", name));
+		console::info(std::format("Registered component {}", name));
 	}
 }
