@@ -59,6 +59,12 @@ namespace minty
 		/// Debug log prints the given message to the screen, in cyan.
 		/// </summary>
 		/// <param name="message">The string to print.</param>
+		void todo(std::string const& message);
+
+		/// <summary>
+		/// Debug log prints the given message to the screen, in blue.
+		/// </summary>
+		/// <param name="message">The string to print.</param>
 		void test(std::string const& message);
 
 		/// <summary>

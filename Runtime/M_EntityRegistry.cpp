@@ -3,6 +3,7 @@
 
 #include "M_Console.h"
 #include "M_NameComponent.h"
+#include <sstream>
 
 using namespace minty;
 
@@ -45,7 +46,43 @@ Component* minty::EntityRegistry::emplace_by_name(std::string const& name, Entit
 	}
 }
 
+size_t minty::EntityRegistry::count() const
+{
+	return storage<Entity>()->size();
+}
+
 std::string const minty::EntityRegistry::to_string() const
 {
-	return std::format("[EntityRegistry({})]", storage<Entity>()->size());
+	// total entities
+	size_t entityCount = count();
+
+	// named entities count
+	size_t namedCount = storage<NameComponent>()->size();
+
+	std::stringstream stream;
+
+	stream << "[EntityRegistry(" << (entityCount - namedCount) << " unnamed, " << namedCount << " named";
+
+	// if there are named entities, print them and their names
+	if (namedCount > 0)
+	{
+		stream << ':';
+
+		size_t i = 0;
+		for (auto &&[entity, name] : view<NameComponent const>().each())
+		{
+			if (i > 0)
+			{
+				stream << ',';
+			}
+
+			stream << ' ' << name.name;
+
+			i++;
+		}
+	}
+
+	stream << ")]";
+
+	return stream.str();
 }

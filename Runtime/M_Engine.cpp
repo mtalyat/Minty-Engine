@@ -46,7 +46,7 @@ void Engine::run()
 	_renderer.start();
 
 	// start the scene(s)
-
+	_sceneManager.load();
 
 	// record start time, and last frame tick
 	time_point_t start = get_now();
@@ -59,9 +59,14 @@ void Engine::run()
 	while (_renderer.running())
 	{
 		glfwPollEvents();
-		_renderer.update_uniform_buffer();
+
+		// update scene(s)
+		_sceneManager.update();
+
+		// render to the screen
 		_renderer.renderFrame();
 
+		// frame complete
 		frameCount++;
 
 		now = get_now();
@@ -75,6 +80,9 @@ void Engine::run()
 			frameTick = now;
 		}
 	}
+
+	// all done
+	_sceneManager.unload();
 
 	// print elapsed time
 	std::cout << "Elapsed time: " << (std::chrono::duration_cast<std::chrono::milliseconds>(get_now() - start).count() / 1000.0f) << "s" << std::endl;

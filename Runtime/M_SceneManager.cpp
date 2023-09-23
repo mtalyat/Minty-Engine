@@ -34,8 +34,6 @@ ID minty::SceneManager::create_scene(std::string const& path)
 
 	// parse
 
-	console::log(std::format("Loading Scene:"));
-
 	// if "Systems" exists, load systems based on name
 	auto found = node.children.find("Systems");
 	if (found != node.children.end())
@@ -50,9 +48,6 @@ ID minty::SceneManager::create_scene(std::string const& path)
 			pair.second.try_get_int(priority);
 			systemRegistry.emplace_by_name(pair.first, priority);
 		}
-
-		// log
-		console::log(systemRegistry.to_string());
 	}
 
 	// if "Entities" exists, create entities based on their components

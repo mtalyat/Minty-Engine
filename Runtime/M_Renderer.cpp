@@ -36,9 +36,7 @@ using namespace minty;
 namespace minty
 {
 	struct UniformBufferObject {
-		alignas(16) glm::mat4 model;
-		alignas(16) glm::mat4 view;
-		alignas(16) glm::mat4 proj;
+		alignas(16) glm::mat4 transform;
 	};
 
 	struct MaterialInfo
@@ -1779,25 +1777,60 @@ void Renderer::create_uniform_buffers()
 	}
 }
 
-void Renderer::update_uniform_buffer()
+void Renderer::update_camera(CameraComponent const& camera, Vector3 const& position, Vector3 const& rotation)
 {
-	// start time of program
-	static auto startTime = std::chrono::high_resolution_clock::now();
+	//// start time of program
+	//static auto startTime = std::chrono::high_resolution_clock::now();
 
-	// current time elapsed since start
-	auto currentTime = std::chrono::high_resolution_clock::now();
-	float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
-	//float time = 0.0f;
+	//// current time elapsed since start
+	//auto currentTime = std::chrono::high_resolution_clock::now();
+	//float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
+	////float time = 0.0f;
 
-	// set uniform values
-	UniformBufferObject ubo{};
-	ubo.model = glm::rotate(glm::mat4(1.0f), time * 0.5f * glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	ubo.proj = glm::perspective(glm::radians(45.0f), swapChainExtent.width / (float)swapChainExtent.height, 0.1f, 10.0f);
-	// flip y and x so that we have a left handed coordinates system
-	ubo.proj[1][1] *= -1.0f;
-	ubo.proj[0][0] *= -1.0f;
-	// pos x is right, pos y is up, pos z is forward
+	//// set uniform values
+	//UniformBufferObject ubo{};
+	//ubo.model = glm::rotate(glm::mat4(1.0f), time * 0.5f * glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	//ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	//ubo.proj = glm::perspective(glm::radians(45.0f), swapChainExtent.width / (float)swapChainExtent.height, 0.1f, 10.0f);
+	//// flip y and x so that we have a left handed coordinates system
+	//ubo.proj[1][1] *= -1.0f;
+	//ubo.proj[0][0] *= -1.0f;
+	//// pos x is right, pos y is up, pos z is forward
+
+	//memcpy(uniformBuffersMapped[currentFrame], &ubo, sizeof(ubo));
+
+	// proj * view * model
+
+	// get view
+	// ignore z rotation for now...
+	//glm::mat4 view = glm::rotate(glm::mat4(1.0f), glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
+	//view = glm::rotate(view, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
+	//view *= glm::translate()
+	glm::mat4 view = glm::lookAt(glm::vec3(position.x, position.y, position.z), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+
+	// get projection
+	glm::mat4 proj;
+	switch (camera.perspective)
+	{
+	case CameraComponent::Perspective::Perspective:
+		proj = glm::perspective(glm::radians(camera.fov), swapChainExtent.width / static_cast<float>(swapChainExtent.height), camera.nearPlane, camera.farPlane);
+		break;
+	default:
+		proj = glm::mat4(1.0f);
+		break;
+	}
+	// flip y and x so that we have a left handed coordinate system
+	proj[0][0] *= -1.0f;
+	proj[1][1] *= -1.0f;
+
+	// multiply together
+	glm::mat4 transform = proj * view;
+
+	// update buffer
+	UniformBufferObject ubo
+	{
+		.transform = transform
+	};
 
 	memcpy(uniformBuffersMapped[currentFrame], &ubo, sizeof(ubo));
 }

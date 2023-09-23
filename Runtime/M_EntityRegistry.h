@@ -7,6 +7,7 @@
 namespace minty
 {
 	typedef entt::entity Entity;
+	constexpr Entity NULL_ENTITY = entt::null;
 
 	class EntityRegistry
 		: public Object, public entt::registry
@@ -35,6 +36,12 @@ namespace minty
 		/// <param name="entity">The Entity to emplace the Component onto.</param>
 		/// <returns>A pointer to the newly emplaced Component, or null if an error occured.</returns>
 		Component* emplace_by_name(std::string const& name, Entity const entity);
+
+		/// <summary>
+		/// Gets the total number of Entities within this registry.
+		/// </summary>
+		/// <returns>The total number of Entities.</returns>
+		size_t count() const;
 
 		std::string const to_string() const override;
 

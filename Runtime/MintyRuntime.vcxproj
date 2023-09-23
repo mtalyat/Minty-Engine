@@ -210,6 +210,7 @@
   <ItemGroup>
     <ClInclude Include="entt.hpp" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="M_CameraComponent.h" />
     <ClInclude Include="M_Component.h" />
     <ClInclude Include="M_EntityRegistry.h" />
     <ClInclude Include="M_ISerializable.h" />
@@ -239,6 +240,7 @@
     <ClInclude Include="M_SceneManager.h" />
     <ClInclude Include="M_SerializedNode.h" />
     <ClInclude Include="M_Shader.h" />
+    <ClInclude Include="M_String.h" />
     <ClInclude Include="M_System.h" />
     <ClInclude Include="M_SystemRegistry.h" />
     <ClInclude Include="M_Texture.h" />
@@ -262,6 +264,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="M_CameraComponent.cpp" />
     <ClCompile Include="M_Color.cpp" />
     <ClCompile Include="M_CommandLineParser.cpp" />
     <ClCompile Include="M_Console.cpp" />
@@ -277,6 +280,7 @@
     <ClCompile Include="M_Parse.cpp" />
     <ClCompile Include="M_PositionComponent.cpp" />
     <ClCompile Include="M_Reader.cpp" />
+    <ClCompile Include="M_RendererSystem.cpp" />
     <ClCompile Include="M_RotationComponent.cpp" />
     <ClCompile Include="M_ScaleComponent.cpp" />
     <ClCompile Include="M_Scene.cpp" />

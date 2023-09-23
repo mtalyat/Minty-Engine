@@ -121,31 +121,33 @@ namespace minty
 
 	std::string const SystemRegistry::to_string() const
 	{
-		// if no systems in registry
-		if (_systems.size() == 0)
-		{
-			return "[SystemRegistry()]";
-		}
+		return std::format("[SystemRegistry({})]", _systems.size());
 
-		// if at least one system in registry
-		std::stringstream stream;
-		stream << "[SystemRegistry(";
+		//// if no systems in registry
+		//if (_systems.size() == 0)
+		//{
+		//	return "[SystemRegistry()]";
+		//}
 
-		size_t i = 0;
-		for (auto const& pair : _systems)
-		{
-			for (auto const& system : pair.second)
-			{
-				if (i > 0) stream << ' ';
+		//// if at least one system in registry
+		//std::stringstream stream;
+		//stream << "[SystemRegistry(";
 
-				stream << typeid(&system).name();
+		//size_t i = 0;
+		//for (auto const& pair : _systems)
+		//{
+		//	for (auto const& system : pair.second)
+		//	{
+		//		if (i > 0) stream << ' ';
 
-				i++;
-			}
-		}
+		//		stream << typeid(&system).name();
 
-		stream << ")]";
+		//		i++;
+		//	}
+		//}
 
-		return stream.str();
+		//stream << ")]";
+
+		//return stream.str();
 	}
 }

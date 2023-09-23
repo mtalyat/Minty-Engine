@@ -9,6 +9,8 @@
 #include "M_Color.h"
 #include "M_Shader.h"
 #include "M_Material.h"
+#include "M_CameraComponent.h"
+#include "M_Vector3.h"
 
 #include <array>
 #include <vector>
@@ -400,10 +402,9 @@ namespace minty
 		void create_uniform_buffers();
 
 		/// <summary>
-		/// Updates the uniform buffer with new rotation values.
+		/// Updates the Camera uniform buffer with the Camera info.
 		/// </summary>
-		/// <param name="currentImage">The image in which to update the buffer for.</param>
-		void update_uniform_buffer();
+		void update_camera(CameraComponent const& camera, Vector3 const& position, Vector3 const& rotation);
 
 		/// <summary>
 		/// Creates the descriptor set layout for uniform objects.
