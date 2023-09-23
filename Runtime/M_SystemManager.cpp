@@ -144,7 +144,7 @@ namespace minty
 			}
 		}
 
-		stream << "]";
+		stream << ")]";
 
 		return stream.str();
 	}
