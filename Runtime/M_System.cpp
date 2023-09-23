@@ -23,7 +23,7 @@ void minty::System::set_enabled(bool const enabled)
 	_enabled = enabled;
 }
 
-constexpr bool minty::System::is_enabled() const
+bool minty::System::is_enabled() const
 {
 	return _enabled;
 }

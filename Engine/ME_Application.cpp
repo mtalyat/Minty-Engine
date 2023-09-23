@@ -115,7 +115,7 @@ void Application::run(int argc, char const* argv[])
 		std::string command;
 		std::getline(std::cin, command);
 		std::vector<std::string> commands = splitString(command);
-		
+
 		if (commands.size() == 0)
 		{
 			running = false;
@@ -146,7 +146,7 @@ void Application::run(int argc, char const* argv[])
 					// regenerate cmake file
 					generate_cmake(info);
 				}
-			} 
+			}
 			else if (c.compare("clean") == 0)
 			{
 				clean(info);
@@ -154,12 +154,10 @@ void Application::run(int argc, char const* argv[])
 			else if (c.compare("build") == 0)
 			{
 				build(info);
-
 			}
 			else if (c.compare("rebuild") == 0)
 			{
-				clean(info);
-				build(info);
+				if (!clean(info) && !build(info)) {}
 			}
 			else if (c.compare("run") == 0)
 			{
@@ -167,14 +165,11 @@ void Application::run(int argc, char const* argv[])
 			}
 			else if (c.compare("rerun") == 0)
 			{
-				build(info);
-				run(info);
+				if (!build(info) && !run(info)) {}
 			}
-			else if(c.compare("all") == 0)
+			else if (c.compare("all") == 0)
 			{
-				clean(info);
-				build(info);
-				run(info);
+				if (!clean(info) && !build(info) && !run(info)) {}
 			}
 			else if (c.compare("quit") == 0)
 			{
@@ -292,32 +287,35 @@ void Application::generate_main(Info const& info)
 	file.close();
 }
 
-void Application::clean(Info const& info)
+size_t Application::clean(Info const& info)
 {
 	// clean the build
-	run_command("cd " + info.project.get_build_path().string() + " && " + std::filesystem::absolute(CMAKE_PATH).string() + " --build . --target clean");
+	return run_command("cd " + info.project.get_build_path().string() + " && " + std::filesystem::absolute(CMAKE_PATH).string() + " --build . --target clean");
 }
 
-void Application::build(Info const& info)
+size_t Application::build(Info const& info)
 {
 	std::string command = "cd " + info.project.get_build_path().string() + " && " + std::filesystem::absolute(CMAKE_PATH).string();
 
 	// make cmake files if needed
-	run_command(command + " .");
+	size_t errors = run_command(command + " .");
 
 	// build program
-	run_command(command + " --build . --config " + info.get_config());
+	errors += run_command(command + " --build . --config " + info.get_config());
+
+	return errors;
 }
 
-void Application::run(Info const& info)
+size_t Application::run(Info const& info)
 {
 	// call executable, pass in project path as argument for the runtime, so it knows what to run
-	run_command("cd " + info.project.get_build_path().string() + " && cd " + info.get_config() + " && start " + EXE_NAME + " " + info.project.get_base_path().string());
+	return run_command("cd " + info.project.get_build_path().string() + " && cd " + info.get_config() + " && start " + EXE_NAME + " " + info.project.get_base_path().string());
 }
 
 //https://stackoverflow.com/questions/478898/how-do-i-execute-a-command-and-get-the-output-of-the-command-within-c-using-po
-void Application::run_command(std::string const& cmd)
+size_t Application::run_command(std::string const& cmd)
 {
+	size_t errorCount = 0;
 	minty::console::log(cmd);
 	std::array<char, 4096> buffer;
 	std::unique_ptr<FILE, decltype(&_pclose)> pipe(_popen(cmd.c_str(), "r"), _pclose);
@@ -334,6 +332,7 @@ void Application::run_command(std::string const& cmd)
 			if (result.find("error") != std::string::npos)
 			{
 				minty::console::error(result);
+				errorCount++;
 			}
 			else if (result.find("warning") != std::string::npos)
 			{
@@ -348,4 +347,6 @@ void Application::run_command(std::string const& cmd)
 		// if newline, it was the end of the inputted line, so update the color for the next line
 		changeColor = result.ends_with('\n');
 	}
+
+	return errorCount;
 }

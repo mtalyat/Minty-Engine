@@ -1,9 +1,6 @@
 #pragma once
 
 #include "M_Engine.h"
-#include "M_EntityRegistry.h"
-#include "M_Component.h"
-#include "M_System.h"
 #include <functional>
 #include <map>
 
@@ -33,5 +30,9 @@ namespace minty
 		/// </summary>
 		/// <returns></returns>
 		int run();
+
+	private:
+		// registers all built in systems and components
+		void register_builtin();
 	};
 }

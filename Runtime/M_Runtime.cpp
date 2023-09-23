@@ -1,6 +1,15 @@
 #include "pch.h"
 #include "M_Runtime.h"
 
+#include "M_SystemRegistry.h"
+#include "M_RendererSystem.h"
+
+#include "M_EntityRegistry.h"
+#include "M_NameComponent.h"
+#include "M_PositionComponent.h"
+#include "M_RotationComponent.h"
+#include "M_ScaleComponent.h"
+
 #include "M_CommandLineParser.h"
 #include "M_Console.h"
 #include <filesystem>
@@ -38,6 +47,8 @@ minty::Runtime::Runtime(int argc, char const* argv[])
 	{
 		std::cerr << "Path argument not found." << std::endl;
 	}
+
+	register_builtin();
 }
 
 Runtime::~Runtime()
@@ -69,4 +80,16 @@ int Runtime::run()
 	}
 
 	return EXIT_SUCCESS;
+}
+
+void minty::Runtime::register_builtin()
+{
+	// systems
+	SystemRegistry::register_system<RendererSystem>();
+
+	// components
+	EntityRegistry::register_component<NameComponent>();
+	EntityRegistry::register_component<PositionComponent>();
+	EntityRegistry::register_component<RotationComponent>();
+	EntityRegistry::register_component<ScaleComponent>();
 }

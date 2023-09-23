@@ -118,10 +118,6 @@ namespace minty
 			}
 		}
 	}
-	void SystemRegistry::register_system(std::string const& name, SystemFunc const& func)
-	{
-		_systemTypes.emplace(name, func);
-	}
 
 	std::string const SystemRegistry::to_string() const
 	{

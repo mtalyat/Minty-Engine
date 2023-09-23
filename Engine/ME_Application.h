@@ -52,24 +52,30 @@ namespace mintye
 		/// Cleans the target project.
 		/// </summary>
 		/// <param name="info">The target info.</param>
-		void clean(Info const& info);
+		size_t clean(Info const& info);
 
 		/// <summary>
 		/// Builds the target project.
 		/// </summary>
 		/// <param name="info">The target info.</param>
-		void build(Info const& info);
+		size_t build(Info const& info);
 
 		/// <summary>
 		/// Runs the target project.
 		/// </summary>
 		/// <param name="info">The target info.</param>
-		void run(Info const& info);
+		size_t run(Info const& info);
 
 		/// <summary>
 		/// Runs the command on the terminal.
 		/// </summary>
 		/// <param name="command">The command to run.</param>
-		void run_command(std::string const& command);
+
+		/// <summary>
+		/// Runs the command on the terminal.
+		/// </summary>
+		/// <param name="command">The command to run.</param>
+		/// <returns>The number of errors that were printed during the execution of the command.</returns>
+		size_t run_command(std::string const& command);
 	};
 }

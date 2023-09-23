@@ -54,7 +54,7 @@ namespace minty
 		/// Checks if this System is enabled or not.
 		/// </summary>
 		/// <returns></returns>
-		constexpr bool is_enabled() const;
+		bool is_enabled() const;
 
 		/// <summary>
 		/// Called when the Scene is being loaded.

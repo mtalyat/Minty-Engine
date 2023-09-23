@@ -29,11 +29,6 @@ std::string minty::EntityRegistry::get_name(Entity const entity) const
 	}
 }
 
-void minty::EntityRegistry::register_component(std::string const& name, ComponentFunc const& func)
-{
-	_componentTypes.emplace(name, func);
-}
-
 Component* minty::EntityRegistry::emplace_by_name(std::string const& name, Entity const entity)
 {
 	auto const& found = _componentTypes.find(name);

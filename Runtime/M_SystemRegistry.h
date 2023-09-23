@@ -71,12 +71,18 @@ namespace minty
 		void unload();
 
 		/// <summary>
-		/// Registers the System creation function, so the System can be dynamically created by name.
+		/// Registers the System, so the System can be dynamically created by name.
 		/// </summary>
-		/// <param name="name">The name of the System class.</param>
-		/// <param name="func">A func that creates a new System and returns it.</param>
-		static void register_system(std::string const& name, SystemFunc const& func);
+		/// <typeparam name="T">The System to be registered.</typeparam>
+		template <class T>
+		static void register_system();
 
 		std::string const to_string() const override;
 	};
+
+	template<class T>
+	void SystemRegistry::register_system()
+	{
+		_systemTypes.emplace(typeid(T).name(), []() { return new T(); });
+	}
 }

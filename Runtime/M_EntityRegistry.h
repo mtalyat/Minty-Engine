@@ -38,10 +38,16 @@ namespace minty
 		std::string const to_string() const override;
 
 		/// <summary>
-		/// Registers the Component creation function, so the Component can be dynamically created by name.
+		/// Registers the Component, so the Component can be dynamically created by name.
 		/// </summary>
-		/// <param name="name">The name of the Component class.</param>
-		/// <param name="func">A func that adds the Component to an entity, and returns the Component.</param>
-		static void register_component(std::string const& name, ComponentFunc const& func);
+		/// <typeparam name="T">The Component to register.</typeparam>
+		template <class T>
+		static void register_component();
 	};
+
+	template<class T>
+	void EntityRegistry::register_component()
+	{
+		_componentTypes.emplace(typeid(T).name(), [](EntityRegistry* const registry, Entity const entity) { return &registry->emplace<T>(entity); });
+	}
 }
