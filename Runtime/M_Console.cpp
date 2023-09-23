@@ -39,7 +39,7 @@ void minty::console::log(std::string const& message)
 void minty::console::todo(std::string const& message)
 {
 #ifndef NDEBUG
-	print(message, Color::Cyan);
+	print("TODO: " + message, Color::Cyan);
 #endif
 }
 
