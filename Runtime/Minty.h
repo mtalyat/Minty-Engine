@@ -26,8 +26,9 @@ access to the entire engine without needing include each file.
 
 // SERIALIZATION
 #include "M_ISerializable.h"
+#include "M_Reader.h"
 #include "M_SerializedNode.h"
-#include "M_Serializer.h"
+#include "M_Writer.h"
 
 // SYSTEMS
 #include "M_System.h"
