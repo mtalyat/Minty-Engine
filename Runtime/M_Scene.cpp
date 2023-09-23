@@ -38,3 +38,8 @@ void minty::Scene::unload()
 {
 	_systems.unload();
 }
+
+std::string const minty::Scene::to_string() const
+{
+	return std::format("[{}({}, {})]", typeid(*this).name(), _systems.to_string(), _entities.to_string());
+}

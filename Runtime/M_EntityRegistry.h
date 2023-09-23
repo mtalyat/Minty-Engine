@@ -8,7 +8,7 @@ namespace minty
 	typedef entt::entity Entity;
 
 	class EntityRegistry
-		: public entt::registry
+		: public Object, public entt::registry
 	{
 	public:
 		typedef std::function<Component* (EntityRegistry* const, Entity const)> ComponentFunc;
@@ -34,6 +34,8 @@ namespace minty
 		/// <param name="entity">The Entity to emplace the Component onto.</param>
 		/// <returns>A pointer to the newly emplaced Component, or null if an error occured.</returns>
 		Component* emplace_by_name(std::string const& name, Entity const entity);
+
+		std::string const to_string() const override;
 
 		/// <summary>
 		/// Registers the Component creation function, so the Component can be dynamically created by name.

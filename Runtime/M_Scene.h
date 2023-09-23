@@ -53,5 +53,7 @@ namespace minty
 		/// Unloads the Scene.
 		/// </summary>
 		void unload();
+
+		std::string const to_string() const override;
 	};
 }
