@@ -35,3 +35,17 @@ std::string const minty::Vector3::to_string() const
 {
 	return std::format("Vector3({}, {}, {})", x, y, z);
 }
+
+void minty::Vector3::serialize(Writer& writer) const
+{
+	writer.write("x", x);
+	writer.write("y", y);
+	writer.write("z", z);
+}
+
+void minty::Vector3::deserialize(Reader const& reader)
+{
+	x = reader.read_float("x");
+	y = reader.read_float("y");
+	z = reader.read_float("z");
+}

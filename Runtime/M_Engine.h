@@ -2,6 +2,7 @@
 
 #include "M_Window.h"
 #include "M_Renderer.h"
+#include "M_SceneManager.h"
 #include <chrono>
 
 typedef std::chrono::steady_clock::time_point time_point_t;
@@ -16,7 +17,7 @@ namespace minty
 	private:
 		Window _window;
 		Renderer _renderer;
-
+		SceneManager _sceneManager;
 
 	public:
 		Engine();

@@ -19,7 +19,7 @@ namespace minty
 
 		ID create_scene();
 
-		ID load_scene(std::string const& path, Runtime const& runtime);
+		ID load_scene(std::string const& path);
 
 		Scene& get_scene(ID const id);
 	};

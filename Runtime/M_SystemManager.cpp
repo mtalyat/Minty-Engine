@@ -21,8 +21,6 @@ namespace minty
 				delete system;
 			}
 		}
-
-		//delete _systems;
 	}
 
 	void SystemRegistry::emplace(System* const system, int const priority)

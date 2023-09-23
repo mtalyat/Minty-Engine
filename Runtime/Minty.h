@@ -13,7 +13,9 @@ access to the entire engine without needing include each file.
 #include "M_Component.h"
 
 #include "M_NameComponent.h"
-#include "M_TransformComponent.h"
+#include "M_PositionComponent.h"
+#include "M_RotationComponent.h"
+#include "M_ScaleComponent.h"
 
 // ENTITIES
 #include "M_EntityRegistry.h"

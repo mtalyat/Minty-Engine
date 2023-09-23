@@ -1,5 +1,7 @@
 #pragma once
+
 #include "M_Object.h"
+#include "M_ISerializable.h"
 
 namespace minty
 {
@@ -10,7 +12,7 @@ namespace minty
     /// Holds X, Y and Z coordinates for a floating point pair in space.
     /// </summary>
     struct Vector3 :
-        public Object
+        public Object, public ISerializable
     {
         /// <summary>
         /// The X position.
@@ -116,6 +118,10 @@ namespace minty
         operator minty::Vector2() const;
 
         std::string const to_string() const override;
-    };
+
+        // Inherited via ISerializable
+        void serialize(Writer& writer) const override;
+        void deserialize(Reader const& reader) override;
+};
 }
 

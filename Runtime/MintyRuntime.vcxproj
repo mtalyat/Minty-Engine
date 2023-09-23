@@ -229,16 +229,18 @@
     <ClInclude Include="M_Math.h" />
     <ClInclude Include="M_Mesh.h" />
     <ClInclude Include="M_Object.h" />
+    <ClInclude Include="M_PositionComponent.h" />
+    <ClInclude Include="M_Reader.h" />
     <ClInclude Include="M_RendererSystem.h" />
+    <ClInclude Include="M_RotationComponent.h" />
+    <ClInclude Include="M_ScaleComponent.h" />
     <ClInclude Include="M_Scene.h" />
     <ClInclude Include="M_SceneManager.h" />
     <ClInclude Include="M_SerializedNode.h" />
-    <ClInclude Include="M_Serializer.h" />
     <ClInclude Include="M_Shader.h" />
     <ClInclude Include="M_System.h" />
     <ClInclude Include="M_SystemRegistry.h" />
     <ClInclude Include="M_Texture.h" />
-    <ClInclude Include="M_TransformComponent.h" />
     <ClInclude Include="M_Vector2Int.h" />
     <ClInclude Include="M_Vector2.h" />
     <ClInclude Include="M_Project.h" />
@@ -253,6 +255,7 @@
     <ClInclude Include="M_Viewport.h" />
     <ClInclude Include="M_Window.h" />
     <ClInclude Include="M_NameComponent.h" />
+    <ClInclude Include="M_Writer.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="M_Vertex.h" />
   </ItemGroup>
@@ -268,11 +271,15 @@
     <ClCompile Include="M_Material.cpp" />
     <ClCompile Include="M_Math.cpp" />
     <ClCompile Include="M_Mesh.cpp" />
+    <ClCompile Include="M_NameComponent.cpp" />
     <ClCompile Include="M_Object.cpp" />
+    <ClCompile Include="M_PositionComponent.cpp" />
+    <ClCompile Include="M_Reader.cpp" />
+    <ClCompile Include="M_RotationComponent.cpp" />
+    <ClCompile Include="M_ScaleComponent.cpp" />
     <ClCompile Include="M_Scene.cpp" />
     <ClCompile Include="M_SceneManager.cpp" />
     <ClCompile Include="M_SerializedNode.cpp" />
-    <ClCompile Include="M_Serializer.cpp" />
     <ClCompile Include="M_Shader.cpp" />
     <ClCompile Include="M_System.cpp" />
     <ClCompile Include="M_SystemManager.cpp" />
@@ -289,6 +296,7 @@
     <ClCompile Include="M_Vector3Int.cpp" />
     <ClCompile Include="M_Viewport.cpp" />
     <ClCompile Include="M_Window.cpp" />
+    <ClCompile Include="M_Writer.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
