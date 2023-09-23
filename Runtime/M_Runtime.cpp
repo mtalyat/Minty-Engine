@@ -85,11 +85,11 @@ int Runtime::run()
 void minty::Runtime::register_builtin()
 {
 	// systems
-	SystemRegistry::register_system<RendererSystem>();
+	SystemRegistry::register_system<RendererSystem>("Renderer");
 
 	// components
-	EntityRegistry::register_component<NameComponent>();
-	EntityRegistry::register_component<PositionComponent>();
-	EntityRegistry::register_component<RotationComponent>();
-	EntityRegistry::register_component<ScaleComponent>();
+	EntityRegistry::register_component<NameComponent>("Name");
+	EntityRegistry::register_component<PositionComponent>("Position");
+	EntityRegistry::register_component<RotationComponent>("Rotation");
+	EntityRegistry::register_component<ScaleComponent>("Scale");
 }

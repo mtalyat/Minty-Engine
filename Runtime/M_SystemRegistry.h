@@ -2,6 +2,7 @@
 
 #include "M_Object.h"
 #include "M_System.h"
+#include "M_Console.h"
 #include <map>
 #include <set>
 
@@ -75,14 +76,16 @@ namespace minty
 		/// </summary>
 		/// <typeparam name="T">The System to be registered.</typeparam>
 		template <class T>
-		static void register_system();
+		static void register_system(std::string const& name);
 
 		std::string const to_string() const override;
 	};
 
 	template<class T>
-	void SystemRegistry::register_system()
+	void SystemRegistry::register_system(std::string const& name)
 	{
-		_systemTypes.emplace(typeid(T).name(), []() { return new T(); });
+		_systemTypes.emplace(name, []() { return new T(); });
+
+		console::log(std::format("Registered system {}", name));
 	}
 }

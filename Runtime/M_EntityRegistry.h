@@ -2,6 +2,7 @@
 
 #include "libraries/entt/entt.hpp"
 #include "M_Component.h"
+#include "M_Console.h"
 
 namespace minty
 {
@@ -42,12 +43,14 @@ namespace minty
 		/// </summary>
 		/// <typeparam name="T">The Component to register.</typeparam>
 		template <class T>
-		static void register_component();
+		static void register_component(std::string const& name);
 	};
 
 	template<class T>
-	void EntityRegistry::register_component()
+	void EntityRegistry::register_component(std::string const& name)
 	{
-		_componentTypes.emplace(typeid(T).name(), [](EntityRegistry* const registry, Entity const entity) { return &registry->emplace<T>(entity); });
+		_componentTypes.emplace(name, [](EntityRegistry* const registry, Entity const entity) { return &registry->emplace<T>(entity); });
+
+		console::log(std::format("Registered component {}", name));
 	}
 }

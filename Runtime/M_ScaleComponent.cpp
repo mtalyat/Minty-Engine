@@ -10,7 +10,7 @@ void minty::ScaleComponent::serialize(Writer& writer) const
 
 void minty::ScaleComponent::deserialize(Reader const& reader)
 {
-	x = reader.read_float("x");
-	y = reader.read_float("y");
-	z = reader.read_float("z");
+	x = reader.read_float("x", 1.0f);
+	y = reader.read_float("y", 1.0f);
+	z = reader.read_float("z", 1.0f);
 }
