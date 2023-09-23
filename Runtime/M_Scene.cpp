@@ -41,5 +41,5 @@ void minty::Scene::unload()
 
 std::string const minty::Scene::to_string() const
 {
-	return std::format("[Scene({}, {})]", _systems.to_string(), _entities.to_string());
+	return std::format("Scene({}, {})", _systems.to_string(), _entities.to_string());
 }

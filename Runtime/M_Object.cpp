@@ -8,5 +8,5 @@ using namespace minty;
 std::string const Object::to_string() const
 {
 	// return the name of this object
-	return std::format("[{}]", typeid(*this).name());
+	return std::format("{}", typeid(*this).name());
 }

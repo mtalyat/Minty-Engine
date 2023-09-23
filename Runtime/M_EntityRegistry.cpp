@@ -4,6 +4,7 @@
 #include "M_Console.h"
 #include "M_NameComponent.h"
 #include <sstream>
+#include <map>
 
 using namespace minty;
 
@@ -59,30 +60,60 @@ std::string const minty::EntityRegistry::to_string() const
 	// named entities count
 	size_t namedCount = storage<NameComponent>()->size();
 
-	std::stringstream stream;
+	// get a count of similarly named entities, so there isn't 100 of the same named entity
+	std::map<std::string, size_t> counts = {};
 
-	stream << "[EntityRegistry(" << (entityCount - namedCount) << " unnamed, " << namedCount << " named";
+	if (entityCount != namedCount)
+	{
+		// add unnamed
+		counts.emplace("_", entityCount - namedCount);
+	}
 
-	// if there are named entities, print them and their names
 	if (namedCount > 0)
 	{
-		stream << ':';
-
-		size_t i = 0;
-		for (auto &&[entity, name] : view<NameComponent const>().each())
+		// add named
+		for (auto&& [entity, name] : view<NameComponent const>().each())
 		{
-			if (i > 0)
+			if (counts.find(name.name) != counts.end())
 			{
-				stream << ',';
+				// name exists
+				counts[name.name] += 1;
 			}
-
-			stream << ' ' << name.name;
-
-			i++;
+			else
+			{
+				// name does not exist yet
+				counts[name.name] = 1;
+			}
 		}
 	}
 
-	stream << ")]";
+	// build string list
+
+	std::stringstream stream;
+
+	stream << "EntityRegistry(";
+
+	size_t i = 0;
+	for (auto const& pair : counts)
+	{
+		if (i > 0)
+		{
+			stream << ", ";
+		}
+
+		// add name
+		stream << pair.first;
+
+		// add number if more than one
+		if (pair.second != 1)
+		{
+			stream << " (x" << pair.second << ")";
+		}	
+
+		i++;
+	}
+
+	stream << ")";
 
 	return stream.str();
 }
