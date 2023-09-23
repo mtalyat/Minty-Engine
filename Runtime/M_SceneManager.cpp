@@ -49,6 +49,10 @@ ID minty::SceneManager::create_scene(std::string const& path)
 			systemRegistry.emplace_by_name(pair.first, priority);
 		}
 	}
+	else
+	{
+		console::warn(std::format("Systems section not found for .scene file: {}", path));
+	}
 
 	// if "Entities" exists, create entities based on their components
 	found = node.children.find("Entities");
@@ -78,6 +82,10 @@ ID minty::SceneManager::create_scene(std::string const& path)
 				component->deserialize(reader);
 			}
 		}
+	}
+	else
+	{
+		console::warn(std::format("Entities section not found for .scene file: {}", path));
 	}
 
 	return id;

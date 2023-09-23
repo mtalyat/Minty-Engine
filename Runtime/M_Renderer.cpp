@@ -1801,6 +1801,8 @@ void Renderer::update_camera(CameraComponent const& camera, Vector3 const& posit
 
 	// proj * view * model
 
+	console::log(std::format("Camera update at {}, fov {}", position.to_string(), camera.fov));
+
 	// get view
 	// ignore z rotation for now...
 	//glm::mat4 view = glm::rotate(glm::mat4(1.0f), glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
