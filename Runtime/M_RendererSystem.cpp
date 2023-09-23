@@ -19,6 +19,10 @@ void minty::RendererSystem::load()
 {
 	// keep renderer reference since it will be used a lot
 	_renderer = &_engine->get_renderer();
+
+	// get first camera in scene to use, for now
+	auto view = _registry->view<CameraComponent>();
+	_mainCamera = view.front();
 }
 
 void minty::RendererSystem::update()
