@@ -102,8 +102,6 @@ namespace minty
 	template<class T>
 	inline void SystemRegistry::emplace(int const priority)
 	{
-		console::log("SR emplace addr: " + std::to_string(reinterpret_cast<uintptr_t>(_registry)), console::Color::Green);
-
 		this->emplace(new T(_engine, _registry), priority);
 	}
 
