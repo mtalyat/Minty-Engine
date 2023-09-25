@@ -12,9 +12,12 @@ namespace minty
 	{
 	private:
 		Renderer* _renderer;
+
 		Entity _mainCamera = NULL_ENTITY;
 
 	public:
+		RendererSystem(Engine* const engine, EntityRegistry* const registry);
+
 		void load() override;
 
 		void update() override;

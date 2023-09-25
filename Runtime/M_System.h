@@ -33,16 +33,9 @@ namespace minty
 		/// <summary>
 		/// Creates a new System.
 		/// </summary>
-		System();
+		System(Engine* const engine, EntityRegistry* const registry);
 
 		virtual ~System() {}
-
-		/// <summary>
-		/// Initializes the System with the Engine and EntityRegistry.
-		/// </summary>
-		/// <param name="engine"></param>
-		/// <param name="registry"></param>
-		void init(Engine& engine, EntityRegistry& registry);
 
 		/// <summary>
 		/// Sets the enabled state of this System.

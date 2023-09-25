@@ -7,12 +7,14 @@
 
 namespace minty
 {
-	class Runtime;
+	class Engine;
 
 	class SceneManager
 		: public Object
 	{
 	private:
+		Engine* _engine;
+
 		// if the scene manager has been loaded or not
 		// if not, no scenes will receive events
 		bool _loaded;
@@ -22,7 +24,7 @@ namespace minty
 		std::unordered_set<Scene*> _activeScenes;
 
 	public:
-		SceneManager();
+		SceneManager(Engine* const engine);
 
 		/// <summary>
 		/// Creates and loads an empty Scene.

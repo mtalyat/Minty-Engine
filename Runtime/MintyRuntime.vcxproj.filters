@@ -105,9 +105,6 @@
     <ClInclude Include="M_Texture.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="entt.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="M_InputMap.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -187,6 +184,9 @@
       <Filter>Header Files\Components</Filter>
     </ClInclude>
     <ClInclude Include="M_String.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\entt\entt.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -275,7 +275,7 @@
     <ClCompile Include="M_System.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="M_SystemManager.cpp">
+    <ClCompile Include="M_SystemRegistry.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_SerializedNode.cpp">

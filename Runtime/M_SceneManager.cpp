@@ -2,6 +2,7 @@
 #include "M_SceneManager.h"
 
 #include "M_Runtime.h"
+#include "M_Engine.h"
 #include "M_SerializedNode.h"
 #include "M_Reader.h"
 #include "M_Console.h"
@@ -10,8 +11,9 @@
 
 using namespace minty;
 
-minty::SceneManager::SceneManager()
-	: _loaded()
+minty::SceneManager::SceneManager(Engine* const engine)
+	: _engine(engine)
+	, _loaded()
 	, _scenes()
 	, _activeScenes()
 {}
@@ -19,7 +21,7 @@ minty::SceneManager::SceneManager()
 ID minty::SceneManager::create_scene()
 {
 	ID id = static_cast<ID>(_scenes.size());
-	_scenes.push_back(Scene());
+	_scenes.push_back(Scene(_engine));
 	return id;
 }
 
@@ -38,7 +40,7 @@ ID minty::SceneManager::create_scene(std::string const& path)
 	auto found = node.children.find("Systems");
 	if (found != node.children.end())
 	{
-		SystemRegistry& systemRegistry = scene.get_system_registry();
+		SystemRegistry* const systemRegistry = scene.get_system_registry();
 
 		// iterate through list of systems
 		for (auto const& pair : found->second.children)
@@ -46,7 +48,7 @@ ID minty::SceneManager::create_scene(std::string const& path)
 			// system could have priority listed, otherwise default to zero
 			int priority = 0;
 			pair.second.try_get_int(priority);
-			systemRegistry.emplace_by_name(pair.first, priority);
+			systemRegistry->emplace_by_name(pair.first, priority);
 		}
 	}
 	else
@@ -58,26 +60,26 @@ ID minty::SceneManager::create_scene(std::string const& path)
 	found = node.children.find("Entities");
 	if (found != node.children.end())
 	{
-		EntityRegistry& entityRegistry = scene.get_entity_registry();
+		EntityRegistry* const entityRegistry = scene.get_entity_registry();
 		
 		// iterate through list of entities
 		for (auto const& pair : found->second.children)
 		{
 			// create entity
-			Entity const entity = entityRegistry.create();
+			Entity const entity = entityRegistry->create();
 
 			// add name if there is one
 			// empty name is either "" or "_"
 			if (pair.first.size() > 1 || (pair.first.size() == 1 && pair.first.at(0) != '_'))
 			{
-				NameComponent& name = entityRegistry.emplace<NameComponent>(entity);
+				NameComponent& name = entityRegistry->emplace<NameComponent>(entity);
 				name.name = pair.first;
 			}
 			
 			// now add the other components (children)
 			for (auto& componentPair : pair.second.children)
 			{
-				Component* component = entityRegistry.emplace_by_name(componentPair.first, entity);
+				Component* component = entityRegistry->emplace_by_name(componentPair.first, entity);
 				Reader reader(componentPair.second);
 				component->deserialize(reader);
 			}

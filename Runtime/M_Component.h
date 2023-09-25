@@ -8,6 +8,8 @@ namespace minty
 	struct Component
 		: public Object, public ISerializable
 	{
+		virtual ~Component() {}
+
 		/// <summary>
 		/// Disposes any resources connected to this Component.
 		/// </summary>

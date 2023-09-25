@@ -6,6 +6,8 @@
 
 namespace minty
 {
+	class Engine;
+
 	/// <summary>
 	/// 
 	/// </summary>
@@ -13,26 +15,33 @@ namespace minty
 		public Object
 	{
 	private:
-		EntityRegistry _entities;
-		SystemRegistry _systems;
+		Engine* _engine;
+		EntityRegistry* _entities;
+		SystemRegistry* _systems;
 
 	public:
 		/// <summary>
 		/// Creates an empty Scene.
 		/// </summary>
-		Scene();
+		Scene(Engine* const engine);
+
+		~Scene();
+
+		Scene(Scene&& other) noexcept;
+
+		Scene& operator=(Scene&& other) noexcept;
 
 		/// <summary>
 		/// Gets the EntityRegistry used in the Scene.
 		/// </summary>
 		/// <returns></returns>
-		EntityRegistry& get_entity_registry();
+		EntityRegistry* get_entity_registry() const;
 
 		/// <summary>
 		/// Gets the SystemRegistry used in the Scene.
 		/// </summary>
 		/// <returns></returns>
-		SystemRegistry& get_system_registry();
+		SystemRegistry* get_system_registry() const;
 
 		/// <summary>
 		/// Loads the Scene.

@@ -5,17 +5,12 @@
 
 using namespace minty;
 
-minty::System::System()
+minty::System::System(Engine* const engine, EntityRegistry* const registry)
 	: _enabled(true)
-	, _engine()
-	, _registry()
+	, _engine(engine)
+	, _registry(registry)
 {
-}
-
-void minty::System::init(Engine& engine, EntityRegistry& registry)
-{
-	_engine = &engine;
-	_registry = &registry;
+	console::log("System engine/registry addrs: " + std::to_string(reinterpret_cast<uintptr_t>(engine)) + "/" + std::to_string(reinterpret_cast<uintptr_t>(registry)), console::Color::Green);
 }
 
 void minty::System::set_enabled(bool const enabled)

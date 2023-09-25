@@ -16,6 +16,7 @@ uint32_t const HEIGHT = 600;
 Engine::Engine()
 	: _window("Minty", WIDTH, HEIGHT)
 	, _renderer(&_window)
+	, _sceneManager(this)
 {
 
 }

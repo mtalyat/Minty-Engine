@@ -13,16 +13,36 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 
+#include <cstdint>
+
 using namespace minty;
+
+minty::RendererSystem::RendererSystem(Engine* const engine, EntityRegistry* const registry)
+	: System(engine, registry)
+	, _renderer(&engine->get_renderer())
+	, _mainCamera(NULL_ENTITY)
+{}
 
 void minty::RendererSystem::load()
 {
-	// keep renderer reference since it will be used a lot
-	_renderer = &_engine->get_renderer();
+	//// keep renderer reference since it will be used a lot
+	//_renderer = &_engine->get_renderer();
 
-	// get first camera in scene to use, for now
-	auto view = _registry->view<CameraComponent>();
-	_mainCamera = view.front();
+	////// get first camera in scene to use, for now
+	//auto view = _registry->view<CameraComponent>();
+	////console::error(std::format("camera count: {}", view.size()));
+	////_mainCamera = view.front();
+
+	Entity entity = _registry->create();
+
+	_registry->emplace<CameraComponent>(entity);
+
+	PositionComponent& pos = _registry->emplace<PositionComponent>(entity);
+	pos.z = -4.0f;
+
+	_mainCamera = entity;
+
+	CameraComponent& camera = _registry->get<CameraComponent>(entity);
 }
 
 void minty::RendererSystem::update()

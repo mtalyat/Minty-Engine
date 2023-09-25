@@ -15,28 +15,46 @@ namespace minty
 		: public Object
 	{
 	public:
-		typedef std::function<System* ()> SystemFunc;
+		typedef std::function<System* (Engine* const, EntityRegistry* const)> SystemFunc;
 
 	private:
-		static std::map<std::string const, SystemFunc const> _systemTypes;
+		Engine* _engine;
+
+		EntityRegistry* _registry;
 
 		// the systems to manage
-		std::map<int, std::set<System*>> _systems;
+		std::map<int, std::set<System*>>* _systems;
 
+		static std::map<std::string const, SystemFunc const> _systemTypes;
 	public:
 		/// <summary>
 		/// Creates an empty SystemRegistry.
 		/// </summary>
-		SystemRegistry();
+		SystemRegistry(Engine* const engine, EntityRegistry* const registry);
 
 		~SystemRegistry();
 
+		// move
+		SystemRegistry(SystemRegistry&& other) noexcept;
+
+		SystemRegistry& operator=(SystemRegistry&& other) noexcept;
+
+	private:
 		/// <summary>
 		/// Places the given System within this SystemRegistry.
 		/// </summary>
 		/// <param name="system">The system to add.</param>
 		/// <param name="priority">The priority in which to update this System in.</param>
 		void emplace(System* const system, int const priority = 0);
+
+	public:
+		/// <summary>
+		/// Places the given System within this SystemRegistry.
+		/// </summary>
+		/// <typeparam name="T">The system to add.</typeparam>
+		/// <param name="priority">The priority in which to update this System in.</param>
+		template<class T>
+		void emplace(int const priority = 0);
 
 		/// <summary>
 		/// Creates and places a registered System within this SystemRegistry.
@@ -82,9 +100,17 @@ namespace minty
 	};
 
 	template<class T>
+	inline void SystemRegistry::emplace(int const priority)
+	{
+		console::log("SR emplace addr: " + std::to_string(reinterpret_cast<uintptr_t>(_registry)), console::Color::Green);
+
+		this->emplace(new T(_engine, _registry), priority);
+	}
+
+	template<class T>
 	void SystemRegistry::register_system(std::string const& name)
 	{
-		_systemTypes.emplace(name, []() { return new T(); });
+		_systemTypes.emplace(name, [](Engine* const engine, EntityRegistry* const registry) { return new T(engine, registry); });
 
 		console::info(std::format("Registered system {}", name));
 	}

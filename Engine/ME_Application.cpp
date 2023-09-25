@@ -25,6 +25,112 @@
 using namespace mintye;
 using namespace minty;
 
+ID matId = 0;
+InputMap input;
+
+void init(Runtime& runtime)
+{
+	Engine& engine = runtime.get_engine();
+	Window* windowPtr = &engine.get_window();
+	Renderer* rendererPtr = &engine.get_renderer();
+	SceneManager& sceneManager = engine.get_scene_manager();
+
+	// load scene from disk
+	// ID sceneId = sceneManager.create_scene("Assets/Scenes/test.scene");
+	console::test("Create scene");
+	ID sceneId = sceneManager.create_scene();
+
+	console::test("Activate scene");
+	// activate scene
+	sceneManager.activate_scene(sceneId);
+
+	console::test("Get scene:");
+	// debug print it
+	Scene& scene = sceneManager.get_scene(sceneId);
+	console::test("Print scene:");
+	console::log("Before: " + scene.to_string());
+
+	SystemRegistry* const systems = scene.get_system_registry();
+	EntityRegistry* const entities = scene.get_entity_registry();
+
+	systems->emplace<RendererSystem>();
+	// systems.emplace_by_name("Renderer");
+
+	console::log("After: " + scene.to_string());
+
+	rendererPtr->create_texture("Assets/Textures/pattern.png");
+	rendererPtr->create_texture("Assets/Textures/funny.jpg");
+	rendererPtr->create_texture("Assets/Textures/texture.jpg");
+	rendererPtr->create_texture("Assets/Textures/brian.png");
+
+	rendererPtr->create_shader("Assets/Shaders/vert.spv", "Assets/Shaders/frag.spv");
+
+	rendererPtr->create_material(0, 0, Color(255, 255, 255));
+	rendererPtr->create_material(0, 1, Color(255, 0, 0));
+	rendererPtr->create_material(0, 2, Color(0, 255, 0));
+	rendererPtr->create_material(0, 3, Color(0, 0, 255));
+
+	rendererPtr->create_main_mesh();
+
+
+
+	ID* matIdPtr = &matId;
+
+	// input
+	// rotate when space held
+	input.emplace_key_down(Key::D1, [rendererPtr, matIdPtr](KeyPressEventArgs const& args)
+		{
+			*matIdPtr = 0;
+			rendererPtr->set_material_for_main_mesh(*matIdPtr);
+		});
+	input.emplace_key_down(Key::D2, [rendererPtr, matIdPtr](KeyPressEventArgs const& args)
+		{
+			*matIdPtr = 1;
+			rendererPtr->set_material_for_main_mesh(*matIdPtr);
+		});
+	input.emplace_key_down(Key::D3, [rendererPtr, matIdPtr](KeyPressEventArgs const& args)
+		{
+			*matIdPtr = 2;
+			rendererPtr->set_material_for_main_mesh(*matIdPtr);
+		});
+	input.emplace_key_down(Key::D4, [rendererPtr, matIdPtr](KeyPressEventArgs const& args)
+		{
+			*matIdPtr = 3;
+			rendererPtr->set_material_for_main_mesh(*matIdPtr);
+		});
+	input.emplace_key_down(Key::Q, [rendererPtr, matIdPtr](KeyPressEventArgs const& args)
+		{
+			Material& mat = rendererPtr->get_material(*matIdPtr);
+			mat.color = Color(255, 255, 255);
+			rendererPtr->update_material(*matIdPtr);
+		});
+	input.emplace_key_down(Key::W, [rendererPtr, matIdPtr](KeyPressEventArgs const& args)
+		{
+			Material& mat = rendererPtr->get_material(*matIdPtr);
+			mat.color = Color(255, 0, 0);
+			rendererPtr->update_material(*matIdPtr);
+		});
+	input.emplace_key_down(Key::E, [rendererPtr, matIdPtr](KeyPressEventArgs const& args)
+		{
+			Material& mat = rendererPtr->get_material(*matIdPtr);
+			mat.color = Color(0, 255, 0);
+			rendererPtr->update_material(*matIdPtr);
+		});
+	input.emplace_key_down(Key::R, [rendererPtr, matIdPtr](KeyPressEventArgs const& args)
+		{
+			Material& mat = rendererPtr->get_material(*matIdPtr);
+			mat.color = Color(0, 0, 255);
+			rendererPtr->update_material(*matIdPtr);
+		});
+	// quit on key close
+	input.emplace_key_down(Key::Escape, [windowPtr](KeyPressEventArgs const& args)
+		{
+			windowPtr->close();
+		});
+
+	windowPtr->setInput(&input);
+}
+
 // A quick way to split strings separated via spaces.
 std::vector<std::string> splitString(std::string s)
 {
@@ -102,6 +208,7 @@ void Application::run(int argc, char const* argv[])
 		// print commands
 		std::cout << std::endl <<
 			" ______________ Commands ______________ " << std::endl <<
+			"| test ......... test runs the runtime |" << std::endl <<
 			"| debug ........ set config to debug   |" << std::endl <<
 			"| release ...... set config to release |" << std::endl <<
 			"| clean ........ clean project         |" << std::endl <<
@@ -127,7 +234,26 @@ void Application::run(int argc, char const* argv[])
 		// run commands
 		for (std::string const& c : commands)
 		{
-			if (c.compare("debug") == 0)
+			if (c.compare("test") == 0)
+			{
+				char const* args[2]
+				{
+					argv[0],
+					path.c_str()
+				};
+				Runtime rt(2, args);
+				init(rt);
+				int result = rt.run();
+				if (result)
+				{
+					console::error(std::format("Runtime exited with code {}.", result));
+				}
+				else
+				{
+					console::log("Runtime exited with code 0.", console::Color::Green);
+				}
+			}
+			else if (c.compare("debug") == 0)
 			{
 				if (!info.debug)
 				{

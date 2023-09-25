@@ -208,8 +208,8 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="entt.hpp" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="libraries\entt\entt.hpp" />
     <ClInclude Include="M_CameraComponent.h" />
     <ClInclude Include="M_Component.h" />
     <ClInclude Include="M_EntityRegistry.h" />
@@ -288,7 +288,7 @@
     <ClCompile Include="M_SerializedNode.cpp" />
     <ClCompile Include="M_Shader.cpp" />
     <ClCompile Include="M_System.cpp" />
-    <ClCompile Include="M_SystemManager.cpp" />
+    <ClCompile Include="M_SystemRegistry.cpp" />
     <ClCompile Include="M_Texture.cpp" />
     <ClCompile Include="M_Vector2Int.cpp" />
     <ClCompile Include="M_Vector2.cpp" />

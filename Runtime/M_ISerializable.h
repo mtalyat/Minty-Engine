@@ -9,6 +9,8 @@ namespace minty
 	class ISerializable
 	{
 	public:
+		virtual ~ISerializable() {}
+
 		virtual void serialize(Writer& writer) const = 0;
 
 		virtual void deserialize(Reader const& reader) = 0;

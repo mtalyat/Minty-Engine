@@ -21,6 +21,15 @@ namespace minty
 	public:
 		EntityRegistry();
 
+		~EntityRegistry();
+
+		// move constructor
+		EntityRegistry(EntityRegistry&& other) noexcept;
+
+		EntityRegistry& operator=(EntityRegistry&& other) noexcept;
+
+		//~EntityRegistry();
+
 		/// <summary>
 		/// Gets the name of the Entity, or an empty string if no name exists.
 		/// The name of an Entity can be added by emplacing the NameComponent component.

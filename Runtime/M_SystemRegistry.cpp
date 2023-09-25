@@ -2,37 +2,68 @@
 #include "M_SystemRegistry.h"
 
 #include "M_Console.h"
+#include "M_Engine.h"
+
 #include <sstream>
 
 namespace minty
 {
 	std::map<std::string const, SystemRegistry::SystemFunc const> SystemRegistry::_systemTypes = std::map<std::string const, SystemRegistry::SystemFunc const>();
 
-	SystemRegistry::SystemRegistry()
-		: _systems()
+	SystemRegistry::SystemRegistry(Engine* const engine, EntityRegistry* const registry)
+		: _engine(engine)
+		, _registry(registry)
+		, _systems(new std::map<int, std::set<System*>>())
 	{}
 
 	SystemRegistry::~SystemRegistry()
 	{
 		// delete each system
-		for (auto& pair : _systems)
+		for (auto& pair : *_systems)
 		{
 			for (auto system : pair.second)
 			{
 				delete system;
 			}
 		}
+		delete _systems;
+	}
+
+	SystemRegistry::SystemRegistry(SystemRegistry&& other) noexcept
+		: _engine(other._engine)
+		, _registry(other._registry)
+		, _systems(other._systems)
+	{
+		other._engine = nullptr;
+		other._registry = nullptr;
+		other._systems = nullptr;
+	}
+
+	SystemRegistry& SystemRegistry::operator=(SystemRegistry&& other) noexcept
+	{
+		if (this != &other)
+		{
+			_engine = other._engine;
+			_registry = other._registry;
+			_systems = other._systems;
+
+			other._engine = nullptr;
+			other._registry = nullptr;
+			other._systems = nullptr;
+		}
+
+		return *this;
 	}
 
 	void SystemRegistry::emplace(System* const system, int const priority)
 	{
-		auto found = _systems.find(priority);
+		auto found = _systems->find(priority);
 
-		if (found == _systems.end())
+		if (found == _systems->end())
 		{
 			// new list
-			_systems.emplace(priority, std::set<System*>());
-			_systems.at(priority).emplace(system);
+			_systems->emplace(priority, std::set<System*>());
+			_systems->at(priority).emplace(system);
 		}
 		else
 		{
@@ -52,14 +83,14 @@ namespace minty
 		else
 		{
 			// name found
-			emplace(found->second(), priority);
+			this->emplace(found->second(_engine, _registry), priority);
 		}
 	}
 
 	void SystemRegistry::erase(System* const system)
 	{
 		// find system, remove it from list
-		for (auto& pair : _systems)
+		for (auto& pair : *_systems)
 		{
 			if (pair.second.erase(system))
 			{
@@ -71,10 +102,11 @@ namespace minty
 
 	void SystemRegistry::load()
 	{
-		for (auto& pair : _systems)
+		for (auto& pair : *_systems)
 		{
 			for (auto system : pair.second)
 			{
+				console::log(std::format("Loading system: {}", typeid(system).name()));
 				system->load();
 			}
 		}
@@ -82,7 +114,7 @@ namespace minty
 
 	void SystemRegistry::update()
 	{
-		for (auto& pair : _systems)
+		for (auto& pair : *_systems)
 		{
 			for (auto system : pair.second)
 			{
@@ -96,7 +128,7 @@ namespace minty
 
 	void SystemRegistry::fixed_update()
 	{
-		for (auto& pair : _systems)
+		for (auto& pair : *_systems)
 		{
 			for (auto system : pair.second)
 			{
@@ -110,7 +142,7 @@ namespace minty
 
 	void SystemRegistry::unload()
 	{
-		for (auto& pair : _systems)
+		for (auto& pair : *_systems)
 		{
 			for (auto system : pair.second)
 			{
@@ -121,10 +153,8 @@ namespace minty
 
 	std::string const SystemRegistry::to_string() const
 	{
-		//return std::format("[SystemRegistry({})]", _systems.size());
-
 		// if no systems in registry
-		if (_systems.size() == 0)
+		if (_systems->size() == 0)
 		{
 			return "SystemRegistry()";
 		}
@@ -134,7 +164,7 @@ namespace minty
 		stream << "SystemRegistry(";
 
 		size_t i = 0;
-		for (auto const& pair : _systems)
+		for (auto const& pair : *_systems)
 		{
 			for (auto const& system : pair.second)
 			{

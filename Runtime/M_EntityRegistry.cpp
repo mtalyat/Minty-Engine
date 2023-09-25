@@ -12,7 +12,21 @@ std::map<std::string const, EntityRegistry::ComponentFunc const> EntityRegistry:
 
 minty::EntityRegistry::EntityRegistry()
 	: entt::registry()
+	, Object()
+{}
+
+minty::EntityRegistry::~EntityRegistry()
+{}
+
+minty::EntityRegistry::EntityRegistry(EntityRegistry && other) noexcept
+	: entt::registry(std::move(other))
+{}
+
+EntityRegistry& minty::EntityRegistry::operator=(EntityRegistry&& other) noexcept
 {
+	this->operator=(std::move(other));
+
+	return *this;
 }
 
 std::string minty::EntityRegistry::get_name(Entity const entity) const
@@ -49,7 +63,7 @@ Component* minty::EntityRegistry::emplace_by_name(std::string const& name, Entit
 
 size_t minty::EntityRegistry::count() const
 {
-	return storage<Entity>()->size();
+	return this->storage<Entity>()->size();
 }
 
 std::string const minty::EntityRegistry::to_string() const
@@ -58,10 +72,10 @@ std::string const minty::EntityRegistry::to_string() const
 	size_t entityCount = count();
 
 	// named entities count
-	size_t namedCount = storage<NameComponent>()->size();
+	size_t namedCount = this->view<NameComponent const>().size();
 
 	// get a count of similarly named entities, so there isn't 100 of the same named entity
-	std::map<std::string, size_t> counts = {};
+	std::map<std::string, size_t> counts;
 
 	if (entityCount != namedCount)
 	{
@@ -108,7 +122,7 @@ std::string const minty::EntityRegistry::to_string() const
 		if (pair.second != 1)
 		{
 			stream << " (x" << pair.second << ")";
-		}	
+		}
 
 		i++;
 	}
