@@ -127,6 +127,11 @@ namespace minty
 		}
 	}
 
+	size_t SystemRegistry::size() const
+	{
+		return _allSystems.size();
+	}
+
 	void SystemRegistry::load()
 	{
 		for (auto& pair : _orderedSystems)

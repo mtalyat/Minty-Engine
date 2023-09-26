@@ -1053,7 +1053,7 @@ void minty::Renderer::create_descriptor_sets()
 		{
 			if (j < _textures.size())
 			{
-				Texture const& tex = get_texture(j);
+				Texture const& tex = get_texture(static_cast<ID>(j));
 
 				imageInfos[j].imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
 				imageInfos[j].imageView = tex._view;
@@ -1949,7 +1949,7 @@ void minty::Renderer::render_mesh(VkCommandBuffer commandBuffer, Mesh const* con
 	vkCmdPushConstants(commandBuffer, shader.layout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(MeshInfo), &info);
 
 	// draw
-	vkCmdDrawIndexed(commandBuffer, mesh->_indexCount, 1, 0, 0, 0);
+	vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(mesh->_indexCount), 1, 0, 0, 0);
 }
 
 void minty::Renderer::create_material_buffers()

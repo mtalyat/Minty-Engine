@@ -19,7 +19,18 @@ namespace minty
 	public:
 		Reader(SerializedNode const& node);
 
+		/// <summary>
+		/// Gets the root node that this Reader is using.
+		/// </summary>
+		/// <returns>A pointer to the root node.</returns>
 		SerializedNode const* get_node() const;
+
+		/// <summary>
+		/// Gets the child node with the given name from the root node.
+		/// </summary>
+		/// <param name="name">The name of the child node.</param>
+		/// <returns>The child node, or null if it does not exist.</returns>
+		SerializedNode const* get_node(std::string const& name) const;
 
 		void read_object(std::string const& name, ISerializable* const value) const;
 

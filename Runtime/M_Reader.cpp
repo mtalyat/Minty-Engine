@@ -14,19 +14,37 @@ SerializedNode const* minty::Reader::get_node() const
 	return &_node;
 }
 
+SerializedNode const* minty::Reader::get_node(std::string const& name) const
+{
+	auto const& found = _node.children.find(name);
+	if (found != _node.children.end())
+	{
+		// found
+		return &found->second;
+	}
+
+	// not found
+	return nullptr;
+}
+
 void minty::Reader::read_object(std::string const& name, ISerializable* const value) const
 {
 	auto const& found = _node.children.find(name);
 	if (found != _node.children.end())
 	{
 		// create Reader to use
-		Reader Reader(found->second);
+		Reader reader(found->second);
 
 		// deserialize the values into the given object
-		value->deserialize(Reader);
+		value->deserialize(reader);
 	}
-
-	// do nothing if not found
+	else
+	{
+		// deserialize with an empty node so it is initialized to defaults
+		SerializedNode empty;
+		Reader reader(empty);
+		value->deserialize(reader);
+	}
 }
 
 std::string minty::Reader::read_string(std::string const& name, std::string const& defaultValue) const

@@ -8,7 +8,8 @@
 
 using namespace minty;
 
-std::map<std::string const, EntityRegistry::ComponentFunc const> EntityRegistry::_componentTypes = std::map<std::string const, EntityRegistry::ComponentFunc const>();
+std::map<std::string const, EntityRegistry::ComponentFuncs const> EntityRegistry::_components = std::map<std::string const, EntityRegistry::ComponentFuncs const>();
+std::map<uint32_t const, std::string const> EntityRegistry::_componentTypes = std::map<uint32_t const, std::string const>();
 
 minty::EntityRegistry::EntityRegistry()
 	: entt::registry()
@@ -18,13 +19,13 @@ minty::EntityRegistry::EntityRegistry()
 minty::EntityRegistry::~EntityRegistry()
 {}
 
-minty::EntityRegistry::EntityRegistry(EntityRegistry && other) noexcept
+minty::EntityRegistry::EntityRegistry(EntityRegistry&& other) noexcept
 	: entt::registry(std::move(other))
 {}
 
 EntityRegistry& minty::EntityRegistry::operator=(EntityRegistry&& other) noexcept
 {
-	this->operator=(std::move(other));
+	entt::registry::operator=(std::move(other));
 
 	return *this;
 }
@@ -68,8 +69,8 @@ std::string minty::EntityRegistry::get_name(Entity const entity) const
 
 Component* minty::EntityRegistry::emplace_by_name(std::string const& name, Entity const entity)
 {
-	auto const& found = _componentTypes.find(name);
-	if (found == _componentTypes.end())
+	auto const& found = _components.find(name);
+	if (found == _components.end())
 	{
 		// name not found
 		throw std::runtime_error(std::format("Cannot emplace Component \"{}\". It has not been registered with the EntityRegistry.", name));
@@ -77,11 +78,26 @@ Component* minty::EntityRegistry::emplace_by_name(std::string const& name, Entit
 	else
 	{
 		// name found
-		return found->second(this, entity);
+		return found->second.create(this, entity);
 	}
 }
 
-size_t minty::EntityRegistry::count() const
+Component const* minty::EntityRegistry::get_by_name(std::string const& name, Entity const entity) const
+{
+	auto const& found = _components.find(name);
+	if (found == _components.end())
+	{
+		// name not found
+		throw std::runtime_error(std::format("Cannot get Component \"{}\". It has not been registered with the EntityRegistry.", name));
+	}
+	else
+	{
+		// name found
+		return found->second.get(this, entity);
+	}
+}
+
+size_t minty::EntityRegistry::size() const
 {
 	return this->storage<Entity>()->size();
 }
@@ -89,7 +105,7 @@ size_t minty::EntityRegistry::count() const
 std::string const minty::EntityRegistry::to_string() const
 {
 	// total entities
-	size_t entityCount = count();
+	size_t entityCount = size();
 
 	// named entities count
 	size_t namedCount = this->view<NameComponent const>().size();
@@ -154,8 +170,77 @@ std::string const minty::EntityRegistry::to_string() const
 
 void minty::EntityRegistry::serialize(Writer& writer) const
 {
+	// write each entity, and each component under it
+	std::string entityName;
+
+	for (auto [entity] : this->storage<Entity>()->each())
+	{
+		// populate a node with children
+		SerializedNode entityNode;
+		Writer entityWriter(entityNode);
+
+		for (auto&& curr : this->storage())
+		{
+			//auto cid = curr.first;
+			auto& storage = curr.second;
+			auto const& ctype = storage.type();
+
+			if (storage.contains(entity))
+			{
+				// this entity has this component type, so get the "pretty" name
+				auto const& found = _componentTypes.find(ctype.index());
+				if (found == _componentTypes.end())
+				{
+					console::error(std::format("Cannot find component type with id: {}, name: {}", ctype.index(), ctype.name().data()));
+					continue;
+				}
+
+				std::string name = found->second;
+
+				// ignore NameComponent, that is used when writing the entity node
+				if (name.compare("Name") == 0)
+				{
+					continue;
+				}
+
+				// write component with its name and serialized values
+				entityWriter.write(name, this->get_by_name(name, entity));
+			}
+		}
+
+		// get entity name
+		entityName = this->get_name(entity);
+
+		// write entity node
+		writer.write(entityName, entityNode);
+	}
 }
 
 void minty::EntityRegistry::deserialize(Reader const& reader)
 {
+	// read each entity, add name if it has one
+	
+	SerializedNode const* node = reader.get_node();
+
+	for (auto const& pair : node->children)
+	{
+		// create entity
+		Entity const entity = this->create();
+
+		// add name if there is one
+		// empty name is either "" or "_"
+		if (pair.first.size() > 1 || (pair.first.size() == 1 && pair.first.at(0) != '_'))
+		{
+			NameComponent& name = this->emplace<NameComponent>(entity);
+			name.name = pair.first;
+		}
+
+		// now add the other components (children)
+		for (auto& componentPair : pair.second.children)
+		{
+			Component* component = this->emplace_by_name(componentPair.first, entity);
+			Reader reader(componentPair.second);
+			component->deserialize(reader);
+		}
+	}
 }

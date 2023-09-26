@@ -82,10 +82,12 @@ std::string const minty::Scene::to_string() const
 
 void minty::Scene::serialize(Writer& writer) const
 {
-	
+	writer.write("Systems", _systems);
+	writer.write("Entities", _entities);
 }
 
 void minty::Scene::deserialize(Reader const& reader)
 {
-
+	reader.read_object("Systems", _systems);
+	reader.read_object("Entities", _entities);
 }

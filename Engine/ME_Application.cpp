@@ -35,28 +35,23 @@ void init(Runtime& runtime)
 	Renderer* rendererPtr = &engine.get_renderer();
 	SceneManager& sceneManager = engine.get_scene_manager();
 
-	//// load scene from disk
-	//// ID sceneId = sceneManager.create_scene("Assets/Scenes/test.scene");
-	//console::test("Create scene");
-	//ID sceneId = sceneManager.create_scene();
 
-	//console::test("Activate scene");
-	//// activate scene
-	//sceneManager.activate_scene(sceneId);
+	// load scene from disk
+	ID sceneId = sceneManager.create_scene("Assets/Scenes/test.scene");
+	Scene& scene = sceneManager.get_scene(sceneId);
+	EntityRegistry* er = scene.get_entity_registry();
+	SystemRegistry* sr = scene.get_system_registry();
 
-	//console::test("Get scene:");
-	//// debug print it
-	//Scene& scene = sceneManager.get_scene(sceneId);
-	//console::test("Print scene:");
-	//console::log("Before: " + scene.to_string());
+	// get the camera and set it as the main camera
+	// Entity camera = er->find_by_type<CameraComponent>();
+	Entity camera = er->find_by_name("Camera");
+	RendererSystem* rendererSystem = sr->find_by_type<RendererSystem>();
+	rendererSystem->set_main_camera(camera);
 
-	//SystemRegistry* const systems = scene.get_system_registry();
-	//EntityRegistry* const entities = scene.get_entity_registry();
+	console::log(std::format("Camera set to: {}", er->get_name(camera)));
 
-	//systems->emplace<RendererSystem>();
-	//// systems.emplace_by_name("Renderer");
+	console::log(scene.to_string());
 
-	//console::log("After: " + scene.to_string());
 
 	rendererPtr->create_texture("Assets/Textures/pattern.png");
 	rendererPtr->create_texture("Assets/Textures/funny.jpg");

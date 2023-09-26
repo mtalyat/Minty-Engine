@@ -87,6 +87,12 @@ namespace minty
 		void erase(System* const system);
 
 		/// <summary>
+		/// Gets the number of systems within the registry.
+		/// </summary>
+		/// <returns>The total number of systems within the registry.</returns>
+		size_t size() const;
+
+		/// <summary>
 		/// Runs the load method on each System within this SystemRegistry.
 		/// </summary>
 		void load();

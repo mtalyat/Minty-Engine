@@ -31,65 +31,26 @@ ID minty::SceneManager::create_scene(std::string const& path)
 	ID id = create_scene();
 	Scene& scene = _scenes.at(id);
 
-	// load the data from the disk
+	// load the data from the disk into the scene
 	SerializedNode node = SerializedNode::parse_file(path);
+	Reader reader(node);
+	scene.deserialize(reader);
 
-	// parse
+	console::log(std::format("Read scene from file with {} systems and {} entities.", scene.get_system_registry()->size(), scene.get_entity_registry()->size()));
 
-	// if "Systems" exists, load systems based on name
-	auto found = node.children.find("Systems");
-	if (found != node.children.end())
-	{
-		SystemRegistry* const systemRegistry = scene.get_system_registry();
+	console::log("Deserialized scene:", console::Color::BrightMagenta);
 
-		// iterate through list of systems
-		for (auto const& pair : found->second.children)
-		{
-			// system could have priority listed, otherwise default to zero
-			int priority = 0;
-			pair.second.to_int(priority);
-			systemRegistry->emplace_by_name(pair.first, priority);
-		}
-	}
-	else
-	{
-		console::warn(std::format("Systems section not found for .scene file: {}", path));
-	}
+	node.print();
 
-	// if "Entities" exists, create entities based on their components
-	found = node.children.find("Entities");
-	if (found != node.children.end())
-	{
-		EntityRegistry* const entityRegistry = scene.get_entity_registry();
-		
-		// iterate through list of entities
-		for (auto const& pair : found->second.children)
-		{
-			// create entity
-			Entity const entity = entityRegistry->create();
+	console::log("Serialized scene:", console::Color::BrightMagenta);
 
-			// add name if there is one
-			// empty name is either "" or "_"
-			if (pair.first.size() > 1 || (pair.first.size() == 1 && pair.first.at(0) != '_'))
-			{
-				NameComponent& name = entityRegistry->emplace<NameComponent>(entity);
-				name.name = pair.first;
-			}
-			
-			// now add the other components (children)
-			for (auto& componentPair : pair.second.children)
-			{
-				Component* component = entityRegistry->emplace_by_name(componentPair.first, entity);
-				Reader reader(componentPair.second);
-				component->deserialize(reader);
-			}
-		}
-	}
-	else
-	{
-		console::warn(std::format("Entities section not found for .scene file: {}", path));
-	}
+	node = SerializedNode();
+	Writer writer(node);
+	scene.serialize(writer);
 
+	node.print();
+
+	// all done
 	return id;
 }
 

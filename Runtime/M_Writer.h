@@ -21,6 +21,8 @@ namespace minty
 
 		void write(std::string const& name);
 
+		void write(std::string const& name, SerializedNode const& node);
+
 		void write(std::string const& name, ISerializable const* const value);
 
 		void write(std::string const& name, std::string const& value);

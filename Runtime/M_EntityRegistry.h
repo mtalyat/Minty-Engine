@@ -14,10 +14,18 @@ namespace minty
 		: public Object, public entt::registry, public ISerializable
 	{
 	public:
-		typedef std::function<Component* (EntityRegistry* const, Entity const)> ComponentFunc;
+		typedef std::function<Component* (EntityRegistry* const, Entity const)> ComponentCreateFunc;
+		typedef std::function<Component const* (EntityRegistry const* const, Entity const)> ComponentGetFunc;
 
 	private:
-		static std::map<std::string const, ComponentFunc const> _componentTypes;
+		struct ComponentFuncs
+		{
+			ComponentCreateFunc create;
+			ComponentGetFunc get;
+		};
+
+		static std::map<std::string const, ComponentFuncs const> _components; // name -> creation/get funcs
+		static std::map<uint32_t const, std::string const> _componentTypes; // type id index -> name
 
 	public:
 		EntityRegistry();
@@ -55,7 +63,7 @@ namespace minty
 		std::string get_name(Entity const entity) const;
 
 		/// <summary>
-		/// Emplaces the component onto the entity, by name.
+		/// Emplaces the Component onto the entity, by name.
 		/// </summary>
 		/// <param name="name">The name of the Component.</param>
 		/// <param name="entity">The Entity to emplace the Component onto.</param>
@@ -63,10 +71,18 @@ namespace minty
 		Component* emplace_by_name(std::string const& name, Entity const entity);
 
 		/// <summary>
+		/// Gets the Component, by name.
+		/// </summary>
+		/// <param name="name">The name of the Component.</param>
+		/// <param name="entity">The Entity that has the Component.</param>
+		/// <returns>The Component, or null if it does not exist.</returns>
+		Component const* get_by_name(std::string const& name, Entity const entity) const;
+
+		/// <summary>
 		/// Gets the total number of Entities within this registry.
 		/// </summary>
 		/// <returns>The total number of Entities.</returns>
-		size_t count() const;
+		size_t size() const;
 
 		std::string const to_string() const override;
 
@@ -98,7 +114,17 @@ namespace minty
 	template<class T>
 	void EntityRegistry::register_component(std::string const& name)
 	{
-		_componentTypes.emplace(name, [](EntityRegistry* const registry, Entity const entity) { return &registry->emplace<T>(entity); });
+		// funcs
+		ComponentFuncs funcs = {
+			.create = [](EntityRegistry* const registry, Entity const entity) { return &registry->emplace<T>(entity); },
+				.get = [](EntityRegistry const* const registry, Entity const entity) { return registry->try_get<T>(entity); }
+		};
+		_components.emplace(name, funcs);
+
+		entt::type_info info = entt::type_id<T>();
+
+		// type names
+		_componentTypes.emplace(info.index(), name);
 
 		console::info(std::format("Registered component {}", name));
 	}
