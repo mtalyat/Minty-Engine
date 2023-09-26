@@ -35,28 +35,28 @@ void init(Runtime& runtime)
 	Renderer* rendererPtr = &engine.get_renderer();
 	SceneManager& sceneManager = engine.get_scene_manager();
 
-	// load scene from disk
-	// ID sceneId = sceneManager.create_scene("Assets/Scenes/test.scene");
-	console::test("Create scene");
-	ID sceneId = sceneManager.create_scene();
+	//// load scene from disk
+	//// ID sceneId = sceneManager.create_scene("Assets/Scenes/test.scene");
+	//console::test("Create scene");
+	//ID sceneId = sceneManager.create_scene();
 
-	console::test("Activate scene");
-	// activate scene
-	sceneManager.activate_scene(sceneId);
+	//console::test("Activate scene");
+	//// activate scene
+	//sceneManager.activate_scene(sceneId);
 
-	console::test("Get scene:");
-	// debug print it
-	Scene& scene = sceneManager.get_scene(sceneId);
-	console::test("Print scene:");
-	console::log("Before: " + scene.to_string());
+	//console::test("Get scene:");
+	//// debug print it
+	//Scene& scene = sceneManager.get_scene(sceneId);
+	//console::test("Print scene:");
+	//console::log("Before: " + scene.to_string());
 
-	SystemRegistry* const systems = scene.get_system_registry();
-	EntityRegistry* const entities = scene.get_entity_registry();
+	//SystemRegistry* const systems = scene.get_system_registry();
+	//EntityRegistry* const entities = scene.get_entity_registry();
 
-	systems->emplace<RendererSystem>();
-	// systems.emplace_by_name("Renderer");
+	//systems->emplace<RendererSystem>();
+	//// systems.emplace_by_name("Renderer");
 
-	console::log("After: " + scene.to_string());
+	//console::log("After: " + scene.to_string());
 
 	rendererPtr->create_texture("Assets/Textures/pattern.png");
 	rendererPtr->create_texture("Assets/Textures/funny.jpg");
