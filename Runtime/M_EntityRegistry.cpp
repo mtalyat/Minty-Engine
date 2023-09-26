@@ -46,6 +46,12 @@ Entity minty::EntityRegistry::find_by_name(std::string const& string) const
 
 std::string minty::EntityRegistry::get_name(Entity const entity) const
 {
+	// if entity is null, return NULL
+	if (entity == NULL_ENTITY)
+	{
+		return "NULL";
+	}
+
 	// if entity has a name component, get the name
 	// otherwise return empty
 	NameComponent const* name = try_get<NameComponent>(entity);
