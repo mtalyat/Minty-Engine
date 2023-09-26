@@ -25,6 +25,104 @@
 using namespace mintye;
 using namespace minty;
 
+ID matId = 0;
+InputMap input;
+
+void init(Runtime& runtime)
+{
+	Engine& engine = runtime.get_engine();
+	Window* windowPtr = &engine.get_window();
+	Renderer* rendererPtr = &engine.get_renderer();
+	SceneManager& sceneManager = engine.get_scene_manager();
+
+
+	// load scene from disk
+	ID sceneId = sceneManager.create_scene("Assets/Scenes/test.scene");
+	sceneManager.activate_scene(sceneId);
+	Scene& scene = sceneManager.get_scene(sceneId);
+	EntityRegistry* er = scene.get_entity_registry();
+	SystemRegistry* sr = scene.get_system_registry();
+
+	// get the camera and set it as the main camera
+	// Entity camera = er->find_by_type<CameraComponent>();
+	Entity camera = er->find_by_name("Camera");
+	RendererSystem* rendererSystem = sr->find_by_type<RendererSystem>();
+	rendererSystem->set_main_camera(camera);
+
+
+	rendererPtr->create_texture("Assets/Textures/pattern.png");
+	rendererPtr->create_texture("Assets/Textures/funny.jpg");
+	rendererPtr->create_texture("Assets/Textures/texture.jpg");
+	rendererPtr->create_texture("Assets/Textures/brian.png");
+
+	rendererPtr->create_shader("Assets/Shaders/vert.spv", "Assets/Shaders/frag.spv");
+
+	rendererPtr->create_material(0, 0, Color(255, 255, 255));
+	rendererPtr->create_material(0, 1, Color(255, 0, 0));
+	rendererPtr->create_material(0, 2, Color(0, 255, 0));
+	rendererPtr->create_material(0, 3, Color(0, 0, 255));
+
+	rendererPtr->create_main_mesh();
+
+
+
+	ID* matIdPtr = &matId;
+
+	// input
+	// rotate when space held
+	input.emplace_key_down(Key::D1, [rendererPtr, matIdPtr](KeyPressEventArgs const& args)
+		{
+			*matIdPtr = 0;
+			rendererPtr->set_material_for_main_mesh(*matIdPtr);
+		});
+	input.emplace_key_down(Key::D2, [rendererPtr, matIdPtr](KeyPressEventArgs const& args)
+		{
+			*matIdPtr = 1;
+			rendererPtr->set_material_for_main_mesh(*matIdPtr);
+		});
+	input.emplace_key_down(Key::D3, [rendererPtr, matIdPtr](KeyPressEventArgs const& args)
+		{
+			*matIdPtr = 2;
+			rendererPtr->set_material_for_main_mesh(*matIdPtr);
+		});
+	input.emplace_key_down(Key::D4, [rendererPtr, matIdPtr](KeyPressEventArgs const& args)
+		{
+			*matIdPtr = 3;
+			rendererPtr->set_material_for_main_mesh(*matIdPtr);
+		});
+	input.emplace_key_down(Key::Q, [rendererPtr, matIdPtr](KeyPressEventArgs const& args)
+		{
+			Material& mat = rendererPtr->get_material(*matIdPtr);
+			mat.color = Color(255, 255, 255);
+			rendererPtr->update_material(*matIdPtr);
+		});
+	input.emplace_key_down(Key::W, [rendererPtr, matIdPtr](KeyPressEventArgs const& args)
+		{
+			Material& mat = rendererPtr->get_material(*matIdPtr);
+			mat.color = Color(255, 0, 0);
+			rendererPtr->update_material(*matIdPtr);
+		});
+	input.emplace_key_down(Key::E, [rendererPtr, matIdPtr](KeyPressEventArgs const& args)
+		{
+			Material& mat = rendererPtr->get_material(*matIdPtr);
+			mat.color = Color(0, 255, 0);
+			rendererPtr->update_material(*matIdPtr);
+		});
+	input.emplace_key_down(Key::R, [rendererPtr, matIdPtr](KeyPressEventArgs const& args)
+		{
+			Material& mat = rendererPtr->get_material(*matIdPtr);
+			mat.color = Color(0, 0, 255);
+			rendererPtr->update_material(*matIdPtr);
+		});
+	// quit on key close
+	input.emplace_key_down(Key::Escape, [windowPtr](KeyPressEventArgs const& args)
+		{
+			windowPtr->close();
+		});
+
+	windowPtr->setInput(&input);
+}
+
 // A quick way to split strings separated via spaces.
 std::vector<std::string> splitString(std::string s)
 {
@@ -58,7 +156,26 @@ void Application::run(int argc, char const* argv[])
 	}
 
 	// create new project with path
-	minty::Project project(path);
+	Project project(path);
+
+	// test
+	console::log("Headers:");
+	for (auto const& p : project.get_assets_header_paths())
+	{
+		console::log(p.string());
+	}
+	console::log("Sources:");
+	for (auto const& p : project.get_assets_source_paths())
+	{
+		console::log(p.string());
+	}
+	console::log("Scenes:");
+	for (auto const& p : project.get_assets_scene_paths())
+	{
+		console::log(p.string());
+		SerializedNode sceneNode = SerializedNode::parse_file(p.string());
+		sceneNode.print();
+	}
 
 	// create info for commands
 	Info info
@@ -78,12 +195,12 @@ void Application::run(int argc, char const* argv[])
 	{
 		// print info
 		std::cout << std::endl << "Info:" << std::endl <<
-			"Config: " << info.getConfig() << std::endl;
+			"Config: " << info.get_config() << std::endl;
 
 		// print commands
 		std::cout << std::endl <<
 			" ______________ Commands ______________ " << std::endl <<
-			"| test ......... test run the runtime  |" << std::endl <<
+			"| test ......... test runs the runtime |" << std::endl <<
 			"| debug ........ set config to debug   |" << std::endl <<
 			"| release ...... set config to release |" << std::endl <<
 			"| clean ........ clean project         |" << std::endl <<
@@ -97,7 +214,7 @@ void Application::run(int argc, char const* argv[])
 		std::string command;
 		std::getline(std::cin, command);
 		std::vector<std::string> commands = splitString(command);
-		
+
 		if (commands.size() == 0)
 		{
 			running = false;
@@ -111,17 +228,22 @@ void Application::run(int argc, char const* argv[])
 		{
 			if (c.compare("test") == 0)
 			{
-				// pass in executable name, then project name
-				char path[256];
-				strcpy_s(path, info.project.getBasePath().c_str());
-				char const* runtimeArgs[2]
+				char const* args[2]
 				{
 					argv[0],
-					path
+					path.c_str()
 				};
-
-				Runtime runtime;
-				runtime.run(2, runtimeArgs);
+				Runtime rt(2, args);
+				init(rt);
+				int result = rt.run();
+				if (result)
+				{
+					console::error(std::format("Runtime exited with code {}.", result));
+				}
+				else
+				{
+					console::log("Runtime exited with code 0.", console::Color::Green);
+				}
 			}
 			else if (c.compare("debug") == 0)
 			{
@@ -142,7 +264,7 @@ void Application::run(int argc, char const* argv[])
 					// regenerate cmake file
 					generate_cmake(info);
 				}
-			} 
+			}
 			else if (c.compare("clean") == 0)
 			{
 				clean(info);
@@ -150,12 +272,10 @@ void Application::run(int argc, char const* argv[])
 			else if (c.compare("build") == 0)
 			{
 				build(info);
-
 			}
 			else if (c.compare("rebuild") == 0)
 			{
-				clean(info);
-				build(info);
+				if (!clean(info) && !build(info)) {}
 			}
 			else if (c.compare("run") == 0)
 			{
@@ -163,14 +283,11 @@ void Application::run(int argc, char const* argv[])
 			}
 			else if (c.compare("rerun") == 0)
 			{
-				build(info);
-				run(info);
+				if (!build(info) && !run(info)) {}
 			}
-			else if(c.compare("all") == 0)
+			else if (c.compare("all") == 0)
 			{
-				clean(info);
-				build(info);
-				run(info);
+				if (!clean(info) && !build(info) && !run(info)) {}
 			}
 			else if (c.compare("quit") == 0)
 			{
@@ -194,7 +311,7 @@ void Application::generate(Info const& info)
 void Application::generate_cmake(Info const& info)
 {
 	// get path to cmake file
-	std::string path = (std::filesystem::path(info.project.getBuildPath()) / "CMakeLists.txt").string();
+	std::string path = (std::filesystem::path(info.project.get_build_path()) / "CMakeLists.txt").string();
 
 	// open file to overwrite
 	std::ofstream file(path, std::ios::trunc);
@@ -228,13 +345,27 @@ void Application::generate_cmake(Info const& info)
 		file << "set(CMAKE_EXE_LINKER_FLAGS /NODEFAULTLIB:\\\"LIBCMT\\\")" << std::endl;
 	}
 
+	// get all local paths for source files
+	std::stringstream pathsStream;
+	filepath buildPath = info.project.get_build_path();
+	for (filepath const& path : info.project.get_assets_source_paths())
+	{
+		pathsStream << " " << std::filesystem::relative(path, buildPath).generic_string();
+	}
+
 	file <<
-		"add_executable(${PROJECT_NAME} main.cpp)" << std::endl <<
+		// add source files for project
+		"set(SOURCES main.cpp" << pathsStream.str() << ")" << std::endl <<
+		// make executable with the source files
+		"add_executable(${PROJECT_NAME} ${SOURCES})" << std::endl <<
+		// set to MT building so it works with the static runtime library
 		"set_property(TARGET ${PROJECT_NAME} PROPERTY INTERPROCEDURAL_OPTIMIZATION_RELEASE TRUE)" << std::endl <<
 		"set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY \"MultiThreaded$<$<CONFIG:Debug>:Debug>\")" << std::endl <<
+		// include the runtime dir
 		"target_include_directories(${PROJECT_NAME} PRIVATE C:/Users/mitch/source/repos/Minty-Engine/Runtime PUBLIC ${VULKAN_INCLUDE_DIRS})" << std::endl <<
+		// include and link Vulkan
 		"include_directories(${Vulkan_INCLUDE_DIRS})" << std::endl <<
-		"target_link_libraries(${PROJECT_NAME} C:/Users/mitch/source/repos/Minty-Engine/Runtime/x64/" << info.getConfig() << "/MintyRuntime.lib)" << std::endl <<
+		"target_link_libraries(${PROJECT_NAME} C:/Users/mitch/source/repos/Minty-Engine/Runtime/x64/" << info.get_config() << "/MintyRuntime.lib)" << std::endl <<
 		"target_link_libraries(${PROJECT_NAME} ${Vulkan_LIBRARIES})";
 
 	file.close();
@@ -243,7 +374,7 @@ void Application::generate_cmake(Info const& info)
 void Application::generate_main(Info const& info)
 {
 	// get path to cmake file
-	std::string path = (std::filesystem::path(info.project.getBuildPath()) / "main.cpp").string();
+	std::string path = (std::filesystem::path(info.project.get_build_path()) / "main.cpp").string();
 
 	// open file to overwrite
 	std::ofstream file(path, std::ios::trunc);
@@ -262,42 +393,49 @@ void Application::generate_main(Info const& info)
 	file <<
 		"// " << std::format("{:%Y-%m-%d %H:%M:%OS}", now) << std::endl <<
 		"#include <Minty.h>" << std::endl <<
+		"#include \"../Assets/Scripts/init.h\"" << std::endl <<
 		"int main(int argc, char const* argv[]) {" << std::endl <<
-		"    minty::Runtime rt;" << std::endl <<
-		"    return rt.run(argc, argv);" << std::endl <<
+		"    minty::Runtime rt(argc, argv);" << std::endl <<
+		"    init(rt);" << std::endl <<
+		"    int result = rt.run();" << std::endl <<
+		"    destroy(rt);" << std::endl <<
+		"    return result;" << std::endl <<
 		"}";
 
 	file.close();
 }
 
-void Application::clean(Info const& info)
+size_t Application::clean(Info const& info)
 {
 	// clean the build
-	run_command("cd " + info.project.getBuildPath() + " && " + std::filesystem::absolute(CMAKE_PATH).string() + " --build . --target clean");
+	return run_command("cd " + info.project.get_build_path().string() + " && " + std::filesystem::absolute(CMAKE_PATH).string() + " --build . --target clean");
 }
 
-void Application::build(Info const& info)
+size_t Application::build(Info const& info)
 {
-	std::string command = "cd " + info.project.getBuildPath() + " && " + std::filesystem::absolute(CMAKE_PATH).string();
+	std::string command = "cd " + info.project.get_build_path().string() + " && " + std::filesystem::absolute(CMAKE_PATH).string();
 
 	// make cmake files if needed
-	run_command(command + " .");
+	size_t errors = run_command(command + " .");
 
 	// build program
-	run_command(command + " --build . --config " + info.getConfig());
+	errors += run_command(command + " --build . --config " + info.get_config());
+
+	return errors;
 }
 
-void Application::run(Info const& info)
+size_t Application::run(Info const& info)
 {
 	// call executable, pass in project path as argument for the runtime, so it knows what to run
-	run_command("cd " + info.project.getBuildPath() + " && cd " + info.getConfig() + " && start " + EXE_NAME + " " + info.project.getBasePath());
+	return run_command("cd " + info.project.get_build_path().string() + " && cd " + info.get_config() + " && start " + EXE_NAME + " " + info.project.get_base_path().string());
 }
 
 //https://stackoverflow.com/questions/478898/how-do-i-execute-a-command-and-get-the-output-of-the-command-within-c-using-po
-void Application::run_command(std::string const& cmd)
+size_t Application::run_command(std::string const& cmd)
 {
+	size_t errorCount = 0;
 	minty::console::log(cmd);
-	std::array<char, 128> buffer;
+	std::array<char, 4096> buffer;
 	std::unique_ptr<FILE, decltype(&_pclose)> pipe(_popen(cmd.c_str(), "r"), _pclose);
 	if (!pipe) {
 		throw std::runtime_error("popen() failed!");
@@ -312,6 +450,7 @@ void Application::run_command(std::string const& cmd)
 			if (result.find("error") != std::string::npos)
 			{
 				minty::console::error(result);
+				errorCount++;
 			}
 			else if (result.find("warning") != std::string::npos)
 			{
@@ -326,4 +465,6 @@ void Application::run_command(std::string const& cmd)
 		// if newline, it was the end of the inputted line, so update the color for the next line
 		changeColor = result.ends_with('\n');
 	}
+
+	return errorCount;
 }

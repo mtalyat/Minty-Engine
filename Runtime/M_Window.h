@@ -16,6 +16,8 @@ namespace minty
 		: public Object
 	{
 	private:
+		static int _windowCount;
+
 		GLFWwindow* _window;
 		bool _resized;
 		InputMap const* _activeInputMap;

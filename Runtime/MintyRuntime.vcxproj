@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?>
+﻿<?xml version="1.0" encoding="utf-8"?>
 <Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup Label="ProjectConfigurations">
     <ProjectConfiguration Include="Debug|Win32">
@@ -208,8 +208,12 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="entt.hpp" />
     <ClInclude Include="framework.h" />
+    <ClInclude Include="libraries\entt\entt.hpp" />
+    <ClInclude Include="M_CameraComponent.h" />
+    <ClInclude Include="M_Component.h" />
+    <ClInclude Include="M_EntityRegistry.h" />
+    <ClInclude Include="M_ISerializable.h" />
     <ClInclude Include="M_Material.h" />
     <ClInclude Include="M_MouseButton.h" />
     <ClInclude Include="M_KeyModifiers.h" />
@@ -226,7 +230,19 @@
     <ClInclude Include="M_Math.h" />
     <ClInclude Include="M_Mesh.h" />
     <ClInclude Include="M_Object.h" />
+    <ClInclude Include="M_Parse.h" />
+    <ClInclude Include="M_PositionComponent.h" />
+    <ClInclude Include="M_Reader.h" />
+    <ClInclude Include="M_RendererSystem.h" />
+    <ClInclude Include="M_RotationComponent.h" />
+    <ClInclude Include="M_ScaleComponent.h" />
+    <ClInclude Include="M_Scene.h" />
+    <ClInclude Include="M_SceneManager.h" />
+    <ClInclude Include="M_SerializedNode.h" />
     <ClInclude Include="M_Shader.h" />
+    <ClInclude Include="M_String.h" />
+    <ClInclude Include="M_System.h" />
+    <ClInclude Include="M_SystemRegistry.h" />
     <ClInclude Include="M_Texture.h" />
     <ClInclude Include="M_Vector2Int.h" />
     <ClInclude Include="M_Vector2.h" />
@@ -241,21 +257,38 @@
     <ClInclude Include="M_Vector3Int.h" />
     <ClInclude Include="M_Viewport.h" />
     <ClInclude Include="M_Window.h" />
+    <ClInclude Include="M_NameComponent.h" />
+    <ClInclude Include="M_Writer.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="M_Vertex.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="M_CameraComponent.cpp" />
     <ClCompile Include="M_Color.cpp" />
     <ClCompile Include="M_CommandLineParser.cpp" />
     <ClCompile Include="M_Console.cpp" />
+    <ClCompile Include="M_EntityRegistry.cpp" />
     <ClCompile Include="M_File.cpp" />
     <ClCompile Include="M_Engine.cpp" />
     <ClCompile Include="M_InputMap.cpp" />
     <ClCompile Include="M_Material.cpp" />
     <ClCompile Include="M_Math.cpp" />
     <ClCompile Include="M_Mesh.cpp" />
+    <ClCompile Include="M_NameComponent.cpp" />
     <ClCompile Include="M_Object.cpp" />
+    <ClCompile Include="M_Parse.cpp" />
+    <ClCompile Include="M_PositionComponent.cpp" />
+    <ClCompile Include="M_Reader.cpp" />
+    <ClCompile Include="M_RendererSystem.cpp" />
+    <ClCompile Include="M_RotationComponent.cpp" />
+    <ClCompile Include="M_ScaleComponent.cpp" />
+    <ClCompile Include="M_Scene.cpp" />
+    <ClCompile Include="M_SceneManager.cpp" />
+    <ClCompile Include="M_SerializedNode.cpp" />
     <ClCompile Include="M_Shader.cpp" />
+    <ClCompile Include="M_System.cpp" />
+    <ClCompile Include="M_SystemRegistry.cpp" />
     <ClCompile Include="M_Texture.cpp" />
     <ClCompile Include="M_Vector2Int.cpp" />
     <ClCompile Include="M_Vector2.cpp" />
@@ -269,6 +302,7 @@
     <ClCompile Include="M_Vector3Int.cpp" />
     <ClCompile Include="M_Viewport.cpp" />
     <ClCompile Include="M_Window.cpp" />
+    <ClCompile Include="M_Writer.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

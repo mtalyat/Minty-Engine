@@ -1,6 +1,8 @@
 #pragma once
 
 #include "M_Engine.h"
+#include <functional>
+#include <map>
 
 namespace minty
 {
@@ -15,20 +17,22 @@ namespace minty
 
 	public:
 		/// <summary>
-		/// Creates a new Runtime.
+		/// Creates a new Runtime based on the given arguments.
 		/// </summary>
-		Runtime();
+		Runtime(int argc, char const* argv[]);
 
 		~Runtime();
-		
+
+		Engine& get_engine();
+
 		/// <summary>
-		/// Runs the Runtime using the given arguments.
-		/// 
-		/// The arguments should be: executable name, project path.
+		/// Runs the Runtime.
 		/// </summary>
-		/// <param name="argc">The number of arguments.</param>
-		/// <param name="argv">The arguments.</param>
 		/// <returns></returns>
-		int run(int argc, char const* argv[]);
+		int run();
+
+	private:
+		// registers all built in systems and components
+		void register_builtin();
 	};
 }

@@ -5,12 +5,38 @@
 Minty Runtime header file.
 
 All of the following files included will allow a user to include just this file, which will allow
-access to the entire engine without needing to know the names for each file.
-
-ONLY include files that somebody writing a game would use.
+access to the entire engine without needing include each file.
 
 */
 
+// COMPONENTS
+#include "M_Component.h"
+
+#include "M_NameComponent.h"
+#include "M_PositionComponent.h"
+#include "M_RotationComponent.h"
+#include "M_ScaleComponent.h"
+
+// ENTITIES
+#include "M_EntityRegistry.h"
+
+// SCENES
+#include "M_Scene.h"
+#include "M_SceneManager.h"
+
+// SERIALIZATION
+#include "M_ISerializable.h"
+#include "M_Reader.h"
+#include "M_SerializedNode.h"
+#include "M_Writer.h"
+
+// SYSTEMS
+#include "M_System.h"
+#include "M_SystemRegistry.h"
+
+#include "M_RendererSystem.h"
+
+// GENERAL
 #include "M_Color.h"
 #include "M_CommandLineParser.h"
 #include "M_Console.h"
@@ -26,9 +52,11 @@ ONLY include files that somebody writing a game would use.
 #include "M_Mesh.h"
 #include "M_MouseButton.h"
 #include "M_Object.h"
+#include "M_Parse.h"
 #include "M_Project.h"
 #include "M_Rect.h"
 #include "M_RectF.h"
+#include "M_Renderer.h"
 #include "M_Runtime.h"
 #include "M_Stopwatch.h"
 #include "M_Texture.h"

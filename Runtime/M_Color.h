@@ -110,7 +110,7 @@ namespace minty
 		/// <returns>A new lightened color.</returns>
 		Color lighten(float const percent) const;
 
-		std::string const toString() const override;
+		std::string const to_string() const override;
 
 		/// <summary>
 		/// Lerps two colors using the red, green and blue. The alpha value is set to the left argument alpha.

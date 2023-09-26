@@ -33,12 +33,12 @@ float minty::math::round(float const value, float const precision)
 	return roundf(value / precision) * precision;
 }
 
-int minty::math::roundToInt(float const value)
+int minty::math::round_to_int(float const value)
 {
 	return static_cast<int>(roundf(value));
 }
 
-int minty::math::roundToInt(float const value, float const precision)
+int minty::math::round_to_int(float const value, float const precision)
 {
 	return static_cast<int>(roundf(value / precision) * precision);
 }
@@ -48,7 +48,7 @@ float minty::math::floor(float const value)
 	return floorf(value);
 }
 
-int minty::math::floorToInt(float const value)
+int minty::math::floor_to_int(float const value)
 {
 	return static_cast<int>(floorf(value));
 }
@@ -58,7 +58,7 @@ float minty::math::ceil(float const value)
 	return ceilf(value);
 }
 
-int minty::math::ceilToInt(float const value)
+int minty::math::ceil_to_int(float const value)
 {
 	return static_cast<int>(ceilf(value));
 }

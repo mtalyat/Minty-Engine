@@ -81,23 +81,23 @@ namespace minty
 		public Object
 	{
 	private:
-		typedef Event<KeyPressEventArgs const&> key_event_t;
-		typedef Event<MouseClickEventArgs const&> click_event_t;
-		typedef Event<MouseMoveEventArgs const&> move_event_t;
-		typedef Event<MouseScrollEventArgs const&> scroll_event_t;
+		typedef Event<KeyPressEventArgs const&> KeyEvent_t;
+		typedef Event<MouseClickEventArgs const&> ClickEvent_t;
+		typedef Event<MouseMoveEventArgs const&> MoveEvent_t;
+		typedef Event<MouseScrollEventArgs const&> ScrollEvent_t;
 
 		// key press
-		std::map<Key, key_event_t>* _keyDownEvents;
-		std::map<Key, key_event_t>* _keyUpEvents;
-		std::map<Key, key_event_t>* _keyEvents;
+		std::map<Key, KeyEvent_t>* _keyDownEvents;
+		std::map<Key, KeyEvent_t>* _keyUpEvents;
+		std::map<Key, KeyEvent_t>* _keyEvents;
 		// mouse click
-		std::map<MouseButton, click_event_t>* _mouseDownEvents;
-		std::map<MouseButton, click_event_t>* _mouseUpEvents;
-		std::map<MouseButton, click_event_t>* _mouseEvents;
+		std::map<MouseButton, ClickEvent_t>* _mouseDownEvents;
+		std::map<MouseButton, ClickEvent_t>* _mouseUpEvents;
+		std::map<MouseButton, ClickEvent_t>* _mouseEvents;
 		// mouse move
-		move_event_t* _mouseMoveEvent;
+		MoveEvent_t* _mouseMoveEvent;
 		// mouse scroll
-		scroll_event_t* _mouseScrollEvent;
+		ScrollEvent_t* _mouseScrollEvent;
 
 	public:
 		/// <summary>
@@ -112,131 +112,131 @@ namespace minty
 		/// </summary>
 		/// <param name="key">The key.</param>
 		/// <param name="func">The callback.</param>
-		void emplaceKeyDown(Key const key, key_event_t::func const& func);
+		void emplace_key_down(Key const key, KeyEvent_t::func const& func);
 
 		/// <summary>
 		/// Places a new callback to be invoked when the given key is released.
 		/// </summary>
 		/// <param name="key">The key.</param>
 		/// <param name="func">The callback.</param>
-		void emplaceKeyUp(Key const key, key_event_t::func const& func);
+		void emplace_key_up(Key const key, KeyEvent_t::func const& func);
 
 		/// <summary>
 		/// Places a new callback to be invoked when the given key is pressed down, held, or released.
 		/// </summary>
 		/// <param name="key">The key.</param>
 		/// <param name="func">The callback.</param>
-		void emplaceKey(Key const key, key_event_t::func const& func);
+		void emplace_key(Key const key, KeyEvent_t::func const& func);
 
 		/// <summary>
 		/// Places a new callback to be invoked when the given mouse button is pressed down.
 		/// </summary>
 		/// <param name="button">The button.</param>
 		/// <param name="func">The callback.</param>
-		void emplaceMouseDown(MouseButton const button, click_event_t::func const& func);
+		void emplace_mouse_down(MouseButton const button, ClickEvent_t::func const& func);
 
 		/// <summary>
 		/// Places a new callback to be invoked when the given mouse button is released.
 		/// </summary>
 		/// <param name="button">The button.</param>
 		/// <param name="func">The callback.</param>
-		void emplaceMouseUp(MouseButton const button, click_event_t::func const& func);
+		void emplace_mouse_up(MouseButton const button, ClickEvent_t::func const& func);
 
 		/// <summary>
 		/// Places a new callback to be invoked when the given mouse button is pressed down or  released.
 		/// </summary>
 		/// <param name="button">The button.</param>
 		/// <param name="func">The callback.</param>
-		void emplaceMouse(MouseButton const button, click_event_t::func const& func);
+		void emplace_mouse(MouseButton const button, ClickEvent_t::func const& func);
 
 		/// <summary>
 		/// Places a new callback to be invoked when the mouse cursor moves.
 		/// </summary>
 		/// <param name="func">The callback.</param>
-		void emplaceMouseMove(move_event_t::func const& func);
+		void emplace_mouse_move(MoveEvent_t::func const& func);
 
 		/// <summary>
 		/// Places a new callback to be invoked when the mouse scrolls.
 		/// </summary>
 		/// <param name="func">The callback.</param>
-		void emplaceMouseScroll(scroll_event_t::func const& func);
+		void emplace_mouse_scroll(ScrollEvent_t::func const& func);
 
 		/// <summary>
 		/// Removes a callback from the key down event.
 		/// </summary>
 		/// <param name="key">The key.</param>
 		/// <param name="func">The callback.</param>
-		void eraseKeyDown(Key const key, key_event_t::func const& func);
+		void erase_key_down(Key const key, KeyEvent_t::func const& func);
 
 		/// <summary>
 		/// Removes a callback from the key up event.
 		/// </summary>
 		/// <param name="key">The key.</param>
 		/// <param name="func">The callback.</param>
-		void eraseKeyUp(Key const key, key_event_t::func const& func);
+		void erase_key_up(Key const key, KeyEvent_t::func const& func);
 
 		/// <summary>
 		/// Removes a callback from the key event.
 		/// </summary>
 		/// <param name="key">The key.</param>
 		/// <param name="func">The callback.</param>
-		void eraseKey(Key const key, key_event_t::func const& func);
+		void erase_key(Key const key, KeyEvent_t::func const& func);
 
 		/// <summary>
 		/// Removes a callback from the mouse down event.
 		/// </summary>
 		/// <param name="button">The button.</param>
 		/// <param name="func">The callback.</param>
-		void eraseMouseDown(MouseButton const button, click_event_t::func const& func);
+		void erase_mouse_down(MouseButton const button, ClickEvent_t::func const& func);
 
 		/// <summary>
 		/// Removes a callback from the mouse up event.
 		/// </summary>
 		/// <param name="button">The button.</param>
 		/// <param name="func">The callback.</param>
-		void eraseMouseUp(MouseButton const button, click_event_t::func const& func);
+		void erase_mouse_up(MouseButton const button, ClickEvent_t::func const& func);
 
 		/// <summary>
 		/// Removes a callback from the mouse event.
 		/// </summary>
 		/// <param name="button">The button.</param>
 		/// <param name="func">The callback.</param>
-		void eraseMouse(MouseButton const button, click_event_t::func const& func);
+		void erase_mouse(MouseButton const button, ClickEvent_t::func const& func);
 
 		/// <summary>
 		/// Removes a callback from the mouse move event.
 		/// </summary>
 		/// <param name="func">The callback.</param>
-		void eraseMouseMove(move_event_t::func const& func);
+		void erase_mouse_move(MoveEvent_t::func const& func);
 
 		/// <summary>
 		/// Removes a callback from the mouse move event.
 		/// </summary>
 		/// <param name="func">The callback.</param>
-		void eraseMouseScroll(scroll_event_t::func const& func);
+		void erase_mouse_scroll(ScrollEvent_t::func const& func);
 
 		/// <summary>
 		/// Invokes a key press event.
 		/// </summary>
 		/// <param name="args"></param>
-		void invokeKey(KeyPressEventArgs const& args) const;
+		void invoke_key(KeyPressEventArgs const& args) const;
 
 		/// <summary>
 		/// Invokes a mouse click event.
 		/// </summary>
 		/// <param name="args"></param>
-		void invokeMouseClick(MouseClickEventArgs const& args) const;
+		void invoke_mouse_click(MouseClickEventArgs const& args) const;
 
 		/// <summary>
 		/// Invokes a mouse move event.
 		/// </summary>
 		/// <param name="args"></param>
-		void invokeMouseMove(MouseMoveEventArgs const& args) const;
+		void invoke_mouse_move(MouseMoveEventArgs const& args) const;
 
 		/// <summary>
 		/// Invokes a mouse scroll event.
 		/// </summary>
 		/// <param name="args"></param>
-		void invokeMouseScroll(MouseScrollEventArgs const& args) const;
+		void invoke_mouse_scroll(MouseScrollEventArgs const& args) const;
 	};
 }

@@ -60,7 +60,7 @@ namespace minty::math
 	/// </summary>
 	/// <param name="value">The value to round.</param>
 	/// <returns>The rounded value.</returns>
-	int roundToInt(float const value);
+	int round_to_int(float const value);
 
 	/// <summary>
 	/// Rounds the value to the nearest value, using the given precision.
@@ -68,7 +68,7 @@ namespace minty::math
 	/// <param name="value">The value to round.</param>
 	/// <param name="precision">The precision to round to.</param>
 	/// <returns>The rounded value.</returns>
-	int roundToInt(float const value, float const precision);
+	int round_to_int(float const value, float const precision);
 
 	/// <summary>
 	/// Rounds down to the nearest integer.
@@ -82,7 +82,7 @@ namespace minty::math
 	/// </summary>
 	/// <param name="value">The value to floor.</param>
 	/// <returns>The floored value.</returns>
-	int floorToInt(float const value);
+	int floor_to_int(float const value);
 
 	/// <summary>
 	/// Rounds up to the nearest integer.
@@ -96,7 +96,7 @@ namespace minty::math
 	/// </summary>
 	/// <param name="value">The value to ceil.</param>
 	/// <returns>The ceiled value.</returns>
-	int ceilToInt(float const value);
+	int ceil_to_int(float const value);
 
 	/// <summary>
 	/// Gets the positive value of the given value.

@@ -5,107 +5,72 @@
 #include "M_Renderer.h"
 #include <iostream>
 
+#define GLFW_INCLUDE_VULKAN
+#include <GLFW/glfw3.h>
+
 using namespace minty;
 
 uint32_t const WIDTH = 800;
 uint32_t const HEIGHT = 600;
 
 Engine::Engine()
+	: _window("Minty", WIDTH, HEIGHT)
+	, _renderer(&_window)
+	, _sceneManager(this)
 {
-	// init GLFW
-	glfwInit();
+
 }
 
 Engine::~Engine()
 {
-	// close GLFW
-	glfwTerminate();
+
+}
+
+Window& minty::Engine::get_window()
+{
+	return _window;
+}
+
+Renderer& minty::Engine::get_renderer()
+{
+	return _renderer;
+}
+
+SceneManager& minty::Engine::get_scene_manager()
+{
+	return _sceneManager;
 }
 
 void Engine::run()
 {
+	// start the renderer
+	_renderer.start();
+
+	// start the scene(s)
+	_sceneManager.load();
+
 	// record start time, and last frame tick
-	time_point_t start = getNow();
+	time_point_t start = get_now();
 	time_point_t frameTick = start;
 	unsigned int frameCount = 0u;
-
-	Window window("Minty", WIDTH, HEIGHT);
-	Window* windowPtr = &window;
-
-	// start the render engine
-	Renderer renderer(windowPtr, *this);
-	Renderer* rendererPtr = &renderer;
-
-	ID matId = 0;
-	ID* matIdPtr = &matId;
-
-	// input
-	InputMap input;
-	// rotate when space held
-	input.emplaceKeyDown(Key::D1, [rendererPtr, matIdPtr](KeyPressEventArgs const& args)
-		{
-			*matIdPtr = 0;
-			rendererPtr->setMaterialForMainMesh(*matIdPtr);
-		});
-	input.emplaceKeyDown(Key::D2, [rendererPtr, matIdPtr](KeyPressEventArgs const& args)
-		{
-			*matIdPtr = 1;
-			rendererPtr->setMaterialForMainMesh(*matIdPtr);
-		});
-	input.emplaceKeyDown(Key::D3, [rendererPtr, matIdPtr](KeyPressEventArgs const& args)
-		{
-			*matIdPtr = 2;
-			rendererPtr->setMaterialForMainMesh(*matIdPtr);
-		});
-	input.emplaceKeyDown(Key::D4, [rendererPtr, matIdPtr](KeyPressEventArgs const& args)
-		{
-			*matIdPtr = 3;
-			rendererPtr->setMaterialForMainMesh(*matIdPtr);
-		});
-	input.emplaceKeyDown(Key::Q, [rendererPtr, matIdPtr](KeyPressEventArgs const& args)
-		{
-			Material& mat = rendererPtr->getMaterial(*matIdPtr);
-			mat.color = Color(255, 255, 255);
-			rendererPtr->updateMaterial(*matIdPtr);
-		});
-	input.emplaceKeyDown(Key::W, [rendererPtr, matIdPtr](KeyPressEventArgs const& args)
-		{
-			Material& mat = rendererPtr->getMaterial(*matIdPtr);
-			mat.color = Color(255, 0, 0);
-			rendererPtr->updateMaterial(*matIdPtr);
-		});
-	input.emplaceKeyDown(Key::E, [rendererPtr, matIdPtr](KeyPressEventArgs const& args)
-		{
-			Material& mat = rendererPtr->getMaterial(*matIdPtr);
-			mat.color = Color(0, 255, 0);
-			rendererPtr->updateMaterial(*matIdPtr);
-		});
-	input.emplaceKeyDown(Key::R, [rendererPtr, matIdPtr](KeyPressEventArgs const& args)
-		{
-			Material& mat = rendererPtr->getMaterial(*matIdPtr);
-			mat.color = Color(0, 0, 255);
-			rendererPtr->updateMaterial(*matIdPtr);
-		});
-	// quit on key close
-	input.emplaceKeyDown(Key::Escape, [windowPtr](KeyPressEventArgs const& args)
-		{
-			windowPtr->close();
-		});
-
-	window.setInput(&input);
 
 	time_point_t now;
 
 	// main loop
-	while (renderer.isRunning())
+	while (_renderer.running())
 	{
 		glfwPollEvents();
-		renderer.updateUniformBuffer();
-		renderer.renderFrame();
 
+		// update scene(s)
+		_sceneManager.update();
+
+		// render to the screen
+		_renderer.renderFrame();
+
+		// frame complete
 		frameCount++;
 
-		now = getNow();
+		now = get_now();
 
 		// if frame tick >= 1 second
 		if (std::chrono::duration_cast<std::chrono::nanoseconds>(now - frameTick).count() >= 1000000000ll)
@@ -117,11 +82,14 @@ void Engine::run()
 		}
 	}
 
+	// all done
+	_sceneManager.unload();
+
 	// print elapsed time
-	std::cout << "Elapsed time: " << (std::chrono::duration_cast<std::chrono::milliseconds>(getNow() - start).count() / 1000.0f) << "s" << std::endl;
+	std::cout << "Elapsed time: " << (std::chrono::duration_cast<std::chrono::milliseconds>(get_now() - start).count() / 1000.0f) << "s" << std::endl;
 }
 
-time_point_t minty::Engine::getNow() const
+time_point_t minty::Engine::get_now() const
 {
 	return std::chrono::steady_clock::now();
 }

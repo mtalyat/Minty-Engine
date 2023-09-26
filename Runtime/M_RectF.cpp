@@ -56,7 +56,7 @@ minty::RectF::RectF(Vector2Int const position, Vector2Int const size)
 	, height(static_cast<float>(size.y))
 {}
 
-std::string const minty::RectF::toString() const
+std::string const minty::RectF::to_string() const
 {
 	return std::format("RectF({0}, {1}, {2}, {3})", x, y, width, height);
 }
@@ -91,15 +91,15 @@ RectF RectF::bounds(float const left, float const right, float const top, float 
 
 Rect RectF::floor(RectF const& rect)
 {
-	return Rect(math::floorToInt(rect.x), math::floorToInt(rect.y), math::floorToInt(rect.width), math::floorToInt(rect.height));
+	return Rect(math::floor_to_int(rect.x), math::floor_to_int(rect.y), math::floor_to_int(rect.width), math::floor_to_int(rect.height));
 }
 
 Rect RectF::round(RectF const& rect)
 {
-	return Rect(math::roundToInt(rect.x), math::roundToInt(rect.y), math::roundToInt(rect.width), math::roundToInt(rect.height));
+	return Rect(math::round_to_int(rect.x), math::round_to_int(rect.y), math::round_to_int(rect.width), math::round_to_int(rect.height));
 }
 
 Rect RectF::ceil(RectF const& rect)
 {
-	return Rect(math::ceilToInt(rect.x), math::ceilToInt(rect.y), math::ceilToInt(rect.width), math::ceilToInt(rect.height));
+	return Rect(math::ceil_to_int(rect.x), math::ceil_to_int(rect.y), math::ceil_to_int(rect.width), math::ceil_to_int(rect.height));
 }

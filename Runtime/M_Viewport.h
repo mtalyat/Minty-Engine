@@ -32,42 +32,42 @@ namespace minty
 		/// </summary>
 		/// <param name="x">The new X position.</param>
 		/// <param name="y">The new Y position.</param>
-		void setOffset(int const x, int const y);
+		void set_offset(int const x, int const y);
 
 		/// <summary>
 		/// Sets the offset for the view.
 		/// </summary>
 		/// <param name="x">The new X position.</param>
 		/// <param name="y">The new Y position.</param>
-		void setViewOffset(int const x, int const y);
+		void set_view_offset(int const x, int const y);
 
 		/// <summary>
 		/// Sets the offset for the scissor.
 		/// </summary>
 		/// <param name="x">The new X position.</param>
 		/// <param name="y">The new Y position.</param>
-		void setScissorOffset(int const x, int const y);
+		void set_scissor_offset(int const x, int const y);
 
 		/// <summary>
 		/// Sets the extent (size) for both the view and the scissor.
 		/// </summary>
 		/// <param name="width">The new width.</param>
 		/// <param name="height">The new height.</param>
-		void setExtent(unsigned int const width, unsigned int const height);
+		void set_extent(unsigned int const width, unsigned int const height);
 
 		/// <summary>
 		/// Sets the extent (size) for the view.
 		/// </summary>
 		/// <param name="width">The new width.</param>
 		/// <param name="height">The new height.</param>
-		void setViewExtent(unsigned int const width, unsigned int const height);
+		void set_view_extent(unsigned int const width, unsigned int const height);
 
 		/// <summary>
 		/// Sets the extent (size) for the scissor.
 		/// </summary>
 		/// <param name="width">The new width.</param>
 		/// <param name="height">The new height.</param>
-		void setScissorExtent(unsigned int const width, unsigned int const height);
+		void set_scissor_extent(unsigned int const width, unsigned int const height);
 	};
 }
 
