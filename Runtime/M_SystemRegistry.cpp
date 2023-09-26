@@ -52,10 +52,20 @@ namespace minty
 		return *this;
 	}
 
-	System* SystemRegistry::emplace(System* const system, int const priority)
+	System* SystemRegistry::emplace(std::string const& name, System* const system, int const priority)
 	{
-		auto found = _orderedSystems.find(priority);
+		// if exists in all, do not add a duplicate
+		if (_allSystems.contains(name))
+		{
+			console::error(std::format("SystemRegistry already contains a System with the name \"{}\". Returning NULL.", name));
+			return nullptr;
+		}
 
+		// add to all systems
+		_allSystems.emplace(name, system);
+
+		// add to ordered list for updating
+		auto found = _orderedSystems.find(priority);
 		if (found == _orderedSystems.end())
 		{
 			// new list
@@ -83,9 +93,24 @@ namespace minty
 		{
 			// name found
 			System* system = found->second(_engine, _registry);
-			this->emplace(system, priority);
+			this->emplace(name, system, priority);
 			return system;
 		}
+	}
+
+	System* SystemRegistry::find_by_name(std::string const& name) const
+	{
+		for (auto const& pair : _allSystems)
+		{
+			if (pair.first.compare(name) == 0)
+			{
+				// found name, return system
+				return pair.second;
+			}
+		}
+
+		// not found
+		return nullptr;
 	}
 
 	void SystemRegistry::erase(System* const system)

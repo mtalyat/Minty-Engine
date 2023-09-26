@@ -46,7 +46,7 @@ namespace minty
 		/// </summary>
 		/// <param name="system">The system to add.</param>
 		/// <param name="priority">The priority in which to update this System in.</param>
-		System* emplace(System* const system, int const priority = 0);
+		System* emplace(std::string const& name, System* const system, int const priority = 0);
 
 	public:
 		/// <summary>
@@ -55,7 +55,7 @@ namespace minty
 		/// <typeparam name="T">The system to add.</typeparam>
 		/// <param name="priority">The priority in which to update this System in.</param>
 		template<class T>
-		T* emplace(int const priority = 0);
+		T* emplace(std::string const& name, int const priority = 0);
 
 		/// <summary>
 		/// Creates and places a registered System within this SystemRegistry.
@@ -63,6 +63,21 @@ namespace minty
 		/// <param name="name">The name of the System, registered with register_system.</param>
 		/// <param name="priority">The priority in which to update this System in.</param>
 		System* emplace_by_name(std::string const& name, int const priority = 0);
+
+		/// <summary>
+		/// Finds the System that matches the given name.
+		/// </summary>
+		/// <param name="name">The name to search by.</param>
+		/// <returns>The System if found, otherwise null.</returns>
+		System* find_by_name(std::string const& name) const;
+
+		/// <summary>
+		/// Finds the first System of the given type.
+		/// </summary>
+		/// <typeparam name="T">The type of System to return.</typeparam>
+		/// <returns>The first System found, or null if none found.</returns>
+		template<class T>
+		T* find_by_type() const;
 
 		/// <summary>
 		/// Removes the given System from the SystemRegistry.
@@ -101,9 +116,25 @@ namespace minty
 	};
 
 	template<class T>
-	T* SystemRegistry::emplace(int const priority)
+	T* SystemRegistry::emplace(std::string const& name, int const priority)
 	{
-		return static_cast<T*>(this->emplace(new T(_engine, _registry), priority));
+		return static_cast<T*>(this->emplace(name, new T(_engine, _registry), priority));
+	}
+
+	template<class T>
+	inline T* SystemRegistry::find_by_type() const
+	{
+		for (auto const& pair : _allSystems)
+		{
+			if (typeid(*pair.second) == typeid(T))
+			{
+				// found, type matches
+				return static_cast<T*>(pair.second);
+			}
+		}
+
+		// not found
+		return nullptr;
 	}
 
 	template<class T>
