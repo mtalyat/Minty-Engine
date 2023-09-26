@@ -26,7 +26,6 @@ namespace minty
 
 		//void unload() override {}
 
-
 		/// <summary>
 		/// Sets the Entity that contains the main Camera component data.
 		/// </summary>
