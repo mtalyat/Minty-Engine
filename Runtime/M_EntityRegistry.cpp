@@ -51,8 +51,7 @@ Component* minty::EntityRegistry::emplace_by_name(std::string const& name, Entit
 	if (found == _componentTypes.end())
 	{
 		// name not found
-		console::error(std::format("Cannot emplace Component \"{}\". It has not been registered with the EntityRegistry.", name));
-		return nullptr;
+		throw std::runtime_error(std::format("Cannot emplace Component \"{}\". It has not been registered with the EntityRegistry.", name));
 	}
 	else
 	{

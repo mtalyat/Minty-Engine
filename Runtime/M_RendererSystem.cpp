@@ -24,26 +24,7 @@ minty::RendererSystem::RendererSystem(Engine* const engine, EntityRegistry* cons
 {}
 
 void minty::RendererSystem::load()
-{
-	//// keep renderer reference since it will be used a lot
-	//_renderer = &_engine->get_renderer();
-
-	////// get first camera in scene to use, for now
-	//auto view = _registry->view<CameraComponent>();
-	////console::error(std::format("camera count: {}", view.size()));
-	////_mainCamera = view.front();
-
-	Entity entity = _registry->create();
-
-	_registry->emplace<CameraComponent>(entity);
-
-	PositionComponent& pos = _registry->emplace<PositionComponent>(entity);
-	pos.z = -4.0f;
-
-	_mainCamera = entity;
-
-	CameraComponent& camera = _registry->get<CameraComponent>(entity);
-}
+{}
 
 void minty::RendererSystem::update()
 {
@@ -86,4 +67,9 @@ void minty::RendererSystem::update()
 
 	// update camera in renderer
 	_renderer->update_camera(camera, position, rotation);
+}
+
+void minty::RendererSystem::set_main_camera(Entity const entity)
+{
+	_mainCamera = entity;
 }

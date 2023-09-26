@@ -25,5 +25,12 @@ namespace minty
 		//void fixed_update() override {}
 
 		//void unload() override {}
+
+
+		/// <summary>
+		/// Sets the Entity that contains the main Camera component data.
+		/// </summary>
+		/// <param name="entity">The entity to render to the screen from.</param>
+		void set_main_camera(Entity const entity);
 	};
 }

@@ -55,7 +55,7 @@ namespace minty
 		return *this;
 	}
 
-	void SystemRegistry::emplace(System* const system, int const priority)
+	System* SystemRegistry::emplace(System* const system, int const priority)
 	{
 		auto found = _systems->find(priority);
 
@@ -70,20 +70,24 @@ namespace minty
 			// existing list
 			found->second.emplace(system);
 		}
+
+		return system;
 	}
 
-	void SystemRegistry::emplace_by_name(std::string const& name, int const priority)
+	System* SystemRegistry::emplace_by_name(std::string const& name, int const priority)
 	{
 		auto const& found = _systemTypes.find(name);
 		if (found == _systemTypes.end())
 		{
 			// name not found
-			console::error(std::format("Cannot emplace System \"{}\". It has not been registered with the SystemRegistry.", name));
+			throw std::runtime_error(std::format("Cannot emplace System \"{}\". It has not been registered with the SystemRegistry.", name));
 		}
 		else
 		{
 			// name found
-			this->emplace(found->second(_engine, _registry), priority);
+			System* system = found->second(_engine, _registry);
+			this->emplace(system, priority);
+			return system;
 		}
 	}
 

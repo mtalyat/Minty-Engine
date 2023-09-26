@@ -45,7 +45,7 @@ namespace minty
 		/// </summary>
 		/// <param name="system">The system to add.</param>
 		/// <param name="priority">The priority in which to update this System in.</param>
-		void emplace(System* const system, int const priority = 0);
+		System* emplace(System* const system, int const priority = 0);
 
 	public:
 		/// <summary>
@@ -54,14 +54,14 @@ namespace minty
 		/// <typeparam name="T">The system to add.</typeparam>
 		/// <param name="priority">The priority in which to update this System in.</param>
 		template<class T>
-		void emplace(int const priority = 0);
+		T* emplace(int const priority = 0);
 
 		/// <summary>
 		/// Creates and places a registered System within this SystemRegistry.
 		/// </summary>
 		/// <param name="name">The name of the System, registered with register_system.</param>
 		/// <param name="priority">The priority in which to update this System in.</param>
-		void emplace_by_name(std::string const& name, int const priority = 0);
+		System* emplace_by_name(std::string const& name, int const priority = 0);
 
 		/// <summary>
 		/// Removes the given System from the SystemRegistry.
@@ -100,9 +100,9 @@ namespace minty
 	};
 
 	template<class T>
-	inline void SystemRegistry::emplace(int const priority)
+	T* SystemRegistry::emplace(int const priority)
 	{
-		this->emplace(new T(_engine, _registry), priority);
+		return static_cast<T*>(this->emplace(new T(_engine, _registry), priority));
 	}
 
 	template<class T>
