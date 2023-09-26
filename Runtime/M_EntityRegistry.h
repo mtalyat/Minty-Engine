@@ -79,6 +79,12 @@ namespace minty
 		Component const* get_by_name(std::string const& name, Entity const entity) const;
 
 		/// <summary>
+		/// Prints an Entity's values to the screen.
+		/// </summary>
+		/// <param name="entity"></param>
+		void print(Entity const entity) const;
+
+		/// <summary>
 		/// Gets the total number of Entities within this registry.
 		/// </summary>
 		/// <returns>The total number of Entities.</returns>
@@ -95,6 +101,9 @@ namespace minty
 
 		void serialize(Writer& writer) const override;
 		void deserialize(Reader const& reader) override;
+
+	private:
+		SerializedNode serialize_entity(Entity const entity) const;
 	};
 
 	template<class T>

@@ -7,10 +7,10 @@ using namespace minty;
 
 void minty::CameraComponent::serialize(Writer& writer) const
 {
-	writer.write("perspective", static_cast<byte>(perspective));
-	writer.write("fov", fov);
-	writer.write("near", nearPlane);
-	writer.write("far", farPlane);
+	writer.write("perspective", static_cast<byte>(perspective), 0u);
+	writer.write("fov", fov, DEFAULT_FOV);
+	writer.write("near", nearPlane, DEFAULT_NEAR);
+	writer.write("far", farPlane, DEFAULT_FAR);
 }
 
 void minty::CameraComponent::deserialize(Reader const& reader)

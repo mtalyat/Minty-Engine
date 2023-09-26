@@ -97,6 +97,14 @@ Component const* minty::EntityRegistry::get_by_name(std::string const& name, Ent
 	}
 }
 
+void minty::EntityRegistry::print(Entity const entity) const
+{
+	// serialize entity, add it to parent, print that
+	SerializedNode root;
+	root.children.emplace(this->get_name(entity), serialize_entity(entity));
+	root.print();
+}
+
 size_t minty::EntityRegistry::size() const
 {
 	return this->storage<Entity>()->size();
@@ -175,38 +183,8 @@ void minty::EntityRegistry::serialize(Writer& writer) const
 
 	for (auto [entity] : this->storage<Entity>()->each())
 	{
-		// populate a node with children
-		SerializedNode entityNode;
-		Writer entityWriter(entityNode);
-
-		for (auto&& curr : this->storage())
-		{
-			//auto cid = curr.first;
-			auto& storage = curr.second;
-			auto const& ctype = storage.type();
-
-			if (storage.contains(entity))
-			{
-				// this entity has this component type, so get the "pretty" name
-				auto const& found = _componentTypes.find(ctype.index());
-				if (found == _componentTypes.end())
-				{
-					console::error(std::format("Cannot find component type with id: {}, name: {}", ctype.index(), ctype.name().data()));
-					continue;
-				}
-
-				std::string name = found->second;
-
-				// ignore NameComponent, that is used when writing the entity node
-				if (name.compare("Name") == 0)
-				{
-					continue;
-				}
-
-				// write component with its name and serialized values
-				entityWriter.write(name, this->get_by_name(name, entity));
-			}
-		}
+		// serialize entity
+		SerializedNode entityNode = serialize_entity(entity);
 
 		// get entity name
 		entityName = this->get_name(entity);
@@ -243,4 +221,42 @@ void minty::EntityRegistry::deserialize(Reader const& reader)
 			component->deserialize(reader);
 		}
 	}
+}
+
+SerializedNode minty::EntityRegistry::serialize_entity(Entity const entity) const
+{
+	// populate a node with children
+	SerializedNode entityNode;
+	Writer entityWriter(entityNode);
+
+	for (auto&& curr : this->storage())
+	{
+		//auto cid = curr.first;
+		auto& storage = curr.second;
+		auto const& ctype = storage.type();
+
+		if (storage.contains(entity))
+		{
+			// this entity has this component type, so get the "pretty" name
+			auto const& found = _componentTypes.find(ctype.index());
+			if (found == _componentTypes.end())
+			{
+				console::error(std::format("Cannot find component type with id: {}, name: {}", ctype.index(), ctype.name().data()));
+				continue;
+			}
+
+			std::string name = found->second;
+
+			// ignore NameComponent, that is used when writing the entity node
+			if (name.compare("Name") == 0)
+			{
+				continue;
+			}
+
+			// write component with its name and serialized values
+			entityWriter.write(name, this->get_by_name(name, entity));
+		}
+	}
+	
+	return entityNode;
 }

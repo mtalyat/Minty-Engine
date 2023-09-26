@@ -3,9 +3,9 @@
 
 void minty::PositionComponent::serialize(Writer& writer) const
 {
-	writer.write("x", x);
-	writer.write("y", y);
-	writer.write("z", z);
+	writer.write("x", x, 0.0f);
+	writer.write("y", y, 0.0f);
+	writer.write("z", z, 0.0f);
 }
 
 void minty::PositionComponent::deserialize(Reader const& reader)

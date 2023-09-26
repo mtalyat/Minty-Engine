@@ -3,9 +3,9 @@
 
 void minty::ScaleComponent::serialize(Writer& writer) const
 {
-	writer.write("x", x);
-	writer.write("y", y);
-	writer.write("z", z);
+	writer.write("x", x, 1.0f);
+	writer.write("y", y, 1.0f);
+	writer.write("z", z, 1.0f);
 }
 
 void minty::ScaleComponent::deserialize(Reader const& reader)

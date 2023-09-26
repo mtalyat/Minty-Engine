@@ -50,3 +50,36 @@ void minty::Writer::write(std::string const& name, byte const value)
 {
 	write(name, std::to_string(value));
 }
+
+void minty::Writer::write(std::string const& name, std::string const& value, std::string const& defaultValue)
+{
+	if (value.compare(defaultValue))
+	{
+		// not default value
+		_node.children.emplace(name, SerializedNode{ .data = value });
+	}
+}
+
+void minty::Writer::write(std::string const& name, int const value, int const defaultValue)
+{
+	if (value != defaultValue)
+	{
+		write(name, std::to_string(value));
+	}
+}
+
+void minty::Writer::write(std::string const& name, float const value, float const defaultValue)
+{
+	if (value != defaultValue)
+	{
+		write(name, std::to_string(value));
+	}
+}
+
+void minty::Writer::write(std::string const& name, byte const value, byte const defaultValue)
+{
+	if (value != defaultValue)
+	{
+		write(name, std::to_string(value));
+	}
+}

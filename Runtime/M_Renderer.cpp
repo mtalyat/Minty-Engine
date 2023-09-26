@@ -1797,6 +1797,8 @@ void Renderer::update_camera(CameraComponent const& camera, Vector3 const& posit
 
 	//memcpy(uniformBuffersMapped[currentFrame], &ubo, sizeof(ubo));
 
+	//console::log(std::format("Drawing camera at: {}", position.to_string()));
+
 	// proj * view * model
 
 	// get view

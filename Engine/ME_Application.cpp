@@ -38,6 +38,7 @@ void init(Runtime& runtime)
 
 	// load scene from disk
 	ID sceneId = sceneManager.create_scene("Assets/Scenes/test.scene");
+	sceneManager.activate_scene(sceneId);
 	Scene& scene = sceneManager.get_scene(sceneId);
 	EntityRegistry* er = scene.get_entity_registry();
 	SystemRegistry* sr = scene.get_system_registry();
@@ -47,10 +48,6 @@ void init(Runtime& runtime)
 	Entity camera = er->find_by_name("Camera");
 	RendererSystem* rendererSystem = sr->find_by_type<RendererSystem>();
 	rendererSystem->set_main_camera(camera);
-
-	console::log(std::format("Camera set to: {}", er->get_name(camera)));
-
-	console::log(scene.to_string());
 
 
 	rendererPtr->create_texture("Assets/Textures/pattern.png");

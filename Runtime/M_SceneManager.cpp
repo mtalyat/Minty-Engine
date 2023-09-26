@@ -36,20 +36,6 @@ ID minty::SceneManager::create_scene(std::string const& path)
 	Reader reader(node);
 	scene.deserialize(reader);
 
-	console::log(std::format("Read scene from file with {} systems and {} entities.", scene.get_system_registry()->size(), scene.get_entity_registry()->size()));
-
-	console::log("Deserialized scene:", console::Color::BrightMagenta);
-
-	node.print();
-
-	console::log("Serialized scene:", console::Color::BrightMagenta);
-
-	node = SerializedNode();
-	Writer writer(node);
-	scene.serialize(writer);
-
-	node.print();
-
 	// all done
 	return id;
 }

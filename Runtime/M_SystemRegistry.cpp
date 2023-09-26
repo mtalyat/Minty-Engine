@@ -138,7 +138,6 @@ namespace minty
 		{
 			for (auto system : pair.second)
 			{
-				console::log(std::format("Loading system: {}", typeid(system).name()));
 				system->load();
 			}
 		}
