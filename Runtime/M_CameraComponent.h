@@ -7,6 +7,13 @@ namespace minty
 	struct CameraComponent
 		: public Component
 	{
+	private:
+		float const DEFAULT_FOV = 45.0f;
+		float const DEFAULT_NEAR = 0.1f;
+		float const DEFAULT_FAR = 100.0f;
+
+	public:
+
 		enum class Perspective : byte
 		{
 			Orthographic,
@@ -15,10 +22,10 @@ namespace minty
 
 		Perspective perspective = Perspective::Perspective;
 
-		float fov = 45.0f;
+		float fov = DEFAULT_FOV;
 
-		float nearPlane = 0.1f;
-		float farPlane = 100.0f;
+		float nearPlane = DEFAULT_NEAR;
+		float farPlane = DEFAULT_FAR;
 
 		void serialize(Writer& writer) const override;
 		void deserialize(Reader const& reader) override;
