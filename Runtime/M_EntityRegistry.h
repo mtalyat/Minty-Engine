@@ -31,6 +31,21 @@ namespace minty
 		//~EntityRegistry();
 
 		/// <summary>
+		/// Finds the first Entity with the given name.
+		/// </summary>
+		/// <param name="string"></param>
+		/// <returns>The Entity, if found, otherwise NULL_ENTITY.</returns>
+		Entity find_by_name(std::string const& string) const;
+
+		/// <summary>
+		/// Finds the first Entity with the given Component type.
+		/// </summary>
+		/// <typeparam name="T">The type of component.</typeparam>
+		/// <returns>The Entity, if found, otherwise NULL_ENTITY.</returns>
+		template<class T>
+		Entity find_by_type() const;
+
+		/// <summary>
 		/// Gets the name of the Entity, or an empty string if no name exists.
 		/// The name of an Entity can be added by emplacing the NameComponent component.
 		/// </summary>
@@ -61,6 +76,20 @@ namespace minty
 		template <class T>
 		static void register_component(std::string const& name);
 	};
+
+	template<class T>
+	inline Entity EntityRegistry::find_by_type() const
+	{
+		// iterate through view
+		for (auto [entity, t] : this->view<T const>().each())
+		{
+			// just return the first one
+			return entity;
+		}
+
+		// no components on any entities
+		return NULL_ENTITY;
+	}
 
 	template<class T>
 	void EntityRegistry::register_component(std::string const& name)

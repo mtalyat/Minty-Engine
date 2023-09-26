@@ -23,7 +23,8 @@ namespace minty
 		EntityRegistry* _registry;
 
 		// the systems to manage
-		std::map<int, std::set<System*>>* _systems;
+		std::map<int, std::set<System*>> _orderedSystems;
+		std::map<std::string const, System*> _allSystems;
 
 		static std::map<std::string const, SystemFunc const> _systemTypes;
 	public:

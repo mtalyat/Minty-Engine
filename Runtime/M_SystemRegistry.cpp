@@ -13,30 +13,27 @@ namespace minty
 	SystemRegistry::SystemRegistry(Engine* const engine, EntityRegistry* const registry)
 		: _engine(engine)
 		, _registry(registry)
-		, _systems(new std::map<int, std::set<System*>>())
+		, _orderedSystems()
+		, _allSystems()
 	{}
 
 	SystemRegistry::~SystemRegistry()
 	{
 		// delete each system
-		for (auto& pair : *_systems)
+		for (auto& pair : _allSystems)
 		{
-			for (auto system : pair.second)
-			{
-				delete system;
-			}
+			delete pair.second;
 		}
-		delete _systems;
 	}
 
 	SystemRegistry::SystemRegistry(SystemRegistry&& other) noexcept
 		: _engine(other._engine)
 		, _registry(other._registry)
-		, _systems(other._systems)
+		, _orderedSystems(std::move(other._orderedSystems))
+		, _allSystems(std::move(other._allSystems))
 	{
 		other._engine = nullptr;
 		other._registry = nullptr;
-		other._systems = nullptr;
 	}
 
 	SystemRegistry& SystemRegistry::operator=(SystemRegistry&& other) noexcept
@@ -45,11 +42,11 @@ namespace minty
 		{
 			_engine = other._engine;
 			_registry = other._registry;
-			_systems = other._systems;
+			_orderedSystems = std::move(other._orderedSystems);
+			_allSystems = std::move(other._allSystems);
 
 			other._engine = nullptr;
 			other._registry = nullptr;
-			other._systems = nullptr;
 		}
 
 		return *this;
@@ -57,13 +54,13 @@ namespace minty
 
 	System* SystemRegistry::emplace(System* const system, int const priority)
 	{
-		auto found = _systems->find(priority);
+		auto found = _orderedSystems.find(priority);
 
-		if (found == _systems->end())
+		if (found == _orderedSystems.end())
 		{
 			// new list
-			_systems->emplace(priority, std::set<System*>());
-			_systems->at(priority).emplace(system);
+			_orderedSystems.emplace(priority, std::set<System*>());
+			_orderedSystems.at(priority).emplace(system);
 		}
 		else
 		{
@@ -94,7 +91,7 @@ namespace minty
 	void SystemRegistry::erase(System* const system)
 	{
 		// find system, remove it from list
-		for (auto& pair : *_systems)
+		for (auto& pair : _orderedSystems)
 		{
 			if (pair.second.erase(system))
 			{
@@ -106,7 +103,7 @@ namespace minty
 
 	void SystemRegistry::load()
 	{
-		for (auto& pair : *_systems)
+		for (auto& pair : _orderedSystems)
 		{
 			for (auto system : pair.second)
 			{
@@ -118,7 +115,7 @@ namespace minty
 
 	void SystemRegistry::update()
 	{
-		for (auto& pair : *_systems)
+		for (auto& pair : _orderedSystems)
 		{
 			for (auto system : pair.second)
 			{
@@ -132,7 +129,7 @@ namespace minty
 
 	void SystemRegistry::fixed_update()
 	{
-		for (auto& pair : *_systems)
+		for (auto& pair : _orderedSystems)
 		{
 			for (auto system : pair.second)
 			{
@@ -146,7 +143,7 @@ namespace minty
 
 	void SystemRegistry::unload()
 	{
-		for (auto& pair : *_systems)
+		for (auto& pair : _orderedSystems)
 		{
 			for (auto system : pair.second)
 			{
@@ -158,7 +155,7 @@ namespace minty
 	std::string const SystemRegistry::to_string() const
 	{
 		// if no systems in registry
-		if (_systems->size() == 0)
+		if (_orderedSystems.size() == 0)
 		{
 			return "SystemRegistry()";
 		}
@@ -168,7 +165,7 @@ namespace minty
 		stream << "SystemRegistry(";
 
 		size_t i = 0;
-		for (auto const& pair : *_systems)
+		for (auto const& pair : _orderedSystems)
 		{
 			for (auto const& system : pair.second)
 			{

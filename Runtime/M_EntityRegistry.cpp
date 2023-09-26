@@ -29,6 +29,21 @@ EntityRegistry& minty::EntityRegistry::operator=(EntityRegistry&& other) noexcep
 	return *this;
 }
 
+Entity minty::EntityRegistry::find_by_name(std::string const& string) const
+{
+	for (auto [entity, name] : this->view<NameComponent const>().each())
+	{
+		if (name.name.compare(string) == 0)
+		{
+			// found entity with same name
+			return entity;
+		}
+	}
+
+	// did not find entity
+	return NULL_ENTITY;
+}
+
 std::string minty::EntityRegistry::get_name(Entity const entity) const
 {
 	// if entity has a name component, get the name
