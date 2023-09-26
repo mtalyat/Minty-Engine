@@ -194,8 +194,6 @@ Renderer::Renderer(Window* const window)
 	_shaders.reserve(MAX_SHADERS);
 
 	init();
-
-	console::log("renderer init");
 }
 
 Renderer::~Renderer()
