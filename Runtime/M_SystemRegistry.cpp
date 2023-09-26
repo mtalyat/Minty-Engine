@@ -3,6 +3,7 @@
 
 #include "M_Console.h"
 #include "M_Engine.h"
+#include "M_Parse.h"
 
 #include <sstream>
 
@@ -177,6 +178,18 @@ namespace minty
 		}
 	}
 
+	void SystemRegistry::clear()
+	{
+		// delete all systems
+		for (auto& pair : _allSystems)
+		{
+			delete pair.second;
+		}
+
+		_allSystems.clear();
+		_orderedSystems.clear();
+	}
+
 	std::string const SystemRegistry::to_string() const
 	{
 		// if no systems in registry
@@ -205,5 +218,38 @@ namespace minty
 		stream << ")";
 
 		return stream.str();
+	}
+	
+	void SystemRegistry::serialize(Writer& writer) const
+	{
+		// create reverse lookup for names
+		std::map<System* const, std::string> lookup;
+
+		for (auto const& pair : _allSystems)
+		{
+			lookup.emplace(pair.second, pair.first);
+		}
+
+		// write all systems:
+		// name: priority
+
+		for (auto const& pair : _orderedSystems)
+		{
+			for (auto const system : pair.second)
+			{
+				writer.write(lookup.at(system), pair.first);
+			}
+		}
+	}
+
+	void SystemRegistry::deserialize(Reader const& reader)
+	{
+		// read each one and emplace as we go, by name
+		SerializedNode const* node = reader.get_node();
+
+		for (auto const& pair : node->children)
+		{
+			emplace_by_name(pair.first, pair.second.to_int());
+		}
 	}
 }

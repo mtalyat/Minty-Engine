@@ -47,7 +47,7 @@ ID minty::SceneManager::create_scene(std::string const& path)
 		{
 			// system could have priority listed, otherwise default to zero
 			int priority = 0;
-			pair.second.try_get_int(priority);
+			pair.second.to_int(priority);
 			systemRegistry->emplace_by_name(pair.first, priority);
 		}
 	}

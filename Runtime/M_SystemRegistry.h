@@ -3,6 +3,7 @@
 #include "M_Object.h"
 #include "M_System.h"
 #include "M_Console.h"
+#include "M_ISerializable.h"
 #include <map>
 #include <set>
 
@@ -12,7 +13,7 @@ namespace minty
 	/// Holds and managers data relevant to systems. Can hold multiple types of systems.
 	/// </summary>
 	class SystemRegistry
-		: public Object
+		: public Object, public ISerializable
 	{
 	public:
 		typedef std::function<System* (Engine* const, EntityRegistry* const)> SystemFunc;
@@ -106,6 +107,11 @@ namespace minty
 		void unload();
 
 		/// <summary>
+		/// Clears the entire registry.
+		/// </summary>
+		void clear();
+
+		/// <summary>
 		/// Registers the System, so the System can be dynamically created by name.
 		/// </summary>
 		/// <typeparam name="T">The System to be registered.</typeparam>
@@ -113,7 +119,10 @@ namespace minty
 		static void register_system(std::string const& name);
 
 		std::string const to_string() const override;
-	};
+
+		void serialize(Writer& writer) const override;
+		void deserialize(Reader const& reader) override;
+};
 
 	template<class T>
 	T* SystemRegistry::emplace(std::string const& name, int const priority)

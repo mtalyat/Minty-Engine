@@ -12,7 +12,11 @@ namespace minty
 
 		std::map <std::string, SerializedNode> children;
 
-		bool try_get_int(int& value) const;
+		byte to_byte(byte const defaultValue = 0) const;
+
+		int to_int(int const defaultValue = 0) const;
+
+		float to_float(float const defaultValue = 0.0f) const;
 
 		void print(int const indent = 0) const;
 

@@ -3,29 +3,42 @@
 
 #include "M_Console.h"
 #include "M_File.h"
+#include "M_Parse.h"
 #include <vector>
 
 using namespace minty;
 
-bool minty::SerializedNode::try_get_int(int& value) const
+byte minty::SerializedNode::to_byte(byte const defaultValue) const
 {
-	std::string temp = data;
-	if (data.starts_with('-'))
+	byte out;
+	if (parse::try_byte(data, out))
 	{
-		temp = temp.substr(1, temp.size() - 1);
+		return out;
 	}
 
-	for (char const c : temp)
+	return defaultValue;
+}
+
+int minty::SerializedNode::to_int(int const defaultValue) const
+{
+	int out;
+	if (parse::try_int(data, out))
 	{
-		if (!isdigit(c))
-		{
-			// not a digit: not an int
-			return false;
-		}
+		return out;
 	}
 
-	value = std::stoi(data);
-	return true;
+	return defaultValue;
+}
+
+float minty::SerializedNode::to_float(float const defaultValue) const
+{
+	float out;
+	if (parse::try_float(data, out))
+	{
+		return out;
+	}
+
+	return defaultValue;
 }
 
 void minty::SerializedNode::print(int const indent) const

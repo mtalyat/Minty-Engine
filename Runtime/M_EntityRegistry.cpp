@@ -151,3 +151,11 @@ std::string const minty::EntityRegistry::to_string() const
 
 	return stream.str();
 }
+
+void minty::EntityRegistry::serialize(Writer& writer) const
+{
+}
+
+void minty::EntityRegistry::deserialize(Reader const& reader)
+{
+}

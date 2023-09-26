@@ -3,6 +3,7 @@
 #include "libraries/entt/entt.hpp"
 #include "M_Component.h"
 #include "M_Console.h"
+#include "M_ISerializable.h"
 
 namespace minty
 {
@@ -10,7 +11,7 @@ namespace minty
 	constexpr Entity NULL_ENTITY = entt::null;
 
 	class EntityRegistry
-		: public Object, public entt::registry
+		: public Object, public entt::registry, public ISerializable
 	{
 	public:
 		typedef std::function<Component* (EntityRegistry* const, Entity const)> ComponentFunc;
@@ -75,6 +76,9 @@ namespace minty
 		/// <typeparam name="T">The Component to register.</typeparam>
 		template <class T>
 		static void register_component(std::string const& name);
+
+		void serialize(Writer& writer) const override;
+		void deserialize(Reader const& reader) override;
 	};
 
 	template<class T>

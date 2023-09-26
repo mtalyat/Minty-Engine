@@ -3,6 +3,7 @@
 
 #include "M_EntityRegistry.h"
 #include "M_SystemRegistry.h"
+#include "M_ISerializable.h"
 
 namespace minty
 {
@@ -12,7 +13,7 @@ namespace minty
 	/// 
 	/// </summary>
 	class Scene :
-		public Object
+		public Object, public ISerializable
 	{
 	private:
 		Engine* _engine;
@@ -64,5 +65,8 @@ namespace minty
 		void unload();
 
 		std::string const to_string() const override;
+
+		void serialize(Writer& writer) const override;
+		void deserialize(Reader const& reader) override;
 	};
 }

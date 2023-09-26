@@ -79,3 +79,13 @@ std::string const minty::Scene::to_string() const
 {
 	return std::format("Scene({}, {})", _systems->to_string(), _entities->to_string());
 }
+
+void minty::Scene::serialize(Writer& writer) const
+{
+	
+}
+
+void minty::Scene::deserialize(Reader const& reader)
+{
+
+}

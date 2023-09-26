@@ -19,6 +19,8 @@ namespace minty
 	public:
 		Reader(SerializedNode const& node);
 
+		SerializedNode const* get_node() const;
+
 		void read_object(std::string const& name, ISerializable* const value) const;
 
 		std::string read_string(std::string const& name, std::string const& defaultValue = "") const;

@@ -9,6 +9,11 @@ minty::Writer::Writer(SerializedNode& node)
 	: _node(node)
 {}
 
+void minty::Writer::write(std::string const& name)
+{
+	write(name, "");
+}
+
 void minty::Writer::write(std::string const& name, ISerializable const* const value)
 {
 	// add child object for this object to write

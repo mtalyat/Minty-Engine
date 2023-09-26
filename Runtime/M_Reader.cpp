@@ -9,6 +9,11 @@ minty::Reader::Reader(SerializedNode const& node)
 	: _node(node)
 {}
 
+SerializedNode const* minty::Reader::get_node() const
+{
+	return &_node;
+}
+
 void minty::Reader::read_object(std::string const& name, ISerializable* const value) const
 {
 	auto const& found = _node.children.find(name);
