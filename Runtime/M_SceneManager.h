@@ -59,6 +59,12 @@ namespace minty
 		Scene& get_scene(ID const id);
 
 		/// <summary>
+		/// Gets the number of Scenes in this SceneManager.
+		/// </summary>
+		/// <returns>The number of Scenes.</returns>
+		size_t size() const;
+
+		/// <summary>
 		/// Loads the SceneManager and any active Scenes.
 		/// </summary>
 		void load();

@@ -79,6 +79,11 @@ Scene& minty::SceneManager::get_scene(ID const id)
 	return _scenes.at(id);
 }
 
+size_t minty::SceneManager::size() const
+{
+	return _scenes.size();
+}
+
 void minty::SceneManager::load()
 {
 	// do nothing if already loaded
