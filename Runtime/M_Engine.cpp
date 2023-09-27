@@ -43,6 +43,18 @@ SceneManager& minty::Engine::get_scene_manager()
 
 void Engine::run()
 {
+	// if no scenes at all, abort
+	if (!_sceneManager.size())
+	{
+		throw std::runtime_error("Aborting game. No Scenes loaded.");
+	}
+
+	// if no scene loaded, just load the first scene
+	if (!_sceneManager.get_loaded_scene())
+	{
+		_sceneManager.load_scene(0);
+	}
+
 	// start the renderer
 	_renderer.start();
 

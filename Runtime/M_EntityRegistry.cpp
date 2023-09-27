@@ -73,7 +73,7 @@ Component* minty::EntityRegistry::emplace_by_name(std::string const& name, Entit
 	if (found == _components.end())
 	{
 		// name not found
-		throw std::runtime_error(std::format("Cannot emplace Component \"{}\". It has not been registered with the EntityRegistry.", name));
+		console::error(std::format("Cannot emplace Component \"{}\". It has not been registered with the EntityRegistry.", name));
 	}
 	else
 	{
@@ -88,7 +88,7 @@ Component const* minty::EntityRegistry::get_by_name(std::string const& name, Ent
 	if (found == _components.end())
 	{
 		// name not found
-		throw std::runtime_error(std::format("Cannot get Component \"{}\". It has not been registered with the EntityRegistry.", name));
+		console::error(std::format("Cannot get Component \"{}\". It has not been registered with the EntityRegistry.", name));
 	}
 	else
 	{
