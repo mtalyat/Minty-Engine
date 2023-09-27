@@ -5,6 +5,14 @@
 #include "M_Engine.h"
 #include "M_Vertex.h"
 #include "M_File.h"
+#include "M_Scene.h"
+#include "M_EntityRegistry.h"
+
+#include "M_CameraComponent.h"
+#include "M_PositionComponent.h"
+#include "M_RotationComponent.h"
+#include "M_ScaleComponent.h"
+#include "M_MeshComponent.h"
 
 //#include <vulkan/vulkan.h>
 #define GLFW_INCLUDE_VULKAN
@@ -184,7 +192,6 @@ Renderer::Renderer(Window* const window)
 	: _window(window)
 	, _textures()
 	, _materials()
-	, _mesh()
 	, view()
 	, _backgroundColor({250, 220, 192, 255}) // light tan color
 {
@@ -361,6 +368,52 @@ void minty::Renderer::start()
 
 	create_command_buffers();
 	create_sync_objects();
+}
+
+void minty::Renderer::update()
+{
+	// do nothing if no scene set
+	if (_scene == nullptr)
+	{
+		console::error("There is no Scene to render!");
+		return;
+	}
+
+	// do nothing if no camera
+	if (_mainCamera == NULL_ENTITY)
+	{
+		console::warn("There is no Camera to render to!");
+		return;
+	}
+
+	// get camera transform
+	Transform transform;
+	CameraComponent const& camera = _registry->get<CameraComponent>(_mainCamera);
+	get_entity_transform(_mainCamera, transform);
+
+	// update camera in renderer
+	update_camera(camera, transform.position, transform.rotation);
+}
+
+void minty::Renderer::get_entity_transform(Entity const entity, Transform& transform) const
+{
+	PositionComponent const* const position = _registry->try_get<PositionComponent>(entity);
+	if (position)
+	{
+		transform.position = position->position;
+	}
+
+	RotationComponent const* const rotation = _registry->try_get<RotationComponent>(entity);
+	if (rotation)
+	{
+		transform.rotation = rotation->rotation;
+	}
+	
+	ScaleComponent const* const scale = _registry->try_get<ScaleComponent>(entity);
+	if (scale)
+	{
+		transform.scale = scale->scale;
+	}
 }
 
 ID minty::Renderer::create_texture(std::string const& path)
@@ -1540,6 +1593,21 @@ void Renderer::draw_frame()
 
 }
 
+void minty::Renderer::draw_scene(VkCommandBuffer commandBuffer)
+{
+	// draw all meshes in the scene
+
+	Transform transform;
+	for (auto&& [entity, mesh] : _registry->view<MeshComponent>().each())
+	{
+		// get transform for entity
+		get_entity_transform(entity, transform);
+
+		// render the entity's mesh at the position
+		render_mesh(commandBuffer, transform, mesh);
+	}
+}
+
 bool Renderer::check_validation_layer_support()
 {
 	uint32_t layerCount;
@@ -1746,20 +1814,6 @@ void Renderer::create_framebuffers()
 	}
 }
 
-void minty::Renderer::create_main_mesh()
-{
-	_mesh = new Mesh();
-	*_mesh = Mesh::create_cube(*this);
-
-	set_material_for_main_mesh(0);
-}
-
-void minty::Renderer::set_material_for_main_mesh(ID const materialId)
-{
-	_mesh->set_material(materialId);
-	//updateDescriptorSets(materialId);
-}
-
 void Renderer::create_uniform_buffers()
 {
 	VkDeviceSize bufferSize = sizeof(UniformBufferObject);
@@ -1922,12 +1976,9 @@ void Renderer::create_command_buffers()
 	}
 }
 
-void minty::Renderer::render_mesh(VkCommandBuffer commandBuffer, Mesh const* const mesh)
+void minty::Renderer::render_mesh(VkCommandBuffer commandBuffer, Transform const& transform, MeshComponent const& meshComponent)
 {
-	// update descriptor data
-	//updateDescriptorSets(mesh->_materialId);
-
-	Material const& mat = get_material(mesh->_materialId);
+	Material const& mat = get_material(meshComponent.materialId);
 	Shader const& shader = get_shader(mat.shaderID);
 
 	// update uniform data
@@ -1937,21 +1988,60 @@ void minty::Renderer::render_mesh(VkCommandBuffer commandBuffer, Mesh const* con
 	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, shader.pipeline);
 
 	// bind vertex data
-	VkBuffer vertexBuffers[] = { mesh->_vertexBuffer };
+	VkBuffer vertexBuffers[] = { meshComponent.mesh->_vertexBuffer };
 	VkDeviceSize offsets[] = { 0 };
 	vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
-	vkCmdBindIndexBuffer(commandBuffer, mesh->_indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+	vkCmdBindIndexBuffer(commandBuffer, meshComponent.mesh->_indexBuffer, 0, VK_INDEX_TYPE_UINT16);
+
+	// convert transform to matrix
+	// just do position for now
+	glm::mat4 transformMatrix = glm::mat4(1.0f);
+	transformMatrix = glm::translate(transformMatrix, glm::vec3(transform.position.x, transform.position.y, transform.position.z));
 
 	// send push constants so we know where to draw, what material to use, etc.
 	MeshInfo info
 	{
-		.transform = glm::mat4(1.0f),
-		.materialId = mesh->_materialId,
+		.transform = transformMatrix,
+		.materialId = meshComponent.materialId,
 	};
 	vkCmdPushConstants(commandBuffer, shader.layout, VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(MeshInfo), &info);
 
 	// draw
-	vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(mesh->_indexCount), 1, 0, 0, 0);
+	vkCmdDrawIndexed(commandBuffer, static_cast<uint32_t>(meshComponent.mesh->_indexCount), 1, 0, 0, 0);
+}
+
+void minty::Renderer::set_main_camera(Entity const entity)
+{
+	_mainCamera = entity;
+}
+
+void minty::Renderer::set_scene(Scene const* const scene, Entity const camera)
+{
+	// update scene that is being rendered
+	_scene = scene;
+
+	// if scene is null, so are other things
+	if (_scene == nullptr)
+	{
+		_registry = nullptr;
+		_mainCamera = NULL_ENTITY;
+		return;
+	}
+
+	// set registry to scene registry
+	_registry = _scene->get_entity_registry();
+	
+	// update camera we are rendering from
+	if (camera == NULL_ENTITY)
+	{
+		// no camera provided, attempt to find first one in scene
+		_mainCamera = _scene->get_entity_registry()->find_by_type<CameraComponent>();
+	}
+	else
+	{
+		// camera provided, use that
+		_mainCamera = camera;
+	}
 }
 
 void minty::Renderer::create_material_buffers()
@@ -2018,7 +2108,7 @@ void Renderer::record_command_buffer(VkCommandBuffer commandBuffer, uint32_t ima
 	vkCmdSetScissor(commandBuffer, 0, 1, &view.scissor);
 
 	// render meshes
-	render_mesh(commandBuffer, _mesh);
+	draw_scene(commandBuffer);
 
 	// done rendering
 	vkCmdEndRenderPass(commandBuffer);
@@ -2082,8 +2172,6 @@ void Renderer::cleanup()
 	{
 		vkDestroyDescriptorSetLayout(device, descriptorSetLayouts[i], nullptr);
 	}
-	_mesh->dispose(*this);
-	delete _mesh;
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
 		vkDestroySemaphore(device, renderFinishedSemaphores[i], nullptr);
 		vkDestroySemaphore(device, imageAvailableSemaphores[i], nullptr);

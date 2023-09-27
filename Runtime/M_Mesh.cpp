@@ -74,11 +74,6 @@ void minty::Mesh::set_indices(void const* const indices, size_t const elementCou
 	vkFreeMemory(engine.device, stagingBufferMemory, nullptr);
 }
 
-void minty::Mesh::set_material(ID const materialId)
-{
-	_materialId = materialId;
-}
-
 void minty::Mesh::dispose(Renderer& engine)
 {
 	// maybe swap order?

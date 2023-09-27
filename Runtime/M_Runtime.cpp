@@ -2,7 +2,6 @@
 #include "M_Runtime.h"
 
 #include "M_SystemRegistry.h"
-#include "M_RendererSystem.h"
 
 #include "M_EntityRegistry.h"
 #include "M_CameraComponent.h"
@@ -86,7 +85,7 @@ int Runtime::run()
 void minty::Runtime::register_builtin()
 {
 	// systems
-	SystemRegistry::register_system<RendererSystem>("Renderer");
+	//SystemRegistry::register_system<RendererSystem>("Renderer");
 
 	// components
 	EntityRegistry::register_component<CameraComponent>("Camera");

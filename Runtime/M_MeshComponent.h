@@ -1,14 +1,15 @@
 #pragma once
 
 #include "M_Component.h"
-#include "M_Vector3.h"
+#include "M_Mesh.h"
 
 namespace minty
 {
-	struct ScaleComponent
+	struct MeshComponent
 		: public Component
 	{
-		Vector3 scale;
+		Mesh* mesh;
+		ID materialId;
 
 		void serialize(Writer& writer) const override;
 		void deserialize(Reader const& reader) override;

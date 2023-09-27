@@ -20,8 +20,8 @@ namespace minty
 		bool _loaded;
 		// all scenes stored in memory
 		std::vector<Scene> _scenes;
-		// scenes that are active, eg. receiving update, etc. events
-		std::unordered_set<Scene*> _activeScenes;
+		// scene that is active, eg. receiving update, etc. events
+		Scene* _loadedScene;
 
 	public:
 		SceneManager(Engine* const engine);
@@ -40,27 +40,16 @@ namespace minty
 		ID create_scene(std::string const& path);
 
 		/// <summary>
-		/// Loads the Scene with the given ID.
+		/// Loads the Scene with the given ID. Unloads the current Scene first.
 		/// </summary>
 		/// <param name="id">The ID of the Scene to load.</param>
-		void activate_scene(ID const id);
+		void load_scene(ID const id);
 
 		/// <summary>
-		/// Loads the Scene with the given ID, and unloads all other loaded Scenes.
+		/// Gets the loaded Scene.
 		/// </summary>
-		/// <param name="id">The ID of the Scene to load.</param>
-		void activate_scene_exclusive(ID const id);
-
-		/// <summary>
-		/// Unloads the Scene with the given ID.
-		/// </summary>
-		/// <param name="id">The ID of the Scene to unload.</param>
-		void deactivate_scene(ID const id);
-
-		/// <summary>
-		/// Unloads all loaded Scenes.
-		/// </summary>
-		void deactivate_all();
+		/// <returns>A pointer to the active scene, or null if none loaded.</returns>
+		Scene* get_loaded_scene();
 
 		/// <summary>
 		/// Get the Scene based on its ID.
@@ -68,6 +57,12 @@ namespace minty
 		/// <param name="id">The ID of the Scene.</param>
 		/// <returns>A reference to the Scene.</returns>
 		Scene& get_scene(ID const id);
+
+		/// <summary>
+		/// Gets the number of Scenes in this SceneManager.
+		/// </summary>
+		/// <returns>The number of Scenes.</returns>
+		size_t size() const;
 
 		/// <summary>
 		/// Loads the SceneManager and any active Scenes.

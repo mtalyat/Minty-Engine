@@ -25,9 +25,6 @@ namespace minty
 		size_t _indexSize;
 		VkBuffer _indexBuffer;
 		VkDeviceMemory _indexMemory;
-
-		ID _materialId;
-
 	public:
 		//Mesh();
 
@@ -46,8 +43,6 @@ namespace minty
 		/// <param name="indices">The index data.</param>
 		/// <param name="deviceSize">The size in bytes of the index data.</param>
 		void set_indices(void const* const indices, size_t const elementCount, size_t const elementSize, Renderer& engine);
-
-		void set_material(ID const materialId);
 
 		/// <summary>
 		/// Creates a cube mesh.

@@ -30,6 +30,19 @@ EntityRegistry& minty::EntityRegistry::operator=(EntityRegistry&& other) noexcep
 	return *this;
 }
 
+Entity minty::EntityRegistry::create()
+{
+	return entt::registry::create();
+}
+
+Entity minty::EntityRegistry::create(std::string const& name)
+{
+	Entity e = entt::registry::create();
+	NameComponent& nameComponent = this->emplace<NameComponent>(e);
+	nameComponent.name = name;
+	return e;
+}
+
 Entity minty::EntityRegistry::find_by_name(std::string const& string) const
 {
 	for (auto [entity, name] : this->view<NameComponent const>().each())
@@ -73,7 +86,7 @@ Component* minty::EntityRegistry::emplace_by_name(std::string const& name, Entit
 	if (found == _components.end())
 	{
 		// name not found
-		throw std::runtime_error(std::format("Cannot emplace Component \"{}\". It has not been registered with the EntityRegistry.", name));
+		console::error(std::format("Cannot emplace Component \"{}\". It has not been registered with the EntityRegistry.", name));
 	}
 	else
 	{
@@ -88,7 +101,7 @@ Component const* minty::EntityRegistry::get_by_name(std::string const& name, Ent
 	if (found == _components.end())
 	{
 		// name not found
-		throw std::runtime_error(std::format("Cannot get Component \"{}\". It has not been registered with the EntityRegistry.", name));
+		console::error(std::format("Cannot get Component \"{}\". It has not been registered with the EntityRegistry.", name));
 	}
 	else
 	{
@@ -203,7 +216,7 @@ void minty::EntityRegistry::deserialize(Reader const& reader)
 	for (auto const& pair : node->children)
 	{
 		// create entity
-		Entity const entity = this->create();
+		Entity const entity = entt::registry::create();
 
 		// add name if there is one
 		// empty name is either "" or "_"

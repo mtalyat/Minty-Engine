@@ -3,14 +3,14 @@
 
 void minty::PositionComponent::serialize(Writer& writer) const
 {
-	writer.write("x", x, 0.0f);
-	writer.write("y", y, 0.0f);
-	writer.write("z", z, 0.0f);
+	writer.write("x", position.x, 0.0f);
+	writer.write("y", position.y, 0.0f);
+	writer.write("z", position.z, 0.0f);
 }
 
 void minty::PositionComponent::deserialize(Reader const& reader)
 {
-	x = reader.read_float("x");
-	y = reader.read_float("y");
-	z = reader.read_float("z");
+	position.x = reader.read_float("x");
+	position.y = reader.read_float("y");
+	position.z = reader.read_float("z");
 }

@@ -3,14 +3,14 @@
 
 void minty::ScaleComponent::serialize(Writer& writer) const
 {
-	writer.write("x", x, 1.0f);
-	writer.write("y", y, 1.0f);
-	writer.write("z", z, 1.0f);
+	writer.write("x", scale.x, 1.0f);
+	writer.write("y", scale.y, 1.0f);
+	writer.write("z", scale.z, 1.0f);
 }
 
 void minty::ScaleComponent::deserialize(Reader const& reader)
 {
-	x = reader.read_float("x", 1.0f);
-	y = reader.read_float("y", 1.0f);
-	z = reader.read_float("z", 1.0f);
+	scale.x = reader.read_float("x", 1.0f);
+	scale.y = reader.read_float("y", 1.0f);
+	scale.z = reader.read_float("z", 1.0f);
 }

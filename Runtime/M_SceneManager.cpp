@@ -15,7 +15,7 @@ minty::SceneManager::SceneManager(Engine* const engine)
 	: _engine(engine)
 	, _loaded()
 	, _scenes()
-	, _activeScenes()
+	, _loadedScene()
 {}
 
 ID minty::SceneManager::create_scene()
@@ -40,112 +40,48 @@ ID minty::SceneManager::create_scene(std::string const& path)
 	return id;
 }
 
-void minty::SceneManager::activate_scene(ID const id)
+void minty::SceneManager::load_scene(ID const id)
 {
 	Scene* scene = &_scenes.at(id);
 
 	// do nothing if already loaded
-	if (_activeScenes.contains(scene))
+	if (scene == _loadedScene)
 	{
 		return;
 	}
 
-	// trigger activate event, if manager is loaded
-	if (_loaded)
+	// if scene already loaded, unload it
+	if (_loaded && _loadedScene)
 	{
-		scene->load();
+		_loadedScene->unload();
 	}
 
-	// add to active list
-	_activeScenes.emplace(scene);
-}
+	// set value
+	_loadedScene = scene;
 
-void minty::SceneManager::activate_scene_exclusive(ID const id)
-{
-	// if already loaded, just unload others
-	// if not loaded, unload all, then load this one
+	// set renderer to use this new scene
+	_engine->get_renderer().set_scene(_loadedScene);
 
-	Scene* scene = &_scenes.at(id);
-
-	if (_activeScenes.contains(scene))
+	// load event
+	if (_loaded && _loadedScene)
 	{
-		// unload all scenes except the one we want
-		for (auto const& s : _activeScenes)
-		{
-			// skip the one we want loaded
-			if (scene == s) continue;
-
-			// unload others
-			if (_loaded)
-			{
-				s->unload();
-			}
-
-			console::error("Attempting to unload scene when SceneManager is not in loaded state.");
-		}
-		
-		// clear list
-		_activeScenes.clear();
-
-		// add target
-		_activeScenes.emplace(scene);
-	}
-	else
-	{
-		// unload all
-		deactivate_all();
-
-		// load target
-		activate_scene(id);
+		_loadedScene->load();
 	}
 }
 
-void minty::SceneManager::deactivate_scene(ID const id)
+Scene* minty::SceneManager::get_loaded_scene()
 {
-	Scene* scene = &_scenes.at(id);
-
-	// do nothing if already unloaded
-	if (!_activeScenes.contains(scene))
-	{
-		return;
-	}
-
-	// trigger deactivate event if manager is loaded
-	if (_loaded)
-	{
-		scene->unload();
-	}
-	else
-	{
-		console::error("Unloading scene when SceneManager is not in loaded state.");
-	}
-
-	// remove from active list
-	_activeScenes.erase(scene);
-}
-
-void minty::SceneManager::deactivate_all()
-{
-	if (_loaded)
-	{
-		// unload all scenes
-		for (auto const& s : _activeScenes)
-		{
-			s->unload();
-		}
-	}
-	else
-	{
-		console::error("Unloading all scenes when SceneManager is not in loaded state.");
-	}
-
-	// clear active scene list
-	_activeScenes.clear();
+	return _loadedScene;
 }
 
 Scene& minty::SceneManager::get_scene(ID const id)
 {
 	return _scenes.at(id);
+}
+
+size_t minty::SceneManager::size() const
+{
+	return _scenes.size();
 }
 
 void minty::SceneManager::load()
@@ -159,34 +95,28 @@ void minty::SceneManager::load()
 	// mark as loaded
 	_loaded = true;
 
-	// load all active scenes
-	for (auto const scene : _activeScenes)
+	// load active scene
+	if (_loadedScene)
 	{
-		scene->load();
+		_loadedScene->load();
 	}
 }
 
 void minty::SceneManager::update()
 {
 	// update all active scenes if loaded
-	if (_loaded)
+	if (_loaded && _loadedScene)
 	{
-		for (auto const scene : _activeScenes)
-		{
-			scene->update();
-		}
+		_loadedScene->update();
 	}
 }
 
 void minty::SceneManager::fixed_update()
 {
 	// fixed update all active scenes if loaded
-	if (_loaded)
+	if (_loaded && _loadedScene)
 	{
-		for (auto const scene : _activeScenes)
-		{
-			scene->fixed_update();
-		}
+		_loadedScene->fixed_update();
 	}
 }
 
@@ -201,9 +131,8 @@ void minty::SceneManager::unload()
 	// mark as unloaded
 	_loaded = false;
 
-	// unload all active scenes
-	for (auto const scene : _activeScenes)
+	if (_loadedScene)
 	{
-		scene->unload();
+		_loadedScene->unload();
 	}
 }

@@ -210,6 +210,7 @@
   <ItemGroup>
     <ClInclude Include="framework.h" />
     <ClInclude Include="libraries\entt\entt.hpp" />
+    <ClInclude Include="M_MeshComponent.h" />
     <ClInclude Include="M_CameraComponent.h" />
     <ClInclude Include="M_Component.h" />
     <ClInclude Include="M_EntityRegistry.h" />
@@ -233,7 +234,6 @@
     <ClInclude Include="M_Parse.h" />
     <ClInclude Include="M_PositionComponent.h" />
     <ClInclude Include="M_Reader.h" />
-    <ClInclude Include="M_RendererSystem.h" />
     <ClInclude Include="M_RotationComponent.h" />
     <ClInclude Include="M_ScaleComponent.h" />
     <ClInclude Include="M_Scene.h" />
@@ -244,6 +244,7 @@
     <ClInclude Include="M_System.h" />
     <ClInclude Include="M_SystemRegistry.h" />
     <ClInclude Include="M_Texture.h" />
+    <ClInclude Include="M_Transform.h" />
     <ClInclude Include="M_Vector2Int.h" />
     <ClInclude Include="M_Vector2.h" />
     <ClInclude Include="M_Project.h" />
@@ -275,12 +276,12 @@
     <ClCompile Include="M_Material.cpp" />
     <ClCompile Include="M_Math.cpp" />
     <ClCompile Include="M_Mesh.cpp" />
+    <ClCompile Include="M_MeshComponent.cpp" />
     <ClCompile Include="M_NameComponent.cpp" />
     <ClCompile Include="M_Object.cpp" />
     <ClCompile Include="M_Parse.cpp" />
     <ClCompile Include="M_PositionComponent.cpp" />
     <ClCompile Include="M_Reader.cpp" />
-    <ClCompile Include="M_RendererSystem.cpp" />
     <ClCompile Include="M_RotationComponent.cpp" />
     <ClCompile Include="M_ScaleComponent.cpp" />
     <ClCompile Include="M_Scene.cpp" />

@@ -88,7 +88,7 @@ namespace minty
 		if (found == _systemTypes.end())
 		{
 			// name not found
-			throw std::runtime_error(std::format("Cannot emplace System \"{}\". It has not been registered with the SystemRegistry.", name));
+			console::error(std::format("Cannot emplace System \"{}\". It has not been registered with the SystemRegistry.", name));
 		}
 		else
 		{
