@@ -27,9 +27,101 @@ using namespace minty;
 
 ID matId = 0;
 InputMap input;
+Mesh mesh;
 
 void init(Runtime& runtime)
-{}
+{
+	Engine& engine = runtime.get_engine();
+	Window* windowPtr = &engine.get_window();
+	Renderer* rendererPtr = &engine.get_renderer();
+	SceneManager& sceneManager = engine.get_scene_manager();
+
+	// load scene from disk
+	ID sceneId = sceneManager.create_scene("Assets/Scenes/test.scene");
+	sceneManager.load_scene(sceneId);
+	Scene& scene = sceneManager.get_scene(sceneId);
+	EntityRegistry* er = scene.get_entity_registry();
+	SystemRegistry* sr = scene.get_system_registry();
+
+	Entity cube = er->find_by_name("Cube");
+	mesh = Mesh::create_cube(*rendererPtr);
+	MeshComponent& meshComponent = er->emplace<MeshComponent>(cube);
+	meshComponent.mesh = &mesh;
+	meshComponent.materialId = 0;
+
+
+	rendererPtr->create_texture("Assets/Textures/pattern.png");
+	rendererPtr->create_texture("Assets/Textures/funny.jpg");
+	rendererPtr->create_texture("Assets/Textures/texture.jpg");
+	rendererPtr->create_texture("Assets/Textures/brian.png");
+
+	rendererPtr->create_shader("Assets/Shaders/vert.spv", "Assets/Shaders/frag.spv");
+
+	rendererPtr->create_material(0, 0, Color(255, 255, 255));
+	rendererPtr->create_material(0, 1, Color(255, 255, 255));
+	rendererPtr->create_material(0, 2, Color(255, 255, 255));
+	rendererPtr->create_material(0, 3, Color(255, 255, 255));
+
+	ID* matIdPtr = &matId;
+
+	// input
+	// rotate when space held
+	input.emplace_key_down(Key::D1, [er, cube](KeyPressEventArgs const& args)
+		{
+			MeshComponent& meshComponent = er->get<MeshComponent>(cube);
+			meshComponent.materialId = 0;
+		});
+	input.emplace_key_down(Key::D2, [er, cube](KeyPressEventArgs const& args)
+		{
+			MeshComponent& meshComponent = er->get<MeshComponent>(cube);
+			meshComponent.materialId = 1;
+		});
+	input.emplace_key_down(Key::D3, [er, cube](KeyPressEventArgs const& args)
+		{
+			MeshComponent& meshComponent = er->get<MeshComponent>(cube);
+			meshComponent.materialId = 2;
+		});
+	input.emplace_key_down(Key::D4, [er, cube](KeyPressEventArgs const& args)
+		{
+			MeshComponent& meshComponent = er->get<MeshComponent>(cube);
+			meshComponent.materialId = 3;
+		});
+	input.emplace_key_down(Key::Q, [rendererPtr, er, cube](KeyPressEventArgs const& args)
+		{
+			MeshComponent& meshComponent = er->get<MeshComponent>(cube);
+			Material& mat = rendererPtr->get_material(meshComponent.materialId);
+			mat.color = Color(255, 255, 255);
+			rendererPtr->update_material(meshComponent.materialId);
+		});
+	input.emplace_key_down(Key::W, [rendererPtr, er, cube](KeyPressEventArgs const& args)
+		{
+			MeshComponent& meshComponent = er->get<MeshComponent>(cube);
+			Material& mat = rendererPtr->get_material(meshComponent.materialId);
+			mat.color = Color(255, 0, 0);
+			rendererPtr->update_material(meshComponent.materialId);
+		});
+	input.emplace_key_down(Key::E, [rendererPtr, er, cube](KeyPressEventArgs const& args)
+		{
+			MeshComponent& meshComponent = er->get<MeshComponent>(cube);
+			Material& mat = rendererPtr->get_material(meshComponent.materialId);
+			mat.color = Color(0, 255, 0);
+			rendererPtr->update_material(meshComponent.materialId);
+		});
+	input.emplace_key_down(Key::R, [rendererPtr, er, cube](KeyPressEventArgs const& args)
+		{
+			MeshComponent& meshComponent = er->get<MeshComponent>(cube);
+			Material& mat = rendererPtr->get_material(meshComponent.materialId);
+			mat.color = Color(0, 0, 255);
+			rendererPtr->update_material(meshComponent.materialId);
+		});
+	// quit on key close
+	input.emplace_key_down(Key::Escape, [windowPtr](KeyPressEventArgs const& args)
+		{
+			windowPtr->close();
+		});
+
+	windowPtr->setInput(&input);
+}
 
 // A quick way to split strings separated via spaces.
 std::vector<std::string> splitString(std::string s)
