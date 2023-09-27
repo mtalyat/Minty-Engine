@@ -30,6 +30,19 @@ EntityRegistry& minty::EntityRegistry::operator=(EntityRegistry&& other) noexcep
 	return *this;
 }
 
+Entity minty::EntityRegistry::create()
+{
+	return entt::registry::create();
+}
+
+Entity minty::EntityRegistry::create(std::string const& name)
+{
+	Entity e = entt::registry::create();
+	NameComponent& nameComponent = this->emplace<NameComponent>(e);
+	nameComponent.name = name;
+	return e;
+}
+
 Entity minty::EntityRegistry::find_by_name(std::string const& string) const
 {
 	for (auto [entity, name] : this->view<NameComponent const>().each())
@@ -203,7 +216,7 @@ void minty::EntityRegistry::deserialize(Reader const& reader)
 	for (auto const& pair : node->children)
 	{
 		// create entity
-		Entity const entity = this->create();
+		Entity const entity = entt::registry::create();
 
 		// add name if there is one
 		// empty name is either "" or "_"

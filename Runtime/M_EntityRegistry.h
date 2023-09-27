@@ -37,6 +37,19 @@ namespace minty
 
 		EntityRegistry& operator=(EntityRegistry&& other) noexcept;
 
+		/// <summary>
+		/// Creates a new Entity.
+		/// </summary>
+		/// <returns>The new Entity created.</returns>
+		Entity create();
+
+		/// <summary>
+		/// Creates a new Entity with the given name on a NameComponent.
+		/// </summary>
+		/// <param name="name">The name of the Entity.</param>
+		/// <returns>The new Entity with a NameComponent attached, with the given name.</returns>
+		Entity create(std::string const& name);
+
 		//~EntityRegistry();
 
 		/// <summary>
