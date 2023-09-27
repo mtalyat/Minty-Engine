@@ -87,34 +87,28 @@ void minty::SceneManager::load()
 	// mark as loaded
 	_loaded = true;
 
-	// load all active scenes
-	for (auto const scene : _activeScenes)
+	// load active scene
+	if (_loadedScene)
 	{
-		scene->load();
+		_loadedScene->load();
 	}
 }
 
 void minty::SceneManager::update()
 {
 	// update all active scenes if loaded
-	if (_loaded)
+	if (_loaded && _loadedScene)
 	{
-		for (auto const scene : _activeScenes)
-		{
-			scene->update();
-		}
+		_loadedScene->update();
 	}
 }
 
 void minty::SceneManager::fixed_update()
 {
 	// fixed update all active scenes if loaded
-	if (_loaded)
+	if (_loaded && _loadedScene)
 	{
-		for (auto const scene : _activeScenes)
-		{
-			scene->fixed_update();
-		}
+		_loadedScene->fixed_update();
 	}
 }
 
@@ -129,9 +123,8 @@ void minty::SceneManager::unload()
 	// mark as unloaded
 	_loaded = false;
 
-	// unload all active scenes
-	for (auto const scene : _activeScenes)
+	if (_loadedScene)
 	{
-		scene->unload();
+		_loadedScene->unload();
 	}
 }
