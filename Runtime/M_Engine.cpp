@@ -64,6 +64,9 @@ void Engine::run()
 		// update scene(s)
 		_sceneManager.update();
 
+		// update renderer
+		_renderer.update();
+
 		// render to the screen
 		_renderer.renderFrame();
 

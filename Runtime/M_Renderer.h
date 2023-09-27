@@ -10,7 +10,10 @@
 #include "M_Shader.h"
 #include "M_Material.h"
 #include "M_CameraComponent.h"
+#include "M_MeshComponent.h"
 #include "M_Vector3.h"
+#include "M_Transform.h"
+#include "M_EntityRegistry.h"
 
 #include <array>
 #include <vector>
@@ -50,6 +53,8 @@ namespace minty
 	struct MaterialInfo;
 	struct MeshInfo;
 
+	class Scene;
+
 	/// <summary>
 	/// Handles rendering for the game engine.
 	/// </summary>
@@ -62,9 +67,12 @@ namespace minty
 		std::vector<Material> _materials;
 		std::vector<Shader> _shaders;
 
-		Mesh* _mesh;
 		Viewport view;
 		Color _backgroundColor;
+
+		Scene const* _scene = nullptr;
+		EntityRegistry const* _registry = nullptr;
+		Entity _mainCamera = NULL_ENTITY;
 	public:
 		Renderer(Window* const window);
 
@@ -129,6 +137,13 @@ namespace minty
 		/// </summary>
 		void start();
 
+		/// <summary>
+		/// Updates the Renderer.
+		/// </summary>
+		void update();
+
+		void get_entity_transform(Entity const entity, Transform& transform) const;
+
 #pragma region Components
 
 		ID create_texture(std::string const& path);
@@ -154,22 +169,15 @@ namespace minty
 
 #pragma endregion
 
-#pragma region Main
-
-		/// <summary>
-		/// Creates the mesh to render.
-		/// </summary>
-		void create_main_mesh();
-
-		void set_material_for_main_mesh(ID const materialId);
-
-#pragma endregion
-
 #pragma region Drawing
 
-		void render_mesh(VkCommandBuffer commandBuffer, Mesh const* const mesh);
+		void render_mesh(VkCommandBuffer commandBuffer, Transform const& transform, MeshComponent const& meshComponent);
 
 #pragma endregion
+
+		void set_main_camera(Entity const entity);
+
+		void set_scene(Scene const* const scene, Entity const camera = NULL_ENTITY);
 
 		void create_material_buffers();
 
@@ -345,6 +353,11 @@ namespace minty
 		/// Draw a single frame to the screen.
 		/// </summary>
 		void draw_frame();
+
+		/// <summary>
+		/// Draws the objects within the Scene.
+		/// </summary>
+		void draw_scene(VkCommandBuffer commandBuffer);
 
 		/// <summary>
 		/// Check if all validation layers are available for debugging.

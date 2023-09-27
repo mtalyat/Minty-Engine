@@ -135,9 +135,6 @@
     <ClInclude Include="M_NameComponent.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
-    <ClInclude Include="M_RendererSystem.h">
-      <Filter>Header Files\Systems</Filter>
-    </ClInclude>
     <ClInclude Include="M_SerializedNode.h">
       <Filter>Header Files\Serialization</Filter>
     </ClInclude>
@@ -187,6 +184,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="libraries\entt\entt.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="M_MeshComponent.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Transform.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -308,10 +311,10 @@
     <ClCompile Include="M_Parse.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="M_RendererSystem.cpp">
+    <ClCompile Include="M_CameraComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="M_CameraComponent.cpp">
+    <ClCompile Include="M_MeshComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

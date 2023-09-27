@@ -12,6 +12,7 @@ access to the entire engine without needing include each file.
 // COMPONENTS
 #include "M_Component.h"
 
+#include "M_MeshComponent.h"
 #include "M_NameComponent.h"
 #include "M_PositionComponent.h"
 #include "M_RotationComponent.h"
@@ -34,7 +35,7 @@ access to the entire engine without needing include each file.
 #include "M_System.h"
 #include "M_SystemRegistry.h"
 
-#include "M_RendererSystem.h"
+
 
 // GENERAL
 #include "M_Color.h"
