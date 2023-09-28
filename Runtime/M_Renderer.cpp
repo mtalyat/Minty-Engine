@@ -8,6 +8,7 @@
 #include "M_Scene.h"
 #include "M_EntityRegistry.h"
 
+#include "M_OriginComponent.h"
 #include "M_CameraComponent.h"
 #include "M_PositionComponent.h"
 #include "M_RotationComponent.h"
@@ -397,18 +398,34 @@ void minty::Renderer::update()
 
 void minty::Renderer::get_entity_transform(Entity const entity, Transform& transform) const
 {
+	// get origin
+	OriginComponent const* const origin = _registry->try_get<OriginComponent>(entity);
+	if (origin)
+	{
+		// origin given
+		transform.position = origin->position;
+	}
+	else
+	{
+		// no origin given, set to (0, 0, 0)
+		transform.position = Vector3();
+	}
+
+	// get and add position to origin
 	PositionComponent const* const position = _registry->try_get<PositionComponent>(entity);
 	if (position)
 	{
-		transform.position = position->position;
+		transform.position += position->position;
 	}
 
+	// get rotation
 	RotationComponent const* const rotation = _registry->try_get<RotationComponent>(entity);
 	if (rotation)
 	{
 		transform.rotation = rotation->rotation;
 	}
 	
+	// get scale
 	ScaleComponent const* const scale = _registry->try_get<ScaleComponent>(entity);
 	if (scale)
 	{
@@ -1590,7 +1607,6 @@ void Renderer::draw_frame()
 
 	// move to next frame
 	currentFrame = (currentFrame + 1) % MAX_FRAMES_IN_FLIGHT;
-
 }
 
 void minty::Renderer::draw_scene(VkCommandBuffer commandBuffer)

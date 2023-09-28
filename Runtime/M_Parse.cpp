@@ -6,6 +6,8 @@ using namespace minty::parse;
 
 bool is_unsigned_integer(std::string const& string)
 {
+    if (!string.length()) return false; // nothing in string
+
     for (char const c : string)
     {
         if (!isdigit(c)) return false; // not a digit
@@ -17,6 +19,8 @@ bool is_unsigned_integer(std::string const& string)
 
 bool is_signed_integer(std::string const& string)
 {
+    if (!string.length()) return false; // nothing in string
+
     char c;
     for (size_t i = 0; i < string.size(); i++)
     {
@@ -38,6 +42,8 @@ bool is_signed_integer(std::string const& string)
 
 bool is_float(std::string const& string)
 {
+    if (!string.length()) return false; // nothing in string
+
     char c;
     bool decimal = false;
     for (size_t i = 0; i < string.size(); i++)

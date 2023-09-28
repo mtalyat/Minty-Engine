@@ -89,6 +89,7 @@ namespace minty
 		{
 			// name not found
 			console::error(std::format("Cannot emplace System \"{}\". It has not been registered with the SystemRegistry.", name));
+			return nullptr;
 		}
 		else
 		{

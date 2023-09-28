@@ -40,7 +40,7 @@ ID minty::SceneManager::create_scene(std::string const& path)
 	return id;
 }
 
-void minty::SceneManager::load_scene(ID const id)
+void minty::SceneManager::load_scene(ID const id, Entity const camera)
 {
 	Scene* scene = &_scenes.at(id);
 
@@ -60,7 +60,7 @@ void minty::SceneManager::load_scene(ID const id)
 	_loadedScene = scene;
 
 	// set renderer to use this new scene
-	_engine->get_renderer().set_scene(_loadedScene);
+	_engine->get_renderer()->set_scene(_loadedScene, camera);
 
 	// load event
 	if (_loaded && _loadedScene)

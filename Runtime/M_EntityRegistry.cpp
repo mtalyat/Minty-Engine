@@ -87,6 +87,7 @@ Component* minty::EntityRegistry::emplace_by_name(std::string const& name, Entit
 	{
 		// name not found
 		console::error(std::format("Cannot emplace Component \"{}\". It has not been registered with the EntityRegistry.", name));
+		return nullptr;
 	}
 	else
 	{
@@ -102,6 +103,7 @@ Component const* minty::EntityRegistry::get_by_name(std::string const& name, Ent
 	{
 		// name not found
 		console::error(std::format("Cannot get Component \"{}\". It has not been registered with the EntityRegistry.", name));
+		return nullptr;
 	}
 	else
 	{
