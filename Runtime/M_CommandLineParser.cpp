@@ -5,7 +5,7 @@
 
 using namespace minty;
 
-void CommandLineParser::addParameter(Parameter const param)
+void CommandLineParser::add_parameter(Parameter const param)
 {
 	switch (param.type)
 	{
@@ -58,7 +58,7 @@ void CommandLineParser::parse(int argc, char const* argv[])
 	}
 }
 
-bool CommandLineParser::getArgument(std::string const& name, Argument& arg)
+bool CommandLineParser::get_argument(std::string const& name, Argument& arg)
 {
 	// try to find the arg
 	auto argFound = _args.find(name);
@@ -74,7 +74,7 @@ bool CommandLineParser::getArgument(std::string const& name, Argument& arg)
 	return false;
 }
 
-bool CommandLineParser::getArgument(std::string const& name)
+bool CommandLineParser::get_argument(std::string const& name)
 {
 	return _args.find(name) != _args.end();
 }

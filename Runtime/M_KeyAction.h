@@ -2,6 +2,9 @@
 
 namespace minty
 {
+	/// <summary>
+	/// The state of a key or button.
+	/// </summary>
 	enum class KeyAction
 	{
 		Up = 0,

@@ -2,6 +2,9 @@
 
 namespace minty
 {
+	/// <summary>
+	/// A key on the keyboard.
+	/// </summary>
 	enum class Key
 	{
 		Unknown = -1,

@@ -45,10 +45,27 @@ namespace minty
 		void print(std::string const& message, Color const color);
 
 		/// <summary>
+		/// Waits until the user presses the enter key.
+		/// </summary>
+		void wait();
+
+		/// <summary>
 		/// Debug log prints the given message to the screen.
 		/// </summary>
 		/// <param name="message">The string to print.</param>
-		void log(std::string const& message);
+		void log(std::string const& message, Color const color = Color::White);
+
+		/// <summary>
+		/// Debug log prints the given message to the screen, in cyan.
+		/// </summary>
+		/// <param name="message">The string to print.</param>
+		void todo(std::string const& message);
+
+		/// <summary>
+		/// Debug log prints the given message to the screen, in blue.
+		/// </summary>
+		/// <param name="message">The string to print.</param>
+		void test(std::string const& message, Color const color = Color::Blue);
 
 		/// <summary>
 		/// Debug info prints the given message to the screen, in gray.

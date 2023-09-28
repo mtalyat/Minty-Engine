@@ -102,21 +102,21 @@ namespace minty
 
         operator minty::Vector3() const;
 
-        std::string const toString() const override;
+        std::string const to_string() const override;
 
         /// <summary>
         /// Converts the given polar coordinates to cartesian coordinates.
         /// </summary>
         /// <param name="polar">The polar coordinates.</param>
         /// <returns>The cartesian coordinates.</returns>
-        static Vector2 polarToCartesian(Vector2 const& polar);
+        static Vector2 to_cartesian(Vector2 const& polar);
 
         /// <summary>
         /// Converts the given cartesian coordinates to polar coordinates.
         /// </summary>
         /// <param name="cartesian">The cartesian coordinates.</param>
         /// <returns>The polar coordinates.</returns>
-        static Vector2 cartesianToPolar(Vector2 const& cartesian);
+        static Vector2 to_polar(Vector2 const& cartesian);
     };
 }
 

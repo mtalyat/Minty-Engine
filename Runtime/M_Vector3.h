@@ -1,5 +1,7 @@
 #pragma once
+
 #include "M_Object.h"
+#include "M_ISerializable.h"
 
 namespace minty
 {
@@ -10,7 +12,7 @@ namespace minty
     /// Holds X, Y and Z coordinates for a floating point pair in space.
     /// </summary>
     struct Vector3 :
-        public Object
+        public Object, public ISerializable
     {
         /// <summary>
         /// The X position.
@@ -81,10 +83,28 @@ namespace minty
             return Vector3(x + other.x, y + other.y, z + other.z);
         }
 
+        // add equals operator
+        Vector3& operator +=(Vector3 const& other)
+        {
+            x += other.x;
+            y += other.y;
+            z += other.z;
+            return *this;
+        }
+
         // subtract operator
         Vector3 operator -(Vector3 const& other) const
         {
             return Vector3(x - other.x, y - other.y, z - other.z);
+        }
+
+        // subtract equals operator
+        Vector3& operator -=(Vector3 const& other)
+        {
+            x -= other.x;
+            y -= other.y;
+            z -= other.z;
+            return *this;
         }
 
         // multiplication operator
@@ -99,6 +119,24 @@ namespace minty
             return Vector3(x * scale, y * scale, z * scale);
         }
 
+        // multiply equals operator
+        Vector3& operator *=(Vector3 const& other)
+        {
+            x *= other.x;
+            y *= other.y;
+            z *= other.z;
+            return *this;
+        }
+
+        // multiply scaling equals operator
+        Vector3& operator *=(float const scale)
+        {
+            x *= scale;
+            y *= scale;
+            z *= scale;
+            return *this;
+        }
+
         // division operator
         Vector3 operator /(Vector3 const& other) const
         {
@@ -111,11 +149,33 @@ namespace minty
             return Vector3(x / scale, y / scale, z / scale);
         }
 
+        // division equals operator
+        Vector3& operator /=(Vector3 const& other)
+        {
+            x /= other.x;
+            y /= other.y;
+            z /= other.z;
+            return *this;
+        }
+
+        // division scaling equals operator
+        Vector3& operator /=(float const scale)
+        {
+            x /= scale;
+            y /= scale;
+            z /= scale;
+            return *this;
+        }
+
         operator minty::Vector3Int() const;
 
         operator minty::Vector2() const;
 
-        std::string const toString() const override;
-    };
+        std::string const to_string() const override;
+
+        // Inherited via ISerializable
+        void serialize(Writer& writer) const override;
+        void deserialize(Reader const& reader) override;
+};
 }
 

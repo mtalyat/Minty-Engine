@@ -2,15 +2,13 @@
 #include "M_Material.h"
 
 #include "M_Renderer.h"
+#include "M_Console.h"
+#include <stdexcept>
 
-minty::Material::Material(VkPipelineLayout const& layout, VkPipeline const& pipeline)
-	: _layout(layout)
-	, _pipeline(pipeline)
-	, _textures()
+using namespace minty;
+
+minty::Material::Material(ID const shaderId, ID const textureID, Color const color)
+	: shaderID(shaderId)
+	, textureID(textureID)
+	, color(color)
 {}
-
-void minty::Material::dispose(Renderer& engine)
-{
-	vkDestroyPipeline(engine.device, _pipeline, nullptr);
-	vkDestroyPipelineLayout(engine.device, _layout, nullptr);
-}

@@ -1,6 +1,8 @@
 #pragma once
 
 #include "M_Engine.h"
+#include <functional>
+#include <map>
 
 namespace minty
 {
@@ -10,15 +12,27 @@ namespace minty
 	class Runtime
 	{
 	private:
-		Engine* const _engine;
+		// the engine that this runtime uses
+		Engine _engine;
 
 	public:
-		Runtime();
+		/// <summary>
+		/// Creates a new Runtime based on the given arguments.
+		/// </summary>
+		Runtime(int argc, char const* argv[]);
 
 		~Runtime();
 
-		int run(int argc, char const* argv[]);
+		Engine* get_engine();
 
-		Engine* getEngine() const;
+		/// <summary>
+		/// Runs the Runtime.
+		/// </summary>
+		/// <returns></returns>
+		int run();
+
+	private:
+		// registers all built in systems and components
+		void register_builtin();
 	};
 }

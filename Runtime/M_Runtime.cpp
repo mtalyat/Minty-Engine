@@ -1,30 +1,36 @@
 #include "pch.h"
 #include "M_Runtime.h"
 
+#include "M_SystemRegistry.h"
+
+#include "M_EntityRegistry.h"
+#include "M_CameraComponent.h"
+#include "M_MeshComponent.h"
+#include "M_NameComponent.h"
+#include "M_OriginComponent.h"
+#include "M_PositionComponent.h"
+#include "M_RotationComponent.h"
+#include "M_ScaleComponent.h"
+
 #include "M_CommandLineParser.h"
+#include "M_Console.h"
 #include <filesystem>
 #include <iostream>
+#include <exception>
+#include <typeinfo>
+#include <stdexcept>
 #include <exception>
 
 using namespace minty;
 
-Runtime::Runtime()
-	: _engine(new Engine())
-{
-}
-
-Runtime::~Runtime()
-{
-	delete _engine;
-}
-
-int Runtime::run(int argc, char const* argv[])
+minty::Runtime::Runtime(int argc, char const* argv[])
+	: _engine()
 {
 	// parse command line arguments...
 
 	// add parameters
 	CommandLineParser parser;
-	parser.addParameter(CommandLineParser::Parameter("path", 1));
+	parser.add_parameter(CommandLineParser::Parameter("path", 1));
 
 	// parse the args
 	parser.parse(argc, argv);
@@ -32,7 +38,7 @@ int Runtime::run(int argc, char const* argv[])
 	// check for args
 	CommandLineParser::Argument arg;
 
-	if (parser.getArgument("path", arg))
+	if (parser.get_argument("path", arg))
 	{
 		std::cout << "Path argument: " << arg.args[0] << std::endl;
 
@@ -42,27 +48,53 @@ int Runtime::run(int argc, char const* argv[])
 	else
 	{
 		std::cerr << "Path argument not found." << std::endl;
-
-		return EXIT_FAILURE;
 	}
 
+	register_builtin();
+}
+
+Runtime::~Runtime()
+{
+	
+}
+
+Engine* minty::Runtime::get_engine()
+{
+	return &_engine;
+}
+
+int Runtime::run()
+{
 	try
 	{
 		// TODO: load game
 
-		_engine->run();
+		_engine.run();
 	}
-	catch (const std::exception& e)
+	catch (std::exception const& e)
 	{
-		std::cerr << e.what() << std::endl;
-		std::cout << e.what() << std::endl;
+		console::error(e.what());
 		return EXIT_FAILURE;
+	}
+	catch (...)
+	{
+		console::error("An uncaught exception occured.");
 	}
 
 	return EXIT_SUCCESS;
 }
 
-Engine* Runtime::getEngine() const
+void minty::Runtime::register_builtin()
 {
-	return _engine;
+	// systems
+	//SystemRegistry::register_system<RendererSystem>("Renderer");
+
+	// components
+	EntityRegistry::register_component<CameraComponent>("Camera");
+	EntityRegistry::register_component<MeshComponent>("Mesh");
+	EntityRegistry::register_component<NameComponent>("Name");
+	EntityRegistry::register_component<OriginComponent>("Origin");
+	EntityRegistry::register_component<PositionComponent>("Position");
+	EntityRegistry::register_component<RotationComponent>("Rotation");
+	EntityRegistry::register_component<ScaleComponent>("Scale");
 }

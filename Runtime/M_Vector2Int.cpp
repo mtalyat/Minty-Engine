@@ -17,8 +17,8 @@ minty::Vector2Int::Vector2Int(int const x, int const y)
 {}
 
 minty::Vector2Int::Vector2Int(float const x, float const y)
-    : x(math::floorToInt(x))
-    , y(math::floorToInt(y))
+    : x(math::floor_to_int(x))
+    , y(math::floor_to_int(y))
 {}
 
 minty::Vector2Int::Vector2Int(Vector2Int const& other)
@@ -36,7 +36,7 @@ minty::Vector2Int::operator Vector3Int() const
     return Vector3Int(x, y);
 }
 
-inline std::string const minty::Vector2Int::toString() const
+inline std::string const minty::Vector2Int::to_string() const
 {
     return std::format("Vector2Int({0}, {1})", x, y);
 }

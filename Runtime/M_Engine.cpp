@@ -5,101 +5,130 @@
 #include "M_Renderer.h"
 #include <iostream>
 
+#define GLFW_INCLUDE_VULKAN
+#include <GLFW/glfw3.h>
+
 using namespace minty;
 
 uint32_t const WIDTH = 800;
 uint32_t const HEIGHT = 600;
 
 Engine::Engine()
+	: _window("Minty", WIDTH, HEIGHT)
+	, _renderer(&_window)
+	, _sceneManager(this)
+	, _deltaTime(0.02f)
 {
-	// init GLFW
-	glfwInit();
+
 }
 
 Engine::~Engine()
 {
-	// close GLFW
-	glfwTerminate();
+
+}
+
+Window* minty::Engine::get_window()
+{
+	return &_window;
+}
+
+Renderer* minty::Engine::get_renderer()
+{
+	return &_renderer;
+}
+
+SceneManager* minty::Engine::get_scene_manager()
+{
+	return &_sceneManager;
+}
+
+float minty::Engine::get_delta_time()
+{
+	return _deltaTime;
 }
 
 void Engine::run()
 {
+	// if no scenes at all, abort
+	if (!_sceneManager.size())
+	{
+		throw std::runtime_error("Aborting game. No Scenes loaded.");
+	}
+
+	// if no scene loaded, just load the first scene
+	if (!_sceneManager.get_loaded_scene())
+	{
+		_sceneManager.load_scene(0);
+	}
+
+	// start the renderer
+	_renderer.start();
+
+	// start the scene(s)
+	_sceneManager.load();
+
 	// record start time, and last frame tick
-	time_point_t start = getNow();
+	time_point_t start = get_now();
+
 	time_point_t frameTick = start;
-	unsigned int frameCount = 0u;
-
-	Window window("Minty", WIDTH, HEIGHT);
-	Window* windowPtr = &window;
-
-	// start the render engine
-	Renderer engine(windowPtr, *this);
-
-	float rotation = 0.0f;
-	float* rotationPtr = &rotation;
-
-	// input
-	InputMap input;
-	// rotate when space held
-	input.emplaceKey(Key::Space, [rotationPtr](KeyPressEventArgs const& args)
-		{
-			switch (args.action)
-			{
-			case KeyAction::Down:
-				break;
-			case KeyAction::Up:
-				break;
-			case KeyAction::Hold:
-				if (static_cast<int>(args.mods) & static_cast<int>(KeyModifiers::Shift))
-				{
-					// rotate backwards
-					*rotationPtr -= 0.01f;
-				}
-				else
-				{
-					// rotate forwards
-					*rotationPtr += 0.01f;
-				}
-				
-				break;
-			}
-		});
-	// quit on key close
-	input.emplaceKeyDown(Key::Escape, [windowPtr](KeyPressEventArgs const& args)
-		{
-			windowPtr->close();
-		});
-
-	window.setInput(&input);
+	long long frameTime;
+	
+	long long fpsTime = 0ll;
+	unsigned int fpsCount = 0u;
 
 	time_point_t now;
 
 	// main loop
-	while (engine.isRunning())
+	while (_renderer.running())
 	{
+		// run window events
 		glfwPollEvents();
-		engine.updateUniformBuffer(rotation);
-		engine.renderFrame();
 
-		frameCount++;
+		// update scene(s)
+		_sceneManager.update();
 
-		now = getNow();
+		// update renderer
+		_renderer.update();
 
-		// if frame tick >= 1 second
-		if (std::chrono::duration_cast<std::chrono::nanoseconds>(now - frameTick).count() >= 1000000000ll)
+		// render to the screen
+		_renderer.renderFrame();
+
+		// frame complete
+		fpsCount++;
+
+		// get time right now
+		now = get_now();
+
+		// calculate time passed in nanoseconds
+		frameTime = std::chrono::duration_cast<std::chrono::nanoseconds>(now - frameTick).count();
+
+		// update delta time
+		_deltaTime = frameTime / 1000000000.0f;
+
+		// update frame tick to now, for next frame
+		frameTick = now;
+
+		// add to fps time
+		fpsTime += frameTime;
+
+		// if fps time >= 1 second (in nanoseconds)
+		if (fpsTime >= 1000000000ll)
 		{
-			std::cout << frameCount << '\r' << std::endl;
+			std::cout << fpsCount << '\r' << std::endl;
 
-			frameCount = 0u;
-			frameTick = now;
+			fpsCount = 0u;
+			fpsTime = 0ll;
 		}
 	}
 
+	// all done
+	_sceneManager.unload();
+
 	// print elapsed time
-	std::cout << "Elapsed time: " << (std::chrono::duration_cast<std::chrono::milliseconds>(getNow() - start).count() / 1000.0f) << "s" << std::endl;
+	std::cout << "Elapsed time: " << (std::chrono::duration_cast<std::chrono::milliseconds>(get_now() - start).count() / 1000.0f) << "s" << std::endl;
 }
 
-time_point_t minty::Engine::getNow() const
+time_point_t minty::Engine::get_now() const
 {
 	return std::chrono::steady_clock::now();
 }

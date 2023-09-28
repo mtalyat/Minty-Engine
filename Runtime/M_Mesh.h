@@ -9,20 +9,22 @@ namespace minty
 {
 	class Renderer;
 
+	/// <summary>
+	/// Holds data for an object to be rendered to the screen.
+	/// </summary>
 	class Mesh :
 		public Object
 	{
 	public: // TODO: SET TO PRIVATE LATER
-		bool _vertexSet;
+		size_t _vertexCount;
+		size_t _vertexSize;
 		VkBuffer _vertexBuffer;
 		VkDeviceMemory _vertexMemory;
 
-		bool _indexSet;
+		size_t _indexCount;
+		size_t _indexSize;
 		VkBuffer _indexBuffer;
 		VkDeviceMemory _indexMemory;
-
-		Material* _material;
-
 	public:
 		//Mesh();
 
@@ -33,32 +35,30 @@ namespace minty
 		/// </summary>
 		/// <param name="vertices">The vertex data.</param>
 		/// <param name="deviceSize">The size in bytes of the vertex data.</param>
-		void setVertices(void const* const vertices, size_t const deviceSize, Renderer& engine);
+		void set_vertices(void const* const vertices, size_t const elementCount, size_t const elementSize, Renderer& engine);
 
 		/// <summary>
 		/// Sets the index data.
 		/// </summary>
 		/// <param name="indices">The index data.</param>
 		/// <param name="deviceSize">The size in bytes of the index data.</param>
-		void setIndices(void const* const indices, size_t const deviceSize, Renderer& engine);
-
-		void setMaterial(Material* const material);
+		void set_indices(void const* const indices, size_t const elementCount, size_t const elementSize, Renderer& engine);
 
 		/// <summary>
 		/// Creates a cube mesh.
 		/// </summary>
 		/// <returns>A Mesh with cube data.</returns>
-		static Mesh createCube(Renderer& engine);
+		static Mesh create_cube(Renderer& engine);
 		
 		/// <summary>
 		/// Creates a quad mesh.
 		/// </summary>
 		/// <returns>A Mesh with quad data.</returns>
-		static Mesh createQuad(Renderer& engine);
+		static Mesh create_quad(Renderer& engine);
 	private:
-		void disposeVertices(Renderer& engine);
+		void dispose_vertices(Renderer& engine);
 
-		void disposeIndices(Renderer& engine);
+		void dispose_indices(Renderer& engine);
 	};
 }
 

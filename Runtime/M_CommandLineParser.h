@@ -83,7 +83,7 @@ namespace minty
 		/// Adds the parameter to the list of parameters to parse for.
 		/// </summary>
 		/// <param name="param"></param>
-		void addParameter(Parameter const param);
+		void add_parameter(Parameter const param);
 
 		/// <summary>
 		/// Parses the loaded parameters.
@@ -97,14 +97,14 @@ namespace minty
 		/// </summary>
 		/// <param name="name">The name of the parameter.</param>
 		/// <returns>True if the argument was found.</returns>
-		bool getArgument(std::string const& name, Argument& arg);
+		bool get_argument(std::string const& name, Argument& arg);
 
 		/// <summary>
 		/// Checks if the argument was provided, using the given parameter name.
 		/// </summary>
 		/// <param name="name">The name of the parameter to check if it exists.</param>
 		/// <returns>True if the argument was given.</returns>
-		bool getArgument(std::string const& name);
+		bool get_argument(std::string const& name);
 	};
 }
 
