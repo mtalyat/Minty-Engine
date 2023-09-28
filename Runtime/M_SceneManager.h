@@ -43,7 +43,8 @@ namespace minty
 		/// Loads the Scene with the given ID. Unloads the current Scene first.
 		/// </summary>
 		/// <param name="id">The ID of the Scene to load.</param>
-		void load_scene(ID const id);
+		/// <param name="camera">The Entity with the CameraComponent to render to.</param>
+		void load_scene(ID const id, Entity const camera = NULL_ENTITY);
 
 		/// <summary>
 		/// Gets the loaded Scene.
