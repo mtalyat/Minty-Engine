@@ -217,8 +217,7 @@ void Application::run(int argc, char const* argv[])
 
 		if (commands.size() == 0)
 		{
-			running = false;
-			break;
+			continue;
 		}
 
 		command = commands.at(0);
