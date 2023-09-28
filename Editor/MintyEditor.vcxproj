@@ -170,6 +170,13 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="libraries\imgui\imgui.cpp" />
+    <ClCompile Include="libraries\imgui\imgui_demo.cpp" />
+    <ClCompile Include="libraries\imgui\imgui_draw.cpp" />
+    <ClCompile Include="libraries\imgui\imgui_impl_vulkan.cpp" />
+    <ClCompile Include="libraries\imgui\imgui_stdlib.cpp" />
+    <ClCompile Include="libraries\imgui\imgui_tables.cpp" />
+    <ClCompile Include="libraries\imgui\imgui_widgets.cpp" />
     <ClCompile Include="ME_Application.cpp" />
     <ClCompile Include="Program.cpp" />
   </ItemGroup>
