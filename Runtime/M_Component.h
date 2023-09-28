@@ -16,7 +16,6 @@ namespace minty
 		virtual void dispose() {}
 
 		virtual void serialize(Writer& writer) const override {}
-
 		virtual void deserialize(Reader const& reader) override {}
 	};
 }

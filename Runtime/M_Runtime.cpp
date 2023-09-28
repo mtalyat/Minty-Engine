@@ -5,7 +5,9 @@
 
 #include "M_EntityRegistry.h"
 #include "M_CameraComponent.h"
+#include "M_MeshComponent.h"
 #include "M_NameComponent.h"
+#include "M_OriginComponent.h"
 #include "M_PositionComponent.h"
 #include "M_RotationComponent.h"
 #include "M_ScaleComponent.h"
@@ -89,7 +91,9 @@ void minty::Runtime::register_builtin()
 
 	// components
 	EntityRegistry::register_component<CameraComponent>("Camera");
+	EntityRegistry::register_component<MeshComponent>("Mesh");
 	EntityRegistry::register_component<NameComponent>("Name");
+	EntityRegistry::register_component<OriginComponent>("Origin");
 	EntityRegistry::register_component<PositionComponent>("Position");
 	EntityRegistry::register_component<RotationComponent>("Rotation");
 	EntityRegistry::register_component<ScaleComponent>("Scale");
