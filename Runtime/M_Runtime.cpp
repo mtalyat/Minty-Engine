@@ -56,9 +56,9 @@ Runtime::~Runtime()
 	
 }
 
-Engine& minty::Runtime::get_engine()
+Engine* minty::Runtime::get_engine()
 {
-	return _engine;
+	return &_engine;
 }
 
 int Runtime::run()

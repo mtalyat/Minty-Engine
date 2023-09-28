@@ -60,7 +60,7 @@ void minty::SceneManager::load_scene(ID const id)
 	_loadedScene = scene;
 
 	// set renderer to use this new scene
-	_engine->get_renderer().set_scene(_loadedScene);
+	_engine->get_renderer()->set_scene(_loadedScene);
 
 	// load event
 	if (_loaded && _loadedScene)

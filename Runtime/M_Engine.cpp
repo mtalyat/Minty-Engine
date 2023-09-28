@@ -17,6 +17,7 @@ Engine::Engine()
 	: _window("Minty", WIDTH, HEIGHT)
 	, _renderer(&_window)
 	, _sceneManager(this)
+	, _deltaTime(0.02f)
 {
 
 }
@@ -26,19 +27,24 @@ Engine::~Engine()
 
 }
 
-Window& minty::Engine::get_window()
+Window* minty::Engine::get_window()
 {
-	return _window;
+	return &_window;
 }
 
-Renderer& minty::Engine::get_renderer()
+Renderer* minty::Engine::get_renderer()
 {
-	return _renderer;
+	return &_renderer;
 }
 
-SceneManager& minty::Engine::get_scene_manager()
+SceneManager* minty::Engine::get_scene_manager()
 {
-	return _sceneManager;
+	return &_sceneManager;
+}
+
+float minty::Engine::get_delta_time()
+{
+	return _deltaTime;
 }
 
 void Engine::run()
@@ -63,14 +69,19 @@ void Engine::run()
 
 	// record start time, and last frame tick
 	time_point_t start = get_now();
+
 	time_point_t frameTick = start;
-	unsigned int frameCount = 0u;
+	long long frameTime;
+	
+	long long fpsTime = 0ll;
+	unsigned int fpsCount = 0u;
 
 	time_point_t now;
 
 	// main loop
 	while (_renderer.running())
 	{
+		// run window events
 		glfwPollEvents();
 
 		// update scene(s)
@@ -83,17 +94,30 @@ void Engine::run()
 		_renderer.renderFrame();
 
 		// frame complete
-		frameCount++;
+		fpsCount++;
 
+		// get time right now
 		now = get_now();
 
-		// if frame tick >= 1 second
-		if (std::chrono::duration_cast<std::chrono::nanoseconds>(now - frameTick).count() >= 1000000000ll)
-		{
-			std::cout << frameCount << '\r' << std::endl;
+		// calculate time passed in nanoseconds
+		frameTime = std::chrono::duration_cast<std::chrono::nanoseconds>(now - frameTick).count();
 
-			frameCount = 0u;
-			frameTick = now;
+		// update delta time
+		_deltaTime = frameTime / 1000000000.0f;
+
+		// update frame tick to now, for next frame
+		frameTick = now;
+
+		// add to fps time
+		fpsTime += frameTime;
+
+		// if fps time >= 1 second (in nanoseconds)
+		if (fpsTime >= 1000000000ll)
+		{
+			std::cout << fpsCount << '\r' << std::endl;
+
+			fpsCount = 0u;
+			fpsTime = 0ll;
 		}
 	}
 

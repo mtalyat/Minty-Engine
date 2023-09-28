@@ -23,7 +23,7 @@ namespace minty
 
 		~Runtime();
 
-		Engine& get_engine();
+		Engine* get_engine();
 
 		/// <summary>
 		/// Runs the Runtime.
