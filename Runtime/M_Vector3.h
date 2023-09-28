@@ -83,10 +83,28 @@ namespace minty
             return Vector3(x + other.x, y + other.y, z + other.z);
         }
 
+        // add equals operator
+        Vector3& operator +=(Vector3 const& other)
+        {
+            x += other.x;
+            y += other.y;
+            z += other.z;
+            return *this;
+        }
+
         // subtract operator
         Vector3 operator -(Vector3 const& other) const
         {
             return Vector3(x - other.x, y - other.y, z - other.z);
+        }
+
+        // subtract equals operator
+        Vector3& operator -=(Vector3 const& other)
+        {
+            x -= other.x;
+            y -= other.y;
+            z -= other.z;
+            return *this;
         }
 
         // multiplication operator
@@ -101,6 +119,24 @@ namespace minty
             return Vector3(x * scale, y * scale, z * scale);
         }
 
+        // multiply equals operator
+        Vector3& operator *=(Vector3 const& other)
+        {
+            x *= other.x;
+            y *= other.y;
+            z *= other.z;
+            return *this;
+        }
+
+        // multiply scaling equals operator
+        Vector3& operator *=(float const scale)
+        {
+            x *= scale;
+            y *= scale;
+            z *= scale;
+            return *this;
+        }
+
         // division operator
         Vector3 operator /(Vector3 const& other) const
         {
@@ -111,6 +147,24 @@ namespace minty
         Vector3 operator /(float const scale) const
         {
             return Vector3(x / scale, y / scale, z / scale);
+        }
+
+        // division equals operator
+        Vector3& operator /=(Vector3 const& other)
+        {
+            x /= other.x;
+            y /= other.y;
+            z /= other.z;
+            return *this;
+        }
+
+        // division scaling equals operator
+        Vector3& operator /=(float const scale)
+        {
+            x /= scale;
+            y /= scale;
+            z /= scale;
+            return *this;
         }
 
         operator minty::Vector3Int() const;
