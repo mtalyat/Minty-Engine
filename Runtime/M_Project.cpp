@@ -2,9 +2,14 @@
 #include "M_Project.h"
 
 #include "M_Console.h"
+#include "M_File.h"
 #include <vector>
 
 using namespace minty;
+
+std::set<std::string> const Project::_headerExtensions = { ".h" };
+std::set<std::string> const Project::_sourceExtensions = { ".cpp" };
+std::set<std::string> const Project::_sceneExtensions = { ".scene" };
 
 Project::Project(std::string const& path)
 	: _base(std::filesystem::absolute(path))
@@ -44,6 +49,11 @@ std::set<filepath> const& minty::Project::get_assets_scene_paths() const
 
 void minty::Project::collect_assets()
 {
+	if (!file::exists(_base.string()))
+	{
+		return;
+	}
+
 	// list of directories to collect from
 	std::vector<filepath> directoriesToCollect;
 

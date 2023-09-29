@@ -15,19 +15,19 @@ namespace minty
 	{
 	private:
 		// the base filepath of the project
-		filepath const _base;
+		filepath _base;
 
 		// all of the header (.h) files in the Assets folder
 		std::set<filepath> _headers;
-		std::set<std::string> const _headerExtensions = { ".h" };
+		static std::set<std::string> const _headerExtensions;
 
 		// all of the source (.cpp) files in the Assets folder
 		std::set<filepath> _sources;
-		std::set<std::string> const _sourceExtensions = { ".cpp" };
+		static std::set<std::string> const _sourceExtensions;
 
 		// all of the scene (.scene) files in the Assets folder
 		std::set<filepath> _scenes;
-		std::set<std::string> const _sceneExtensions = { ".scene" };
+		static std::set<std::string> const _sceneExtensions;
 
 		// everything else
 		std::set<filepath> _others;
