@@ -29,9 +29,8 @@ namespace mintye
 
 		ImGuiTextFilter _filter;
 
-		int _maxSize;
-
-		std::vector<Line> _lines;
+		int _maxLines;
+		std::deque<Line> _lines;
 		std::mutex _linesLock;
 
 		std::queue<std::vector<std::string>> _commandsQueue;
@@ -61,6 +60,8 @@ namespace mintye
 		void log_warning(std::string const& text);
 
 		void log_error(std::string const& text);
+
+		void set_max_lines(int const count);
 
 	private:
 		size_t execute_command(std::string const& command);

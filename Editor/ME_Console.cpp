@@ -11,10 +11,10 @@ mintye::Console::Console()
 	, showWarnings(true)
 	, showErrors(true)
 	, _filter()
-	, _maxSize(16384)
+	, _maxLines(16384)
 	, _lines()
 {
-	_lines.reserve(_maxSize);
+	//_lines.reserve(_maxLines);
 }
 
 ImVec4 ColorToImVec4(console::Color const color)
@@ -156,11 +156,10 @@ void mintye::Console::log(std::string const& text, minty::console::Color const c
 {
 	_linesLock.lock();
 
-	if (static_cast<int>(_lines.size()) >= _maxSize)
+	if (static_cast<int>(_lines.size()) >= _maxLines)
 	{
-		// TODO: pop oldest off stack...
-		_linesLock.unlock();
-		return;
+		// pop oldest off stack...
+		_lines.pop_front();
 	}
 
 	_lines.push_back(Line(text, color));
@@ -186,6 +185,11 @@ void mintye::Console::log_warning(std::string const& text)
 void mintye::Console::log_error(std::string const& text)
 {
 	log(text, console::Color::Red);
+}
+
+void mintye::Console::set_max_lines(int const count)
+{
+	_maxLines = count;
 }
 
 size_t mintye::Console::execute_command(std::string const& command)
