@@ -1,5 +1,9 @@
 #include "ME_Console.h"
 
+#include <cstdio>
+#include <cstdlib>
+#include <sys/types.h>
+
 using namespace minty;
 
 mintye::Console::Console()
@@ -36,6 +40,8 @@ void mintye::Console::draw(char const* title)
 	if (ImGui::BeginChild("ScrollingRegion", ImVec2(0, -footer_height_to_reserve), false, ImGuiWindowFlags_HorizontalScrollbar))
 	{
 		ImGui::PushStyleVar(ImGuiStyleVar_ItemSpacing, ImVec2(4, 1));
+
+		_linesLock.lock();
 
 		for (Line const& line : _lines)
 		{
@@ -80,6 +86,8 @@ void mintye::Console::draw(char const* title)
 			}
 		}
 
+		_linesLock.unlock();
+
 		if (_scrollToBottom || (_autoScroll && ImGui::GetScrollY() >= ImGui::GetScrollMaxY()))
 		{
 			ImGui::SetScrollHereY(1.0f);
@@ -116,7 +124,64 @@ void mintye::Console::draw(char const* title)
 	ImGui::End();
 }
 
-size_t mintye::Console::run_command(std::string const& command)
+void mintye::Console::run_command(std::string const& command)
+{
+	run_commands({ command });
+}
+
+void mintye::Console::run_commands(std::vector<std::string> const& commands)
+{
+	// lock and add to queue
+	_commandsLock.lock();
+	_commandsQueue.push(commands);
+
+	// if not executing, start executing
+	if (!_commandsThreadRunning)
+	{
+		_commandsThreadRunning = true;
+		std::thread thread(&Console::execute_commands, this);
+		_commandsLock.unlock();
+		//thread.join();
+		thread.detach();
+	}
+	else
+	{
+		_commandsLock.unlock();
+	}
+}
+
+bool mintye::Console::is_command_running() const
+{
+	return _commandsThreadRunning;
+}
+
+void mintye::Console::log(std::string const& text, minty::console::Color const color)
+{
+	_linesLock.lock();
+
+	if (static_cast<int>(_lines.size()) >= _maxSize)
+	{
+		// TODO: pop oldest off stack...
+		_linesLock.unlock();
+		return;
+	}
+
+	_lines.push_back(Line(text, color));
+
+	_linesLock.unlock();
+}
+
+void mintye::Console::log_warning(std::string const& text)
+{
+	log(text, console::Color::Yellow);
+}
+
+void mintye::Console::log_error(std::string const& text)
+{
+	log(text, console::Color::Red);
+}
+
+size_t mintye::Console::execute_command(std::string const& command)
 {
 	size_t errorCount = 0;
 	//minty::console::log(command);
@@ -128,7 +193,7 @@ size_t mintye::Console::run_command(std::string const& command)
 	std::string result;
 	bool changeColor = true;
 	while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
-		
+
 		result = buffer.data();
 
 		if (changeColor)
@@ -158,22 +223,43 @@ size_t mintye::Console::run_command(std::string const& command)
 	return errorCount;
 }
 
-void mintye::Console::log(std::string const& text, minty::console::Color const color)
+void mintye::Console::execute_commands()
 {
-	if (static_cast<int>(_lines.size()) >= _maxSize)
+	console::log("Thread start");
+
+	size_t queueSize = 0;
+
+	_commandsLock.lock();
+	queueSize = _commandsQueue.size();
+
+	while (queueSize)
 	{
-		return;
+		// get command(s)
+		std::vector<std::string> commands = _commandsQueue.front();
+		_commandsQueue.pop();
+		_commandsLock.unlock();
+
+		// execute the command(s)
+		size_t errorCount = 0;
+		for (std::string const& command : commands)
+		{
+			errorCount = execute_command(command);
+
+			// if any errors, do not call the other dependent commands
+			if (errorCount)
+			{
+				break;
+			}
+		}
+
+		// get new count
+		_commandsLock.lock();
+		queueSize = _commandsQueue.size();
 	}
 
-	_lines.push_back(Line(text, color));
-}
+	// all done
+	_commandsThreadRunning = false;
+	_commandsLock.unlock();
 
-void mintye::Console::log_warning(std::string const& text)
-{
-	log(text, console::Color::Yellow);
-}
-
-void mintye::Console::log_error(std::string const& text)
-{
-	log(text, console::Color::Red);
+	console::log("Thread end");
 }

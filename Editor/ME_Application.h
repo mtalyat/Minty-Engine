@@ -59,18 +59,18 @@ namespace mintye
 		/// Cleans the target project.
 		/// </summary>
 		/// <param name="info">The target info.</param>
-		size_t clean();
+		void clean();
 
 		/// <summary>
 		/// Builds the target project.
 		/// </summary>
 		/// <param name="info">The target info.</param>
-		size_t build();
+		void build();
 
 		/// <summary>
 		/// Runs the target project.
 		/// </summary>
 		/// <param name="info">The target info.</param>
-		size_t run();
+		void run();
 	};
 }

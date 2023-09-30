@@ -6,6 +6,7 @@
 
 #include <Minty.h>
 #include <vector>
+#include <queue>
 
 namespace mintye
 {
@@ -34,19 +35,36 @@ namespace mintye
 		int _maxSize;
 
 		std::vector<Line> _lines;
+		std::mutex _linesLock;
 
+		std::queue<std::vector<std::string>> _commandsQueue;
+		std::mutex _commandsLock;
+		bool _commandsThreadRunning;
 	public:
 		Console();
 
 		void draw(char const* title);
 
-		size_t run_command(std::string const& command);
+		void run_command(std::string const& command);
+
+		void run_commands(std::vector<std::string> const& commands);
+
+		/// <summary>
+		/// Checks if a command is running in the Console.
+		/// </summary>
+		/// <returns>True if there is a command being executed, otherwise false.</returns>
+		bool is_command_running() const;
 
 		void log(std::string const& text, minty::console::Color const color = minty::console::Color::White);
 
 		void log_warning(std::string const& text);
 
 		void log_error(std::string const& text);
+
+	private:
+		size_t execute_command(std::string const& command);
+
+		void execute_commands();
 	};
 }
 

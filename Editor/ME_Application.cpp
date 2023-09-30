@@ -645,7 +645,9 @@ void Application::draw_main()
         _info.project = nullptr;
     }
 
-    if (!_info.project)
+    bool disabled = !_info.project || _console.is_command_running();
+
+    if (disabled)
     {
         ImGui::BeginDisabled();
     }
@@ -668,7 +670,7 @@ void Application::draw_main()
         run();
     }
 
-    if (!_info.project)
+    if (disabled)
     {
         ImGui::EndDisabled();
     }
@@ -784,32 +786,31 @@ void Application::generate_main()
 	file.close();
 }
 
-size_t Application::clean()
+void Application::clean()
 {
-	// clean the build
     _console.log("clean");
-	return _console.run_command("cd " + _info.project->get_build_path().string() + " && " + std::filesystem::absolute(CMAKE_PATH).string() + " --build . --target clean");
+
+    // clean the build
+	_console.run_command("cd " + _info.project->get_build_path().string() + " && " + std::filesystem::absolute(CMAKE_PATH).string() + " --build . --target clean");
 }
 
-size_t Application::build()
+void Application::build()
 {
     _console.log("build");
 
 	std::string command = "cd " + _info.project->get_build_path().string() + " && " + std::filesystem::absolute(CMAKE_PATH).string();
-
-	// make cmake files if needed
-	size_t errors = _console.run_command(command + " .");
-
-	// build program
-	errors += _console.run_command(command + " --build . --config " + _info.get_config());
-
-	return errors;
+    _console.run_commands({
+        // // make cmake files if needed
+        command + " .",
+        // build program
+        command + " --build . --config " + _info.get_config(),
+        });
 }
 
-size_t Application::run()
+void Application::run()
 {
     _console.log("run");
 
 	// call executable, pass in project path as argument for the runtime, so it knows what to run
-	return _console.run_command("cd " + _info.project->get_build_path().string() + " && cd " + _info.get_config() + " && start " + EXE_NAME + " " + _info.project->get_base_path().string());
+	_console.run_command("cd " + _info.project->get_build_path().string() + " && cd " + _info.get_config() + " && start " + EXE_NAME + " " + _info.project->get_base_path().string());
 }
