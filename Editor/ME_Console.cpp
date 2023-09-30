@@ -108,7 +108,7 @@ void mintye::Console::draw(char const* title)
 	{
 		if (commandBuffer[0])
 		{
-			log(commandBuffer);
+			run_command(commandBuffer);
 			commandBuffer[0] = '\0';
 		}
 		reclaimFocus = true;
@@ -225,8 +225,6 @@ size_t mintye::Console::execute_command(std::string const& command)
 
 void mintye::Console::execute_commands()
 {
-	console::log("Thread start");
-
 	size_t queueSize = 0;
 
 	_commandsLock.lock();
@@ -243,6 +241,10 @@ void mintye::Console::execute_commands()
 		size_t errorCount = 0;
 		for (std::string const& command : commands)
 		{
+			// log command
+			log(command);
+
+			// run command
 			errorCount = execute_command(command);
 
 			// if any errors, do not call the other dependent commands
@@ -260,6 +262,4 @@ void mintye::Console::execute_commands()
 	// all done
 	_commandsThreadRunning = false;
 	_commandsLock.unlock();
-
-	console::log("Thread end");
 }

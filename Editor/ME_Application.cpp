@@ -812,5 +812,5 @@ void Application::run()
     _console.log("run");
 
 	// call executable, pass in project path as argument for the runtime, so it knows what to run
-	_console.run_command("cd " + _info.project->get_build_path().string() + " && cd " + _info.get_config() + " && start " + EXE_NAME + " " + _info.project->get_base_path().string());
+	_console.run_command("cd " + _info.project->get_build_path().string() + " && cd " + _info.get_config() + " && call " + EXE_NAME + " " + _info.project->get_base_path().string());
 }
