@@ -622,7 +622,7 @@ int Application::run(int argc, char const* argv[])
 void Application::draw_main()
 {
     // begin new window
-    ImGui::Begin("Minty");
+    ImGui::Begin("Controls");
 
     // list commands
     ImGui::Text("Commands:");
