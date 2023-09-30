@@ -44,35 +44,35 @@ void minty::console::log(std::string const& message, Color const color)
 void minty::console::todo(std::string const& message)
 {
 #ifndef NDEBUG
-	print_raw(std::cerr, "[todo]: " + message, Color::Cyan);
+	print_raw(std::cout, "[todo]: " + message, Color::Magenta);
 #endif
 }
 
 void minty::console::test(std::string const& message, Color const color)
 {
 #ifndef NDEBUG
-	print_raw(std::cerr, "[test]: " + message, color);
+	print_raw(std::cout, "[test]: " + message, color);
 #endif
 }
 
 void minty::console::info(std::string const& message)
 {
 #ifndef NDEBUG
-	print_raw(std::cerr, "[info]: " + message, Color::Gray);
+	print_raw(std::cout, "[info]: " + message, Color::Gray);
 #endif
 }
 
 void minty::console::warn(std::string const& message)
 {
 #ifndef NDEBUG
-	print_raw(std::cerr, "[warn]: " + message, Color::Yellow);
+	print_raw(std::cout, "[warn]: " + message, Color::Yellow);
 #endif
 }
 
 void minty::console::error(std::string const& message)
 {
 #ifndef NDEBUG
-	print_raw(std::cerr, "[erro]: " + message, Color::Red);
+	print_raw(std::cout, "[erro]: " + message, Color::Red);
 #endif
 }
 

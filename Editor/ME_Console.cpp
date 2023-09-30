@@ -17,6 +17,23 @@ mintye::Console::Console()
 	_lines.reserve(_maxSize);
 }
 
+ImVec4 ColorToImVec4(console::Color const color)
+{
+	switch (color)
+	{
+	case console::Color::Black: return ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
+	case console::Color::Red: return ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
+	case console::Color::Green: return ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
+	case console::Color::Yellow: return ImVec4(1.0f, 1.0f, 0.0f, 1.0f);
+	case console::Color::Blue: return ImVec4(0.0f, 0.0f, 1.0f, 1.0f);
+	case console::Color::Magenta: return ImVec4(1.0f, 0.0f, 1.0f, 1.0f);
+	case console::Color::Cyan: return ImVec4(0.0f, 1.0f, 1.0f, 1.0f);
+	case console::Color::White: return ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+	case console::Color::Gray: return ImVec4(0.5f, 0.5f, 0.5f, 1.0f);
+	default: return ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
+	}
+}
+
 void mintye::Console::draw(char const* title)
 {
 	ImGui::SetNextWindowSize(ImVec2(520, 600), ImGuiCond_FirstUseEver);
@@ -50,28 +67,10 @@ void mintye::Console::draw(char const* title)
 			}
 
 			// pick color
-			bool hasColor = true;
-			ImVec4 color;
-			switch (line.color)
-			{
-			case console::Color::Red:
-				color = ImVec4(1.0f, 0.4f, 0.4f, 1.0f);
-				break;
-			case console::Color::Yellow:
-				color = ImVec4(1.0f, 0.1f, 0.4f, 1.0f);
-				break;
-			case console::Color::Gray:
-				color = ImVec4(0.4f, 0.4f, 0.4f, 1.0f);
-				break;
-			default:
-				hasColor = false;
-				break;
-			}
-
-			// add color
+			bool hasColor = line.color != console::Color::White;
 			if (hasColor)
 			{
-				ImGui::PushStyleColor(ImGuiCol_Text, color);
+				ImGui::PushStyleColor(ImGuiCol_Text, ColorToImVec4(line.color));
 			}
 
 			// show text on screen
@@ -164,14 +163,19 @@ void mintye::Console::log(std::string const& text, minty::console::Color const c
 		return;
 	}
 
-	// remove escape codes
-	std::regex regex("(\033\\[)[0-?]*[ -\\/]*[@-~]");
-	//std::regex regex("(\\x9B|\\033\\[)[0-?]*[ -\\/]*[@-~]");
-	std::string finalText = std::regex_replace(text, regex, "");
-
-	_lines.push_back(Line(finalText, color));
+	_lines.push_back(Line(text, color));
 
 	_linesLock.unlock();
+}
+
+void mintye::Console::log_important(std::string const& text)
+{
+	log(text, console::Color::Cyan);
+}
+
+void mintye::Console::log_info(std::string const& text)
+{
+	log(text, console::Color::Gray);
 }
 
 void mintye::Console::log_warning(std::string const& text)
@@ -187,37 +191,55 @@ void mintye::Console::log_error(std::string const& text)
 size_t mintye::Console::execute_command(std::string const& command)
 {
 	size_t errorCount = 0;
-	//minty::console::log(command);
 	std::array<char, 4096> buffer;
 	std::unique_ptr<FILE, decltype(&_pclose)> pipe(_popen(command.c_str(), "r"), _pclose);
 	if (!pipe) {
 		throw std::runtime_error("popen() failed!");
 	}
+	std::regex regex("(\033\\[)[0-?]*[ -\\/]*[@-~]"); // regex to remove escape codes
 	std::string result;
 	bool changeColor = true;
+	console::Color color = console::Color::White;
 	while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
 
+		// get text
 		result = buffer.data();
+
+		// remove escape codes
+		result = std::regex_replace(result , regex, "");
 
 		if (changeColor)
 		{
-			if (result.find("error") != std::string::npos)
+			// check for [type]
+			if (result.starts_with("[erro]"))
 			{
-				//minty::console::error(result);
-				log(result, minty::console::Color::Red);
+				color = console::Color::Red;
 				errorCount++;
 			}
-			else if (result.find("warning") != std::string::npos)
+			else if (result.starts_with("[warn]"))
 			{
-				//minty::console::warn(result);
-				log(result, minty::console::Color::Yellow);
+				color = console::Color::Yellow;
+			}
+			else if (result.starts_with("[info]"))
+			{
+				color = console::Color::Gray;
+			}
+			else if (result.starts_with("[test]"))
+			{
+				color = console::Color::Blue;
+			}
+			else if (result.starts_with("[todo]"))
+			{
+				color = console::Color::Magenta;
 			}
 			else
 			{
-				//minty::console::info(result);
-				log(result, minty::console::Color::Gray);
+				// normal
+				color = console::Color::White;
 			}
 		}
+
+		log(result, color);
 
 		// if newline, it was the end of the inputted line, so update the color for the next line
 		changeColor = result.ends_with('\n');

@@ -194,7 +194,7 @@ Renderer::Renderer(Window* const window)
 	, _textures()
 	, _materials()
 	, view()
-	, _backgroundColor({250, 220, 192, 255}) // light tan color
+	, _backgroundColor({ 250, 220, 192, 255 }) // light tan color
 {
 	// init fields
 	_textures.reserve(MAX_TEXTURES);
@@ -424,7 +424,7 @@ void minty::Renderer::get_entity_transform(Entity const entity, Transform& trans
 	{
 		transform.rotation = rotation->rotation;
 	}
-	
+
 	// get scale
 	ScaleComponent const* const scale = _registry->try_get<ScaleComponent>(entity);
 	if (scale)
@@ -1079,7 +1079,7 @@ void minty::Renderer::create_descriptor_sets()
 		allocInfo.pSetLayouts = layouts.data();
 
 		VK_ASSERT(result, vkAllocateDescriptorSets(device, &allocInfo, &descriptorSets[i]), std::format("Failed to allocate descriptor sets for descriptor set layout {}.", i))
-		i++;
+			i++;
 	}
 
 	for (i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
@@ -1505,7 +1505,7 @@ void Renderer::create_logical_device()
 	createInfo.pNext = &deviceFeatures2;
 	createInfo.queueCreateInfoCount = static_cast<uint32_t>(queueCreateInfos.size());
 	createInfo.pQueueCreateInfos = queueCreateInfos.data();
-	
+
 	createInfo.enabledExtensionCount = static_cast<uint32_t>(deviceExtensions.size());
 	createInfo.ppEnabledExtensionNames = deviceExtensions.data();
 
@@ -1579,8 +1579,8 @@ void Renderer::draw_frame()
 	// submit the buffer
 	VK_ASSERT(submitResult, vkQueueSubmit(graphicsQueue, 1, &submitInfo, inFlightFences[currentFrame]), "Failed to submit draw command buffer.")
 
-	// submit to swap chain so it will show up on the screen
-	VkPresentInfoKHR presentInfo
+		// submit to swap chain so it will show up on the screen
+		VkPresentInfoKHR presentInfo
 	{
 		.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
 		.waitSemaphoreCount = 1,
@@ -1700,7 +1700,8 @@ VKAPI_ATTR VkBool32 VKAPI_CALL Renderer::debug_callback(VkDebugUtilsMessageSever
 	}
 	else
 	{
-		console::log(pCallbackData->pMessage);
+		console::info(pCallbackData->pMessage);
+		//console::log(pCallbackData->pMessage);
 	}
 
 	return VK_FALSE;
@@ -2042,7 +2043,7 @@ void minty::Renderer::set_scene(Scene const* const scene, Entity const camera)
 
 	// set registry to scene registry
 	_registry = _scene->get_entity_registry();
-	
+
 	// update camera we are rendering from
 	if (camera == NULL_ENTITY)
 	{

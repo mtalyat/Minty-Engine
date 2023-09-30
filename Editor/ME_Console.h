@@ -54,6 +54,10 @@ namespace mintye
 
 		void log(std::string const& text, minty::console::Color const color = minty::console::Color::White);
 
+		void log_important(std::string const& text);
+
+		void log_info(std::string const& text);
+
 		void log_warning(std::string const& text);
 
 		void log_error(std::string const& text);

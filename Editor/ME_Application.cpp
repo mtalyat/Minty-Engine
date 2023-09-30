@@ -788,7 +788,7 @@ void Application::generate_main()
 
 void Application::clean()
 {
-    _console.log("clean");
+    _console.log_important("clean");
 
     // clean the build
 	_console.run_command("cd " + _info.project->get_build_path().string() + " && " + std::filesystem::absolute(CMAKE_PATH).string() + " --build . --target clean");
@@ -796,7 +796,7 @@ void Application::clean()
 
 void Application::build()
 {
-    _console.log("build");
+    _console.log_important("build");
 
 	std::string command = "cd " + _info.project->get_build_path().string() + " && " + std::filesystem::absolute(CMAKE_PATH).string();
     _console.run_commands({
@@ -809,7 +809,7 @@ void Application::build()
 
 void Application::run()
 {
-    _console.log("run");
+    _console.log_important("run");
 
 	// call executable, pass in project path as argument for the runtime, so it knows what to run
 	_console.run_command("cd " + _info.project->get_build_path().string() + " && cd " + _info.get_config() + " && call " + EXE_NAME + " " + _info.project->get_base_path().string());
