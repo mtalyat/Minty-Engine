@@ -1688,24 +1688,20 @@ VKAPI_ATTR VkBool32 VKAPI_CALL Renderer::debug_callback(VkDebugUtilsMessageSever
 	// change colors based on severity
 	if (messageSeverity & VkDebugUtilsMessageSeverityFlagBitsEXT::VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
 	{
-		std::cout << "\033[31;40m"; // red
+		console::error(pCallbackData->pMessage);
 	}
 	else if (messageSeverity & VkDebugUtilsMessageSeverityFlagBitsEXT::VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
 	{
-		std::cout << "\033[33;40m"; // yellow
+		console::warn(pCallbackData->pMessage);
 	}
 	else if (messageSeverity & VkDebugUtilsMessageSeverityFlagBitsEXT::VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT)
 	{
-		std::cout << "\033[37;40m"; // white
+		console::info(pCallbackData->pMessage);
 	}
 	else
 	{
-		std::cout << "\033[90;40m"; // gray
+		console::log(pCallbackData->pMessage);
 	}
-	
-	std::cerr << "validation layer: " << pCallbackData->pMessage << std::endl;
-
-	std::cerr << "\033[0m"; // reset to white
 
 	return VK_FALSE;
 }

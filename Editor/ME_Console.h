@@ -18,10 +18,7 @@ namespace mintye
 			std::string text;
 			minty::console::Color color;
 
-			Line(std::string const& text, minty::console::Color color)
-				: text(text)
-				, color(color)
-			{}
+			Line(std::string const& text, minty::console::Color color);
 		};
 
 		bool _scrollToBottom;

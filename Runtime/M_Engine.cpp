@@ -114,7 +114,7 @@ void Engine::run()
 		// if fps time >= 1 second (in nanoseconds)
 		if (fpsTime >= 1000000000ll)
 		{
-			std::cout << fpsCount << '\r' << std::endl;
+			console::log(std::format("{}\r", fpsCount));
 
 			fpsCount = 0u;
 			fpsTime = 0ll;
@@ -125,7 +125,7 @@ void Engine::run()
 	_sceneManager.unload();
 
 	// print elapsed time
-	std::cout << "Elapsed time: " << (std::chrono::duration_cast<std::chrono::milliseconds>(get_now() - start).count() / 1000.0f) << "s" << std::endl;
+	console::log(std::format("Elapsed time: {}s", std::chrono::duration_cast<std::chrono::milliseconds>(get_now() - start).count() / 1000.0f));
 }
 
 time_point_t minty::Engine::get_now() const

@@ -1,8 +1,6 @@
 #include "ME_Console.h"
 
-#include <cstdio>
-#include <cstdlib>
-#include <sys/types.h>
+#include <regex>
 
 using namespace minty;
 
@@ -69,7 +67,7 @@ void mintye::Console::draw(char const* title)
 				hasColor = false;
 				break;
 			}
-			
+
 			// add color
 			if (hasColor)
 			{
@@ -166,7 +164,12 @@ void mintye::Console::log(std::string const& text, minty::console::Color const c
 		return;
 	}
 
-	_lines.push_back(Line(text, color));
+	// remove escape codes
+	std::regex regex("(\033\\[)[0-?]*[ -\\/]*[@-~]");
+	//std::regex regex("(\\x9B|\\033\\[)[0-?]*[ -\\/]*[@-~]");
+	std::string finalText = std::regex_replace(text, regex, "");
+
+	_lines.push_back(Line(finalText, color));
 
 	_linesLock.unlock();
 }
@@ -263,3 +266,8 @@ void mintye::Console::execute_commands()
 	_commandsThreadRunning = false;
 	_commandsLock.unlock();
 }
+
+mintye::Console::Line::Line(std::string const& text, minty::console::Color color)
+	: text(text)
+	, color(color)
+{}
