@@ -34,7 +34,7 @@ namespace mintye
 		/// <param name="argv">The command line arguments.</param>
 		int run(int argc, char const* argv[]);
 	private:
-		void draw_main();
+		void draw_controls();
 		void draw_console();
 
 		/// <summary>

@@ -417,7 +417,7 @@ int Application::run(int argc, char const* argv[])
 
     // Create window with Vulkan context
     glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-    GLFWwindow* window = glfwCreateWindow(1280, 720, "Dear ImGui GLFW+Vulkan example", nullptr, nullptr);
+    GLFWwindow* window = glfwCreateWindow(1280, 720, "Minty Editor", nullptr, nullptr);
     if (!glfwVulkanSupported())
     {
         printf("GLFW: Vulkan Not Supported\n");
@@ -531,7 +531,6 @@ int Application::run(int argc, char const* argv[])
 
     // Our state
     bool show_demo_window = true;
-    bool show_another_window = false;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     // Main loop
@@ -567,18 +566,8 @@ int Application::run(int argc, char const* argv[])
         //if (show_demo_window)
         ImGui::ShowDemoWindow(&show_demo_window);
 
-        draw_main();
+        draw_controls();
         draw_console();
-
-        // 3. Show another simple window.
-        if (show_another_window)
-        {
-            ImGui::Begin("Another Window", &show_another_window);   // Pass a pointer to our bool variable (the window will have a closing button that will clear the bool when clicked)
-            ImGui::Text("Hello from another window!");
-            if (ImGui::Button("Close Me"))
-                show_another_window = false;
-            ImGui::End();
-        }
 
         // Rendering
         ImGui::Render();
@@ -619,7 +608,7 @@ int Application::run(int argc, char const* argv[])
     return 0;
 }
 
-void Application::draw_main()
+void Application::draw_controls()
 {
     // begin new window
     ImGui::Begin("Controls");
