@@ -880,7 +880,7 @@ VkImageView Renderer::create_image_view(VkImage image, VkFormat format, VkImageA
 	return imageView;
 }
 
-VkCommandBuffer Renderer::begin_single_time_commands() {
+VkCommandBuffer Renderer::begin_single_time_commands(VkCommandPool commandPool) {
 	VkCommandBufferAllocateInfo allocInfo{};
 	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
@@ -899,7 +899,7 @@ VkCommandBuffer Renderer::begin_single_time_commands() {
 	return commandBuffer;
 }
 
-void Renderer::end_single_time_commands(VkCommandBuffer commandBuffer) {
+void Renderer::end_single_time_commands(VkCommandBuffer commandBuffer, VkCommandPool commandPool) {
 	vkEndCommandBuffer(commandBuffer);
 
 	VkSubmitInfo submitInfo{};
@@ -914,7 +914,7 @@ void Renderer::end_single_time_commands(VkCommandBuffer commandBuffer) {
 }
 
 void Renderer::transition_image_layout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout) {
-	VkCommandBuffer commandBuffer = begin_single_time_commands();
+	VkCommandBuffer commandBuffer = begin_single_time_commands(commandPool);
 
 	VkImageMemoryBarrier barrier{};
 	barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -964,11 +964,11 @@ void Renderer::transition_image_layout(VkImage image, VkFormat format, VkImageLa
 		1, &barrier
 	);
 
-	end_single_time_commands(commandBuffer);
+	end_single_time_commands(commandBuffer, commandPool);
 }
 
 void Renderer::copy_buffer_to_image(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height) {
-	VkCommandBuffer commandBuffer = begin_single_time_commands();
+	VkCommandBuffer commandBuffer = begin_single_time_commands(commandPool);
 
 	VkBufferImageCopy region{};
 	region.bufferOffset = 0;
@@ -996,7 +996,7 @@ void Renderer::copy_buffer_to_image(VkBuffer buffer, VkImage image, uint32_t wid
 		&region
 	);
 
-	end_single_time_commands(commandBuffer);
+	end_single_time_commands(commandBuffer, commandPool);
 }
 
 void Renderer::create_descriptor_set_layouts()
@@ -1930,13 +1930,13 @@ void Renderer::create_buffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemo
 }
 
 void Renderer::copy_buffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) {
-	VkCommandBuffer commandBuffer = begin_single_time_commands();
+	VkCommandBuffer commandBuffer = begin_single_time_commands(commandPool);
 
 	VkBufferCopy copyRegion{};
 	copyRegion.size = size;
 	vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
 
-	end_single_time_commands(commandBuffer);
+	end_single_time_commands(commandBuffer, commandPool);
 }
 
 uint32_t Renderer::find_memory_type(uint32_t typeFilter, VkMemoryPropertyFlags properties)

@@ -240,13 +240,13 @@ namespace minty
 		/// Start the command buffer.
 		/// </summary>
 		/// <returns>The command buffer that has began, and is ready for use.</returns>
-		VkCommandBuffer begin_single_time_commands();
+		VkCommandBuffer begin_single_time_commands(VkCommandPool commandPool);
 
 		/// <summary>
 		/// Ends the command buffer.
 		/// </summary>
 		/// <param name="commandBuffer">The command buffer to end, and will be no longer used.</param>
-		void end_single_time_commands(VkCommandBuffer commandBuffer);
+		void end_single_time_commands(VkCommandBuffer commandBuffer, VkCommandPool commandPool);
 
 		/// <summary>
 		/// Changes the image layout.
@@ -353,7 +353,7 @@ namespace minty
 		/// <summary>
 		/// Draw a single frame to the screen.
 		/// </summary>
-		void draw_frame();
+		virtual void draw_frame();
 
 		/// <summary>
 		/// Draws the objects within the Scene.
@@ -473,7 +473,7 @@ namespace minty
 		/// </summary>
 		/// <param name="commandBuffer">The command buffer to record.</param>
 		/// <param name="imageIndex">The image to send the commands to.</param>
-		void record_command_buffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
+		virtual void record_command_buffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
 
 		/// <summary>
 		/// Create the sync objects.
