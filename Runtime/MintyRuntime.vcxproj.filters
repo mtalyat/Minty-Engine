@@ -51,9 +51,6 @@
     <ClInclude Include="M_CommandLineParser.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="M_Project.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="M_Window.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -213,9 +210,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_CommandLineParser.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="M_Project.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_Window.cpp">

@@ -51,12 +51,24 @@
     <ClCompile Include="ME_Console.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ME_GuiRenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ME_Project.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ME_Application.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ME_Console.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ME_GuiRenderer.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ME_Project.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

@@ -180,11 +180,15 @@
     <ClCompile Include="libraries\imgui\imgui_widgets.cpp" />
     <ClCompile Include="ME_Application.cpp" />
     <ClCompile Include="ME_Console.cpp" />
+    <ClCompile Include="ME_GuiRenderer.cpp" />
+    <ClCompile Include="ME_Project.cpp" />
     <ClCompile Include="Program.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ME_Application.h" />
     <ClInclude Include="ME_Console.h" />
+    <ClInclude Include="ME_GuiRenderer.h" />
+    <ClInclude Include="ME_Project.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

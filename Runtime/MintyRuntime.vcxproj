@@ -248,7 +248,6 @@
     <ClInclude Include="M_Transform.h" />
     <ClInclude Include="M_Vector2Int.h" />
     <ClInclude Include="M_Vector2.h" />
-    <ClInclude Include="M_Project.h" />
     <ClInclude Include="M_Rect.h" />
     <ClInclude Include="M_RectF.h" />
     <ClInclude Include="M_Renderer.h" />
@@ -295,7 +294,6 @@
     <ClCompile Include="M_Texture.cpp" />
     <ClCompile Include="M_Vector2Int.cpp" />
     <ClCompile Include="M_Vector2.cpp" />
-    <ClCompile Include="M_Project.cpp" />
     <ClCompile Include="M_Rect.cpp" />
     <ClCompile Include="M_RectF.cpp" />
     <ClCompile Include="M_Renderer.cpp" />
