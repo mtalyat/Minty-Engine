@@ -519,6 +519,16 @@ int Application::run(int argc, char const* argv[])
         ImGui_ImplVulkan_DestroyFontUploadObjects();
     }
 
+    // load renderer data
+    _renderer.create_shader(_project.find_asset("vert.spv").string(), _project.find_asset("frag.spv").string());
+    for (filepath const& path : _project.find_assets(Project::CommonFileTypes::Texture))
+    {
+        _renderer.create_material(0, _renderer.create_texture(path.string()), Color::white());
+    }
+
+    // start renderer
+    _renderer.start();
+
     // Our state
     bool show_demo_window = true;
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
@@ -553,11 +563,16 @@ int Application::run(int argc, char const* argv[])
         ImGui::NewFrame();
 
         // 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-        //if (show_demo_window)
         ImGui::ShowDemoWindow(&show_demo_window);
 
-        draw_controls();
+        _renderer.draw_frame();
+
+        draw_commands();
         draw_console();
+        draw_hierarchy();
+        draw_inspector();
+        draw_scene();
+        draw_game();
 
         // Rendering
         ImGui::Render();
@@ -598,31 +613,10 @@ int Application::run(int argc, char const* argv[])
     return 0;
 }
 
-void Application::draw_controls()
+void Application::draw_commands()
 {
     // begin new window
-    ImGui::Begin("Controls");
-
-    // list commands
-    ImGui::Text("Commands:");
-
-    // get path
-    static char pathBuffer[256] = "..\\Projects\\Tests\\TestProject";
-    ImGui::InputText("Project Path", pathBuffer, 256);
-
-    // make project from path
-    Project project("");
-
-    // set if path exists
-    if (file::exists(pathBuffer))
-    {
-        project = Project(pathBuffer);
-        _info.project = &project;
-    }
-    else
-    {
-        _info.project = nullptr;
-    }
+    ImGui::Begin("Commands");
 
     bool disabled = !_info.project || _console.is_command_running();
 
@@ -660,6 +654,35 @@ void Application::draw_controls()
 void mintye::Application::draw_console()
 {
     _console.draw("Console");
+}
+
+void mintye::Application::draw_hierarchy()
+{
+
+}
+
+void mintye::Application::draw_inspector()
+{
+
+}
+
+void mintye::Application::draw_game()
+{
+    _renderer.descriptorSets.resize(_renderer._viewportImageViews.size());
+    for (uint32_t i = 0; i < _renderer._viewportImageViews.size(); i++)
+        _renderer.descriptorSets[i] = ImGui_ImplVulkan_AddTexture(_renderer._guiSampler, _viewportImageViews[i], VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+
+    ImGui::Begin("Game");
+
+    ImVec2 viewportPanelSize = ImGui::GetContentRegionAvail();
+    ImGui::Image(_renderer._dset[_renderer.currentFrame], ImVec2{ viewportPanelSize.x, viewportPanelSize.y });
+
+    ImGui::End();
+}
+
+void mintye::Application::draw_scene()
+{
+
 }
 
 void Application::generate()

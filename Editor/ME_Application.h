@@ -38,8 +38,12 @@ namespace mintye
 		/// <param name="argv">The command line arguments.</param>
 		int run(int argc, char const* argv[]);
 	private:
-		void draw_controls();
+		void draw_commands();
 		void draw_console();
+		void draw_hierarchy();
+		void draw_inspector();
+		void draw_game();
+		void draw_scene();
 
 		/// <summary>
 		/// Generates all necessary files for the target project.
