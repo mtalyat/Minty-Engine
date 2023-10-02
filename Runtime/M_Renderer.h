@@ -107,6 +107,7 @@ namespace minty
 		std::vector<VkFramebuffer> swapChainFramebuffers;
 		VkCommandPool commandPool;
 		std::vector<VkCommandBuffer> commandBuffers;
+		QueueFamilyIndices queueFamilyIndices;
 		std::vector<VkSemaphore> imageAvailableSemaphores;
 		std::vector<VkSemaphore> renderFinishedSemaphores;
 		std::vector<VkFence> inFlightFences;
@@ -460,7 +461,7 @@ namespace minty
 		/// <summary>
 		/// Creates the command pool.
 		/// </summary>
-		void create_command_pool();
+		void create_command_pool(VkCommandPool& commandPool);
 
 		/// <summary>
 		/// Creates the command buffers.

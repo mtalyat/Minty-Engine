@@ -220,7 +220,8 @@ void minty::Renderer::init()
 	create_image_views();
 	create_render_pass();
 	create_descriptor_set_layouts();
-	create_command_pool();
+	queueFamilyIndices = find_queue_families(physicalDevice);
+	create_command_pool(commandPool);
 	create_depth_resources();
 	create_framebuffers();
 	create_material_buffers();
@@ -1952,11 +1953,8 @@ uint32_t Renderer::find_memory_type(uint32_t typeFilter, VkMemoryPropertyFlags p
 	throw std::runtime_error("failed to find suitable memory type!");
 }
 
-void Renderer::create_command_pool()
+void Renderer::create_command_pool(VkCommandPool& commandPool)
 {
-	// get queue families
-	QueueFamilyIndices queueFamilyIndices = find_queue_families(physicalDevice);
-
 	// create info for command pool
 	VkCommandPoolCreateInfo poolInfo
 	{

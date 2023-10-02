@@ -32,22 +32,5 @@ namespace mintye
 		std::vector<VkDescriptorSet> _dset;
 	public:
 		GuiRenderer(minty::Window* const window);
-
-	protected:
-		void init() override;
-
-	public:
-		void start() override;
-
-		void recreate_swap_chain() override;
-
-	private:
-		void create_gui_render_pass();
-
-		void create_gui_command_buffers();
-
-		void create_gui_framebuffers();
-
-		void create_gui_sampler();
 	};
 }
