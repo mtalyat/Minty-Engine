@@ -55,7 +55,6 @@ access to the entire engine without needing include each file.
 #include "M_MouseButton.h"
 #include "M_Object.h"
 #include "M_Parse.h"
-#include "M_Project.h"
 #include "M_Rect.h"
 #include "M_RectF.h"
 #include "M_Renderer.h"
