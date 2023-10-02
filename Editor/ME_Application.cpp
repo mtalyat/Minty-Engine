@@ -403,26 +403,16 @@ std::vector<std::string> splitString(std::string s)
 }
 
 Application::Application()
-    : _info()
+    : _project("../Projects/Tests/TestProject")
+    , _info(&_project, true)
+    , _window("Minty Editor", 1280, 720)
+    , _renderer(&_window)
     , _console()
-{
-    _info.debug = true;
-}
+{}
 
 int Application::run(int argc, char const* argv[])
 {
     glfwSetErrorCallback(glfw_error_callback);
-    if (!glfwInit())
-        return 1;
-
-    // Create window with Vulkan context
-    glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-    GLFWwindow* window = glfwCreateWindow(1280, 720, "Minty Editor", nullptr, nullptr);
-    if (!glfwVulkanSupported())
-    {
-        printf("GLFW: Vulkan Not Supported\n");
-        return 1;
-    }
 
     ImVector<const char*> extensions;
     uint32_t extensions_count = 0;
@@ -433,12 +423,12 @@ int Application::run(int argc, char const* argv[])
 
     // Create Window Surface
     VkSurfaceKHR surface;
-    VkResult err = glfwCreateWindowSurface(g_Instance, window, g_Allocator, &surface);
+    VkResult err = glfwCreateWindowSurface(g_Instance, _window.getRaw(), g_Allocator, &surface);
     check_vk_result(err);
 
     // Create Framebuffers
     int w, h;
-    glfwGetFramebufferSize(window, &w, &h);
+    glfwGetFramebufferSize(_window.getRaw(), &w, &h);
     ImGui_ImplVulkanH_Window* wd = &g_MainWindowData;
     SetupVulkanWindow(wd, surface, w, h);
 
@@ -466,7 +456,7 @@ int Application::run(int argc, char const* argv[])
     }
 
     // Setup Platform/Renderer backends
-    ImGui_ImplGlfw_InitForVulkan(window, true);
+    ImGui_ImplGlfw_InitForVulkan(_window.getRaw(), true);
     ImGui_ImplVulkan_InitInfo init_info = {};
     init_info.Instance = g_Instance;
     init_info.PhysicalDevice = g_PhysicalDevice;
@@ -534,7 +524,7 @@ int Application::run(int argc, char const* argv[])
     ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
     // Main loop
-    while (!glfwWindowShouldClose(window))
+    while (_window.isOpen())
     {
         // Poll and handle events (inputs, window resize, etc.)
         // You can read the io.WantCaptureMouse, io.WantCaptureKeyboard flags to tell if dear imgui wants to use your inputs.
@@ -547,7 +537,7 @@ int Application::run(int argc, char const* argv[])
         if (g_SwapChainRebuild)
         {
             int width, height;
-            glfwGetFramebufferSize(window, &width, &height);
+            glfwGetFramebufferSize(_window.getRaw(), &width, &height);
             if (width > 0 && height > 0)
             {
                 ImGui_ImplVulkan_SetMinImageCount(g_MinImageCount);
@@ -602,8 +592,8 @@ int Application::run(int argc, char const* argv[])
     CleanupVulkanWindow();
     CleanupVulkan();
 
-    glfwDestroyWindow(window);
-    glfwTerminate();
+    //glfwDestroyWindow(window);
+    //glfwTerminate();
 
     return 0;
 }
@@ -718,7 +708,7 @@ void Application::generate_cmake()
 	// get all local paths for source files
 	std::stringstream pathsStream;
 	filepath buildPath = _info.project->get_build_path();
-	for (filepath const& path : _info.project->get_assets_source_paths())
+	for (filepath const& path : _info.project->find_assets(Project::CommonFileTypes::Source))
 	{
 		pathsStream << " " << std::filesystem::relative(path, buildPath).generic_string();
 	}
@@ -802,4 +792,14 @@ void Application::run()
 
 	// call executable, pass in project path as argument for the runtime, so it knows what to run
 	_console.run_command("cd " + _info.project->get_build_path().string() + " && cd " + _info.get_config() + " && call " + EXE_NAME + " " + _info.project->get_base_path().string());
+}
+
+mintye::Application::BuildInfo::BuildInfo(Project* const project, bool const debug)
+    : project(project)
+    , debug(debug)
+{}
+
+std::string const mintye::Application::BuildInfo::get_config() const
+{
+    return debug ? "Debug" : "Release";
 }

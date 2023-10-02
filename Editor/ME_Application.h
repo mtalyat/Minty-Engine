@@ -1,6 +1,8 @@
 #pragma once
 
 #include "ME_Console.h"
+#include "ME_Project.h"
+#include "ME_GuiRenderer.h"
 #include <Minty.h>
 
 namespace mintye
@@ -11,18 +13,20 @@ namespace mintye
 	class Application
 	{
 	private:
-		struct Info
+		struct BuildInfo
 		{
-			minty::Project* project;
+			Project* project;
 			bool debug;
 
-			std::string const get_config() const
-			{
-				return debug ? "Debug" : "Release";
-			}
+			BuildInfo(Project* const project, bool const debug);
+
+			std::string const get_config() const;
 		};
 
-		Info _info;
+		Project _project;
+		BuildInfo _info;
+		minty::Window _window;
+		GuiRenderer _renderer;
 		Console _console;
 	public:
 		Application();

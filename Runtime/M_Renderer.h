@@ -130,12 +130,12 @@ namespace minty
 		/// <summary>
 		/// Initializes the Renderer.
 		/// </summary>
-		void init();
+		virtual void init();
 
 		/// <summary>
 		/// Starts the Renderer.
 		/// </summary>
-		void start();
+		virtual void start();
 
 		/// <summary>
 		/// Updates the Renderer.
@@ -290,7 +290,7 @@ namespace minty
 		/// <summary>
 		/// Creates the swap chain.
 		/// </summary>
-		void create_swap_chain();
+		virtual void create_swap_chain();
 
 		/// <summary>
 		/// Cleans up any resources in the current swap chain.
@@ -300,7 +300,7 @@ namespace minty
 		/// <summary>
 		/// Recreates the swap chain. Important for window changing events, such as a resize.
 		/// </summary>
-		void recreate_swap_chain();
+		virtual void recreate_swap_chain();
 
 		/// <summary>
 		/// Chooses the swap extent, given the capabilities of the surface.
