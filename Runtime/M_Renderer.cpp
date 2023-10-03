@@ -189,7 +189,7 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
 	}
 }
 
-Renderer::Renderer(Window* const window)
+Renderer::Renderer(Window* const window, Info* const appInfo)
 	: _window(window)
 	, _textures()
 	, _materials()
@@ -201,7 +201,7 @@ Renderer::Renderer(Window* const window)
 	_materials.reserve(MAX_MATERIALS);
 	_shaders.reserve(MAX_SHADERS);
 
-	init();
+	init(appInfo);
 }
 
 Renderer::~Renderer()
@@ -209,9 +209,9 @@ Renderer::~Renderer()
 	cleanup();
 }
 
-void minty::Renderer::init()
+void minty::Renderer::init(Info* const appInfo)
 {
-	create_instance();
+	create_instance(appInfo);
 	setup_debug_messenger();
 	create_surface();
 	pick_physical_device();
@@ -234,10 +234,10 @@ void Renderer::renderFrame()
 
 bool Renderer::running()
 {
-	return _window->isOpen();
+	return _window->is_open();
 }
 
-void Renderer::create_instance()
+void Renderer::create_instance(Info* const appInfo)
 {
 	// check if we can use validation layers
 	if (enableValidationLayers && !check_validation_layer_support())
@@ -245,26 +245,36 @@ void Renderer::create_instance()
 		throw std::runtime_error("Validation layers requested, but not available.");
 	}
 
-	// create instance app info
-	VkApplicationInfo appInfo{
-		.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO,
-		.pApplicationName = "Voxel",
-		.applicationVersion = VK_MAKE_VERSION(1, 0, 0),
-		.pEngineName = "Unknown Engine",
-		.engineVersion = VK_MAKE_VERSION(1, 0, 0),
-		.apiVersion = VK_API_VERSION_1_2
-	};
-
 	// get glfw extensions
 	uint32_t glfwExtensionCount = 0;
 	const char** glfwExtensions;
 
 	glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
 
+	VkApplicationInfo vkAppInfo;
+
+	if (appInfo)
+	{
+		// custom info
+		vkAppInfo = appInfo->get_application_info();
+	}
+	else
+	{
+		// default
+		vkAppInfo =
+		{
+			.pApplicationName = "Minty Application",
+			.applicationVersion = VK_MAKE_VERSION(1, 0, 0),
+			.pEngineName = MINTY_NAME,
+			.engineVersion = MINTY_VERSION,
+			.apiVersion = MINTY_API_VERSION,
+		};
+	}
+
 	// create info, telling vulkan which global extensions and validation layers we want to use
 	VkInstanceCreateInfo createInfo{
 		.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO,
-		.pApplicationInfo = &appInfo,
+		.pApplicationInfo = &vkAppInfo,
 	};
 
 	auto extensions = get_required_extensions();
@@ -1163,7 +1173,7 @@ void Renderer::create_image_views()
 void Renderer::create_surface()
 {
 	// create window surface that vulkan can use to draw
-	if (glfwCreateWindowSurface(instance, _window->getRaw(), nullptr, &surface) != VK_SUCCESS) {
+	if (glfwCreateWindowSurface(instance, _window->get_raw(), nullptr, &surface) != VK_SUCCESS) {
 		throw std::runtime_error("Failed to create window surface.");
 	}
 }
@@ -1319,9 +1329,9 @@ void Renderer::recreate_swap_chain()
 {
 	// on window minimize, pause program until un-minimized
 	int width = 0, height = 0;
-	_window->getFramebufferSize(&width, &height);
+	_window->get_framebuffer_size(&width, &height);
 	while (width == 0 || height == 0) {
-		_window->getFramebufferSize(&width, &height);
+		_window->get_framebuffer_size(&width, &height);
 		glfwWaitEvents();
 	}
 
@@ -1343,7 +1353,7 @@ VkExtent2D Renderer::choose_swap_extent(const VkSurfaceCapabilitiesKHR& capabili
 	}
 	else {
 		int width, height;
-		_window->getFramebufferSize(&width, &height);
+		_window->get_framebuffer_size(&width, &height);
 
 		VkExtent2D actualExtent = {
 			static_cast<uint32_t>(width),
@@ -1808,7 +1818,7 @@ void Renderer::create_framebuffers()
 	swapChainFramebuffers.resize(swapChainImageViews.size());
 
 	for (size_t i = 0; i < swapChainImageViews.size(); i++) {
-		std::array<VkImageView, 2> attachments = {
+		std::array<swapChainFramebuffersView, 2> attachments = {
 			swapChainImageViews[i],
 			depthImageView
 		};

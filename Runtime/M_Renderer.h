@@ -1,7 +1,7 @@
 #pragma once
 
-// Graphics pipeline: https://vulkan-tutorial.com/en/Drawing_a_triangle/Graphics_pipeline_basics/Introduction
-
+#include "M_Object.h"
+#include "M_Info.h"
 #include "M_Window.h"
 #include "M_Texture.h"
 #include "M_Mesh.h"
@@ -59,6 +59,7 @@ namespace minty
 	/// Handles rendering for the game engine.
 	/// </summary>
 	class Renderer
+		: public Object
 	{
 	public: // TODO: set to private
 		Window* const _window;
@@ -74,7 +75,7 @@ namespace minty
 		EntityRegistry const* _registry = nullptr;
 		Entity _mainCamera = NULL_ENTITY;
 	public:
-		Renderer(Window* const window);
+		Renderer(Window* const window, Info* const appInfo);
 
 		~Renderer();
 
@@ -131,7 +132,7 @@ namespace minty
 		/// <summary>
 		/// Initializes the Renderer.
 		/// </summary>
-		virtual void init();
+		virtual void init(Info* const appInfo);
 
 		/// <summary>
 		/// Starts the Renderer.
@@ -185,7 +186,7 @@ namespace minty
 		/// <summary>
 		/// Creates a Vulkan instance.
 		/// </summary>
-		void create_instance();
+		void create_instance(Info* const appInfo);
 
 		/// <summary>
 		/// Finds the depth rendering format that can be used.
