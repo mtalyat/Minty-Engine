@@ -13,7 +13,8 @@ using namespace minty;
 int Window::_windowCount = 0;
 
 Window::Window(std::string const& title, int const width, int const height)
-	: _window()
+	: _title(title)
+	, _window()
 	, _resized(true) // start as "resized" so render engine regenerates data on start
 	, _activeInputMap()
 	, _lastMouseX()
@@ -68,6 +69,17 @@ Window::~Window()
 	{
 		glfwTerminate();
 	}
+}
+
+void minty::Window::set_title(std::string const& title)
+{
+	_title = title;
+	glfwSetWindowTitle(_window, title.c_str());
+}
+
+std::string minty::Window::get_title() const
+{
+	return _title;
 }
 
 bool minty::Window::isResized()

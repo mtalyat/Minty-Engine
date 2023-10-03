@@ -18,6 +18,7 @@ namespace minty
 	private:
 		static int _windowCount;
 
+		std::string _title;
 		GLFWwindow* _window;
 		bool _resized;
 		InputMap const* _activeInputMap;
@@ -34,6 +35,16 @@ namespace minty
 		Window(std::string const& title, int const width, int const height);
 
 		~Window();
+
+		/// <summary>
+		/// Sets the title text of this Window.
+		/// </summary>
+		void set_title(std::string const& title);
+
+		/// <summary>
+		/// Gets the title text of this Window.
+		/// </summary>
+		std::string get_title() const;
 
 		/// <summary>
 		/// Checks if the Window has resized since the last time this method was called.
