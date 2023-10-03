@@ -189,7 +189,7 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
 	}
 }
 
-Renderer::Renderer(Window* const window, Info* const appInfo)
+Renderer::Renderer(Window* const window, Info const* const appInfo)
 	: _window(window)
 	, _textures()
 	, _materials()
@@ -209,7 +209,7 @@ Renderer::~Renderer()
 	cleanup();
 }
 
-void minty::Renderer::init(Info* const appInfo)
+void minty::Renderer::init(Info const* const appInfo)
 {
 	create_instance(appInfo);
 	setup_debug_messenger();
@@ -237,7 +237,7 @@ bool Renderer::running()
 	return _window->is_open();
 }
 
-void Renderer::create_instance(Info* const appInfo)
+void Renderer::create_instance(Info const* const appInfo)
 {
 	// check if we can use validation layers
 	if (enableValidationLayers && !check_validation_layer_support())
@@ -1818,7 +1818,7 @@ void Renderer::create_framebuffers()
 	swapChainFramebuffers.resize(swapChainImageViews.size());
 
 	for (size_t i = 0; i < swapChainImageViews.size(); i++) {
-		std::array<swapChainFramebuffersView, 2> attachments = {
+		std::array<VkImageView, 2> attachments = {
 			swapChainImageViews[i],
 			depthImageView
 		};

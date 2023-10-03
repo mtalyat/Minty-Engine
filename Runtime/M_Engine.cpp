@@ -13,9 +13,9 @@ using namespace minty;
 uint32_t const WIDTH = 800;
 uint32_t const HEIGHT = 600;
 
-Engine::Engine()
+Engine::Engine(Info const* const appInfo)
 	: _window("Minty", WIDTH, HEIGHT)
-	, _renderer(&_window)
+	, _renderer(&_window, appInfo)
 	, _sceneManager(this)
 	, _deltaTime(0.02f)
 {

@@ -75,7 +75,7 @@ namespace minty
 		EntityRegistry const* _registry = nullptr;
 		Entity _mainCamera = NULL_ENTITY;
 	public:
-		Renderer(Window* const window, Info* const appInfo);
+		Renderer(Window* const window, Info const* const appInfo);
 
 		~Renderer();
 
@@ -132,7 +132,7 @@ namespace minty
 		/// <summary>
 		/// Initializes the Renderer.
 		/// </summary>
-		virtual void init(Info* const appInfo);
+		virtual void init(Info const* const appInfo);
 
 		/// <summary>
 		/// Starts the Renderer.
@@ -186,7 +186,7 @@ namespace minty
 		/// <summary>
 		/// Creates a Vulkan instance.
 		/// </summary>
-		void create_instance(Info* const appInfo);
+		void create_instance(Info const* const appInfo);
 
 		/// <summary>
 		/// Finds the depth rendering format that can be used.
