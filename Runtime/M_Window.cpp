@@ -46,13 +46,13 @@ Window::Window(std::string const& title, int const width, int const height)
 	glfwSetWindowUserPointer(_window, reinterpret_cast<void*>(this));
 
 	// set a callback for when the window is resized
-	glfwSetFramebufferSizeCallback(_window, resizeCallback);
+	glfwSetFramebufferSizeCallback(_window, resize_callback);
 
 	// set input callbacks
-	glfwSetKeyCallback(_window, keyCallback);
-	glfwSetMouseButtonCallback(_window, buttonCallback);
-	glfwSetCursorPosCallback(_window, cursorCallback);
-	glfwSetScrollCallback(_window, scrollCallback);
+	glfwSetKeyCallback(_window, key_callback);
+	glfwSetMouseButtonCallback(_window, button_ballback);
+	glfwSetCursorPosCallback(_window, cursor_callback);
+	glfwSetScrollCallback(_window, scroll_callback);
 
 	// might want this for engine:
 	// glfwSetDropCallback
@@ -82,7 +82,7 @@ std::string minty::Window::get_title() const
 	return _title;
 }
 
-bool minty::Window::isResized()
+bool minty::Window::is_resized()
 {
 	if (_resized)
 	{
@@ -95,7 +95,7 @@ bool minty::Window::isResized()
 	return false;
 }
 
-bool minty::Window::isOpen() const
+bool minty::Window::is_open() const
 {
 	return !glfwWindowShouldClose(_window);
 }
@@ -105,22 +105,22 @@ void minty::Window::close()
 	glfwSetWindowShouldClose(_window, GLFW_TRUE);
 }
 
-void minty::Window::getFramebufferSize(int* const width, int* const height) const
+void minty::Window::get_framebuffer_size(int* const width, int* const height) const
 {
 	glfwGetFramebufferSize(_window, width, height);
 }
 
-GLFWwindow* minty::Window::getRaw() const
+GLFWwindow* minty::Window::get_raw() const
 {
 	return _window;
 }
 
-void minty::Window::setInput(InputMap const* const inputMap)
+void minty::Window::set_input(InputMap const* const inputMap)
 {
 	_activeInputMap = inputMap;
 }
 
-void minty::Window::triggerKey(Key const key, KeyAction const action, KeyModifiers const mods)
+void minty::Window::trigger_key(Key const key, KeyAction const action, KeyModifiers const mods)
 {
 	if (_activeInputMap)
 	{
@@ -134,7 +134,7 @@ void minty::Window::triggerKey(Key const key, KeyAction const action, KeyModifie
 	}
 }
 
-void minty::Window::triggerButton(MouseButton const button, KeyAction const action, KeyModifiers const mods)
+void minty::Window::trigger_button(MouseButton const button, KeyAction const action, KeyModifiers const mods)
 {
 	if (_activeInputMap)
 	{
@@ -150,7 +150,7 @@ void minty::Window::triggerButton(MouseButton const button, KeyAction const acti
 	}
 }
 
-void minty::Window::triggerScroll(float dx, float dy)
+void minty::Window::trigger_scroll(float dx, float dy)
 {
 	if (_activeInputMap)
 	{
@@ -163,7 +163,7 @@ void minty::Window::triggerScroll(float dx, float dy)
 	}
 }
 
-void minty::Window::triggerCursor(float x, float y)
+void minty::Window::trigger_cursor(float x, float y)
 {
 	if (_activeInputMap)
 	{
@@ -197,7 +197,7 @@ void minty::Window::triggerCursor(float x, float y)
 	_mouseOutOfBounds = false;
 }
 
-void Window::resizeCallback(GLFWwindow* const window, int const width, int const height)
+void Window::resize_callback(GLFWwindow* const window, int const width, int const height)
 {
 	auto w = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
 	console::ass(w != nullptr, "Window is null on resize callback.");
@@ -207,42 +207,42 @@ void Window::resizeCallback(GLFWwindow* const window, int const width, int const
 	}
 }
 
-void Window::keyCallback(GLFWwindow* window, int key, int scancode, int action, int mods)
+void Window::key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
 	auto w = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
 	console::ass(w != nullptr, "Window is null on key callback.");
 	if (w)
 	{
-		w->triggerKey(static_cast<Key>(key), static_cast<KeyAction>(action), static_cast<KeyModifiers>(mods));
+		w->trigger_key(static_cast<Key>(key), static_cast<KeyAction>(action), static_cast<KeyModifiers>(mods));
 	}
 }
 
-void minty::Window::buttonCallback(GLFWwindow* window, int button, int action, int mods)
+void minty::Window::button_ballback(GLFWwindow* window, int button, int action, int mods)
 {
 	auto w = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
 	console::ass(w != nullptr, "Window is null on button callback.");
 	if (w)
 	{
-		w->triggerButton(static_cast<MouseButton>(button), static_cast<KeyAction>(action), static_cast<KeyModifiers>(mods));
+		w->trigger_button(static_cast<MouseButton>(button), static_cast<KeyAction>(action), static_cast<KeyModifiers>(mods));
 	}
 }
 
-void minty::Window::cursorCallback(GLFWwindow* window, double xpos, double ypos)
+void minty::Window::cursor_callback(GLFWwindow* window, double xpos, double ypos)
 {
 	auto w = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
 	console::ass(w != nullptr, "Window is null on cursor callback.");
 	if (w)
 	{
-		w->triggerCursor(static_cast<float>(xpos), static_cast<float>(ypos));
+		w->trigger_cursor(static_cast<float>(xpos), static_cast<float>(ypos));
 	}
 }
 
-void minty::Window::scrollCallback(GLFWwindow* window, double xoffset, double yoffset)
+void minty::Window::scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
 	auto w = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
 	console::ass(w != nullptr, "Window is null on scroll callback.");
 	if (w)
 	{
-		w->triggerScroll(static_cast<float>(xoffset), static_cast<float>(yoffset));
+		w->trigger_scroll(static_cast<float>(xoffset), static_cast<float>(yoffset));
 	}
 }
