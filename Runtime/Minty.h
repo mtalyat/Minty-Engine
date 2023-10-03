@@ -45,6 +45,7 @@ access to the entire engine without needing include each file.
 #include "M_Engine.h"
 #include "M_Event.h"
 #include "M_File.h"
+#include "M_Info.h"
 #include "M_InputMap.h"
 #include "M_Key.h"
 #include "M_KeyAction.h"

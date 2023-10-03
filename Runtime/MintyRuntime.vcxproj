@@ -210,6 +210,7 @@
   <ItemGroup>
     <ClInclude Include="framework.h" />
     <ClInclude Include="libraries\entt\entt.hpp" />
+    <ClInclude Include="M_Info.h" />
     <ClInclude Include="M_MeshComponent.h" />
     <ClInclude Include="M_CameraComponent.h" />
     <ClInclude Include="M_Component.h" />
@@ -272,6 +273,7 @@
     <ClCompile Include="M_EntityRegistry.cpp" />
     <ClCompile Include="M_File.cpp" />
     <ClCompile Include="M_Engine.cpp" />
+    <ClCompile Include="M_Info.cpp" />
     <ClCompile Include="M_InputMap.cpp" />
     <ClCompile Include="M_Material.cpp" />
     <ClCompile Include="M_Math.cpp" />
