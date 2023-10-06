@@ -6,7 +6,7 @@
 #include "M_Renderer.h"
 #include "M_Console.h"
 #include "M_Color.h"
-#include <stdexcept>
+#include "M_Error.h"
 
 using namespace minty;
 using namespace minty::rendering;
@@ -31,7 +31,8 @@ void minty::Material::set(std::string const& name, void* const value, size_t con
 
 	if (dst == nullptr)
 	{
-		throw std::runtime_error("Failed to malloc material data.");
+		error::abort("Failed to malloc material data.");
+		return;
 	}
 
 	memcpy(dst, value, size);

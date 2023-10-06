@@ -4,7 +4,7 @@
 #include "M_Renderer.h"
 #include "M_Rendering_TextureBuilder.h"
 #include "M_File.h"
-#include <stdexcept>
+#include "M_Error.h"
 #include <format>
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -120,7 +120,7 @@ Texture::Texture(std::string const& path, rendering::TextureBuilder const& build
 	samplerInfo.maxLod = 0.0f;
 
 	if (vkCreateSampler(device, &samplerInfo, nullptr, &sampler) != VK_SUCCESS) {
-		throw std::runtime_error(std::format("Failed to load texture: {}", path));
+		error::abort(std::format("Failed to load texture: {}", path));
 	}
 }
 

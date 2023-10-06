@@ -145,7 +145,7 @@ void Renderer::create_instance()
 	// check if we can use validation layers
 	if (enableValidationLayers && !check_validation_layer_support())
 	{
-		throw std::runtime_error("Validation layers requested, but not available.");
+		error::abort("Validation layers requested, but not available.");
 	}
 
 	// get glfw extensions
@@ -202,7 +202,7 @@ void Renderer::create_instance()
 
 	if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS)
 	{
-		throw std::runtime_error("failed to create instance!");
+		error::abort("failed to create instance!");
 	}
 }
 
@@ -231,7 +231,7 @@ VkFormat Renderer::find_supported_format(const std::vector<VkFormat>& candidates
 		}
 	}
 
-	throw std::runtime_error("failed to find supported format!");
+	error::abort("Failed to find supported format.");
 }
 
 void Renderer::create_depth_resources()
@@ -259,7 +259,7 @@ void Renderer::create_image(uint32_t width, uint32_t height, VkFormat format, Vk
 	imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
 	if (vkCreateImage(_device, &imageInfo, nullptr, &image) != VK_SUCCESS) {
-		throw std::runtime_error("Failed to create image!");
+		error::abort("Failed to create image.");
 	}
 
 	VkMemoryRequirements memRequirements;
@@ -271,7 +271,7 @@ void Renderer::create_image(uint32_t width, uint32_t height, VkFormat format, Vk
 	allocInfo.memoryTypeIndex = find_memory_type(memRequirements.memoryTypeBits, properties);
 
 	if (vkAllocateMemory(_device, &allocInfo, nullptr, &imageMemory) != VK_SUCCESS) {
-		throw std::runtime_error("failed to allocate _image memory!");
+		error::abort("Failed to allocate image memory.");
 	}
 
 	vkBindImageMemory(_device, image, imageMemory, 0);
@@ -471,7 +471,7 @@ VkImageView Renderer::create_image_view(VkImage image, VkFormat format, VkImageA
 
 	VkImageView imageView;
 	if (vkCreateImageView(_device, &viewInfo, nullptr, &imageView) != VK_SUCCESS) {
-		throw std::runtime_error("failed to create texture _image view!");
+		error::abort("Failed to create texture image view.");
 	}
 
 	return imageView;
@@ -610,7 +610,7 @@ void Renderer::create_surface()
 {
 	// create window surface that vulkan can use to draw
 	if (glfwCreateWindowSurface(instance, _window->get_raw(), nullptr, &surface) != VK_SUCCESS) {
-		throw std::runtime_error("Failed to create window surface.");
+		error::abort("Failed to create window surface.");
 	}
 }
 
@@ -623,7 +623,7 @@ void Renderer::pick_physical_device()
 	// if zero, error
 	if (deviceCount == 0)
 	{
-		throw std::runtime_error("Failed to find GPU's with Vulkan support!");
+		error::abort("Failed to find GPU's with Vulkan support.");
 	}
 
 	// get devices
@@ -640,7 +640,7 @@ void Renderer::pick_physical_device()
 
 	// none found
 	if (_physicalDevice == VK_NULL_HANDLE) {
-		throw std::runtime_error("failed to find a suitable GPU!");
+		error::abort("Failed to find a suitable GPU.");
 	}
 }
 
@@ -730,7 +730,7 @@ void Renderer::create_swap_chain()
 
 	// create swap chain
 	if (vkCreateSwapchainKHR(_device, &createInfo, nullptr, &swapChain) != VK_SUCCESS) {
-		throw std::runtime_error("failed to create swap chain!");
+		error::abort("Failed to create swap chain.");
 	}
 
 	vkGetSwapchainImagesKHR(_device, swapChain, &imageCount, nullptr);
@@ -965,7 +965,7 @@ void Renderer::create_logical_device()
 	}
 
 	if (vkCreateDevice(_physicalDevice, &createInfo, nullptr, &_device) != VK_SUCCESS) {
-		throw std::runtime_error("Failed to create logical device.");
+		error::abort("Failed to create logical device.");
 	}
 
 	vkGetDeviceQueue(_device, indices.graphicsFamily.value(), 0, &graphicsQueue);
@@ -986,7 +986,7 @@ void Renderer::draw_frame()
 		return;
 	}
 	else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
-		throw std::runtime_error("failed to acquire swap chain image!");
+		error::abort("Failed to acquire swap chain image.");
 	}
 
 	// reset the fence states so they can be used to wait again
@@ -1049,7 +1049,7 @@ void Renderer::draw_frame()
 		recreate_swap_chain();
 	}
 	else if (result != VK_SUCCESS) {
-		throw std::runtime_error("failed to present swap chain image!");
+		error::abort("Failed to present swap chain image.");
 	}
 
 	// move to next frame
@@ -1127,7 +1127,7 @@ void Renderer::setup_debug_messenger() {
 	populate_debug_messenger_create_info(createInfo);
 
 	if (CreateDebugUtilsMessengerEXT(instance, &createInfo, nullptr, &debugMessenger) != VK_SUCCESS) {
-		throw std::runtime_error("failed to set up debug messenger!");
+		error::abort("Failed to set up debug messenger.");
 	}
 }
 
@@ -1220,7 +1220,7 @@ void Renderer::create_render_pass()
 	renderPassInfo.pDependencies = &dependency;
 
 	if (vkCreateRenderPass(_device, &renderPassInfo, nullptr, &_renderPass) != VK_SUCCESS) {
-		throw std::runtime_error("failed to create render pass!");
+		error::abort("Failed to create render pass.");
 	}
 }
 
@@ -1245,7 +1245,7 @@ void Renderer::create_framebuffers()
 		framebufferInfo.layers = 1;
 
 		if (vkCreateFramebuffer(_device, &framebufferInfo, nullptr, &swapChainFramebuffers[i]) != VK_SUCCESS) {
-			throw std::runtime_error("failed to create framebuffer!");
+			error::abort("Failed to create framebuffer.");
 		}
 	}
 }
@@ -1344,7 +1344,7 @@ void Renderer::create_buffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemo
 	bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
 	if (vkCreateBuffer(_device, &bufferInfo, nullptr, &buffer) != VK_SUCCESS) {
-		throw std::runtime_error("failed to create buffer!");
+		error::abort("Failed to create buffer.");
 	}
 
 	VkMemoryRequirements memRequirements;
@@ -1356,7 +1356,7 @@ void Renderer::create_buffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemo
 	allocInfo.memoryTypeIndex = find_memory_type(memRequirements.memoryTypeBits, properties);
 
 	if (vkAllocateMemory(_device, &allocInfo, nullptr, &bufferMemory) != VK_SUCCESS) {
-		throw std::runtime_error("failed to allocate buffer memory!");
+		error::abort("Failed to allocate buffer memory.");
 	}
 
 	vkBindBufferMemory(_device, buffer, bufferMemory, 0);
@@ -1383,7 +1383,7 @@ uint32_t Renderer::find_memory_type(uint32_t typeFilter, VkMemoryPropertyFlags p
 		}
 	}
 
-	throw std::runtime_error("failed to find suitable memory type!");
+	error::abort("Failed to find suitable memory type.");
 }
 
 void Renderer::create_command_pool(VkCommandPool& commandPool)
@@ -1397,7 +1397,7 @@ void Renderer::create_command_pool(VkCommandPool& commandPool)
 	};
 
 	if (vkCreateCommandPool(_device, &poolInfo, nullptr, &commandPool) != VK_SUCCESS) {
-		throw std::runtime_error("failed to create command pool!");
+		error::abort("Failed to create command pool.");
 	}
 }
 
@@ -1416,7 +1416,7 @@ void Renderer::create_command_buffers()
 	};
 
 	if (vkAllocateCommandBuffers(_device, &allocInfo, commandBuffers.data()) != VK_SUCCESS) {
-		throw std::runtime_error("failed to allocate command buffers!");
+		error::abort("Failed to allocate command buffers.");
 	}
 }
 
@@ -1497,7 +1497,7 @@ void Renderer::record_command_buffer(VkCommandBuffer commandBuffer, uint32_t ima
 	};
 
 	if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
-		throw std::runtime_error("failed to begin recording command buffer!");
+		error::abort("Failed to begin recording command buffer.");
 	}
 
 	// begin the render pass
@@ -1541,7 +1541,7 @@ void Renderer::record_command_buffer(VkCommandBuffer commandBuffer, uint32_t ima
 	vkCmdEndRenderPass(commandBuffer);
 
 	if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
-		throw std::runtime_error("failed to record command buffer!");
+		error::abort("Failed to record command buffer.");
 	}
 }
 
@@ -1574,7 +1574,7 @@ void Renderer::create_sync_objects()
 			vkCreateSemaphore(_device, &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]) != VK_SUCCESS ||
 			vkCreateFence(_device, &fenceInfo, nullptr, &inFlightFences[i]) != VK_SUCCESS) {
 
-			throw std::runtime_error("failed to create synchronization objects for a frame!");
+			error::abort("Failed to create synchronization objects for a frame.");
 		}
 	}
 }

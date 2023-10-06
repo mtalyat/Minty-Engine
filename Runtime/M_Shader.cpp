@@ -136,7 +136,7 @@ VkShaderModule minty::Shader::load_module(std::string const& path)
 
 	VkShaderModule shaderModule;
 	if (vkCreateShaderModule(_renderer.get_device(), &createInfo, nullptr, &shaderModule) != VK_SUCCESS) {
-		throw std::runtime_error("failed to create shader module!");
+		error::abort("failed to create shader module!");
 	}
 
 	return shaderModule;
@@ -185,7 +185,7 @@ void minty::Shader::create_descriptor_set_layouts(rendering::ShaderBuilder const
 	};
 
 	if (vkCreateDescriptorSetLayout(_renderer.get_device(), &layoutInfo, nullptr, &_descriptorSetLayouts[0]) != VK_SUCCESS) {
-		throw std::runtime_error("Failed to create descriptor set layout.");
+		error::abort("Failed to create descriptor set layout.");
 	}
 }
 
@@ -350,7 +350,7 @@ void minty::Shader::create_shader(std::string const& vertexPath, std::string con
 
 	std::vector<VkPushConstantRange> pushConstants;
 	pushConstants.reserve(pushConstantInfos.size());
-	_pushConstants.reserve(pushConstantInfos.size());
+	_pushConstants.reserve(static_cast<ID>(pushConstantInfos.size()));
 
 	i = 0;
 	for (auto const& info : pushConstantInfos)
@@ -377,7 +377,7 @@ void minty::Shader::create_shader(std::string const& vertexPath, std::string con
 
 	// create the pipeline layout
 	if (vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &_layout) != VK_SUCCESS) {
-		throw std::runtime_error("Failed to create pipeline layout.");
+		error::abort("Failed to create pipeline layout.");
 	}
 
 	// compile all of the information to create the pipeline
@@ -405,7 +405,7 @@ void minty::Shader::create_shader(std::string const& vertexPath, std::string con
 
 	// create the pipeline
 	if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &_pipeline) != VK_SUCCESS) {
-		throw std::runtime_error("Failed to create graphics pipeline.");
+		error::abort("Failed to create graphics pipeline.");
 	}
 
 	// cleanup shader modules
@@ -494,7 +494,7 @@ void minty::Shader::create_descriptor_pool(rendering::ShaderBuilder const& build
 
 	if (vkCreateDescriptorPool(_renderer.get_device(), &poolInfo, nullptr, &_descriptorPool) != VK_SUCCESS)
 	{
-		throw std::runtime_error("Failed to create descriptor pool.");
+		error::abort("Failed to create descriptor pool.");
 	}
 }
 

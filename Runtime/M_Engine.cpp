@@ -14,7 +14,7 @@ uint32_t const WIDTH = 800;
 uint32_t const HEIGHT = 600;
 
 Engine::Engine(Info const* const info)
-	: _window("Minty", WIDTH, HEIGHT)
+	: _window(info->get_application_info().pApplicationName, WIDTH, HEIGHT)
 	, _renderer(&_window)
 	, _sceneManager(this)
 	, _deltaTime(0.02f)
@@ -48,7 +48,7 @@ void Engine::run()
 	// if no scenes at all, abort
 	if (!_sceneManager.size())
 	{
-		throw std::runtime_error("Aborting game. No Scenes loaded.");
+		error::abort("Aborting game. No Scenes loaded.");
 	}
 
 	// if no scene loaded, just load the first scene

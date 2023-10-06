@@ -169,11 +169,17 @@ namespace minty::rendering
 			offset = _pushConstants.back().range.offset + _pushConstants.back().range.size;
 		}
 
-		return _pushConstants.emplace(VkPushConstantRange
+		VkPushConstantRange range
+		{
+			.stageFlags = stageFlags,
+			.offset = offset,
+			.size = sizeof(T),
+		};
+
+		return _pushConstants.push_back(PushConstantInfo
 			{
-				.offset = offset,
-				.size = sizeof(T),
-				.stageFlags = stageFlags
+				.name = name,
+				.range = range
 			});
 	}
 

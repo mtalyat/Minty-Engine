@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "M_Rendering_MaterialBuilder.h"
 
+#include "M_Error.h"
+
 using namespace minty;
 
 minty::rendering::MaterialBuilder::MaterialBuilder(ID const shaderId)
@@ -25,14 +27,14 @@ void minty::rendering::MaterialBuilder::set(std::string const& name, void* const
 	// check for existing
 	if (_values.contains(name))
 	{
-		throw std::runtime_error("MaterialBuilder already contains name.");
+		error::abort("MaterialBuilder already contains name.");
 	}
 
 	// make copy
 	void* dst = malloc(size);
 	if (dst == nullptr)
 	{
-		throw std::runtime_error("Unable to malloc in MaterialBuilder.");
+		error::abort("Unable to malloc in MaterialBuilder.");
 	}
 	memcpy(dst, data, size);
 

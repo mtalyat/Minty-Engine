@@ -1,8 +1,7 @@
 #include "pch.h"
 #include "M_Window.h"
 #include "M_Console.h"
-#include <exception>
-#include <stdexcept>
+#include "M_Error.h"
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 #include <format>
@@ -39,7 +38,7 @@ Window::Window(std::string const& title, int const width, int const height)
 
 	if (!_window)
 	{
-		throw std::runtime_error("Failed to create GLFW window \"" + title + "\".");
+		error::abort("Failed to create GLFW window \"" + title + "\".");
 	}
 
 	// set user pointer, so this class can be referenced for callbacks

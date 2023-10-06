@@ -213,6 +213,7 @@
     <ClInclude Include="libraries\entt\entt.hpp" />
     <ClInclude Include="M_Basic.h" />
     <ClInclude Include="M_Basic_Vertex.h" />
+    <ClInclude Include="M_Error.h" />
     <ClInclude Include="M_Info.h" />
     <ClInclude Include="M_MeshComponent.h" />
     <ClInclude Include="M_CameraComponent.h" />
@@ -280,6 +281,7 @@
     <ClCompile Include="M_CommandLineParser.cpp" />
     <ClCompile Include="M_Console.cpp" />
     <ClCompile Include="M_EntityRegistry.cpp" />
+    <ClCompile Include="M_Error.cpp" />
     <ClCompile Include="M_File.cpp" />
     <ClCompile Include="M_Engine.cpp" />
     <ClCompile Include="M_Info.cpp" />
