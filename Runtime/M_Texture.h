@@ -1,16 +1,19 @@
 #pragma once
-#include "M_Object.h"
+#include "M_Rendering_Object.h"
 
 #include <vulkan/vulkan.h>
 
 namespace minty
 {
-	class Renderer;
+	namespace rendering
+	{
+		class TextureBuilder;
+	}
 
 	class Texture :
-		public Object
+		public rendering::RendererObject
 	{
-	public: // TODO: TESTING, SET TO PRIVATE LATER
+	private:
 		VkFormat _format;
 		VkImage _image;
 		VkImageView _view;
@@ -18,9 +21,19 @@ namespace minty
 		VkSampler _sampler;
 
 	public:
-		Texture(VkImage image, VkFormat format, VkImageView view, VkDeviceMemory memory, VkSampler sampler);
+		Texture(std::string const& path, rendering::TextureBuilder const& builder, Renderer& renderer);
 
 		void dispose(Renderer& engine);
+
+		VkFormat get_format() const;
+
+		VkImage get_image() const;
+
+		VkImageView get_image_view() const;
+
+		VkDeviceMemory get_device_memory() const;
+
+		VkSampler get_sampler() const;
 	};
 }
 

@@ -249,7 +249,7 @@ namespace minty
 
 	void SystemRegistry::deserialize(Reader const& reader)
 	{
-		// read each one and emplace as we go, by name
+		// read each one and set as we go, by name
 		SerializedNode const* node = reader.get_node();
 
 		for (auto const& pair : node->children)

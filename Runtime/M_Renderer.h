@@ -1,19 +1,29 @@
 #pragma once
-
 #include "M_Object.h"
+
+#include "M_Constants.h"
+#include "M_Register.h"
+#include "M_Color.h"
 #include "M_Info.h"
 #include "M_Window.h"
-#include "M_Texture.h"
-#include "M_Mesh.h"
 #include "M_Viewport.h"
-#include "M_Color.h"
-#include "M_Shader.h"
-#include "M_Material.h"
-#include "M_CameraComponent.h"
-#include "M_MeshComponent.h"
 #include "M_Vector3.h"
 #include "M_Transform.h"
+
 #include "M_EntityRegistry.h"
+#include "M_CameraComponent.h"
+#include "M_MeshComponent.h"
+
+#include "M_Texture.h"
+#include "M_Shader.h"
+#include "M_Material.h"
+#include "M_Mesh.h"
+
+#include "M_Rendering_TextureBuilder.h"
+#include "M_Rendering_ShaderBuilder.h"
+#include "M_Rendering_MaterialBuilder.h"
+
+#include "glm.hpp"
 
 #include <array>
 #include <vector>
@@ -22,8 +32,107 @@
 #include <string>
 #include <cstring>
 
+#define VK_ASSERT(result, func, message) VkResult result = func; if(result != VkResult::VK_SUCCESS) throw std::runtime_error(std::format("[{}] {}", minty::vkResultToString(result), message));
+
 namespace minty
 {
+	std::string const vkResultToString(VkResult const result)
+	{
+		switch (result)
+		{
+		case VK_SUCCESS:
+			return "VK_SUCCESS";
+		case VK_NOT_READY:
+			return "VK_NOT_READY";
+		case VK_TIMEOUT:
+			return "VK_TIMEOUT";
+		case VK_EVENT_SET:
+			return "VK_EVENT_SET";
+		case VK_EVENT_RESET:
+			return "VK_EVENT_RESET";
+		case VK_INCOMPLETE:
+			return "VK_INCOMPLETE";
+		case VK_ERROR_OUT_OF_HOST_MEMORY:
+			return "VK_ERROR_OUT_OF_HOST_MEMORY";
+		case VK_ERROR_OUT_OF_DEVICE_MEMORY:
+			return "VK_ERROR_OUT_OF_DEVICE_MEMORY";
+		case VK_ERROR_INITIALIZATION_FAILED:
+			return "VK_ERROR_INITIALIZATION_FAILED";
+		case VK_ERROR_DEVICE_LOST:
+			return "VK_ERROR_DEVICE_LOST";
+		case VK_ERROR_MEMORY_MAP_FAILED:
+			return "VK_ERROR_MEMORY_MAP_FAILED";
+		case VK_ERROR_LAYER_NOT_PRESENT:
+			return "VK_ERROR_LAYER_NOT_PRESENT";
+		case VK_ERROR_EXTENSION_NOT_PRESENT:
+			return "VK_ERROR_EXTENSION_NOT_PRESENT";
+		case VK_ERROR_FEATURE_NOT_PRESENT:
+			return "VK_ERROR_FEATURE_NOT_PRESENT";
+		case VK_ERROR_INCOMPATIBLE_DRIVER:
+			return "VK_ERROR_INCOMPATIBLE_DRIVER";
+		case VK_ERROR_TOO_MANY_OBJECTS:
+			return "VK_ERROR_TOO_MANY_OBJECTS";
+		case VK_ERROR_FORMAT_NOT_SUPPORTED:
+			return "VK_ERROR_FORMAT_NOT_SUPPORTED";
+		case VK_ERROR_FRAGMENTED_POOL:
+			return "VK_ERROR_FRAGMENTED_POOL";
+		case VK_ERROR_UNKNOWN:
+			return "VK_ERROR_UNKNOWN";
+		case VK_ERROR_OUT_OF_POOL_MEMORY:
+			return "VK_ERROR_OUT_OF_POOL_MEMORY";
+		case VK_ERROR_INVALID_EXTERNAL_HANDLE:
+			return "VK_ERROR_INVALID_EXTERNAL_HANDLE";
+		case VK_ERROR_FRAGMENTATION:
+			return "VK_ERROR_FRAGMENTATION";
+		case VK_ERROR_INVALID_OPAQUE_CAPTURE_ADDRESS:
+			return "VK_ERROR_INVALID_OPAQUE_CAPTURE_ADDRESS";
+		case VK_PIPELINE_COMPILE_REQUIRED:
+			return "VK_PIPELINE_COMPILE_REQUIRED";
+		case VK_ERROR_SURFACE_LOST_KHR:
+			return "VK_ERROR_SURFACE_LOST_KHR";
+		case VK_ERROR_NATIVE_WINDOW_IN_USE_KHR:
+			return "VK_ERROR_NATIVE_WINDOW_IN_USE_KHR";
+		case VK_SUBOPTIMAL_KHR:
+			return "VK_SUBOPTIMAL_KHR";
+		case VK_ERROR_OUT_OF_DATE_KHR:
+			return "VK_ERROR_OUT_OF_DATE_KHR";
+		case VK_ERROR_INCOMPATIBLE_DISPLAY_KHR:
+			return "VK_ERROR_INCOMPATIBLE_DISPLAY_KHR";
+		case VK_ERROR_VALIDATION_FAILED_EXT:
+			return "VK_ERROR_VALIDATION_FAILED_EXT";
+		case VK_ERROR_INVALID_SHADER_NV:
+			return "VK_ERROR_INVALID_SHADER_NV";
+		case VK_ERROR_IMAGE_USAGE_NOT_SUPPORTED_KHR:
+			return "VK_ERROR_IMAGE_USAGE_NOT_SUPPORTED_KHR";
+		case VK_ERROR_VIDEO_PICTURE_LAYOUT_NOT_SUPPORTED_KHR:
+			return "VK_ERROR_VIDEO_PICTURE_LAYOUT_NOT_SUPPORTED_KHR";
+		case VK_ERROR_VIDEO_PROFILE_OPERATION_NOT_SUPPORTED_KHR:
+			return "VK_ERROR_VIDEO_PROFILE_OPERATION_NOT_SUPPORTED_KHR";
+		case VK_ERROR_VIDEO_PROFILE_FORMAT_NOT_SUPPORTED_KHR:
+			return "VK_ERROR_VIDEO_PROFILE_FORMAT_NOT_SUPPORTED_KHR";
+		case VK_ERROR_VIDEO_PROFILE_CODEC_NOT_SUPPORTED_KHR:
+			return "VK_ERROR_VIDEO_PROFILE_CODEC_NOT_SUPPORTED_KHR";
+		case VK_ERROR_VIDEO_STD_VERSION_NOT_SUPPORTED_KHR:
+			return "VK_ERROR_VIDEO_STD_VERSION_NOT_SUPPORTED_KHR";
+		case VK_ERROR_INVALID_DRM_FORMAT_MODIFIER_PLANE_LAYOUT_EXT:
+			return "VK_ERROR_INVALID_DRM_FORMAT_MODIFIER_PLANE_LAYOUT_EXT";
+		case VK_ERROR_NOT_PERMITTED_KHR:
+			return "VK_ERROR_NOT_PERMITTED_KHR";
+		case VK_ERROR_FULL_SCREEN_EXCLUSIVE_MODE_LOST_EXT:
+			return "VK_ERROR_FULL_SCREEN_EXCLUSIVE_MODE_LOST_EXT";
+		case VK_THREAD_IDLE_KHR:
+			return "VK_THREAD_IDLE_KHR";
+		case VK_THREAD_DONE_KHR:
+			return "VK_THREAD_DONE_KHR";
+		case VK_OPERATION_DEFERRED_KHR:
+			return "VK_OPERATION_DEFERRED_KHR";
+		case VK_OPERATION_NOT_DEFERRED_KHR:
+			return "VK_OPERATION_NOT_DEFERRED_KHR";
+		default:
+			return "Unknown";
+		}
+	}
+
 	struct QueueFamilyIndices {
 		std::optional<uint32_t> graphicsFamily;
 		std::optional<uint32_t> presentFamily;
@@ -40,20 +149,18 @@ namespace minty
 		std::vector<VkPresentModeKHR> presentModes;
 	};
 
-	constexpr int MAX_FRAMES_IN_FLIGHT = 2;
-	constexpr int MAX_SETS_PER_FRAME = 1;
-	constexpr int MAX_SETS = MAX_FRAMES_IN_FLIGHT * MAX_SETS_PER_FRAME;
-
-	// 100 is arbitrary
-	constexpr int MAX_TEXTURES = 4;
-	constexpr int MAX_MATERIALS = 4;
-	constexpr int MAX_SHADERS = 1;
-
-	struct UniformBufferObject;
-	struct MaterialInfo;
-	struct MeshInfo;
+	struct DrawCallObjectInfo
+	{
+		glm::mat4 transform;
+	};
 
 	class Scene;
+
+	namespace rendering
+	{
+		class RendererBuilder;
+		class TextureBuilder;
+	}
 
 	/// <summary>
 	/// Handles rendering for the game engine.
@@ -61,40 +168,31 @@ namespace minty
 	class Renderer
 		: public Object
 	{
-	public: // TODO: set to private
-		Window* const _window;
+	private:
+		rendering::RendererBuilder const* _builder;
+		Window* _window;
 		
-		std::vector<Texture> _textures;
-		std::vector<Material> _materials;
-		std::vector<Shader> _shaders;
+		//std::vector<Texture> _textures;
+		//std::vector<Material> _materials;
+		//std::vector<Shader> _shaders;
+		Register<Texture> _textures;
+		Register<Material> _materials;
+		Register<Shader> _shaders;
 
-		Viewport view;
+		Viewport _view;
 		Color _backgroundColor;
-
+		bool _initialized;
+	protected:
 		Scene const* _scene = nullptr;
 		EntityRegistry const* _registry = nullptr;
 		Entity _mainCamera = NULL_ENTITY;
-	public:
-		Renderer(Window* const window, Info const* const appInfo);
 
-		~Renderer();
-
-		/// <summary>
-		/// Draws a frame to the screen.
-		/// </summary>
-		void renderFrame();
-
-		/// <summary>
-		/// Checks if the render engine is still running.
-		/// </summary>
-		/// <returns>True if the engine is still running.</returns>
-		bool running();
-	//private:
-	public: // TODO: TEMPORARILY ALL PUBLIC FOR TESTING/REFACTORING PURPOSES
+		// (Vulkan) rendering components
+		VkDevice _device;
 		VkInstance instance;
+		VkPhysicalDevice _physicalDevice = nullptr;
+
 		VkDebugUtilsMessengerEXT debugMessenger;
-		VkPhysicalDevice physicalDevice = VK_NULL_HANDLE;
-		VkDevice device;
 		VkQueue graphicsQueue;
 		VkSurfaceKHR surface;
 		VkQueue presentQueue;
@@ -103,8 +201,7 @@ namespace minty
 		VkFormat swapChainImageFormat;
 		VkExtent2D swapChainExtent;
 		std::vector<VkImageView> swapChainImageViews;
-		std::vector<VkDescriptorSetLayout> descriptorSetLayouts;
-		VkRenderPass renderPass;
+		VkRenderPass _renderPass;
 		std::vector<VkFramebuffer> swapChainFramebuffers;
 		VkCommandPool commandPool;
 		std::vector<VkCommandBuffer> commandBuffers;
@@ -113,81 +210,316 @@ namespace minty
 		std::vector<VkSemaphore> renderFinishedSemaphores;
 		std::vector<VkFence> inFlightFences;
 		bool framebufferResized = false;
-		uint32_t currentFrame = 0;
+		uint32_t _frame = 0;
 
 		std::vector<VkBuffer> uniformBuffers;
 		std::vector<VkDeviceMemory> uniformBuffersMemory;
 		std::vector<void*> uniformBuffersMapped;
-		
+
 		std::vector<VkBuffer> materialBuffers;
 		std::vector<VkDeviceMemory> materialBuffersMemory;
 		std::vector<void*> materialBuffersMapped;
 
-		VkDescriptorPool descriptorPool;
-		std::vector<VkDescriptorSet> descriptorSets;
 		VkImage depthImage;
 		VkDeviceMemory depthImageMemory;
 		VkImageView depthImageView;
+	public:
+		Renderer(Window* const window);
 
+		~Renderer();
+
+		/// <summary>
+		/// Draws a frame to the screen.
+		/// </summary>
+		void render_frame();
+
+		/// <summary>
+		/// Checks if the render engine is still running.
+		/// </summary>
+		/// <returns>True if the engine is still running.</returns>
+		bool is_running() const;
+
+		bool is_initialized() const;
+
+#pragma region Get
+
+		/// <summary>
+		/// Gets the device that this Renderer is rendering to.
+		/// </summary>
+		/// <returns></returns>
+		VkDevice get_device() const;
+
+		/// <summary>
+		/// Gets the physical graphics device that this Renderer is using to render.
+		/// </summary>
+		/// <returns></returns>
+		VkPhysicalDevice get_physical_device() const;
+
+		VkRenderPass get_render_pass() const;
+
+		uint32_t get_shader_count() const;
+
+		uint32_t get_texture_count() const;
+
+		uint32_t get_material_count() const;
+
+		uint32_t get_frame() const;
+
+#pragma endregion
+
+#pragma region Init
+
+	public:
 		/// <summary>
 		/// Initializes the Renderer.
 		/// </summary>
-		virtual void init(Info const* const appInfo);
+		void init(rendering::RendererBuilder const& builder);
+
+	private:
+		/// <summary>
+		/// Creates a Vulkan instance.
+		/// </summary>
+		void create_instance();
 
 		/// <summary>
-		/// Starts the Renderer.
+		/// Initializes the debug messenger.
 		/// </summary>
-		virtual void start();
+		void setup_debug_messenger();
 
+		/// <summary>
+		/// Creates the rendering surface.
+		/// </summary>
+		void create_surface();
+
+		/// <summary>
+		/// Picks the hardware (GPU) to use.
+		/// </summary>
+		void pick_physical_device();
+
+		/// <summary>
+		/// Pick the software side of the GPU to use (driver).
+		/// </summary>
+		void create_logical_device();
+
+		/// <summary>
+		/// Creates the swap chain.
+		/// </summary>
+		virtual void create_swap_chain();
+
+		/// <summary>
+		/// Creates the image views in the swap chain.
+		/// </summary>
+		void create_image_views();
+
+		/// <summary>
+		/// Creates the render pass.
+		/// </summary>
+		void create_render_pass();
+
+		/// <summary>
+		/// Creates a command pool.
+		/// </summary>
+		void create_command_pool(VkCommandPool& commandPool);
+
+		/// <summary>
+		/// Creates the depth buffer resources.
+		/// </summary>
+		void create_depth_resources();
+
+		/// <summary>
+		/// Creates the frame buffers.
+		/// </summary>
+		void create_framebuffers();
+
+		/// <summary>
+		/// Creates all textures based on the builder plans.
+		/// </summary>
+		void build_textures();
+
+		/// <summary>
+		/// Creates all shaders based on the builder plans.
+		/// </summary>
+		void build_shaders();
+
+		/// <summary>
+		/// Creates all materials based on the builder plans.
+		/// </summary>
+		void build_materials();
+
+		/// <summary>
+		/// Creates the command buffers.
+		/// </summary>
+		void create_command_buffers();
+
+		/// <summary>
+		/// Create the objects used to sync the CPU and the GPU.
+		/// </summary>
+		void create_sync_objects();
+
+#pragma endregion
+
+#pragma region Update
+
+	public:
 		/// <summary>
 		/// Updates the Renderer.
 		/// </summary>
 		void update();
 
-		void get_entity_transform(Entity const entity, Transform& transform) const;
+		/// <summary>
+		/// Updates the Camera uniform buffer with the Camera info.
+		/// </summary>
+		void update_camera(CameraComponent const& camera, Vector3 const& position, Vector3 const& rotation);
 
-#pragma region Components
+#pragma endregion
 
-		ID create_texture(std::string const& path);
+#pragma region Destroy
 
-		Texture& get_texture(ID const id);
+	public:
+		/// <summary>
+		/// Cleans up all of the render engine resources.
+		/// </summary>
+		void destroy();
+
+#pragma endregion
+
+#pragma region Data
+
+	public:
+		/// <summary>
+		/// Sets the Camera that this Renderer is rendering from.
+		/// </summary>
+		/// <param name="entity">The entity to render from.</param>
+		void set_main_camera(Entity const entity);
 
 		/// <summary>
-		/// Loads a shader from the disk.
+		/// Sets the Scene that this Renderer is rendering.
 		/// </summary>
-		/// <param name="path">The path to the .spv shader file. .spv files come from a compiled GLSL file.</param>
-		/// <returns>The shader module.</returns>
-		VkShaderModule load_shader_module(std::string const& path);
+		/// <param name="scene">The Scene to render.</param>
+		/// <param name="camera">The entity to render from.</param>
+		void set_scene(Scene const* const scene, Entity const camera = NULL_ENTITY);
 
-		ID create_shader(std::string const& vertexPath, std::string const& fragmentPath);
+#pragma endregion
+
+#pragma region Debug
+
+	private:
+		/// <summary>
+		/// Fills in the create info for the debug messenger.
+		/// </summary>
+		/// <param name="createInfo">The create info to populate.</param>
+		void populate_debug_messenger_create_info(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
+
+#pragma endregion
+
+#pragma region Assets
+
+	private:
+		/// <summary>
+		/// Creates a Texture using the file at the given path.
+		/// </summary>
+		/// <param name="path">The path to the file on the disk.</param>
+		/// <returns>The ID of the new Texture.</returns>
+		ID create_texture(std::string const& path, rendering::TextureBuilder const& builder);
+
+		ID create_shader(std::string const& vertexPath, std::string const& fragmentPath, rendering::ShaderBuilder const& builder);
+
+		ID create_material(rendering::MaterialBuilder const& builder);
+
+	public:
+		Texture& get_texture(ID const id);
+
+		Texture const& get_texture(ID const id) const;
 
 		Shader& get_shader(ID const id);
 
-		ID create_material(ID const shaderId, ID const textureID, Color const color);
+		Shader const& get_shader(ID const id) const;
 
 		Material& get_material(ID const id);
 
-		void update_material(ID const id);
+		Material const& get_material(ID const id) const;
 
 #pragma endregion
 
 #pragma region Drawing
 
-		void render_mesh(VkCommandBuffer commandBuffer, Transform const& transform, MeshComponent const& meshComponent);
+	private:
+		void draw_mesh(VkCommandBuffer commandBuffer, Transform const& transform, MeshComponent const& meshComponent);
 
 #pragma endregion
 
-		void set_main_camera(Entity const entity);
+#pragma region Helper
 
-		void set_scene(Scene const* const scene, Entity const camera = NULL_ENTITY);
+	private:
+		/// <summary>
+		/// Gets the Transform for the given Entity.
+		/// </summary>
+		/// <param name="entity"></param>
+		/// <param name="transform"></param>
+		void get_entity_transform(Entity const entity, Transform& transform) const;
 
-		void create_material_buffers();
+	public:
+		/// <summary>
+		/// Creates a buffer.
+		/// </summary>
+		/// <param name="size">The size of the buffer.</param>
+		/// <param name="usage">How the buffer will be used.</param>
+		/// <param name="properties">The memory properties.</param>
+		/// <param name="buffer">The buffer to create.</param>
+		/// <param name="bufferMemory">The memory to be associated with the buffer.</param>
+		void create_buffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
 
 		/// <summary>
-		/// Creates a Vulkan instance.
+		/// Copies the buffer from source to destination.
 		/// </summary>
-		void create_instance(Info const* const appInfo);
+		/// <param name="srcBuffer">The buffer to copy from.</param>
+		/// <param name="dstBuffer">The buffer to copy to.</param>
+		/// <param name="size">The size of the buffer to copy.</param>
+		void copy_buffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
 
+		/// <summary>
+		/// Creates an image.
+		/// </summary>
+		/// <param name="width">The width of the image.</param>
+		/// <param name="height">The height of the image.</param>
+		/// <param name="format">The format of the image.</param>
+		/// <param name="tiling">The tiling mode of the image.</param>
+		/// <param name="usage">How the image will be used.</param>
+		/// <param name="properties">The properties of the image.</param>
+		/// <param name="image">The image object to update/create values in.</param>
+		/// <param name="imageMemory">The memory location of where the image is stored.</param>
+		void create_image(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
+
+		/// <summary>
+		/// Changes the image layout.
+		/// </summary>
+		/// <param name="image">The image to change.</param>
+		/// <param name="format">The format of the image.</param>
+		/// <param name="oldLayout">The old layout of the image.</param>
+		/// <param name="newLayout">The new layout of the image.</param>
+		void change_image_layout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
+
+		/// <summary>
+		/// Coppies the buffer to the image data.
+		/// </summary>
+		/// <param name="buffer">The buffer to copy the data from.</param>
+		/// <param name="image">The image to copy the data to.</param>
+		/// <param name="width">The width of the image.</param>
+		/// <param name="height">The height of the image.</param>
+		void copy_buffer_to_image(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
+
+		/// <summary>
+		/// Creates an image view, so the image can be seen.
+		/// </summary>
+		/// <param name="image">The image to view.</param>
+		/// <param name="format">The format of the image.</param>
+		/// <param name="aspectFlags">The aspect flags of the image.</param>
+		/// <returns>The created image view.</returns>
+		VkImageView create_image_view(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
+
+#pragma endregion
+
+	private:
 		/// <summary>
 		/// Finds the depth rendering format that can be used.
 		/// </summary>
@@ -211,33 +543,6 @@ namespace minty
 		VkFormat find_supported_format(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features);
 
 		/// <summary>
-		/// Creates the depth buffer resources.
-		/// </summary>
-		void create_depth_resources();
-
-		/// <summary>
-		/// Creates an image.
-		/// </summary>
-		/// <param name="width">The width of the image.</param>
-		/// <param name="height">The height of the image.</param>
-		/// <param name="format">The format of the image.</param>
-		/// <param name="tiling">The tiling mode of the image.</param>
-		/// <param name="usage">How the image will be used.</param>
-		/// <param name="properties">The properties of the image.</param>
-		/// <param name="image">The image object to update/create values in.</param>
-		/// <param name="imageMemory">The memory location of where the image is stored.</param>
-		void create_image(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory);
-
-		/// <summary>
-		/// Creates an image view, so the image can be seen.
-		/// </summary>
-		/// <param name="image">The image to view.</param>
-		/// <param name="format">The format of the image.</param>
-		/// <param name="aspectFlags">The aspect flags of the image.</param>
-		/// <returns>The created image view.</returns>
-		VkImageView create_image_view(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
-
-		/// <summary>
 		/// Start the command buffer.
 		/// </summary>
 		/// <returns>The command buffer that has began, and is ready for use.</returns>
@@ -250,49 +555,11 @@ namespace minty
 		void end_single_time_commands(VkCommandBuffer commandBuffer, VkCommandPool commandPool);
 
 		/// <summary>
-		/// Changes the image layout.
-		/// </summary>
-		/// <param name="image">The image to change.</param>
-		/// <param name="format">The format of the image.</param>
-		/// <param name="oldLayout">The old layout of the image.</param>
-		/// <param name="newLayout">The new layout of the image.</param>
-		void transition_image_layout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout);
-
-		/// <summary>
-		/// Coppies the buffer to the image data.
-		/// </summary>
-		/// <param name="buffer">The buffer to copy the data from.</param>
-		/// <param name="image">The image to copy the data to.</param>
-		/// <param name="width">The width of the image.</param>
-		/// <param name="height">The height of the image.</param>
-		void copy_buffer_to_image(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height);
-
-		/// <summary>
-		/// Creates the image views in the swap chain.
-		/// </summary>
-		void create_image_views();
-
-		/// <summary>
-		/// Creates the rendering surface.
-		/// </summary>
-		void create_surface();
-
-		/// <summary>
-		/// Picks the hardware (GPU) to use.
-		/// </summary>
-		void pick_physical_device();
-
-		/// <summary>
 		/// Checks if the given device is able to do the operations we want.
 		/// </summary>
 		/// <param name="device">The device to check.</param>
 		/// <returns>True if it is suitable.</returns>
 		bool is_device_suitable(VkPhysicalDevice device);
-
-		/// <summary>
-		/// Creates the swap chain.
-		/// </summary>
-		virtual void create_swap_chain();
 
 		/// <summary>
 		/// Cleans up any resources in the current swap chain.
@@ -347,11 +614,6 @@ namespace minty
 		QueueFamilyIndices find_queue_families(VkPhysicalDevice device);
 
 		/// <summary>
-		/// Pick the software side of the GPU to use (driver).
-		/// </summary>
-		void create_logical_device();
-
-		/// <summary>
 		/// Draw a single frame to the screen.
 		/// </summary>
 		virtual void draw_frame();
@@ -374,17 +636,6 @@ namespace minty
 		std::vector<const char*> get_required_extensions();
 
 		/// <summary>
-		/// Fills in the create info for the debug messenger.
-		/// </summary>
-		/// <param name="createInfo">The create info to populate.</param>
-		void populate_debug_messenger_create_info(VkDebugUtilsMessengerCreateInfoEXT& createInfo);
-
-		/// <summary>
-		/// Initializes the debug messenger.
-		/// </summary>
-		void setup_debug_messenger();
-
-		/// <summary>
 		/// Called when a debug message has been "printed" from Vulkan.
 		/// </summary>
 		/// <param name="messageSeverity">The severtity of the message.</param>
@@ -395,63 +646,6 @@ namespace minty
 		static VKAPI_ATTR VkBool32 VKAPI_CALL debug_callback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData);
 
 		/// <summary>
-		/// Reads the file into a char vector.
-		/// </summary>
-		/// <param name="filename">The path fo the file.</param>
-		/// <returns>The text from the file.</returns>
-		static std::vector<char> read_file(const std::string& filename);
-
-		/// <summary>
-		/// Creates the render pass.
-		/// </summary>
-		void create_render_pass();
-
-		/// <summary>
-		/// Creates the frame buffers.
-		/// </summary>
-		void create_framebuffers();
-
-		/// <summary>
-		/// Creates the uniform buffers.
-		/// </summary>
-		void create_uniform_buffers();
-
-		/// <summary>
-		/// Updates the Camera uniform buffer with the Camera info.
-		/// </summary>
-		void update_camera(CameraComponent const& camera, Vector3 const& position, Vector3 const& rotation);
-
-		/// <summary>
-		/// Creates the descriptor set layout for uniform objects.
-		/// </summary>
-		void create_descriptor_set_layouts();
-
-		/// <summary>
-		/// Creates the descriptor pool.
-		/// </summary>
-		void create_descriptor_pool();
-
-		void create_descriptor_sets();
-
-		/// <summary>
-		/// Creates a buffer.
-		/// </summary>
-		/// <param name="size">The size of the buffer.</param>
-		/// <param name="usage">How the buffer will be used.</param>
-		/// <param name="properties">The memory properties.</param>
-		/// <param name="buffer">The buffer to create.</param>
-		/// <param name="bufferMemory">The memory to be associated with the buffer.</param>
-		void create_buffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
-
-		/// <summary>
-		/// Copies the buffer from source to destination.
-		/// </summary>
-		/// <param name="srcBuffer">The buffer to copy from.</param>
-		/// <param name="dstBuffer">The buffer to copy to.</param>
-		/// <param name="size">The size of the buffer to copy.</param>
-		void copy_buffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
-
-		/// <summary>
 		/// Finds the memory type.
 		/// </summary>
 		/// <param name="typeFilter">The filter for what types are acceptable.</param>
@@ -460,30 +654,10 @@ namespace minty
 		uint32_t find_memory_type(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
 		/// <summary>
-		/// Creates the command pool.
-		/// </summary>
-		void create_command_pool(VkCommandPool& commandPool);
-
-		/// <summary>
-		/// Creates the command buffers.
-		/// </summary>
-		void create_command_buffers();
-
-		/// <summary>
 		/// Records the command buffer.
 		/// </summary>
 		/// <param name="commandBuffer">The command buffer to record.</param>
 		/// <param name="imageIndex">The image to send the commands to.</param>
 		virtual void record_command_buffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
-
-		/// <summary>
-		/// Create the sync objects.
-		/// </summary>
-		void create_sync_objects();
-
-		/// <summary>
-		/// Cleans up all of the render engine resources.
-		/// </summary>
-		void cleanup();
 	};
 }

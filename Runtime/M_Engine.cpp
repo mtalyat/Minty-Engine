@@ -2,30 +2,26 @@
 #include "M_Engine.h"
 
 #include "M_Console.h"
-#include "M_Renderer.h"
 #include <iostream>
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
 using namespace minty;
+using namespace minty::rendering;
 
 uint32_t const WIDTH = 800;
 uint32_t const HEIGHT = 600;
 
-Engine::Engine(Info const* const appInfo)
+Engine::Engine(Info const* const info)
 	: _window("Minty", WIDTH, HEIGHT)
-	, _renderer(&_window, appInfo)
+	, _renderer(&_window)
 	, _sceneManager(this)
 	, _deltaTime(0.02f)
-{
-
-}
+{}
 
 Engine::~Engine()
-{
-
-}
+{}
 
 Window* minty::Engine::get_window()
 {
@@ -61,9 +57,6 @@ void Engine::run()
 		_sceneManager.load_scene(0);
 	}
 
-	// start the renderer
-	_renderer.start();
-
 	// start the scene(s)
 	_sceneManager.load();
 
@@ -79,7 +72,7 @@ void Engine::run()
 	time_point_t now;
 
 	// main loop
-	while (_renderer.running())
+	while (_renderer.is_running())
 	{
 		// run window events
 		glfwPollEvents();
@@ -91,7 +84,7 @@ void Engine::run()
 		_renderer.update();
 
 		// render to the screen
-		_renderer.renderFrame();
+		_renderer.render_frame();
 
 		// frame complete
 		fpsCount++;
@@ -126,6 +119,9 @@ void Engine::run()
 
 	// print elapsed time
 	console::log(std::format("Elapsed time: {}s", std::chrono::duration_cast<std::chrono::milliseconds>(get_now() - start).count() / 1000.0f));
+
+	// cleanup
+	_renderer.destroy();
 }
 
 time_point_t minty::Engine::get_now() const

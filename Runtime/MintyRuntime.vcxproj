@@ -209,7 +209,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
+    <ClInclude Include="glm.hpp" />
     <ClInclude Include="libraries\entt\entt.hpp" />
+    <ClInclude Include="M_Basic.h" />
+    <ClInclude Include="M_Basic_Vertex.h" />
     <ClInclude Include="M_Info.h" />
     <ClInclude Include="M_MeshComponent.h" />
     <ClInclude Include="M_CameraComponent.h" />
@@ -236,6 +239,12 @@
     <ClInclude Include="M_Parse.h" />
     <ClInclude Include="M_PositionComponent.h" />
     <ClInclude Include="M_Reader.h" />
+    <ClInclude Include="M_Register.h" />
+    <ClInclude Include="M_Rendering_MaterialBuilder.h" />
+    <ClInclude Include="M_Rendering_Object.h" />
+    <ClInclude Include="M_Rendering_RendererBuilder.h" />
+    <ClInclude Include="M_Rendering_ShaderBuilder.h" />
+    <ClInclude Include="M_Rendering_TextureBuilder.h" />
     <ClInclude Include="M_RotationComponent.h" />
     <ClInclude Include="M_ScaleComponent.h" />
     <ClInclude Include="M_Scene.h" />
@@ -262,10 +271,10 @@
     <ClInclude Include="M_NameComponent.h" />
     <ClInclude Include="M_Writer.h" />
     <ClInclude Include="pch.h" />
-    <ClInclude Include="M_Vertex.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="M_Basic.cpp" />
     <ClCompile Include="M_CameraComponent.cpp" />
     <ClCompile Include="M_Color.cpp" />
     <ClCompile Include="M_CommandLineParser.cpp" />
@@ -285,6 +294,11 @@
     <ClCompile Include="M_Parse.cpp" />
     <ClCompile Include="M_PositionComponent.cpp" />
     <ClCompile Include="M_Reader.cpp" />
+    <ClCompile Include="M_Rendering_MaterialBuilder.cpp" />
+    <ClCompile Include="M_Rendering_Object.cpp" />
+    <ClCompile Include="M_Rendering_RendererBuilder.cpp" />
+    <ClCompile Include="M_Rendering_ShaderBuilder.cpp" />
+    <ClCompile Include="M_Rendering_TextureBuilder.cpp" />
     <ClCompile Include="M_RotationComponent.cpp" />
     <ClCompile Include="M_ScaleComponent.cpp" />
     <ClCompile Include="M_Scene.cpp" />
@@ -315,6 +329,9 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="notes.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="M_Constants.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
