@@ -2,6 +2,7 @@
 #include "M_Renderer.h"
 
 #include "M_Rendering_RendererBuilder.h"
+#include "M_Rendering_DrawCallObjectInfo.h"
 
 #include "M_Console.h"
 #include "M_Engine.h"
@@ -1253,7 +1254,7 @@ void Renderer::create_framebuffers()
 void minty::Renderer::build_textures()
 {
 	// go through each texture, create it with builder data
-	for (auto const& pair : _builder->get_texture_plans())
+	for (auto const& pair : _builder->get_textures())
 	{
 		create_texture(pair.first, *pair.second);
 	}
@@ -1261,7 +1262,7 @@ void minty::Renderer::build_textures()
 
 void minty::Renderer::build_shaders()
 {
-	for (auto const& pair : _builder->get_shader_plans())
+	for (auto const& pair : _builder->get_shaders())
 	{
 		create_shader(pair.first.at(0), pair.first.at(1), *pair.second);
 	}
@@ -1270,7 +1271,7 @@ void minty::Renderer::build_shaders()
 void minty::Renderer::build_materials()
 {
 	// not really a "pair"
-	for (auto const& pair : _builder->get_material_plans())
+	for (auto const& pair : _builder->get_materials())
 	{
 		create_material(*pair);
 	}
@@ -1343,9 +1344,7 @@ void Renderer::create_buffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemo
 	bufferInfo.usage = usage;
 	bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-	if (vkCreateBuffer(_device, &bufferInfo, nullptr, &buffer) != VK_SUCCESS) {
-		error::abort("Failed to create buffer.");
-	}
+	VK_ASSERT(result, vkCreateBuffer(_device, &bufferInfo, nullptr, &buffer), "Failed to create buffer.");
 
 	VkMemoryRequirements memRequirements;
 	vkGetBufferMemoryRequirements(_device, buffer, &memRequirements);
@@ -1355,11 +1354,9 @@ void Renderer::create_buffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemo
 	allocInfo.allocationSize = memRequirements.size;
 	allocInfo.memoryTypeIndex = find_memory_type(memRequirements.memoryTypeBits, properties);
 
-	if (vkAllocateMemory(_device, &allocInfo, nullptr, &bufferMemory) != VK_SUCCESS) {
-		error::abort("Failed to allocate buffer memory.");
-	}
+	VK_ASSERT(result2, vkAllocateMemory(_device, &allocInfo, nullptr, &bufferMemory), "Failed to allocate buffer memory.");
 
-	vkBindBufferMemory(_device, buffer, bufferMemory, 0);
+	VK_ASSERT(result3, vkBindBufferMemory(_device, buffer, bufferMemory, 0), "Failed to bind buffer memory.");
 }
 
 void Renderer::copy_buffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) {
@@ -1442,6 +1439,7 @@ void minty::Renderer::draw_mesh(VkCommandBuffer commandBuffer, Transform const& 
 	// get the shader
 	Shader const& shader = get_shader(mat.get_shader_id());
 
+	// NOTE: added this to the builder inside of the shader builder class
 	// send push constants so we know where to draw, what material to use, etc.
 	DrawCallObjectInfo info
 	{
@@ -1588,11 +1586,11 @@ void Renderer::destroy()
 	cleanup_swap_chain();
 	for (auto& tex : _textures)
 	{
-		tex.dispose(*this);
+		tex.destroy();
 	}
-	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-		vkDestroyBuffer(_device, uniformBuffers[i], nullptr);
-		vkFreeMemory(_device, uniformBuffersMemory[i], nullptr);
+	for (auto& shader : _shaders)
+	{
+		shader.destroy();
 	}
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
 		vkDestroySemaphore(_device, renderFinishedSemaphores[i], nullptr);

@@ -59,30 +59,26 @@ Texture::Texture(std::string const& path, rendering::TextureBuilder const& build
 	stbi_image_free(pixels);
 
 	// image data
-	VkFormat format = static_cast<VkFormat>(builder.get_format());
-	VkImage image;
-	VkImageView view;
-	VkDeviceMemory memory;
-	VkSampler sampler;
+	_format = static_cast<VkFormat>(builder.get_format());
 
 	// create the image on gpu
-	renderer.create_image(width, height, format, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, image, memory);
+	renderer.create_image(width, height, _format, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, _image, _memory);
 
 	// prep texture for copying
-	renderer.change_image_layout(image, format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+	renderer.change_image_layout(_image, _format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
 	// copy pixel data to image
-	renderer.copy_buffer_to_image(stagingBuffer, image, width, height);
+	renderer.copy_buffer_to_image(stagingBuffer, _image, width, height);
 
 	// prep texture for rendering
-	renderer.change_image_layout(image, format, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+	renderer.change_image_layout(_image, _format, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
 	// cleanup staging buffer, no longer needed
 	vkDestroyBuffer(device, stagingBuffer, nullptr);
 	vkFreeMemory(device, stagingMemory, nullptr);
 
 	// create view, so the shaders can access the image data
-	view = renderer.create_image_view(image, format, VK_IMAGE_ASPECT_COLOR_BIT);
+	_view = renderer.create_image_view(_image, _format, VK_IMAGE_ASPECT_COLOR_BIT);
 
 	// create sampler
 	// create the sampler in constructor for now
@@ -119,19 +115,19 @@ Texture::Texture(std::string const& path, rendering::TextureBuilder const& build
 	samplerInfo.minLod = 0.0f;
 	samplerInfo.maxLod = 0.0f;
 
-	if (vkCreateSampler(device, &samplerInfo, nullptr, &sampler) != VK_SUCCESS) {
+	if (vkCreateSampler(device, &samplerInfo, nullptr, &_sampler) != VK_SUCCESS) {
 		error::abort(std::format("Failed to load texture: {}", path));
 	}
 }
 
-void minty::Texture::dispose(Renderer& renderer)
+void minty::Texture::destroy()
 {
-    auto device = renderer.get_device();
+	auto device = _renderer.get_device();
 
-    vkDestroySampler(device, _sampler, nullptr);
-    vkDestroyImageView(device, _view, nullptr);
-    vkDestroyImage(device, _image, nullptr);
-    vkFreeMemory(device, _memory, nullptr);
+	vkDestroySampler(device, _sampler, nullptr);
+	vkDestroyImageView(device, _view, nullptr);
+	vkDestroyImage(device, _image, nullptr);
+	vkFreeMemory(device, _memory, nullptr);
 }
 
 VkFormat minty::Texture::get_format() const

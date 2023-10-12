@@ -4,7 +4,9 @@
 #include "M_Renderer.h"
 #include "M_Rendering_ShaderBuilder.h"
 
+#include "M_Math.h"
 #include "M_File.h"
+#include <fstream>
 
 using namespace minty;
 using namespace minty::rendering;
@@ -43,26 +45,30 @@ using namespace minty::rendering;
 minty::Shader::Shader(std::string const& vertexPath, std::string const& fragmentPath, rendering::ShaderBuilder const& builder, Renderer& renderer)
 	: RendererObject::RendererObject(renderer)
 {
-	_uniformCount = builder.get_uniform_constant_count();
+	_uniformCount = builder.get_uniform_constant_count(0);
 
 	// first, create descriptor layouts
 	create_descriptor_set_layouts(builder);
 
-	// create shader modules/shader itself
-	create_shader(vertexPath, fragmentPath, builder);
-
 	// create buffers to store descriptor data
 	create_buffers(builder);
+
+	// create shader modules/shader itself
+	create_shader(vertexPath, fragmentPath, builder);
 
 	// create descriptor pool and the descriptor sets
 	create_descriptor_pool(builder);
 	create_descriptor_sets(builder);
 }
 
-minty::Shader::~Shader()
+void minty::Shader::destroy()
 {
 	auto device = _renderer.get_device();
 
+	for (size_t i = 0; i < _buffers.size(); i++) {
+		vkDestroyBuffer(device, _buffers[i], nullptr);
+		vkFreeMemory(device, _memories[i], nullptr);
+	}
 	vkDestroyDescriptorPool(device, _descriptorPool, nullptr);
 	for (size_t i = 0; i < _descriptorSetLayouts.size(); i++)
 	{
@@ -75,7 +81,7 @@ minty::Shader::~Shader()
 void minty::Shader::bind(VkCommandBuffer const commandBuffer) const
 {
 	// bind descriptors
-	vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _layout, 0, _uniformCount, &_descriptorSets[get_buffer_index(0, _renderer.get_frame())], 0, nullptr);
+	vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _layout, 0, 1, &_descriptorSets[_renderer.get_frame()], 0, nullptr);
 
 	// bind pipeline
 	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipeline);
@@ -123,9 +129,27 @@ size_t minty::Shader::get_buffer_count() const
 	return _uniformCount * MAX_FRAMES_IN_FLIGHT;
 }
 
+std::vector<char> read_file_raw(const std::string& filename) {
+	std::ifstream file(filename, std::ios::ate | std::ios::binary);
+
+	if (!file.is_open()) {
+		throw std::runtime_error("failed to open file!");
+	}
+
+	size_t fileSize = (size_t)file.tellg();
+	std::vector<char> buffer(fileSize);
+
+	file.seekg(0);
+	file.read(buffer.data(), fileSize);
+
+	file.close();
+
+	return buffer;
+}
+
 VkShaderModule minty::Shader::load_module(std::string const& path)
 {
-	std::string code = file::read_all_text(path);
+	std::vector<char> code = read_file_raw(path);
 
 	VkShaderModuleCreateInfo createInfo
 	{
@@ -173,19 +197,25 @@ void minty::Shader::create_descriptor_set_layouts(rendering::ShaderBuilder const
 	//layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
 	//layoutInfo.pBindings = bindings.data();
 
-	auto layoutBindings = builder.get_descriptor_set_layouts();
+	size_t count = builder.get_descriptor_set_layout_count();
+	_descriptorSetLayouts.resize(count);
 
-	_descriptorSetLayouts.resize(layoutBindings.size() * MAX_FRAMES_IN_FLIGHT);
+	VkDevice device = _renderer.get_device();
 
-	VkDescriptorSetLayoutCreateInfo layoutInfo
+	for (size_t i = 0; i < count; i++)
 	{
-		.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
-		.bindingCount = static_cast<uint32_t>(layoutBindings.size()),
-		.pBindings = layoutBindings.data(),
-	};
+		auto layoutBindings = builder.get_descriptor_set_layout_bindings(static_cast<uint32_t>(i));
 
-	if (vkCreateDescriptorSetLayout(_renderer.get_device(), &layoutInfo, nullptr, &_descriptorSetLayouts[0]) != VK_SUCCESS) {
-		error::abort("Failed to create descriptor set layout.");
+		VkDescriptorSetLayoutCreateInfo layoutInfo
+		{
+			.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO,
+			.bindingCount = static_cast<uint32_t>(layoutBindings.size()),
+			.pBindings = layoutBindings.data(),
+		};
+
+		if (vkCreateDescriptorSetLayout(device, &layoutInfo, nullptr, &_descriptorSetLayouts.at(i)) != VK_SUCCESS) {
+			error::abort("Failed to create descriptor set layout.");
+		}
 	}
 }
 
@@ -373,8 +403,6 @@ void minty::Shader::create_shader(std::string const& vertexPath, std::string con
 		.pPushConstantRanges = pushConstants.data(),
 	};
 
-	VkPipelineLayout _layout;
-
 	// create the pipeline layout
 	if (vkCreatePipelineLayout(device, &pipelineLayoutInfo, nullptr, &_layout) != VK_SUCCESS) {
 		error::abort("Failed to create pipeline layout.");
@@ -401,8 +429,6 @@ void minty::Shader::create_shader(std::string const& vertexPath, std::string con
 		.basePipelineIndex = -1, // Optional
 	};
 
-	VkPipeline _pipeline;
-
 	// create the pipeline
 	if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &_pipeline) != VK_SUCCESS) {
 		error::abort("Failed to create graphics pipeline.");
@@ -417,32 +443,32 @@ void minty::Shader::create_buffers(rendering::ShaderBuilder const& builder)
 {
 	// get count
 	auto count = get_buffer_count();
-	
+
 	// resize all buffers
 	_buffers.resize(count);
 	_memories.resize(count);
 	_mapped.resize(count);
 
 	// get info about constants
-	auto const& constantInfos = builder.get_uniform_constant_infos();
+	auto const& constantInfos = builder.get_uniform_constant_infos(0);
 
-	uint32_t i;
+	uint32_t j;
 	size_t index;
 	VkDevice device = _renderer.get_device();
-	for (size_t j = 0; j < MAX_FRAMES_IN_FLIGHT; j++)
+	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 	{
-		i = 0;
+		j = 0;
 		for (auto const& info : constantInfos)
 		{
-			index = get_buffer_index(i, j);
+			index = get_buffer_index(j, i);
 
 			// create the buffer
-			_renderer.create_buffer(info.size, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, _buffers[i], _memories[i]);
+			_renderer.create_buffer(info.size, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, _buffers[index], _memories[index]);
 
 			// map the memory so the values can be set
-			vkMapMemory(device, _memories[i], 0, info.size, 0, &_mapped[i]);
+			VK_ASSERT(result, vkMapMemory(device, _memories[index], 0, info.size, 0, &_mapped[index]), "Failed to map memory for new buffer.");
 
-			i++;
+			j++;
 		}
 	}
 
@@ -462,20 +488,19 @@ void minty::Shader::create_descriptor_pool(rendering::ShaderBuilder const& build
 	//poolSize.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
 	//poolSize.descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
 
-	auto layouts = builder.get_descriptor_set_layouts();
+	auto constants = builder.get_uniform_constant_infos(0);
 
-	uint32_t maxSets = static_cast<uint32_t>(layouts.size() * MAX_FRAMES_IN_FLIGHT);
+	uint32_t maxSets = static_cast<uint32_t>(_descriptorSetLayouts.size() * MAX_FRAMES_IN_FLIGHT);
 
 	std::vector<VkDescriptorPoolSize> poolSizes;
-	poolSizes.reserve(layouts.size());
+	poolSizes.resize(constants.size());
 
-	for (auto const& layout : layouts)
+	for (size_t i = 0; i < constants.size(); i++)
 	{
-		poolSizes.push_back(VkDescriptorPoolSize
-			{
-				.type = layout.descriptorType,
-				.descriptorCount = MAX_FRAMES_IN_FLIGHT * layout.descriptorCount, // account for each frame in the flight
-			});
+		poolSizes[i] = {
+				.type = constants[i].type,
+				.descriptorCount = MAX_FRAMES_IN_FLIGHT * constants[i].descriptorCount, // account for each frame in the flight
+		};
 	}
 
 	//std::array<VkDescriptorPoolSize, 3> poolSizes{};
@@ -501,7 +526,7 @@ void minty::Shader::create_descriptor_pool(rendering::ShaderBuilder const& build
 void minty::Shader::create_descriptor_sets(rendering::ShaderBuilder const& builder)
 {
 	// allocate descriptor sets
-	_descriptorSets.resize(get_buffer_count());
+	_descriptorSets.resize(_descriptorSetLayouts.size() * MAX_FRAMES_IN_FLIGHT);
 	size_t i = 0;
 	for (auto& descriptorSetLayout : _descriptorSetLayouts)
 	{
@@ -517,17 +542,23 @@ void minty::Shader::create_descriptor_sets(rendering::ShaderBuilder const& build
 		i++;
 	}
 
-	auto const& constantInfos = builder.get_uniform_constant_infos();
+	auto const& constantInfos = builder.get_uniform_constant_infos(0);
+
+	std::vector<VkDescriptorBufferInfo> bufferInfos;
+	std::vector<std::vector<VkDescriptorImageInfo>> imageInfos;
+	std::vector<VkWriteDescriptorSet> descriptorWrites;
 
 	// write descriptor sets
-	for (i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
+	for (i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+	{
 		// keep track of infos so they can be properly disposed of after creation
-		std::vector<VkDescriptorBufferInfo> bufferInfos;
-		std::vector<std::vector<VkDescriptorImageInfo>> imageInfos;
+		bufferInfos.clear();
+		bufferInfos.resize(constantInfos.size());
+		imageInfos.clear();
 
 		// create write structs
-		std::vector<VkWriteDescriptorSet> descriptorWrites;
-		descriptorWrites.reserve(constantInfos.size());
+		descriptorWrites.clear();
+		descriptorWrites.resize(constantInfos.size());
 
 		int j = 0;
 		for (auto const& info : constantInfos)
@@ -537,27 +568,34 @@ void minty::Shader::create_descriptor_sets(rendering::ShaderBuilder const& build
 			switch (info.type)
 			{
 			case VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER:
-				// create new buffer info
-				bufferInfos.push_back(VkDescriptorBufferInfo
-					{
-						.buffer = _buffers.at(index),
-						.offset = 0,
-						.range = VK_WHOLE_SIZE,
-					});
+			{
+				// set buffer info
+				VkDescriptorBufferInfo* bufferInfo = &bufferInfos.at(j);
+
+				bufferInfo->buffer = _buffers.at(index);
+				bufferInfo->offset = 0;
+				bufferInfo->range = info.size;
 
 				// create write
-				descriptorWrites.push_back(VkWriteDescriptorSet
-					{
+				descriptorWrites[j] = {
 						.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-						.dstSet = _descriptorSets.at(index),
+						.pNext = nullptr,
+						.dstSet = _descriptorSets.at(i),
 						.dstBinding = info.binding,
 						.dstArrayElement = 0,
-						.descriptorCount = info.descriptorCount,
+						.descriptorCount = 1,//info.descriptorCount,
 						.descriptorType = info.type,
 						.pImageInfo = nullptr,
-						.pBufferInfo = &bufferInfos.back(),
-					});
+						.pBufferInfo = bufferInfo,
+						.pTexelBufferView = nullptr,
+				};
+
+				bufferInfo = nullptr;
+
+				//console::log(std::format("Buffer: {}, offset: {}, range: {}", reinterpret_cast<size_t>(&bufferInfos.back().buffer), bufferInfos.back().offset, bufferInfos.back().range));
+				//console::log(std::format("Buffer: {}, offset: {}, range: {}", reinterpret_cast<size_t>(&descriptorWrites[j].pBufferInfo->buffer), descriptorWrites[j].pBufferInfo->offset, descriptorWrites[j].pBufferInfo->range));
 				break;
+			}
 			case VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER:
 				// create new array of image infos
 				imageInfos.push_back(std::vector<VkDescriptorImageInfo>());
@@ -566,9 +604,9 @@ void minty::Shader::create_descriptor_sets(rendering::ShaderBuilder const& build
 
 				// populate with images based on ids
 				ID textureCount = _renderer.get_texture_count();
-				for (ID i = 0; i < textureCount; i++)
+				for (ID k = 0; k < textureCount; k++)
 				{
-					Texture const& texture = _renderer.get_texture(i);
+					Texture const& texture = _renderer.get_texture(k);
 					list.push_back(VkDescriptorImageInfo
 						{
 							.sampler = texture.get_sampler(),
@@ -578,17 +616,18 @@ void minty::Shader::create_descriptor_sets(rendering::ShaderBuilder const& build
 				}
 
 				// create write
-				descriptorWrites.push_back(VkWriteDescriptorSet
-					{
+				descriptorWrites[j] = {
 						.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-						.dstSet = _descriptorSets.at(index),
+						.pNext = nullptr,
+						.dstSet = _descriptorSets.at(i),
 						.dstBinding = info.binding,
 						.dstArrayElement = 0,
 						.descriptorCount = info.descriptorCount,
 						.descriptorType = info.type,
 						.pImageInfo = list.data(),
 						.pBufferInfo = nullptr,
-					});
+						.pTexelBufferView = nullptr,
+				};
 				break;
 			}
 			j++;

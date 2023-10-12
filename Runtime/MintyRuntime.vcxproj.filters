@@ -231,6 +231,9 @@
     <ClInclude Include="M_Error.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="M_Rendering_DrawCallObjectInfo.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

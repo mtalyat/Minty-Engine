@@ -3,6 +3,7 @@
 
 #include "M_Basic_Vertex.h"
 #include "M_Mesh.h"
+#include "M_Rendering_DrawCallObjectInfo.h"
 #include "M_Rendering_ShaderBuilder.h"
 
 using namespace minty;
@@ -11,6 +12,7 @@ using namespace minty::basic;
 
 void minty::basic::create_basic_shader_builder(minty::rendering::ShaderBuilder& builder)
 {
+	// add vertex data
 	builder.emplace_vertex_binding<Vertex>(0);
 	builder.emplace_vertex_attribute<glm::vec3>(0, VkFormat::VK_FORMAT_R32G32B32_SFLOAT);
 	builder.emplace_vertex_attribute<glm::vec3>(0, VkFormat::VK_FORMAT_R32G32B32_SFLOAT);

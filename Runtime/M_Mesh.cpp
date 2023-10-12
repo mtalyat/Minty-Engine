@@ -9,6 +9,14 @@ using namespace minty::rendering;
 
 minty::Mesh::Mesh(Renderer& renderer)
 	: rendering::RendererObject::RendererObject(renderer)
+	, _vertexCount()
+	, _vertexSize()
+	, _vertexBuffer()
+	, _vertexMemory()
+	, _indexCount()
+	, _indexSize()
+	, _indexBuffer()
+	, _indexMemory()
 {}
 
 minty::Mesh::~Mesh()

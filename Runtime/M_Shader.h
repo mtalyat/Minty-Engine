@@ -27,7 +27,7 @@ namespace minty
 
 		struct UniformConstantInfo
 		{
-
+			
 		};
 
 		VkPipelineLayout _layout;
@@ -53,7 +53,7 @@ namespace minty
 		/// <param name="pipeline"></param>
 		Shader(std::string const& vertexPath, std::string const& fragmentPath, rendering::ShaderBuilder const& builder, Renderer& renderer);
 
-		~Shader();
+		void destroy();
 
 		void bind(VkCommandBuffer const commandBuffer) const;
 

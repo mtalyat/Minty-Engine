@@ -7,6 +7,7 @@ using namespace minty;
 
 minty::rendering::MaterialBuilder::MaterialBuilder(ID const shaderId)
 	: _shaderId(shaderId)
+	, _values(std::unordered_map<std::string, MaterialData>())
 {}
 
 minty::rendering::MaterialBuilder::~MaterialBuilder()
@@ -15,6 +16,7 @@ minty::rendering::MaterialBuilder::~MaterialBuilder()
 	{
 		free(pair.second.data);
 	}
+	_values.clear();
 }
 
 void minty::rendering::MaterialBuilder::set_shader_id(ID const id)
@@ -27,7 +29,8 @@ void minty::rendering::MaterialBuilder::set(std::string const& name, void* const
 	// check for existing
 	if (_values.contains(name))
 	{
-		error::abort("MaterialBuilder already contains name.");
+		error::abort(std::format("MaterialBuilder already contains name \"{}\".", name));
+		return;
 	}
 
 	// make copy
@@ -35,6 +38,7 @@ void minty::rendering::MaterialBuilder::set(std::string const& name, void* const
 	if (dst == nullptr)
 	{
 		error::abort("Unable to malloc in MaterialBuilder.");
+		return;
 	}
 	memcpy(dst, data, size);
 

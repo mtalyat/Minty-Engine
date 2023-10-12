@@ -42,7 +42,7 @@ std::set<filepath> mintye::Project::find_assets(std::set<std::string> const& ext
 		if (found != _files.end())
 		{
 			// add all to result
-			result.insert(found->second.begin(), found->second.begin());
+			result.insert(found->second.begin(), found->second.end());
 		}
 	}
 
@@ -110,6 +110,8 @@ void Project::collect_assets()
 
 	filepath directory;
 
+	size_t count = 0;
+
 	// keep collecting while paths to collect has something in it
 	while (directoriesToCollect.size())
 	{
@@ -148,7 +150,19 @@ void Project::collect_assets()
 					// existing list
 					found->second.emplace(path);
 				}
+
+				count++;
 			}
 		}
 	}
+
+	//console::log(std::format("Found {} assets:", count));
+	//for (auto const& pair : _files)
+	//{
+	//	console::log(std::format("\t{}:", pair.first));
+	//	for (auto const& path : pair.second)
+	//	{
+	//		console::log(std::format("\t\t{}", path.string()));
+	//	}
+	//}
 }

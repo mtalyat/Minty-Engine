@@ -102,11 +102,15 @@ namespace minty::rendering
 
 		std::vector<PushConstantInfo> const& get_push_constant_infos() const;
 
-		std::vector<VkDescriptorSetLayoutBinding> get_descriptor_set_layouts() const;
+		uint32_t get_descriptor_set_layout_count() const;
 
-		std::vector<UniformConstantInfo> const& get_uniform_constant_infos() const;
+		std::vector<VkDescriptorSetLayoutBinding> get_descriptor_set_layout_bindings(uint32_t const set) const;
+
+		std::vector<UniformConstantInfo> get_uniform_constant_infos(uint32_t const set) const;
 
 		uint32_t get_uniform_constant_count() const;
+
+		uint32_t get_uniform_constant_count(uint32_t const set) const;
 
 #pragma endregion
 

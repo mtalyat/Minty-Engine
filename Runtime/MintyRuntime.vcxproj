@@ -213,6 +213,7 @@
     <ClInclude Include="libraries\entt\entt.hpp" />
     <ClInclude Include="M_Basic.h" />
     <ClInclude Include="M_Basic_Vertex.h" />
+    <ClInclude Include="M_Rendering_DrawCallObjectInfo.h" />
     <ClInclude Include="M_Error.h" />
     <ClInclude Include="M_Info.h" />
     <ClInclude Include="M_MeshComponent.h" />

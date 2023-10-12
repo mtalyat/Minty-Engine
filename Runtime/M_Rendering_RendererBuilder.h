@@ -31,13 +31,10 @@ namespace minty::rendering
 		ID _maxShaders;
 		ID _maxMaterials;
 
-		Register<TextureBuilder> _textureBuilders;
 		Register<std::pair<std::string, TextureBuilder const*>> _textures;
 
-		Register<ShaderBuilder> _shaderBuilders;
 		Register<std::pair<std::vector<std::string>, ShaderBuilder const*>> _shaders;
 
-		Register<MaterialBuilder> _materialBuilders;
 		Register<MaterialBuilder const*> _materials;
 	public:
 		RendererBuilder(Info const* const info = nullptr);
@@ -66,33 +63,25 @@ namespace minty::rendering
 
 #pragma region Textures
 
-		ID emplace_texture_builder(TextureBuilder const& builder);
+		ID emplace_texture(TextureBuilder const* const builder, std::string const& path);
 
-		ID plan_texture(ID const builderId, std::string const& path);
-
-		std::vector<std::pair<std::string, TextureBuilder const*>> const& get_texture_plans() const;
+		std::vector<std::pair<std::string, TextureBuilder const*>> const& get_textures() const;
 
 #pragma endregion
 
 #pragma region Shaders
 
-		ID emplace_shader_builder(ShaderBuilder const& builder);
+		ID emplace_shader(ShaderBuilder const* const builder, std::string const& vertexPath, std::string const& fragmentPath);
 
-		ID plan_shader(ID const builderId, std::string const& vertexPath, std::string const& fragmentPath);
-
-		std::vector<ShaderBuilder> const& get_shader_builders() const;
-
-		std::vector<std::pair<std::vector<std::string>, ShaderBuilder const*>> const& get_shader_plans() const;
+		std::vector<std::pair<std::vector<std::string>, ShaderBuilder const*>> const& get_shaders() const;
 
 #pragma endregion
 
 #pragma region Materials
 
-		ID emplace_material_builder(MaterialBuilder const& builder);
+		ID emplace_material(MaterialBuilder const* const builder);
 
-		ID plan_material(ID const builderId);
-
-		std::vector<MaterialBuilder const*> const& get_material_plans() const;
+		std::vector<MaterialBuilder const*> const& get_materials() const;
 
 #pragma endregion
 

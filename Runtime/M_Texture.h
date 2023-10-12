@@ -23,7 +23,7 @@ namespace minty
 	public:
 		Texture(std::string const& path, rendering::TextureBuilder const& builder, Renderer& renderer);
 
-		void dispose(Renderer& engine);
+		void destroy();
 
 		VkFormat get_format() const;
 

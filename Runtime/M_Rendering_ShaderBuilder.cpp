@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "M_Rendering_ShaderBuilder.h"
 
+#include "M_Rendering_DrawCallObjectInfo.h"
+
 #include "M_Console.h"
 
 using namespace minty;
@@ -26,7 +28,10 @@ ShaderBuilder::ShaderBuilder()
 	, _cullMode(VK_CULL_MODE_BACK_BIT)
 	, _frontFace(VK_FRONT_FACE_CLOCKWISE)
 	, _lineWidth(1.0f)
-{}
+{
+	// set default push constant
+	emplace_push_constant<DrawCallObjectInfo>("data", VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT);
+}
 
 void ShaderBuilder::set_vertex_enter_point(std::string const& enterPoint)
 {
@@ -122,12 +127,29 @@ std::vector<ShaderBuilder::PushConstantInfo> const& minty::rendering::ShaderBuil
 	return _pushConstants;
 }
 
-std::vector<VkDescriptorSetLayoutBinding> ShaderBuilder::get_descriptor_set_layouts() const
+uint32_t minty::rendering::ShaderBuilder::get_descriptor_set_layout_count() const
+{
+	uint32_t count = 0;
+
+	for (auto const& constant : _uniformConstants)
+	{
+		count = count < (constant.set + 1) ? constant.set + 1 : count;
+	}
+
+	return count;
+}
+
+std::vector<VkDescriptorSetLayoutBinding> ShaderBuilder::get_descriptor_set_layout_bindings(uint32_t const set) const
 {
 	std::vector<VkDescriptorSetLayoutBinding> result;
 
 	for (auto const& constant : _uniformConstants)
 	{
+		if (constant.set != set)
+		{
+			continue;
+		}
+
 		result.push_back(VkDescriptorSetLayoutBinding
 			{
 				.binding = constant.binding,
@@ -141,12 +163,37 @@ std::vector<VkDescriptorSetLayoutBinding> ShaderBuilder::get_descriptor_set_layo
 	return result;
 }
 
-std::vector<ShaderBuilder::UniformConstantInfo> const& minty::rendering::ShaderBuilder::get_uniform_constant_infos() const
+std::vector<ShaderBuilder::UniformConstantInfo> minty::rendering::ShaderBuilder::get_uniform_constant_infos(uint32_t const set) const
 {
-	return _uniformConstants;
+	std::vector<ShaderBuilder::UniformConstantInfo> results;
+
+	for (auto const& constant : _uniformConstants)
+	{
+		if (constant.set == set)
+		{
+			results.push_back(constant);
+		}
+	}
+
+	return results;
 }
 
 uint32_t minty::rendering::ShaderBuilder::get_uniform_constant_count() const
 {
 	return static_cast<uint32_t>(_uniformConstants.size());
+}
+
+uint32_t minty::rendering::ShaderBuilder::get_uniform_constant_count(uint32_t const set) const
+{
+	uint32_t count = 0;
+
+	for (auto const& constant : _uniformConstants)
+	{
+		if (constant.set == set)
+		{
+			count++;
+		}
+	}
+
+	return count;
 }

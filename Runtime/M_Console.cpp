@@ -72,7 +72,7 @@ void minty::console::warn(std::string const& message)
 void minty::console::error(std::string const& message)
 {
 #ifndef NDEBUG
-	print_raw(std::cout, "[erro]: " + message, Color::Red);
+	print_raw(std::cout, "[errr]: " + message, Color::Red);
 #endif
 }
 

@@ -32,7 +32,12 @@ ID minty::rendering::RendererBuilder::get_max_materials() const
     return _maxMaterials;
 }
 
-std::vector<std::pair<std::string, TextureBuilder const*>> const& minty::rendering::RendererBuilder::get_texture_plans() const
+ID minty::rendering::RendererBuilder::emplace_texture(TextureBuilder const* const builder, std::string const& path)
+{
+    return _textures.emplace({ path, builder });
+}
+
+std::vector<std::pair<std::string, TextureBuilder const*>> const& minty::rendering::RendererBuilder::get_textures() const
 {
     return _textures.data();
 }
@@ -52,47 +57,22 @@ void minty::rendering::RendererBuilder::set_max_materials(ID const max)
     _maxMaterials = max;
 }
 
-ID minty::rendering::RendererBuilder::emplace_texture_builder(TextureBuilder const& builder)
+ID minty::rendering::RendererBuilder::emplace_shader(ShaderBuilder const* const builder, std::string const& vertexPath, std::string const& fragmentPath)
 {
-    return _textureBuilders.emplace(builder);
+    return _shaders.emplace({ { vertexPath, fragmentPath }, builder });
 }
 
-ID minty::rendering::RendererBuilder::plan_texture(ID const builderId, std::string const& path)
-{
-    return _textures.emplace(std::pair<std::string, TextureBuilder const*>(path, &_textureBuilders.at(builderId)));
-}
-
-ID minty::rendering::RendererBuilder::emplace_shader_builder(ShaderBuilder const& builder)
-{
-    return _shaderBuilders.emplace(builder);
-}
-
-ID minty::rendering::RendererBuilder::plan_shader(ID const builderId, std::string const& vertexPath, std::string const& fragmentPath)
-{
-    return _shaders.emplace(std::pair<std::vector<std::string>, ShaderBuilder const*>({ vertexPath, fragmentPath }, &_shaderBuilders.at(builderId)));
-}
-
-std::vector<ShaderBuilder> const& minty::rendering::RendererBuilder::get_shader_builders() const
-{
-    return _shaderBuilders.data();
-}
-
-std::vector<std::pair<std::vector<std::string>, ShaderBuilder const*>> const& minty::rendering::RendererBuilder::get_shader_plans() const
+std::vector<std::pair<std::vector<std::string>, ShaderBuilder const*>> const& minty::rendering::RendererBuilder::get_shaders() const
 {
     return _shaders.data();
 }
 
-ID minty::rendering::RendererBuilder::emplace_material_builder(MaterialBuilder const& builder)
+ID minty::rendering::RendererBuilder::emplace_material(MaterialBuilder const* const builder)
 {
-    return _materialBuilders.emplace(builder);
+    return _materials.emplace(builder);
 }
 
-ID minty::rendering::RendererBuilder::plan_material(ID const builderId)
-{
-    return _materials.emplace(&_materialBuilders.at(builderId));
-}
-
-std::vector<MaterialBuilder const*> const& minty::rendering::RendererBuilder::get_material_plans() const
+std::vector<MaterialBuilder const*> const& minty::rendering::RendererBuilder::get_materials() const
 {
     return _materials.data();
 }

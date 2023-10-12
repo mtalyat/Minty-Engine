@@ -52,11 +52,6 @@ namespace minty
 		std::vector<VkPresentModeKHR> presentModes;
 	};
 
-	struct DrawCallObjectInfo
-	{
-		glm::mat4 transform;
-	};
-
 	class Scene;
 
 	namespace rendering
@@ -114,10 +109,6 @@ namespace minty
 		std::vector<VkFence> inFlightFences;
 		bool framebufferResized = false;
 		uint32_t _frame = 0;
-
-		std::vector<VkBuffer> uniformBuffers;
-		std::vector<VkDeviceMemory> uniformBuffersMemory;
-		std::vector<void*> uniformBuffersMapped;
 
 		std::vector<VkBuffer> materialBuffers;
 		std::vector<VkDeviceMemory> materialBuffersMemory;

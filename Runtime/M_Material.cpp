@@ -22,6 +22,7 @@ minty::Material::~Material()
 	{
 		free(pair.second.data);
 	}
+	_values.clear();
 }
 
 void minty::Material::set(std::string const& name, void* const value, size_t const size)

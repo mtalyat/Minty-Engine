@@ -2,7 +2,6 @@
 
 #include "ME_Console.h"
 #include "ME_Project.h"
-#include "ME_GuiRenderer.h"
 #include <Minty.h>
 
 namespace mintye
@@ -26,7 +25,6 @@ namespace mintye
 		Project _project;
 		BuildInfo _info;
 		minty::Window _window;
-		GuiRenderer _renderer;
 		Console _console;
 	public:
 		Application();
