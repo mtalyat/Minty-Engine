@@ -19,13 +19,12 @@ namespace minty
 	class Material
 		: public rendering::RendererObject
 	{
-		friend class MaterialInstance;
-
 	private:
 		ID _shaderId;
 
-		std::unordered_map<std::string, MaterialData> _values;
+		bool _dirty;
 
+		std::unordered_map<std::string, MaterialData> _values;
 	public:
 		/// <summary>
 		/// Creates a new Material that corresponds to the given Shader ID.
@@ -35,12 +34,37 @@ namespace minty
 		/// <param name="color">The initial Color used for this Material.</param>
 		Material(rendering::MaterialBuilder const& builder, Renderer& renderer);
 
-		~Material();
+		void destroy();
+
+		bool is_dirty() const;
+
+		template<class T>
+		void set(std::string const& name, T* const value);
 
 		void set(std::string const& name, void* const value, size_t const size);
 
+		template<class T>
+		void* at(std::string const& name);
+
+		void* get(std::string const& name);
+
 		ID get_shader_id() const;
 
-		void bind(VkCommandBuffer const commandBuffer) const;
+		/// <summary>
+		/// Applies this Material's data to the Shader.
+		/// </summary>
+		void apply();
 	};
+
+	template<class T>
+	void Material::set(std::string const& name, T* const value)
+	{
+		set(name, value, sizeof(T));
+	}
+
+	template<class T>
+	void* Material::at(std::string const& name)
+	{
+		return static_cast<T*>(get(name));
+	}
 }

@@ -28,10 +28,7 @@ ShaderBuilder::ShaderBuilder()
 	, _cullMode(VK_CULL_MODE_BACK_BIT)
 	, _frontFace(VK_FRONT_FACE_CLOCKWISE)
 	, _lineWidth(1.0f)
-{
-	// set default push constant
-	emplace_push_constant<DrawCallObjectInfo>("data", VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT);
-}
+{}
 
 void ShaderBuilder::set_vertex_enter_point(std::string const& enterPoint)
 {

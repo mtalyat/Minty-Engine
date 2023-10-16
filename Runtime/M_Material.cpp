@@ -14,15 +14,28 @@ using namespace minty::rendering;
 minty::Material::Material(rendering::MaterialBuilder const& builder, Renderer& renderer)
 	: RendererObject::RendererObject(renderer)
 	, _shaderId(builder.get_shader_id())
-{}
+	, _dirty()
+	, _values()
+{
+	// copy over all values
+	for (auto const& value : builder.get_values())
+	{
+		set(value.first, value.second.data, value.second.size);
+	}
+}
 
-minty::Material::~Material()
+void minty::Material::destroy()
 {
 	for (auto const& pair : _values)
 	{
 		free(pair.second.data);
 	}
 	_values.clear();
+}
+
+bool minty::Material::is_dirty() const
+{
+	return _dirty;
 }
 
 void minty::Material::set(std::string const& name, void* const value, size_t const size)
@@ -52,6 +65,23 @@ void minty::Material::set(std::string const& name, void* const value, size_t con
 		.data = dst,
 		.size = size
 	};
+
+	// mark as dirty
+	_dirty = true;
+}
+
+void* minty::Material::get(std::string const& name)
+{
+	auto const& found = _values.find(name);
+
+	if (found == _values.end())
+	{
+		// not found
+		return nullptr;
+	}
+
+	// found
+	return found->second.data;
 }
 
 ID minty::Material::get_shader_id() const
@@ -59,18 +89,17 @@ ID minty::Material::get_shader_id() const
 	return _shaderId;
 }
 
-void minty::Material::bind(VkCommandBuffer const commandBuffer) const
+void minty::Material::apply()
 {
-	Shader const& shader = _renderer.get_shader(_shaderId);
-
-	// bind shader
-	shader.bind(commandBuffer);
-
-	// update self
-
+	// get shader
+	Shader& shader = _renderer.get_shader(_shaderId);
+	
 	// update all constant values
 	for (auto const& pair : _values)
 	{
 		shader.update_uniform_constant(pair.first, pair.second.data, pair.second.size);
 	}
+
+	// up to date
+	_dirty = false;
 }

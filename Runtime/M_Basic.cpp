@@ -4,19 +4,48 @@
 #include "M_Basic_Vertex.h"
 #include "M_Mesh.h"
 #include "M_Rendering_DrawCallObjectInfo.h"
+#include "M_Rendering_RendererBuilder.h"
 #include "M_Rendering_ShaderBuilder.h"
 
 using namespace minty;
 using namespace minty::rendering;
 using namespace minty::basic;
 
-void minty::basic::create_basic_shader_builder(minty::rendering::ShaderBuilder& builder)
+void minty::basic::create_basic_renderer_builder(minty::rendering::RendererBuilder& builder)
+{
+	builder.set_max_textures(64);
+	builder.set_max_shaders(64);
+	builder.set_max_materials(64);
+}
+
+void minty::basic::create_basic_shader_builder(minty::rendering::RendererBuilder const& rendererBuilder, minty::rendering::ShaderBuilder& builder)
 {
 	// add vertex data
 	builder.emplace_vertex_binding<Vertex>(0);
 	builder.emplace_vertex_attribute<glm::vec3>(0, VkFormat::VK_FORMAT_R32G32B32_SFLOAT);
 	builder.emplace_vertex_attribute<glm::vec3>(0, VkFormat::VK_FORMAT_R32G32B32_SFLOAT);
 	builder.emplace_vertex_attribute<glm::vec2>(0, VkFormat::VK_FORMAT_R32G32_SFLOAT);
+
+	// add uniform data that should be part of every shader
+	builder.emplace_uniform_constant<CameraBufferObject>(
+		"camera",
+		VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT,
+		0, 0,
+		VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER
+	);
+	builder.emplace_uniform_constant<VkSampler>(
+		"texSamplers",
+		VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT,
+		0, 1,
+		VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+		rendererBuilder.get_max_textures()
+	);
+
+	// add push constant that should be part of every shader
+	builder.emplace_push_constant<DrawCallObjectInfo>(
+		"object",
+		VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT
+	);
 }
 
 void basic::create_basic_cube(Mesh& mesh)

@@ -77,6 +77,8 @@ Renderer::Renderer(Window* const window)
 	, _textures()
 	, _materials()
 	, _shaders()
+	, _boundMaterial()
+	, _boundShader()
 	, _view()
 	, _backgroundColor({ 250, 220, 192, 255 }) // light tan color
 {}
@@ -128,7 +130,86 @@ void minty::Renderer::init(rendering::RendererBuilder const& builder)
 
 void Renderer::render_frame()
 {
-	draw_frame();
+	// wait until previous draw has completed
+	vkWaitForFences(_device, 1, &inFlightFences[_frame], VK_TRUE, UINT64_MAX);
+
+	// recreate swap chain check
+	uint32_t imageIndex;
+	VkResult result = vkAcquireNextImageKHR(_device, swapChain, UINT64_MAX, imageAvailableSemaphores[_frame], VK_NULL_HANDLE, &imageIndex);
+
+	if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+		recreate_swap_chain();
+		return;
+	}
+	else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
+		error::abort("Failed to acquire swap chain image.");
+	}
+
+	// reset the fence states so they can be used to wait again
+	vkResetFences(_device, 1, &inFlightFences[_frame]);
+
+	// reset command buffer
+	vkResetCommandBuffer(commandBuffers[_frame], 0);
+
+	// record the command buffer so we know what to do to render stuff to the screen
+	record_command_buffer(commandBuffers[_frame], imageIndex);
+
+	// update uniform information
+	//update_uniform_buffer();
+
+	// submit the command buffer
+	VkSubmitInfo submitInfo
+	{
+		.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO
+	};
+
+	// specify how to wait, in this case, with the semaphores
+	VkSemaphore waitSemaphores[] = { imageAvailableSemaphores[_frame] };
+	VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
+	submitInfo.waitSemaphoreCount = 1;
+	submitInfo.pWaitSemaphores = waitSemaphores;
+	submitInfo.pWaitDstStageMask = waitStages;
+
+	// set number of command buffers
+	submitInfo.commandBufferCount = 1;
+	submitInfo.pCommandBuffers = &commandBuffers[_frame];
+
+	// specift what semaphores to signal when complete
+	VkSemaphore signalSemaphores[] = { renderFinishedSemaphores[_frame] };
+	submitInfo.signalSemaphoreCount = 1;
+	submitInfo.pSignalSemaphores = signalSemaphores;
+
+	// submit the buffer
+	VK_ASSERT(submitResult, vkQueueSubmit(graphicsQueue, 1, &submitInfo, inFlightFences[_frame]), "Failed to submit draw command buffer.");
+
+	// submit to swap chain so it will show up on the screen
+	VkPresentInfoKHR presentInfo
+	{
+		.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
+		.waitSemaphoreCount = 1,
+		.pWaitSemaphores = signalSemaphores
+	};
+
+	// specify which swap chain to use (only 1 normally)
+	VkSwapchainKHR swapChains[] = { swapChain };
+	presentInfo.swapchainCount = 1;
+	presentInfo.pSwapchains = swapChains;
+	presentInfo.pImageIndices = &imageIndex;
+	presentInfo.pResults = nullptr; // Optional
+
+	// present the visual to the screen
+	result = vkQueuePresentKHR(presentQueue, &presentInfo);
+
+	if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || framebufferResized) {
+		framebufferResized = false;
+		recreate_swap_chain();
+	}
+	else if (result != VK_SUCCESS) {
+		error::abort("Failed to present swap chain image.");
+	}
+
+	// move to next frame
+	_frame = (_frame + 1) % MAX_FRAMES_IN_FLIGHT;
 }
 
 bool Renderer::is_running() const
@@ -233,6 +314,8 @@ VkFormat Renderer::find_supported_format(const std::vector<VkFormat>& candidates
 	}
 
 	error::abort("Failed to find supported format.");
+
+	return VkFormat();
 }
 
 void Renderer::create_depth_resources()
@@ -973,90 +1056,6 @@ void Renderer::create_logical_device()
 	vkGetDeviceQueue(_device, indices.presentFamily.value(), 0, &presentQueue);
 }
 
-void Renderer::draw_frame()
-{
-	// wait until previous draw has completed
-	vkWaitForFences(_device, 1, &inFlightFences[_frame], VK_TRUE, UINT64_MAX);
-
-	// recreate swap chain check
-	uint32_t imageIndex;
-	VkResult result = vkAcquireNextImageKHR(_device, swapChain, UINT64_MAX, imageAvailableSemaphores[_frame], VK_NULL_HANDLE, &imageIndex);
-
-	if (result == VK_ERROR_OUT_OF_DATE_KHR) {
-		recreate_swap_chain();
-		return;
-	}
-	else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
-		error::abort("Failed to acquire swap chain image.");
-	}
-
-	// reset the fence states so they can be used to wait again
-	vkResetFences(_device, 1, &inFlightFences[_frame]);
-
-	// reset command buffer
-	vkResetCommandBuffer(commandBuffers[_frame], 0);
-
-	// record the command buffer so we know what to do to render stuff to the screen
-	record_command_buffer(commandBuffers[_frame], imageIndex);
-
-	// update uniform information
-	//update_uniform_buffer();
-
-	// submit the command buffer
-	VkSubmitInfo submitInfo
-	{
-		.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO
-	};
-
-	// specify how to wait, in this case, with the semaphores
-	VkSemaphore waitSemaphores[] = { imageAvailableSemaphores[_frame] };
-	VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
-	submitInfo.waitSemaphoreCount = 1;
-	submitInfo.pWaitSemaphores = waitSemaphores;
-	submitInfo.pWaitDstStageMask = waitStages;
-
-	// set number of command buffers
-	submitInfo.commandBufferCount = 1;
-	submitInfo.pCommandBuffers = &commandBuffers[_frame];
-
-	// specift what semaphores to signal when complete
-	VkSemaphore signalSemaphores[] = { renderFinishedSemaphores[_frame] };
-	submitInfo.signalSemaphoreCount = 1;
-	submitInfo.pSignalSemaphores = signalSemaphores;
-
-	// submit the buffer
-	VK_ASSERT(submitResult, vkQueueSubmit(graphicsQueue, 1, &submitInfo, inFlightFences[_frame]), "Failed to submit draw command buffer.")
-
-		// submit to swap chain so it will show up on the screen
-		VkPresentInfoKHR presentInfo
-	{
-		.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR,
-		.waitSemaphoreCount = 1,
-		.pWaitSemaphores = signalSemaphores
-	};
-
-	// specify which swap chain to use (only 1 normally)
-	VkSwapchainKHR swapChains[] = { swapChain };
-	presentInfo.swapchainCount = 1;
-	presentInfo.pSwapchains = swapChains;
-	presentInfo.pImageIndices = &imageIndex;
-	presentInfo.pResults = nullptr; // Optional
-
-	// present the visual to the screen
-	result = vkQueuePresentKHR(presentQueue, &presentInfo);
-
-	if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || framebufferResized) {
-		framebufferResized = false;
-		recreate_swap_chain();
-	}
-	else if (result != VK_SUCCESS) {
-		error::abort("Failed to present swap chain image.");
-	}
-
-	// move to next frame
-	_frame = (_frame + 1) % MAX_FRAMES_IN_FLIGHT;
-}
-
 void minty::Renderer::draw_scene(VkCommandBuffer commandBuffer)
 {
 	// draw all meshes in the scene
@@ -1070,6 +1069,9 @@ void minty::Renderer::draw_scene(VkCommandBuffer commandBuffer)
 		// render the entity's mesh at the position
 		draw_mesh(commandBuffer, transform, mesh);
 	}
+
+	// unbind material/shader
+	unbind_material();
 }
 
 bool Renderer::check_validation_layer_support()
@@ -1328,13 +1330,17 @@ void Renderer::update_camera(CameraComponent const& camera, Vector3 const& posit
 	// multiply together
 	glm::mat4 transform = proj * view;
 
-	//// update buffer
-	//UniformBufferObject ubo
-	//{
-	//	.transform = transform
-	//};
+	// update buffer object
+	CameraBufferObject obj =
+	{
+		.transform = transform,
+	};
 
-	//memcpy(uniformBuffersMapped[_frame], &ubo, sizeof(ubo));
+	// update all shaders
+	for (auto& shader : _shaders)
+	{
+		shader.update_uniform_constant("camera", &obj, sizeof(CameraBufferObject));
+	}
 }
 
 void Renderer::create_buffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory) {
@@ -1381,6 +1387,7 @@ uint32_t Renderer::find_memory_type(uint32_t typeFilter, VkMemoryPropertyFlags p
 	}
 
 	error::abort("Failed to find suitable memory type.");
+	return 0;
 }
 
 void Renderer::create_command_pool(VkCommandPool& commandPool)
@@ -1420,10 +1427,10 @@ void Renderer::create_command_buffers()
 void minty::Renderer::draw_mesh(VkCommandBuffer commandBuffer, Transform const& transform, MeshComponent const& meshComponent)
 {
 	// get the material
-	Material const& mat = get_material(meshComponent.materialId);
+	Material& mat = get_material(meshComponent.materialId);
 
 	// bind the material, which will bind the shader and update its values
-	mat.bind(commandBuffer);
+	bind_material(commandBuffer, mat);
 
 	// bind vertex data
 	VkBuffer vertexBuffers[] = { meshComponent.mesh->get_vertex_buffer() };
@@ -1439,8 +1446,7 @@ void minty::Renderer::draw_mesh(VkCommandBuffer commandBuffer, Transform const& 
 	// get the shader
 	Shader const& shader = get_shader(mat.get_shader_id());
 
-	// NOTE: added this to the builder inside of the shader builder class
-	// send push constants so we know where to draw, what material to use, etc.
+	// send push constants so we know where to draw
 	DrawCallObjectInfo info
 	{
 		.transform = transformMatrix
@@ -1588,6 +1594,10 @@ void Renderer::destroy()
 	{
 		tex.destroy();
 	}
+	for (auto& mat : _materials)
+	{
+		mat.destroy();
+	}
 	for (auto& shader : _shaders)
 	{
 		shader.destroy();
@@ -1607,4 +1617,47 @@ void Renderer::destroy()
 	vkDestroyDevice(_device, nullptr);
 	vkDestroySurfaceKHR(instance, surface, nullptr);
 	vkDestroyInstance(instance, nullptr);
+}
+
+void minty::Renderer::bind_material(VkCommandBuffer const commandBuffer, Material& material)
+{
+	Material* mat = &material;
+
+	if (mat == _boundMaterial)
+	{
+		// material already bound
+
+		// update shader values if necessary
+		if (material.is_dirty())
+		{
+			material.apply();
+		}
+
+		return;
+	}
+
+	Shader* shader = &get_shader(material.get_shader_id());
+
+	if (shader != _boundShader)
+	{
+		// binding new shader
+
+		// set shader
+		shader->bind(commandBuffer);
+
+		// update reference
+		_boundShader = shader;
+	}
+
+	// apply
+	material.apply();
+
+	// update reference
+	_boundMaterial = mat;
+}
+
+void minty::Renderer::unbind_material()
+{
+	_boundMaterial = nullptr;
+	_boundShader = nullptr;
 }

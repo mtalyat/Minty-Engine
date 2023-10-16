@@ -77,6 +77,9 @@ namespace minty
 		Register<Material> _materials;
 		Register<Shader> _shaders;
 
+		Material* _boundMaterial;
+		Shader* _boundShader;
+
 		Viewport _view;
 		Color _backgroundColor;
 		bool _initialized;
@@ -264,6 +267,14 @@ namespace minty
 		/// Updates the Camera uniform buffer with the Camera info.
 		/// </summary>
 		void update_camera(CameraComponent const& camera, Vector3 const& position, Vector3 const& rotation);
+
+#pragma endregion
+
+#pragma region Binding
+
+		void bind_material(VkCommandBuffer const commandBuffer, Material& material);
+
+		void unbind_material();
 
 #pragma endregion
 
@@ -506,11 +517,6 @@ namespace minty
 		/// <param name="device">The device to grab the queue families from.</param>
 		/// <returns>The indices of the queue families.</returns>
 		QueueFamilyIndices find_queue_families(VkPhysicalDevice device);
-
-		/// <summary>
-		/// Draw a single frame to the screen.
-		/// </summary>
-		virtual void draw_frame();
 
 		/// <summary>
 		/// Draws the objects within the Scene.

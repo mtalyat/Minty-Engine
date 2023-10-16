@@ -49,7 +49,7 @@ int Runtime::run()
 	}
 	catch (std::exception const& e)
 	{
-		console::error(e.what());
+		console::error(std::format("Program aborted: \"{}\"", e.what()));
 		return EXIT_FAILURE;
 	}
 	catch (...)
