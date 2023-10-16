@@ -62,6 +62,8 @@ namespace minty
 		void update_push_constant(std::string const& name, VkCommandBuffer const commandBuffer, void* const value, uint32_t const size, uint32_t offset = 0) const;
 
 		void update_uniform_constant(std::string const& name, void* const value, size_t const elementSize, size_t const count = 1, size_t const index = 0) const;
+
+		//void update_uniform_constant_frame(std::string const& name, void)
 	private:
 
 		size_t get_buffer_index(size_t const buffer, size_t const frame) const;

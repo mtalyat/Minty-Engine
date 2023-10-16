@@ -111,9 +111,9 @@ void minty::Shader::update_uniform_constant(std::string const& name, void* const
 
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 	{
-		size_t index = get_buffer_index(id, i);
+		size_t bufferIndex = get_buffer_index(id, i);
 
-		byte* ptr = static_cast<byte*>(_mapped.at(index));
+		byte* ptr = static_cast<byte*>(_mapped.at(bufferIndex));
 
 		memcpy(ptr + index * elementSize, value, elementSize * count);
 	}

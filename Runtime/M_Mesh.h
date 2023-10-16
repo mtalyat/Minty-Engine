@@ -23,6 +23,7 @@ namespace minty
 		uint32_t _indexSize;
 		VkBuffer _indexBuffer;
 		VkDeviceMemory _indexMemory;
+		VkIndexType _indexType;
 	public:
 		Mesh(Renderer& renderer);
 
@@ -54,12 +55,14 @@ namespace minty
 
 		VkBuffer get_index_buffer() const;
 
+		VkIndexType get_index_type() const;
+
 #pragma endregion
 
 	private:
 		void set_vertices(void const* const vertices, size_t const count, size_t const vertexSize);
 
-		void set_indices(void const* const indices, size_t const count, size_t const indexSize);
+		void set_indices(void const* const indices, size_t const count, size_t const indexSize, VkIndexType const type = VkIndexType::VK_INDEX_TYPE_UINT16);
 
 		void dispose_vertices();
 

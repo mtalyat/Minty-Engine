@@ -17,6 +17,7 @@ minty::Mesh::Mesh(Renderer& renderer)
 	, _indexSize()
 	, _indexBuffer()
 	, _indexMemory()
+	, _indexType()
 {}
 
 minty::Mesh::~Mesh()
@@ -43,6 +44,11 @@ uint32_t minty::Mesh::get_index_count() const
 VkBuffer minty::Mesh::get_index_buffer() const
 {
 	return _indexBuffer;
+}
+
+VkIndexType minty::Mesh::get_index_type() const
+{
+	return _indexType;
 }
 
 void minty::Mesh::set_vertices(void const* const vertices, size_t const count, size_t const vertexSize)
@@ -79,13 +85,14 @@ void minty::Mesh::set_vertices(void const* const vertices, size_t const count, s
 	vkFreeMemory(device, stagingBufferMemory, nullptr);
 }
 
-void minty::Mesh::set_indices(void const* const indices, size_t const count, size_t const indexSize)
+void minty::Mesh::set_indices(void const* const indices, size_t const count, size_t const indexSize, VkIndexType const type)
 {
 	// if data already set, get rid of the old data
 	dispose_indices();
 
 	_indexCount = static_cast<uint32_t>(count);
 	_indexSize = static_cast<uint32_t>(indexSize);
+	_indexType = type;
 
 	// get buffer size
 	VkDeviceSize bufferSize = static_cast<VkDeviceSize>(count * indexSize);

@@ -111,7 +111,7 @@ namespace minty
 		std::vector<VkSemaphore> renderFinishedSemaphores;
 		std::vector<VkFence> inFlightFences;
 		bool framebufferResized = false;
-		uint32_t _frame = 0;
+		uint32_t _frame;
 
 		std::vector<VkBuffer> materialBuffers;
 		std::vector<VkDeviceMemory> materialBuffersMemory;

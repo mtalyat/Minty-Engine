@@ -81,6 +81,7 @@ Renderer::Renderer(Window* const window)
 	, _boundShader()
 	, _view()
 	, _backgroundColor({ 250, 220, 192, 255 }) // light tan color
+	, _frame(1)
 {}
 
 Renderer::~Renderer()
@@ -209,7 +210,8 @@ void Renderer::render_frame()
 	}
 
 	// move to next frame
-	_frame = (_frame + 1) % MAX_FRAMES_IN_FLIGHT;
+	_frame++;
+	if (_frame == MAX_FRAMES_IN_FLIGHT) _frame = 0;
 }
 
 bool Renderer::is_running() const
@@ -1426,8 +1428,17 @@ void Renderer::create_command_buffers()
 
 void minty::Renderer::draw_mesh(VkCommandBuffer commandBuffer, Transform const& transform, MeshComponent const& meshComponent)
 {
+	// do nothing if null mesh, or mesh empty
+	if (!meshComponent.mesh || !meshComponent.mesh->get_vertex_count())
+	{
+		return;
+	}
+
 	// get the material
 	Material& mat = get_material(meshComponent.materialId);
+
+	// get the shader
+	Shader const& shader = get_shader(mat.get_shader_id());
 
 	// bind the material, which will bind the shader and update its values
 	bind_material(commandBuffer, mat);
@@ -1436,15 +1447,12 @@ void minty::Renderer::draw_mesh(VkCommandBuffer commandBuffer, Transform const& 
 	VkBuffer vertexBuffers[] = { meshComponent.mesh->get_vertex_buffer() };
 	VkDeviceSize offsets[] = { 0 };
 	vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
-	vkCmdBindIndexBuffer(commandBuffer, meshComponent.mesh->get_index_buffer(), 0, VK_INDEX_TYPE_UINT16);
+	vkCmdBindIndexBuffer(commandBuffer, meshComponent.mesh->get_index_buffer(), 0, meshComponent.mesh->get_index_type());
 
 	// convert transform to matrix
 	// just do position for now
 	glm::mat4 transformMatrix = glm::mat4(1.0f);
 	transformMatrix = glm::translate(transformMatrix, glm::vec3(transform.position.x, transform.position.y, transform.position.z));
-
-	// get the shader
-	Shader const& shader = get_shader(mat.get_shader_id());
 
 	// send push constants so we know where to draw
 	DrawCallObjectInfo info
