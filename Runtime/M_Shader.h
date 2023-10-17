@@ -61,9 +61,25 @@ namespace minty
 
 		void update_push_constant(std::string const& name, VkCommandBuffer const commandBuffer, void* const value, uint32_t const size, uint32_t offset = 0) const;
 
+		/// <summary>
+		/// Updates the uniform constant with the given name, for all frames.
+		/// </summary>
+		/// <param name="name"></param>
+		/// <param name="value"></param>
+		/// <param name="elementSize"></param>
+		/// <param name="count"></param>
+		/// <param name="index"></param>
 		void update_uniform_constant(std::string const& name, void* const value, size_t const elementSize, size_t const count = 1, size_t const index = 0) const;
 
-		//void update_uniform_constant_frame(std::string const& name, void)
+		/// <summary>
+		/// Updates the uniform constant with the given name, only for the active frame.
+		/// </summary>
+		/// <param name="name"></param>
+		/// <param name="value"></param>
+		/// <param name="elementSize"></param>
+		/// <param name="count"></param>
+		/// <param name="index"></param>
+		void update_uniform_constant_frame(std::string const& name, void* const value, size_t const elementSize, size_t const count = 1, size_t const index = 0) const;
 	private:
 
 		size_t get_buffer_index(size_t const buffer, size_t const frame) const;

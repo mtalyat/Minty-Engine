@@ -109,6 +109,8 @@ void minty::Shader::update_uniform_constant(std::string const& name, void* const
 {
 	auto id = _uniformConstants.get_id(name);
 
+	MINTY_ASSERT(id >= 0, std::format("Uniform constant \"{}\" not found.", name));
+
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 	{
 		size_t bufferIndex = get_buffer_index(id, i);
@@ -117,6 +119,19 @@ void minty::Shader::update_uniform_constant(std::string const& name, void* const
 
 		memcpy(ptr + index * elementSize, value, elementSize * count);
 	}
+}
+
+void minty::Shader::update_uniform_constant_frame(std::string const& name, void* const value, size_t const elementSize, size_t const count, size_t const index) const
+{
+	auto id = _uniformConstants.get_id(name);
+
+	MINTY_ASSERT(id >= 0, std::format("Uniform constant \"{}\" not found.", name));
+
+	size_t bufferIndex = get_buffer_index(id, _renderer.get_frame());
+
+	byte* ptr = static_cast<byte*>(_mapped.at(bufferIndex));
+
+	memcpy(ptr + index * elementSize, value, elementSize * count);
 }
 
 size_t minty::Shader::get_buffer_index(size_t const buffer, size_t const frame) const

@@ -7,7 +7,7 @@ minty::rendering::TextureBuilder::TextureBuilder()
 	: _filter(VkFilter::VK_FILTER_LINEAR)
 	, _addressMode(VkSamplerAddressMode::VK_SAMPLER_ADDRESS_MODE_REPEAT)
 	, _mipmapMode(VkSamplerMipmapMode::VK_SAMPLER_MIPMAP_MODE_LINEAR)
-	, _format(VkFormat::VK_FORMAT_B8G8R8A8_SRGB)
+	, _format(VkFormat::VK_FORMAT_R8G8B8A8_SRGB)
 {}
 
 void minty::rendering::TextureBuilder::set_filter(VkFilter const filter)

@@ -3,7 +3,13 @@
 #include <vulkan/vulkan.h>
 #include <string>
 
-#define VK_ASSERT(result, func, message) VkResult result = func; if(result != VkResult::VK_SUCCESS) minty::error::abort(std::format("[{}] {}", minty::error::result_to_string(result), message));
+#define VK_ASSERT(result, expression, message) VkResult result = expression; if(result != VkResult::VK_SUCCESS) minty::error::abort(std::format("[{}] {}", minty::error::result_to_string(result), message));
+
+#ifdef NDEBUG
+#define MINTY_ASSERT(expression, message)
+#else
+#define MINTY_ASSERT(expression, message) if(!(expression)) minty::error::abort(message);
+#endif
 
 namespace minty::error
 {

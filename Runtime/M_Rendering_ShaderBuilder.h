@@ -147,12 +147,23 @@ namespace minty::rendering
 	template<class T>
 	void ShaderBuilder::emplace_vertex_attribute(uint32_t const binding, VkFormat const format)
 	{
+		// get offset, which is the combined sizes of the attributes w the same binding
+		uint32_t offset = 0;
+
+		for (auto const& data : _vertexAttributes)
+		{
+			if (data.description.binding == binding)
+			{
+				offset += data.size;
+			}
+		}
+
 		VkVertexInputAttributeDescription desc =
 		{
 			.location = static_cast<uint32_t>(_vertexAttributes.size()),
 			.binding = binding,
 			.format = format,
-			.offset = 0,
+			.offset = offset,
 		};
 
 		_vertexAttributes.push_back(VertexInputAttribute

@@ -97,7 +97,7 @@ void minty::Material::apply()
 	// update all constant values
 	for (auto const& pair : _values)
 	{
-		shader.update_uniform_constant(pair.first, pair.second.data, pair.second.size);
+		shader.update_uniform_constant_frame(pair.first, pair.second.data, pair.second.size);
 	}
 
 	// up to date

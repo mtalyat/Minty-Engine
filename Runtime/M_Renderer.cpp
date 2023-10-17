@@ -1341,7 +1341,7 @@ void Renderer::update_camera(CameraComponent const& camera, Vector3 const& posit
 	// update all shaders
 	for (auto& shader : _shaders)
 	{
-		shader.update_uniform_constant("camera", &obj, sizeof(CameraBufferObject));
+		shader.update_uniform_constant_frame("camera", &obj, sizeof(CameraBufferObject));
 	}
 }
 

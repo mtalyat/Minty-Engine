@@ -558,6 +558,6 @@ namespace minty
 		/// </summary>
 		/// <param name="commandBuffer">The command buffer to record.</param>
 		/// <param name="imageIndex">The image to send the commands to.</param>
-		virtual void record_command_buffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
+		void record_command_buffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
 	};
 }
