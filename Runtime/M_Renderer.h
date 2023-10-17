@@ -70,9 +70,6 @@ namespace minty
 		rendering::RendererBuilder const* _builder;
 		Window* _window;
 		
-		//std::vector<Texture> _textures;
-		//std::vector<Material> _materials;
-		//std::vector<Shader> _shaders;
 		Register<Texture> _textures;
 		Register<Material> _materials;
 		Register<Shader> _shaders;
