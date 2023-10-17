@@ -6,16 +6,11 @@ namespace minty::rendering
 {
 	struct DrawCallObjectInfo
 	{
-		glm::mat4 transform;
+		alignas(16) glm::mat4 transform;
+		alignas(16) minty::ID materialId;
 	};
 
 	struct CameraBufferObject {
 		alignas (16) glm::mat4 transform;
-	};
-
-	struct MaterialBufferObject
-	{
-		alignas (16) minty::ID textureID;
-		alignas (16) glm::vec4 color;
 	};
 }

@@ -272,9 +272,7 @@ namespace minty
 
 #pragma region Binding
 
-		void bind_material(VkCommandBuffer const commandBuffer, Material& material);
-
-		void unbind_material();
+		void bind_shader(VkCommandBuffer const commandBuffer, Shader* const shader);
 
 #pragma endregion
 
@@ -329,7 +327,7 @@ namespace minty
 
 		ID create_shader(std::string const& vertexPath, std::string const& fragmentPath, rendering::ShaderBuilder const& builder);
 
-		ID create_material(rendering::MaterialBuilder const& builder);
+		ID create_material(void const* const materialData, rendering::MaterialBuilder const& builder);
 
 	public:
 		Texture& get_texture(ID const id);

@@ -11,77 +11,21 @@
 using namespace minty;
 using namespace minty::rendering;
 
-minty::Material::Material(rendering::MaterialBuilder const& builder, Renderer& renderer)
+minty::Material::Material(ID const id, void const* const data, rendering::MaterialBuilder const& builder, Renderer& renderer)
 	: RendererObject::RendererObject(renderer)
 	, _shaderId(builder.get_shader_id())
-	, _dirty()
-	, _values()
+	, _id(id)
+	, _data(nullptr)
 {
-	// copy over all values
-	for (auto const& value : builder.get_values())
-	{
-		set(value.first, value.second.data, value.second.size);
-	}
+	set(data);
 }
 
 void minty::Material::destroy()
 {
-	for (auto const& pair : _values)
+	if (_data)
 	{
-		free(pair.second.data);
+		free(_data);
 	}
-	_values.clear();
-}
-
-bool minty::Material::is_dirty() const
-{
-	return _dirty;
-}
-
-void minty::Material::set(std::string const& name, void* const value, size_t const size)
-{
-	// create copy of the data
-	void* dst = malloc(size);
-
-	if (dst == nullptr)
-	{
-		error::abort("Failed to malloc material data.");
-		return;
-	}
-
-	memcpy(dst, value, size);
-
-	// check if old data
-	auto const& found = _values.find(name);
-	if (found != _values.end())
-	{
-		// old value exists, so free it
-		free(found->second.data);
-	}
-
-	// set/replace values
-	_values[name] = MaterialData
-	{
-		.data = dst,
-		.size = size
-	};
-
-	// mark as dirty
-	_dirty = true;
-}
-
-void* minty::Material::get(std::string const& name)
-{
-	auto const& found = _values.find(name);
-
-	if (found == _values.end())
-	{
-		// not found
-		return nullptr;
-	}
-
-	// found
-	return found->second.data;
 }
 
 ID minty::Material::get_shader_id() const
@@ -89,17 +33,32 @@ ID minty::Material::get_shader_id() const
 	return _shaderId;
 }
 
-void minty::Material::apply()
+void minty::Material::set(void const* const data)
 {
 	// get shader
 	Shader& shader = _renderer.get_shader(_shaderId);
-	
-	// update all constant values
-	for (auto const& pair : _values)
-	{
-		shader.update_uniform_constant_frame(pair.first, pair.second.data, pair.second.size);
-	}
 
-	// up to date
-	_dirty = false;
+	// get element size
+	size_t size = shader.get_material_size();
+
+	// copy to local data
+	if (!_data)
+	{
+		_data = malloc(size);
+
+		if (!_data)
+		{
+			console::error("Failed to malloc Material data.");
+			return;
+		}
+	}
+	memcpy(_data, data, size);
+
+	// update constant at material position
+	shader.update_uniform_constant("materials", data, size, 1, _id);
+}
+
+void* minty::Material::get() const
+{
+	return _data;
 }

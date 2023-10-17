@@ -28,6 +28,7 @@ ShaderBuilder::ShaderBuilder()
 	, _cullMode(VK_CULL_MODE_BACK_BIT)
 	, _frontFace(VK_FRONT_FACE_CLOCKWISE)
 	, _lineWidth(1.0f)
+	, _materialSize()
 {}
 
 void ShaderBuilder::set_vertex_enter_point(std::string const& enterPoint)
@@ -100,6 +101,11 @@ float minty::rendering::ShaderBuilder::get_line_width() const
 	return _lineWidth;
 }
 
+size_t minty::rendering::ShaderBuilder::get_material_size() const
+{
+	return _materialSize;
+}
+
 std::vector<VkVertexInputBindingDescription> const& ShaderBuilder::get_vertex_bindings() const
 {
 	return _vertexBindings;
@@ -151,7 +157,7 @@ std::vector<VkDescriptorSetLayoutBinding> ShaderBuilder::get_descriptor_set_layo
 			{
 				.binding = constant.binding,
 				.descriptorType = constant.type,
-				.descriptorCount = constant.descriptorCount,
+				.descriptorCount = constant.count,
 				.stageFlags = constant.stageFlags,
 				.pImmutableSamplers = nullptr
 			});
@@ -193,4 +199,34 @@ uint32_t minty::rendering::ShaderBuilder::get_uniform_constant_count(uint32_t co
 	}
 
 	return count;
+}
+
+void minty::rendering::ShaderBuilder::emplace_uniform_constant(std::string const& name, VkShaderStageFlags const stageFlags, uint32_t const set, uint32_t const binding, VkDescriptorType const type, VkDeviceSize const descriptorSize, uint32_t const descriptorCount)
+{
+	_uniformConstants.push_back(UniformConstantInfo
+		{
+			.type = type,
+			.name = name,
+			.set = set,
+			.binding = binding,
+			.count = descriptorCount,
+			.size = descriptorSize,
+			.stageFlags = stageFlags,
+			.ids = {},
+		});
+}
+
+void minty::rendering::ShaderBuilder::emplace_uniform_constant(std::string const& name, VkShaderStageFlags const stageFlags, uint32_t const set, uint32_t const binding, VkDescriptorType const type, VkDeviceSize const descriptorSize, std::vector<ID> const& ids)
+{
+	_uniformConstants.push_back(UniformConstantInfo
+		{
+			.type = type,
+			.name = name,
+			.set = set,
+			.binding = binding,
+			.count = static_cast<uint32_t>(ids.size()),
+			.size = static_cast<VkDeviceSize>(descriptorSize),
+			.stageFlags = stageFlags,
+			.ids = ids,
+		});
 }

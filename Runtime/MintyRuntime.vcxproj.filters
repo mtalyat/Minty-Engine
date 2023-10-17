@@ -222,9 +222,6 @@
     <ClInclude Include="M_Basic.h">
       <Filter>Header Files\Basic</Filter>
     </ClInclude>
-    <ClInclude Include="M_Rendering_MaterialBuilder.h">
-      <Filter>Header Files\Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="M_Rendering_Object.h">
       <Filter>Header Files\Rendering</Filter>
     </ClInclude>
@@ -232,6 +229,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="M_Rendering_DrawCallObjectInfo.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Rendering_MaterialBuilder.h">
       <Filter>Header Files\Rendering</Filter>
     </ClInclude>
   </ItemGroup>
@@ -377,10 +377,10 @@
     <ClCompile Include="M_Basic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="M_Rendering_MaterialBuilder.cpp">
+    <ClCompile Include="M_Error.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="M_Error.cpp">
+    <ClCompile Include="M_Rendering_MaterialBuilder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

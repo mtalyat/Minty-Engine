@@ -46,6 +46,7 @@ minty::Shader::Shader(std::string const& vertexPath, std::string const& fragment
 	: RendererObject::RendererObject(renderer)
 {
 	_uniformCount = builder.get_uniform_constant_count(0);
+	_materialSize = builder.get_material_size();
 
 	// first, create descriptor layouts
 	create_descriptor_set_layouts(builder);
@@ -78,6 +79,11 @@ void minty::Shader::destroy()
 	vkDestroyPipelineLayout(device, _layout, nullptr);
 }
 
+size_t minty::Shader::get_material_size() const
+{
+	return _materialSize;
+}
+
 void minty::Shader::bind(VkCommandBuffer const commandBuffer) const
 {
 	// bind descriptors
@@ -105,7 +111,7 @@ void minty::Shader::update_push_constant(std::string const& name, VkCommandBuffe
 	vkCmdPushConstants(commandBuffer, _layout, info.flags, offset, size, value);
 }
 
-void minty::Shader::update_uniform_constant(std::string const& name, void* const value, size_t const elementSize, size_t const count, size_t const index) const
+void minty::Shader::update_uniform_constant(std::string const& name, void const* const value, size_t const elementSize, size_t const count, size_t const index) const
 {
 	auto id = _uniformConstants.get_id(name);
 
@@ -121,7 +127,7 @@ void minty::Shader::update_uniform_constant(std::string const& name, void* const
 	}
 }
 
-void minty::Shader::update_uniform_constant_frame(std::string const& name, void* const value, size_t const elementSize, size_t const count, size_t const index) const
+void minty::Shader::update_uniform_constant_frame(std::string const& name, void const* const value, size_t const elementSize, size_t const count, size_t const index) const
 {
 	auto id = _uniformConstants.get_id(name);
 
@@ -514,7 +520,7 @@ void minty::Shader::create_descriptor_pool(rendering::ShaderBuilder const& build
 	{
 		poolSizes[i] = {
 				.type = constants[i].type,
-				.descriptorCount = MAX_FRAMES_IN_FLIGHT * constants[i].descriptorCount, // account for each frame in the flight
+				.descriptorCount = MAX_FRAMES_IN_FLIGHT * constants[i].count, // account for each frame in the flight
 		};
 	}
 
@@ -598,7 +604,7 @@ void minty::Shader::create_descriptor_sets(rendering::ShaderBuilder const& build
 						.dstSet = _descriptorSets.at(i),
 						.dstBinding = info.binding,
 						.dstArrayElement = 0,
-						.descriptorCount = 1,//info.descriptorCount,
+						.descriptorCount = info.count,
 						.descriptorType = info.type,
 						.pImageInfo = nullptr,
 						.pBufferInfo = bufferInfo,
@@ -615,7 +621,7 @@ void minty::Shader::create_descriptor_sets(rendering::ShaderBuilder const& build
 				// create new array of image infos
 				imageInfos.push_back(std::vector<VkDescriptorImageInfo>());
 				auto& list = imageInfos.back();
-				list.reserve(info.descriptorCount);
+				list.reserve(info.count);
 
 				// populate with images based on ids
 				ID textureCount = _renderer.get_texture_count();
@@ -637,7 +643,7 @@ void minty::Shader::create_descriptor_sets(rendering::ShaderBuilder const& build
 						.dstSet = _descriptorSets.at(i),
 						.dstBinding = info.binding,
 						.dstArrayElement = 0,
-						.descriptorCount = info.descriptorCount,
+						.descriptorCount = info.count,
 						.descriptorType = info.type,
 						.pImageInfo = list.data(),
 						.pBufferInfo = nullptr,

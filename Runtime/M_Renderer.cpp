@@ -520,7 +520,7 @@ Shader const& minty::Renderer::get_shader(ID const id) const
 	return _shaders.at(id);
 }
 
-ID minty::Renderer::create_material(rendering::MaterialBuilder const& builder)
+ID minty::Renderer::create_material(void const* const materialData, rendering::MaterialBuilder const& builder)
 {
 	if (_materials.full())
 	{
@@ -528,7 +528,7 @@ ID minty::Renderer::create_material(rendering::MaterialBuilder const& builder)
 		return ERROR_ID;
 	}
 
-	ID id = _materials.emplace(Material(builder, *this));
+	ID id = _materials.emplace(Material(_materials.size(), materialData, builder, *this));
 
 	return id;
 }
@@ -1072,8 +1072,8 @@ void minty::Renderer::draw_scene(VkCommandBuffer commandBuffer)
 		draw_mesh(commandBuffer, transform, mesh);
 	}
 
-	// unbind material/shader
-	unbind_material();
+	// unbind any shaders used
+	bind_shader(commandBuffer, nullptr);
 }
 
 bool Renderer::check_validation_layer_support()
@@ -1277,7 +1277,7 @@ void minty::Renderer::build_materials()
 	// not really a "pair"
 	for (auto const& pair : _builder->get_materials())
 	{
-		create_material(*pair);
+		create_material(pair.first, *pair.second);
 	}
 }
 
@@ -1438,10 +1438,10 @@ void minty::Renderer::draw_mesh(VkCommandBuffer commandBuffer, Transform const& 
 	Material& mat = get_material(meshComponent.materialId);
 
 	// get the shader
-	Shader const& shader = get_shader(mat.get_shader_id());
+	Shader& shader = get_shader(mat.get_shader_id());
 
 	// bind the material, which will bind the shader and update its values
-	bind_material(commandBuffer, mat);
+	bind_shader(commandBuffer, &shader);
 
 	// bind vertex data
 	VkBuffer vertexBuffers[] = { meshComponent.mesh->get_vertex_buffer() };
@@ -1627,45 +1627,22 @@ void Renderer::destroy()
 	vkDestroyInstance(instance, nullptr);
 }
 
-void minty::Renderer::bind_material(VkCommandBuffer const commandBuffer, Material& material)
+void minty::Renderer::bind_shader(VkCommandBuffer const commandBuffer, Shader* const shader)
 {
-	Material* mat = &material;
-
-	if (mat == _boundMaterial)
+	// if empty, set to empty
+	if (shader == nullptr)
 	{
-		// material already bound
-
-		// update shader values if necessary
-		if (material.is_dirty())
-		{
-			material.apply();
-		}
-
+		_boundShader = nullptr;
 		return;
 	}
 
-	Shader* shader = &get_shader(material.get_shader_id());
-
+	// set to a new shader
 	if (shader != _boundShader)
 	{
-		// binding new shader
-
 		// set shader
 		shader->bind(commandBuffer);
 
 		// update reference
 		_boundShader = shader;
 	}
-
-	// apply
-	material.apply();
-
-	// update reference
-	_boundMaterial = mat;
-}
-
-void minty::Renderer::unbind_material()
-{
-	_boundMaterial = nullptr;
-	_boundShader = nullptr;
 }

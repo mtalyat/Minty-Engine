@@ -35,7 +35,7 @@ namespace minty::rendering
 
 		Register<std::pair<std::vector<std::string>, ShaderBuilder const*>> _shaders;
 
-		Register<MaterialBuilder const*> _materials;
+		Register<std::pair<void const*, MaterialBuilder const*>> _materials;
 	public:
 		RendererBuilder(Info const* const info = nullptr);
 
@@ -79,9 +79,9 @@ namespace minty::rendering
 
 #pragma region Materials
 
-		ID emplace_material(MaterialBuilder const* const builder);
+		ID emplace_material(MaterialBuilder const* const builder, void const* const material);
 
-		std::vector<MaterialBuilder const*> const& get_materials() const;
+		std::vector<std::pair<void const*, MaterialBuilder const*>> const& get_materials() const;
 
 #pragma endregion
 

@@ -45,6 +45,8 @@ namespace minty
 
 		minty::Register<PushConstantInfo> _pushConstants;
 		minty::Register<UniformConstantInfo> _uniformConstants;
+
+		size_t _materialSize;
 	public:
 		/// <summary>
 		/// Creates a new Shader with the given layout and pipeline.
@@ -54,6 +56,8 @@ namespace minty
 		Shader(std::string const& vertexPath, std::string const& fragmentPath, rendering::ShaderBuilder const& builder, Renderer& renderer);
 
 		void destroy();
+
+		size_t get_material_size() const;
 
 		void bind(VkCommandBuffer const commandBuffer) const;
 
@@ -69,7 +73,7 @@ namespace minty
 		/// <param name="elementSize"></param>
 		/// <param name="count"></param>
 		/// <param name="index"></param>
-		void update_uniform_constant(std::string const& name, void* const value, size_t const elementSize, size_t const count = 1, size_t const index = 0) const;
+		void update_uniform_constant(std::string const& name, void const* const value, size_t const elementSize, size_t const count = 1, size_t const index = 0) const;
 
 		/// <summary>
 		/// Updates the uniform constant with the given name, only for the active frame.
@@ -79,7 +83,7 @@ namespace minty
 		/// <param name="elementSize"></param>
 		/// <param name="count"></param>
 		/// <param name="index"></param>
-		void update_uniform_constant_frame(std::string const& name, void* const value, size_t const elementSize, size_t const count = 1, size_t const index = 0) const;
+		void update_uniform_constant_frame(std::string const& name, void const* const value, size_t const elementSize, size_t const count = 1, size_t const index = 0) const;
 	private:
 
 		size_t get_buffer_index(size_t const buffer, size_t const frame) const;

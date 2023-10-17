@@ -27,17 +27,20 @@ void minty::basic::create_basic_shader_builder(minty::rendering::RendererBuilder
 	builder.emplace_vertex_attribute<glm::vec2>(0, VkFormat::VK_FORMAT_R32G32_SFLOAT);
 
 	// add uniform data that should be part of every shader
-	builder.emplace_uniform_constant<CameraBufferObject>(
+	builder.emplace_uniform_constant(
 		"camera",
 		VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT,
 		0, 0,
-		VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER
+		VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+		sizeof(CameraBufferObject),
+		1
 	);
-	builder.emplace_uniform_constant<VkSampler>(
+	builder.emplace_uniform_constant(
 		"texSamplers",
 		VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT,
 		0, 1,
 		VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+		sizeof(VkSampler),
 		rendererBuilder.get_max_textures()
 	);
 

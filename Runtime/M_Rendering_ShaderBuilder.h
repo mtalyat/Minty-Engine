@@ -19,7 +19,7 @@ namespace minty::rendering
 			std::string name;
 			uint32_t set;
 			uint32_t binding;
-			uint32_t descriptorCount;
+			uint32_t count;
 			VkDeviceSize size;
 			VkShaderStageFlags stageFlags;
 			std::vector<ID> ids;
@@ -52,10 +52,15 @@ namespace minty::rendering
 		std::vector<PushConstantInfo> _pushConstants;
 		std::vector<UniformConstantInfo> _uniformConstants;
 
+		size_t _materialSize;
+
 	public:
 		ShaderBuilder();
 
 #pragma region Set
+
+		template<class T>
+		void set_material_type();
 
 		void set_vertex_enter_point(std::string const& enterPoint);
 
@@ -96,6 +101,8 @@ namespace minty::rendering
 
 		float get_line_width() const;
 
+		size_t get_material_size() const;
+
 		std::vector<VkVertexInputBindingDescription> const& get_vertex_bindings() const;
 
 		std::vector<VkVertexInputAttributeDescription> get_vertex_attributes() const;
@@ -125,14 +132,18 @@ namespace minty::rendering
 		template<class T>
 		void emplace_push_constant(std::string const& name, VkShaderStageFlags const stageFlags);
 
-		template<class T>
-		void emplace_uniform_constant(std::string const& name, VkShaderStageFlags const stageFlags, uint32_t const set, uint32_t const binding, VkDescriptorType const type, uint32_t const descriptorCount = 1);
+		void emplace_uniform_constant(std::string const& name, VkShaderStageFlags const stageFlags, uint32_t const set, uint32_t const binding, VkDescriptorType const type, VkDeviceSize const size, uint32_t const count);
 
-		template<class T>
-		void emplace_uniform_constant(std::string const& name, VkShaderStageFlags const stageFlags, uint32_t const set, uint32_t const binding, VkDescriptorType const type, std::vector<ID> const& ids);
+		void emplace_uniform_constant(std::string const& name, VkShaderStageFlags const stageFlags, uint32_t const set, uint32_t const binding, VkDescriptorType const type, VkDeviceSize const size, std::vector<ID> const& ids);
 
 #pragma endregion
 	};
+
+	template<class T>
+	void ShaderBuilder::set_material_type()
+	{
+		_materialSize = sizeof(T);
+	}
 
 	template<class T>
 	void ShaderBuilder::emplace_vertex_binding(uint32_t const binding, VkVertexInputRate const inputRate)
@@ -195,38 +206,6 @@ namespace minty::rendering
 			{
 				.name = name,
 				.range = range
-			});
-	}
-
-	template<class T>
-	void ShaderBuilder::emplace_uniform_constant(std::string const& name, VkShaderStageFlags const stageFlags, uint32_t const set, uint32_t const binding, VkDescriptorType const type, uint32_t const descriptorCount)
-	{
-		_uniformConstants.push_back(UniformConstantInfo
-			{
-				.type = type,
-				.name = name,
-				.set = set,
-				.binding = binding,
-				.descriptorCount = descriptorCount,
-				.size = static_cast<VkDeviceSize>(sizeof(T) * descriptorCount),
-				.stageFlags = stageFlags,
-				.ids = {},
-			});
-	}
-
-	template<class T>
-	void ShaderBuilder::emplace_uniform_constant(std::string const& name, VkShaderStageFlags const stageFlags, uint32_t const set, uint32_t const binding, VkDescriptorType const type, std::vector<ID> const& ids)
-	{
-		_uniformConstants.push_back(UniformConstantInfo
-			{
-				.type = type,
-				.name = name,
-				.set = set,
-				.binding = binding,
-				.descriptorCount = static_cast<uint32_t>(ids.size()),
-				.size = static_cast<VkDeviceSize>(sizeof(T) * ids.size()),
-				.stageFlags = stageFlags,
-				.ids = ids,
 			});
 	}
 }

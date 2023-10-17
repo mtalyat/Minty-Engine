@@ -67,12 +67,29 @@ std::vector<std::pair<std::vector<std::string>, ShaderBuilder const*>> const& mi
     return _shaders.data();
 }
 
-ID minty::rendering::RendererBuilder::emplace_material(MaterialBuilder const* const builder)
+ID minty::rendering::RendererBuilder::emplace_material(MaterialBuilder const* const builder, void const* const material)
 {
-    return _materials.emplace(builder);
+    // get material size from shader builder
+    ShaderBuilder const* shader = _shaders.at(builder->get_shader_id()).second;
+
+    // allocate space for copy of data
+    void* dst = malloc(shader->get_material_size());
+
+    if (dst == nullptr)
+    {
+        console::error("Could not malloc material.");
+
+        return ERROR_ID;
+    }
+
+    // copy over
+    memcpy(dst, material, shader->get_material_size());
+
+    // add to register
+    return _materials.emplace({ dst, builder });
 }
 
-std::vector<MaterialBuilder const*> const& minty::rendering::RendererBuilder::get_materials() const
+std::vector<std::pair<void const*, MaterialBuilder const*>> const& minty::rendering::RendererBuilder::get_materials() const
 {
     return _materials.data();
 }
