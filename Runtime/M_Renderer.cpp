@@ -17,6 +17,9 @@
 #include "M_ScaleComponent.h"
 #include "M_MeshComponent.h"
 
+#include "M_Vector.h"
+#include "M_Matrix.h"
+
 //#include <vulkan/vulkan.h>
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -431,11 +434,6 @@ void minty::Renderer::get_entity_transform(Entity const entity, Transform& trans
 	{
 		// origin given
 		transform.position = origin->position;
-	}
-	else
-	{
-		// no origin given, set to (0, 0, 0)
-		transform.position = Vector3();
 	}
 
 	// get and add position to origin
@@ -1061,10 +1059,11 @@ void Renderer::create_logical_device()
 void minty::Renderer::draw_scene(VkCommandBuffer commandBuffer)
 {
 	// draw all meshes in the scene
-
-	Transform transform;
 	for (auto&& [entity, mesh] : _registry->view<MeshComponent>().each())
 	{
+		// create transform
+		Transform transform;
+
 		// get transform for entity
 		get_entity_transform(entity, transform);
 
@@ -1450,9 +1449,7 @@ void minty::Renderer::draw_mesh(VkCommandBuffer commandBuffer, Transform const& 
 	vkCmdBindIndexBuffer(commandBuffer, meshComponent.mesh->get_index_buffer(), 0, meshComponent.mesh->get_index_type());
 
 	// convert transform to matrix
-	// just do position for now
-	glm::mat4 transformMatrix = glm::mat4(1.0f);
-	transformMatrix = glm::translate(transformMatrix, glm::vec3(transform.position.x, transform.position.y, transform.position.z));
+	Matrix4 transformMatrix = transform.get_matrix();
 
 	// send push constants so we know where to draw
 	DrawCallObjectInfo info

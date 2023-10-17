@@ -7,7 +7,6 @@
 #include "M_Info.h"
 #include "M_Window.h"
 #include "M_Viewport.h"
-#include "M_Vector3.h"
 #include "M_Transform.h"
 
 #include "M_EntityRegistry.h"
