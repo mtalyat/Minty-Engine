@@ -73,7 +73,7 @@ namespace minty
 		/// <param name="elementSize"></param>
 		/// <param name="count"></param>
 		/// <param name="index"></param>
-		void update_uniform_constant(std::string const& name, void const* const value, size_t const elementSize, size_t const count = 1, size_t const index = 0) const;
+		void update_uniform_constant(std::string const& name, void const* const value, size_t const size, size_t const offset = 0) const;
 
 		/// <summary>
 		/// Updates the uniform constant with the given name, only for the active frame.
@@ -83,7 +83,7 @@ namespace minty
 		/// <param name="elementSize"></param>
 		/// <param name="count"></param>
 		/// <param name="index"></param>
-		void update_uniform_constant_frame(std::string const& name, void const* const value, size_t const elementSize, size_t const count = 1, size_t const index = 0) const;
+		void update_uniform_constant_frame(std::string const& name, void const* const value, size_t const size, size_t const offset = 0) const;
 	private:
 
 		size_t get_buffer_index(size_t const buffer, size_t const frame) const;

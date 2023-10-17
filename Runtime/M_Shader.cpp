@@ -111,7 +111,7 @@ void minty::Shader::update_push_constant(std::string const& name, VkCommandBuffe
 	vkCmdPushConstants(commandBuffer, _layout, info.flags, offset, size, value);
 }
 
-void minty::Shader::update_uniform_constant(std::string const& name, void const* const value, size_t const elementSize, size_t const count, size_t const index) const
+void minty::Shader::update_uniform_constant(std::string const& name, void const* const value, size_t const size, size_t const offset) const
 {
 	auto id = _uniformConstants.get_id(name);
 
@@ -123,11 +123,11 @@ void minty::Shader::update_uniform_constant(std::string const& name, void const*
 
 		byte* ptr = static_cast<byte*>(_mapped.at(bufferIndex));
 
-		memcpy(ptr + index * elementSize, value, elementSize * count);
+		memcpy(ptr + offset, value, size);
 	}
 }
 
-void minty::Shader::update_uniform_constant_frame(std::string const& name, void const* const value, size_t const elementSize, size_t const count, size_t const index) const
+void minty::Shader::update_uniform_constant_frame(std::string const& name, void const* const value, size_t const size, size_t const offset) const
 {
 	auto id = _uniformConstants.get_id(name);
 
@@ -137,7 +137,7 @@ void minty::Shader::update_uniform_constant_frame(std::string const& name, void 
 
 	byte* ptr = static_cast<byte*>(_mapped.at(bufferIndex));
 
-	memcpy(ptr + index * elementSize, value, elementSize * count);
+	memcpy(ptr + offset, value, size);
 }
 
 size_t minty::Shader::get_buffer_index(size_t const buffer, size_t const frame) const

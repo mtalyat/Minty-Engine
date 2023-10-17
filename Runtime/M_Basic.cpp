@@ -21,10 +21,10 @@ void minty::basic::create_basic_renderer_builder(minty::rendering::RendererBuild
 void minty::basic::create_basic_shader_builder(minty::rendering::RendererBuilder const& rendererBuilder, minty::rendering::ShaderBuilder& builder)
 {
 	// add vertex data
-	builder.emplace_vertex_binding<Vertex>(0);
-	builder.emplace_vertex_attribute<glm::vec3>(0, VkFormat::VK_FORMAT_R32G32B32_SFLOAT);
-	builder.emplace_vertex_attribute<glm::vec3>(0, VkFormat::VK_FORMAT_R32G32B32_SFLOAT);
-	builder.emplace_vertex_attribute<glm::vec2>(0, VkFormat::VK_FORMAT_R32G32_SFLOAT);
+	builder.emplace_vertex_binding(0, sizeof(Vertex));
+	builder.emplace_vertex_attribute(0, sizeof(glm::vec3), VkFormat::VK_FORMAT_R32G32B32_SFLOAT);
+	builder.emplace_vertex_attribute(0, sizeof(glm::vec3), VkFormat::VK_FORMAT_R32G32B32_SFLOAT);
+	builder.emplace_vertex_attribute(0, sizeof(glm::vec2), VkFormat::VK_FORMAT_R32G32_SFLOAT);
 
 	// add uniform data that should be part of every shader
 	builder.emplace_uniform_constant(
@@ -45,8 +45,9 @@ void minty::basic::create_basic_shader_builder(minty::rendering::RendererBuilder
 	);
 
 	// add push constant that should be part of every shader
-	builder.emplace_push_constant<DrawCallObjectInfo>(
+	builder.emplace_push_constant(
 		"object",
+		sizeof(DrawCallObjectInfo),
 		VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT
 	);
 }

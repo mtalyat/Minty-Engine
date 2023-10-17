@@ -31,6 +31,11 @@ ShaderBuilder::ShaderBuilder()
 	, _materialSize()
 {}
 
+void minty::rendering::ShaderBuilder::set_material_size(size_t const size)
+{
+	_materialSize = size;
+}
+
 void ShaderBuilder::set_vertex_enter_point(std::string const& enterPoint)
 {
 	_vertexEnterPoint = enterPoint;
@@ -199,6 +204,68 @@ uint32_t minty::rendering::ShaderBuilder::get_uniform_constant_count(uint32_t co
 	}
 
 	return count;
+}
+
+void minty::rendering::ShaderBuilder::emplace_vertex_binding(uint32_t const binding, uint32_t const stride, VkVertexInputRate const inputRate)
+{
+	_vertexBindings.push_back(VkVertexInputBindingDescription
+		{
+			.binding = binding,
+			.stride = stride,
+			.inputRate = inputRate,
+		});
+}
+
+void minty::rendering::ShaderBuilder::emplace_vertex_attribute(uint32_t const binding, VkDeviceSize const size, VkFormat const format)
+{
+	// get offset, which is the combined sizes of the attributes w the same binding
+	uint32_t offset = 0;
+
+	for (auto const& data : _vertexAttributes)
+	{
+		if (data.description.binding == binding)
+		{
+			offset += data.size;
+		}
+	}
+
+	VkVertexInputAttributeDescription desc =
+	{
+		.location = static_cast<uint32_t>(_vertexAttributes.size()),
+		.binding = binding,
+		.format = format,
+		.offset = offset,
+	};
+
+	_vertexAttributes.push_back(VertexInputAttribute
+		{
+			.description = desc,
+			.size = size,
+		});
+}
+
+void minty::rendering::ShaderBuilder::emplace_push_constant(std::string const& name, uint32_t const size, VkShaderStageFlags const stageFlags)
+{
+	// get offset using previous element
+	uint32_t offset = 0;
+
+	if (_pushConstants.size())
+	{
+		offset = _pushConstants.back().range.offset + _pushConstants.back().range.size;
+	}
+
+	VkPushConstantRange range
+	{
+		.stageFlags = stageFlags,
+		.offset = offset,
+		.size = size,
+	};
+
+	return _pushConstants.push_back(PushConstantInfo
+		{
+			.name = name,
+			.range = range
+		});
 }
 
 void minty::rendering::ShaderBuilder::emplace_uniform_constant(std::string const& name, VkShaderStageFlags const stageFlags, uint32_t const set, uint32_t const binding, VkDescriptorType const type, VkDeviceSize const descriptorSize, uint32_t const descriptorCount)

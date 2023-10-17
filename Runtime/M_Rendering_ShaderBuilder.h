@@ -59,8 +59,7 @@ namespace minty::rendering
 
 #pragma region Set
 
-		template<class T>
-		void set_material_type();
+		void set_material_size(size_t const size);
 
 		void set_vertex_enter_point(std::string const& enterPoint);
 
@@ -123,14 +122,11 @@ namespace minty::rendering
 
 #pragma region Emplace
 
-		template<class T>
-		void emplace_vertex_binding(uint32_t const binding, VkVertexInputRate const inputRate = VkVertexInputRate::VK_VERTEX_INPUT_RATE_VERTEX);
+		void emplace_vertex_binding(uint32_t const binding, uint32_t const stride, VkVertexInputRate const inputRate = VkVertexInputRate::VK_VERTEX_INPUT_RATE_VERTEX);
 
-		template<class T>
-		void emplace_vertex_attribute(uint32_t const binding, VkFormat const format);
+		void emplace_vertex_attribute(uint32_t const binding, VkDeviceSize const size, VkFormat const format);
 
-		template<class T>
-		void emplace_push_constant(std::string const& name, VkShaderStageFlags const stageFlags);
+		void emplace_push_constant(std::string const& name, uint32_t const size, VkShaderStageFlags const stageFlags);
 
 		void emplace_uniform_constant(std::string const& name, VkShaderStageFlags const stageFlags, uint32_t const set, uint32_t const binding, VkDescriptorType const type, VkDeviceSize const size, uint32_t const count);
 
@@ -138,74 +134,4 @@ namespace minty::rendering
 
 #pragma endregion
 	};
-
-	template<class T>
-	void ShaderBuilder::set_material_type()
-	{
-		_materialSize = sizeof(T);
-	}
-
-	template<class T>
-	void ShaderBuilder::emplace_vertex_binding(uint32_t const binding, VkVertexInputRate const inputRate)
-	{
-		_vertexBindings.push_back(VkVertexInputBindingDescription
-			{
-				.binding = binding,
-				.stride = sizeof(T),
-				.inputRate = inputRate,
-			});
-	}
-	template<class T>
-	void ShaderBuilder::emplace_vertex_attribute(uint32_t const binding, VkFormat const format)
-	{
-		// get offset, which is the combined sizes of the attributes w the same binding
-		uint32_t offset = 0;
-
-		for (auto const& data : _vertexAttributes)
-		{
-			if (data.description.binding == binding)
-			{
-				offset += data.size;
-			}
-		}
-
-		VkVertexInputAttributeDescription desc =
-		{
-			.location = static_cast<uint32_t>(_vertexAttributes.size()),
-			.binding = binding,
-			.format = format,
-			.offset = offset,
-		};
-
-		_vertexAttributes.push_back(VertexInputAttribute
-			{
-				.description = desc,
-				.size = sizeof(T),
-			});
-	}
-
-	template<class T>
-	void ShaderBuilder::emplace_push_constant(std::string const& name, VkShaderStageFlags const stageFlags)
-	{
-		// get offset using previous element
-		uint32_t offset = 0;
-
-		if (_pushConstants.size())
-		{
-			offset = _pushConstants.back().range.offset + _pushConstants.back().range.size;
-		}
-
-		VkPushConstantRange range
-		{
-			.stageFlags = stageFlags,
-			.offset = offset,
-			.size = sizeof(T),
-		};
-
-		return _pushConstants.push_back(PushConstantInfo
-			{
-				.name = name,
-				.range = range
-			});
-	}
 }

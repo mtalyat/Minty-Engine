@@ -55,7 +55,7 @@ void minty::Material::set(void const* const data)
 	memcpy(_data, data, size);
 
 	// update constant at material position
-	shader.update_uniform_constant("materials", data, size, 1, _id);
+	shader.update_uniform_constant("materials", data, size, _id * size);
 }
 
 void* minty::Material::get() const

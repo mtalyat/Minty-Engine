@@ -1457,7 +1457,8 @@ void minty::Renderer::draw_mesh(VkCommandBuffer commandBuffer, Transform const& 
 	// send push constants so we know where to draw
 	DrawCallObjectInfo info
 	{
-		.transform = transformMatrix
+		.transform = transformMatrix,
+		.materialId = meshComponent.materialId,
 	};
 	shader.update_push_constant(commandBuffer, &info, sizeof(DrawCallObjectInfo));
 
