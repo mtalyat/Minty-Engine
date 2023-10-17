@@ -215,7 +215,7 @@ size_t mintye::Console::execute_command(std::string const& command)
 		if (changeColor)
 		{
 			// check for [type]
-			if (result.starts_with("[erro]"))
+			if (result.starts_with("[errr]"))
 			{
 				color = console::Color::Red;
 				errorCount++;

@@ -758,14 +758,16 @@ void Application::generate_main()
 	file <<
 		"// " << std::format("{:%Y-%m-%d %H:%M:%OS}", now) << std::endl <<
 		"#include <Minty.h>" << std::endl <<
+		"#include <filesystem>" << std::endl <<
 		"#include \"../Assets/Scripts/init.h\"" << std::endl <<
 		"int main(int argc, char const* argv[]) {" << std::endl <<
-		"    minty::Info info(\"TestProject - HARD CODED NAME\", 1, 0, 0);" << std::endl <<
-		"    minty::Runtime rt(&info);" << std::endl <<
-		"    init(rt);" << std::endl <<
-		"    int result = rt.run();" << std::endl <<
-		"    destroy(rt);" << std::endl <<
-		"    return result;" << std::endl <<
+		"	std::filesystem::current_path(\"../../\");" << std::endl << // move out of Build/Debug or Build/Release folder, into base folder
+		"	minty::Info info(\"TestProject - HARD CODED NAME\", 1, 0, 0);" << std::endl <<
+		"	minty::Runtime rt(&info);" << std::endl <<
+		"	init(rt);" << std::endl <<
+		"	int result = rt.run();" << std::endl <<
+		"	destroy(rt);" << std::endl <<
+		"	return result;" << std::endl <<
 		"}";
 
 	file.close();
