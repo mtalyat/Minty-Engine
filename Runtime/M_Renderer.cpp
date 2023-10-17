@@ -1594,8 +1594,7 @@ void Renderer::create_sync_objects()
 
 void Renderer::destroy()
 {
-	// wait for logical device to finish rendering before closing program
-	vkDeviceWaitIdle(_device);
+	sync();
 
 	// clean up vulkan
 	cleanup_swap_chain();
@@ -1617,13 +1616,11 @@ void Renderer::destroy()
 		vkDestroyFence(_device, inFlightFences[i], nullptr);
 	}
 	vkDestroyCommandPool(_device, commandPool, nullptr);
-	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
-	{
-		vkDestroyBuffer(_device, materialBuffers[i], nullptr);
-		vkFreeMemory(_device, materialBuffersMemory[i], nullptr);
-	}
 	vkDestroyRenderPass(_device, _renderPass, nullptr);
 	vkDestroyDevice(_device, nullptr);
+	if (enableValidationLayers) {
+		DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
+	}
 	vkDestroySurfaceKHR(instance, surface, nullptr);
 	vkDestroyInstance(instance, nullptr);
 }
@@ -1646,4 +1643,10 @@ void minty::Renderer::bind_shader(VkCommandBuffer const commandBuffer, Shader* c
 		// update reference
 		_boundShader = shader;
 	}
+}
+
+void minty::Renderer::sync()
+{
+	// wait for logical device to finish rendering before closing program
+	vkDeviceWaitIdle(_device);
 }

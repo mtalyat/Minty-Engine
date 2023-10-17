@@ -21,7 +21,9 @@ Engine::Engine(Info const* const info)
 {}
 
 Engine::~Engine()
-{}
+{
+	_renderer.destroy();
+}
 
 Window* minty::Engine::get_window()
 {
@@ -120,8 +122,8 @@ void Engine::run()
 	// print elapsed time
 	console::log(std::format("Elapsed time: {}s", std::chrono::duration_cast<std::chrono::milliseconds>(get_now() - start).count() / 1000.0f));
 
-	// cleanup
-	_renderer.destroy();
+	// wait for device to be safe
+	_renderer.sync();
 }
 
 time_point_t minty::Engine::get_now() const

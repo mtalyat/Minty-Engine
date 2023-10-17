@@ -113,10 +113,6 @@ namespace minty
 		bool framebufferResized = false;
 		uint32_t _frame;
 
-		std::vector<VkBuffer> materialBuffers;
-		std::vector<VkDeviceMemory> materialBuffersMemory;
-		std::vector<void*> materialBuffersMapped;
-
 		VkImage depthImage;
 		VkDeviceMemory depthImageMemory;
 		VkImageView depthImageView;
@@ -279,6 +275,11 @@ namespace minty
 #pragma region Destroy
 
 	public:
+		/// <summary>
+		/// Waits for the device to be idle.
+		/// </summary>
+		void sync();
+
 		/// <summary>
 		/// Cleans up all of the render engine resources.
 		/// </summary>

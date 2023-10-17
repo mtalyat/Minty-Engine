@@ -43,8 +43,6 @@ int Runtime::run()
 {
 	try
 	{
-		// TODO: load game
-
 		_engine.run();
 	}
 	catch (std::exception const& e)
