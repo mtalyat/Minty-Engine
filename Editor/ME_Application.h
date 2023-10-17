@@ -1,5 +1,7 @@
 #pragma once
 
+#include "ME_Console.h"
+#include "ME_Project.h"
 #include <Minty.h>
 
 namespace mintye
@@ -10,16 +12,20 @@ namespace mintye
 	class Application
 	{
 	private:
-		struct Info
+		struct BuildInfo
 		{
-			minty::Project const& project;
+			Project* project;
 			bool debug;
 
-			std::string const get_config() const
-			{
-				return debug ? "Debug" : "Release";
-			}
+			BuildInfo(Project* const project, bool const debug);
+
+			std::string const get_config() const;
 		};
+
+		Project _project;
+		BuildInfo _info;
+		minty::Window _window;
+		Console _console;
 	public:
 		Application();
 
@@ -28,54 +34,49 @@ namespace mintye
 		/// </summary>
 		/// <param name="argc">The command line argument count.</param>
 		/// <param name="argv">The command line arguments.</param>
-		void run(int argc, char const* argv[]);
+		int run(int argc, char const* argv[]);
 	private:
+		void draw_commands();
+		void draw_console();
+		void draw_hierarchy();
+		void draw_inspector();
+		void draw_game();
+		void draw_scene();
+
 		/// <summary>
 		/// Generates all necessary files for the target project.
 		/// </summary>
 		/// <param name="info"></param>
-		void generate(Info const& info);
+		void generate();
 
 		/// <summary>
 		/// Generates and updates the cmake file for the target project.
 		/// </summary>
 		/// <param name="info">The target info.</param>
-		void generate_cmake(Info const& info);
+		void generate_cmake();
 
 		/// <summary>
 		/// Generates the main file for the target project.
 		/// </summary>
 		/// <param name="info"></param>
-		void generate_main(Info const& info);
+		void generate_main();
 
 		/// <summary>
 		/// Cleans the target project.
 		/// </summary>
 		/// <param name="info">The target info.</param>
-		size_t clean(Info const& info);
+		void clean();
 
 		/// <summary>
 		/// Builds the target project.
 		/// </summary>
 		/// <param name="info">The target info.</param>
-		size_t build(Info const& info);
+		void build();
 
 		/// <summary>
 		/// Runs the target project.
 		/// </summary>
 		/// <param name="info">The target info.</param>
-		size_t run(Info const& info);
-
-		/// <summary>
-		/// Runs the command on the terminal.
-		/// </summary>
-		/// <param name="command">The command to run.</param>
-
-		/// <summary>
-		/// Runs the command on the terminal.
-		/// </summary>
-		/// <param name="command">The command to run.</param>
-		/// <returns>The number of errors that were printed during the execution of the command.</returns>
-		size_t run_command(std::string const& command);
+		void run();
 	};
 }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "M_Engine.h"
+#include "M_Info.h"
 #include <functional>
 #include <map>
 
@@ -17,9 +18,9 @@ namespace minty
 
 	public:
 		/// <summary>
-		/// Creates a new Runtime based on the given arguments.
+		/// Creates a new Runtime based on the given info.
 		/// </summary>
-		Runtime(int argc, char const* argv[]);
+		Runtime(Info const* const appInfo);
 
 		~Runtime();
 

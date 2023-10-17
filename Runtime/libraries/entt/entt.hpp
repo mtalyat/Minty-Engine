@@ -38373,7 +38373,7 @@ public:
     /**
      * @brief Assigns each entity in a range the given component.
      *
-     * @sa emplace
+     * @sa set
      *
      * @tparam Type Type of component to create.
      * @tparam It Type of input iterator.
@@ -38389,7 +38389,7 @@ public:
     /**
      * @brief Assigns each entity in a range the given components.
      *
-     * @sa emplace
+     * @sa set
      *
      * @tparam Type Type of component to create.
      * @tparam EIt Type of input iterator.
@@ -38406,7 +38406,7 @@ public:
     /**
      * @brief Assigns or replaces the given component for an entity.
      *
-     * @sa emplace
+     * @sa set
      * @sa replace
      *
      * @tparam Type Type of component to assign or replace.
@@ -38670,7 +38670,7 @@ public:
      * used to construct it.
      *
      * @sa get
-     * @sa emplace
+     * @sa set
      *
      * @tparam Type Type of component to get.
      * @tparam Args Types of arguments to use to construct the component.
@@ -61386,7 +61386,7 @@ public:
         return allow_cast(meta_type{*ctx, other}) && (!(std::is_reference_v<Type> && !std::is_const_v<std::remove_reference_t<Type>>) || storage.data() != nullptr);
     }
 
-    /*! @copydoc any::emplace */
+    /*! @copydoc any::set */
     template<typename Type, typename... Args>
     void emplace(Args &&...args) {
         release();
@@ -65063,7 +65063,7 @@ public:
         return allow_cast(meta_type{*ctx, other}) && (!(std::is_reference_v<Type> && !std::is_const_v<std::remove_reference_t<Type>>) || storage.data() != nullptr);
     }
 
-    /*! @copydoc any::emplace */
+    /*! @copydoc any::set */
     template<typename Type, typename... Args>
     void emplace(Args &&...args) {
         release();

@@ -23,33 +23,9 @@
 
 using namespace minty;
 
-minty::Runtime::Runtime(int argc, char const* argv[])
-	: _engine()
+minty::Runtime::Runtime(Info const* const appInfo)
+	: _engine(appInfo)
 {
-	// parse command line arguments...
-
-	// add parameters
-	CommandLineParser parser;
-	parser.add_parameter(CommandLineParser::Parameter("path", 1));
-
-	// parse the args
-	parser.parse(argc, argv);
-
-	// check for args
-	CommandLineParser::Argument arg;
-
-	if (parser.get_argument("path", arg))
-	{
-		std::cout << "Path argument: " << arg.args[0] << std::endl;
-
-		// change working directory to project path
-		std::filesystem::current_path(arg.args[0]);
-	}
-	else
-	{
-		std::cerr << "Path argument not found." << std::endl;
-	}
-
 	register_builtin();
 }
 
@@ -67,13 +43,11 @@ int Runtime::run()
 {
 	try
 	{
-		// TODO: load game
-
 		_engine.run();
 	}
 	catch (std::exception const& e)
 	{
-		console::error(e.what());
+		console::error(std::format("Program aborted: \"{}\"", e.what()));
 		return EXIT_FAILURE;
 	}
 	catch (...)

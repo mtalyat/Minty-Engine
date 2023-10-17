@@ -79,7 +79,7 @@ namespace minty
 		/// Emplaces the Component onto the entity, by name.
 		/// </summary>
 		/// <param name="name">The name of the Component.</param>
-		/// <param name="entity">The Entity to emplace the Component onto.</param>
+		/// <param name="entity">The Entity to set the Component onto.</param>
 		/// <returns>A pointer to the newly emplaced Component, or null if an error occured.</returns>
 		Component* emplace_by_name(std::string const& name, Entity const entity);
 
