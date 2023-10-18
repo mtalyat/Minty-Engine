@@ -77,6 +77,7 @@ access to the entire engine without needing include each file.
 #include "M_Matrix.h"
 #include "M_Object.h"
 #include "M_Parse.h"
+#include "M_Quaternion.h"
 #include "M_Rect.h"
 #include "M_RectF.h"
 #include "M_Runtime.h"

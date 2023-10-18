@@ -258,7 +258,7 @@ namespace minty
 		/// <summary>
 		/// Updates the Camera uniform buffer with the Camera info.
 		/// </summary>
-		void update_camera(CameraComponent const& camera, Vector3 const& position, Vector3 const& rotation);
+		void update_camera(CameraComponent const& camera, Transform const& transform);
 
 #pragma endregion
 

@@ -33,6 +33,8 @@ namespace minty
 
 		SceneManager* get_scene_manager();
 
+		InputMap const* get_input_map() const;
+
 		/// <summary>
 		/// Gets the time that elapsed over the course of the last frame.
 		/// </summary>

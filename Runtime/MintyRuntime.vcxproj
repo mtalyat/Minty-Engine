@@ -209,10 +209,12 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
+    <ClInclude Include="glfw.hpp" />
     <ClInclude Include="glm.hpp" />
     <ClInclude Include="libraries\entt\entt.hpp" />
     <ClInclude Include="M_Basic.h" />
     <ClInclude Include="M_Basic_Vertex.h" />
+    <ClInclude Include="M_CursorMode.h" />
     <ClInclude Include="M_Matrix.h" />
     <ClInclude Include="M_Rendering_DrawCallObjectInfo.h" />
     <ClInclude Include="M_Error.h" />
@@ -271,6 +273,7 @@
     <ClInclude Include="M_NameComponent.h" />
     <ClInclude Include="M_Writer.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="M_Quaternion.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
@@ -294,6 +297,7 @@
     <ClCompile Include="M_OriginComponent.cpp" />
     <ClCompile Include="M_Parse.cpp" />
     <ClCompile Include="M_PositionComponent.cpp" />
+    <ClCompile Include="M_Quaternion.cpp" />
     <ClCompile Include="M_Reader.cpp" />
     <ClCompile Include="M_Rendering_MaterialBuilder.cpp" />
     <ClCompile Include="M_Rendering_Object.cpp" />
@@ -315,6 +319,7 @@
     <ClCompile Include="M_Runtime.cpp" />
     <ClCompile Include="M_Stopwatch.cpp" />
     <ClCompile Include="M_Transform.cpp" />
+    <ClCompile Include="M_Vector.cpp" />
     <ClCompile Include="M_Viewport.cpp" />
     <ClCompile Include="M_Window.cpp" />
     <ClCompile Include="M_Writer.cpp" />

@@ -388,7 +388,7 @@ void minty::Renderer::update()
 	get_entity_transform(_mainCamera, transform);
 
 	// update camera in renderer
-	update_camera(camera, transform.position, transform.rotation);
+	update_camera(camera, transform);
 }
 
 VkDevice minty::Renderer::get_device() const
@@ -1280,7 +1280,7 @@ void minty::Renderer::build_materials()
 	}
 }
 
-void Renderer::update_camera(CameraComponent const& camera, Vector3 const& position, Vector3 const& rotation)
+void Renderer::update_camera(CameraComponent const& camera, Transform const& transform)
 {
 	//// start time of program
 	//static auto startTime = std::chrono::high_resolution_clock::now();
@@ -1311,17 +1311,18 @@ void Renderer::update_camera(CameraComponent const& camera, Vector3 const& posit
 	//glm::mat4 view = glm::rotate(glm::mat4(1.0f), glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
 	//view = glm::rotate(view, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
 	//view *= glm::translate()
-	glm::mat4 view = glm::lookAt(glm::vec3(position.x, position.y, position.z), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	//glm::mat4 view = glm::lookAt(glm::vec3(position.x, position.y, position.z), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	Matrix4 view = transform.get_matrix();
 
 	// get projection
-	glm::mat4 proj;
+	Matrix4 proj;
 	switch (camera.perspective)
 	{
 	case CameraComponent::Perspective::Perspective:
 		proj = glm::perspective(glm::radians(camera.fov), swapChainExtent.width / static_cast<float>(swapChainExtent.height), camera.nearPlane, camera.farPlane);
 		break;
 	default:
-		proj = glm::mat4(1.0f);
+		proj = Matrix4(1.0f);
 		break;
 	}
 	// flip y and x so that we have a left handed coordinate system
@@ -1329,12 +1330,12 @@ void Renderer::update_camera(CameraComponent const& camera, Vector3 const& posit
 	proj[1][1] *= -1.0f;
 
 	// multiply together
-	glm::mat4 transform = proj * view;
+	Matrix4 transformMatrix = proj * view;
 
 	// update buffer object
 	CameraBufferObject obj =
 	{
-		.transform = transform,
+		.transform = transformMatrix,
 	};
 
 	// update all shaders

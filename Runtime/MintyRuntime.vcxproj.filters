@@ -75,12 +75,6 @@
     <ClInclude Include="M_Console.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="M_Vector2Int.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="M_Vector2.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="M_Stopwatch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -94,12 +88,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="M_File.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="M_Vector3.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="M_Vector3Int.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="M_Viewport.h">
@@ -234,6 +222,21 @@
     <ClInclude Include="M_Rendering_MaterialBuilder.h">
       <Filter>Header Files\Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="M_Matrix.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Vector.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Quaternion.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="M_CursorMode.h">
+      <Filter>Header Files\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="glfw.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -269,12 +272,6 @@
     <ClCompile Include="M_Console.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="M_Vector2Int.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="M_Vector2.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="M_Stopwatch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -288,12 +285,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_Mesh.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="M_Vector3.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="M_Vector3Int.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_Texture.cpp">
@@ -381,6 +372,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_Rendering_MaterialBuilder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_Quaternion.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_Transform.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_Vector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
