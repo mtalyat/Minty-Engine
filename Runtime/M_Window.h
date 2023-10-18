@@ -3,6 +3,7 @@
 #include "M_Object.h"
 #include "M_Event.h"
 #include "M_InputMap.h"
+#include "M_CursorMode.h"
 #include <map>
 
 struct GLFWwindow;
@@ -47,6 +48,12 @@ namespace minty
 		std::string get_title() const;
 
 		/// <summary>
+		/// Sets the cursor mode.
+		/// </summary>
+		/// <param name="mode"></param>
+		void set_cursor_mode(CursorMode const mode);
+
+		/// <summary>
 		/// Checks if the Window has resized since the last time this method was called.
 		/// </summary>
 		/// <returns>True if the Window has been resized.</returns>
@@ -81,6 +88,12 @@ namespace minty
 		/// </summary>
 		/// <param name="inputMap"></param>
 		void set_input(InputMap const* const inputMap);
+
+		/// <summary>
+		/// Gets the currently active InputMap for this Window.
+		/// </summary>
+		/// <returns></returns>
+		InputMap const* get_input() const;
 	private:
 		// triggers a key in the input map
 		void trigger_key(Key const key, KeyAction const action, KeyModifiers const mods);
