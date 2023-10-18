@@ -1282,37 +1282,14 @@ void minty::Renderer::build_materials()
 
 void Renderer::update_camera(CameraComponent const& camera, Transform const& transform)
 {
-	//// start time of program
-	//static auto startTime = std::chrono::high_resolution_clock::now();
-
-	//// current time elapsed since start
-	//auto currentTime = std::chrono::high_resolution_clock::now();
-	//float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
-	////float time = 0.0f;
-
-	//// set uniform values
-	//UniformBufferObject ubo{};
-	//ubo.model = glm::rotate(glm::mat4(1.0f), time * 0.5f * glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	//ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	//ubo.proj = glm::perspective(glm::radians(45.0f), swapChainExtent.width / (float)swapChainExtent.height, 0.1f, 10.0f);
-	//// flip y and x so that we have a left handed coordinates system
-	//ubo.proj[1][1] *= -1.0f;
-	//ubo.proj[0][0] *= -1.0f;
-	//// pos x is right, pos y is up, pos z is forward
-
-	//memcpy(uniformBuffersMapped[_frame], &ubo, sizeof(ubo));
-
-	//console::log(std::format("Drawing camera at: {}", position.to_string()));
-
 	// proj * view * model
 
 	// get view
-	// ignore z rotation for now...
-	//glm::mat4 view = glm::rotate(glm::mat4(1.0f), glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-	//view = glm::rotate(view, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-	//view *= glm::translate()
-	//glm::mat4 view = glm::lookAt(glm::vec3(position.x, position.y, position.z), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	Matrix4 view = transform.get_matrix();
+	//Matrix4 view = transform.get_matrix();
+	Matrix4 translationMatrix = glm::translate(Matrix4(1.0f), transform.position);
+	Matrix4 rotationMatrix = glm::mat4_cast(transform.rotation);
+	Matrix4 scaleMatrix = glm::scale(Matrix4(1.0f), transform.scale);
+	Matrix4 view = scaleMatrix * rotationMatrix * translationMatrix; // backwards multiplication for some reason
 
 	// get projection
 	Matrix4 proj;
@@ -1326,8 +1303,9 @@ void Renderer::update_camera(CameraComponent const& camera, Transform const& tra
 		break;
 	}
 	// flip y and x so that we have a left handed coordinate system
-	proj[0][0] *= -1.0f;
-	proj[1][1] *= -1.0f;
+	proj[0][0] *= -1.0f;	// x
+	//proj[1][1] *= -1.0f;	// y
+	//proj[2][2] *= -1.0f;	// z
 
 	// multiply together
 	Matrix4 transformMatrix = proj * view;

@@ -29,12 +29,12 @@ Vector3 minty::Quaternion::left() const
 
 Vector3 minty::Quaternion::up() const
 {
-    return *this * Vector3(0.0f, -1.0f, 0.0f);
+    return *this * Vector3(0.0f, 1.0f, 0.0f);
 }
 
 Vector3 minty::Quaternion::down() const
 {
-    return *this * Vector3(0.0f, 1.0f, 0.0f);
+    return *this * Vector3(0.0f, -1.0f, 0.0f);
 }
 
 std::string minty::to_string(Quaternion const& value)
