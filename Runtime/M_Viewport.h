@@ -5,12 +5,14 @@
 
 namespace minty
 {
-	struct Viewport :
+	class Viewport :
 		public Object
 	{
-		VkViewport view;
-		VkRect2D scissor;
+	private:
+		VkViewport _view;
+		VkRect2D _scissor;
 
+	public:
 		/// <summary>
 		/// Creates an empty Viewport.
 		/// </summary>
@@ -26,6 +28,8 @@ namespace minty
 		/// <param name="minDepth">The minimum depth of the Viewport.</param>
 		/// <param name="maxDepth">The maximum depth of the Viewport.</param>
 		Viewport(int const x, int const y, unsigned int const width, unsigned int const height, float const minDepth, float const maxDepth);
+
+		void bind(VkCommandBuffer const commandBuffer) const;
 
 		/// <summary>
 		/// Sets the offset for both the view and the scissor.
@@ -68,6 +72,10 @@ namespace minty
 		/// <param name="width">The new width.</param>
 		/// <param name="height">The new height.</param>
 		void set_scissor_extent(unsigned int const width, unsigned int const height);
+
+		VkViewport get_view() const;
+
+		VkRect2D get_scissor() const;
 	};
 }
 

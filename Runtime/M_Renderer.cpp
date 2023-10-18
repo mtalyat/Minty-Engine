@@ -1286,10 +1286,13 @@ void Renderer::update_camera(CameraComponent const& camera, Transform const& tra
 
 	// get view
 	//Matrix4 view = transform.get_matrix();
-	Matrix4 translationMatrix = glm::translate(Matrix4(1.0f), transform.position);
-	Matrix4 rotationMatrix = glm::mat4_cast(transform.rotation);
-	Matrix4 scaleMatrix = glm::scale(Matrix4(1.0f), transform.scale);
-	Matrix4 view = scaleMatrix * rotationMatrix * translationMatrix; // backwards multiplication for some reason
+
+	//Matrix4 translationMatrix = glm::translate(Matrix4(1.0f), transform.position);
+	//Matrix4 rotationMatrix = glm::mat4_cast(transform.rotation);
+	//Matrix4 scaleMatrix = glm::scale(Matrix4(1.0f), transform.scale);
+	//Matrix4 view = scaleMatrix * rotationMatrix * translationMatrix; // backwards multiplication for some reason
+
+	Matrix4 view = glm::lookAt(transform.position, transform.position + transform.rotation.forward(), Vector3(0.0f, 1.0f, 0.0f));
 
 	// get projection
 	Matrix4 proj;
@@ -1303,7 +1306,7 @@ void Renderer::update_camera(CameraComponent const& camera, Transform const& tra
 		break;
 	}
 	// flip y and x so that we have a left handed coordinate system
-	proj[0][0] *= -1.0f;	// x
+	//proj[0][0] *= -1.0f;	// x
 	//proj[1][1] *= -1.0f;	// y
 	//proj[2][2] *= -1.0f;	// z
 
@@ -1520,8 +1523,7 @@ void Renderer::record_command_buffer(VkCommandBuffer commandBuffer, uint32_t ima
 	vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 	// set viewport
-	vkCmdSetViewport(commandBuffer, 0, 1, &_view.view);
-	vkCmdSetScissor(commandBuffer, 0, 1, &_view.scissor);
+	_view.bind(commandBuffer);
 
 	// render meshes
 	draw_scene(commandBuffer);
