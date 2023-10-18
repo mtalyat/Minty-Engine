@@ -385,7 +385,7 @@ void minty::Renderer::update()
 	// get camera transform
 	Transform transform;
 	CameraComponent const& camera = _registry->get<CameraComponent>(_mainCamera);
-	get_entity_transform(_mainCamera, transform);
+	_registry->get_transform(_mainCamera, transform);
 
 	// update camera in renderer
 	update_camera(camera, transform);
@@ -424,38 +424,6 @@ uint32_t minty::Renderer::get_material_count() const
 uint32_t minty::Renderer::get_frame() const
 {
 	return _frame;
-}
-
-void minty::Renderer::get_entity_transform(Entity const entity, Transform& transform) const
-{
-	// get origin
-	OriginComponent const* const origin = _registry->try_get<OriginComponent>(entity);
-	if (origin)
-	{
-		// origin given
-		transform.position = origin->position;
-	}
-
-	// get and add position to origin
-	PositionComponent const* const position = _registry->try_get<PositionComponent>(entity);
-	if (position)
-	{
-		transform.position += position->position;
-	}
-
-	// get rotation
-	RotationComponent const* const rotation = _registry->try_get<RotationComponent>(entity);
-	if (rotation)
-	{
-		transform.rotation = rotation->rotation;
-	}
-
-	// get scale
-	ScaleComponent const* const scale = _registry->try_get<ScaleComponent>(entity);
-	if (scale)
-	{
-		transform.scale = scale->scale;
-	}
 }
 
 ID minty::Renderer::create_texture(std::string const& path, rendering::TextureBuilder const& builder)
@@ -1058,14 +1026,14 @@ void Renderer::create_logical_device()
 
 void minty::Renderer::draw_scene(VkCommandBuffer commandBuffer)
 {
+	// create transform
+	Transform transform;
+
 	// draw all meshes in the scene
 	for (auto&& [entity, mesh] : _registry->view<MeshComponent>().each())
 	{
-		// create transform
-		Transform transform;
-
 		// get transform for entity
-		get_entity_transform(entity, transform);
+		_registry->get_transform(entity, transform);
 
 		// render the entity's mesh at the position
 		draw_mesh(commandBuffer, transform, mesh);

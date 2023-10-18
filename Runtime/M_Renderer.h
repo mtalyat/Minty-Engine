@@ -350,14 +350,6 @@ namespace minty
 
 #pragma region Helper
 
-	private:
-		/// <summary>
-		/// Gets the Transform for the given Entity.
-		/// </summary>
-		/// <param name="entity"></param>
-		/// <param name="transform"></param>
-		void get_entity_transform(Entity const entity, Transform& transform) const;
-
 	public:
 		/// <summary>
 		/// Creates a buffer.
