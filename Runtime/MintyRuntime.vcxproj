@@ -209,10 +209,13 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="framework.h" />
+    <ClInclude Include="glfw.hpp" />
     <ClInclude Include="glm.hpp" />
     <ClInclude Include="libraries\entt\entt.hpp" />
     <ClInclude Include="M_Basic.h" />
     <ClInclude Include="M_Basic_Vertex.h" />
+    <ClInclude Include="M_CursorMode.h" />
+    <ClInclude Include="M_Matrix.h" />
     <ClInclude Include="M_Rendering_DrawCallObjectInfo.h" />
     <ClInclude Include="M_Error.h" />
     <ClInclude Include="M_Info.h" />
@@ -258,21 +261,19 @@
     <ClInclude Include="M_SystemRegistry.h" />
     <ClInclude Include="M_Texture.h" />
     <ClInclude Include="M_Transform.h" />
-    <ClInclude Include="M_Vector2Int.h" />
-    <ClInclude Include="M_Vector2.h" />
     <ClInclude Include="M_Rect.h" />
     <ClInclude Include="M_RectF.h" />
     <ClInclude Include="M_Renderer.h" />
     <ClInclude Include="M_Runtime.h" />
     <ClInclude Include="M_Stopwatch.h" />
     <ClInclude Include="M_Types.h" />
-    <ClInclude Include="M_Vector3.h" />
-    <ClInclude Include="M_Vector3Int.h" />
+    <ClInclude Include="M_Vector.h" />
     <ClInclude Include="M_Viewport.h" />
     <ClInclude Include="M_Window.h" />
     <ClInclude Include="M_NameComponent.h" />
     <ClInclude Include="M_Writer.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="M_Quaternion.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
@@ -296,6 +297,7 @@
     <ClCompile Include="M_OriginComponent.cpp" />
     <ClCompile Include="M_Parse.cpp" />
     <ClCompile Include="M_PositionComponent.cpp" />
+    <ClCompile Include="M_Quaternion.cpp" />
     <ClCompile Include="M_Reader.cpp" />
     <ClCompile Include="M_Rendering_MaterialBuilder.cpp" />
     <ClCompile Include="M_Rendering_Object.cpp" />
@@ -311,15 +313,13 @@
     <ClCompile Include="M_System.cpp" />
     <ClCompile Include="M_SystemRegistry.cpp" />
     <ClCompile Include="M_Texture.cpp" />
-    <ClCompile Include="M_Vector2Int.cpp" />
-    <ClCompile Include="M_Vector2.cpp" />
     <ClCompile Include="M_Rect.cpp" />
     <ClCompile Include="M_RectF.cpp" />
     <ClCompile Include="M_Renderer.cpp" />
     <ClCompile Include="M_Runtime.cpp" />
     <ClCompile Include="M_Stopwatch.cpp" />
-    <ClCompile Include="M_Vector3.cpp" />
-    <ClCompile Include="M_Vector3Int.cpp" />
+    <ClCompile Include="M_Transform.cpp" />
+    <ClCompile Include="M_Vector.cpp" />
     <ClCompile Include="M_Viewport.cpp" />
     <ClCompile Include="M_Window.cpp" />
     <ClCompile Include="M_Writer.cpp" />

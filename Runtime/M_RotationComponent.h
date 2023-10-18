@@ -1,15 +1,15 @@
 #pragma once
 
 #include "M_Component.h"
-#include "M_Vector3.h"
+#include "M_Vector.h"
+#include "M_Quaternion.h"
 
 namespace minty
 {
 	struct RotationComponent
 		: public Component
 	{
-		// TODO: make into quaternion
-		Vector3 rotation;
+		Quaternion rotation;
 
 		void serialize(Writer& writer) const override;
 		void deserialize(Reader const& reader) override;

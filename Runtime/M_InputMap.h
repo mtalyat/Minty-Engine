@@ -6,6 +6,7 @@
 #include "M_MouseButton.h"
 #include "M_Event.h"
 #include <map>
+#include <unordered_set>
 
 namespace minty
 {
@@ -90,10 +91,12 @@ namespace minty
 		std::map<Key, KeyEvent_t>* _keyDownEvents;
 		std::map<Key, KeyEvent_t>* _keyUpEvents;
 		std::map<Key, KeyEvent_t>* _keyEvents;
+		std::unordered_set<Key>* _keys;
 		// mouse click
 		std::map<MouseButton, ClickEvent_t>* _mouseDownEvents;
 		std::map<MouseButton, ClickEvent_t>* _mouseUpEvents;
 		std::map<MouseButton, ClickEvent_t>* _mouseEvents;
+		std::unordered_set<MouseButton>* _buttons;
 		// mouse move
 		MoveEvent_t* _mouseMoveEvent;
 		// mouse scroll
@@ -238,5 +241,19 @@ namespace minty
 		/// </summary>
 		/// <param name="args"></param>
 		void invoke_mouse_scroll(MouseScrollEventArgs const& args) const;
+
+		/// <summary>
+		/// Checks if the given keyboard key is being held down.
+		/// </summary>
+		/// <param name="key">The key to check.</param>
+		/// <returns>True if the key is actively being pressed.</returns>
+		bool is_key_pressed(Key const key) const;
+
+		/// <summary>
+		/// Checks if the given mouse button is being held down.
+		/// </summary>
+		/// <param name="button">The button to check.</param>
+		/// <returns>True if the button is actively being pressed.</returns>
+		bool is_button_pressed(MouseButton const button) const;
 	};
 }

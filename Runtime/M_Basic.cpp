@@ -68,10 +68,10 @@ void basic::create_basic_cube(Mesh& mesh)
 
 	glm::vec3 color = { 1.0f, 1.0f, 1.0f };
 
-	glm::vec2 topLeft = { 0.0f, 0.0f };
-	glm::vec2 topRight = { 1.0f, 0.0f };
-	glm::vec2 bottomLeft = { 0.0f, 1.0f };
-	glm::vec2 bottomRight = { 1.0f, 1.0f };
+	glm::vec2 bottomLeft = { 0.0f, 0.0f };
+	glm::vec2 bottomRight = { 1.0f, 0.0f };
+	glm::vec2 topLeft = { 0.0f, 1.0f };
+	glm::vec2 topRight = { 1.0f, 1.0f };
 
 	std::vector<Vertex> vertices =
 	{

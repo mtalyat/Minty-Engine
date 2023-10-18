@@ -17,6 +17,9 @@
 #include "M_ScaleComponent.h"
 #include "M_MeshComponent.h"
 
+#include "M_Vector.h"
+#include "M_Matrix.h"
+
 //#include <vulkan/vulkan.h>
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
@@ -382,10 +385,10 @@ void minty::Renderer::update()
 	// get camera transform
 	Transform transform;
 	CameraComponent const& camera = _registry->get<CameraComponent>(_mainCamera);
-	get_entity_transform(_mainCamera, transform);
+	_registry->get_transform(_mainCamera, transform);
 
 	// update camera in renderer
-	update_camera(camera, transform.position, transform.rotation);
+	update_camera(camera, transform);
 }
 
 VkDevice minty::Renderer::get_device() const
@@ -421,43 +424,6 @@ uint32_t minty::Renderer::get_material_count() const
 uint32_t minty::Renderer::get_frame() const
 {
 	return _frame;
-}
-
-void minty::Renderer::get_entity_transform(Entity const entity, Transform& transform) const
-{
-	// get origin
-	OriginComponent const* const origin = _registry->try_get<OriginComponent>(entity);
-	if (origin)
-	{
-		// origin given
-		transform.position = origin->position;
-	}
-	else
-	{
-		// no origin given, set to (0, 0, 0)
-		transform.position = Vector3();
-	}
-
-	// get and add position to origin
-	PositionComponent const* const position = _registry->try_get<PositionComponent>(entity);
-	if (position)
-	{
-		transform.position += position->position;
-	}
-
-	// get rotation
-	RotationComponent const* const rotation = _registry->try_get<RotationComponent>(entity);
-	if (rotation)
-	{
-		transform.rotation = rotation->rotation;
-	}
-
-	// get scale
-	ScaleComponent const* const scale = _registry->try_get<ScaleComponent>(entity);
-	if (scale)
-	{
-		transform.scale = scale->scale;
-	}
 }
 
 ID minty::Renderer::create_texture(std::string const& path, rendering::TextureBuilder const& builder)
@@ -1060,13 +1026,14 @@ void Renderer::create_logical_device()
 
 void minty::Renderer::draw_scene(VkCommandBuffer commandBuffer)
 {
-	// draw all meshes in the scene
-
+	// create transform
 	Transform transform;
+
+	// draw all meshes in the scene
 	for (auto&& [entity, mesh] : _registry->view<MeshComponent>().each())
 	{
 		// get transform for entity
-		get_entity_transform(entity, transform);
+		_registry->get_transform(entity, transform);
 
 		// render the entity's mesh at the position
 		draw_mesh(commandBuffer, transform, mesh);
@@ -1281,61 +1248,43 @@ void minty::Renderer::build_materials()
 	}
 }
 
-void Renderer::update_camera(CameraComponent const& camera, Vector3 const& position, Vector3 const& rotation)
+void Renderer::update_camera(CameraComponent const& camera, Transform const& transform)
 {
-	//// start time of program
-	//static auto startTime = std::chrono::high_resolution_clock::now();
-
-	//// current time elapsed since start
-	//auto currentTime = std::chrono::high_resolution_clock::now();
-	//float time = std::chrono::duration<float, std::chrono::seconds::period>(currentTime - startTime).count();
-	////float time = 0.0f;
-
-	//// set uniform values
-	//UniformBufferObject ubo{};
-	//ubo.model = glm::rotate(glm::mat4(1.0f), time * 0.5f * glm::radians(90.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	//ubo.view = glm::lookAt(glm::vec3(2.0f, 2.0f, 2.0f), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
-	//ubo.proj = glm::perspective(glm::radians(45.0f), swapChainExtent.width / (float)swapChainExtent.height, 0.1f, 10.0f);
-	//// flip y and x so that we have a left handed coordinates system
-	//ubo.proj[1][1] *= -1.0f;
-	//ubo.proj[0][0] *= -1.0f;
-	//// pos x is right, pos y is up, pos z is forward
-
-	//memcpy(uniformBuffersMapped[_frame], &ubo, sizeof(ubo));
-
-	//console::log(std::format("Drawing camera at: {}", position.to_string()));
-
 	// proj * view * model
 
 	// get view
-	// ignore z rotation for now...
-	//glm::mat4 view = glm::rotate(glm::mat4(1.0f), glm::radians(rotation.y), glm::vec3(0.0f, 1.0f, 0.0f));
-	//view = glm::rotate(view, glm::radians(rotation.x), glm::vec3(1.0f, 0.0f, 0.0f));
-	//view *= glm::translate()
-	glm::mat4 view = glm::lookAt(glm::vec3(position.x, position.y, position.z), glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(0.0f, 1.0f, 0.0f));
+	//Matrix4 view = transform.get_matrix();
+
+	//Matrix4 translationMatrix = glm::translate(Matrix4(1.0f), transform.position);
+	//Matrix4 rotationMatrix = glm::mat4_cast(transform.rotation);
+	//Matrix4 scaleMatrix = glm::scale(Matrix4(1.0f), transform.scale);
+	//Matrix4 view = scaleMatrix * rotationMatrix * translationMatrix; // backwards multiplication for some reason
+
+	Matrix4 view = glm::lookAt(transform.position, transform.position + transform.rotation.forward(), Vector3(0.0f, 1.0f, 0.0f));
 
 	// get projection
-	glm::mat4 proj;
+	Matrix4 proj;
 	switch (camera.perspective)
 	{
 	case CameraComponent::Perspective::Perspective:
 		proj = glm::perspective(glm::radians(camera.fov), swapChainExtent.width / static_cast<float>(swapChainExtent.height), camera.nearPlane, camera.farPlane);
 		break;
 	default:
-		proj = glm::mat4(1.0f);
+		proj = Matrix4(1.0f);
 		break;
 	}
 	// flip y and x so that we have a left handed coordinate system
-	proj[0][0] *= -1.0f;
-	proj[1][1] *= -1.0f;
+	//proj[0][0] *= -1.0f;	// x
+	//proj[1][1] *= -1.0f;	// y
+	//proj[2][2] *= -1.0f;	// z
 
 	// multiply together
-	glm::mat4 transform = proj * view;
+	Matrix4 transformMatrix = proj * view;
 
 	// update buffer object
 	CameraBufferObject obj =
 	{
-		.transform = transform,
+		.transform = transformMatrix,
 	};
 
 	// update all shaders
@@ -1450,9 +1399,7 @@ void minty::Renderer::draw_mesh(VkCommandBuffer commandBuffer, Transform const& 
 	vkCmdBindIndexBuffer(commandBuffer, meshComponent.mesh->get_index_buffer(), 0, meshComponent.mesh->get_index_type());
 
 	// convert transform to matrix
-	// just do position for now
-	glm::mat4 transformMatrix = glm::mat4(1.0f);
-	transformMatrix = glm::translate(transformMatrix, glm::vec3(transform.position.x, transform.position.y, transform.position.z));
+	Matrix4 transformMatrix = transform.get_matrix();
 
 	// send push constants so we know where to draw
 	DrawCallObjectInfo info
@@ -1544,8 +1491,7 @@ void Renderer::record_command_buffer(VkCommandBuffer commandBuffer, uint32_t ima
 	vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 
 	// set viewport
-	vkCmdSetViewport(commandBuffer, 0, 1, &_view.view);
-	vkCmdSetScissor(commandBuffer, 0, 1, &_view.scissor);
+	_view.bind(commandBuffer);
 
 	// render meshes
 	draw_scene(commandBuffer);

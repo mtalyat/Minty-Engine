@@ -2,8 +2,7 @@
 #include "M_Window.h"
 #include "M_Console.h"
 #include "M_Error.h"
-#define GLFW_INCLUDE_VULKAN
-#include <GLFW/glfw3.h>
+#include "glfw.hpp"
 #include <format>
 #include <string>
 
@@ -81,6 +80,22 @@ std::string minty::Window::get_title() const
 	return _title;
 }
 
+void minty::Window::set_cursor_mode(CursorMode const mode)
+{
+	switch (mode)
+	{
+	case CursorMode::Normal:
+		glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+		break;
+	case CursorMode::Hidden:
+		glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+		break;
+	case CursorMode::Disabled:
+		glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+		break;
+	}
+}
+
 bool minty::Window::is_resized()
 {
 	if (_resized)
@@ -117,6 +132,11 @@ GLFWwindow* minty::Window::get_raw() const
 void minty::Window::set_input(InputMap const* const inputMap)
 {
 	_activeInputMap = inputMap;
+}
+
+InputMap const* minty::Window::get_input() const
+{
+	return _activeInputMap;
 }
 
 void minty::Window::trigger_key(Key const key, KeyAction const action, KeyModifiers const mods)

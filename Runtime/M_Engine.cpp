@@ -40,6 +40,11 @@ SceneManager* minty::Engine::get_scene_manager()
 	return &_sceneManager;
 }
 
+InputMap const* minty::Engine::get_input_map() const
+{
+	return _window.get_input();
+}
+
 float minty::Engine::get_delta_time()
 {
 	return _deltaTime;

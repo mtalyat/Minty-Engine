@@ -7,7 +7,6 @@
 #include "M_Info.h"
 #include "M_Window.h"
 #include "M_Viewport.h"
-#include "M_Vector3.h"
 #include "M_Transform.h"
 
 #include "M_EntityRegistry.h"
@@ -259,7 +258,7 @@ namespace minty
 		/// <summary>
 		/// Updates the Camera uniform buffer with the Camera info.
 		/// </summary>
-		void update_camera(CameraComponent const& camera, Vector3 const& position, Vector3 const& rotation);
+		void update_camera(CameraComponent const& camera, Transform const& transform);
 
 #pragma endregion
 
@@ -350,14 +349,6 @@ namespace minty
 #pragma endregion
 
 #pragma region Helper
-
-	private:
-		/// <summary>
-		/// Gets the Transform for the given Entity.
-		/// </summary>
-		/// <param name="entity"></param>
-		/// <param name="transform"></param>
-		void get_entity_transform(Entity const entity, Transform& transform) const;
 
 	public:
 		/// <summary>
