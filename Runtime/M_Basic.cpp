@@ -6,6 +6,7 @@
 #include "M_Rendering_DrawCallObjectInfo.h"
 #include "M_Rendering_RendererBuilder.h"
 #include "M_Rendering_ShaderBuilder.h"
+#include "M_Vector.h"
 
 using namespace minty;
 using namespace minty::rendering;
@@ -22,9 +23,9 @@ void minty::basic::create_basic_shader_builder(minty::rendering::RendererBuilder
 {
 	// add vertex data
 	builder.emplace_vertex_binding(0, sizeof(Vertex));
-	builder.emplace_vertex_attribute(0, sizeof(glm::vec3), VkFormat::VK_FORMAT_R32G32B32_SFLOAT);
-	builder.emplace_vertex_attribute(0, sizeof(glm::vec3), VkFormat::VK_FORMAT_R32G32B32_SFLOAT);
-	builder.emplace_vertex_attribute(0, sizeof(glm::vec2), VkFormat::VK_FORMAT_R32G32_SFLOAT);
+	builder.emplace_vertex_attribute(0, sizeof(Vector3), VkFormat::VK_FORMAT_R32G32B32_SFLOAT);
+	builder.emplace_vertex_attribute(0, sizeof(Vector3), VkFormat::VK_FORMAT_R32G32B32_SFLOAT);
+	builder.emplace_vertex_attribute(0, sizeof(Vector2), VkFormat::VK_FORMAT_R32G32_SFLOAT);
 
 	// add uniform data that should be part of every shader
 	builder.emplace_uniform_constant(
@@ -57,59 +58,64 @@ void basic::create_basic_cube(Mesh& mesh)
 	// create mesh data
 	const float SIZE = 0.5f;
 
-	glm::vec3 leftBottomBack = { -SIZE, -SIZE, -SIZE };
-	glm::vec3 leftBottomFront = { -SIZE, -SIZE, SIZE };
-	glm::vec3 leftTopBack = { -SIZE, SIZE, -SIZE };
-	glm::vec3 leftTopFront = { -SIZE, SIZE, SIZE };
-	glm::vec3 rightBottomBack = { SIZE, -SIZE, -SIZE };
-	glm::vec3 rightBottomFront = { SIZE, -SIZE, SIZE };
-	glm::vec3 rightTopBack = { SIZE, SIZE, -SIZE };
-	glm::vec3 rightTopFront = { SIZE, SIZE, SIZE };
+	Vector3 leftBottomBack = { -SIZE, -SIZE, -SIZE };
+	Vector3 leftBottomFront = { -SIZE, -SIZE, SIZE };
+	Vector3 leftTopBack = { -SIZE, SIZE, -SIZE };
+	Vector3 leftTopFront = { -SIZE, SIZE, SIZE };
+	Vector3 rightBottomBack = { SIZE, -SIZE, -SIZE };
+	Vector3 rightBottomFront = { SIZE, -SIZE, SIZE };
+	Vector3 rightTopBack = { SIZE, SIZE, -SIZE };
+	Vector3 rightTopFront = { SIZE, SIZE, SIZE };
 
-	glm::vec3 color = { 1.0f, 1.0f, 1.0f };
+	Vector3 up(0.0f, -1.0f, 0.0f);
+	Vector3 down(0.0f, 1.0f, 0.0f);
+	Vector3 left(-1.0f, 0.0f, 0.0f);
+	Vector3 right(1.0f, 0.0f, 0.0f);
+	Vector3 back(0.0f, 0.0f, -1.0f);
+	Vector3 front(0.0f, 0.0f, 1.0f);
 
-	glm::vec2 bottomLeft = { 0.0f, 0.0f };
-	glm::vec2 bottomRight = { 1.0f, 0.0f };
-	glm::vec2 topLeft = { 0.0f, 1.0f };
-	glm::vec2 topRight = { 1.0f, 1.0f };
+	Vector2 bottomLeft = { 0.0f, 0.0f };
+	Vector2 bottomRight = { 1.0f, 0.0f };
+	Vector2 topLeft = { 0.0f, 1.0f };
+	Vector2 topRight = { 1.0f, 1.0f };
 
 	std::vector<Vertex> vertices =
 	{
 		// up?
-		{ leftTopBack, color, bottomLeft },
-		{ leftTopFront, color, topLeft },
-		{ rightTopFront, color, topRight },
-		{ rightTopBack, color, bottomRight },
+		{ leftTopBack, up, bottomLeft },
+		{ leftTopFront, up, topLeft },
+		{ rightTopFront, up, topRight },
+		{ rightTopBack, up, bottomRight },
 
 		// down?
-		{ rightBottomBack, color, bottomLeft },
-		{ rightBottomFront, color, topLeft },
-		{ leftBottomFront, color, topRight },
-		{ leftBottomBack, color, bottomRight },
+		{ rightBottomBack, down, bottomLeft },
+		{ rightBottomFront, down, topLeft },
+		{ leftBottomFront, down, topRight },
+		{ leftBottomBack, down, bottomRight },
 
 		// right?
-		{ rightBottomBack, color, bottomLeft },
-		{ rightTopBack, color, topLeft },
-		{ rightTopFront, color, topRight },
-		{ rightBottomFront, color, bottomRight },
+		{ rightBottomBack, right, bottomLeft },
+		{ rightTopBack, right, topLeft },
+		{ rightTopFront, right, topRight },
+		{ rightBottomFront, right, bottomRight },
 
 		// left?
-		{ leftBottomFront, color, bottomLeft },
-		{ leftTopFront, color, topLeft },
-		{ leftTopBack, color, topRight },
-		{ leftBottomBack, color, bottomRight },
+		{ leftBottomFront, left, bottomLeft },
+		{ leftTopFront, left, topLeft },
+		{ leftTopBack, left, topRight },
+		{ leftBottomBack, left, bottomRight },
 
 		// front?
-		{ rightBottomFront, color, bottomLeft },
-		{ rightTopFront, color, topLeft },
-		{ leftTopFront, color, topRight },
-		{ leftBottomFront, color, bottomRight },
+		{ rightBottomFront, front, bottomLeft },
+		{ rightTopFront, front, topLeft },
+		{ leftTopFront, front, topRight },
+		{ leftBottomFront, front, bottomRight },
 
 		// back?
-		{ leftBottomBack, color, bottomLeft },
-		{ leftTopBack, color, topLeft },
-		{ rightTopBack, color, topRight },
-		{ rightBottomBack, color, bottomRight },
+		{ leftBottomBack, back, bottomLeft },
+		{ leftTopBack, back, topLeft },
+		{ rightTopBack, back, topRight },
+		{ rightBottomBack, back, bottomRight },
 	};
 
 	std::vector<uint16_t> indices =
@@ -136,25 +142,25 @@ void basic::create_basic_quad(Mesh& mesh)
 	// create mesh data
 	const float SIZE = 0.5f;
 
-	glm::vec3 leftTopBack = { -SIZE, 0.0f, -SIZE };
-	glm::vec3 leftTopFront = { -SIZE, 0.0f, SIZE };
-	glm::vec3 rightTopBack = { SIZE, 0.0f, -SIZE };
-	glm::vec3 rightTopFront = { SIZE, 0.0f, SIZE };
+	Vector3 leftTopBack = { -SIZE, 0.0f, -SIZE };
+	Vector3 leftTopFront = { -SIZE, 0.0f, SIZE };
+	Vector3 rightTopBack = { SIZE, 0.0f, -SIZE };
+	Vector3 rightTopFront = { SIZE, 0.0f, SIZE };
 
-	glm::vec3 color = { 1.0f, 1.0f, 1.0f };
+	Vector3 up(0.0f, -1.0f, 0.0f);
 
-	glm::vec2 topLeft = { 0.0f, 0.0f };
-	glm::vec2 topRight = { 1.0f, 0.0f };
-	glm::vec2 bottomLeft = { 0.0f, 1.0f };
-	glm::vec2 bottomRight = { 1.0f, 1.0f };
+	Vector2 topLeft = { 0.0f, 0.0f };
+	Vector2 topRight = { 1.0f, 0.0f };
+	Vector2 bottomLeft = { 0.0f, 1.0f };
+	Vector2 bottomRight = { 1.0f, 1.0f };
 
 	std::vector<Vertex> vertices =
 	{
 		// up?
-		{ leftTopBack, color, bottomLeft },
-		{ leftTopFront, color, topLeft },
-		{ rightTopFront, color, topRight },
-		{ rightTopBack, color, bottomRight },
+		{ leftTopBack, up, bottomLeft },
+		{ leftTopFront, up, topLeft },
+		{ rightTopFront, up, topRight },
+		{ rightTopBack, up, bottomRight },
 	};
 
 	std::vector<uint16_t> indices =
