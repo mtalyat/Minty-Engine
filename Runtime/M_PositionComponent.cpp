@@ -14,3 +14,8 @@ void minty::PositionComponent::deserialize(Reader const& reader)
 	position.y = reader.read_float("y");
 	position.z = reader.read_float("z");
 }
+
+std::string minty::to_string(PositionComponent const& value)
+{
+	return std::format("PositionComponent(position = {})", to_string(value.position));
+}

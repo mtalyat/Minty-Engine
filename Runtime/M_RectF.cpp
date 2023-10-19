@@ -56,12 +56,6 @@ minty::RectF::RectF(Vector2Int const position, Vector2Int const size)
 	, height(static_cast<float>(size.y))
 {}
 
-std::string const minty::RectF::to_string() const
-{
-	return std::format("RectF({0}, {1}, {2}, {3})", x, y, width, height);
-}
-
-
 bool RectF::overlaps(RectF const& other) const
 {
 	return left() < other.right() && right() > other.left() &&
@@ -102,4 +96,9 @@ Rect RectF::round(RectF const& rect)
 Rect RectF::ceil(RectF const& rect)
 {
 	return Rect(math::ceil_to_int(rect.x), math::ceil_to_int(rect.y), math::ceil_to_int(rect.width), math::ceil_to_int(rect.height));
+}
+
+std::string minty::to_string(RectF const& value)
+{
+	return std::format("RectF({0}, {1}, {2}, {3})", value.x, value.y, value.width, value.height);
 }

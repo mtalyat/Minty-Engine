@@ -2,29 +2,27 @@
 #include "M_Engine.h"
 
 #include "M_Console.h"
-#include "M_Renderer.h"
 #include <iostream>
 
 #define GLFW_INCLUDE_VULKAN
 #include <GLFW/glfw3.h>
 
 using namespace minty;
+using namespace minty::rendering;
 
 uint32_t const WIDTH = 800;
 uint32_t const HEIGHT = 600;
 
-Engine::Engine()
-	: _window("Minty", WIDTH, HEIGHT)
+Engine::Engine(Info const* const info)
+	: _window(info->get_application_info().pApplicationName, WIDTH, HEIGHT)
 	, _renderer(&_window)
 	, _sceneManager(this)
 	, _deltaTime(0.02f)
-{
-
-}
+{}
 
 Engine::~Engine()
 {
-
+	_renderer.destroy();
 }
 
 Window* minty::Engine::get_window()
@@ -42,6 +40,11 @@ SceneManager* minty::Engine::get_scene_manager()
 	return &_sceneManager;
 }
 
+InputMap const* minty::Engine::get_input_map() const
+{
+	return _window.get_input();
+}
+
 float minty::Engine::get_delta_time()
 {
 	return _deltaTime;
@@ -52,7 +55,7 @@ void Engine::run()
 	// if no scenes at all, abort
 	if (!_sceneManager.size())
 	{
-		throw std::runtime_error("Aborting game. No Scenes loaded.");
+		error::abort("Aborting game. No Scenes loaded.");
 	}
 
 	// if no scene loaded, just load the first scene
@@ -60,9 +63,6 @@ void Engine::run()
 	{
 		_sceneManager.load_scene(0);
 	}
-
-	// start the renderer
-	_renderer.start();
 
 	// start the scene(s)
 	_sceneManager.load();
@@ -79,7 +79,7 @@ void Engine::run()
 	time_point_t now;
 
 	// main loop
-	while (_renderer.running())
+	while (_renderer.is_running())
 	{
 		// run window events
 		glfwPollEvents();
@@ -91,7 +91,7 @@ void Engine::run()
 		_renderer.update();
 
 		// render to the screen
-		_renderer.renderFrame();
+		_renderer.render_frame();
 
 		// frame complete
 		fpsCount++;
@@ -114,7 +114,7 @@ void Engine::run()
 		// if fps time >= 1 second (in nanoseconds)
 		if (fpsTime >= 1000000000ll)
 		{
-			std::cout << fpsCount << '\r' << std::endl;
+			console::log(std::format("{}\r", fpsCount));
 
 			fpsCount = 0u;
 			fpsTime = 0ll;
@@ -125,10 +125,18 @@ void Engine::run()
 	_sceneManager.unload();
 
 	// print elapsed time
-	std::cout << "Elapsed time: " << (std::chrono::duration_cast<std::chrono::milliseconds>(get_now() - start).count() / 1000.0f) << "s" << std::endl;
+	console::log(std::format("Elapsed time: {}s", std::chrono::duration_cast<std::chrono::milliseconds>(get_now() - start).count() / 1000.0f));
+
+	// wait for device to be safe
+	_renderer.sync();
 }
 
 time_point_t minty::Engine::get_now() const
 {
 	return std::chrono::steady_clock::now();
+}
+
+std::string minty::to_string(Engine const& value)
+{
+	return std::format("Engine()");
 }

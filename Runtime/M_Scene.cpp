@@ -75,11 +75,6 @@ void minty::Scene::unload()
 	_systems->unload();
 }
 
-std::string const minty::Scene::to_string() const
-{
-	return std::format("Scene({}, {})", _systems->to_string(), _entities->to_string());
-}
-
 void minty::Scene::serialize(Writer& writer) const
 {
 	writer.write("Systems", _systems);
@@ -90,4 +85,9 @@ void minty::Scene::deserialize(Reader const& reader)
 {
 	reader.read_object("Systems", _systems);
 	reader.read_object("Entities", _entities);
+}
+
+std::string minty::to_string(Scene const& value)
+{
+	return std::format("Scene({}, {})", to_string(*value._systems), to_string(*value._entities));
 }

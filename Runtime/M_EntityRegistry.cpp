@@ -3,6 +3,10 @@
 
 #include "M_Console.h"
 #include "M_NameComponent.h"
+#include "M_OriginComponent.h"
+#include "M_PositionComponent.h"
+#include "M_RotationComponent.h"
+#include "M_ScaleComponent.h"
 #include <sstream>
 #include <map>
 
@@ -112,10 +116,55 @@ Component const* minty::EntityRegistry::get_by_name(std::string const& name, Ent
 	}
 }
 
+void minty::EntityRegistry::get_transform(Entity const entity, Transform& transform) const
+{
+	// get origin
+	OriginComponent const* const origin = this->try_get<OriginComponent>(entity);
+	if (origin)
+	{
+		// origin given
+		transform.position = origin->position;
+	}
+	else
+	{
+		// origin is at 0, 0, 0
+		transform.position = Vector3();
+	}
+
+	// get and add position to origin
+	PositionComponent const* const position = this->try_get<PositionComponent>(entity);
+	if (position)
+	{
+		transform.position += position->position;
+	}
+
+	// get rotation
+	RotationComponent const* const rotation = this->try_get<RotationComponent>(entity);
+	if (rotation)
+	{
+		transform.rotation = rotation->rotation;
+	}
+	else
+	{
+		transform.rotation = Quaternion();
+	}
+
+	// get scale
+	ScaleComponent const* const scale = this->try_get<ScaleComponent>(entity);
+	if (scale)
+	{
+		transform.scale = scale->scale;
+	}
+	else
+	{
+		transform.scale = Vector3(1.0f, 1.0f, 1.0f);
+	}
+}
+
 void minty::EntityRegistry::print(Entity const entity) const
 {
 	// serialize entity, add it to parent, print that
-	SerializedNode root;
+	Node root;
 	root.children.emplace(this->get_name(entity), serialize_entity(entity));
 	root.print();
 }
@@ -125,13 +174,98 @@ size_t minty::EntityRegistry::size() const
 	return this->storage<Entity>()->size();
 }
 
-std::string const minty::EntityRegistry::to_string() const
+void minty::EntityRegistry::serialize(Writer& writer) const
+{
+	// write each entity, and each component under it
+	std::string entityName;
+
+	for (auto [entity] : this->storage<Entity>()->each())
+	{
+		// serialize entity
+		Node entityNode = serialize_entity(entity);
+
+		// get entity name
+		entityName = this->get_name(entity);
+
+		// write entity node
+		writer.write(entityName, entityNode);
+	}
+}
+
+void minty::EntityRegistry::deserialize(Reader const& reader)
+{
+	// read each entity, add name if it has one
+	
+	Node const* node = reader.get_node();
+
+	for (auto const& pair : node->children)
+	{
+		// create entity
+		Entity const entity = entt::registry::create();
+
+		// add name if there is one
+		// empty name is either "" or "_"
+		if (pair.first.size() > 1 || (pair.first.size() == 1 && pair.first.at(0) != '_'))
+		{
+			NameComponent& name = this->emplace<NameComponent>(entity);
+			name.name = pair.first;
+		}
+
+		// now add the other components (children)
+		for (auto& componentPair : pair.second.children)
+		{
+			Component* component = this->emplace_by_name(componentPair.first, entity);
+			Reader reader(componentPair.second);
+			component->deserialize(reader);
+		}
+	}
+}
+
+Node minty::EntityRegistry::serialize_entity(Entity const entity) const
+{
+	// populate a node with children
+	Node entityNode;
+	Writer entityWriter(entityNode);
+
+	for (auto&& curr : this->storage())
+	{
+		//auto cid = curr.first;
+		auto& storage = curr.second;
+		auto const& ctype = storage.type();
+
+		if (storage.contains(entity))
+		{
+			// this entity has this component type, so get the "pretty" name
+			auto const& found = _componentTypes.find(ctype.index());
+			if (found == _componentTypes.end())
+			{
+				console::error(std::format("Cannot find component type with id: {}, name: {}", ctype.index(), ctype.name().data()));
+				continue;
+			}
+
+			std::string name = found->second;
+
+			// ignore NameComponent, that is used when writing the entity node
+			if (name.compare("Name") == 0)
+			{
+				continue;
+			}
+
+			// write component with its name and serialized values
+			entityWriter.write(name, this->get_by_name(name, entity));
+		}
+	}
+	
+	return entityNode;
+}
+
+std::string minty::to_string(EntityRegistry const& value)
 {
 	// total entities
-	size_t entityCount = size();
+	size_t entityCount = value.size();
 
 	// named entities count
-	size_t namedCount = this->view<NameComponent const>().size();
+	size_t namedCount = value.view<NameComponent const>().size();
 
 	// get a count of similarly named entities, so there isn't 100 of the same named entity
 	std::map<std::string, size_t> counts;
@@ -145,7 +279,7 @@ std::string const minty::EntityRegistry::to_string() const
 	if (namedCount > 0)
 	{
 		// add named
-		for (auto&& [entity, name] : view<NameComponent const>().each())
+		for (auto&& [entity, name] : value.view<NameComponent const>().each())
 		{
 			if (counts.find(name.name) != counts.end())
 			{
@@ -189,89 +323,4 @@ std::string const minty::EntityRegistry::to_string() const
 	stream << ")";
 
 	return stream.str();
-}
-
-void minty::EntityRegistry::serialize(Writer& writer) const
-{
-	// write each entity, and each component under it
-	std::string entityName;
-
-	for (auto [entity] : this->storage<Entity>()->each())
-	{
-		// serialize entity
-		SerializedNode entityNode = serialize_entity(entity);
-
-		// get entity name
-		entityName = this->get_name(entity);
-
-		// write entity node
-		writer.write(entityName, entityNode);
-	}
-}
-
-void minty::EntityRegistry::deserialize(Reader const& reader)
-{
-	// read each entity, add name if it has one
-	
-	SerializedNode const* node = reader.get_node();
-
-	for (auto const& pair : node->children)
-	{
-		// create entity
-		Entity const entity = entt::registry::create();
-
-		// add name if there is one
-		// empty name is either "" or "_"
-		if (pair.first.size() > 1 || (pair.first.size() == 1 && pair.first.at(0) != '_'))
-		{
-			NameComponent& name = this->emplace<NameComponent>(entity);
-			name.name = pair.first;
-		}
-
-		// now add the other components (children)
-		for (auto& componentPair : pair.second.children)
-		{
-			Component* component = this->emplace_by_name(componentPair.first, entity);
-			Reader reader(componentPair.second);
-			component->deserialize(reader);
-		}
-	}
-}
-
-SerializedNode minty::EntityRegistry::serialize_entity(Entity const entity) const
-{
-	// populate a node with children
-	SerializedNode entityNode;
-	Writer entityWriter(entityNode);
-
-	for (auto&& curr : this->storage())
-	{
-		//auto cid = curr.first;
-		auto& storage = curr.second;
-		auto const& ctype = storage.type();
-
-		if (storage.contains(entity))
-		{
-			// this entity has this component type, so get the "pretty" name
-			auto const& found = _componentTypes.find(ctype.index());
-			if (found == _componentTypes.end())
-			{
-				console::error(std::format("Cannot find component type with id: {}, name: {}", ctype.index(), ctype.name().data()));
-				continue;
-			}
-
-			std::string name = found->second;
-
-			// ignore NameComponent, that is used when writing the entity node
-			if (name.compare("Name") == 0)
-			{
-				continue;
-			}
-
-			// write component with its name and serialized values
-			entityWriter.write(name, this->get_by_name(name, entity));
-		}
-	}
-	
-	return entityNode;
 }

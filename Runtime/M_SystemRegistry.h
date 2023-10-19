@@ -124,10 +124,11 @@ namespace minty
 		template <class T>
 		static void register_system(std::string const& name);
 
-		std::string const to_string() const override;
-
 		void serialize(Writer& writer) const override;
 		void deserialize(Reader const& reader) override;
+
+	public:
+		friend std::string to_string(SystemRegistry const& value);
 };
 
 	template<class T>

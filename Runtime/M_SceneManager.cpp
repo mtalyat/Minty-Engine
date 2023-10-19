@@ -32,7 +32,7 @@ ID minty::SceneManager::create_scene(std::string const& path)
 	Scene& scene = _scenes.at(id);
 
 	// load the data from the disk into the scene
-	SerializedNode node = SerializedNode::parse_file(path);
+	Node node = Node::parse_file(path);
 	Reader reader(node);
 	scene.deserialize(reader);
 
@@ -135,4 +135,9 @@ void minty::SceneManager::unload()
 	{
 		_loadedScene->unload();
 	}
+}
+
+std::string minty::to_string(SceneManager const& value)
+{
+	return std::format("SceneManager(scenes size = {})", value.size());
 }

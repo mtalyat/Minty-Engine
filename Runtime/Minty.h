@@ -9,6 +9,14 @@ access to the entire engine without needing include each file.
 
 */
 
+// LIBRARIES
+#include <vulkan/vulkan.h>
+#include "glm.hpp"
+
+// BASIC
+#include "M_Basic.h"
+#include "M_Basic_Vertex.h"
+
 // COMPONENTS
 #include "M_Component.h"
 
@@ -21,6 +29,25 @@ access to the entire engine without needing include each file.
 
 // ENTITIES
 #include "M_EntityRegistry.h"
+
+// INPUT
+#include "M_InputMap.h"
+#include "M_Key.h"
+#include "M_KeyAction.h"
+#include "M_KeyModifiers.h"
+#include "M_MouseButton.h"
+
+// RENDERING
+#include "M_Material.h"
+#include "M_Mesh.h"
+#include "M_Renderer.h"
+#include "M_Rendering_MaterialBuilder.h"
+#include "M_Rendering_Object.h"
+#include "M_Rendering_RendererBuilder.h"
+#include "M_Rendering_TextureBuilder.h"
+#include "M_Rendering_ShaderBuilder.h"
+#include "M_Shader.h"
+#include "M_Texture.h"
 
 // SCENES
 #include "M_Scene.h"
@@ -45,26 +72,16 @@ access to the entire engine without needing include each file.
 #include "M_Engine.h"
 #include "M_Event.h"
 #include "M_File.h"
-#include "M_InputMap.h"
-#include "M_Key.h"
-#include "M_KeyAction.h"
-#include "M_KeyModifiers.h"
-#include "M_Material.h"
+#include "M_Info.h"
 #include "M_Math.h"
-#include "M_Mesh.h"
-#include "M_MouseButton.h"
+#include "M_Matrix.h"
 #include "M_Object.h"
 #include "M_Parse.h"
-#include "M_Project.h"
+#include "M_Quaternion.h"
 #include "M_Rect.h"
 #include "M_RectF.h"
-#include "M_Renderer.h"
 #include "M_Runtime.h"
 #include "M_Stopwatch.h"
-#include "M_Texture.h"
 #include "M_Types.h"
-#include "M_Vector2.h"
-#include "M_Vector2Int.h"
-#include "M_Vector3.h"
-#include "M_Vector3Int.h"
+#include "M_Vector.h"
 #include "M_Window.h"

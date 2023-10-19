@@ -4,6 +4,7 @@
 #include "M_Component.h"
 #include "M_Console.h"
 #include "M_ISerializable.h"
+#include "M_Transform.h"
 
 namespace minty
 {
@@ -79,7 +80,7 @@ namespace minty
 		/// Emplaces the Component onto the entity, by name.
 		/// </summary>
 		/// <param name="name">The name of the Component.</param>
-		/// <param name="entity">The Entity to emplace the Component onto.</param>
+		/// <param name="entity">The Entity to set the Component onto.</param>
 		/// <returns>A pointer to the newly emplaced Component, or null if an error occured.</returns>
 		Component* emplace_by_name(std::string const& name, Entity const entity);
 
@@ -90,6 +91,14 @@ namespace minty
 		/// <param name="entity">The Entity that has the Component.</param>
 		/// <returns>The Component, or null if it does not exist.</returns>
 		Component const* get_by_name(std::string const& name, Entity const entity) const;
+
+		/// <summary>
+		/// Gets the Transform for the given Entity.
+		/// </summary>
+		/// <param name="entity"></param>
+		/// <param name="transform"></param>
+		/// <returns></returns>
+		void get_transform(Entity const entity, Transform& transform) const;
 
 		/// <summary>
 		/// Prints an Entity's values to the screen.
@@ -103,7 +112,7 @@ namespace minty
 		/// <returns>The total number of Entities.</returns>
 		size_t size() const;
 
-		std::string const to_string() const override;
+		friend std::string to_string(EntityRegistry const& value);
 
 		/// <summary>
 		/// Registers the Component, so the Component can be dynamically created by name.
@@ -116,7 +125,7 @@ namespace minty
 		void deserialize(Reader const& reader) override;
 
 	private:
-		SerializedNode serialize_entity(Entity const entity) const;
+		Node serialize_entity(Entity const entity) const;
 	};
 
 	template<class T>

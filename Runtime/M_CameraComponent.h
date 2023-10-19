@@ -1,5 +1,6 @@
 #pragma once
 
+#include "M_Base.h"
 #include "M_Component.h"
 
 namespace minty
@@ -29,5 +30,7 @@ namespace minty
 
 		void serialize(Writer& writer) const override;
 		void deserialize(Reader const& reader) override;
+
+		friend std::string to_string(CameraComponent const& value);
 	};
 }

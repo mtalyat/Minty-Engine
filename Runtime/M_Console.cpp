@@ -17,6 +17,29 @@ void print_raw(std::ostream& stream, std::string const& message, minty::console:
 	}
 }
 
+std::string minty::console::to_string(Color const value)
+{
+	switch (value) {
+	case Color::Black: return "Black";
+	case Color::Red: return "Red";
+	case Color::Green: return "Green";
+	case Color::Yellow: return "Yellow";
+	case Color::Blue: return "Blue";
+	case Color::Magenta: return "Magenta";
+	case Color::Cyan: return "Cyan";
+	case Color::White: return "White";
+	case Color::Gray: return "Gray";
+	case Color::BrightRed: return "Bright Red";
+	case Color::BrightGreen: return "Bright Green";
+	case Color::BrightYellow: return "Bright Yellow";
+	case Color::BrightBlue: return "Bright Blue";
+	case Color::BrightMagenta: return "Bright Magenta";
+	case Color::BrightCyan: return "Bright Cyan";
+	case Color::BrightWhite: return "Bright White";
+	default: return minty::error::ERROR_TEXT;
+	}
+}
+
 void minty::console::print(std::string const& message)
 {
 	std::cout << message << std::endl;
@@ -44,35 +67,35 @@ void minty::console::log(std::string const& message, Color const color)
 void minty::console::todo(std::string const& message)
 {
 #ifndef NDEBUG
-	print_raw(std::cerr, "TODO: " + message, Color::Cyan);
+	print_raw(std::cout, "[todo]: " + message, Color::Magenta);
 #endif
 }
 
 void minty::console::test(std::string const& message, Color const color)
 {
 #ifndef NDEBUG
-	print_raw(std::cerr, message, color);
+	print_raw(std::cout, "[test]: " + message, color);
 #endif
 }
 
 void minty::console::info(std::string const& message)
 {
 #ifndef NDEBUG
-	print_raw(std::cerr, message, Color::Gray);
+	print_raw(std::cout, "[info]: " + message, Color::Gray);
 #endif
 }
 
 void minty::console::warn(std::string const& message)
 {
 #ifndef NDEBUG
-	print_raw(std::cerr, message, Color::Yellow);
+	print_raw(std::cout, "[warn]: " + message, Color::Yellow);
 #endif
 }
 
 void minty::console::error(std::string const& message)
 {
 #ifndef NDEBUG
-	print_raw(std::cerr, message, Color::Red);
+	print_raw(std::cout, "[errr]: " + message, Color::Red);
 #endif
 }
 

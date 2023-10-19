@@ -2,7 +2,9 @@
 
 #include "M_Window.h"
 #include "M_Renderer.h"
+#include "M_Rendering_RendererBuilder.h"
 #include "M_SceneManager.h"
+#include "M_Info.h"
 #include <chrono>
 
 typedef std::chrono::steady_clock::time_point time_point_t;
@@ -21,7 +23,7 @@ namespace minty
 
 		float _deltaTime;
 	public:
-		Engine();
+		Engine(Info const* const appInfo);
 
 		~Engine();
 
@@ -30,6 +32,8 @@ namespace minty
 		Renderer* get_renderer();
 
 		SceneManager* get_scene_manager();
+
+		InputMap const* get_input_map() const;
 
 		/// <summary>
 		/// Gets the time that elapsed over the course of the last frame.
@@ -44,5 +48,8 @@ namespace minty
 	private:
 		// gets the current time as a time point
 		time_point_t get_now() const;
+
+	public:
+		friend std::string to_string(Engine const& value);
 	};
 }
