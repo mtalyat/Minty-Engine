@@ -12,3 +12,8 @@ RendererObject::RendererObject(Renderer& renderer)
 
 RendererObject::~RendererObject()
 {}
+
+std::string minty::rendering::to_string(RendererObject const& value)
+{
+	return std::format("RendererObject()");
+}

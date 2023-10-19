@@ -93,3 +93,8 @@ std::vector<std::pair<void const*, MaterialBuilder const*>> const& minty::render
 {
     return _materials.data();
 }
+
+std::string minty::rendering::to_string(RendererBuilder const& value)
+{
+    return std::format("RendererBuilder()");
+}

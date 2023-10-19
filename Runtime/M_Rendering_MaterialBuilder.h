@@ -15,5 +15,7 @@ namespace minty::rendering
 		void set_shader_id(ID const id);
 
 		ID get_shader_id() const;
+
+		std::string to_string(MaterialBuilder const& value);
 	};
 }

@@ -1,12 +1,9 @@
 #include "pch.h"
 #include "M_Object.h"
 
-#include <typeinfo>
-
 using namespace minty;
 
-std::string const Object::to_string() const
+std::string minty::to_string(Object const& value)
 {
-	// return the name of this object
-	return std::format("{}", typeid(*this).name());
+	return std::format("Object()");
 }

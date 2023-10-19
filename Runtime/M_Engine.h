@@ -48,5 +48,8 @@ namespace minty
 	private:
 		// gets the current time as a time point
 		time_point_t get_now() const;
+
+	public:
+		friend std::string to_string(Engine const& value);
 	};
 }

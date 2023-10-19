@@ -114,11 +114,6 @@ inline Color Color::lighten(float const percent) const
 	return Color();
 }
 
-std::string const minty::Color::to_string() const
-{
-	return std::format("Color({}, {}, {}, {})", r, g, b, a);
-}
-
 Color Color::lerp(Color const left, Color const right, float const t)
 {
 	return Color(
@@ -135,4 +130,9 @@ Color Color::lerpa(Color const left, Color const right, float const t)
 		static_cast<byte>(math::lerp(left.g, right.g, t)),
 		static_cast<byte>(math::lerp(left.b, right.b, t)),
 		static_cast<byte>(math::lerp(left.a, right.a, t)));
+}
+
+std::string minty::to_string(Color const color)
+{
+	return std::format("Color({}, {}, {}, {})", color.r, color.g, color.b, color.a);
 }

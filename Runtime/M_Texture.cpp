@@ -17,10 +17,10 @@ Texture::Texture(std::string const& path, rendering::TextureBuilder const& build
 	: RendererObject::RendererObject(renderer)
 {
 	// get data from file: pixels, width, height, color channels
-	int width = 0, height = 0, channels;
+	int channels;
 
 	// load a texture with r g b and a
-	stbi_uc* pixels = stbi_load(path.c_str(), &width, &height, &channels, STBI_rgb_alpha);
+	stbi_uc* pixels = stbi_load(path.c_str(), &_width, &_height, &channels, STBI_rgb_alpha);
 
 	// if no pixels, error
 	if (!pixels)
@@ -30,7 +30,7 @@ Texture::Texture(std::string const& path, rendering::TextureBuilder const& build
 	}
 
 	// get size needed to store the texture
-	VkDeviceSize imageSize = width * height * sizeof(color_t);
+	VkDeviceSize imageSize = _width * _height * sizeof(color_t);
 
 	// copy to device via a staging buffer
 
@@ -62,13 +62,13 @@ Texture::Texture(std::string const& path, rendering::TextureBuilder const& build
 	_format = static_cast<VkFormat>(builder.get_format());
 
 	// create the image on gpu
-	renderer.create_image(width, height, _format, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, _image, _memory);
+	renderer.create_image(_width, _height, _format, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, _image, _memory);
 
 	// prep texture for copying
 	renderer.change_image_layout(_image, _format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
 	// copy pixel data to image
-	renderer.copy_buffer_to_image(stagingBuffer, _image, width, height);
+	renderer.copy_buffer_to_image(stagingBuffer, _image, _width, _height);
 
 	// prep texture for rendering
 	renderer.change_image_layout(_image, _format, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
@@ -130,6 +130,16 @@ void minty::Texture::destroy()
 	vkFreeMemory(device, _memory, nullptr);
 }
 
+int minty::Texture::get_width() const
+{
+	return _width;
+}
+
+int minty::Texture::get_height() const
+{
+	return _height;
+}
+
 VkFormat minty::Texture::get_format() const
 {
 	return _format;
@@ -153,4 +163,9 @@ VkDeviceMemory minty::Texture::get_device_memory() const
 VkSampler minty::Texture::get_sampler() const
 {
 	return _sampler;
+}
+
+std::string minty::to_string(Texture const& value)
+{
+	return std::format("Texture(width = {}, height = {})", value._width, value._height);
 }

@@ -199,6 +199,7 @@ namespace minty
 		/// <returns>A RectF, with the given values, ceiled.</returns>
 		static Rect ceil(RectF const& rect);
 
-		std::string const to_string() const override;
+	public:
+		friend std::string to_string(RectF const& value);
 	};
 }

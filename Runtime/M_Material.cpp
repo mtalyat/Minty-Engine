@@ -62,3 +62,8 @@ void* minty::Material::get() const
 {
 	return _data;
 }
+
+std::string minty::to_string(Material const& value)
+{
+	return std::format("Material(shaderId = {})", value._shaderId);
+}

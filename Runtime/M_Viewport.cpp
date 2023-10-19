@@ -67,3 +67,8 @@ VkRect2D minty::Viewport::get_scissor() const
 {
 	return _scissor;
 }
+
+std::string minty::to_string(Viewport const& value)
+{
+	return std::format("Viewport(View(x = {}, y = {}, width = {}, height = {}, min depth = {}, max depth = {}), Scissor(x = {}, y = {}, width = {}, height = {}))", value._view.x, value._view.y, value._view.width, value._view.height, value._view.minDepth, value._view.maxDepth, value._scissor.offset.x, value._scissor.offset.y, value._scissor.extent.width, value._scissor.extent.height);
+}

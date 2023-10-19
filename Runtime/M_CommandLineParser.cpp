@@ -78,3 +78,8 @@ bool CommandLineParser::get_argument(std::string const& name)
 {
 	return _args.find(name) != _args.end();
 }
+
+std::string minty::to_string(CommandLineParser const& value)
+{
+	return std::format("CommandLineParser()");
+}

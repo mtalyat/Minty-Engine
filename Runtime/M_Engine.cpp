@@ -135,3 +135,8 @@ time_point_t minty::Engine::get_now() const
 {
 	return std::chrono::steady_clock::now();
 }
+
+std::string minty::to_string(Engine const& value)
+{
+	return std::format("Engine()");
+}

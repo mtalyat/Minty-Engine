@@ -1,5 +1,7 @@
 #pragma once
 
+#include "M_Base.h"
+
 namespace minty
 {
 	/// <summary>
@@ -14,4 +16,6 @@ namespace minty
 		CapsLock =		0b010000,
 		NumLock =		0b100000
 	};
+
+	std::string to_string(KeyModifiers const value);
 }

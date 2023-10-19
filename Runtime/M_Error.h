@@ -13,6 +13,8 @@
 
 namespace minty::error
 {
+	constexpr char const* ERROR_TEXT = "ERROR";
+
 	std::string result_to_string(VkResult const result);
 
 	void abort(std::string const& message);

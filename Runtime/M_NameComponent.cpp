@@ -10,3 +10,8 @@ void minty::NameComponent::deserialize(Reader const& reader)
 {
 	name = reader.read_string("name");
 }
+
+std::string minty::to_string(NameComponent const& value)
+{
+	return std::format("NameComponent(name = {})", value.name);
+}

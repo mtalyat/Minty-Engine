@@ -194,36 +194,6 @@ namespace minty
 		_allSystems.clear();
 		_orderedSystems.clear();
 	}
-
-	std::string const SystemRegistry::to_string() const
-	{
-		// if no systems in registry
-		if (_orderedSystems.size() == 0)
-		{
-			return "SystemRegistry()";
-		}
-
-		// if at least one system in registry
-		std::stringstream stream;
-		stream << "SystemRegistry(";
-
-		size_t i = 0;
-		for (auto const& pair : _orderedSystems)
-		{
-			for (auto const& system : pair.second)
-			{
-				if (i > 0) stream << ' ';
-
-				stream << system->to_string();
-
-				i++;
-			}
-		}
-
-		stream << ")";
-
-		return stream.str();
-	}
 	
 	void SystemRegistry::serialize(Writer& writer) const
 	{
@@ -250,11 +220,51 @@ namespace minty
 	void SystemRegistry::deserialize(Reader const& reader)
 	{
 		// read each one and set as we go, by name
-		SerializedNode const* node = reader.get_node();
+		Node const* node = reader.get_node();
 
 		for (auto const& pair : node->children)
 		{
 			emplace_by_name(pair.first, pair.second.to_int());
 		}
+	}
+
+	std::string to_string(SystemRegistry const& value)
+	{
+		// if no systems in registry
+		if (value._orderedSystems.size() == 0)
+		{
+			return "SystemRegistry()";
+		}
+
+		// if at least one system in registry
+		std::stringstream stream;
+		stream << "SystemRegistry(";
+
+		size_t i = 0;
+		for (auto const& pair : value._orderedSystems)
+		{
+			for (auto const system : pair.second)
+			{
+				for (auto const& pair : value._allSystems)
+				{
+					if (pair.second == system)
+					{
+						// match, use name
+						if (i > 0) stream << ' ';
+
+						stream << pair.first;
+
+						i++;
+						break;
+					}
+				}
+
+				// ignore if no match found, I guess
+			}
+		}
+
+		stream << ")";
+
+		return stream.str();
 	}
 }

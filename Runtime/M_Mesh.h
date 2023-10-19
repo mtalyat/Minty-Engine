@@ -67,6 +67,9 @@ namespace minty
 		void dispose_vertices();
 
 		void dispose_indices();
+
+	public:
+		friend std::string to_string(Mesh const& mesh);
 	};
 
 	template<class T>

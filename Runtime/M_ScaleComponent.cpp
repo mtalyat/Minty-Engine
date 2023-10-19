@@ -14,3 +14,8 @@ void minty::ScaleComponent::deserialize(Reader const& reader)
 	scale.y = reader.read_float("y", 1.0f);
 	scale.z = reader.read_float("z", 1.0f);
 }
+
+std::string minty::to_string(ScaleComponent const& value)
+{
+	return std::format("ScaleComponent(scale = {})", to_string(value.scale));
+}

@@ -141,9 +141,6 @@
     <ClInclude Include="M_CameraComponent.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
-    <ClInclude Include="M_String.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="libraries\entt\entt.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -235,6 +232,9 @@
       <Filter>Header Files\Input</Filter>
     </ClInclude>
     <ClInclude Include="glfw.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Base.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -381,6 +381,24 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_Vector.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_CursorMode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_Key.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_KeyAction.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_KeyModifiers.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_MouseButton.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_Matrix.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

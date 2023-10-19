@@ -112,7 +112,7 @@ namespace minty
 		/// <returns>The total number of Entities.</returns>
 		size_t size() const;
 
-		std::string const to_string() const override;
+		friend std::string to_string(EntityRegistry const& value);
 
 		/// <summary>
 		/// Registers the Component, so the Component can be dynamically created by name.
@@ -125,7 +125,7 @@ namespace minty
 		void deserialize(Reader const& reader) override;
 
 	private:
-		SerializedNode serialize_entity(Entity const entity) const;
+		Node serialize_entity(Entity const entity) const;
 	};
 
 	template<class T>

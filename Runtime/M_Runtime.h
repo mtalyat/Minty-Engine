@@ -35,5 +35,8 @@ namespace minty
 	private:
 		// registers all built in systems and components
 		void register_builtin();
+
+	public:
+		friend std::string to_string(Runtime const& runtime);
 	};
 }

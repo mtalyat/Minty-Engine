@@ -1,7 +1,6 @@
 #pragma once
 
-#include <string>
-#include <format>
+#include "M_Base.h"
 
 namespace minty
 {
@@ -30,6 +29,8 @@ namespace minty
 			BrightCyan = 14,
 			BrightWhite = 15
 		};
+
+		std::string to_string(Color const value);
 
 		/// <summary>
 		/// Prints the string to the console.

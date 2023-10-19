@@ -68,5 +68,8 @@ namespace minty
 		/// Called when the Scene is being unloaded.
 		/// </summary>
 		virtual void unload() {}
+
+	public:
+		friend std::string to_string(System const& value);
 	};
 }

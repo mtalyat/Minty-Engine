@@ -16,3 +16,8 @@ void minty::OriginComponent::deserialize(Reader const& reader)
 	position.y = reader.read_float("y");
 	position.z = reader.read_float("z");
 }
+
+std::string minty::to_string(OriginComponent const& value)
+{
+	return std::format("OriginComponent(position = {})", to_string(value.position));
+}

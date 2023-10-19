@@ -1,5 +1,7 @@
 #pragma once
 
+#include "M_Base.h"
+
 namespace minty
 {
 	/// <summary>
@@ -9,7 +11,7 @@ namespace minty
 	{
 		Unknown = -1,
 		Space = 32,
-		Apostrphe = 39,
+		Apostrophe = 39,
 		Comma = 44,
 		Minus = 45,
 		Period = 46,
@@ -128,4 +130,6 @@ namespace minty
 		RightSuper = 347,
 		Menu = 348,
 	};
+
+	std::string to_string(Key const value);
 }

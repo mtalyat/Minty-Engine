@@ -5,16 +5,16 @@
 
 using namespace minty;
 
-minty::Reader::Reader(SerializedNode const& node)
+minty::Reader::Reader(Node const& node)
 	: _node(node)
 {}
 
-SerializedNode const* minty::Reader::get_node() const
+Node const* minty::Reader::get_node() const
 {
 	return &_node;
 }
 
-SerializedNode const* minty::Reader::get_node(std::string const& name) const
+Node const* minty::Reader::get_node(std::string const& name) const
 {
 	auto const& found = _node.children.find(name);
 	if (found != _node.children.end())
@@ -41,7 +41,7 @@ void minty::Reader::read_object(std::string const& name, ISerializable* const va
 	else
 	{
 		// deserialize with an empty node so it is initialized to defaults
-		SerializedNode empty;
+		Node empty;
 		Reader reader(empty);
 		value->deserialize(reader);
 	}
@@ -160,4 +160,9 @@ Vector4Int minty::Reader::read_vector4int(std::string const& name, Vector4Int co
 Quaternion minty::Reader::read_quaternion(std::string const& name, Quaternion const& defaultValue) const
 {
 	return Quaternion();
+}
+
+std::string minty::to_string(Reader const& value)
+{
+	return std::format("Reader(node = {})", to_string(value._node));
 }

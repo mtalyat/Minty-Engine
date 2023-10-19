@@ -14,3 +14,8 @@ void minty::MeshComponent::deserialize(Reader const& reader)
 {
 	console::todo("MeshComponent::deserialize");
 }
+
+std::string minty::to_string(MeshComponent const& value)
+{
+	return std::format("MeshComponent()");
+}

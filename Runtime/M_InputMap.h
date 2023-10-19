@@ -20,6 +20,8 @@ namespace minty
 		KeyModifiers mods;
 	};
 
+	std::string to_string(KeyPressEventArgs const& value);
+
 	/// <summary>
 	/// Event arguments for when a mouse button is pressed, held or released.
 	/// </summary>
@@ -30,6 +32,8 @@ namespace minty
 		KeyModifiers mods;
 		float x, y;
 	};
+
+	std::string to_string(MouseClickEventArgs const& value);
 
 	/// <summary>
 	/// Event arguments for when the mouse is moved.
@@ -57,6 +61,8 @@ namespace minty
 		float dy;
 	};
 
+	std::string to_string(MouseMoveEventArgs const& value);
+
 	/// <summary>
 	/// Event arguments for when the mouse scrolls.
 	/// </summary>
@@ -72,6 +78,8 @@ namespace minty
 		/// </summary>
 		float dy;
 	};
+
+	std::string to_string(MouseScrollEventArgs const& value);
 
 	/// <summary>
 	/// Holds events for actions taken by the user.
@@ -255,5 +263,7 @@ namespace minty
 		/// <param name="button">The button to check.</param>
 		/// <returns>True if the button is actively being pressed.</returns>
 		bool is_button_pressed(MouseButton const button) const;
+
+		friend std::string to_string(InputMap const& value);
 	};
 }

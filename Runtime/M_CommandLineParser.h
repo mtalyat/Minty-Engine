@@ -1,6 +1,6 @@
 #pragma once
 
-#include <string>
+#include "M_Base.h"
 #include <vector>
 #include <map>
 
@@ -105,6 +105,9 @@ namespace minty
 		/// <param name="name">The name of the parameter to check if it exists.</param>
 		/// <returns>True if the argument was given.</returns>
 		bool get_argument(std::string const& name);
+
+	public:
+		friend std::string to_string(CommandLineParser const& value);
 	};
 }
 
