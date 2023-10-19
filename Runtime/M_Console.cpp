@@ -17,6 +17,29 @@ void print_raw(std::ostream& stream, std::string const& message, minty::console:
 	}
 }
 
+std::string minty::console::to_string(Color const value)
+{
+	switch (value) {
+	case Color::Black: return "Black";
+	case Color::Red: return "Red";
+	case Color::Green: return "Green";
+	case Color::Yellow: return "Yellow";
+	case Color::Blue: return "Blue";
+	case Color::Magenta: return "Magenta";
+	case Color::Cyan: return "Cyan";
+	case Color::White: return "White";
+	case Color::Gray: return "Gray";
+	case Color::BrightRed: return "Bright Red";
+	case Color::BrightGreen: return "Bright Green";
+	case Color::BrightYellow: return "Bright Yellow";
+	case Color::BrightBlue: return "Bright Blue";
+	case Color::BrightMagenta: return "Bright Magenta";
+	case Color::BrightCyan: return "Bright Cyan";
+	case Color::BrightWhite: return "Bright White";
+	default: return minty::error::ERROR_TEXT;
+	}
+}
+
 void minty::console::print(std::string const& message)
 {
 	std::cout << message << std::endl;

@@ -17,3 +17,8 @@ ID minty::rendering::MaterialBuilder::get_shader_id() const
 {
     return _shaderId;
 }
+
+std::string minty::rendering::MaterialBuilder::to_string(MaterialBuilder const& value)
+{
+    return std::format("MaterialBuilder(sahderId = {})", value._shaderId);
+}

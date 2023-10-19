@@ -49,3 +49,8 @@ VkFormat minty::rendering::TextureBuilder::get_format() const
 {
 	return _format;
 }
+
+std::string minty::rendering::to_string(TextureBuilder const& value)
+{
+	return std::format("TextureBuilder()");
+}

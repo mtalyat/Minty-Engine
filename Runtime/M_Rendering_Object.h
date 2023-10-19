@@ -18,6 +18,8 @@ namespace minty::rendering
 		RendererObject(minty::Renderer& renderer);
 
 		virtual ~RendererObject();
+
+		friend std::string to_string(RendererObject const& value);
 	};
 }
 

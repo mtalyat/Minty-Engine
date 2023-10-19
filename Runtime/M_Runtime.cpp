@@ -72,3 +72,8 @@ void minty::Runtime::register_builtin()
 	EntityRegistry::register_component<RotationComponent>("Rotation");
 	EntityRegistry::register_component<ScaleComponent>("Scale");
 }
+
+std::string minty::to_string(Runtime const& runtime)
+{
+	return std::format("Runtime()");
+}

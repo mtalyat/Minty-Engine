@@ -84,5 +84,8 @@ namespace minty
 		/// Unloads the SceneManager and any active Scenes.
 		/// </summary>
 		void unload();
+
+	public:
+		friend std::string to_string(SceneManager const& value);
 	};
 }

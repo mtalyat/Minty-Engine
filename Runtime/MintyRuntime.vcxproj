@@ -208,6 +208,7 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="M_Base.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="glfw.hpp" />
     <ClInclude Include="glm.hpp" />
@@ -216,6 +217,7 @@
     <ClInclude Include="M_Basic_Vertex.h" />
     <ClInclude Include="M_CursorMode.h" />
     <ClInclude Include="M_Matrix.h" />
+    <ClInclude Include="M_Object.h" />
     <ClInclude Include="M_Rendering_DrawCallObjectInfo.h" />
     <ClInclude Include="M_Error.h" />
     <ClInclude Include="M_Info.h" />
@@ -239,7 +241,6 @@
     <ClInclude Include="M_Key.h" />
     <ClInclude Include="M_Math.h" />
     <ClInclude Include="M_Mesh.h" />
-    <ClInclude Include="M_Object.h" />
     <ClInclude Include="M_OriginComponent.h" />
     <ClInclude Include="M_Parse.h" />
     <ClInclude Include="M_PositionComponent.h" />
@@ -256,7 +257,6 @@
     <ClInclude Include="M_SceneManager.h" />
     <ClInclude Include="M_SerializedNode.h" />
     <ClInclude Include="M_Shader.h" />
-    <ClInclude Include="M_String.h" />
     <ClInclude Include="M_System.h" />
     <ClInclude Include="M_SystemRegistry.h" />
     <ClInclude Include="M_Texture.h" />
@@ -282,16 +282,22 @@
     <ClCompile Include="M_Color.cpp" />
     <ClCompile Include="M_CommandLineParser.cpp" />
     <ClCompile Include="M_Console.cpp" />
+    <ClCompile Include="M_CursorMode.cpp" />
     <ClCompile Include="M_EntityRegistry.cpp" />
     <ClCompile Include="M_Error.cpp" />
     <ClCompile Include="M_File.cpp" />
     <ClCompile Include="M_Engine.cpp" />
     <ClCompile Include="M_Info.cpp" />
     <ClCompile Include="M_InputMap.cpp" />
+    <ClCompile Include="M_Key.cpp" />
+    <ClCompile Include="M_KeyAction.cpp" />
+    <ClCompile Include="M_KeyModifiers.cpp" />
     <ClCompile Include="M_Material.cpp" />
     <ClCompile Include="M_Math.cpp" />
+    <ClCompile Include="M_Matrix.cpp" />
     <ClCompile Include="M_Mesh.cpp" />
     <ClCompile Include="M_MeshComponent.cpp" />
+    <ClCompile Include="M_MouseButton.cpp" />
     <ClCompile Include="M_NameComponent.cpp" />
     <ClCompile Include="M_Object.cpp" />
     <ClCompile Include="M_OriginComponent.cpp" />

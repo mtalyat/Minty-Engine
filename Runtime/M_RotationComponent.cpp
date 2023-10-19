@@ -14,3 +14,8 @@ void minty::RotationComponent::deserialize(Reader const& reader)
 	rotation.y = reader.read_float("y");
 	rotation.z = reader.read_float("z");
 }
+
+std::string minty::to_string(RotationComponent const& value)
+{
+	return std::format("RotationComponent(rotation = {})", to_string(value.rotation));
+}

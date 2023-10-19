@@ -101,6 +101,9 @@ namespace minty
 		void create_descriptor_pool(rendering::ShaderBuilder const& builder);
 
 		void create_descriptor_sets(rendering::ShaderBuilder const& builder);
+
+	public:
+		friend std::string to_string(Shader const& shader);
 	};
 }
 

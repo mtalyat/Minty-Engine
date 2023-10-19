@@ -1596,3 +1596,8 @@ void minty::Renderer::sync()
 	// wait for logical device to finish rendering before closing program
 	vkDeviceWaitIdle(_device);
 }
+
+std::string minty::to_string(Renderer const& value)
+{
+	return std::format("Renderer()");
+}

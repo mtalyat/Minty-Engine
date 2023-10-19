@@ -24,5 +24,8 @@ namespace minty
 		Info(std::string const& name, uint32_t const major, uint32_t const minor, uint32_t const patch);
 
 		VkApplicationInfo get_application_info() const;
+
+	public:
+		friend std::string to_string(Info const& value);
 	};
 }

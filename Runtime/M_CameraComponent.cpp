@@ -20,3 +20,8 @@ void minty::CameraComponent::deserialize(Reader const& reader)
 	nearPlane = reader.read_float("near", DEFAULT_NEAR);
 	farPlane = reader.read_float("far", DEFAULT_FAR);
 }
+
+std::string minty::to_string(CameraComponent const& value)
+{
+	return std::format("CameraComponent(perspective = {}, fov = {}, near = {}, far = {})", static_cast<int>(value.perspective), value.fov, value.nearPlane, value.farPlane);
+}

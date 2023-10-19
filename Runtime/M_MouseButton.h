@@ -1,5 +1,7 @@
 #pragma once
 
+#include "M_Base.h"
+
 namespace minty
 {
 	/// <summary>
@@ -19,4 +21,6 @@ namespace minty
 		Right = 1,
 		Middle = 2
 	};
+
+	std::string to_string(MouseButton const value);
 }

@@ -20,3 +20,8 @@ VkApplicationInfo minty::Info::get_application_info() const
 		.apiVersion = MINTY_API_VERSION,
 	};
 }
+
+std::string minty::to_string(Info const& value)
+{
+	return std::format("Info(application name = {}, application version = {}, engine name = {}, engine version = {}, Vulkan version = {})", value._applicationName, value._applicationVersion, MINTY_NAME, MINTY_VERSION, MINTY_API_VERSION);
+}

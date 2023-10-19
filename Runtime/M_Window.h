@@ -121,6 +121,9 @@ namespace minty
 
 		// cursor position
 		static void cursor_callback(GLFWwindow* window, double xpos, double ypos);
+
+	public:
+		friend std::string to_string(Window const& value);
 	};
 }
 

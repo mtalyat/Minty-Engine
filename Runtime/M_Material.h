@@ -35,5 +35,7 @@ namespace minty
 		void set(void const* const data);
 
 		void* get() const;
+
+		friend std::string to_string(Material const& value);
 	};
 }

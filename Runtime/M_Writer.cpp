@@ -5,7 +5,7 @@
 
 using namespace minty;
 
-minty::Writer::Writer(SerializedNode& node)
+minty::Writer::Writer(Node& node)
 	: _node(node)
 {}
 
@@ -14,7 +14,7 @@ void minty::Writer::write(std::string const& name)
 	write(name, "");
 }
 
-void minty::Writer::write(std::string const& name, SerializedNode const& node)
+void minty::Writer::write(std::string const& name, Node const& node)
 {
 	_node.children.emplace(name, node);
 }
@@ -22,7 +22,7 @@ void minty::Writer::write(std::string const& name, SerializedNode const& node)
 void minty::Writer::write(std::string const& name, ISerializable const* const value)
 {
 	// add child object for this object to write
-	_node.children.emplace(name, SerializedNode());
+	_node.children.emplace(name, Node());
 
 	// create a Writer to use
 	Writer Writer(_node.children.at(name));
@@ -33,7 +33,7 @@ void minty::Writer::write(std::string const& name, ISerializable const* const va
 
 void minty::Writer::write(std::string const& name, std::string const& value)
 {
-	_node.children.emplace(name, SerializedNode{ .data = value });
+	_node.children.emplace(name, Node{ .data = value });
 }
 
 void minty::Writer::write(std::string const& name, int const value)
@@ -53,7 +53,7 @@ void minty::Writer::write(std::string const& name, byte const value)
 
 void minty::Writer::write(std::string const& name, Vector2 const& value)
 {
-	SerializedNode node;
+	Node node;
 
 	Writer writer(node);
 
@@ -65,7 +65,7 @@ void minty::Writer::write(std::string const& name, Vector2 const& value)
 
 void minty::Writer::write(std::string const& name, Vector3 const& value)
 {
-	SerializedNode node;
+	Node node;
 
 	Writer writer(node);
 
@@ -78,7 +78,7 @@ void minty::Writer::write(std::string const& name, Vector3 const& value)
 
 void minty::Writer::write(std::string const& name, Vector4 const& value)
 {
-	SerializedNode node;
+	Node node;
 
 	Writer writer(node);
 
@@ -92,7 +92,7 @@ void minty::Writer::write(std::string const& name, Vector4 const& value)
 
 void minty::Writer::write(std::string const& name, Vector2Int const& value)
 {
-	SerializedNode node;
+	Node node;
 
 	Writer writer(node);
 
@@ -104,7 +104,7 @@ void minty::Writer::write(std::string const& name, Vector2Int const& value)
 
 void minty::Writer::write(std::string const& name, Vector3Int const& value)
 {
-	SerializedNode node;
+	Node node;
 
 	Writer writer(node);
 
@@ -117,7 +117,7 @@ void minty::Writer::write(std::string const& name, Vector3Int const& value)
 
 void minty::Writer::write(std::string const& name, Vector4Int const& value)
 {
-	SerializedNode node;
+	Node node;
 
 	Writer writer(node);
 
@@ -131,7 +131,7 @@ void minty::Writer::write(std::string const& name, Vector4Int const& value)
 
 void minty::Writer::write(std::string const& name, Quaternion const& value)
 {
-	SerializedNode node;
+	Node node;
 
 	Writer writer(node);
 
@@ -149,7 +149,7 @@ void minty::Writer::write(std::string const& name, std::string const& value, std
 	if (value.compare(defaultValue))
 	{
 		// not default value
-		_node.children.emplace(name, SerializedNode{ .data = value });
+		_node.children.emplace(name, Node{ .data = value });
 	}
 }
 
@@ -181,7 +181,7 @@ void minty::Writer::write(std::string const& name, Vector2 const& value, Vector2
 {
 	if (value != defaultValue)
 	{
-		SerializedNode node;
+		Node node;
 
 		Writer writer(node);
 
@@ -196,7 +196,7 @@ void minty::Writer::write(std::string const& name, Vector3 const& value, Vector3
 {
 	if (value != defaultValue)
 	{
-		SerializedNode node;
+		Node node;
 
 		Writer writer(node);
 
@@ -212,7 +212,7 @@ void minty::Writer::write(std::string const& name, Vector4 const& value, Vector4
 {
 	if (value != defaultValue)
 	{
-		SerializedNode node;
+		Node node;
 
 		Writer writer(node);
 
@@ -229,7 +229,7 @@ void minty::Writer::write(std::string const& name, Vector2Int const& value, Vect
 {
 	if (value != defaultValue)
 	{
-		SerializedNode node;
+		Node node;
 
 		Writer writer(node);
 
@@ -244,7 +244,7 @@ void minty::Writer::write(std::string const& name, Vector3Int const& value, Vect
 {
 	if (value != defaultValue)
 	{
-		SerializedNode node;
+		Node node;
 
 		Writer writer(node);
 
@@ -260,7 +260,7 @@ void minty::Writer::write(std::string const& name, Vector4Int const& value, Vect
 {
 	if (value != defaultValue)
 	{
-		SerializedNode node;
+		Node node;
 
 		Writer writer(node);
 
@@ -277,7 +277,7 @@ void minty::Writer::write(std::string const& name, Quaternion const& value, Quat
 {
 	if (value != defaultValue)
 	{
-		SerializedNode node;
+		Node node;
 
 		Writer writer(node);
 
@@ -290,4 +290,9 @@ void minty::Writer::write(std::string const& name, Quaternion const& value, Quat
 
 		write(name, node);
 	}
+}
+
+std::string minty::to_string(Writer const& value)
+{
+	return std::format("Writer(node = {})", to_string(value._node));
 }

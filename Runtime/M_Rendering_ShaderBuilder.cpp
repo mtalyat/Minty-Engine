@@ -297,3 +297,8 @@ void minty::rendering::ShaderBuilder::emplace_uniform_constant(std::string const
 			.ids = ids,
 		});
 }
+
+std::string minty::rendering::to_string(ShaderBuilder const& value)
+{
+	return std::format("ShaderBuilder()");
+}

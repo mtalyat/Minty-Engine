@@ -16,16 +16,16 @@ namespace minty
 		: public Object
 	{
 	private:
-		SerializedNode& _node;
+		Node& _node;
 
 	public:
-		Writer(SerializedNode& node);
+		Writer(Node& node);
 
 #pragma region Normal Writing
 
 		void write(std::string const& name);
 
-		void write(std::string const& name, SerializedNode const& node);
+		void write(std::string const& name, Node const& node);
 
 		void write(std::string const& name, ISerializable const* const value);
 
@@ -78,5 +78,8 @@ namespace minty
 		void write(std::string const& name, Quaternion const& value, Quaternion const& defaultValue);
 
 #pragma endregion
+
+	public:
+		friend std::string to_string(Writer const& value);
 	};
 }

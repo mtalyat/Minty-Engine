@@ -17,5 +17,8 @@ namespace minty
 		Transform(Vector3 const& position = Vector3(), Vector3 const& rotation = Vector3(), Vector3 const scale = Vector3(1.0f, 1.0f, 1.0f));
 
 		Matrix4 get_matrix() const;
+
+	public:
+		friend std::string to_string(Transform const& value);
 	};
 }

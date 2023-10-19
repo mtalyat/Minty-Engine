@@ -85,5 +85,7 @@ namespace minty::rendering
 
 #pragma endregion
 
+	public:
+		friend std::string to_string(RendererBuilder const& value);
 	};
 }

@@ -546,5 +546,9 @@ namespace minty
 		/// <param name="commandBuffer">The command buffer to record.</param>
 		/// <param name="imageIndex">The image to send the commands to.</param>
 		void record_command_buffer(VkCommandBuffer commandBuffer, uint32_t imageIndex);
+
+	public:
+
+		friend std::string to_string(Renderer const& value);
 	};
 }

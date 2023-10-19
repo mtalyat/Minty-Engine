@@ -6,11 +6,11 @@
 
 namespace minty
 {
-	struct SerializedNode
+	struct Node
 	{
 		std::string data;
 
-		std::map <std::string, SerializedNode> children;
+		std::map <std::string, Node> children;
 
 		byte to_byte(byte const defaultValue = 0) const;
 
@@ -20,6 +20,9 @@ namespace minty
 
 		void print(int const indent = 0) const;
 
-		static SerializedNode parse_file(std::string const& path);
+		static Node parse_file(std::string const& path);
+
+	public:
+		friend std::string to_string(Node const& value);
 	};
 }

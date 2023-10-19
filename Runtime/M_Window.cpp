@@ -265,3 +265,8 @@ void minty::Window::scroll_callback(GLFWwindow* window, double xoffset, double y
 		w->trigger_scroll(static_cast<float>(xoffset), static_cast<float>(yoffset));
 	}
 }
+
+std::string minty::to_string(Window const& value)
+{
+	return std::format("Window(title = {})", value._title);
+}

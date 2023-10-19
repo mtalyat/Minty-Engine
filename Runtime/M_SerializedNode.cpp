@@ -8,7 +8,7 @@
 
 using namespace minty;
 
-byte minty::SerializedNode::to_byte(byte const defaultValue) const
+byte minty::Node::to_byte(byte const defaultValue) const
 {
 	byte out;
 	if (parse::try_byte(data, out))
@@ -19,7 +19,7 @@ byte minty::SerializedNode::to_byte(byte const defaultValue) const
 	return defaultValue;
 }
 
-int minty::SerializedNode::to_int(int const defaultValue) const
+int minty::Node::to_int(int const defaultValue) const
 {
 	int out;
 	if (parse::try_int(data, out))
@@ -30,7 +30,7 @@ int minty::SerializedNode::to_int(int const defaultValue) const
 	return defaultValue;
 }
 
-float minty::SerializedNode::to_float(float const defaultValue) const
+float minty::Node::to_float(float const defaultValue) const
 {
 	float out;
 	if (parse::try_float(data, out))
@@ -41,7 +41,7 @@ float minty::SerializedNode::to_float(float const defaultValue) const
 	return defaultValue;
 }
 
-void minty::SerializedNode::print(int const indent) const
+void minty::Node::print(int const indent) const
 {
 	// print children
 	// parent takes care of printing this node's data
@@ -62,7 +62,7 @@ void minty::SerializedNode::print(int const indent) const
 }
 
 
-SerializedNode minty::SerializedNode::parse_file(std::string const& path)
+Node minty::Node::parse_file(std::string const& path)
 {
 	std::vector<std::string> lines = file::read_all_lines(path);
 
@@ -70,11 +70,11 @@ SerializedNode minty::SerializedNode::parse_file(std::string const& path)
 	std::string key;
 	std::string value;
 
-	SerializedNode root;
+	Node root;
 
-	std::vector<SerializedNode*> nodeStack;
+	std::vector<Node*> nodeStack;
 	nodeStack.push_back(&root);
-	SerializedNode* node = nodeStack.back();
+	Node* node = nodeStack.back();
 
 	int const SPACES_PER_TAB = 4;
 
@@ -152,7 +152,7 @@ SerializedNode minty::SerializedNode::parse_file(std::string const& path)
 			key = line;
 
 			// add as child
-			node->children.emplace(key, SerializedNode());
+			node->children.emplace(key, Node());
 		}
 		else
 		{
@@ -161,10 +161,15 @@ SerializedNode minty::SerializedNode::parse_file(std::string const& path)
 			value = line.substr(split + 2, line.size() - split - 2); // ignore ": "
 
 			// add as child
-			node->children.emplace(key, SerializedNode{ .data = value });
+			node->children.emplace(key, Node{ .data = value });
 		}
 	}
 
 	// root node should contain everything
 	return root;
+}
+
+std::string minty::to_string(Node const& value)
+{
+	return std::format("Node(data = {}, children size = {})", value.data, value.children.size());
 }

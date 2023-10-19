@@ -1,8 +1,6 @@
 #pragma once
 
-#include "M_Types.h"
-#include <string>
-#include <format>
+#include "M_Base.h"
 
 namespace minty
 {
@@ -14,11 +12,8 @@ namespace minty
 	public:
 		virtual ~Object() {}
 
-		/// <summary>
-		/// Converts this Object to a human readable string.
-		/// </summary>
-		/// <returns>A string of this Object.</returns>
-		virtual std::string const to_string() const;
+	public:
+		friend std::string to_string(Object const& value);
 	};
 }
 

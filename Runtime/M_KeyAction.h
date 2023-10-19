@@ -1,5 +1,7 @@
 #pragma once
 
+#include "M_Base.h"
+
 namespace minty
 {
 	/// <summary>
@@ -11,4 +13,6 @@ namespace minty
 		Down = 1,
 		Hold = 2
 	};
+
+	std::string to_string(KeyAction const value);
 }

@@ -76,6 +76,9 @@ namespace minty
 		VkViewport get_view() const;
 
 		VkRect2D get_scissor() const;
+
+	public:
+		friend std::string to_string(Viewport const& value);
 	};
 }
 

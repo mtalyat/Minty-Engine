@@ -221,3 +221,28 @@ bool minty::InputMap::is_button_pressed(MouseButton const button) const
 {
 	return _buttons->contains(button);
 }
+
+std::string minty::to_string(KeyPressEventArgs const& value)
+{
+	return std::format("KeyPressEventArgs(key = {}, action = {}, mods = {})", to_string(value.key), to_string(value.action), to_string(value.mods));
+}
+
+std::string minty::to_string(MouseClickEventArgs const& value)
+{
+	return std::format("MouseClickEventArgs(button = {}, action = {}, mods = {}, x = {}, y = {})", to_string(value.button), to_string(value.action), to_string(value.mods), value.x, value.y);
+}
+
+std::string minty::to_string(MouseMoveEventArgs const& value)
+{
+	return std::format("MouseMoveEventArgs(x = {}, y = {}, dx = {}, dy = {})", value.x, value.y, value.dx, value.dy);
+}
+
+std::string minty::to_string(MouseScrollEventArgs const& value)
+{
+	return std::format("MouseScrollEventArgs(dx = {}, dy = {})", value.dx, value.dy);
+}
+
+std::string minty::to_string(InputMap const& value)
+{
+	return std::format("InputMap()");
+}

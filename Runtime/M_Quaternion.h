@@ -1,7 +1,8 @@
 #pragma once
 
-#include "glm.hpp"
+#include "M_Base.h"
 #include "M_Vector.h"
+#include "glm.hpp"
 
 namespace minty
 {
@@ -25,7 +26,13 @@ namespace minty
 		Vector3 up() const;
 
 		Vector3 down() const;
+
+		Vector3 to_euler_angles() const;
+
+		static Quaternion from_euler_angles(float const x, float const y, float const z);
+
+		friend std::string to_string(Quaternion const& value);
 	};
 
-	std::string to_string(Quaternion const& value);
+	std::string to_string(glm::quat const& value);
 }

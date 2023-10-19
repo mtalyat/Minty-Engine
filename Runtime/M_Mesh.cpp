@@ -149,3 +149,8 @@ void minty::Mesh::dispose_indices()
 	_indexCount = 0;
 	_indexSize = 0;
 }
+
+std::string minty::to_string(Mesh const& mesh)
+{
+	return std::format("Mesh()");
+}

@@ -32,6 +32,9 @@ namespace minty::rendering
 		VkSamplerMipmapMode get_sampler_mipmap_mode() const;
 
 		VkFormat get_format() const;
+
+	public:
+		friend std::string to_string(TextureBuilder const& value);
 	};
 }
 

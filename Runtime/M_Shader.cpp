@@ -717,3 +717,8 @@ void minty::Shader::create_descriptor_sets(rendering::ShaderBuilder const& build
 		//descriptorWrites[2].pImageInfo = imageInfos.data();
 	}
 }
+
+std::string minty::to_string(Shader const& shader)
+{
+	return std::format("Shader()");
+}

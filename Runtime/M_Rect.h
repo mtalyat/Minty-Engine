@@ -160,8 +160,6 @@ namespace minty
 		/// <returns>A RectF with this Rect's values.</returns>
 		RectF to_RectF() const;
 
-		std::string const to_string() const override;
-
 		/// <summary>
 		/// Creates a Rect using the given bounds of each size of the Rect.
 		/// </summary>
@@ -178,5 +176,8 @@ namespace minty
 		/// <param name="rect">The RectF to round.</param>
 		/// <returns>A Rect, with the given rect's values, rounded.</returns>
 		static Rect round(RectF const& rect);
+
+	public:
+		friend std::string to_string(Rect const& rect);
 	};
 }

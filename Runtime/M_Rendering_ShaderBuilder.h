@@ -133,5 +133,8 @@ namespace minty::rendering
 		void emplace_uniform_constant(std::string const& name, VkShaderStageFlags const stageFlags, uint32_t const set, uint32_t const binding, VkDescriptorType const type, VkDeviceSize const size, std::vector<ID> const& ids);
 
 #pragma endregion
+
+	public:
+		friend std::string to_string(ShaderBuilder const& value);
 	};
 }

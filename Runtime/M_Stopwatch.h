@@ -95,8 +95,9 @@ namespace minty
         /// Creates a new Stopwatch, and starts it immediately after.
         /// </summary>
         /// <returns></returns>
-        inline static Stopwatch start_new() { Stopwatch watch; watch.start(); return watch; }
+        static Stopwatch start_new() { Stopwatch watch; watch.start(); return watch; }
 
-        std::string const to_string() const override;
+    public:
+        friend std::string to_string(Stopwatch const& value);
     };
 }

@@ -19,3 +19,8 @@ Matrix4 minty::Transform::get_matrix() const
     // combine and return
     return translationMatrix * rotationMatrix * scaleMatrix;
 }
+
+std::string minty::to_string(Transform const& value)
+{
+    return std::format("Transform(position = {}, rotation = {}, scale = {})", to_string(value.position), to_string(value.rotation), to_string(value.scale));
+}
