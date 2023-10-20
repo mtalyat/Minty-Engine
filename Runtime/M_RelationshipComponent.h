@@ -24,7 +24,7 @@ namespace minty
 		// parent
 		Entity parent;
 
-		//RelationshipComponent(size_t const children = 0, Entity const first = NULL_ENTITY, Entity const prev = NULL_ENTITY, Entity const next = NULL_ENTITY, Entity const parent = NULL_ENTITY);
+		RelationshipComponent(size_t const children = 0, Entity const first = NULL_ENTITY, Entity const prev = NULL_ENTITY, Entity const next = NULL_ENTITY, Entity const parent = NULL_ENTITY);
 
 		void serialize(Writer& writer) const override;
 		void deserialize(Reader const& reader) override;

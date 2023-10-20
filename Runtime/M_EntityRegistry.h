@@ -114,10 +114,11 @@ namespace minty
 		static void register_component(std::string const& name);
 
 		void serialize(Writer& writer) const override;
+		void serialize_entity(Writer& writer, Entity const entity) const;
+		Node serialize_entity(Entity const entity) const;
 		void deserialize(Reader const& reader) override;
 
-	private:
-		Node serialize_entity(Entity const entity) const;
+		static bool is_name_empty(std::string const& name);
 	};
 
 	template<class T>
