@@ -59,6 +59,8 @@ namespace minty
 
 		byte read_byte(std::string const& name, byte const defaultValue = 0) const;
 
+		size_t read_size(std::string const& name, size_t const defaultValue = 0) const;
+
 		Vector2 read_vector2(std::string const& name, Vector2 const& defaultValue = Vector2()) const;
 
 		Vector3 read_vector3(std::string const& name, Vector3 const& defaultValue = Vector3()) const;

@@ -52,6 +52,8 @@ namespace minty
 
 		void write(std::string const& name, byte const value);
 
+		void write(std::string const& name, size_t const value);
+
 		void write(std::string const& name, Vector2 const& value);
 
 		void write(std::string const& name, Vector3 const& value);
@@ -77,6 +79,8 @@ namespace minty
 		void write(std::string const& name, float const value, float const defaultValue);
 
 		void write(std::string const& name, byte const value, byte const defaultValue);
+
+		void write(std::string const& name, size_t const value, size_t const defaultValue);
 
 		void write(std::string const& name, Vector2 const& value, Vector2 const& defaultValue);
 

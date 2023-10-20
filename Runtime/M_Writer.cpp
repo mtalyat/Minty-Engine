@@ -57,6 +57,11 @@ void minty::Writer::write(std::string const& name, byte const value)
 	write(name, std::to_string(value));
 }
 
+void minty::Writer::write(std::string const& name, size_t const value)
+{
+	write(name, std::to_string(value));
+}
+
 void minty::Writer::write(std::string const& name, Vector2 const& value)
 {
 	Node node;
@@ -176,6 +181,14 @@ void minty::Writer::write(std::string const& name, float const value, float cons
 }
 
 void minty::Writer::write(std::string const& name, byte const value, byte const defaultValue)
+{
+	if (value != defaultValue)
+	{
+		write(name, std::to_string(value));
+	}
+}
+
+void minty::Writer::write(std::string const& name, size_t const value, size_t const defaultValue)
 {
 	if (value != defaultValue)
 	{

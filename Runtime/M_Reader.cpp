@@ -97,6 +97,17 @@ byte minty::Reader::read_byte(std::string const& name, byte const defaultValue) 
 	return defaultValue;
 }
 
+size_t minty::Reader::read_size(std::string const& name, size_t const defaultValue) const
+{
+	auto const& found = _node.children.find(name);
+	if (found != _node.children.end())
+	{
+		return static_cast<size_t>(std::stoull(found->second.data));
+	}
+
+	return defaultValue;
+}
+
 Vector2 minty::Reader::read_vector2(std::string const& name, Vector2 const& defaultValue) const
 {
 	auto const& found = _node.children.find(name);
