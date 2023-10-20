@@ -5,12 +5,12 @@
 
 using namespace minty;
 
-minty::Writer::Writer(Node& node, void* const data = nullptr)
+minty::Writer::Writer(Node& node, void* const data)
 	: _node(node)
 	, _data(data)
 {}
 
-void* minty::Writer::get_data_raw() const
+void* minty::Writer::get_data() const
 {
 	return _data;
 }

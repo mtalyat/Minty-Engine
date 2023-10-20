@@ -26,15 +26,7 @@ namespace minty
 		/// Gets the extra data given to this Writer.
 		/// </summary>
 		/// <returns>The extra data as a void pointer.</returns>
-		void* get_data_raw() const;
-
-		/// <summary>
-		/// Gets the extra data given to this Writer as a pointer to the given type.
-		/// </summary>
-		/// <typeparam name="T">The type of value.</typeparam>
-		/// <returns>A pointer to the given data, assuming T matches the data type.</returns>
-		template<class T>
-		T* get_data() const;
+		void* get_data() const;
 
 #pragma region Normal Writing
 
@@ -101,10 +93,4 @@ namespace minty
 	public:
 		friend std::string to_string(Writer const& value);
 	};
-	
-	template<class T>
-	T* Writer::get_data() const
-	{
-		return dynamic_cast<T*>(_data);
-	}
 }

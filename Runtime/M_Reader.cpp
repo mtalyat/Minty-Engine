@@ -5,7 +5,7 @@
 
 using namespace minty;
 
-minty::Reader::Reader(Node const& node, void* const data = nullptr)
+minty::Reader::Reader(Node const& node, void* const data)
 	: _node(node)
 	, _data(data)
 {}
@@ -28,7 +28,7 @@ Node const* minty::Reader::get_node(std::string const& name) const
 	return nullptr;
 }
 
-void* minty::Reader::get_data_raw() const
+void* minty::Reader::get_data() const
 {
 	return _data;
 }
@@ -39,7 +39,7 @@ void minty::Reader::read_object(std::string const& name, ISerializable* const va
 	if (found != _node.children.end())
 	{
 		// create Reader to use
-		Reader reader(found->second);
+		Reader reader(found->second, _data);
 
 		// deserialize the values into the given object
 		value->deserialize(reader);
@@ -48,7 +48,7 @@ void minty::Reader::read_object(std::string const& name, ISerializable* const va
 	{
 		// deserialize with an empty node so it is initialized to defaults
 		Node empty;
-		Reader reader(empty);
+		Reader reader(empty, _data);
 		value->deserialize(reader);
 	}
 }
