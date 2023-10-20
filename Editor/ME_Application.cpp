@@ -786,6 +786,16 @@ void Application::build()
 {
 	_console.log_important("build");
 
+	_console.log_important("\tgenerating cmake");
+
+	generate_cmake();
+
+	_console.log_important("\tgenerating main");
+
+	generate_main();
+
+	_console.log_important("\tbuilding program");
+
 	std::string command = "cd " + _info.project->get_build_path().string() + " && " + std::filesystem::absolute(CMAKE_PATH).string();
 	_console.run_commands({
 		// // make cmake files if needed
