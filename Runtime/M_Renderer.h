@@ -7,11 +7,11 @@
 #include "M_Info.h"
 #include "M_Window.h"
 #include "M_Viewport.h"
-#include "M_Transform.h"
 
 #include "M_EntityRegistry.h"
 #include "M_CameraComponent.h"
 #include "M_MeshComponent.h"
+#include "M_TransformComponent.h"
 
 #include "M_Texture.h"
 #include "M_Shader.h"
@@ -81,7 +81,7 @@ namespace minty
 		bool _initialized;
 	protected:
 		Scene const* _scene = nullptr;
-		EntityRegistry const* _registry = nullptr;
+		EntityRegistry* _registry = nullptr;
 		Entity _mainCamera = NULL_ENTITY;
 
 		// (Vulkan) rendering components
@@ -258,7 +258,7 @@ namespace minty
 		/// <summary>
 		/// Updates the Camera uniform buffer with the Camera info.
 		/// </summary>
-		void update_camera(CameraComponent const& camera, Transform const& transform);
+		void update_camera(CameraComponent const& camera, TransformComponent const& transform);
 
 #pragma endregion
 
@@ -344,7 +344,11 @@ namespace minty
 #pragma region Drawing
 
 	private:
-		void draw_mesh(VkCommandBuffer commandBuffer, Transform const& transform, MeshComponent const& meshComponent);
+		void draw_mesh(VkCommandBuffer commandBuffer, Matrix4 const& transformationMatrix, MeshComponent const& meshComponent);
+
+		void draw_scene(VkCommandBuffer commandBuffer);
+
+		Matrix4 get_entity_transformation_matrix(Entity const entity) const;
 
 #pragma endregion
 
@@ -504,11 +508,6 @@ namespace minty
 		/// <param name="device">The device to grab the queue families from.</param>
 		/// <returns>The indices of the queue families.</returns>
 		QueueFamilyIndices find_queue_families(VkPhysicalDevice device);
-
-		/// <summary>
-		/// Draws the objects within the Scene.
-		/// </summary>
-		void draw_scene(VkCommandBuffer commandBuffer);
 
 		/// <summary>
 		/// Check if all validation layers are available for debugging.

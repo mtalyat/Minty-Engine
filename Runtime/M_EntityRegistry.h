@@ -2,9 +2,9 @@
 
 #include "libraries/entt/entt.hpp"
 #include "M_Component.h"
+#include "M_Transform.h"
 #include "M_Console.h"
 #include "M_ISerializable.h"
-#include "M_Transform.h"
 
 namespace minty
 {
@@ -91,14 +91,6 @@ namespace minty
 		/// <param name="entity">The Entity that has the Component.</param>
 		/// <returns>The Component, or null if it does not exist.</returns>
 		Component const* get_by_name(std::string const& name, Entity const entity) const;
-
-		/// <summary>
-		/// Gets the Transform for the given Entity.
-		/// </summary>
-		/// <param name="entity"></param>
-		/// <param name="transform"></param>
-		/// <returns></returns>
-		void get_transform(Entity const entity, Transform& transform) const;
 
 		/// <summary>
 		/// Prints an Entity's values to the screen.

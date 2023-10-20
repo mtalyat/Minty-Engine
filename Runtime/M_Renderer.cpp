@@ -10,12 +10,11 @@
 #include "M_Scene.h"
 #include "M_EntityRegistry.h"
 
-#include "M_OriginComponent.h"
+#include "M_TransformComponent.h"
 #include "M_CameraComponent.h"
-#include "M_PositionComponent.h"
-#include "M_RotationComponent.h"
-#include "M_ScaleComponent.h"
 #include "M_MeshComponent.h"
+#include "M_RenderableComponent.h"
+#include "M_RelationshipComponent.h"
 
 #include "M_Vector.h"
 #include "M_Matrix.h"
@@ -383,12 +382,11 @@ void minty::Renderer::update()
 	}
 
 	// get camera transform
-	Transform transform;
 	CameraComponent const& camera = _registry->get<CameraComponent>(_mainCamera);
-	_registry->get_transform(_mainCamera, transform);
+	TransformComponent const& transformComponent = _registry->get<TransformComponent>(_mainCamera);
 
 	// update camera in renderer
-	update_camera(camera, transform);
+	update_camera(camera, transformComponent);
 }
 
 VkDevice minty::Renderer::get_device() const
@@ -1026,17 +1024,24 @@ void Renderer::create_logical_device()
 
 void minty::Renderer::draw_scene(VkCommandBuffer commandBuffer)
 {
-	// create transform
-	Transform transform;
+	TransformComponent const* transformComponent;
 
 	// draw all meshes in the scene
-	for (auto&& [entity, mesh] : _registry->view<MeshComponent>().each())
+	for (auto&& [entity, renderable, mesh] : _registry->view<RenderableComponent const, MeshComponent>().each())
 	{
 		// get transform for entity
-		_registry->get_transform(entity, transform);
+		transformComponent = _registry->try_get<TransformComponent>(entity);
 
-		// render the entity's mesh at the position
-		draw_mesh(commandBuffer, transform, mesh);
+		if (transformComponent)
+		{
+			// render the entity's mesh at the position
+			draw_mesh(commandBuffer, transformComponent->global, mesh);
+		}
+		else
+		{
+			// if no transform, use empty matrix
+			draw_mesh(commandBuffer, Matrix4(1.0f), mesh);
+		}
 	}
 
 	// unbind any shaders used
@@ -1248,19 +1253,15 @@ void minty::Renderer::build_materials()
 	}
 }
 
-void Renderer::update_camera(CameraComponent const& camera, Transform const& transform)
+void Renderer::update_camera(CameraComponent const& camera, TransformComponent const& transform)
 {
-	// proj * view * model
+	Vector4 matPos = transform.global[3];
+	Vector3 globalPos = Vector3(matPos.x, matPos.y, matPos.z);
 
-	// get view
-	//Matrix4 view = transform.get_matrix();
+	Matrix4 view = glm::lookAt(globalPos, globalPos + transform.local.rotation.forward(), Vector3(0.0f, 1.0f, 0.0f));
 
-	//Matrix4 translationMatrix = glm::translate(Matrix4(1.0f), transform.position);
-	//Matrix4 rotationMatrix = glm::mat4_cast(transform.rotation);
-	//Matrix4 scaleMatrix = glm::scale(Matrix4(1.0f), transform.scale);
-	//Matrix4 view = scaleMatrix * rotationMatrix * translationMatrix; // backwards multiplication for some reason
-
-	Matrix4 view = glm::lookAt(transform.position, transform.position + transform.rotation.forward(), Vector3(0.0f, 1.0f, 0.0f));
+	// TODO: don't use lookat
+	// maybe invert global?
 
 	// get projection
 	Matrix4 proj;
@@ -1375,7 +1376,7 @@ void Renderer::create_command_buffers()
 	}
 }
 
-void minty::Renderer::draw_mesh(VkCommandBuffer commandBuffer, Transform const& transform, MeshComponent const& meshComponent)
+void minty::Renderer::draw_mesh(VkCommandBuffer commandBuffer, Matrix4 const& transformationMatrix, MeshComponent const& meshComponent)
 {
 	// do nothing if null mesh, or mesh empty
 	if (!meshComponent.mesh || !meshComponent.mesh->get_vertex_count())
@@ -1398,13 +1399,10 @@ void minty::Renderer::draw_mesh(VkCommandBuffer commandBuffer, Transform const& 
 	vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
 	vkCmdBindIndexBuffer(commandBuffer, meshComponent.mesh->get_index_buffer(), 0, meshComponent.mesh->get_index_type());
 
-	// convert transform to matrix
-	Matrix4 transformMatrix = transform.get_matrix();
-
 	// send push constants so we know where to draw
 	DrawCallObjectInfo info
 	{
-		.transform = transformMatrix,
+		.transform = transformationMatrix,
 		.materialId = meshComponent.materialId,
 	};
 	shader.update_push_constant(commandBuffer, &info, sizeof(DrawCallObjectInfo));

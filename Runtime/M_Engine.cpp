@@ -72,7 +72,7 @@ void Engine::run()
 
 	time_point_t frameTick = start;
 	long long frameTime;
-	
+
 	long long fpsTime = 0ll;
 	unsigned int fpsCount = 0u;
 

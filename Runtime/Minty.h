@@ -20,12 +20,12 @@ access to the entire engine without needing include each file.
 // COMPONENTS
 #include "M_Component.h"
 
+#include "M_CameraComponent.h"
+#include "M_DirtyTag.h"
 #include "M_MeshComponent.h"
 #include "M_NameComponent.h"
-#include "M_OriginComponent.h"
-#include "M_PositionComponent.h"
-#include "M_RotationComponent.h"
-#include "M_ScaleComponent.h"
+#include "M_RenderableComponent.h"
+#include "M_TransformComponent.h"
 
 // ENTITIES
 #include "M_EntityRegistry.h"

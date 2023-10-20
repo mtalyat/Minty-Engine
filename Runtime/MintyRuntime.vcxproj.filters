@@ -120,15 +120,6 @@
     <ClInclude Include="M_EntityRegistry.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
-    <ClInclude Include="M_PositionComponent.h">
-      <Filter>Header Files\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="M_RotationComponent.h">
-      <Filter>Header Files\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="M_ScaleComponent.h">
-      <Filter>Header Files\Components</Filter>
-    </ClInclude>
     <ClInclude Include="M_Writer.h">
       <Filter>Header Files\Serialization</Filter>
     </ClInclude>
@@ -143,12 +134,6 @@
     </ClInclude>
     <ClInclude Include="libraries\entt\entt.hpp">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="M_Transform.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="M_OriginComponent.h">
-      <Filter>Header Files\Components</Filter>
     </ClInclude>
     <ClInclude Include="M_MeshComponent.h">
       <Filter>Header Files\Components</Filter>
@@ -237,6 +222,21 @@
     <ClInclude Include="M_Base.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="M_RenderableComponent.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="M_RelationshipComponent.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="M_TransformComponent.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Transform.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="M_DirtyTag.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -323,15 +323,6 @@
     <ClCompile Include="M_NameComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="M_PositionComponent.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="M_RotationComponent.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="M_ScaleComponent.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="M_Reader.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -345,9 +336,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_MeshComponent.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="M_OriginComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_Info.cpp">
@@ -377,9 +365,6 @@
     <ClCompile Include="M_Quaternion.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="M_Transform.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="M_Vector.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -399,6 +384,21 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_Matrix.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_RelationshipComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_RenderableComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_TransformComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_Transform.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_DirtyTag.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
