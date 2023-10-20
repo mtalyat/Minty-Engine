@@ -5,9 +5,15 @@
 
 using namespace minty;
 
-minty::Writer::Writer(Node& node)
+minty::Writer::Writer(Node& node, void* const data = nullptr)
 	: _node(node)
+	, _data(data)
 {}
+
+void* minty::Writer::get_data_raw() const
+{
+	return _data;
+}
 
 void minty::Writer::write(std::string const& name)
 {

@@ -17,9 +17,10 @@ namespace minty
 	{
 	private:
 		Node const& _node;
+		void* _data;
 
 	public:
-		Reader(Node const& node);
+		Reader(Node const& node, void* const data = nullptr);
 
 		/// <summary>
 		/// Gets the root node that this Reader is using.
@@ -33,6 +34,20 @@ namespace minty
 		/// <param name="name">The name of the child node.</param>
 		/// <returns>The child node, or null if it does not exist.</returns>
 		Node const* get_node(std::string const& name) const;
+
+		/// <summary>
+		/// Gets the extra data given to this Reader.
+		/// </summary>
+		/// <returns>The extra data as a void pointer.</returns>
+		void* get_data_raw() const;
+
+		/// <summary>
+		/// Gets the extra data given to this Reader as a pointer to the given type.
+		/// </summary>
+		/// <typeparam name="T">The type of value.</typeparam>
+		/// <returns>A pointer to the given data, assuming T matches the data type.</returns>
+		template<class T>
+		T* get_data() const;
 
 		void read_object(std::string const& name, ISerializable* const value) const;
 
@@ -61,4 +76,10 @@ namespace minty
 	public:
 		friend std::string to_string(Reader const& value);
 	};
+
+	template<class T>
+	T* Reader::get_data() const
+	{
+		return dynamic_cast<T*>(_data);
+	}
 }

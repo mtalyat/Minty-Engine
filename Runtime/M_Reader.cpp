@@ -5,8 +5,9 @@
 
 using namespace minty;
 
-minty::Reader::Reader(Node const& node)
+minty::Reader::Reader(Node const& node, void* const data = nullptr)
 	: _node(node)
+	, _data(data)
 {}
 
 Node const* minty::Reader::get_node() const
@@ -25,6 +26,11 @@ Node const* minty::Reader::get_node(std::string const& name) const
 
 	// not found
 	return nullptr;
+}
+
+void* minty::Reader::get_data_raw() const
+{
+	return _data;
 }
 
 void minty::Reader::read_object(std::string const& name, ISerializable* const value) const
