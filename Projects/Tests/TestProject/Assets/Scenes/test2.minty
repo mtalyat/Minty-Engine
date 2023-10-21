@@ -1,0 +1,46 @@
+Systems
+    Oscilate
+Entities
+    Camera
+        Position
+            x: 0
+            y: 3
+            z: -8
+        Camera
+            perspective: 1
+    Cube 0
+        Mesh
+        Origin
+            x: -3
+        Position
+        Oscilate
+            xScale: 0
+            zScale: 0
+            ySpeed: 1
+    Cube 1
+        Mesh
+        Origin
+            x: -1
+        Position
+        Oscilate
+            xScale: 0
+            zScale: 0
+            ySpeed: 0.9
+    Cube 2
+        Mesh
+        Origin
+            x: 1
+        Position
+        Oscilate
+            xScale: 0
+            zScale: 0
+            ySpeed: 0.8
+    Cube 3
+        Mesh
+        Origin
+            x: 3
+        Position
+        Oscilate
+            xScale: 0
+            zScale: 0
+            ySpeed: 0.7

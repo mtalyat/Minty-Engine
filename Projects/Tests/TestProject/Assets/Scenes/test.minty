@@ -1,0 +1,53 @@
+Systems
+    CameraController
+    Move
+    Test
+Entities
+    UI Test
+        Renderable
+        UI
+            x: 0.0
+            y: 0.0
+            width: 1.0
+            height: 1.0
+            sprite: 5
+    Camera
+        Transform
+            position
+                z: -4
+        Camera
+            perspective: 1
+            far: 1000
+        Move
+    Cube 0
+        Renderable
+        Mesh
+        Transform
+        Test
+            translateSpeed: 1
+            rotateSpeed: 1
+            scaleSpeed: 1
+    Cube 1
+        Renderable
+        Mesh
+        Transform
+            position
+                y: -1
+            scale
+                x: 0.5
+                y: 0.5
+                z: 0.5
+        Relationship
+            parent: Cube 0
+    Cube 2
+        Renderable
+        Mesh
+        Transform
+            position
+                z: 1
+            scale
+                x: 0.5
+                y: 0.5
+                z: 0.5
+        Relationship
+            parent: Cube 1
