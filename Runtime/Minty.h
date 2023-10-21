@@ -69,6 +69,8 @@ access to the entire engine without needing include each file.
 #include "M_Color.h"
 #include "M_CommandLineParser.h"
 #include "M_Console.h"
+#include "M_Constants.h"
+#include "M_Encoding.h"
 #include "M_Engine.h"
 #include "M_Event.h"
 #include "M_File.h"

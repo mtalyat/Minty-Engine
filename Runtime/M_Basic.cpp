@@ -21,10 +21,10 @@ void minty::basic::create_basic_renderer_builder(minty::rendering::RendererBuild
 void minty::basic::create_basic_shader_builder(minty::rendering::RendererBuilder const& rendererBuilder, minty::rendering::ShaderBuilder& builder)
 {
 	// add vertex data
-	builder.emplace_vertex_binding(0, sizeof(Vertex));
-	builder.emplace_vertex_attribute(0, sizeof(glm::vec3), VkFormat::VK_FORMAT_R32G32B32_SFLOAT);
-	builder.emplace_vertex_attribute(0, sizeof(glm::vec3), VkFormat::VK_FORMAT_R32G32B32_SFLOAT);
-	builder.emplace_vertex_attribute(0, sizeof(glm::vec2), VkFormat::VK_FORMAT_R32G32_SFLOAT);
+	builder.emplace_vertex_binding(0, sizeof(Vertex3D));
+	builder.emplace_vertex_attribute(0, sizeof(Vector3), VkFormat::VK_FORMAT_R32G32B32_SFLOAT);
+	builder.emplace_vertex_attribute(0, sizeof(Vector3), VkFormat::VK_FORMAT_R32G32B32_SFLOAT);
+	builder.emplace_vertex_attribute(0, sizeof(Vector2), VkFormat::VK_FORMAT_R32G32_SFLOAT);
 
 	// add uniform data that should be part of every shader
 	builder.emplace_uniform_constant(
@@ -35,6 +35,31 @@ void minty::basic::create_basic_shader_builder(minty::rendering::RendererBuilder
 		sizeof(CameraBufferObject),
 		1
 	);
+	builder.emplace_uniform_constant(
+		"texSamplers",
+		VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT,
+		0, 1,
+		VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+		sizeof(VkSampler),
+		rendererBuilder.get_max_textures()
+	);
+
+	// add push constant that should be part of every shader
+	builder.emplace_push_constant(
+		"object",
+		sizeof(DrawCallObjectInfo),
+		VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT
+	);
+}
+
+void minty::basic::create_basic_ui_shader_builder(minty::rendering::RendererBuilder const& rendererBuilder, minty::rendering::ShaderBuilder& builder)
+{
+	// add vertex data
+	builder.emplace_vertex_binding(0, sizeof(Vertex3D));
+	builder.emplace_vertex_attribute(0, sizeof(Vector2), VkFormat::VK_FORMAT_R32G32_SFLOAT);
+	builder.emplace_vertex_attribute(0, sizeof(Vector2), VkFormat::VK_FORMAT_R32G32_SFLOAT);
+
+	// add uniform data that should be part of every shader
 	builder.emplace_uniform_constant(
 		"texSamplers",
 		VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT,
@@ -73,7 +98,7 @@ void basic::create_basic_cube(Mesh& mesh)
 	glm::vec2 topLeft = { 0.0f, 1.0f };
 	glm::vec2 topRight = { 1.0f, 1.0f };
 
-	std::vector<Vertex> vertices =
+	std::vector<Vertex3D> vertices =
 	{
 		// up?
 		{ leftTopBack, color, bottomLeft },
@@ -148,7 +173,7 @@ void basic::create_basic_quad(Mesh& mesh)
 	glm::vec2 bottomLeft = { 0.0f, 1.0f };
 	glm::vec2 bottomRight = { 1.0f, 1.0f };
 
-	std::vector<Vertex> vertices =
+	std::vector<Vertex3D> vertices =
 	{
 		// up?
 		{ leftTopBack, color, bottomLeft },

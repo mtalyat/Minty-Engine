@@ -37,6 +37,9 @@
     <Filter Include="Header Files\Basic">
       <UniqueIdentifier>{99d49d9a-3f7d-4ebd-be21-d325b215e22d}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Resource Files\Shaders">
+      <UniqueIdentifier>{b7dff789-4b79-4049-aa6f-7ddcd995f28f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -237,6 +240,12 @@
     <ClInclude Include="M_DirtyTag.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
+    <ClInclude Include="resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Encoding.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -401,6 +410,9 @@
     <ClCompile Include="M_DirtyTag.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="M_Encoding.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="notes.txt" />
@@ -408,6 +420,18 @@
   <ItemGroup>
     <None Include="M_Constants.h">
       <Filter>Header Files</Filter>
+    </None>
+    <None Include="ui.vert">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="ui.frag">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="uifrag.spv">
+      <Filter>Resource Files\Shaders</Filter>
+    </None>
+    <None Include="uivert.spv">
+      <Filter>Resource Files\Shaders</Filter>
     </None>
   </ItemGroup>
 </Project>
