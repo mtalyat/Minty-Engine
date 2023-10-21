@@ -98,6 +98,7 @@ void minty::Renderer::init(rendering::RendererBuilder const& builder)
 	// init fields
 	_textures.limit(builder.get_max_textures());
 	_materials.limit(builder.get_max_materials());
+	_sprites.limit(builder.get_max_materials());
 	_shaders.limit(builder.get_max_shaders());
 
 	create_instance();
@@ -409,6 +410,11 @@ uint32_t minty::Renderer::get_texture_count() const
 	return static_cast<uint32_t>(_textures.size());
 }
 
+uint32_t minty::Renderer::get_sprite_count() const
+{
+	return static_cast<uint32_t>(_sprites.size());
+}
+
 uint32_t minty::Renderer::get_material_count() const
 {
 	return static_cast<uint32_t>(_materials.size());
@@ -446,6 +452,11 @@ Texture const& minty::Renderer::get_texture(ID const id) const
 	return _textures.at(id);
 }
 
+Sprite& minty::Renderer::get_sprite(ID const id)
+{
+	return _sprites.at(id);
+}
+
 ID minty::Renderer::create_shader(std::string const& vertexPath, std::string const& fragmentPath, rendering::ShaderBuilder const& builder)
 {
 	if (!file::exists(vertexPath))
@@ -469,6 +480,11 @@ ID minty::Renderer::create_shader(std::string const& vertexPath, std::string con
 	return _shaders.emplace(Shader(vertexPath, fragmentPath, builder, *this));
 }
 
+Sprite const& minty::Renderer::get_sprite(ID const id) const
+{
+	return _sprites.at(id);
+}
+
 Shader& minty::Renderer::get_shader(ID const id)
 {
 	return _shaders.at(id);
@@ -488,6 +504,9 @@ ID minty::Renderer::create_material(void const* const materialData, rendering::M
 	}
 
 	ID id = _materials.emplace(Material(_materials.size(), materialData, builder, *this));
+
+	// TODO: move somewhere else
+	_sprites.emplace(Sprite(id));
 
 	return id;
 }
@@ -1019,6 +1038,12 @@ void Renderer::create_logical_device()
 
 void minty::Renderer::draw_scene(VkCommandBuffer commandBuffer)
 {
+	// draw all UI in scene
+	for (auto&& [entity, renderable, ui] : _registry->view<RenderableComponent const, UIComponent const>().each())
+	{
+		draw_ui(commandBuffer, ui);
+	}
+
 	TransformComponent const* transformComponent;
 
 	// draw all meshes in the scene
@@ -1041,6 +1066,32 @@ void minty::Renderer::draw_scene(VkCommandBuffer commandBuffer)
 
 	// unbind any shaders used
 	bind_shader(commandBuffer, nullptr);
+}
+
+void minty::Renderer::draw_ui(VkCommandBuffer commandBuffer, UIComponent const& uiComponent)
+{
+	// get the sprite
+	Sprite& sprite = get_sprite(uiComponent.spriteId);
+
+	// get the material
+	Material& mat = get_material(sprite.get_material_id());
+
+	// get the shader
+	Shader& shader = get_shader(mat.get_shader_id());
+
+	// bind the material, which will bind the shader and update its values
+	bind_shader(commandBuffer, &shader);
+
+	DrawCallObjectUI info
+	{
+		.materialId = sprite.get_material_id(),
+		.coords = Vector4(sprite.get_min_coords(), sprite.get_max_coords()),
+		.pos = Vector4(uiComponent.left, uiComponent.top, uiComponent.right, uiComponent.bottom),
+	};
+	shader.update_push_constant(commandBuffer, &info, sizeof(DrawCallObjectUI));
+
+	// draw
+	vkCmdDraw(commandBuffer, 6, 1, 0, 0);
 }
 
 bool Renderer::check_validation_layer_support()
@@ -1396,12 +1447,12 @@ void minty::Renderer::draw_mesh(VkCommandBuffer commandBuffer, Matrix4 const& tr
 	vkCmdBindIndexBuffer(commandBuffer, meshComponent.mesh->get_index_buffer(), 0, meshComponent.mesh->get_index_type());
 
 	// send push constants so we know where to draw
-	DrawCallObjectInfo info
+	DrawCallObject3D info
 	{
 		.transform = transformationMatrix,
 		.materialId = meshComponent.materialId,
 	};
-	shader.update_push_constant(commandBuffer, &info, sizeof(DrawCallObjectInfo));
+	shader.update_push_constant(commandBuffer, &info, sizeof(DrawCallObject3D));
 
 	// draw
 	vkCmdDrawIndexed(commandBuffer, meshComponent.mesh->get_index_count(), 1, 0, 0, 0);

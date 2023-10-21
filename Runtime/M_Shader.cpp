@@ -113,6 +113,12 @@ void minty::Shader::update_push_constant(std::string const& name, VkCommandBuffe
 
 void minty::Shader::update_uniform_constant(std::string const& name, void const* const value, size_t const size, size_t const offset) const
 {
+	// do nothing if does not contain name
+	if (!_uniformConstants.contains(name))
+	{
+		return;
+	}
+
 	auto id = _uniformConstants.get_id(name);
 
 	MINTY_ASSERT(id >= 0, std::format("Uniform constant \"{}\" not found.", name));
@@ -129,6 +135,12 @@ void minty::Shader::update_uniform_constant(std::string const& name, void const*
 
 void minty::Shader::update_uniform_constant_frame(std::string const& name, void const* const value, size_t const size, size_t const offset) const
 {
+	// do nothing if does not contain name
+	if (!_uniformConstants.contains(name))
+	{
+		return;
+	}
+
 	auto id = _uniformConstants.get_id(name);
 
 	MINTY_ASSERT(id >= 0, std::format("Uniform constant \"{}\" not found.", name));
@@ -189,36 +201,7 @@ VkShaderModule minty::Shader::load_module(std::string const& path)
 
 void minty::Shader::create_descriptor_set_layouts(rendering::ShaderBuilder const& builder)
 {
-	//// UniformBufferObject
-	//VkDescriptorSetLayoutBinding uboLayoutBinding{};
-	//uboLayoutBinding.binding = 0;
-	//uboLayoutBinding.descriptorCount = 1;
-	//uboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	//uboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-
-	//// MaterialsBufferObject
-	//VkDescriptorSetLayoutBinding mboLayoutBinding{};
-	//mboLayoutBinding.binding = 1;
-	//mboLayoutBinding.descriptorCount = 1;
-	//mboLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	//mboLayoutBinding.stageFlags = VK_SHADER_STAGE_VERTEX_BIT;
-
-	//// texSamplers[]
-	//VkDescriptorSetLayoutBinding samplerLayoutBinding{};
-	//samplerLayoutBinding.binding = 2;
-	//samplerLayoutBinding.descriptorCount = static_cast<uint32_t>(MAX_TEXTURES);
-	//samplerLayoutBinding.descriptorType = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-	//samplerLayoutBinding.pImmutableSamplers = nullptr;
-	//samplerLayoutBinding.stageFlags = VK_SHADER_STAGE_FRAGMENT_BIT;
-
-	//std::array<VkDescriptorSetLayoutBinding, 3> bindings = { uboLayoutBinding, mboLayoutBinding, samplerLayoutBinding };
-
-	//VkDescriptorSetLayoutCreateInfo layoutInfo{};
-	//layoutInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_LAYOUT_CREATE_INFO;
-	//layoutInfo.bindingCount = static_cast<uint32_t>(bindings.size());
-	//layoutInfo.pBindings = bindings.data();
-
-	size_t count = builder.get_descriptor_set_layout_count();
+	uint32_t count = builder.get_descriptor_set_layout_count();
 	_descriptorSetLayouts.resize(count);
 
 	VkDevice device = _renderer.get_device();
@@ -470,6 +453,13 @@ void minty::Shader::create_buffers(rendering::ShaderBuilder const& builder)
 	_memories.resize(count);
 	_mapped.resize(count);
 
+	//auto count = builder.get_descriptor_set_layout_count();
+
+	//for (uint32_t k = 0; k < count; k++)
+	//{
+
+	//}
+
 	// get info about constants
 	auto const& constantInfos = builder.get_uniform_constant_infos(0);
 
@@ -505,32 +495,22 @@ void minty::Shader::create_buffers(rendering::ShaderBuilder const& builder)
 
 void minty::Shader::create_descriptor_pool(rendering::ShaderBuilder const& builder)
 {
-	//VkDescriptorPoolSize poolSize{};
-	//poolSize.type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	//poolSize.descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
-
-	auto constants = builder.get_uniform_constant_infos(0);
-
 	uint32_t maxSets = static_cast<uint32_t>(_descriptorSetLayouts.size() * MAX_FRAMES_IN_FLIGHT);
 
 	std::vector<VkDescriptorPoolSize> poolSizes;
-	poolSizes.resize(constants.size());
 
-	for (size_t i = 0; i < constants.size(); i++)
+	for (uint32_t i = 0; i < maxSets; i++)
 	{
-		poolSizes[i] = {
-				.type = constants[i].type,
-				.descriptorCount = MAX_FRAMES_IN_FLIGHT * constants[i].count, // account for each frame in the flight
-		};
-	}
+		auto constants = builder.get_uniform_constant_infos(i);
 
-	//std::array<VkDescriptorPoolSize, 3> poolSizes{};
-	//poolSizes[0].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	//poolSizes[0].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT); // UBO
-	//poolSizes[1].type = VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER;
-	//poolSizes[1].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * MAX_MATERIALS); // MBO
-	//poolSizes[2].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
-	//poolSizes[2].descriptorCount = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * MAX_TEXTURES); // samplers
+		for (size_t j = 0; j < constants.size(); j++)
+		{
+			poolSizes.push_back({
+					.type = constants[j].type,
+					.descriptorCount = MAX_FRAMES_IN_FLIGHT * constants[j].count, // account for each frame in the flight
+				});
+		}
+	}
 
 	VkDescriptorPoolCreateInfo poolInfo{};
 	poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;

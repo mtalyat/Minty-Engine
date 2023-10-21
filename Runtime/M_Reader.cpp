@@ -75,6 +75,17 @@ int minty::Reader::read_int(std::string const& name, int const defaultValue) con
 	return defaultValue;
 }
 
+ID minty::Reader::read_id(std::string const& name, ID const defaultValue) const
+{
+	auto const& found = _node.children.find(name);
+	if (found != _node.children.end())
+	{
+		return std::stoi(found->second.data);
+	}
+
+	return defaultValue;
+}
+
 float minty::Reader::read_float(std::string const& name, float const defaultValue) const
 {
 	auto const& found = _node.children.find(name);

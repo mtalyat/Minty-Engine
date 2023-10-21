@@ -18,7 +18,7 @@ void minty::basic::create_basic_renderer_builder(minty::rendering::RendererBuild
 	builder.set_max_materials(64);
 }
 
-void minty::basic::create_basic_shader_builder(minty::rendering::RendererBuilder const& rendererBuilder, minty::rendering::ShaderBuilder& builder)
+void minty::basic::create_basic_shader_builder_3d(minty::rendering::RendererBuilder const& rendererBuilder, minty::rendering::ShaderBuilder& builder)
 {
 	// add vertex data
 	builder.emplace_vertex_binding(0, sizeof(Vertex3D));
@@ -47,23 +47,20 @@ void minty::basic::create_basic_shader_builder(minty::rendering::RendererBuilder
 	// add push constant that should be part of every shader
 	builder.emplace_push_constant(
 		"object",
-		sizeof(DrawCallObjectInfo),
+		sizeof(DrawCallObject3D),
 		VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT
 	);
 }
 
-void minty::basic::create_basic_ui_shader_builder(minty::rendering::RendererBuilder const& rendererBuilder, minty::rendering::ShaderBuilder& builder)
+void minty::basic::create_basic_shader_builder_ui(minty::rendering::RendererBuilder const& rendererBuilder, minty::rendering::ShaderBuilder& builder)
 {
-	// add vertex data
-	builder.emplace_vertex_binding(0, sizeof(Vertex3D));
-	builder.emplace_vertex_attribute(0, sizeof(Vector2), VkFormat::VK_FORMAT_R32G32_SFLOAT);
-	builder.emplace_vertex_attribute(0, sizeof(Vector2), VkFormat::VK_FORMAT_R32G32_SFLOAT);
-
+	// no vertex data for UI
+	
 	// add uniform data that should be part of every shader
 	builder.emplace_uniform_constant(
 		"texSamplers",
 		VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT,
-		0, 1,
+		0, 0,
 		VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
 		sizeof(VkSampler),
 		rendererBuilder.get_max_textures()
@@ -72,7 +69,7 @@ void minty::basic::create_basic_ui_shader_builder(minty::rendering::RendererBuil
 	// add push constant that should be part of every shader
 	builder.emplace_push_constant(
 		"object",
-		sizeof(DrawCallObjectInfo),
+		sizeof(DrawCallObjectUI),
 		VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT
 	);
 }

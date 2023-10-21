@@ -12,8 +12,10 @@
 #include "M_CameraComponent.h"
 #include "M_MeshComponent.h"
 #include "M_TransformComponent.h"
+#include "M_UIComponent.h"
 
 #include "M_Texture.h"
+#include "M_Sprite.h"
 #include "M_Shader.h"
 #include "M_Material.h"
 #include "M_Mesh.h"
@@ -70,6 +72,7 @@ namespace minty
 		Window* _window;
 		
 		Register<Texture> _textures;
+		Register<Sprite> _sprites;
 		Register<Material> _materials;
 		Register<Shader> _shaders;
 
@@ -149,6 +152,8 @@ namespace minty
 		uint32_t get_shader_count() const;
 
 		uint32_t get_texture_count() const;
+
+		uint32_t get_sprite_count() const;
 
 		uint32_t get_material_count() const;
 
@@ -315,11 +320,6 @@ namespace minty
 #pragma region Assets
 
 	private:
-		/// <summary>
-		/// Creates a Texture using the file at the given path.
-		/// </summary>
-		/// <param name="path">The path to the file on the disk.</param>
-		/// <returns>The ID of the new Texture.</returns>
 		ID create_texture(std::string const& path, rendering::TextureBuilder const& builder);
 
 		ID create_shader(std::string const& vertexPath, std::string const& fragmentPath, rendering::ShaderBuilder const& builder);
@@ -330,6 +330,10 @@ namespace minty
 		Texture& get_texture(ID const id);
 
 		Texture const& get_texture(ID const id) const;
+
+		Sprite& get_sprite(ID const id);
+
+		Sprite const& get_sprite(ID const id) const;
 
 		Shader& get_shader(ID const id);
 
@@ -348,7 +352,7 @@ namespace minty
 
 		void draw_scene(VkCommandBuffer commandBuffer);
 
-		Matrix4 get_entity_transformation_matrix(Entity const entity) const;
+		void draw_ui(VkCommandBuffer commandBuffer, UIComponent const& uiComponent);
 
 #pragma endregion
 

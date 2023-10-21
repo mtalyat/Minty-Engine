@@ -11,6 +11,7 @@
 #include "M_RelationshipComponent.h"
 #include "M_RenderableComponent.h"
 #include "M_TransformComponent.h"
+#include "M_UIComponent.h"
 
 #include "M_CommandLineParser.h"
 #include "M_Console.h"
@@ -71,6 +72,7 @@ void minty::Runtime::register_builtin()
 	EntityRegistry::register_component<RelationshipComponent>("Relationship");
 	EntityRegistry::register_component<RenderableComponent>("Renderable");
 	EntityRegistry::register_component<TransformComponent>("Transform");
+	EntityRegistry::register_component<UIComponent>("UI");
 }
 
 std::string minty::to_string(Runtime const& runtime)

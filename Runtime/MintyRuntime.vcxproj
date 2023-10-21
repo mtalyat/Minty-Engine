@@ -257,6 +257,7 @@
     <ClInclude Include="M_SceneManager.h" />
     <ClInclude Include="M_SerializedNode.h" />
     <ClInclude Include="M_Shader.h" />
+    <ClInclude Include="M_Sprite.h" />
     <ClInclude Include="M_System.h" />
     <ClInclude Include="M_SystemRegistry.h" />
     <ClInclude Include="M_Texture.h" />
@@ -268,6 +269,7 @@
     <ClInclude Include="M_Transform.h" />
     <ClInclude Include="M_TransformComponent.h" />
     <ClInclude Include="M_Types.h" />
+    <ClInclude Include="M_UIComponent.h" />
     <ClInclude Include="M_Vector.h" />
     <ClInclude Include="M_Viewport.h" />
     <ClInclude Include="M_Window.h" />
@@ -318,6 +320,7 @@
     <ClCompile Include="M_SceneManager.cpp" />
     <ClCompile Include="M_SerializedNode.cpp" />
     <ClCompile Include="M_Shader.cpp" />
+    <ClCompile Include="M_Sprite.cpp" />
     <ClCompile Include="M_System.cpp" />
     <ClCompile Include="M_SystemRegistry.cpp" />
     <ClCompile Include="M_Texture.cpp" />
@@ -328,6 +331,7 @@
     <ClCompile Include="M_Stopwatch.cpp" />
     <ClCompile Include="M_Transform.cpp" />
     <ClCompile Include="M_TransformComponent.cpp" />
+    <ClCompile Include="M_UIComponent.cpp" />
     <ClCompile Include="M_Vector.cpp" />
     <ClCompile Include="M_Viewport.cpp" />
     <ClCompile Include="M_Window.cpp" />

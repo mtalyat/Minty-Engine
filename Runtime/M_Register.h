@@ -60,6 +60,10 @@ namespace minty
 		/// <param name="name">The alias name.</param>
 		void erase_alias(std::string const& name);
 
+		bool contains(std::string const& name) const;
+
+		bool contains(ID const id) const;
+
 		/// <summary>
 		/// Gets the ID for the given name in this Register.
 		/// </summary>
@@ -191,6 +195,18 @@ namespace minty
 	void Register<T>::erase_alias(std::string const& name)
 	{
 		_lookup.erase(name);
+	}
+
+	template<class T>
+	bool Register<T>::contains(std::string const& name) const
+	{
+		return _lookup.contains(name);
+	}
+
+	template<class T>
+	bool Register<T>::contains(ID const id) const
+	{
+		return id >= 0 && id < _data.size();
 	}
 
 	template<class T>
