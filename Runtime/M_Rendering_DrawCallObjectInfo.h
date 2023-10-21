@@ -13,10 +13,9 @@ namespace minty::rendering
 
 	struct DrawCallObjectUI
 	{
-		minty::ID materialId;
-		int x, y, z;
-		minty::Vector4 coords;
-		minty::Vector4 pos;
+		alignas(16) minty::ID materialId;
+		alignas(16) minty::Vector4 coords;
+		alignas(16) minty::Vector4 pos;
 	};
 
 	struct CameraBufferObject {
