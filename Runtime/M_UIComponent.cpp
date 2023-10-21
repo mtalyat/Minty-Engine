@@ -5,7 +5,7 @@ using namespace minty;
 
 void minty::UIComponent::serialize(Writer& writer) const
 {
-	writer.write("anchor", static_cast<byte>(anchorMode));
+	writer.write("anchor", static_cast<int>(anchorMode));
 	writer.write("x", x, 0.0f);
 	writer.write("y", y, 0.0f);
 	writer.write("width", width, 0.0f);
@@ -16,7 +16,7 @@ void minty::UIComponent::serialize(Writer& writer) const
 
 void minty::UIComponent::deserialize(Reader const& reader)
 {
-	anchorMode = static_cast<AnchorMode>(reader.read_byte("anchor"));
+	anchorMode = static_cast<AnchorMode>(reader.read_int("anchor"));
 	x = reader.read_float("x");
 	if (x == 0.0f) x = reader.read_float("left");
 	y = reader.read_float("y");

@@ -13,6 +13,8 @@ int Window::_windowCount = 0;
 Window::Window(std::string const& title, int const width, int const height)
 	: _title(title)
 	, _window()
+	, _width(width)
+	, _height(height)
 	, _resized(true) // start as "resized" so render engine regenerates data on start
 	, _activeInputMap()
 	, _lastMouseX()
@@ -119,9 +121,30 @@ void minty::Window::close()
 	glfwSetWindowShouldClose(_window, GLFW_TRUE);
 }
 
-void minty::Window::get_framebuffer_size(int* const width, int* const height) const
+void minty::Window::refresh()
 {
-	glfwGetFramebufferSize(_window, width, height);
+	glfwGetFramebufferSize(_window, &_frameWidth, &_frameHeight);
+	glfwGetWindowSize(_window, &_width, &_height);
+}
+
+int minty::Window::get_frame_width() const
+{
+	return _frameWidth;
+}
+
+int minty::Window::get_frame_height() const
+{
+	return _frameHeight;
+}
+
+int minty::Window::get_width() const
+{
+	return _width;
+}
+
+int minty::Window::get_height() const
+{
+	return _height;
 }
 
 GLFWwindow* minty::Window::get_raw() const

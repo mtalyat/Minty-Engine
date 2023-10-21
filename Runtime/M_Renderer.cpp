@@ -828,10 +828,9 @@ void Renderer::cleanup_swap_chain()
 void Renderer::recreate_swap_chain()
 {
 	// on window minimize, pause program until un-minimized
-	int width = 0, height = 0;
-	_window->get_framebuffer_size(&width, &height);
-	while (width == 0 || height == 0) {
-		_window->get_framebuffer_size(&width, &height);
+	_window->refresh();
+	while (_window->get_frame_width() == 0 || _window->get_frame_height() == 0) {
+		_window->refresh();
 		glfwWaitEvents();
 	}
 
@@ -852,12 +851,11 @@ VkExtent2D Renderer::choose_swap_extent(const VkSurfaceCapabilitiesKHR& capabili
 		return capabilities.currentExtent;
 	}
 	else {
-		int width, height;
-		_window->get_framebuffer_size(&width, &height);
+		_window->refresh();
 
 		VkExtent2D actualExtent = {
-			static_cast<uint32_t>(width),
-			static_cast<uint32_t>(height)
+			static_cast<uint32_t>(_window->get_frame_width()),
+			static_cast<uint32_t>(_window->get_frame_height())
 		};
 
 		actualExtent.width = std::clamp(actualExtent.width, capabilities.minImageExtent.width, capabilities.maxImageExtent.width);
@@ -1082,11 +1080,63 @@ void minty::Renderer::draw_ui(VkCommandBuffer commandBuffer, UIComponent const& 
 	// bind the material, which will bind the shader and update its values
 	bind_shader(commandBuffer, &shader);
 
+	float width = static_cast<float>(_window->get_width());
+	float height = static_cast<float>(_window->get_height());
+
+	// adjust info based on anchor and pivot
+	float left, top, right, bottom;
+
+	int anchor = static_cast<int>(uiComponent.anchorMode);
+
+	// do x, then y
+	if (anchor & static_cast<int>(AnchorMode::Left))
+	{
+		left = uiComponent.x / width;
+		right = (uiComponent.x + uiComponent.width) / width;
+	}
+	else if (anchor & static_cast<int>(AnchorMode::Center))
+	{
+		left = uiComponent.x / width + 0.5f;
+		right = (uiComponent.x + uiComponent.width) / width + 0.5f;
+	}
+	else if (anchor & static_cast<int>(AnchorMode::Right))
+	{
+		left = uiComponent.x / width + 1.0f;
+		right = (uiComponent.x + uiComponent.width) / width + 1.0f;
+	}
+	else
+	{
+		left = uiComponent.left;
+		right = uiComponent.right;
+	}
+
+	if (anchor & static_cast<int>(AnchorMode::Top))
+	{
+		top = uiComponent.y / height;
+		bottom = (uiComponent.y + uiComponent.height) / height;
+	}
+	else if (anchor & static_cast<int>(AnchorMode::Middle))
+	{
+		top = uiComponent.y / height + 0.5f;
+		bottom = (uiComponent.y + uiComponent.height) / height + 0.5f;
+	}
+	else if (anchor & static_cast<int>(AnchorMode::Bottom))
+	{
+		top = uiComponent.y / height + 1.0f;
+		bottom = (uiComponent.y + uiComponent.height) / height + 1.0f;
+	}
+	else
+	{
+		top = uiComponent.top;
+		bottom = uiComponent.bottom;
+	}
+
+	// set draw call info
 	DrawCallObjectUI info
 	{
 		.materialId = sprite.get_material_id(),
 		.coords = Vector4(sprite.get_min_coords(), sprite.get_max_coords()),
-		.pos = Vector4(uiComponent.left, uiComponent.top, uiComponent.right, uiComponent.bottom),
+		.pos = Vector4(left, top, right, bottom),
 	};
 	shader.update_push_constant(commandBuffer, &info, sizeof(DrawCallObjectUI));
 

@@ -6,10 +6,13 @@ Entities
     UI Test
         Renderable
         UI
-            x: 0.0
-            y: 0.0
-            width: 0.1
-            height: 0.1
+            anchor: 36
+#            anchor: 18
+#            anchor: 9
+            x: -100.0
+            y: -100.0
+            width: 100
+            height: 100
             sprite: 5
     Camera
         Transform

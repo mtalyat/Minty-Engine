@@ -5,40 +5,14 @@
 
 namespace minty
 {
-	enum class AnchorMode : byte
+	enum class AnchorMode : int
 	{
-		// anchor to top left
-		TopLeft,
-		// anchor to top center
-		TopCenter,
-		// anchor to top right
-		TopRight,
-		// anchor to middle left
-		MiddleLeft,
-		// anchor to middle center
-		MiddleCenter,
-		// anchor to middle right
-		MiddleRight,
-		// anchor to bottom left
-		BottomLeft,
-		// anchor to bottom center
-		BottomCenter,
-		// anchor to bottom right
-		BottomRight,
-		// stretch left/right, anchor to top
-		Top,
-		// stretch left/right, anchor to middle
-		Middle,
-		// stretch left/right, anchor to bottom
-		Bottom,
-		// stretch top/bottom, anchor to left
-		Left,
-		// stretch top/bottom, anchor to center
-		Center,
-		// stretch top/bottom, anchor to right
-		Right,
-		// stretch both
-		All
+		Top =		0b00000001,
+		Middle =	0b00000010,
+		Bottom =	0b00000100,
+		Left =		0b00001000,
+		Center =	0b00010000,
+		Right =		0b00100000,
 	};
 
 	struct UIComponent

@@ -48,7 +48,7 @@ void main() {
         pos = vec2(1.0, 1.0);
         break;
     }
-    gl_Position = vec4(pos * (object.maxPos - object.minPos) * 2.0 + object.minPos - 1.0, 0.0, 1.0);
+    gl_Position = vec4(pos * (object.maxPos - object.minPos) * 2.0 + object.minPos * 2.0 - 1.0, 0.0, 1.0);
     fragColor = materials.materials[object.materialId].color;
     fragTexCoord = pos * (object.maxCoords - object.minCoords) + object.minCoords;
     fragTexId = materials.materials[object.materialId].textureId;
