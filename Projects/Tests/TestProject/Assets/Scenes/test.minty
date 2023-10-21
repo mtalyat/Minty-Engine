@@ -8,8 +8,8 @@ Entities
         UI
             x: 0.0
             y: 0.0
-            width: 1.0
-            height: 1.0
+            width: 0.1
+            height: 0.1
             sprite: 5
     Camera
         Transform
