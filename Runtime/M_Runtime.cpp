@@ -5,12 +5,12 @@
 
 #include "M_EntityRegistry.h"
 #include "M_CameraComponent.h"
+#include "M_DirtyTag.h"
 #include "M_MeshComponent.h"
 #include "M_NameComponent.h"
-#include "M_OriginComponent.h"
-#include "M_PositionComponent.h"
-#include "M_RotationComponent.h"
-#include "M_ScaleComponent.h"
+#include "M_RelationshipComponent.h"
+#include "M_RenderableComponent.h"
+#include "M_TransformComponent.h"
 
 #include "M_CommandLineParser.h"
 #include "M_Console.h"
@@ -65,12 +65,12 @@ void minty::Runtime::register_builtin()
 
 	// components
 	EntityRegistry::register_component<CameraComponent>("Camera");
+	EntityRegistry::register_component<DirtyTag>("Dirty");
 	EntityRegistry::register_component<MeshComponent>("Mesh");
 	EntityRegistry::register_component<NameComponent>("Name");
-	EntityRegistry::register_component<OriginComponent>("Origin");
-	EntityRegistry::register_component<PositionComponent>("Position");
-	EntityRegistry::register_component<RotationComponent>("Rotation");
-	EntityRegistry::register_component<ScaleComponent>("Scale");
+	EntityRegistry::register_component<RelationshipComponent>("Relationship");
+	EntityRegistry::register_component<RenderableComponent>("Renderable");
+	EntityRegistry::register_component<TransformComponent>("Transform");
 }
 
 std::string minty::to_string(Runtime const& runtime)

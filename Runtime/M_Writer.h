@@ -17,9 +17,16 @@ namespace minty
 	{
 	private:
 		Node& _node;
+		void* _data;
 
 	public:
-		Writer(Node& node);
+		Writer(Node& node, void* const data = nullptr);
+
+		/// <summary>
+		/// Gets the extra data given to this Writer.
+		/// </summary>
+		/// <returns>The extra data as a void pointer.</returns>
+		void* get_data() const;
 
 #pragma region Normal Writing
 
@@ -36,6 +43,8 @@ namespace minty
 		void write(std::string const& name, float const value);
 
 		void write(std::string const& name, byte const value);
+
+		void write(std::string const& name, size_t const value);
 
 		void write(std::string const& name, Vector2 const& value);
 
@@ -62,6 +71,8 @@ namespace minty
 		void write(std::string const& name, float const value, float const defaultValue);
 
 		void write(std::string const& name, byte const value, byte const defaultValue);
+
+		void write(std::string const& name, size_t const value, size_t const defaultValue);
 
 		void write(std::string const& name, Vector2 const& value, Vector2 const& defaultValue);
 

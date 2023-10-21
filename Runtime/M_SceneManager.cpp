@@ -33,7 +33,7 @@ ID minty::SceneManager::create_scene(std::string const& path)
 
 	// load the data from the disk into the scene
 	Node node = Node::parse_file(path);
-	Reader reader(node);
+	Reader reader(node, &scene);
 	scene.deserialize(reader);
 
 	// all done

@@ -1,18 +1,19 @@
 #pragma once
 
 #include "M_Component.h"
-#include "M_Vector.h"
+#include "M_Transform.h"
 
 namespace minty
 {
-	struct ScaleComponent
+	struct TransformComponent
 		: public Component
 	{
-		Vector3 scale;
+		Matrix4 global;
+		Transform local;
 
 		void serialize(Writer& writer) const override;
 		void deserialize(Reader const& reader) override;
 
-		friend std::string to_string(ScaleComponent const& value);
+		friend std::string to_string(TransformComponent const& value);
 	};
 }

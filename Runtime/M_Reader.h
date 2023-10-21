@@ -17,9 +17,10 @@ namespace minty
 	{
 	private:
 		Node const& _node;
+		void* _data;
 
 	public:
-		Reader(Node const& node);
+		Reader(Node const& node, void* const data = nullptr);
 
 		/// <summary>
 		/// Gets the root node that this Reader is using.
@@ -34,6 +35,12 @@ namespace minty
 		/// <returns>The child node, or null if it does not exist.</returns>
 		Node const* get_node(std::string const& name) const;
 
+		/// <summary>
+		/// Gets the extra data given to this Reader.
+		/// </summary>
+		/// <returns>The extra data as a void pointer.</returns>
+		void* get_data() const;
+
 		void read_object(std::string const& name, ISerializable* const value) const;
 
 		std::string read_string(std::string const& name, std::string const& defaultValue = "") const;
@@ -43,6 +50,8 @@ namespace minty
 		float read_float(std::string const& name, float const defaultValue = 0.0f) const;
 
 		byte read_byte(std::string const& name, byte const defaultValue = 0) const;
+
+		size_t read_size(std::string const& name, size_t const defaultValue = 0) const;
 
 		Vector2 read_vector2(std::string const& name, Vector2 const& defaultValue = Vector2()) const;
 

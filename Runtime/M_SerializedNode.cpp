@@ -80,8 +80,8 @@ Node minty::Node::parse_file(std::string const& path)
 
 	for (std::string line : lines)
 	{
-		// skip empty/whitespace
-		if (line.size() == 0 || line.find_first_not_of(" \t\n\v\f\r") == std::string::npos)
+		// skip empty/whitespace/comment lines
+		if (line.size() == 0 || line.find_first_not_of(" \t\n\v\f\r") == std::string::npos || line.at(0) == '#')
 		{
 			continue;
 		}

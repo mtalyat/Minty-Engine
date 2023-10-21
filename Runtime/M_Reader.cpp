@@ -5,8 +5,9 @@
 
 using namespace minty;
 
-minty::Reader::Reader(Node const& node)
+minty::Reader::Reader(Node const& node, void* const data)
 	: _node(node)
+	, _data(data)
 {}
 
 Node const* minty::Reader::get_node() const
@@ -27,13 +28,18 @@ Node const* minty::Reader::get_node(std::string const& name) const
 	return nullptr;
 }
 
+void* minty::Reader::get_data() const
+{
+	return _data;
+}
+
 void minty::Reader::read_object(std::string const& name, ISerializable* const value) const
 {
 	auto const& found = _node.children.find(name);
 	if (found != _node.children.end())
 	{
 		// create Reader to use
-		Reader reader(found->second);
+		Reader reader(found->second, _data);
 
 		// deserialize the values into the given object
 		value->deserialize(reader);
@@ -42,7 +48,7 @@ void minty::Reader::read_object(std::string const& name, ISerializable* const va
 	{
 		// deserialize with an empty node so it is initialized to defaults
 		Node empty;
-		Reader reader(empty);
+		Reader reader(empty, _data);
 		value->deserialize(reader);
 	}
 }
@@ -91,12 +97,25 @@ byte minty::Reader::read_byte(std::string const& name, byte const defaultValue) 
 	return defaultValue;
 }
 
+size_t minty::Reader::read_size(std::string const& name, size_t const defaultValue) const
+{
+	auto const& found = _node.children.find(name);
+	if (found != _node.children.end())
+	{
+		return static_cast<size_t>(std::stoull(found->second.data));
+	}
+
+	return defaultValue;
+}
+
 Vector2 minty::Reader::read_vector2(std::string const& name, Vector2 const& defaultValue) const
 {
 	auto const& found = _node.children.find(name);
 	if (found != _node.children.end())
 	{
-		return Vector2(read_float("x", defaultValue.x), read_float("y", defaultValue.y));
+		Reader r(found->second);
+
+		return Vector2(r.read_float("x", defaultValue.x), r.read_float("y", defaultValue.y));
 	}
 
 	return defaultValue;
@@ -107,7 +126,9 @@ Vector3 minty::Reader::read_vector3(std::string const& name, Vector3 const& defa
 	auto const& found = _node.children.find(name);
 	if (found != _node.children.end())
 	{
-		return Vector3(read_float("x", defaultValue.x), read_float("y", defaultValue.y), read_float("z", defaultValue.z));
+		Reader r(found->second);
+
+		return Vector3(r.read_float("x", defaultValue.x), r.read_float("y", defaultValue.y), r.read_float("z", defaultValue.z));
 	}
 
 	return defaultValue;
@@ -118,7 +139,9 @@ Vector4 minty::Reader::read_vector4(std::string const& name, Vector4 const& defa
 	auto const& found = _node.children.find(name);
 	if (found != _node.children.end())
 	{
-		return Vector4(read_float("x", defaultValue.x), read_float("y", defaultValue.y), read_float("z", defaultValue.z), read_float("w", defaultValue.w));
+		Reader r(found->second);
+
+		return Vector4(r.read_float("x", defaultValue.x), r.read_float("y", defaultValue.y), r.read_float("z", defaultValue.z), r.read_float("w", defaultValue.w));
 	}
 
 	return defaultValue;
@@ -129,7 +152,9 @@ Vector2Int minty::Reader::read_vector2int(std::string const& name, Vector2Int co
 	auto const& found = _node.children.find(name);
 	if (found != _node.children.end())
 	{
-		return Vector2Int(read_int("x", defaultValue.x), read_int("y", defaultValue.y));
+		Reader r(found->second);
+
+		return Vector2Int(r.read_int("x", defaultValue.x), r.read_int("y", defaultValue.y));
 	}
 
 	return defaultValue;
@@ -140,7 +165,9 @@ Vector3Int minty::Reader::read_vector3int(std::string const& name, Vector3Int co
 	auto const& found = _node.children.find(name);
 	if (found != _node.children.end())
 	{
-		return Vector3Int(read_int("x", defaultValue.x), read_int("y", defaultValue.y), read_int("z", defaultValue.z));
+		Reader r(found->second);
+
+		return Vector3Int(r.read_int("x", defaultValue.x), r.read_int("y", defaultValue.y), r.read_int("z", defaultValue.z));
 	}
 
 	return defaultValue;
@@ -151,7 +178,9 @@ Vector4Int minty::Reader::read_vector4int(std::string const& name, Vector4Int co
 	auto const& found = _node.children.find(name);
 	if (found != _node.children.end())
 	{
-		return Vector4Int(read_int("x", defaultValue.x), read_int("y", defaultValue.y), read_int("z", defaultValue.z), read_int("w", defaultValue.w));
+		Reader r(found->second);
+
+		return Vector4Int(r.read_int("x", defaultValue.x), r.read_int("y", defaultValue.y), r.read_int("z", defaultValue.z), r.read_int("w", defaultValue.w));
 	}
 
 	return defaultValue;
@@ -159,7 +188,17 @@ Vector4Int minty::Reader::read_vector4int(std::string const& name, Vector4Int co
 
 Quaternion minty::Reader::read_quaternion(std::string const& name, Quaternion const& defaultValue) const
 {
-	return Quaternion();
+	auto const& found = _node.children.find(name);
+	if (found != _node.children.end())
+	{
+		Reader r(found->second);
+
+		Vector3 defaultValueEuler = defaultValue.to_euler_angles();
+
+		return Quaternion::from_euler_angles(r.read_float("x", defaultValueEuler.x), r.read_float("y", defaultValueEuler.y), r.read_float("z", defaultValueEuler.z));
+	}
+
+	return defaultValue;
 }
 
 std::string minty::to_string(Reader const& value)

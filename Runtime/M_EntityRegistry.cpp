@@ -3,10 +3,9 @@
 
 #include "M_Console.h"
 #include "M_NameComponent.h"
-#include "M_OriginComponent.h"
-#include "M_PositionComponent.h"
-#include "M_RotationComponent.h"
-#include "M_ScaleComponent.h"
+#include "M_RelationshipComponent.h"
+#include "M_TransformComponent.h"
+#include "M_DirtyTag.h"
 #include <sstream>
 #include <map>
 
@@ -18,7 +17,11 @@ std::map<uint32_t const, std::string const> EntityRegistry::_componentTypes = st
 minty::EntityRegistry::EntityRegistry()
 	: entt::registry()
 	, Object()
-{}
+{
+	// make it so whenever a transform is editied, it is marked as dirty
+	on_construct<TransformComponent>().connect<&EntityRegistry::emplace_or_replace<DirtyTag>>();
+	on_update<TransformComponent>().connect<&EntityRegistry::emplace_or_replace<DirtyTag>>();
+}
 
 minty::EntityRegistry::~EntityRegistry()
 {}
@@ -41,7 +44,7 @@ Entity minty::EntityRegistry::create()
 
 Entity minty::EntityRegistry::create(std::string const& name)
 {
-	Entity e = entt::registry::create();
+	Entity e = create();
 	NameComponent& nameComponent = this->emplace<NameComponent>(e);
 	nameComponent.name = name;
 	return e;
@@ -49,6 +52,11 @@ Entity minty::EntityRegistry::create(std::string const& name)
 
 Entity minty::EntityRegistry::find_by_name(std::string const& string) const
 {
+	if (is_name_empty(string))
+	{
+		return NULL_ENTITY;
+	}
+
 	for (auto [entity, name] : this->view<NameComponent const>().each())
 	{
 		if (name.name.compare(string) == 0)
@@ -67,7 +75,7 @@ std::string minty::EntityRegistry::get_name(Entity const entity) const
 	// if entity is null, return NULL
 	if (entity == NULL_ENTITY)
 	{
-		return "NULL";
+		return "";
 	}
 
 	// if entity has a name component, get the name
@@ -116,51 +124,6 @@ Component const* minty::EntityRegistry::get_by_name(std::string const& name, Ent
 	}
 }
 
-void minty::EntityRegistry::get_transform(Entity const entity, Transform& transform) const
-{
-	// get origin
-	OriginComponent const* const origin = this->try_get<OriginComponent>(entity);
-	if (origin)
-	{
-		// origin given
-		transform.position = origin->position;
-	}
-	else
-	{
-		// origin is at 0, 0, 0
-		transform.position = Vector3();
-	}
-
-	// get and add position to origin
-	PositionComponent const* const position = this->try_get<PositionComponent>(entity);
-	if (position)
-	{
-		transform.position += position->position;
-	}
-
-	// get rotation
-	RotationComponent const* const rotation = this->try_get<RotationComponent>(entity);
-	if (rotation)
-	{
-		transform.rotation = rotation->rotation;
-	}
-	else
-	{
-		transform.rotation = Quaternion();
-	}
-
-	// get scale
-	ScaleComponent const* const scale = this->try_get<ScaleComponent>(entity);
-	if (scale)
-	{
-		transform.scale = scale->scale;
-	}
-	else
-	{
-		transform.scale = Vector3(1.0f, 1.0f, 1.0f);
-	}
-}
-
 void minty::EntityRegistry::print(Entity const entity) const
 {
 	// serialize entity, add it to parent, print that
@@ -182,7 +145,10 @@ void minty::EntityRegistry::serialize(Writer& writer) const
 	for (auto [entity] : this->storage<Entity>()->each())
 	{
 		// serialize entity
-		Node entityNode = serialize_entity(entity);
+		Node entityNode;
+		Writer entityWriter(entityNode, writer.get_data());
+
+		serialize_entity(entityWriter, entity);
 
 		// get entity name
 		entityName = this->get_name(entity);
@@ -215,18 +181,19 @@ void minty::EntityRegistry::deserialize(Reader const& reader)
 		for (auto& componentPair : pair.second.children)
 		{
 			Component* component = this->emplace_by_name(componentPair.first, entity);
-			Reader reader(componentPair.second);
-			component->deserialize(reader);
+			Reader componentReader(componentPair.second, reader.get_data());
+			component->deserialize(componentReader);
 		}
 	}
 }
 
-Node minty::EntityRegistry::serialize_entity(Entity const entity) const
+bool minty::EntityRegistry::is_name_empty(std::string const& name)
 {
-	// populate a node with children
-	Node entityNode;
-	Writer entityWriter(entityNode);
+	return name.size() == 0 || (name.size() == 1 && name.at(0) == '_');
+}
 
+void minty::EntityRegistry::serialize_entity(Writer& writer, Entity const entity) const
+{
 	for (auto&& curr : this->storage())
 	{
 		//auto cid = curr.first;
@@ -252,11 +219,17 @@ Node minty::EntityRegistry::serialize_entity(Entity const entity) const
 			}
 
 			// write component with its name and serialized values
-			entityWriter.write(name, this->get_by_name(name, entity));
+			writer.write(name, this->get_by_name(name, entity));
 		}
 	}
-	
-	return entityNode;
+}
+
+Node minty::EntityRegistry::serialize_entity(Entity const entity) const
+{
+	Node node;
+	Writer writer(node);
+	serialize_entity(writer, entity);
+	return node;
 }
 
 std::string minty::to_string(EntityRegistry const& value)

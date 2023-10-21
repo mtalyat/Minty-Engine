@@ -5,9 +5,15 @@
 
 using namespace minty;
 
-minty::Writer::Writer(Node& node)
+minty::Writer::Writer(Node& node, void* const data)
 	: _node(node)
+	, _data(data)
 {}
+
+void* minty::Writer::get_data() const
+{
+	return _data;
+}
 
 void minty::Writer::write(std::string const& name)
 {
@@ -47,6 +53,11 @@ void minty::Writer::write(std::string const& name, float const value)
 }
 
 void minty::Writer::write(std::string const& name, byte const value)
+{
+	write(name, std::to_string(value));
+}
+
+void minty::Writer::write(std::string const& name, size_t const value)
 {
 	write(name, std::to_string(value));
 }
@@ -170,6 +181,14 @@ void minty::Writer::write(std::string const& name, float const value, float cons
 }
 
 void minty::Writer::write(std::string const& name, byte const value, byte const defaultValue)
+{
+	if (value != defaultValue)
+	{
+		write(name, std::to_string(value));
+	}
+}
+
+void minty::Writer::write(std::string const& name, size_t const value, size_t const defaultValue)
 {
 	if (value != defaultValue)
 	{
