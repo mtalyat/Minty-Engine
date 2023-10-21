@@ -193,7 +193,7 @@ namespace minty
 		/// <summary>
 		/// Creates the swap chain.
 		/// </summary>
-		virtual void create_swap_chain();
+		void create_swap_chain();
 
 		/// <summary>
 		/// Creates the image views in the swap chain.

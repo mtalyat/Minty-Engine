@@ -9,6 +9,7 @@
 #include "M_File.h"
 #include "M_Scene.h"
 #include "M_EntityRegistry.h"
+#include "M_Encoding.h"
 
 #include "M_TransformComponent.h"
 #include "M_CameraComponent.h"
@@ -107,20 +108,14 @@ void minty::Renderer::init(rendering::RendererBuilder const& builder)
 	create_swap_chain();
 	create_image_views();
 	create_render_pass();
-	//create_descriptor_set_layouts();
 	queueFamilyIndices = find_queue_families(_physicalDevice);
 	create_command_pool(commandPool);
 	create_depth_resources();
 	create_framebuffers();
-	//create_material_buffers();
 
 	build_textures();
 	build_shaders();
 	build_materials();
-
-	//create_uniform_buffers();
-	//create_descriptor_pool();
-	//create_descriptor_sets();
 
 	create_command_buffers();
 	create_sync_objects();
@@ -1238,6 +1233,7 @@ void minty::Renderer::build_textures()
 
 void minty::Renderer::build_shaders()
 {
+	// build custom
 	for (auto const& pair : _builder->get_shaders())
 	{
 		create_shader(pair.first.at(0), pair.first.at(1), *pair.second);
