@@ -14,6 +14,7 @@ namespace minty::rendering
 	struct DrawCallObjectUI
 	{
 		alignas(16) minty::ID materialId;
+		int layer;
 		alignas(16) minty::Vector4 coords;
 		alignas(16) minty::Vector4 pos;
 	};

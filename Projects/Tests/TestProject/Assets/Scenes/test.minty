@@ -3,17 +3,45 @@ Systems
     Move
     Test
 Entities
-    UI Test
+    Crosshair
         Renderable
         UI
-            anchor: 36
-#            anchor: 18
-#            anchor: 9
-            x: -100.0
-            y: -100.0
-            width: 100
-            height: 100
+            anchor: MiddleCenter
+            x: -25
+            y: -25
+            width: 50
+            height: 50
+            sprite: 4
+    UI 0
+        Renderable
+        UI
+            anchor: TopLeft
+            x: 0
+            y: 0
+            width: 200
+            height: 200
             sprite: 5
+            layer: 0
+    UI 1
+        Renderable
+        UI
+            anchor: TopLeft
+            x: 0
+            y: 100
+            width: 200
+            height: 200
+            sprite: 5
+            layer: 1
+    UI 2
+        Renderable
+        UI
+            anchor: TopLeft
+            x: 50
+            y: 50
+            width: 200
+            height: 200
+            sprite: 5
+            layer: -1
     Camera
         Transform
             position

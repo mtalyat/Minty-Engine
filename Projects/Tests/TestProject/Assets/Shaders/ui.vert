@@ -17,7 +17,8 @@ layout(set = 0, binding = 1) uniform MaterialBufferObjects
 layout(push_constant) uniform DrawObject
 {
     int materialId;
-    int x, y, z;
+    int layer;
+    int x, y;
     vec2 minCoords;
     vec2 maxCoords;
     vec2 minPos;
@@ -48,7 +49,7 @@ void main() {
         pos = vec2(1.0, 1.0);
         break;
     }
-    gl_Position = vec4(pos * (object.maxPos - object.minPos) * 2.0 + object.minPos * 2.0 - 1.0, 0.0, 1.0);
+    gl_Position = vec4(pos * (object.maxPos - object.minPos) * 2.0 + object.minPos * 2.0 - 1.0, 0.5 + object.layer * 0.00001, 1.0);
     fragColor = materials.materials[object.materialId].color;
     fragTexCoord = pos * (object.maxCoords - object.minCoords) + object.minCoords;
     fragTexId = materials.materials[object.materialId].textureId;

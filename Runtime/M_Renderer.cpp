@@ -1036,12 +1036,6 @@ void Renderer::create_logical_device()
 
 void minty::Renderer::draw_scene(VkCommandBuffer commandBuffer)
 {
-	// draw all UI in scene
-	for (auto&& [entity, renderable, ui] : _registry->view<RenderableComponent const, UIComponent const>().each())
-	{
-		draw_ui(commandBuffer, ui);
-	}
-
 	TransformComponent const* transformComponent;
 
 	// draw all meshes in the scene
@@ -1060,6 +1054,17 @@ void minty::Renderer::draw_scene(VkCommandBuffer commandBuffer)
 			// if no transform, use empty matrix
 			draw_mesh(commandBuffer, Matrix4(1.0f), mesh);
 		}
+	}
+
+	_registry->sort<UIComponent>([](UIComponent const& left, UIComponent const& right)
+		{
+			return left.layer > right.layer;
+		});
+
+	// draw all UI in scene
+	for (auto&& [entity, renderable, ui] : _registry->view<RenderableComponent const, UIComponent const>().each())
+	{
+		draw_ui(commandBuffer, ui);
 	}
 
 	// unbind any shaders used
@@ -1135,6 +1140,7 @@ void minty::Renderer::draw_ui(VkCommandBuffer commandBuffer, UIComponent const& 
 	DrawCallObjectUI info
 	{
 		.materialId = sprite.get_material_id(),
+		.layer = uiComponent.layer,
 		.coords = Vector4(sprite.get_min_coords(), sprite.get_max_coords()),
 		.pos = Vector4(left, top, right, bottom),
 	};

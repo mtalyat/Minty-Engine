@@ -11,37 +11,6 @@
 using namespace minty;
 using namespace minty::rendering;
 
-//void Renderer::create_uniform_buffers()
-//{
-//	VkDeviceSize bufferSize = sizeof(UniformBufferObject);
-//
-//	uniformBuffers.resize(MAX_FRAMES_IN_FLIGHT);
-//	uniformBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
-//	uniformBuffersMapped.resize(MAX_FRAMES_IN_FLIGHT);
-//
-//	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-//		create_buffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, uniformBuffers[i], uniformBuffersMemory[i]);
-//
-//		vkMapMemory(_device, uniformBuffersMemory[i], 0, bufferSize, 0, &uniformBuffersMapped[i]);
-//	}
-//}
-
-//void minty::Renderer::create_material_buffers()
-//{
-//	// allocate space for materials
-//	VkDeviceSize bufferSize = sizeof(MaterialInfo) * MAX_MATERIALS;
-//
-//	materialBuffers.resize(MAX_FRAMES_IN_FLIGHT);
-//	materialBuffersMemory.resize(MAX_FRAMES_IN_FLIGHT);
-//	materialBuffersMapped.resize(MAX_FRAMES_IN_FLIGHT);
-//
-//	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-//		create_buffer(bufferSize, VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, materialBuffers[i], materialBuffersMemory[i]);
-//
-//		vkMapMemory(_device, materialBuffersMemory[i], 0, bufferSize, 0, &materialBuffersMapped[i]);
-//	}
-//}
-
 minty::Shader::Shader(std::string const& vertexPath, std::string const& fragmentPath, rendering::ShaderBuilder const& builder, Renderer& renderer)
 	: RendererObject::RendererObject(renderer)
 {
@@ -347,7 +316,7 @@ void minty::Shader::create_shader(std::string const& vertexPath, std::string con
 	// create color blend info, based on alpha
 	VkPipelineColorBlendAttachmentState colorBlendAttachment
 	{
-		.blendEnable = VK_FALSE,
+		.blendEnable = VK_TRUE,
 		.srcColorBlendFactor = VK_BLEND_FACTOR_SRC_ALPHA,
 		.dstColorBlendFactor = VK_BLEND_FACTOR_ONE_MINUS_SRC_ALPHA,
 		.colorBlendOp = VK_BLEND_OP_ADD,

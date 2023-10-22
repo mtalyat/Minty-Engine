@@ -49,7 +49,7 @@ void init(Runtime &runtime)
             basic::create_basic_renderer_builder(rb);
 
             rb.set_max_shaders(2);
-            rb.set_max_textures(4);
+            rb.set_max_textures(6);
             rb.set_max_materials(8);
 
             // create textures
@@ -57,13 +57,12 @@ void init(Runtime &runtime)
             tb0.set_filter(VkFilter::VK_FILTER_NEAREST);
             TextureBuilder tb1; // for "normal" textures
 
-            std::vector<ID> tids =
-                {
-                    rb.emplace_texture(&tb0, "Assets/Textures/pattern.png"),
-                    rb.emplace_texture(&tb1, "Assets/Textures/texture.jpg"),
-                    rb.emplace_texture(&tb0, "Assets/Textures/brian.png"),
-                    rb.emplace_texture(&tb1, "Assets/Textures/funny.jpg"),
-                };
+            rb.emplace_texture(&tb0, "Assets/Textures/pattern.png");
+            rb.emplace_texture(&tb1, "Assets/Textures/texture.jpg");
+            rb.emplace_texture(&tb0, "Assets/Textures/brian.png");
+            rb.emplace_texture(&tb1, "Assets/Textures/funny.jpg");
+            rb.emplace_texture(&tb0, "Assets/Textures/crosshair.png");
+            rb.emplace_texture(&tb0, "Assets/Textures/ui.png");
 
             // create shader
             ShaderBuilder sb;
@@ -95,31 +94,26 @@ void init(Runtime &runtime)
             rb.emplace_shader(&sb2, "Assets/Shaders/uivert.spv", "Assets/Shaders/uifrag.spv");
 
             // create materials
-            MaterialBuilder mb(0);
+            MaterialBuilder mb(0);  // world
+            MaterialBuilder mb2(1); // ui
 
             Vector4 whiteColor(1.0f, 1.0f, 1.0f, 1.0f);
 
-            for (ID const i : tids)
-            {
-                MaterialBufferObject mbo = {
-                    .textureId = i,
-                    .color = whiteColor,
-                };
-
-                rb.emplace_material(&mb, &mbo);
-            }
-
-            MaterialBuilder mb2(1);
-
-            for (ID const i : tids)
-            {
-                MaterialBufferObject mbo = {
-                    .textureId = i,
-                    .color = whiteColor,
-                };
-
-                rb.emplace_material(&mb2, &mbo);
-            }
+            MaterialBufferObject mbo = {
+                .textureId = 0,
+                .color = whiteColor
+            };
+            rb.emplace_material(&mb, &mbo);
+            mbo.textureId = 1;
+            rb.emplace_material(&mb, &mbo);
+            mbo.textureId = 2;
+            rb.emplace_material(&mb, &mbo);
+            mbo.textureId = 3;
+            rb.emplace_material(&mb, &mbo);
+            mbo.textureId = 4;
+            rb.emplace_material(&mb2, &mbo);
+            mbo.textureId = 5;
+            rb.emplace_material(&mb2, &mbo);
 
             // init renderer with builders
             renderer->init(rb);
