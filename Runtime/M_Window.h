@@ -77,12 +77,28 @@ namespace minty
 		/// </summary>
 		void refresh();
 
+		/// <summary>
+		/// Gets the framebuffer width of this Window.
+		/// </summary>
+		/// <returns></returns>
 		int get_frame_width() const;
 
+		/// <summary>
+		/// Gets the framebuffer height of this Window.
+		/// </summary>
+		/// <returns></returns>
 		int get_frame_height() const;
 
+		/// <summary>
+		/// Gets the width of this Window.
+		/// </summary>
+		/// <returns></returns>
 		int get_width() const;
 
+		/// <summary>
+		/// Gets the height of this Window.
+		/// </summary>
+		/// <returns></returns>
 		int get_height() const;
 
 		/// <summary>
