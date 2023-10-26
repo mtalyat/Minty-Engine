@@ -31,7 +31,7 @@ void minty::Writer::write(std::string const& name, ISerializable const* const va
 	_node.children.emplace(name, Node());
 
 	// create a Writer to use
-	Writer Writer(_node.children.at(name));
+	Writer Writer(_node.children.at(name), _data);
 
 	// serialize the object into that node
 	value->serialize(Writer);

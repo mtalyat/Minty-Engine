@@ -9,6 +9,7 @@
 #include "M_File.h"
 #include "M_Scene.h"
 #include "M_EntityRegistry.h"
+#include "M_Encoding.h"
 
 #include "M_TransformComponent.h"
 #include "M_CameraComponent.h"
@@ -97,6 +98,7 @@ void minty::Renderer::init(rendering::RendererBuilder const& builder)
 	// init fields
 	_textures.limit(builder.get_max_textures());
 	_materials.limit(builder.get_max_materials());
+	_sprites.limit(builder.get_max_materials());
 	_shaders.limit(builder.get_max_shaders());
 
 	create_instance();
@@ -107,20 +109,14 @@ void minty::Renderer::init(rendering::RendererBuilder const& builder)
 	create_swap_chain();
 	create_image_views();
 	create_render_pass();
-	//create_descriptor_set_layouts();
 	queueFamilyIndices = find_queue_families(_physicalDevice);
 	create_command_pool(commandPool);
 	create_depth_resources();
 	create_framebuffers();
-	//create_material_buffers();
 
 	build_textures();
 	build_shaders();
 	build_materials();
-
-	//create_uniform_buffers();
-	//create_descriptor_pool();
-	//create_descriptor_sets();
 
 	create_command_buffers();
 	create_sync_objects();
@@ -414,6 +410,11 @@ uint32_t minty::Renderer::get_texture_count() const
 	return static_cast<uint32_t>(_textures.size());
 }
 
+uint32_t minty::Renderer::get_sprite_count() const
+{
+	return static_cast<uint32_t>(_sprites.size());
+}
+
 uint32_t minty::Renderer::get_material_count() const
 {
 	return static_cast<uint32_t>(_materials.size());
@@ -451,6 +452,11 @@ Texture const& minty::Renderer::get_texture(ID const id) const
 	return _textures.at(id);
 }
 
+Sprite& minty::Renderer::get_sprite(ID const id)
+{
+	return _sprites.at(id);
+}
+
 ID minty::Renderer::create_shader(std::string const& vertexPath, std::string const& fragmentPath, rendering::ShaderBuilder const& builder)
 {
 	if (!file::exists(vertexPath))
@@ -474,6 +480,11 @@ ID minty::Renderer::create_shader(std::string const& vertexPath, std::string con
 	return _shaders.emplace(Shader(vertexPath, fragmentPath, builder, *this));
 }
 
+Sprite const& minty::Renderer::get_sprite(ID const id) const
+{
+	return _sprites.at(id);
+}
+
 Shader& minty::Renderer::get_shader(ID const id)
 {
 	return _shaders.at(id);
@@ -493,6 +504,9 @@ ID minty::Renderer::create_material(void const* const materialData, rendering::M
 	}
 
 	ID id = _materials.emplace(Material(_materials.size(), materialData, builder, *this));
+
+	// TODO: move somewhere else
+	_sprites.emplace(Sprite(id));
 
 	return id;
 }
@@ -814,10 +828,9 @@ void Renderer::cleanup_swap_chain()
 void Renderer::recreate_swap_chain()
 {
 	// on window minimize, pause program until un-minimized
-	int width = 0, height = 0;
-	_window->get_framebuffer_size(&width, &height);
-	while (width == 0 || height == 0) {
-		_window->get_framebuffer_size(&width, &height);
+	_window->refresh();
+	while (_window->get_frame_width() == 0 || _window->get_frame_height() == 0) {
+		_window->refresh();
 		glfwWaitEvents();
 	}
 
@@ -838,12 +851,11 @@ VkExtent2D Renderer::choose_swap_extent(const VkSurfaceCapabilitiesKHR& capabili
 		return capabilities.currentExtent;
 	}
 	else {
-		int width, height;
-		_window->get_framebuffer_size(&width, &height);
+		_window->refresh();
 
 		VkExtent2D actualExtent = {
-			static_cast<uint32_t>(width),
-			static_cast<uint32_t>(height)
+			static_cast<uint32_t>(_window->get_frame_width()),
+			static_cast<uint32_t>(_window->get_frame_height())
 		};
 
 		actualExtent.width = std::clamp(actualExtent.width, capabilities.minImageExtent.width, capabilities.maxImageExtent.width);
@@ -1024,6 +1036,12 @@ void Renderer::create_logical_device()
 
 void minty::Renderer::draw_scene(VkCommandBuffer commandBuffer)
 {
+	// sort sprites so they render in the correct order, since Z does not matter
+	_registry->sort<SpriteComponent>([](SpriteComponent const& left, SpriteComponent const& right)
+		{
+			return left.layer < right.layer;
+		});
+
 	TransformComponent const* transformComponent;
 
 	// draw all meshes in the scene
@@ -1044,8 +1062,96 @@ void minty::Renderer::draw_scene(VkCommandBuffer commandBuffer)
 		}
 	}
 
+	// sort UITransforms so that it matches order of sprites for rendering
+	_registry->sort<UITransformComponent, SpriteComponent>();
+
+	// draw all UI in scene
+	for (auto&& [entity, renderable, ui, sprite] : _registry->view<RenderableComponent const, UITransformComponent const, SpriteComponent const>().each())
+	{
+		draw_ui(commandBuffer, ui, sprite);
+	}
+
 	// unbind any shaders used
 	bind_shader(commandBuffer, nullptr);
+}
+
+void minty::Renderer::draw_ui(VkCommandBuffer commandBuffer, UITransformComponent const& uiComponent, SpriteComponent const& spriteComponent)
+{
+	// get the sprite
+	Sprite& sprite = get_sprite(spriteComponent.id);
+
+	// get the material
+	Material& mat = get_material(sprite.get_material_id());
+
+	// get the shader
+	Shader& shader = get_shader(mat.get_shader_id());
+
+	// bind the material, which will bind the shader and update its values
+	bind_shader(commandBuffer, &shader);
+
+	float width = static_cast<float>(_window->get_width());
+	float height = static_cast<float>(_window->get_height());
+
+	// adjust info based on anchor and pivot
+	float left, top, right, bottom;
+
+	int anchor = static_cast<int>(uiComponent.anchorMode);
+
+	// do x, then y
+	if (anchor & static_cast<int>(AnchorMode::Left))
+	{
+		left = uiComponent.x / width;
+		right = (uiComponent.x + uiComponent.width) / width;
+	}
+	else if (anchor & static_cast<int>(AnchorMode::Center))
+	{
+		left = uiComponent.x / width + 0.5f;
+		right = (uiComponent.x + uiComponent.width) / width + 0.5f;
+	}
+	else if (anchor & static_cast<int>(AnchorMode::Right))
+	{
+		left = uiComponent.x / width + 1.0f;
+		right = (uiComponent.x + uiComponent.width) / width + 1.0f;
+	}
+	else
+	{
+		left = uiComponent.left;
+		right = uiComponent.right;
+	}
+
+	if (anchor & static_cast<int>(AnchorMode::Top))
+	{
+		top = uiComponent.y / height;
+		bottom = (uiComponent.y + uiComponent.height) / height;
+	}
+	else if (anchor & static_cast<int>(AnchorMode::Middle))
+	{
+		top = uiComponent.y / height + 0.5f;
+		bottom = (uiComponent.y + uiComponent.height) / height + 0.5f;
+	}
+	else if (anchor & static_cast<int>(AnchorMode::Bottom))
+	{
+		top = uiComponent.y / height + 1.0f;
+		bottom = (uiComponent.y + uiComponent.height) / height + 1.0f;
+	}
+	else
+	{
+		top = uiComponent.top;
+		bottom = uiComponent.bottom;
+	}
+
+	// set draw call info
+	DrawCallObjectUI info
+	{
+		.materialId = sprite.get_material_id(),
+		.layer = spriteComponent.layer,
+		.coords = Vector4(sprite.get_min_coords(), sprite.get_max_coords()),
+		.pos = Vector4(left, top, right, bottom),
+	};
+	shader.update_push_constant(commandBuffer, &info, sizeof(DrawCallObjectUI));
+
+	// draw
+	vkCmdDraw(commandBuffer, 6, 1, 0, 0);
 }
 
 bool Renderer::check_validation_layer_support()
@@ -1238,6 +1344,7 @@ void minty::Renderer::build_textures()
 
 void minty::Renderer::build_shaders()
 {
+	// build custom
 	for (auto const& pair : _builder->get_shaders())
 	{
 		create_shader(pair.first.at(0), pair.first.at(1), *pair.second);
@@ -1400,12 +1507,12 @@ void minty::Renderer::draw_mesh(VkCommandBuffer commandBuffer, Matrix4 const& tr
 	vkCmdBindIndexBuffer(commandBuffer, meshComponent.mesh->get_index_buffer(), 0, meshComponent.mesh->get_index_type());
 
 	// send push constants so we know where to draw
-	DrawCallObjectInfo info
+	DrawCallObject3D info
 	{
 		.transform = transformationMatrix,
 		.materialId = meshComponent.materialId,
 	};
-	shader.update_push_constant(commandBuffer, &info, sizeof(DrawCallObjectInfo));
+	shader.update_push_constant(commandBuffer, &info, sizeof(DrawCallObject3D));
 
 	// draw
 	vkCmdDrawIndexed(commandBuffer, meshComponent.mesh->get_index_count(), 1, 0, 0, 0);

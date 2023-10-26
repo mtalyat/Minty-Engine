@@ -1,13 +1,22 @@
 #pragma once
 
 #include "M_Matrix.h"
+#include "M_Vector.h"
 
 namespace minty::rendering
 {
-	struct DrawCallObjectInfo
+	struct DrawCallObject3D
 	{
 		alignas(16) Matrix4 transform;
 		alignas(16) minty::ID materialId;
+	};
+
+	struct DrawCallObjectUI
+	{
+		alignas(16) minty::ID materialId;
+		int layer;
+		alignas(16) minty::Vector4 coords;
+		alignas(16) minty::Vector4 pos;
 	};
 
 	struct CameraBufferObject {

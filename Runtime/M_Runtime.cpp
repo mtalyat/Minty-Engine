@@ -2,6 +2,7 @@
 #include "M_Runtime.h"
 
 #include "M_SystemRegistry.h"
+#include "M_UISystem.h"
 
 #include "M_EntityRegistry.h"
 #include "M_CameraComponent.h"
@@ -10,7 +11,9 @@
 #include "M_NameComponent.h"
 #include "M_RelationshipComponent.h"
 #include "M_RenderableComponent.h"
+#include "M_SpriteComponent.h"
 #include "M_TransformComponent.h"
+#include "M_UITransformComponent.h"
 
 #include "M_CommandLineParser.h"
 #include "M_Console.h"
@@ -61,7 +64,7 @@ int Runtime::run()
 void minty::Runtime::register_builtin()
 {
 	// systems
-	//SystemRegistry::register_system<RendererSystem>("Renderer");
+	SystemRegistry::register_system<UISystem>("UI");
 
 	// components
 	EntityRegistry::register_component<CameraComponent>("Camera");
@@ -70,7 +73,9 @@ void minty::Runtime::register_builtin()
 	EntityRegistry::register_component<NameComponent>("Name");
 	EntityRegistry::register_component<RelationshipComponent>("Relationship");
 	EntityRegistry::register_component<RenderableComponent>("Renderable");
+	EntityRegistry::register_component<SpriteComponent>("Sprite");
 	EntityRegistry::register_component<TransformComponent>("Transform");
+	EntityRegistry::register_component<UITransformComponent>("UITransform");
 }
 
 std::string minty::to_string(Runtime const& runtime)

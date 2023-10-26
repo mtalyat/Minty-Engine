@@ -24,8 +24,11 @@ access to the entire engine without needing include each file.
 #include "M_DirtyTag.h"
 #include "M_MeshComponent.h"
 #include "M_NameComponent.h"
+#include "M_RelationshipComponent.h"
 #include "M_RenderableComponent.h"
+#include "M_SpriteComponent.h"
 #include "M_TransformComponent.h"
+#include "M_UITransformComponent.h"
 
 // ENTITIES
 #include "M_EntityRegistry.h"
@@ -62,13 +65,15 @@ access to the entire engine without needing include each file.
 // SYSTEMS
 #include "M_System.h"
 #include "M_SystemRegistry.h"
-
+#include "M_UISystem.h"
 
 
 // GENERAL
 #include "M_Color.h"
 #include "M_CommandLineParser.h"
 #include "M_Console.h"
+#include "M_Constants.h"
+#include "M_Encoding.h"
 #include "M_Engine.h"
 #include "M_Event.h"
 #include "M_File.h"

@@ -217,6 +217,7 @@
     <ClInclude Include="M_Basic_Vertex.h" />
     <ClInclude Include="M_CursorMode.h" />
     <ClInclude Include="M_DirtyTag.h" />
+    <ClInclude Include="M_Encoding.h" />
     <ClInclude Include="M_RelationshipComponent.h" />
     <ClInclude Include="M_Matrix.h" />
     <ClInclude Include="M_Object.h" />
@@ -256,6 +257,7 @@
     <ClInclude Include="M_SceneManager.h" />
     <ClInclude Include="M_SerializedNode.h" />
     <ClInclude Include="M_Shader.h" />
+    <ClInclude Include="M_Sprite.h" />
     <ClInclude Include="M_System.h" />
     <ClInclude Include="M_SystemRegistry.h" />
     <ClInclude Include="M_Texture.h" />
@@ -267,6 +269,9 @@
     <ClInclude Include="M_Transform.h" />
     <ClInclude Include="M_TransformComponent.h" />
     <ClInclude Include="M_Types.h" />
+    <ClInclude Include="M_SpriteComponent.h" />
+    <ClInclude Include="M_UITransformComponent.h" />
+    <ClInclude Include="M_UISystem.h" />
     <ClInclude Include="M_Vector.h" />
     <ClInclude Include="M_Viewport.h" />
     <ClInclude Include="M_Window.h" />
@@ -274,6 +279,7 @@
     <ClInclude Include="M_Writer.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="M_Quaternion.h" />
+    <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
@@ -284,6 +290,7 @@
     <ClCompile Include="M_Console.cpp" />
     <ClCompile Include="M_CursorMode.cpp" />
     <ClCompile Include="M_DirtyTag.cpp" />
+    <ClCompile Include="M_Encoding.cpp" />
     <ClCompile Include="M_EntityRegistry.cpp" />
     <ClCompile Include="M_Error.cpp" />
     <ClCompile Include="M_File.cpp" />
@@ -315,6 +322,7 @@
     <ClCompile Include="M_SceneManager.cpp" />
     <ClCompile Include="M_SerializedNode.cpp" />
     <ClCompile Include="M_Shader.cpp" />
+    <ClCompile Include="M_Sprite.cpp" />
     <ClCompile Include="M_System.cpp" />
     <ClCompile Include="M_SystemRegistry.cpp" />
     <ClCompile Include="M_Texture.cpp" />
@@ -325,6 +333,9 @@
     <ClCompile Include="M_Stopwatch.cpp" />
     <ClCompile Include="M_Transform.cpp" />
     <ClCompile Include="M_TransformComponent.cpp" />
+    <ClCompile Include="M_SpriteComponent.cpp" />
+    <ClCompile Include="M_UITransformComponent.cpp" />
+    <ClCompile Include="M_UISystem.cpp" />
     <ClCompile Include="M_Vector.cpp" />
     <ClCompile Include="M_Viewport.cpp" />
     <ClCompile Include="M_Window.cpp" />
@@ -341,6 +352,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="M_Constants.h" />
+    <None Include="ui.frag" />
+    <None Include="ui.vert" />
+    <None Include="uifrag.spv" />
+    <None Include="uivert.spv" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

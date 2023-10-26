@@ -1,0 +1,90 @@
+Systems
+    CameraController
+    Move
+    Test
+Entities
+    Crosshair
+        Renderable
+        UITransform
+            anchor: MiddleCenter
+            x: -25
+            y: -25
+            width: 50
+            height: 50
+        Sprite
+            id: 4
+    UI 0
+        Renderable
+        UITransform
+            anchor: TopLeft
+            x: 0
+            y: 0
+            width: 200
+            height: 200
+        Sprite
+            id: 5
+            layer: 2
+    UI 1
+        Renderable
+        UITransform
+            anchor: TopLeft
+            x: 0
+            y: 100
+            width: 200
+            height: 200
+        Sprite
+            id: 5
+            layer: 3
+    UI 2
+        Renderable
+        UITransform
+            anchor: TopLeft
+            x: 50
+            y: 50
+            width: 200
+            height: 200
+        Sprite
+            id: 5
+            layer: 1
+    Camera
+        Transform
+            position
+                z: -4
+        Camera
+            perspective: 1
+            far: 1000
+        Move
+    Cube 0
+        Renderable
+        Mesh
+        Transform
+    Cube 1
+        Renderable
+        Mesh
+        Transform
+            position
+                x: 2
+#    Cube 1
+#        Renderable
+#        Mesh
+#        Transform
+#            position
+#                y: -1
+#            scale
+#                x: 0.5
+#                y: 0.5
+#                z: 0.5
+#        Relationship
+#            parent: Cube 0
+#    Cube 2
+#        Renderable
+#        Mesh
+#        Transform
+#            position
+#                z: 1
+#            scale
+#                x: 0.5
+#                y: 0.5
+#                z: 0.5
+#        Relationship
+#            parent: Cube 1

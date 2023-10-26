@@ -14,7 +14,8 @@ uint32_t const WIDTH = 800;
 uint32_t const HEIGHT = 600;
 
 Engine::Engine(Info const* const info)
-	: _window(info->get_application_info().pApplicationName, WIDTH, HEIGHT)
+	: _globalInput()
+	, _window(info->get_application_info().pApplicationName, WIDTH, HEIGHT, &_globalInput)
 	, _renderer(&_window)
 	, _sceneManager(this)
 	, _deltaTime(0.02f)
@@ -43,6 +44,11 @@ SceneManager* minty::Engine::get_scene_manager()
 InputMap const* minty::Engine::get_input_map() const
 {
 	return _window.get_input();
+}
+
+InputMap* minty::Engine::get_global_input_map()
+{
+	return &_globalInput;
 }
 
 float minty::Engine::get_delta_time()

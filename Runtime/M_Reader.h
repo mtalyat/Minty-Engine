@@ -47,6 +47,8 @@ namespace minty
 
 		int read_int(std::string const& name, int const defaultValue = 0) const;
 
+		ID read_id(std::string const& name, ID const defaultValue = ERROR_ID) const;
+
 		float read_float(std::string const& name, float const defaultValue = 0.0f) const;
 
 		byte read_byte(std::string const& name, byte const defaultValue = 0) const;
