@@ -25,7 +25,7 @@ access to the entire engine without needing include each file.
 #include "M_MeshComponent.h"
 #include "M_NameComponent.h"
 #include "M_RelationshipComponent.h"
-#include "M_RenderableComponent.h"
+#include "M_RenderableTag.h"
 #include "M_SpriteComponent.h"
 #include "M_TransformComponent.h"
 #include "M_UITransformComponent.h"

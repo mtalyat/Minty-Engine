@@ -10,7 +10,7 @@
 #include "M_MeshComponent.h"
 #include "M_NameComponent.h"
 #include "M_RelationshipComponent.h"
-#include "M_RenderableComponent.h"
+#include "M_RenderableTag.h"
 #include "M_SpriteComponent.h"
 #include "M_TransformComponent.h"
 #include "M_UITransformComponent.h"
@@ -72,7 +72,7 @@ void minty::Runtime::register_builtin()
 	EntityRegistry::register_component<MeshComponent>("Mesh");
 	EntityRegistry::register_component<NameComponent>("Name");
 	EntityRegistry::register_component<RelationshipComponent>("Relationship");
-	EntityRegistry::register_component<RenderableComponent>("Renderable");
+	EntityRegistry::register_component<RenderableTag>("Renderable");
 	EntityRegistry::register_component<SpriteComponent>("Sprite");
 	EntityRegistry::register_component<TransformComponent>("Transform");
 	EntityRegistry::register_component<UITransformComponent>("UITransform");

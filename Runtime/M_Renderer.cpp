@@ -14,7 +14,7 @@
 #include "M_TransformComponent.h"
 #include "M_CameraComponent.h"
 #include "M_MeshComponent.h"
-#include "M_RenderableComponent.h"
+#include "M_RenderableTag.h"
 #include "M_RelationshipComponent.h"
 
 #include "M_Vector.h"
@@ -1045,7 +1045,7 @@ void minty::Renderer::draw_scene(VkCommandBuffer commandBuffer)
 	TransformComponent const* transformComponent;
 
 	// draw all meshes in the scene
-	for (auto&& [entity, renderable, mesh] : _registry->view<RenderableComponent const, MeshComponent>().each())
+	for (auto&& [entity, renderable, mesh] : _registry->view<RenderableTag const, MeshComponent>().each())
 	{
 		// get transform for entity
 		transformComponent = _registry->try_get<TransformComponent>(entity);
@@ -1066,7 +1066,7 @@ void minty::Renderer::draw_scene(VkCommandBuffer commandBuffer)
 	_registry->sort<UITransformComponent, SpriteComponent>();
 
 	// draw all UI in scene
-	for (auto&& [entity, renderable, ui, sprite] : _registry->view<RenderableComponent const, UITransformComponent const, SpriteComponent const>().each())
+	for (auto&& [entity, renderable, ui, sprite] : _registry->view<RenderableTag const, UITransformComponent const, SpriteComponent const>().each())
 	{
 		draw_ui(commandBuffer, ui, sprite);
 	}
