@@ -12,7 +12,8 @@
 #include "M_CameraComponent.h"
 #include "M_MeshComponent.h"
 #include "M_TransformComponent.h"
-#include "M_UIComponent.h"
+#include "M_UITransformComponent.h"
+#include "M_SpriteComponent.h"
 
 #include "M_Texture.h"
 #include "M_Sprite.h"
@@ -352,7 +353,7 @@ namespace minty
 
 		void draw_scene(VkCommandBuffer commandBuffer);
 
-		void draw_ui(VkCommandBuffer commandBuffer, UIComponent const& uiComponent);
+		void draw_ui(VkCommandBuffer commandBuffer, UITransformComponent const& uiComponent, SpriteComponent const& spriteComponent);
 
 #pragma endregion
 

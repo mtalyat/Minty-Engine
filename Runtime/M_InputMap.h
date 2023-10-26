@@ -89,12 +89,13 @@ namespace minty
 	class InputMap :
 		public Object
 	{
-	private:
+	public:
 		typedef Event<KeyPressEventArgs const&> KeyEvent_t;
 		typedef Event<MouseClickEventArgs const&> ClickEvent_t;
 		typedef Event<MouseMoveEventArgs const&> MoveEvent_t;
 		typedef Event<MouseScrollEventArgs const&> ScrollEvent_t;
 
+	private:
 		// key press
 		std::map<Key, KeyEvent_t>* _keyDownEvents;
 		std::map<Key, KeyEvent_t>* _keyUpEvents;

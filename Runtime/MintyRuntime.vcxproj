@@ -269,7 +269,10 @@
     <ClInclude Include="M_Transform.h" />
     <ClInclude Include="M_TransformComponent.h" />
     <ClInclude Include="M_Types.h" />
-    <ClInclude Include="M_UIComponent.h" />
+    <ClInclude Include="M_SpriteComponent.h" />
+    <ClInclude Include="M_UITransformComponent.h" />
+    <ClInclude Include="M_UIOnMouseEnterComponent.h" />
+    <ClInclude Include="M_UISystem.h" />
     <ClInclude Include="M_Vector.h" />
     <ClInclude Include="M_Viewport.h" />
     <ClInclude Include="M_Window.h" />
@@ -331,7 +334,9 @@
     <ClCompile Include="M_Stopwatch.cpp" />
     <ClCompile Include="M_Transform.cpp" />
     <ClCompile Include="M_TransformComponent.cpp" />
-    <ClCompile Include="M_UIComponent.cpp" />
+    <ClCompile Include="M_SpriteComponent.cpp" />
+    <ClCompile Include="M_UITransformComponent.cpp" />
+    <ClCompile Include="M_UISystem.cpp" />
     <ClCompile Include="M_Vector.cpp" />
     <ClCompile Include="M_Viewport.cpp" />
     <ClCompile Include="M_Window.cpp" />

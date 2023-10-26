@@ -1036,6 +1036,12 @@ void Renderer::create_logical_device()
 
 void minty::Renderer::draw_scene(VkCommandBuffer commandBuffer)
 {
+	// sort sprites so they render in the correct order, since Z does not matter
+	_registry->sort<SpriteComponent>([](SpriteComponent const& left, SpriteComponent const& right)
+		{
+			return left.layer > right.layer;
+		});
+
 	TransformComponent const* transformComponent;
 
 	// draw all meshes in the scene
@@ -1056,25 +1062,23 @@ void minty::Renderer::draw_scene(VkCommandBuffer commandBuffer)
 		}
 	}
 
-	_registry->sort<UIComponent>([](UIComponent const& left, UIComponent const& right)
-		{
-			return left.layer > right.layer;
-		});
+	// sort UITransforms so that it matches order of sprites for rendering
+	_registry->sort<UITransformComponent, SpriteComponent>();
 
 	// draw all UI in scene
-	for (auto&& [entity, renderable, ui] : _registry->view<RenderableComponent const, UIComponent const>().each())
+	for (auto&& [entity, renderable, ui, sprite] : _registry->view<RenderableComponent const, UITransformComponent const, SpriteComponent const>().each())
 	{
-		draw_ui(commandBuffer, ui);
+		draw_ui(commandBuffer, ui, sprite);
 	}
 
 	// unbind any shaders used
 	bind_shader(commandBuffer, nullptr);
 }
 
-void minty::Renderer::draw_ui(VkCommandBuffer commandBuffer, UIComponent const& uiComponent)
+void minty::Renderer::draw_ui(VkCommandBuffer commandBuffer, UITransformComponent const& uiComponent, SpriteComponent const& spriteComponent)
 {
 	// get the sprite
-	Sprite& sprite = get_sprite(uiComponent.spriteId);
+	Sprite& sprite = get_sprite(spriteComponent.id);
 
 	// get the material
 	Material& mat = get_material(sprite.get_material_id());
@@ -1140,7 +1144,7 @@ void minty::Renderer::draw_ui(VkCommandBuffer commandBuffer, UIComponent const& 
 	DrawCallObjectUI info
 	{
 		.materialId = sprite.get_material_id(),
-		.layer = uiComponent.layer,
+		.layer = spriteComponent.layer,
 		.coords = Vector4(sprite.get_min_coords(), sprite.get_max_coords()),
 		.pos = Vector4(left, top, right, bottom),
 	};

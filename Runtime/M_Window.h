@@ -25,6 +25,7 @@ namespace minty
 		int _width, _height;
 		bool _resized;
 		InputMap const* _activeInputMap;
+		InputMap const* _globalInputMap;
 		float _lastMouseX, _lastMouseY;
 		bool _mouseOutOfBounds;
 
@@ -35,7 +36,7 @@ namespace minty
 		/// <param name="title">The title to be displayed on the Window.</param>
 		/// <param name="width">The width of the Window in pixels.</param>
 		/// <param name="height">The height of the Window in pixels.</param>
-		Window(std::string const& title, int const width, int const height);
+		Window(std::string const& title, int const width, int const height, InputMap const* const globalInputMap = nullptr);
 
 		~Window();
 

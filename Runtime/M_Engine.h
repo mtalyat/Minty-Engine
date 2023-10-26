@@ -1,5 +1,6 @@
 #pragma once
 
+#include "M_InputMap.h"
 #include "M_Window.h"
 #include "M_Renderer.h"
 #include "M_Rendering_RendererBuilder.h"
@@ -17,6 +18,7 @@ namespace minty
 	class Engine
 	{
 	private:
+		InputMap _globalInput;
 		Window _window;
 		Renderer _renderer;
 		SceneManager _sceneManager;
@@ -26,6 +28,8 @@ namespace minty
 		Engine(Info const* const appInfo);
 
 		~Engine();
+
+		InputMap* get_global_input_map();
 
 		Window* get_window();
 
