@@ -58,10 +58,6 @@ Entities
         Renderable
         Mesh
         Transform
-        Test
-            translateSpeed: 1
-            rotateSpeed: 1
-            scaleSpeed: 1
     Cube 1
         Renderable
         Mesh

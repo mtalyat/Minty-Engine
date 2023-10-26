@@ -1039,7 +1039,7 @@ void minty::Renderer::draw_scene(VkCommandBuffer commandBuffer)
 	// sort sprites so they render in the correct order, since Z does not matter
 	_registry->sort<SpriteComponent>([](SpriteComponent const& left, SpriteComponent const& right)
 		{
-			return left.layer > right.layer;
+			return left.layer < right.layer;
 		});
 
 	TransformComponent const* transformComponent;
