@@ -1507,9 +1507,11 @@ void minty::Renderer::draw_mesh(VkCommandBuffer commandBuffer, Matrix4 const& tr
 	vkCmdBindIndexBuffer(commandBuffer, meshComponent.mesh->get_index_buffer(), 0, meshComponent.mesh->get_index_type());
 
 	// send push constants so we know where to draw
+	Matrix4 tmatrix = transformationMatrix;
+	tmatrix[3][1] *= -1.0f;
 	DrawCallObject3D info
 	{
-		.transform = transformationMatrix,
+		.transform = tmatrix,
 		.materialId = meshComponent.materialId,
 	};
 	shader.update_push_constant(commandBuffer, &info, sizeof(DrawCallObject3D));
