@@ -271,7 +271,6 @@
     <ClInclude Include="M_Types.h" />
     <ClInclude Include="M_SpriteComponent.h" />
     <ClInclude Include="M_UITransformComponent.h" />
-    <ClInclude Include="M_UIOnMouseEnterComponent.h" />
     <ClInclude Include="M_UISystem.h" />
     <ClInclude Include="M_Vector.h" />
     <ClInclude Include="M_Viewport.h" />

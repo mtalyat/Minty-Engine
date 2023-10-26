@@ -2,7 +2,6 @@
 #include "M_UISystem.h"
 
 #include "M_UITransformComponent.h"
-#include "M_UIOnMouseEnterComponent.h"
 
 using namespace minty;
 

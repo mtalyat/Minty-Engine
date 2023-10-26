@@ -13,7 +13,6 @@
 #include "M_RenderableComponent.h"
 #include "M_SpriteComponent.h"
 #include "M_TransformComponent.h"
-#include "M_UIOnMouseEnterComponent.h"
 #include "M_UITransformComponent.h"
 
 #include "M_CommandLineParser.h"
@@ -76,7 +75,6 @@ void minty::Runtime::register_builtin()
 	EntityRegistry::register_component<RenderableComponent>("Renderable");
 	EntityRegistry::register_component<SpriteComponent>("Sprite");
 	EntityRegistry::register_component<TransformComponent>("Transform");
-	EntityRegistry::register_component<UIOnMouseEnterComponent>("UIOnMouseEnter");
 	EntityRegistry::register_component<UITransformComponent>("UITransform");
 }
 
