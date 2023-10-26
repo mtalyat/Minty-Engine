@@ -225,9 +225,6 @@
     <ClInclude Include="M_Base.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="M_RenderableComponent.h">
-      <Filter>Header Files\Components</Filter>
-    </ClInclude>
     <ClInclude Include="M_RelationshipComponent.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
@@ -256,6 +253,9 @@
       <Filter>Header Files\Systems</Filter>
     </ClInclude>
     <ClInclude Include="M_UITransformComponent.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="M_RenderableTag.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
   </ItemGroup>
@@ -410,7 +410,7 @@
     <ClCompile Include="M_RelationshipComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="M_RenderableComponent.cpp">
+    <ClCompile Include="M_RenderableTag.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_TransformComponent.cpp">

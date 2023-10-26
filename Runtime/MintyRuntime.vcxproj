@@ -221,7 +221,7 @@
     <ClInclude Include="M_RelationshipComponent.h" />
     <ClInclude Include="M_Matrix.h" />
     <ClInclude Include="M_Object.h" />
-    <ClInclude Include="M_RenderableComponent.h" />
+    <ClInclude Include="M_RenderableTag.h" />
     <ClInclude Include="M_Rendering_DrawCallObjectInfo.h" />
     <ClInclude Include="M_Error.h" />
     <ClInclude Include="M_Info.h" />
@@ -312,7 +312,7 @@
     <ClCompile Include="M_Parse.cpp" />
     <ClCompile Include="M_Quaternion.cpp" />
     <ClCompile Include="M_Reader.cpp" />
-    <ClCompile Include="M_RenderableComponent.cpp" />
+    <ClCompile Include="M_RenderableTag.cpp" />
     <ClCompile Include="M_Rendering_MaterialBuilder.cpp" />
     <ClCompile Include="M_Rendering_Object.cpp" />
     <ClCompile Include="M_Rendering_RendererBuilder.cpp" />
