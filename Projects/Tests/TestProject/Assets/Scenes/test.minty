@@ -63,7 +63,7 @@ Entities
         Mesh
         Transform
             position
-                x: 2
+                y: 2
 #    Cube 1
 #        Renderable
 #        Mesh
