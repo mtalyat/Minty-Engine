@@ -57,10 +57,10 @@ void init(Runtime &runtime)
             tb0.set_filter(VkFilter::VK_FILTER_NEAREST);
             TextureBuilder tb1; // for "normal" textures
 
-            rb.emplace_texture(&tb0, "Assets/Textures/pattern.png");
+            rb.emplace_texture(&tb1, "Assets/Textures/funny.jpg");
+            rb.emplace_texture(&tb1, "Assets/Textures/funny2.png");
             rb.emplace_texture(&tb1, "Assets/Textures/texture.jpg");
             rb.emplace_texture(&tb0, "Assets/Textures/brian.png");
-            rb.emplace_texture(&tb1, "Assets/Textures/funny.jpg");
             rb.emplace_texture(&tb0, "Assets/Textures/crosshair.png");
             rb.emplace_texture(&tb0, "Assets/Textures/ui.png");
 
