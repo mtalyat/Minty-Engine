@@ -252,7 +252,7 @@ std::array<VkDescriptorSet, MAX_FRAMES_IN_FLIGHT> minty::Shader::create_descript
 	allocInfo.pSetLayouts = layouts.data();
 
 	// create the descriptor sets
-	VK_ASSERT(result, vkAllocateDescriptorSets(_renderer.get_device(), &allocInfo, descriptorSets.data()), std::format("Failed to allocate descriptor sets for descriptor set layout {}.", set));
+	VK_ASSERT(vkAllocateDescriptorSets(_renderer.get_device(), &allocInfo, descriptorSets.data()), std::format("Failed to allocate descriptor sets for descriptor set layout {}.", set));
 
 	return descriptorSets;
 

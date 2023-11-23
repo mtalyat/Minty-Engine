@@ -130,13 +130,13 @@ void Renderer::render_frame()
 
 	// recreate swap chain check
 	uint32_t imageIndex;
-	VkResult result = vkAcquireNextImageKHR(_device, swapChain, UINT64_MAX, imageAvailableSemaphores[_frame], VK_NULL_HANDLE, &imageIndex);
+	VkResult r = vkAcquireNextImageKHR(_device, swapChain, UINT64_MAX, imageAvailableSemaphores[_frame], VK_NULL_HANDLE, &imageIndex);
 
-	if (result == VK_ERROR_OUT_OF_DATE_KHR) {
+	if (r == VK_ERROR_OUT_OF_DATE_KHR) {
 		recreate_swap_chain();
 		return;
 	}
-	else if (result != VK_SUCCESS && result != VK_SUBOPTIMAL_KHR) {
+	else if (r != VK_SUCCESS && r != VK_SUBOPTIMAL_KHR) {
 		error::abort("Failed to acquire swap chain image.");
 	}
 
@@ -175,7 +175,7 @@ void Renderer::render_frame()
 	submitInfo.pSignalSemaphores = signalSemaphores;
 
 	// submit the buffer
-	VK_ASSERT(submitResult, vkQueueSubmit(graphicsQueue, 1, &submitInfo, inFlightFences[_frame]), "Failed to submit draw command buffer.");
+	VK_ASSERT(vkQueueSubmit(graphicsQueue, 1, &submitInfo, inFlightFences[_frame]), "Failed to submit draw command buffer.");
 
 	// submit to swap chain so it will show up on the screen
 	VkPresentInfoKHR presentInfo
@@ -193,13 +193,13 @@ void Renderer::render_frame()
 	presentInfo.pResults = nullptr; // Optional
 
 	// present the visual to the screen
-	result = vkQueuePresentKHR(presentQueue, &presentInfo);
+	r = vkQueuePresentKHR(presentQueue, &presentInfo);
 
-	if (result == VK_ERROR_OUT_OF_DATE_KHR || result == VK_SUBOPTIMAL_KHR || framebufferResized) {
+	if (r == VK_ERROR_OUT_OF_DATE_KHR || r == VK_SUBOPTIMAL_KHR || framebufferResized) {
 		framebufferResized = false;
 		recreate_swap_chain();
 	}
-	else if (result != VK_SUCCESS) {
+	else if (r != VK_SUCCESS) {
 		error::abort("Failed to present swap chain image.");
 	}
 
@@ -1489,7 +1489,7 @@ ID minty::Renderer::create_buffer(VkDeviceSize const size, VkBufferUsageFlags co
 	bufferInfo.usage = usage;
 	bufferInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
-	VK_ASSERT(result, vkCreateBuffer(_device, &bufferInfo, nullptr, &buffer), "Failed to create buffer.");
+	VK_ASSERT(vkCreateBuffer(_device, &bufferInfo, nullptr, &buffer), "Failed to create buffer.");
 
 	VkMemoryRequirements memRequirements;
 	vkGetBufferMemoryRequirements(_device, buffer, &memRequirements);
@@ -1499,9 +1499,9 @@ ID minty::Renderer::create_buffer(VkDeviceSize const size, VkBufferUsageFlags co
 	allocInfo.allocationSize = memRequirements.size;
 	allocInfo.memoryTypeIndex = find_memory_type(memRequirements.memoryTypeBits, properties);
 
-	VK_ASSERT(result2, vkAllocateMemory(_device, &allocInfo, nullptr, &bufferMemory), "Failed to allocate buffer memory.");
+	VK_ASSERT(vkAllocateMemory(_device, &allocInfo, nullptr, &bufferMemory), "Failed to allocate buffer memory.");
 
-	VK_ASSERT(result3, vkBindBufferMemory(_device, buffer, bufferMemory, 0), "Failed to bind buffer memory.");
+	VK_ASSERT(vkBindBufferMemory(_device, buffer, bufferMemory, 0), "Failed to bind buffer memory.");
 
 	return _buffers.emplace(Buffer
 		{
@@ -1531,7 +1531,7 @@ void* minty::Renderer::map_buffer(ID const id) const
 
 	void* data = nullptr;
 
-	VK_ASSERT(result, vkMapMemory(_device, buffer.memory, 0, buffer.size, 0, &data), "Failed to map memory for new buffer.");
+	VK_ASSERT(vkMapMemory(_device, buffer.memory, 0, buffer.size, 0, &data), "Failed to map memory for new buffer.");
 
 	return data;
 }
