@@ -1620,16 +1620,6 @@ void minty::Renderer::destroy_buffer(rendering::Buffer const& buffer)
 	vkFreeMemory(_device, buffer.memory, nullptr);
 }
 
-//void Renderer::copy_buffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) {
-//	VkCommandBuffer commandBuffer = begin_single_time_commands(commandPool);
-//
-//	VkBufferCopy copyRegion{};
-//	copyRegion.size = size;
-//	vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
-//
-//	end_single_time_commands(commandBuffer, commandPool);
-//}
-
 uint32_t Renderer::find_memory_type(uint32_t typeFilter, VkMemoryPropertyFlags properties)
 {
 	VkPhysicalDeviceMemoryProperties memProperties;
