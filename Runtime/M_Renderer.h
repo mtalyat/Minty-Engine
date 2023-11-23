@@ -422,6 +422,9 @@ namespace minty
 
 			void copy_buffer(ID const srcId, ID const dstId, VkDeviceSize const size);
 
+			private:
+				void destroy_buffer(rendering::Buffer const& buffer);
+
 #pragma endregion
 
 #pragma region Drawing

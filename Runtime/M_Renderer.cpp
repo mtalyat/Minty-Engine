@@ -1519,7 +1519,7 @@ ID minty::Renderer::create_buffer_uniform(VkDeviceSize const size)
 void minty::Renderer::destroy_buffer(ID const id)
 {
 	// destroy the buffer with the id
-	vkDestroyBuffer(_device, _buffers.at(id).buffer, nullptr);
+	destroy_buffer(_buffers.at(id));
 
 	// remove it from the list
 	_buffers.erase(id);
@@ -1612,6 +1612,12 @@ void minty::Renderer::copy_buffer(ID const srcId, ID const dstId, VkDeviceSize c
 	vkCmdCopyBuffer(commandBuffer, srcBuffer.buffer, dstBuffer.buffer, 1, &copyRegion);
 
 	end_single_time_commands(commandBuffer, commandPool);
+}
+
+void minty::Renderer::destroy_buffer(rendering::Buffer const& buffer)
+{
+	vkDestroyBuffer(_device, buffer.buffer, nullptr);
+	vkFreeMemory(_device, buffer.memory, nullptr);
 }
 
 //void Renderer::copy_buffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) {
@@ -1835,6 +1841,15 @@ void Renderer::destroy()
 
 	// clean up vulkan
 	cleanup_swap_chain();
+	/*
+		Register<Texture> _textures;
+		Register<Sprite> _sprites;
+		Register<MaterialTemplate> _materialTemplates;
+		Register<Material> _materials;
+		Register<Shader> _shaders;
+		Register<ShaderPass> _shaderPasses;
+		Register<rendering::Buffer> _buffers;
+	*/
 	for (auto& tex : _textures)
 	{
 		tex.second.destroy();
@@ -1857,8 +1872,7 @@ void Renderer::destroy()
 	}
 	for (auto& buffer : _buffers)
 	{
-		vkDestroyBuffer(_device, buffer.second.buffer, nullptr);
-		vkFreeMemory(_device, buffer.second.memory, nullptr);
+		destroy_buffer(buffer.second);
 	}
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
 		vkDestroySemaphore(_device, renderFinishedSemaphores[i], nullptr);
