@@ -39477,7 +39477,7 @@ public:
      * @return An object of this type to continue creating the snapshot.
      */
     template<typename Archive>
-    [[deprecated("use .get<Entity>(archive) instead")]] const basic_snapshot &entities(Archive &archive) const {
+    [[deprecated("use .at<Entity>(archive) instead")]] const basic_snapshot &entities(Archive &archive) const {
         return get<entity_type>(archive);
     }
 
@@ -39489,7 +39489,7 @@ public:
      * @return An object of this type to continue creating the snapshot.
      */
     template<typename... Component, typename Archive>
-    [[deprecated("use .get<Type>(archive) instead")]] const basic_snapshot &component(Archive &archive) const {
+    [[deprecated("use .at<Type>(archive) instead")]] const basic_snapshot &component(Archive &archive) const {
         return (get<Component>(archive), ...);
     }
 
@@ -39505,7 +39505,7 @@ public:
      * @return An object of this type to continue creating the snapshot.
      */
     template<typename... Component, typename Archive, typename It>
-    [[deprecated("use .get<Type>(archive, first, last) instead")]] const basic_snapshot &component(Archive &archive, It first, It last) const {
+    [[deprecated("use .at<Type>(archive, first, last) instead")]] const basic_snapshot &component(Archive &archive, It first, It last) const {
         return (get<Component>(archive, first, last), ...);
     }
 
@@ -39609,7 +39609,7 @@ public:
      * @return A valid loader to continue restoring data.
      */
     template<typename Archive>
-    [[deprecated("use .get<Entity>(archive) instead")]] basic_snapshot_loader &entities(Archive &archive) {
+    [[deprecated("use .at<Entity>(archive) instead")]] basic_snapshot_loader &entities(Archive &archive) {
         return get<entity_type>(archive);
     }
 
@@ -39625,7 +39625,7 @@ public:
      * @return A valid loader to continue restoring data.
      */
     template<typename... Component, typename Archive>
-    [[deprecated("use .get<Type>(archive) instead")]] basic_snapshot_loader &component(Archive &archive) {
+    [[deprecated("use .at<Type>(archive) instead")]] basic_snapshot_loader &component(Archive &archive) {
         return (get<Component>(archive), ...);
     }
 
@@ -39821,7 +39821,7 @@ public:
      * @return A non-const reference to this loader.
      */
     template<typename Archive>
-    [[deprecated("use .get<Entity>(archive) instead")]] basic_continuous_loader &entities(Archive &archive) {
+    [[deprecated("use .at<Entity>(archive) instead")]] basic_continuous_loader &entities(Archive &archive) {
         return get<entity_type>(archive);
     }
 
@@ -39880,7 +39880,7 @@ public:
      *
      * @return A non-const reference to this loader.
      */
-    [[deprecated("use .get<Entity>(archive) instead")]] basic_continuous_loader &shrink() {
+    [[deprecated("use .at<Entity>(archive) instead")]] basic_continuous_loader &shrink() {
         return *this;
     }
 

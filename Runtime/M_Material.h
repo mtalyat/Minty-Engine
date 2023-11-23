@@ -1,7 +1,9 @@
 #pragma once
 #include "M_Rendering_Object.h"
 
+#include "M_Rendering_Buffer.h"
 #include "M_Rendering_MaterialBuilder.h"
+#include "M_Rendering_DescriptorSet.h"
 
 #include "M_Color.h"
 #include <vulkan/vulkan.h>
@@ -11,7 +13,10 @@
 
 namespace minty
 {
-	class Shader;
+	namespace rendering
+	{
+		class MaterialBuilder;
+	}
 
 	/// <summary>
 	/// Holds graphics information.
@@ -20,22 +25,19 @@ namespace minty
 		: public rendering::RendererObject
 	{
 	private:
-		ID _shaderId;
+		ID _templateId;
+		std::vector<rendering::DescriptorSet> _passDescriptorSets;
 
-		ID _id;
-
-		void* _data;
 	public:
-		Material(ID const id, void const* const data, rendering::MaterialBuilder const& builder, Renderer& renderer);
+		Material(rendering::MaterialBuilder const& builder, Renderer& renderer);
 
 		void destroy();
 
-		ID get_shader_id() const;
+		ID get_template_id() const;
 
-		void set(void const* const data);
+		rendering::DescriptorSet const& get_descriptor_set(uint32_t const pass) const;
 
-		void* get() const;
-
+	public:
 		friend std::string to_string(Material const& value);
 	};
 }

@@ -4,8 +4,10 @@ namespace game
 {
     struct MaterialBufferObject
     {
-        int textureId;
-        int x, y, z;
+        minty::ID textureId;
+        int x;
+        int y;
+        int z;
         minty::Vector4 color;
     };
 }

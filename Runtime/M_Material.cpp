@@ -1,69 +1,75 @@
 #include "pch.h"
 #include "M_Material.h"
 
-#include "M_Shader.h"
-
+#include "M_Rendering_MaterialBuilder.h"
 #include "M_Renderer.h"
-#include "M_Console.h"
-#include "M_Color.h"
-#include "M_Error.h"
 
 using namespace minty;
 using namespace minty::rendering;
 
-minty::Material::Material(ID const id, void const* const data, rendering::MaterialBuilder const& builder, Renderer& renderer)
-	: RendererObject::RendererObject(renderer)
-	, _shaderId(builder.get_shader_id())
-	, _id(id)
-	, _data(nullptr)
+minty::Material::Material(rendering::MaterialBuilder const& builder, Renderer& renderer)
+	: rendering::RendererObject(renderer)
+	, _templateId(builder.get_template_id())
+	, _passDescriptorSets()
 {
-	set(data);
+	// use template to generate descriptor sets
+	auto const& materialTemplate = _renderer.get_material_template(_templateId);
+	auto const& passIds = materialTemplate.get_shader_pass_ids();
+
+	auto const& defaultValues = materialTemplate.get_default_values();
+	auto const& values = builder.get_values();
+
+	for (auto const passId : passIds)
+	{
+		// get the shader pass
+		auto const& shaderPass = _renderer.get_shader_pass(passId);
+
+		// get the shader that the pass belongs to
+		auto const shaderId = shaderPass.get_shader_id();
+		auto& shader = _renderer.get_shader(shaderId);
+
+		// get the descriptor set for the pass
+		DescriptorSet descriptorSet = shader.create_descriptor_set(DESCRIPTOR_SET_MATERIAL);
+		
+		// set all values
+		for (auto const& defaultValue : defaultValues)
+		{
+			auto const& found = values.find(defaultValue.first);
+			if (found == values.end())
+			{
+				// if no value exists, use a default value
+				descriptorSet.set(defaultValue.first, defaultValue.second);
+			}
+			else
+			{
+				// if custom value exists, use it
+				descriptorSet.set(found->first, found->second);
+			}
+		}
+
+		// add to pass descriptor sets
+		_passDescriptorSets.push_back(descriptorSet);
+	}
 }
 
 void minty::Material::destroy()
 {
-	if (_data)
-	{
-		free(_data);
-	}
+	_templateId = ERROR_ID;
+	_passDescriptorSets.clear();
 }
 
-ID minty::Material::get_shader_id() const
+ID minty::Material::get_template_id() const
 {
-	return _shaderId;
+	return _templateId;
 }
 
-void minty::Material::set(void const* const data)
+DescriptorSet const& minty::Material::get_descriptor_set(uint32_t const pass) const
 {
-	// get shader
-	Shader& shader = _renderer.get_shader(_shaderId);
-
-	// get element size
-	size_t size = shader.get_material_size();
-
-	// copy to local data
-	if (!_data)
-	{
-		_data = malloc(size);
-
-		if (!_data)
-		{
-			console::error("Failed to malloc Material data.");
-			return;
-		}
-	}
-	memcpy(_data, data, size);
-
-	// update constant at material position
-	shader.update_uniform_constant("materials", data, size, _id * size);
-}
-
-void* minty::Material::get() const
-{
-	return _data;
+	return _passDescriptorSets.at(pass);
 }
 
 std::string minty::to_string(Material const& value)
 {
-	return std::format("Material(shaderId = {})", value._shaderId);
+	//return std::format("Material(materialId = {})", value._materialId);
+	return error::ERROR_TEXT;
 }

@@ -1,21 +1,26 @@
 #pragma once
 #include "M_Object.h"
 
+#include "M_Dynamic.h"
+#include <unordered_map>
+
 namespace minty::rendering
 {
 	class MaterialBuilder
 		: public Object
 	{
 	private:
-		ID _shaderId;
+		ID _templateId;
+
+		std::unordered_map<std::string, Dynamic> _values;
 
 	public:
-		MaterialBuilder(ID const shaderId);
+		MaterialBuilder(ID const templateId);
 
-		void set_shader_id(ID const id);
+		void emplace_value(std::string const& name, Dynamic const& value);
 
-		ID get_shader_id() const;
+		ID get_template_id() const;
 
-		std::string to_string(MaterialBuilder const& value);
+		std::unordered_map<std::string, Dynamic> const& get_values() const;
 	};
 }

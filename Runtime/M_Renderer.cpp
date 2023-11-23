@@ -78,14 +78,18 @@ Renderer::Renderer(Window* const window)
 	: _builder(nullptr)
 	, _window(window)
 	, _textures()
-	, _materials()
+	, _materialTemplates()
 	, _shaders()
-	, _boundMaterial()
-	, _boundShader()
+	, _boundIds()
 	, _view()
 	, _backgroundColor({ 250, 220, 192, 255 }) // light tan color
 	, _frame(1)
-{}
+{
+	for (size_t i = 0; i < _boundIds.size(); i++)
+	{
+		_boundIds[i] = ERROR_ID;
+	}
+}
 
 Renderer::~Renderer()
 {}
@@ -94,12 +98,6 @@ void minty::Renderer::init(rendering::RendererBuilder const& builder)
 {
 	// keep track of builder
 	_builder = &builder;
-
-	// init fields
-	_textures.limit(builder.get_max_textures());
-	_materials.limit(builder.get_max_materials());
-	_sprites.limit(builder.get_max_materials());
-	_shaders.limit(builder.get_max_shaders());
 
 	create_instance();
 	setup_debug_messenger();
@@ -114,9 +112,7 @@ void minty::Renderer::init(rendering::RendererBuilder const& builder)
 	create_depth_resources();
 	create_framebuffers();
 
-	build_textures();
-	build_shaders();
-	build_materials();
+	create_assets();
 
 	create_command_buffers();
 	create_sync_objects();
@@ -417,29 +413,12 @@ uint32_t minty::Renderer::get_sprite_count() const
 
 uint32_t minty::Renderer::get_material_count() const
 {
-	return static_cast<uint32_t>(_materials.size());
+	return static_cast<uint32_t>(_materialTemplates.size());
 }
 
 uint32_t minty::Renderer::get_frame() const
 {
 	return _frame;
-}
-
-ID minty::Renderer::create_texture(std::string const& path, rendering::TextureBuilder const& builder)
-{
-	if (!file::exists(path))
-	{
-		console::error(std::format("Cannot load texture. File not found at: {}", path));
-		return ERROR_ID;
-	}
-
-	if (_textures.full())
-	{
-		console::error(std::format("Cannot load another texture. {0}/{0} textures loaded.", _builder->get_max_textures()));
-		return ERROR_ID;
-	}
-
-	return _textures.emplace(Texture(path, builder, *this));
 }
 
 Texture& minty::Renderer::get_texture(ID const id)
@@ -457,29 +436,6 @@ Sprite& minty::Renderer::get_sprite(ID const id)
 	return _sprites.at(id);
 }
 
-ID minty::Renderer::create_shader(std::string const& vertexPath, std::string const& fragmentPath, rendering::ShaderBuilder const& builder)
-{
-	if (!file::exists(vertexPath))
-	{
-		console::error(std::format("Cannot load shader. Cannot find file: {}", vertexPath));
-		return ERROR_ID;
-	}
-
-	if (!file::exists(fragmentPath))
-	{
-		console::error(std::format("Cannot load shader. Cannot find file: {}", fragmentPath));
-		return ERROR_ID;
-	}
-
-	if (_shaders.full())
-	{
-		console::error(std::format("Cannot load another shader. {0}/{0} shaders loaded.", _builder->get_max_shaders()));
-		return ERROR_ID;
-	}
-
-	return _shaders.emplace(Shader(vertexPath, fragmentPath, builder, *this));
-}
-
 Sprite const& minty::Renderer::get_sprite(ID const id) const
 {
 	return _sprites.at(id);
@@ -495,20 +451,54 @@ Shader const& minty::Renderer::get_shader(ID const id) const
 	return _shaders.at(id);
 }
 
-ID minty::Renderer::create_material(void const* const materialData, rendering::MaterialBuilder const& builder)
+Shader& minty::Renderer::get_shader_from_material_id(ID const id)
 {
-	if (_materials.full())
-	{
-		console::error(std::format("Cannot load another texture. {0}/{0} textures loaded.", _builder->get_max_materials()));
-		return ERROR_ID;
-	}
+	return get_shader(get_shader_pass(get_material_template(get_material(id).get_template_id()).get_shader_pass_ids().front()).get_shader_id());
+}
 
-	ID id = _materials.emplace(Material(_materials.size(), materialData, builder, *this));
+Shader const& minty::Renderer::get_shader_from_material_id(ID const id) const
+{
+	return get_shader(get_shader_pass(get_material_template(get_material(id).get_template_id()).get_shader_pass_ids().front()).get_shader_id());
+}
 
-	// TODO: move somewhere else
-	_sprites.emplace(Sprite(id));
+ShaderPass& minty::Renderer::get_shader_pass(ID const id)
+{
+	return _shaderPasses.at(id);
+}
 
-	return id;
+ShaderPass const& minty::Renderer::get_shader_pass(ID const id) const
+{
+	return _shaderPasses.at(id);
+}
+
+ShaderPass& minty::Renderer::get_shader_pass_from_material_id(ID const id)
+{
+	return get_shader_pass(get_material_template(get_material(id).get_template_id()).get_shader_pass_ids().front());
+}
+
+ShaderPass const& minty::Renderer::get_shader_pass_from_material_id(ID const id) const
+{
+	return get_shader_pass(get_material_template(get_material(id).get_template_id()).get_shader_pass_ids().front());
+}
+
+MaterialTemplate& minty::Renderer::get_material_template(ID const id)
+{
+	return _materialTemplates.at(id);
+}
+
+MaterialTemplate const& minty::Renderer::get_material_template(ID const id) const
+{
+	return _materialTemplates.at(id);
+}
+
+MaterialTemplate& minty::Renderer::get_material_template_from_material_id(ID const id)
+{
+	return get_material_template(get_material(id).get_template_id());
+}
+
+MaterialTemplate const& minty::Renderer::get_material_template_from_material_id(ID const id) const
+{
+	return get_material_template(get_material(id).get_template_id());
 }
 
 Material& minty::Renderer::get_material(ID const id)
@@ -539,6 +529,47 @@ VkImageView Renderer::create_image_view(VkImage image, VkFormat format, VkImageA
 	}
 
 	return imageView;
+}
+
+std::vector<char> minty::Renderer::load_file(std::string const& path) const
+{
+	std::ifstream file(path, std::ios::ate | std::ios::binary);
+
+	if (!file.is_open()) {
+		error::abort("Failed to open file!");
+	}
+
+	size_t fileSize = (size_t)file.tellg();
+	std::vector<char> buffer(fileSize);
+
+	file.seekg(0);
+	file.read(buffer.data(), fileSize);
+
+	file.close();
+
+	return buffer;
+}
+
+VkShaderModule minty::Renderer::load_shader_module(std::string const& path) const
+{
+	return create_shader_module(load_file(path));
+}
+
+VkShaderModule minty::Renderer::create_shader_module(std::vector<char> const& code) const
+{
+	VkShaderModuleCreateInfo createInfo
+	{
+		.sType = VK_STRUCTURE_TYPE_SHADER_MODULE_CREATE_INFO,
+		.codeSize = code.size(),
+		.pCode = reinterpret_cast<const uint32_t*>(code.data())
+	};
+
+	VkShaderModule shaderModule;
+	if (vkCreateShaderModule(_device, &createInfo, nullptr, &shaderModule) != VK_SUCCESS) {
+		error::abort("Failed to create shader module.");
+	}
+
+	return shaderModule;
 }
 
 VkCommandBuffer Renderer::begin_single_time_commands(VkCommandPool commandPool) {
@@ -1072,7 +1103,8 @@ void minty::Renderer::draw_scene(VkCommandBuffer commandBuffer)
 	}
 
 	// unbind any shaders used
-	bind_shader(commandBuffer, nullptr);
+	bind(commandBuffer, ERROR_ID);
+	//bind_shader(commandBuffer, nullptr);
 }
 
 void minty::Renderer::draw_ui(VkCommandBuffer commandBuffer, UITransformComponent const& uiComponent, SpriteComponent const& spriteComponent)
@@ -1080,19 +1112,12 @@ void minty::Renderer::draw_ui(VkCommandBuffer commandBuffer, UITransformComponen
 	// get the sprite
 	Sprite& sprite = get_sprite(spriteComponent.id);
 
-	// get the material
-	Material& mat = get_material(sprite.get_material_id());
-
-	// get the shader
-	Shader& shader = get_shader(mat.get_shader_id());
-
-	// bind the material, which will bind the shader and update its values
-	bind_shader(commandBuffer, &shader);
-
-	float width = static_cast<float>(_window->get_width());
-	float height = static_cast<float>(_window->get_height());
+	// bind the material the sprite is using
+	bind(commandBuffer, sprite.get_material_id());
 
 	// adjust info based on anchor and pivot
+	float width = static_cast<float>(_window->get_width());
+	float height = static_cast<float>(_window->get_height());
 	float left, top, right, bottom;
 
 	int anchor = static_cast<int>(uiComponent.anchorMode);
@@ -1148,6 +1173,7 @@ void minty::Renderer::draw_ui(VkCommandBuffer commandBuffer, UITransformComponen
 		.coords = Vector4(sprite.get_min_coords(), sprite.get_max_coords()),
 		.pos = Vector4(left, top, right, bottom),
 	};
+	Shader& shader = get_shader_from_material_id(sprite.get_material_id());
 	shader.update_push_constant(commandBuffer, &info, sizeof(DrawCallObjectUI));
 
 	// draw
@@ -1201,6 +1227,31 @@ void Renderer::populate_debug_messenger_create_info(VkDebugUtilsMessengerCreateI
 		.messageType = VK_DEBUG_UTILS_MESSAGE_TYPE_GENERAL_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_VALIDATION_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_TYPE_PERFORMANCE_BIT_EXT,
 		.pfnUserCallback = debug_callback
 	};
+}
+
+ID minty::Renderer::create_texture(rendering::TextureBuilder const& builder)
+{
+	return _textures.emplace(Texture(builder, *this));
+}
+
+ID minty::Renderer::create_shader(rendering::ShaderBuilder const& builder)
+{
+	return _shaders.emplace(Shader(builder, *this));
+}
+
+ID minty::Renderer::create_shader_pass(rendering::ShaderPassBuilder const& builder)
+{
+	return _shaderPasses.emplace(ShaderPass(builder, *this));
+}
+
+ID minty::Renderer::create_material_template(rendering::MaterialTemplateBuilder const& builder)
+{
+	return _materialTemplates.emplace(MaterialTemplate(builder, *this));
+}
+
+ID minty::Renderer::create_material(rendering::MaterialBuilder const& builder)
+{
+	return _materials.emplace(Material(builder, *this));
 }
 
 void Renderer::setup_debug_messenger() {
@@ -1336,27 +1387,51 @@ void Renderer::create_framebuffers()
 void minty::Renderer::build_textures()
 {
 	// go through each texture, create it with builder data
-	for (auto const& pair : _builder->get_textures())
-	{
-		create_texture(pair.first, *pair.second);
-	}
+
 }
 
 void minty::Renderer::build_shaders()
 {
 	// build custom
-	for (auto const& pair : _builder->get_shaders())
-	{
-		create_shader(pair.first.at(0), pair.first.at(1), *pair.second);
-	}
+
 }
 
 void minty::Renderer::build_materials()
 {
 	// not really a "pair"
-	for (auto const& pair : _builder->get_materials())
+
+}
+
+void minty::Renderer::create_assets()
+{
+	// textures
+	for (auto const& builder : _builder->get_texture_builders())
 	{
-		create_material(pair.first, *pair.second);
+		create_texture(*builder.second);
+	}
+
+	// shaders
+	for (auto const builder : _builder->get_shader_builders())
+	{
+		create_shader(*builder.second);
+	}
+
+	// shader passes
+	for (auto const builder : _builder->get_shader_pass_builders())
+	{
+		create_shader_pass(*builder.second);
+	}
+
+	// material templates
+	for (auto const builder : _builder->get_material_template_builders())
+	{
+		create_material_template(*builder.second);
+	}
+	
+	// materials
+	for (auto const& builder : _builder->get_material_builders())
+	{
+		create_material(*builder.second);
 	}
 }
 
@@ -1398,11 +1473,16 @@ void Renderer::update_camera(CameraComponent const& camera, TransformComponent c
 	// update all shaders
 	for (auto& shader : _shaders)
 	{
-		shader.update_uniform_constant_frame("camera", &obj, sizeof(CameraBufferObject));
+		shader.second.update_global_uniform_constant("camera", &obj, sizeof(CameraBufferObject));
+		//shader.update_uniform_constant_frame("camera", &obj, sizeof(CameraBufferObject));
 	}
 }
 
-void Renderer::create_buffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory) {
+ID minty::Renderer::create_buffer(VkDeviceSize const size, VkBufferUsageFlags const usage, VkMemoryPropertyFlags const properties)
+{
+	VkBuffer buffer;
+	VkDeviceMemory bufferMemory;
+
 	VkBufferCreateInfo bufferInfo{};
 	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
 	bufferInfo.size = size;
@@ -1422,16 +1502,122 @@ void Renderer::create_buffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemo
 	VK_ASSERT(result2, vkAllocateMemory(_device, &allocInfo, nullptr, &bufferMemory), "Failed to allocate buffer memory.");
 
 	VK_ASSERT(result3, vkBindBufferMemory(_device, buffer, bufferMemory, 0), "Failed to bind buffer memory.");
+
+	return _buffers.emplace(Buffer
+		{
+			.buffer = buffer,
+			.memory = bufferMemory,
+			.size = size
+		});
 }
 
-void Renderer::copy_buffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size) {
+ID minty::Renderer::create_buffer_uniform(VkDeviceSize const size)
+{
+	return create_buffer(size, VkBufferUsageFlagBits::VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+}
+
+void minty::Renderer::destroy_buffer(ID const id)
+{
+	// destroy the buffer with the id
+	destroy_buffer(_buffers.at(id));
+
+	// remove it from the list
+	_buffers.erase(id);
+}
+
+void* minty::Renderer::map_buffer(ID const id) const
+{
+	Buffer const& buffer = _buffers.at(id);
+
+	void* data = nullptr;
+
+	VK_ASSERT(result, vkMapMemory(_device, buffer.memory, 0, buffer.size, 0, &data), "Failed to map memory for new buffer.");
+
+	return data;
+}
+
+void minty::Renderer::unmap_buffer(ID const id) const
+{
+	Buffer const& buffer = _buffers.at(id);
+
+	vkUnmapMemory(_device, buffer.memory);
+}
+
+void minty::Renderer::set_buffer(ID const id, void* const data)
+{
+	Buffer const& buffer = _buffers.at(id);
+
+	// set whole buffer
+	set_buffer(id, data, 0, buffer.size);
+}
+
+void minty::Renderer::set_buffer(ID const id, void* const data, VkDeviceSize const size, VkDeviceSize const offset)
+{
+	Buffer const& buffer = _buffers.at(id);
+
+	// map data
+	void* mappedData = map_buffer(id);
+
+	// offset if needed
+	if (offset)
+	{
+		byte* temp = static_cast<byte*>(mappedData);
+
+		temp += offset;
+
+		mappedData = static_cast<void*>(temp);
+	}
+
+	// set data
+	memcpy(mappedData, data, size);
+
+	// unmap data
+	unmap_buffer(id);
+}
+
+VkBuffer minty::Renderer::get_buffer(ID const id) const
+{
+	return _buffers.at(id).buffer;
+}
+
+void minty::Renderer::get_buffer_data(ID const id, void* const out) const
+{
+	// get buffer
+	Buffer const& buffer = _buffers.at(id);
+
+	// map data
+	void* data = map_buffer(id);
+
+	// copy out data
+	memcpy(out, data, buffer.size);
+
+	// unmap
+	unmap_buffer(id);
+}
+
+VkDeviceSize minty::Renderer::get_buffer_size(ID const id) const
+{
+	return _buffers.at(id).size;
+}
+
+void minty::Renderer::copy_buffer(ID const srcId, ID const dstId, VkDeviceSize const size)
+{
+	Buffer const& srcBuffer = _buffers.at(srcId);
+	Buffer const& dstBuffer = _buffers.at(dstId);
+
 	VkCommandBuffer commandBuffer = begin_single_time_commands(commandPool);
 
 	VkBufferCopy copyRegion{};
 	copyRegion.size = size;
-	vkCmdCopyBuffer(commandBuffer, srcBuffer, dstBuffer, 1, &copyRegion);
+	vkCmdCopyBuffer(commandBuffer, srcBuffer.buffer, dstBuffer.buffer, 1, &copyRegion);
 
 	end_single_time_commands(commandBuffer, commandPool);
+}
+
+void minty::Renderer::destroy_buffer(rendering::Buffer const& buffer)
+{
+	vkDestroyBuffer(_device, buffer.buffer, nullptr);
+	vkFreeMemory(_device, buffer.memory, nullptr);
 }
 
 uint32_t Renderer::find_memory_type(uint32_t typeFilter, VkMemoryPropertyFlags properties)
@@ -1491,29 +1677,23 @@ void minty::Renderer::draw_mesh(VkCommandBuffer commandBuffer, Matrix4 const& tr
 		return;
 	}
 
-	// get the material
-	Material& mat = get_material(meshComponent.materialId);
-
-	// get the shader
-	Shader& shader = get_shader(mat.get_shader_id());
-
 	// bind the material, which will bind the shader and update its values
-	bind_shader(commandBuffer, &shader);
+	//bind_shader(commandBuffer, &shader);
+	bind(commandBuffer, meshComponent.materialId);
 
 	// bind vertex data
-	VkBuffer vertexBuffers[] = { meshComponent.mesh->get_vertex_buffer() };
+	VkBuffer vertexBuffers[] = { get_buffer(meshComponent.mesh->get_vertex_buffer_id()) };
 	VkDeviceSize offsets[] = { 0 };
 	vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
-	vkCmdBindIndexBuffer(commandBuffer, meshComponent.mesh->get_index_buffer(), 0, meshComponent.mesh->get_index_type());
+	vkCmdBindIndexBuffer(commandBuffer, get_buffer(meshComponent.mesh->get_index_buffer_id()), 0, meshComponent.mesh->get_index_type());
 
 	// send push constants so we know where to draw
 	Matrix4 tmatrix = transformationMatrix;
-	tmatrix[3][1] *= -1.0f;
 	DrawCallObject3D info
 	{
 		.transform = tmatrix,
-		.materialId = meshComponent.materialId,
 	};
+	Shader& shader = get_shader_from_material_id(meshComponent.materialId);
 	shader.update_push_constant(commandBuffer, &info, sizeof(DrawCallObject3D));
 
 	// draw
@@ -1651,17 +1831,38 @@ void Renderer::destroy()
 
 	// clean up vulkan
 	cleanup_swap_chain();
+	/*
+		Register<Texture> _textures;
+		Register<Sprite> _sprites;
+		Register<MaterialTemplate> _materialTemplates;
+		Register<Material> _materials;
+		Register<Shader> _shaders;
+		Register<ShaderPass> _shaderPasses;
+		Register<rendering::Buffer> _buffers;
+	*/
 	for (auto& tex : _textures)
 	{
-		tex.destroy();
+		tex.second.destroy();
 	}
-	for (auto& mat : _materials)
+	for (auto& material : _materials)
 	{
-		mat.destroy();
+		material.second.destroy();
+	}
+	for (auto& materialTemplate : _materialTemplates)
+	{
+		materialTemplate.second.destroy();
+	}
+	for (auto& shaderPass : _shaderPasses)
+	{
+		shaderPass.second.destroy();
 	}
 	for (auto& shader : _shaders)
 	{
-		shader.destroy();
+		shader.second.destroy();
+	}
+	for (auto& buffer : _buffers)
+	{
+		destroy_buffer(buffer.second);
 	}
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
 		vkDestroySemaphore(_device, renderFinishedSemaphores[i], nullptr);
@@ -1678,24 +1879,107 @@ void Renderer::destroy()
 	vkDestroyInstance(instance, nullptr);
 }
 
-void minty::Renderer::bind_shader(VkCommandBuffer const commandBuffer, Shader* const shader)
+//void minty::Renderer::bind_shader(VkCommandBuffer const commandBuffer, Shader* const shader)
+//{
+//	// if empty, set to empty
+//	if (shader == nullptr)
+//	{
+//		_boundShader = nullptr;
+//		return;
+//	}
+//
+//	// set to a new shader
+//	if (shader != _boundShader)
+//	{
+//		// set shader
+//		shader->bind(commandBuffer);
+//
+//		// update reference
+//		_boundShader = shader;
+//	}
+//}
+
+void minty::Renderer::bind(VkCommandBuffer const commandBuffer)
 {
-	// if empty, set to empty
-	if (shader == nullptr)
+	// bind using the bound ids
+	if (_boundIds.at(0) == ERROR_ID)
 	{
-		_boundShader = nullptr;
 		return;
 	}
 
-	// set to a new shader
-	if (shader != _boundShader)
-	{
-		// set shader
-		shader->bind(commandBuffer);
+	// get references to grab descriptor sets from
+	Shader const& shader = get_shader(_boundIds.at(BIND_SHADER));
+	ShaderPass const& shaderPass = get_shader_pass(_boundIds.at(BIND_SHADER_PASS));
+	Material const& material = get_material(_boundIds.at(BIND_MATERIAL));
 
-		// update reference
-		_boundShader = shader;
+	// set descriptor sets we actually care about
+	std::array<VkDescriptorSet, DESCRIPTOR_SET_COUNT> descriptorSets;
+	descriptorSets[DESCRIPTOR_SET_SHADER] = shader.get_global_descriptor_set().at(_frame);
+	descriptorSets[DESCRIPTOR_SET_SHADER_PASS] = shaderPass.get_descriptor_set().at(_frame);
+	descriptorSets[DESCRIPTOR_SET_MATERIAL] = material.get_descriptor_set(0).at(_frame);
+
+	// bind pipeline and descriptor sets
+	vkCmdBindPipeline(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, shaderPass.get_pipeline());
+	vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, shader.get_pipeline_layout(), 0, DESCRIPTOR_SET_COUNT, descriptorSets.data(), 0, nullptr);
+}
+
+void minty::Renderer::bind(VkCommandBuffer const commandBuffer, ID const materialId, uint32_t const pass)
+{
+	// if ERROR_ID material, unbind all
+	if (materialId == ERROR_ID)
+	{
+		for (size_t i = 0; i < _boundIds.size(); i++)
+		{
+			_boundIds[i] = ERROR_ID;
+		}
+		return;
 	}
+
+	// if the same, do nothing
+	if (_boundIds.at(BIND_MATERIAL) == materialId)
+	{
+		return;
+	}
+
+	// new material, so update bound ids and bind descriptor sets as needed
+
+	_boundIds[BIND_MATERIAL] = materialId;
+
+	Material const& material = get_material(materialId);
+	ID const materialTemplateId = material.get_template_id();
+
+	if (_boundIds.at(BIND_MATERIAL_TEMPLATE) == materialTemplateId)
+	{
+		// only update material
+		bind(commandBuffer);
+		return;
+	}
+
+	_boundIds[BIND_MATERIAL_TEMPLATE] = materialTemplateId;
+	MaterialTemplate const& materialTemplate = get_material_template(materialTemplateId);
+	ID const shaderPassId = materialTemplate.get_shader_pass_ids().front();
+
+	if (_boundIds.at(BIND_SHADER_PASS) == shaderPassId)
+	{
+		// only update material and material template
+		bind(commandBuffer);
+		return;
+	}
+
+	_boundIds[BIND_SHADER_PASS] = shaderPassId;
+	ShaderPass const& shaderPass = get_shader_pass(shaderPassId);
+	ID const shaderId = shaderPass.get_shader_id();
+
+	if (_boundIds.at(BIND_SHADER) == shaderId)
+	{
+		// only update material, material template, and shader pass
+		bind(commandBuffer);
+		return;
+	}
+
+	// update everything
+	_boundIds[BIND_SHADER] = shaderId;
+	bind(commandBuffer);
 }
 
 void minty::Renderer::sync()

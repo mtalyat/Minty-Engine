@@ -7,9 +7,6 @@ using namespace minty::rendering;
 
 RendererBuilder::RendererBuilder(Info const* const info)
     : _info(info)
-    , _maxTextures(16)
-    , _maxShaders(16)
-    , _maxMaterials(16)
 {}
 
 Info const* RendererBuilder::get_info() const
@@ -17,81 +14,54 @@ Info const* RendererBuilder::get_info() const
     return _info;
 }
 
-ID minty::rendering::RendererBuilder::get_max_textures() const
+ID minty::rendering::RendererBuilder::emplace_texture(TextureBuilder const& builder)
 {
-    return _maxTextures;
+    return _textures.emplace(&builder);
 }
 
-ID minty::rendering::RendererBuilder::get_max_shaders() const
+ID minty::rendering::RendererBuilder::emplace_shader(ShaderBuilder const& builder)
 {
-    return _maxShaders;
+    return _shaders.emplace(&builder);
 }
 
-ID minty::rendering::RendererBuilder::get_max_materials() const
+ID minty::rendering::RendererBuilder::emplace_shader_pass(ShaderPassBuilder const& builder)
 {
-    return _maxMaterials;
+    return _shaderPasses.emplace(&builder);
 }
 
-ID minty::rendering::RendererBuilder::emplace_texture(TextureBuilder const* const builder, std::string const& path)
+ID minty::rendering::RendererBuilder::emplace_material_template(MaterialTemplateBuilder const& builder)
 {
-    return _textures.emplace({ path, builder });
+    return _materialTemplates.emplace(&builder);
 }
 
-std::vector<std::pair<std::string, TextureBuilder const*>> const& minty::rendering::RendererBuilder::get_textures() const
+ID minty::rendering::RendererBuilder::emplace_material(MaterialBuilder const& builder)
 {
-    return _textures.data();
+    return _materials.emplace(&builder);
 }
 
-void minty::rendering::RendererBuilder::set_max_textures(ID const max)
+Register<TextureBuilder const*> const& minty::rendering::RendererBuilder::get_texture_builders() const
 {
-    _maxTextures = max;
+    return _textures;
 }
 
-void minty::rendering::RendererBuilder::set_max_shaders(ID const max)
+Register<ShaderBuilder const*> const& minty::rendering::RendererBuilder::get_shader_builders() const
 {
-    _maxShaders = max;
+    return _shaders;
 }
 
-void minty::rendering::RendererBuilder::set_max_materials(ID const max)
+Register<ShaderPassBuilder const*> const& minty::rendering::RendererBuilder::get_shader_pass_builders() const
 {
-    _maxMaterials = max;
+    return _shaderPasses;
 }
 
-ID minty::rendering::RendererBuilder::emplace_shader(ShaderBuilder const* const builder, std::string const& vertexPath, std::string const& fragmentPath)
+Register<MaterialTemplateBuilder const*> const& minty::rendering::RendererBuilder::get_material_template_builders() const
 {
-    return _shaders.emplace({ { vertexPath, fragmentPath }, builder });
+    return _materialTemplates;
 }
 
-std::vector<std::pair<std::vector<std::string>, ShaderBuilder const*>> const& minty::rendering::RendererBuilder::get_shaders() const
+Register<MaterialBuilder const*> const& minty::rendering::RendererBuilder::get_material_builders() const
 {
-    return _shaders.data();
-}
-
-ID minty::rendering::RendererBuilder::emplace_material(MaterialBuilder const* const builder, void const* const material)
-{
-    // get material size from shader builder
-    ShaderBuilder const* shader = _shaders.at(builder->get_shader_id()).second;
-
-    // allocate space for copy of data
-    void* dst = malloc(shader->get_material_size());
-
-    if (dst == nullptr)
-    {
-        console::error("Could not malloc material.");
-
-        return ERROR_ID;
-    }
-
-    // copy over
-    memcpy(dst, material, shader->get_material_size());
-
-    // add to register
-    return _materials.emplace({ dst, builder });
-}
-
-std::vector<std::pair<void const*, MaterialBuilder const*>> const& minty::rendering::RendererBuilder::get_materials() const
-{
-    return _materials.data();
+    return _materials;
 }
 
 std::string minty::rendering::to_string(RendererBuilder const& value)

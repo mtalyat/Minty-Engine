@@ -31,6 +31,8 @@ namespace minty
 
 		static Quaternion from_euler_angles(float const x, float const y, float const z);
 
+		static Quaternion from_euler_angles(Vector3 const v);
+
 		friend std::string to_string(Quaternion const& value);
 	};
 

@@ -114,7 +114,7 @@ Component const* minty::EntityRegistry::get_by_name(std::string const& name, Ent
 	if (found == _components.end())
 	{
 		// name not found
-		console::error(std::format("Cannot get Component \"{}\". It has not been registered with the EntityRegistry.", name));
+		console::error(std::format("Cannot at Component \"{}\". It has not been registered with the EntityRegistry.", name));
 		return nullptr;
 	}
 	else
