@@ -13,6 +13,15 @@ namespace minty
 	class Texture :
 		public rendering::RendererObject
 	{
+	public:
+		enum class PixelFormat
+		{
+			None = 0,
+			Gray = 1,
+			GrayAlpha = 2,
+			RedGreenBlue = 3,
+			RedGreenBlueAlpha = 4,
+		};
 	private:
 		int _width, _height;
 		VkFormat _format;
@@ -22,7 +31,7 @@ namespace minty
 		VkSampler _sampler;
 
 	public:
-		Texture(std::string const& path, rendering::TextureBuilder const& builder, Renderer& renderer);
+		Texture(rendering::TextureBuilder const& builder, Renderer& renderer);
 
 		void destroy();
 

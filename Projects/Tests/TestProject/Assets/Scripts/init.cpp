@@ -48,72 +48,96 @@ void init(Runtime &runtime)
 
             basic::create_basic_renderer_builder(rb);
 
-            rb.set_max_shaders(2);
-            rb.set_max_textures(6);
-            rb.set_max_materials(8);
-
             // create textures
-            TextureBuilder tb0; // for "pixel art" textures
-            tb0.set_filter(VkFilter::VK_FILTER_NEAREST);
-            TextureBuilder tb1; // for "normal" textures
-
-            rb.emplace_texture(&tb1, "Assets/Textures/funny.jpg");
-            rb.emplace_texture(&tb1, "Assets/Textures/funny2.png");
-            rb.emplace_texture(&tb1, "Assets/Textures/texture.jpg");
-            rb.emplace_texture(&tb0, "Assets/Textures/brian.png");
-            rb.emplace_texture(&tb0, "Assets/Textures/crosshair.png");
-            rb.emplace_texture(&tb0, "Assets/Textures/ui.png");
+            std::vector<TextureBuilder> textureBuilders =
+                {
+                    TextureBuilder("Assets/Textures/funny.jpg"),
+                    TextureBuilder("Assets/Textures/funny2.png"),
+                    TextureBuilder("Assets/Textures/texture.jpg"),
+                    TextureBuilder("Assets/Textures/brian.png"),
+                    TextureBuilder("Assets/Textures/crosshair.png"),
+                    TextureBuilder("Assets/Textures/ui.png"),
+                };
+            for (TextureBuilder &builder : textureBuilders)
+            {
+                // builder.set_filter(VkFilter::VK_FILTER_NEAREST);
+                rb.emplace_texture(builder);
+            }
 
             // create shader
             ShaderBuilder sb;
             basic::create_basic_shader_builder_3d(rb, sb);
-            sb.set_material_size(sizeof(MaterialBufferObject));
-
-            sb.emplace_uniform_constant(
-                "materials",
+            sb.emplace_uniform_constant(UniformConstantInfo(
+                "material",
                 VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT,
-                0, 2,
                 VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                sizeof(MaterialBufferObject) * rb.get_max_materials(),
-                1);
+                sizeof(MaterialBufferObject),
+                DESCRIPTOR_SET_MATERIAL,
+                0));
+            sb.emplace_uniform_constant(UniformConstantInfo(
+                "textures",
+                VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT,
+                VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+                sizeof(VkSampler),
+                DESCRIPTOR_SET_MATERIAL,
+                1,
+                // 4,
+                // {0, 1, 2, 3}
+                1,
+                {0}));
+            ID shaderId = rb.emplace_shader(sb);
 
-            rb.emplace_shader(&sb, "Assets/Shaders/vert.spv", "Assets/Shaders/frag.spv");
-            
-            ShaderBuilder sb2;
-            basic::create_basic_shader_builder_ui(rb, sb2);
-            sb2.set_material_size(sizeof(MaterialBufferObject));
-            
-            sb2.emplace_uniform_constant(
-                "materials",
-                VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT,
-                0, 1,
-                VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                sizeof(MaterialBufferObject) * rb.get_max_materials(),
-                1);
+            // create shader pass
+            ShaderPassBuilder spb(shaderId);
+            basic::create_basic_shader_pass_builder_3d(rb, spb);
+            spb.emplace_stage(VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT, "Assets/Shaders/vert.spv", *renderer);
+            spb.emplace_stage(VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT, "Assets/Shaders/frag.spv", *renderer);
+            // spb.set_front_face(VkFrontFace::VK_FRONT_FACE_COUNTER_CLOCKWISE);
+            // spb.set_cull_mode(VkCullModeFlagBits::VK_CULL_MODE_FRONT_BIT);
+            ID shaderPassId = rb.emplace_shader_pass(spb);
 
-            rb.emplace_shader(&sb2, "Assets/Shaders/uivert.spv", "Assets/Shaders/uifrag.spv");
+            // // create ui shader
+            // ShaderBuilder sb2;
+            // basic::create_basic_shader_builder_ui(rb, sb2);
+            // sb2.emplace_uniform_constant(UniformConstantInfo(
+            //     "material",
+            //     VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT,
+            //     VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+            //     sizeof(MaterialBufferObject),
+            //     DESCRIPTOR_SET_MATERIAL,
+            //     0));
+            // ID shaderId2 = rb.emplace_shader(sb2);
+
+            // // create ui shader pass
+            // ShaderPassBuilder spb2(shaderId2);
+            // basic::create_basic_shader_pass_builder_3d(rb, spb2);
+            // spb2.emplace_stage(VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT, "Assets/Shaders/uivert.spv", *renderer);
+            // spb2.emplace_stage(VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT, "Assets/Shaders/uifrag.spv", *renderer);
+            // ID shaderPassId2 = rb.emplace_shader_pass(spb2);
+
+            // create material templates
+            MaterialTemplateBuilder mtb({shaderPassId});
+            MaterialBufferObject mbo{
+                .textureId = 0,
+                .color = Vector4(1.0f, 1.0f, 1.0f, 1.0f)};
+            mtb.emplace_default_value("material", Dynamic(&mbo, sizeof(MaterialBufferObject)));
+            ID materialTemplateId = rb.emplace_material_template(mtb);
+
+            // MaterialTemplateBuilder mtb2({shaderPassId2});
+            // MaterialBufferObject mbo{
+            //     .color = Vector4(1.0f, 1.0f, 1.0f, 1.0f)};
+            // mtb2.emplace_default_value("material", Dynamic(&mbo, sizeof(MaterialBufferObject)));
+            // ID materialTemplateId2 = rb.emplace_material_template(mtb2);
 
             // create materials
-            MaterialBuilder mb(0);  // world
-            MaterialBuilder mb2(1); // ui
-
-            Vector4 whiteColor(1.0f, 1.0f, 1.0f, 1.0f);
-
-            MaterialBufferObject mbo = {
-                .textureId = 0,
-                .color = whiteColor
-            };
-            rb.emplace_material(&mb, &mbo);
-            mbo.textureId = 1;
-            rb.emplace_material(&mb, &mbo);
-            mbo.textureId = 2;
-            rb.emplace_material(&mb, &mbo);
-            mbo.textureId = 3;
-            rb.emplace_material(&mb, &mbo);
-            mbo.textureId = 4;
-            rb.emplace_material(&mb2, &mbo);
-            mbo.textureId = 5;
-            rb.emplace_material(&mb2, &mbo);
+            MaterialBuilder mb(materialTemplateId); // world
+            rb.emplace_material(mb);
+            // MaterialBuilder mb2(materialTemplateId); // world 2
+            // mbo.textureId = 1;
+            // mbo.color = Vector4(1.0f, 0.0f, 1.0f, 1.0f);
+            // mb2.emplace_value("material", Dynamic(&mbo, sizeof(MaterialBufferObject)));
+            // rb.emplace_material(mb2);
+            // MaterialBuilder mb2(materialTemplateId2); // ui
 
             // init renderer with builders
             renderer->init(rb);
@@ -147,7 +171,8 @@ void init(Runtime &runtime)
 
             MeshComponent &meshComponent = er->get<MeshComponent>(e);
             meshComponent.mesh = mesh;
-            meshComponent.materialId = static_cast<ID>(i % 4);
+            meshComponent.materialId = static_cast<ID>(0);
+            // meshComponent.materialId = static_cast<ID>(i % 4);
         }
 
         // debug print scene:
@@ -163,90 +188,65 @@ void init(Runtime &runtime)
                                { window->close(); });
 
         MoveSystem *moveSystem = sr->find_by_type<MoveSystem>();
-        input.emplace_key_down(Key::W, [moveSystem](KeyPressEventArgs const &args) 
-        {
-            moveSystem->forward += 1.0f;
-        });
+        input.emplace_key_down(Key::W, [moveSystem](KeyPressEventArgs const &args)
+                               { moveSystem->forward += 1.0f; });
         input.emplace_key_up(Key::W, [moveSystem](KeyPressEventArgs const &args)
-        {
-            moveSystem->forward -= 1.0f;
-        });
-        input.emplace_key_down(Key::S, [moveSystem](KeyPressEventArgs const &args) 
-        {
-            moveSystem->forward += -1.0f;
-        });
+                             { moveSystem->forward -= 1.0f; });
+        input.emplace_key_down(Key::S, [moveSystem](KeyPressEventArgs const &args)
+                               { moveSystem->forward += -1.0f; });
         input.emplace_key_up(Key::S, [moveSystem](KeyPressEventArgs const &args)
-        {
-            moveSystem->forward -= -1.0f;
-        });
-        input.emplace_key_down(Key::D, [moveSystem](KeyPressEventArgs const &args) 
-        {
-            moveSystem->right += 1.0f;
-        });
+                             { moveSystem->forward -= -1.0f; });
+        input.emplace_key_down(Key::D, [moveSystem](KeyPressEventArgs const &args)
+                               { moveSystem->right += 1.0f; });
         input.emplace_key_up(Key::D, [moveSystem](KeyPressEventArgs const &args)
-        {
-            moveSystem->right -= 1.0f;
-        });
-        input.emplace_key_down(Key::A, [moveSystem](KeyPressEventArgs const &args) 
-        {
-            moveSystem->right += -1.0f;
-        });
+                             { moveSystem->right -= 1.0f; });
+        input.emplace_key_down(Key::A, [moveSystem](KeyPressEventArgs const &args)
+                               { moveSystem->right += -1.0f; });
         input.emplace_key_up(Key::A, [moveSystem](KeyPressEventArgs const &args)
-        {
-            moveSystem->right -= -1.0f;
-        });
-        input.emplace_key_down(Key::Space, [moveSystem](KeyPressEventArgs const &args) 
-        {
-            moveSystem->up += -1.0f;
-        });
+                             { moveSystem->right -= -1.0f; });
+        input.emplace_key_down(Key::Space, [moveSystem](KeyPressEventArgs const &args)
+                               { moveSystem->up += -1.0f; });
         input.emplace_key_up(Key::Space, [moveSystem](KeyPressEventArgs const &args)
-        {
-            moveSystem->up -= -1.0f;
-        });
-        input.emplace_key_down(Key::LeftShift, [moveSystem](KeyPressEventArgs const &args) 
-        {
-            moveSystem->up += 1.0f;
-        });
+                             { moveSystem->up -= -1.0f; });
+        input.emplace_key_down(Key::LeftShift, [moveSystem](KeyPressEventArgs const &args)
+                               { moveSystem->up += 1.0f; });
         input.emplace_key_up(Key::LeftShift, [moveSystem](KeyPressEventArgs const &args)
-        {
-            moveSystem->up -= 1.0f;
-        });
+                             { moveSystem->up -= 1.0f; });
 
-        input.emplace_key_down(Key::LeftControl, [moveSystem](KeyPressEventArgs const& args)
-        {
-            moveSystem->faster = true;
-        });
-        input.emplace_key_up(Key::LeftControl, [moveSystem](KeyPressEventArgs const& args)
-        {
-            moveSystem->faster = false;
-        });
+        input.emplace_key_down(Key::LeftControl, [moveSystem](KeyPressEventArgs const &args)
+                               { moveSystem->faster = true; });
+        input.emplace_key_up(Key::LeftControl, [moveSystem](KeyPressEventArgs const &args)
+                             { moveSystem->faster = false; });
 
-        CameraControllerSystem* cameraControllerSystem = sr->find_by_type<CameraControllerSystem>();
+        TestSystem *testSystem = sr->find_by_type<TestSystem>();
+        input.emplace_key_down(Key::Pause, [testSystem](KeyPressEventArgs const &args)
+                               { testSystem->toggle_pause(); });
+        input.emplace_key_down(Key::Insert, [testSystem](KeyPressEventArgs const &args)
+                               { testSystem->reset(); });
 
-        input.emplace_mouse_down(MouseButton::Left, [cameraControllerSystem, window](MouseClickEventArgs const& args)
-        {
-            if(cameraControllerSystem->mouseDown)
-            {
-                // free to move
-                cameraControllerSystem->mouseDown = false;
-                window->set_cursor_mode(CursorMode::Normal);
-            } else
-            {
-                // lock movement, move camera around
-                cameraControllerSystem->mouseDown = true;
-                window->set_cursor_mode(CursorMode::Disabled);
-            }
-            
-        });
+        CameraControllerSystem *cameraControllerSystem = sr->find_by_type<CameraControllerSystem>();
+        input.emplace_mouse_down(MouseButton::Left, [cameraControllerSystem, window](MouseClickEventArgs const &args)
+                                 {
+                                     if (cameraControllerSystem->mouseDown)
+                                     {
+                                         // free to move
+                                         cameraControllerSystem->mouseDown = false;
+                                         window->set_cursor_mode(CursorMode::Normal);
+                                     }
+                                     else
+                                     {
+                                         // lock movement, move camera around
+                                         cameraControllerSystem->mouseDown = true;
+                                         window->set_cursor_mode(CursorMode::Disabled);
+                                     } });
 
-        input.emplace_mouse_move([cameraControllerSystem](MouseMoveEventArgs const& args)
-        {
+        input.emplace_mouse_move([cameraControllerSystem](MouseMoveEventArgs const &args)
+                                 {
             if(cameraControllerSystem->mouseDown)
             {
                 cameraControllerSystem->pitch -= args.dy;
                 cameraControllerSystem->yaw += args.dx;
-            }
-        });
+            } });
 
         window->set_input(&input);
     }

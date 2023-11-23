@@ -16,10 +16,13 @@ namespace minty
 		ID _capacity;
 		
 		// the data within the register
-		std::vector<T> _data;
+		std::unordered_map<ID, T> _data;
 
 		// name lookup
 		std::unordered_map<std::string, ID> _lookup;
+
+		// next ID to be used
+		ID _next;
 	public:
 		/// <summary>
 		/// Create an empty Register.
@@ -53,6 +56,10 @@ namespace minty
 		/// <param name="name">The alias name.</param>
 		/// <param name="id">The ID of the object.</param>
 		void emplace_alias(std::string const& name, ID const id);
+
+		void erase(ID const id);
+
+		void erase(std::string const& name);
 
 		/// <summary>
 		/// Removes an alias for an ID in this Register.
@@ -145,12 +152,14 @@ namespace minty
 	Register<T>::Register()
 		: _data()
 		, _capacity(MAX_ID)
+		, _next(0)
 	{}
 
 	template<class T>
 	Register<T>::Register(ID const capacity)
 		: _data()
 		, _capacity(capacity)
+		, _next(0)
 	{}
 
 	template<class T>
@@ -163,10 +172,10 @@ namespace minty
 		}
 
 		// get id
-		ID id = static_cast<ID>(_data.size());
+		ID id = static_cast<ID>(_next++);
 
 		// add
-		_data.push_back(obj);
+		_data.emplace(id, obj);
 
 		// return the id
 		return id;
@@ -192,6 +201,20 @@ namespace minty
 	}
 
 	template<class T>
+	void Register<T>::erase(ID const id)
+	{
+		_data.erase(id);
+	}
+
+	template<class T>
+	void Register<T>::erase(std::string const& name)
+	{
+		ID id = _lookup.at(name);
+
+		_data.erase(id);
+	}
+
+	template<class T>
 	void Register<T>::erase_alias(std::string const& name)
 	{
 		_lookup.erase(name);
@@ -206,7 +229,7 @@ namespace minty
 	template<class T>
 	bool Register<T>::contains(ID const id) const
 	{
-		return id >= 0 && id < _data.size();
+		return _data.contains(id);
 	}
 
 	template<class T>

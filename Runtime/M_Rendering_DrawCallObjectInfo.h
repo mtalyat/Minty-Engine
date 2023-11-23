@@ -8,7 +8,6 @@ namespace minty::rendering
 	struct DrawCallObject3D
 	{
 		alignas(16) Matrix4 transform;
-		alignas(16) minty::ID materialId;
 	};
 
 	struct DrawCallObjectUI

@@ -13,19 +13,58 @@
 using namespace minty;
 using namespace minty::rendering;
 
-Texture::Texture(std::string const& path, rendering::TextureBuilder const& builder, Renderer& renderer)
+Texture::Texture(rendering::TextureBuilder const& builder, Renderer& renderer)
 	: RendererObject::RendererObject(renderer)
+	, _width(builder.get_width())
+	, _height(builder.get_height())
 {
-	// get data from file: pixels, width, height, color channels
-	int channels;
+	// determine how to load data
+	stbi_uc* pixels = builder.get_pixel_data_raw();
+	bool allocated = false;
 
-	// load a texture with r g b and a
-	stbi_uc* pixels = stbi_load(path.c_str(), &_width, &_height, &channels, STBI_rgb_alpha);
+	std::string const& path = builder.get_path();
+	bool fromFile = path.size();
 
-	// if no pixels, error
+	if (fromFile)
+	{
+		if (!file::exists(path))
+		{
+			console::error(std::format("Cannot load texture. File not found at: {}", path));
+			return;
+		}
+
+		// get data from file: pixels, width, height, color channels
+		int channels;
+
+		pixels = stbi_load(path.c_str(), &_width, &_height, &channels, static_cast<int>(builder.get_pixel_format()));
+
+		// if no pixels, error
+		if (!pixels)
+		{
+			console::error(std::format("Failed to load texture: {}", path));
+			return;
+		}
+	}
+	else
+	{
+		// get data from builder
+		_width = builder.get_width();
+		_height = builder.get_height();
+
+		// create color data if needed
+		if (!pixels && _width * _height > 0)
+		{
+			size_t size = _width * _height * 4;
+			pixels = new stbi_uc[size];
+			std::memset(pixels, 0, size);
+
+			allocated = true;
+		}
+	}
+
 	if (!pixels)
 	{
-		console::error(std::format("Failed to load texture: {}", path));
+		console::error("Failed to create texture. Pixels are null.");
 		return;
 	}
 
@@ -34,29 +73,35 @@ Texture::Texture(std::string const& path, rendering::TextureBuilder const& build
 
 	// copy to device via a staging buffer
 
-	VkBuffer stagingBuffer;
-	VkDeviceMemory stagingMemory;
-
 	// create a buffer that can be used as the source of a transfer command
 	// the memory can be mapped, and specify that flush is not needed (we do not need to flush to make writes)
-	renderer.create_buffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingMemory);
+	ID stagingBufferId = renderer.create_buffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
 	VkDevice device = renderer.get_device();
 
 	// map memory and copy it to buffer memory
 
-	// map memory: get pointer where we can actually copy data to
-	void* data;
-	vkMapMemory(device, stagingMemory, 0, imageSize, 0, &data);
+	void* mappedData = renderer.map_buffer(stagingBufferId);
+	memcpy(mappedData, pixels, static_cast<size_t>(imageSize));
+	renderer.unmap_buffer(stagingBufferId);
+	//void* data;
+	//vkMapMemory(device, stagingMemory, 0, imageSize, 0, &data);
 
-	// copy data over
-	memcpy(data, pixels, static_cast<size_t>(imageSize));
+	//// copy data over
+	//memcpy(data, pixels, static_cast<size_t>(imageSize));
 
-	// no longer need access to the data
-	vkUnmapMemory(device, stagingMemory);
+	//// no longer need access to the data
+	//vkUnmapMemory(device, stagingMemory);
 
 	// done with the pixels from file
-	stbi_image_free(pixels);
+	if (fromFile)
+	{
+		stbi_image_free(pixels);
+	}
+	else if (allocated)
+	{
+		delete[] pixels;
+	}
 
 	// image data
 	_format = static_cast<VkFormat>(builder.get_format());
@@ -68,14 +113,15 @@ Texture::Texture(std::string const& path, rendering::TextureBuilder const& build
 	renderer.change_image_layout(_image, _format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
 	// copy pixel data to image
-	renderer.copy_buffer_to_image(stagingBuffer, _image, _width, _height);
+	renderer.copy_buffer_to_image(renderer.get_buffer(stagingBufferId), _image, _width, _height);
 
 	// prep texture for rendering
 	renderer.change_image_layout(_image, _format, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
 	// cleanup staging buffer, no longer needed
-	vkDestroyBuffer(device, stagingBuffer, nullptr);
-	vkFreeMemory(device, stagingMemory, nullptr);
+	renderer.destroy_buffer(stagingBufferId);
+	//vkDestroyBuffer(device, stagingBuffer, nullptr);
+	//vkFreeMemory(device, stagingMemory, nullptr);
 
 	// create view, so the shaders can access the image data
 	_view = renderer.create_image_view(_image, _format, VK_IMAGE_ASPECT_COLOR_BIT);

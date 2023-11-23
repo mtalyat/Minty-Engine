@@ -40,6 +40,9 @@
     <Filter Include="Resource Files\Shaders">
       <UniqueIdentifier>{b7dff789-4b79-4049-aa6f-7ddcd995f28f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Builtin">
+      <UniqueIdentifier>{ddbf4554-4699-450d-a3d1-6498173672f0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -168,7 +171,7 @@
     <ClInclude Include="M_Mesh.h">
       <Filter>Header Files\Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="M_Material.h">
+    <ClInclude Include="M_MaterialTemplate.h">
       <Filter>Header Files\Rendering</Filter>
     </ClInclude>
     <ClInclude Include="M_Key.h">
@@ -204,7 +207,7 @@
     <ClInclude Include="M_Rendering_DrawCallObjectInfo.h">
       <Filter>Header Files\Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="M_Rendering_MaterialBuilder.h">
+    <ClInclude Include="M_Rendering_MaterialTemplateBuilder.h">
       <Filter>Header Files\Rendering</Filter>
     </ClInclude>
     <ClInclude Include="M_Matrix.h">
@@ -257,6 +260,36 @@
     </ClInclude>
     <ClInclude Include="M_RenderableTag.h">
       <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="M_ShaderPass.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Rendering_ShaderPassBuilder.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Material.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Rendering_MaterialBuilder.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Rendering_Buffer.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Rendering_UniformConstantInfo.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Rendering_PushConstantInfo.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Rendering_DescriptorSet.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Dynamic.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Builtin_GlobalData.h">
+      <Filter>Header Files\Builtin</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -314,7 +347,7 @@
     <ClCompile Include="M_InputMap.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="M_Material.cpp">
+    <ClCompile Include="M_MaterialTemplate.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_Viewport.cpp">
@@ -380,7 +413,7 @@
     <ClCompile Include="M_Error.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="M_Rendering_MaterialBuilder.cpp">
+    <ClCompile Include="M_Rendering_MaterialTemplateBuilder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_Quaternion.cpp">
@@ -435,6 +468,33 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_UITransformComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_ShaderPass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_Rendering_ShaderPassBuilder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_Rendering_MaterialBuilder.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_Material.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_Rendering_Buffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_Rendering_UniformConstantInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_Rendering_PushConstantInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_Rendering_DescriptorSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_Dynamic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

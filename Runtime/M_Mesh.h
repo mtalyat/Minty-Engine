@@ -16,13 +16,11 @@ namespace minty
 	private:
 		uint32_t _vertexCount;
 		uint32_t _vertexSize;
-		VkBuffer _vertexBuffer;
-		VkDeviceMemory _vertexMemory;
+		ID _vertexBufferId;
 
 		uint32_t _indexCount;
 		uint32_t _indexSize;
-		VkBuffer _indexBuffer;
-		VkDeviceMemory _indexMemory;
+		ID _indexBufferId;
 		VkIndexType _indexType;
 	public:
 		Mesh(Renderer& renderer);
@@ -49,11 +47,11 @@ namespace minty
 
 		uint32_t get_vertex_count() const;
 
-		VkBuffer get_vertex_buffer() const;
+		ID get_vertex_buffer_id() const;
 
 		uint32_t get_index_count() const;
 
-		VkBuffer get_index_buffer() const;
+		ID get_index_buffer_id() const;
 
 		VkIndexType get_index_type() const;
 

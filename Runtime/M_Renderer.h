@@ -18,12 +18,18 @@
 #include "M_Texture.h"
 #include "M_Sprite.h"
 #include "M_Shader.h"
+#include "M_ShaderPass.h"
+#include "M_MaterialTemplate.h"
 #include "M_Material.h"
 #include "M_Mesh.h"
 
+#include "M_Rendering_Buffer.h"
 #include "M_Rendering_TextureBuilder.h"
 #include "M_Rendering_ShaderBuilder.h"
+#include "M_Rendering_ShaderPassBuilder.h"
+#include "M_Rendering_MaterialTemplateBuilder.h"
 #include "M_Rendering_MaterialBuilder.h"
+#include "M_Rendering_DescriptorSet.h"
 
 #include "M_Error.h"
 
@@ -54,6 +60,12 @@ namespace minty
 		std::vector<VkPresentModeKHR> presentModes;
 	};
 
+	constexpr uint32_t const BIND_COUNT = 4;
+	constexpr uint32_t const BIND_SHADER = 0;
+	constexpr uint32_t const BIND_SHADER_PASS = 1;
+	constexpr uint32_t const BIND_MATERIAL_TEMPLATE = 2;
+	constexpr uint32_t const BIND_MATERIAL = 3;
+
 	class Scene;
 
 	namespace rendering
@@ -72,13 +84,17 @@ namespace minty
 		rendering::RendererBuilder const* _builder;
 		Window* _window;
 		
+		// assets
+
 		Register<Texture> _textures;
 		Register<Sprite> _sprites;
+		Register<MaterialTemplate> _materialTemplates;
 		Register<Material> _materials;
 		Register<Shader> _shaders;
+		Register<ShaderPass> _shaderPasses;
+		Register<rendering::Buffer> _buffers;
 
-		Material* _boundMaterial;
-		Shader* _boundShader;
+		std::array<ID, BIND_COUNT> _boundIds;
 
 		Viewport _view;
 		Color _backgroundColor;
@@ -241,6 +257,8 @@ namespace minty
 		/// </summary>
 		void build_materials();
 
+		void create_assets();
+
 		/// <summary>
 		/// Creates the command buffers.
 		/// </summary>
@@ -270,7 +288,10 @@ namespace minty
 
 #pragma region Binding
 
-		void bind_shader(VkCommandBuffer const commandBuffer, Shader* const shader);
+	private:
+		void bind(VkCommandBuffer const commandBuffer);
+
+		void bind(VkCommandBuffer const commandBuffer, ID const materialId, uint32_t const pass = 0);
 
 #pragma endregion
 
@@ -320,12 +341,16 @@ namespace minty
 
 #pragma region Assets
 
-	private:
-		ID create_texture(std::string const& path, rendering::TextureBuilder const& builder);
+	public:
+		ID create_texture(rendering::TextureBuilder const& builder);
 
-		ID create_shader(std::string const& vertexPath, std::string const& fragmentPath, rendering::ShaderBuilder const& builder);
+		ID create_shader(rendering::ShaderBuilder const& builder);
 
-		ID create_material(void const* const materialData, rendering::MaterialBuilder const& builder);
+		ID create_shader_pass(rendering::ShaderPassBuilder const& builder);
+
+		ID create_material_template(rendering::MaterialTemplateBuilder const& builder);
+
+		ID create_material(rendering::MaterialBuilder const& builder);
 
 	public:
 		Texture& get_texture(ID const id);
@@ -340,9 +365,62 @@ namespace minty
 
 		Shader const& get_shader(ID const id) const;
 
+		Shader& get_shader_from_material_id(ID const id);
+
+		Shader const& get_shader_from_material_id(ID const id) const;
+
+		ShaderPass& get_shader_pass(ID const id);
+
+		ShaderPass const& get_shader_pass(ID const id) const;
+
+		ShaderPass& get_shader_pass_from_material_id(ID const id);
+
+		ShaderPass const& get_shader_pass_from_material_id(ID const id) const;
+
+		MaterialTemplate& get_material_template(ID const id);
+
+		MaterialTemplate const& get_material_template(ID const id) const;
+
+		MaterialTemplate& get_material_template_from_material_id(ID const id);
+
+		MaterialTemplate const& get_material_template_from_material_id(ID const id) const;
+
 		Material& get_material(ID const id);
 
 		Material const& get_material(ID const id) const;
+
+#pragma endregion
+
+#pragma region Buffers
+
+		public:
+			/// <summary>
+			/// Creates a buffer.
+			/// </summary>
+			/// <param name="size">The size of the buffer.</param>
+			/// <param name="usage">How the buffer will be used.</param>
+			/// <param name="properties">The memory properties.</param>
+			ID create_buffer(VkDeviceSize const size, VkBufferUsageFlags const usage, VkMemoryPropertyFlags const properties);
+
+			ID create_buffer_uniform(VkDeviceSize const size);
+
+			void destroy_buffer(ID const id);
+
+			void* map_buffer(ID const id) const;
+
+			void unmap_buffer(ID const id) const;
+
+			void set_buffer(ID const id, void* const data);
+
+			void set_buffer(ID const id, void* const data, VkDeviceSize const size, VkDeviceSize const offset = 0);
+
+			VkBuffer get_buffer(ID const id) const;
+
+			void get_buffer_data(ID const id, void* const out) const;
+
+			VkDeviceSize get_buffer_size(ID const id) const;
+
+			void copy_buffer(ID const srcId, ID const dstId, VkDeviceSize const size);
 
 #pragma endregion
 
@@ -359,24 +437,7 @@ namespace minty
 
 #pragma region Helper
 
-	public:
-		/// <summary>
-		/// Creates a buffer.
-		/// </summary>
-		/// <param name="size">The size of the buffer.</param>
-		/// <param name="usage">How the buffer will be used.</param>
-		/// <param name="properties">The memory properties.</param>
-		/// <param name="buffer">The buffer to create.</param>
-		/// <param name="bufferMemory">The memory to be associated with the buffer.</param>
-		void create_buffer(VkDeviceSize size, VkBufferUsageFlags usage, VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& bufferMemory);
-
-		/// <summary>
-		/// Copies the buffer from source to destination.
-		/// </summary>
-		/// <param name="srcBuffer">The buffer to copy from.</param>
-		/// <param name="dstBuffer">The buffer to copy to.</param>
-		/// <param name="size">The size of the buffer to copy.</param>
-		void copy_buffer(VkBuffer srcBuffer, VkBuffer dstBuffer, VkDeviceSize size);
+	public:	
 
 		/// <summary>
 		/// Creates an image.
@@ -417,6 +478,12 @@ namespace minty
 		/// <param name="aspectFlags">The aspect flags of the image.</param>
 		/// <returns>The created image view.</returns>
 		VkImageView create_image_view(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
+
+		std::vector<char> load_file(std::string const& path) const;
+
+		VkShaderModule load_shader_module(std::string const& path) const;
+
+		VkShaderModule create_shader_module(std::vector<char> const& code) const;
 
 #pragma endregion
 

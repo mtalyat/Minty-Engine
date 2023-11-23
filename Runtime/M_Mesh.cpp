@@ -11,12 +11,10 @@ minty::Mesh::Mesh(Renderer& renderer)
 	: rendering::RendererObject::RendererObject(renderer)
 	, _vertexCount()
 	, _vertexSize()
-	, _vertexBuffer()
-	, _vertexMemory()
+	, _vertexBufferId(ERROR_ID)
 	, _indexCount()
 	, _indexSize()
-	, _indexBuffer()
-	, _indexMemory()
+	, _indexBufferId(ERROR_ID)
 	, _indexType()
 {}
 
@@ -31,9 +29,9 @@ uint32_t minty::Mesh::get_vertex_count() const
 	return _vertexCount;
 }
 
-VkBuffer minty::Mesh::get_vertex_buffer() const
+ID minty::Mesh::get_vertex_buffer_id() const
 {
-	return _vertexBuffer;
+	return _vertexBufferId;
 }
 
 uint32_t minty::Mesh::get_index_count() const
@@ -41,9 +39,9 @@ uint32_t minty::Mesh::get_index_count() const
 	return _indexCount;
 }
 
-VkBuffer minty::Mesh::get_index_buffer() const
+ID minty::Mesh::get_index_buffer_id() const
 {
-	return _indexBuffer;
+	return _indexBufferId;
 }
 
 VkIndexType minty::Mesh::get_index_type() const
@@ -63,26 +61,31 @@ void minty::Mesh::set_vertices(void const* const vertices, size_t const count, s
 	VkDeviceSize bufferSize = static_cast<VkDeviceSize>(count * vertexSize);
 
 	// use buffer to copy data into device memory
-	VkBuffer stagingBuffer;
-	VkDeviceMemory stagingBufferMemory;
-	_renderer.create_buffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+	ID stagingBufferId = _renderer.create_buffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
 	auto device = _renderer.get_device();
 
+	// map data so it can be set
+	void* mappedData = _renderer.map_buffer(stagingBufferId);
+
 	// copy into staging buffer
-	void* data;
-	vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
-	memcpy(data, vertices, static_cast<size_t>(bufferSize));
-	vkUnmapMemory(device, stagingBufferMemory);
+	memcpy(mappedData, vertices, static_cast<size_t>(bufferSize));
+
+	// unmap
+	_renderer.unmap_buffer(stagingBufferId);
+
+	//void* data;
+	//vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
+	//memcpy(data, vertices, static_cast<size_t>(bufferSize));
+	//vkUnmapMemory(device, stagingBufferMemory);
 
 	// copy into device memory
-	_renderer.create_buffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, _vertexBuffer, _vertexMemory);
+	_vertexBufferId = _renderer.create_buffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-	_renderer.copy_buffer(stagingBuffer, _vertexBuffer, bufferSize);
+	_renderer.copy_buffer(stagingBufferId, _vertexBufferId, bufferSize);
 
 	// clean up
-	vkDestroyBuffer(device, stagingBuffer, nullptr);
-	vkFreeMemory(device, stagingBufferMemory, nullptr);
+	_renderer.destroy_buffer(stagingBufferId);
 }
 
 void minty::Mesh::set_indices(void const* const indices, size_t const count, size_t const indexSize, VkIndexType const type)
@@ -98,26 +101,30 @@ void minty::Mesh::set_indices(void const* const indices, size_t const count, siz
 	VkDeviceSize bufferSize = static_cast<VkDeviceSize>(count * indexSize);
 
 	// use buffer to copy data into device memory
-	VkBuffer stagingBuffer;
-	VkDeviceMemory stagingBufferMemory;
-	_renderer.create_buffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+	//VkBuffer stagingBuffer;
+	//VkDeviceMemory stagingBufferMemory;
+	//_renderer.create_buffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
+	ID stagingBufferId = _renderer.create_buffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
 	auto device = _renderer.get_device();
 
 	// copy into staging buffer
-	void* data;
-	vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
-	memcpy(data, indices, (size_t)bufferSize);
-	vkUnmapMemory(device, stagingBufferMemory);
+	void* mappedData = _renderer.map_buffer(stagingBufferId);
+	memcpy(mappedData, indices, static_cast<size_t>(bufferSize));
+	_renderer.unmap_buffer(stagingBufferId);
+	//void* data;
+	//vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
+	//memcpy(data, indices, (size_t)bufferSize);
+	//vkUnmapMemory(device, stagingBufferMemory);
 
 	// copy into device memory
-	_renderer.create_buffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, _indexBuffer, _indexMemory);
+	//_renderer.create_buffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, _indexBuffer, _indexMemory);
+	_indexBufferId = _renderer.create_buffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
-	_renderer.copy_buffer(stagingBuffer, _indexBuffer, bufferSize);
+	_renderer.copy_buffer(stagingBufferId, _indexBufferId, bufferSize);
 
 	// clean up
-	vkDestroyBuffer(device, stagingBuffer, nullptr);
-	vkFreeMemory(device, stagingBufferMemory, nullptr);
+	_renderer.destroy_buffer(stagingBufferId);
 }
 
 void minty::Mesh::dispose_vertices()
@@ -129,8 +136,7 @@ void minty::Mesh::dispose_vertices()
 
 	auto device = _renderer.get_device();
 
-	vkDestroyBuffer(device, _vertexBuffer, nullptr);
-	vkFreeMemory(device, _vertexMemory, nullptr);
+	_renderer.destroy_buffer(_vertexBufferId);
 	_vertexCount = 0;
 	_vertexSize = 0;
 }
@@ -144,8 +150,7 @@ void minty::Mesh::dispose_indices()
 
 	auto device = _renderer.get_device();
 
-	vkDestroyBuffer(device, _indexBuffer, nullptr);
-	vkFreeMemory(device, _indexMemory, nullptr);
+	_renderer.destroy_buffer(_indexBufferId);
 	_indexCount = 0;
 	_indexSize = 0;
 }

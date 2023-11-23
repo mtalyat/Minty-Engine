@@ -4,21 +4,22 @@
 using namespace minty;
 using namespace minty::rendering;
 
-minty::rendering::MaterialBuilder::MaterialBuilder(ID const shaderId)
-    : _shaderId(shaderId)
+minty::rendering::MaterialBuilder::MaterialBuilder(ID const templateId)
+	: _templateId(templateId)
+	, _values()
 {}
 
-void minty::rendering::MaterialBuilder::set_shader_id(ID const id)
+ID minty::rendering::MaterialBuilder::get_template_id() const
 {
-    _shaderId = id;
+	return _templateId;
 }
 
-ID minty::rendering::MaterialBuilder::get_shader_id() const
+std::unordered_map<std::string, Dynamic> const& minty::rendering::MaterialBuilder::get_values() const
 {
-    return _shaderId;
+	return _values;
 }
 
-std::string minty::rendering::MaterialBuilder::to_string(MaterialBuilder const& value)
+void minty::rendering::MaterialBuilder::emplace_value(std::string const& name, Dynamic const& value)
 {
-    return std::format("MaterialBuilder(sahderId = {})", value._shaderId);
+	_values[name] = value;
 }

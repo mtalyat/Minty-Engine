@@ -3,8 +3,13 @@
 
 #include "M_Constants.h"
 #include "M_Register.h"
+#include "M_Rendering_PushConstantInfo.h"
+#include "M_Rendering_UniformConstantInfo.h"
+#include "M_Rendering_DescriptorSet.h"
 
 #include <vulkan/vulkan.h>
+#include <vector>
+#include <unordered_map>
 
 namespace minty
 {
@@ -20,87 +25,47 @@ namespace minty
 		public rendering::RendererObject
 	{
 	private:
-		struct PushConstantInfo
-		{
-			VkShaderStageFlags flags;
-		};
+		VkPipelineLayout _pipelineLayout;
+		std::array<VkDescriptorSetLayout, DESCRIPTOR_SET_COUNT> _descriptorSetLayouts;
+		std::unordered_map<uint32_t, std::vector<std::pair<VkDescriptorPool, uint32_t>>> _descriptorPools;
 
-		struct UniformConstantInfo
-		{
-			
-		};
-
-		VkPipelineLayout _layout;
-		VkPipeline _pipeline;
-
-		uint32_t _uniformCount;
-
-		std::vector<VkBuffer> _buffers;
-		std::vector<VkDeviceMemory> _memories;
-		std::vector<void*> _mapped;
-
-		std::vector<VkDescriptorSetLayout> _descriptorSetLayouts;
-		VkDescriptorPool _descriptorPool;
-		std::vector<VkDescriptorSet> _descriptorSets;
-
-		minty::Register<PushConstantInfo> _pushConstants;
-		minty::Register<UniformConstantInfo> _uniformConstants;
-
-		size_t _materialSize;
+		Register<rendering::PushConstantInfo> _pushConstantInfos;
+		Register<rendering::UniformConstantInfo> _uniformConstantInfos;
+		rendering::DescriptorSet _descriptorSet;
 	public:
 		/// <summary>
 		/// Creates a new Shader with the given layout and pipeline.
 		/// </summary>
 		/// <param name="layout"></param>
 		/// <param name="pipeline"></param>
-		Shader(std::string const& vertexPath, std::string const& fragmentPath, rendering::ShaderBuilder const& builder, Renderer& renderer);
+		Shader(rendering::ShaderBuilder const& builder, Renderer& renderer);
 
 		void destroy();
 
-		size_t get_material_size() const;
+		VkPipelineLayout get_pipeline_layout() const;
 
-		void bind(VkCommandBuffer const commandBuffer) const;
+		rendering::DescriptorSet const& get_global_descriptor_set() const;
 
-		void update_push_constant(VkCommandBuffer const commandBuffer, void* const value, uint32_t const size, uint32_t offset = 0) const;
+		void update_push_constant(VkCommandBuffer const commandBuffer, void* const value, uint32_t const size, uint32_t const offset = 0) const;
 
-		void update_push_constant(std::string const& name, VkCommandBuffer const commandBuffer, void* const value, uint32_t const size, uint32_t offset = 0) const;
+		void update_push_constant(std::string const& name, VkCommandBuffer const commandBuffer, void* const value, uint32_t const size, uint32_t const offset = 0) const;
 
-		/// <summary>
-		/// Updates the uniform constant with the given name, for all frames.
-		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="value"></param>
-		/// <param name="elementSize"></param>
-		/// <param name="count"></param>
-		/// <param name="index"></param>
-		void update_uniform_constant(std::string const& name, void const* const value, size_t const size, size_t const offset = 0) const;
-
-		/// <summary>
-		/// Updates the uniform constant with the given name, only for the active frame.
-		/// </summary>
-		/// <param name="name"></param>
-		/// <param name="value"></param>
-		/// <param name="elementSize"></param>
-		/// <param name="count"></param>
-		/// <param name="index"></param>
-		void update_uniform_constant_frame(std::string const& name, void const* const value, size_t const size, size_t const offset = 0) const;
+		void update_global_uniform_constant(std::string const& name, void* const value, uint32_t const size, uint32_t const offset = 0) const;
 	private:
-
-		size_t get_buffer_index(size_t const buffer, size_t const frame) const;
-
-		size_t get_buffer_count() const;
-
-		VkShaderModule load_module(std::string const& path);
-
 		void create_descriptor_set_layouts(rendering::ShaderBuilder const& builder);
 
-		void create_shader(std::string const& vertexPath, std::string const& fragmentPath, rendering::ShaderBuilder const& builder);
+		void create_pipeline_layout(rendering::ShaderBuilder const& builder);
 
-		void create_buffers(rendering::ShaderBuilder const& builder);
+		VkDescriptorPool create_pool(uint32_t const set);
 
-		void create_descriptor_pool(rendering::ShaderBuilder const& builder);
+		VkDescriptorPool get_pool(uint32_t const set, uint32_t const amount = MAX_FRAMES_IN_FLIGHT);
 
-		void create_descriptor_sets(rendering::ShaderBuilder const& builder);
+		std::array<VkDescriptorSet, MAX_FRAMES_IN_FLIGHT> create_descriptor_sets(uint32_t const set);
+
+	public:
+		rendering::DescriptorSet create_descriptor_set(uint32_t const set);
+
+		std::vector<rendering::UniformConstantInfo> get_uniform_constant_infos(uint32_t const set);
 
 	public:
 		friend std::string to_string(Shader const& shader);
