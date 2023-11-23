@@ -51,8 +51,8 @@ void init(Runtime &runtime)
             // create textures
             std::vector<TextureBuilder> textureBuilders =
                 {
-                    TextureBuilder("Assets/Textures/funny.jpg"),
                     TextureBuilder("Assets/Textures/funny2.png"),
+                    TextureBuilder("Assets/Textures/funny.jpg"),
                     TextureBuilder("Assets/Textures/texture.jpg"),
                     TextureBuilder("Assets/Textures/brian.png"),
                     TextureBuilder("Assets/Textures/crosshair.png"),
@@ -81,10 +81,9 @@ void init(Runtime &runtime)
                 sizeof(VkSampler),
                 DESCRIPTOR_SET_MATERIAL,
                 1,
-                // 4,
-                // {0, 1, 2, 3}
-                1,
-                {0}));
+                4,
+                {0, 1, 2, 3}
+                ));
             ID shaderId = rb.emplace_shader(sb);
 
             // create shader pass
@@ -123,20 +122,17 @@ void init(Runtime &runtime)
             mtb.emplace_default_value("material", Dynamic(&mbo, sizeof(MaterialBufferObject)));
             ID materialTemplateId = rb.emplace_material_template(mtb);
 
-            // MaterialTemplateBuilder mtb2({shaderPassId2});
-            // MaterialBufferObject mbo{
-            //     .color = Vector4(1.0f, 1.0f, 1.0f, 1.0f)};
-            // mtb2.emplace_default_value("material", Dynamic(&mbo, sizeof(MaterialBufferObject)));
-            // ID materialTemplateId2 = rb.emplace_material_template(mtb2);
-
             // create materials
             MaterialBuilder mb(materialTemplateId); // world
             rb.emplace_material(mb);
-            // MaterialBuilder mb2(materialTemplateId); // world 2
-            // mbo.textureId = 1;
-            // mbo.color = Vector4(1.0f, 0.0f, 1.0f, 1.0f);
-            // mb2.emplace_value("material", Dynamic(&mbo, sizeof(MaterialBufferObject)));
-            // rb.emplace_material(mb2);
+            MaterialBuilder mb2(materialTemplateId); // world 2
+            mbo.textureId = 1;
+            mb2.emplace_value("material", Dynamic(&mbo, sizeof(MaterialBufferObject)));
+            rb.emplace_material(mb2);
+            MaterialBuilder mb3(materialTemplateId); // world 3
+            mbo.textureId = 2;
+            mb3.emplace_value("material", Dynamic(&mbo, sizeof(MaterialBufferObject)));
+            rb.emplace_material(mb3);
             // MaterialBuilder mb2(materialTemplateId2); // ui
 
             // init renderer with builders
@@ -171,8 +167,6 @@ void init(Runtime &runtime)
 
             MeshComponent &meshComponent = er->get<MeshComponent>(e);
             meshComponent.mesh = mesh;
-            meshComponent.materialId = static_cast<ID>(0);
-            // meshComponent.materialId = static_cast<ID>(i % 4);
         }
 
         // debug print scene:

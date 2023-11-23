@@ -7,11 +7,13 @@ using namespace minty;
 
 void minty::MeshComponent::serialize(Writer& writer) const
 {
+	writer.write("materialId", materialId, ERROR_ID);
 	console::todo("MeshComponent::serialize");
 }
 
 void minty::MeshComponent::deserialize(Reader const& reader)
 {
+	materialId = reader.read_id("materialId");
 	console::todo("MeshComponent::deserialize");
 }
 

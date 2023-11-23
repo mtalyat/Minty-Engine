@@ -159,13 +159,10 @@ VkDescriptorPool minty::Shader::create_pool(uint32_t const set)
 		}
 
 		// add pool size, account for all the frames in the flight
-		for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
-		{
-			poolSizes.push_back(VkDescriptorPoolSize{
+		poolSizes.push_back(VkDescriptorPoolSize{
 					.type = info.second.get_type(),
-					.descriptorCount = info.second.get_count()
-				});
-		}
+					.descriptorCount = info.second.get_count() * maxSets
+			});
 	}
 
 	VkDescriptorPool descriptorPool;

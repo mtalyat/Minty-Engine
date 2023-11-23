@@ -14,6 +14,7 @@ Entities
     Cube 0
         Renderable
         Mesh
+            materialId: 0
         Transform
             position
                 x: -2
@@ -23,6 +24,7 @@ Entities
     Cube 1
         Renderable
         Mesh
+            materialId: 1
         Transform
             position
                 x: 0
@@ -32,6 +34,7 @@ Entities
     Cube 2
         Renderable
         Mesh
+            materialId: 2
         Transform
             position
                 x: 2
