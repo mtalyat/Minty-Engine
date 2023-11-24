@@ -16,7 +16,6 @@ using namespace minty::rendering;
 using namespace game;
 
 InputMap input;
-Mesh *mesh;
 
 // called when the engine is initialized
 void init(Runtime &runtime)
@@ -153,22 +152,6 @@ void init(Runtime &runtime)
         // load the scene we created, with the camera
         sceneManager->load_scene(sceneId, cameraEntity);
 
-        // cubes all use same mesh, but different materials
-        mesh = new Mesh(*renderer);
-        basic::create_basic_cube(*mesh);
-        for (int i = 0; i < ENTITY_COUNT; i++)
-        {
-            Entity e = er->find_by_name(std::format("Cube {}", i));
-
-            if (e == NULL_ENTITY)
-            {
-                break;
-            }
-
-            MeshComponent &meshComponent = er->get<MeshComponent>(e);
-            meshComponent.mesh = mesh;
-        }
-
         // debug print scene:
         Node node;
         Writer writer(node, &scene);
@@ -256,8 +239,6 @@ void init(Runtime &runtime)
 void destroy(Runtime &runtime)
 {
     console::log("Game over.");
-
-    delete mesh;
 
     // wait for input to close
     // console::wait();

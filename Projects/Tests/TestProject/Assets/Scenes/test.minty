@@ -11,30 +11,33 @@ Entities
             perspective: 1
             far: 1000
         Move
-    Cube 0
+    _
         Renderable
         Mesh
             materialId: 0
+            meshType: Cube
         Transform
             position
                 x: -2
         Test
             rotationSpeed
                 x: 1
-    Cube 1
+    _
         Renderable
         Mesh
             materialId: 1
+            meshType: Quad
         Transform
             position
                 x: 0
         Test
             rotationSpeed
                 y: 1
-    Cube 2
+    _
         Renderable
         Mesh
             materialId: 2
+            meshType: Cube
         Transform
             position
                 x: 2

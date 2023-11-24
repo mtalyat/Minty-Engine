@@ -291,6 +291,9 @@
     <ClInclude Include="M_Builtin_GlobalData.h">
       <Filter>Header Files\Builtin</Filter>
     </ClInclude>
+    <ClInclude Include="M_SerializationData.h">
+      <Filter>Header Files\Serialization</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

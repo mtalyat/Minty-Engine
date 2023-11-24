@@ -32,6 +32,8 @@ namespace minty
 
 		Scene& operator=(Scene&& other) noexcept;
 
+		Engine* get_engine() const;
+
 		/// <summary>
 		/// Gets the EntityRegistry used in the Scene.
 		/// </summary>

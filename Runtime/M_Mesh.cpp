@@ -1,10 +1,12 @@
 #include "pch.h"
 #include "M_Mesh.h"
 
+#include "M_Basic_Vertex.h"
 #include "M_Renderer.h"
 #include "glm.hpp"
 
 using namespace minty;
+using namespace minty::basic;
 using namespace minty::rendering;
 
 minty::Mesh::Mesh(Renderer& renderer)
@@ -22,6 +24,12 @@ minty::Mesh::~Mesh()
 {
 	dispose_vertices();
 	dispose_indices();
+}
+
+void minty::Mesh::clear()
+{
+	set_vertices(nullptr, 0, 0);
+	set_indices(nullptr, 0, 0);
 }
 
 uint32_t minty::Mesh::get_vertex_count() const
@@ -47,6 +55,127 @@ ID minty::Mesh::get_index_buffer_id() const
 VkIndexType minty::Mesh::get_index_type() const
 {
 	return _indexType;
+}
+
+bool minty::Mesh::empty() const
+{
+	return _vertexCount == 0;
+}
+
+void minty::Mesh::create_primitive_quad(Mesh& mesh)
+{
+	// create mesh data
+	const float SIZE = 0.5f;
+
+	Vector3 leftTopBack = { -SIZE, 0.0f, -SIZE };
+	Vector3 leftTopFront = { -SIZE, 0.0f, SIZE };
+	Vector3 rightTopBack = { SIZE, 0.0f, -SIZE };
+	Vector3 rightTopFront = { SIZE, 0.0f, SIZE };
+
+	Vector3 up = { 0.0f, -1.0f, 0.0f };
+
+	Vector2 topLeft = { 0.0f, 0.0f };
+	Vector2 topRight = { 1.0f, 0.0f };
+	Vector2 bottomLeft = { 0.0f, 1.0f };
+	Vector2 bottomRight = { 1.0f, 1.0f };
+
+	std::vector<Vertex3D> vertices =
+	{
+		// up?
+		{ leftTopBack, up, bottomLeft},
+		{ leftTopFront, up, topLeft },
+		{ rightTopFront, up, topRight },
+		{ rightTopBack, up, bottomRight },
+	};
+
+	std::vector<uint16_t> indices =
+	{
+		0, 1, 2, 0, 2, 3
+	};
+
+	// set mesh data
+	mesh.set_vertices(vertices);
+	mesh.set_indices(indices);
+}
+
+void minty::Mesh::create_primitive_cube(Mesh& mesh)
+{
+	// create mesh data
+	const float SIZE = 0.5f;
+
+	Vector3 leftBottomBack = { -SIZE, -SIZE, -SIZE };
+	Vector3 leftBottomFront = { -SIZE, -SIZE, SIZE };
+	Vector3 leftTopBack = { -SIZE, SIZE, -SIZE };
+	Vector3 leftTopFront = { -SIZE, SIZE, SIZE };
+	Vector3 rightBottomBack = { SIZE, -SIZE, -SIZE };
+	Vector3 rightBottomFront = { SIZE, -SIZE, SIZE };
+	Vector3 rightTopBack = { SIZE, SIZE, -SIZE };
+	Vector3 rightTopFront = { SIZE, SIZE, SIZE };
+
+	Vector3 up = { 0.0f, -1.0f, 0.0f };
+	Vector3 down = { 0.0f, 1.0f, 0.0f };
+	Vector3 left = { -1.0f, 0.0f, 0.0f };
+	Vector3 right = { 1.0f, 0.0f, 0.0f };
+	Vector3 forward = { 0.0f, 0.0f, 1.0f };
+	Vector3 backward = { 0.0f, 0.0f, -1.0f };
+
+	Vector2 bottomLeft = { 0.0f, 0.0f };
+	Vector2 bottomRight = { 1.0f, 0.0f };
+	Vector2 topLeft = { 0.0f, 1.0f };
+	Vector2 topRight = { 1.0f, 1.0f };
+
+	std::vector<Vertex3D> vertices =
+	{
+		// up
+		{ leftTopBack, up, bottomLeft },
+		{ leftTopFront, up, topLeft },
+		{ rightTopFront, up, topRight },
+		{ rightTopBack, up, bottomRight },
+
+		// down
+		{ rightBottomBack, down, bottomLeft },
+		{ rightBottomFront, down, topLeft },
+		{ leftBottomFront, down, topRight },
+		{ leftBottomBack, down, bottomRight },
+
+		// right
+		{ rightBottomBack, right, bottomLeft },
+		{ rightTopBack, right, topLeft },
+		{ rightTopFront, right, topRight },
+		{ rightBottomFront, right, bottomRight },
+
+		// left
+		{ leftBottomFront, left, bottomLeft },
+		{ leftTopFront, left, topLeft },
+		{ leftTopBack, left, topRight },
+		{ leftBottomBack, left, bottomRight },
+
+		// front
+		{ rightBottomFront, forward, bottomLeft },
+		{ rightTopFront, forward, topLeft },
+		{ leftTopFront, forward, topRight },
+		{ leftBottomFront, forward, bottomRight },
+
+		// back
+		{ leftBottomBack, backward, bottomLeft },
+		{ leftTopBack, backward, topLeft },
+		{ rightTopBack, backward, topRight },
+		{ rightBottomBack, backward, bottomRight },
+	};
+
+	std::vector<uint16_t> indices =
+	{
+		0, 1, 2, 0, 2, 3,
+		4, 5, 6, 4, 6, 7,
+		8, 9, 10, 8, 10, 11,
+		12, 13, 14, 12, 14, 15,
+		16, 17, 18, 16, 18, 19,
+		20, 21, 22, 20, 22, 23,
+	};
+
+	// set mesh data
+	mesh.set_vertices(vertices);
+	mesh.set_indices(indices);
 }
 
 void minty::Mesh::set_vertices(void const* const vertices, size_t const count, size_t const vertexSize)
@@ -153,6 +282,43 @@ void minty::Mesh::dispose_indices()
 	_renderer.destroy_buffer(_indexBufferId);
 	_indexCount = 0;
 	_indexSize = 0;
+}
+
+std::string minty::to_string(MeshType const value)
+{
+	switch (value)
+	{
+	case MeshType::Empty:
+		return "Empty";
+	case MeshType::Custom:
+		return "Custom";
+	case MeshType::Quad:
+		return "Quad";
+	case MeshType::Cube:
+		return "Cube";
+	default:
+		return error::ERROR_TEXT;
+	}
+}
+
+MeshType minty::from_string_mesh_type(std::string const& value)
+{
+	if (value == "Custom")
+	{
+		return MeshType::Custom;
+	}
+	else if (value == "Quad")
+	{
+		return MeshType::Quad;
+	}
+	else if (value == "Cube")
+	{
+		return MeshType::Cube;
+	}
+	else
+	{
+		return MeshType::Empty;
+	}
 }
 
 std::string minty::to_string(Mesh const& mesh)

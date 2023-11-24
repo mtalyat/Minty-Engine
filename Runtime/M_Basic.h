@@ -25,8 +25,4 @@ namespace minty::basic
 	void create_basic_shader_builder_ui(minty::rendering::RendererBuilder const& rendererBuilder, minty::rendering::ShaderBuilder& shaderBuilder);
 
 	void create_basic_shader_pass_builder_ui(minty::rendering::RendererBuilder const& rendererBuilder, minty::rendering::ShaderPassBuilder& shaderPassBuilder);
-
-	void create_basic_cube(minty::Mesh& mesh);
-
-	void create_basic_quad(minty::Mesh& mesh);
 }

@@ -78,8 +78,12 @@ Renderer::Renderer(Window* const window)
 	: _builder(nullptr)
 	, _window(window)
 	, _textures()
+	, _materials()
 	, _materialTemplates()
+	, _shaderPasses()
 	, _shaders()
+	, _buffers()
+	, _meshes()
 	, _boundIds()
 	, _view()
 	, _backgroundColor({ 250, 220, 192, 255 }) // light tan color
@@ -509,6 +513,16 @@ Material& minty::Renderer::get_material(ID const id)
 Material const& minty::Renderer::get_material(ID const id) const
 {
 	return _materials.at(id);
+}
+
+Mesh& minty::Renderer::get_mesh(ID const id)
+{
+	return _meshes.at(id);
+}
+
+Mesh const& minty::Renderer::get_mesh(ID const id) const
+{
+	return _meshes.at(id);
 }
 
 VkImageView Renderer::create_image_view(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags) {
@@ -1254,6 +1268,51 @@ ID minty::Renderer::create_material(rendering::MaterialBuilder const& builder)
 	return _materials.emplace(Material(builder, *this));
 }
 
+ID minty::Renderer::create_mesh()
+{
+	// just create a brand new mesh
+	return _meshes.emplace(Mesh(*this));
+}
+
+ID minty::Renderer::get_or_create_mesh(std::string const& name)
+{
+	// if contains name, return it
+	if (_meshes.contains(name))
+	{
+		return _meshes.get_id(name);
+	}
+
+	// create new
+	return _meshes.emplace(name, Mesh(*this));
+}
+
+ID minty::Renderer::get_or_create_mesh(MeshType const type)
+{
+	std::string name = to_string(type);
+
+	// if contains type, return that
+	if (_meshes.contains(name))
+	{
+		return _meshes.get_id(name);
+	}
+
+	// create new
+	ID id = _meshes.emplace(name, Mesh(*this));
+	Mesh& mesh = _meshes.at(id);
+
+	switch (type)
+	{
+	case MeshType::Quad:
+		Mesh::create_primitive_quad(mesh);
+		break;
+	case MeshType::Cube:
+		Mesh::create_primitive_cube(mesh);
+		break;
+	}
+
+	return id;
+}
+
 void Renderer::setup_debug_messenger() {
 	if (!enableValidationLayers) return;
 
@@ -1518,6 +1577,11 @@ ID minty::Renderer::create_buffer_uniform(VkDeviceSize const size)
 
 void minty::Renderer::destroy_buffer(ID const id)
 {
+	if (!_buffers.contains(id))
+	{
+		return;
+	}
+
 	// destroy the buffer with the id
 	destroy_buffer(_buffers.at(id));
 
@@ -1671,8 +1735,16 @@ void Renderer::create_command_buffers()
 
 void minty::Renderer::draw_mesh(VkCommandBuffer commandBuffer, Matrix4 const& transformationMatrix, MeshComponent const& meshComponent)
 {
-	// do nothing if null mesh, or mesh empty
-	if (!meshComponent.mesh || !meshComponent.mesh->get_vertex_count())
+	// do nothing if null mesh
+	if (meshComponent.meshId == ERROR_ID)
+	{
+		return;
+	}
+
+	Mesh& mesh = get_mesh(meshComponent.meshId);
+
+	// do nothing if empty mesh
+	if (mesh.empty())
 	{
 		return;
 	}
@@ -1682,10 +1754,10 @@ void minty::Renderer::draw_mesh(VkCommandBuffer commandBuffer, Matrix4 const& tr
 	bind(commandBuffer, meshComponent.materialId);
 
 	// bind vertex data
-	VkBuffer vertexBuffers[] = { get_buffer(meshComponent.mesh->get_vertex_buffer_id()) };
+	VkBuffer vertexBuffers[] = { get_buffer(mesh.get_vertex_buffer_id()) };
 	VkDeviceSize offsets[] = { 0 };
 	vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
-	vkCmdBindIndexBuffer(commandBuffer, get_buffer(meshComponent.mesh->get_index_buffer_id()), 0, meshComponent.mesh->get_index_type());
+	vkCmdBindIndexBuffer(commandBuffer, get_buffer(mesh.get_index_buffer_id()), 0, mesh.get_index_type());
 
 	// send push constants so we know where to draw
 	Matrix4 tmatrix = transformationMatrix;
@@ -1697,7 +1769,7 @@ void minty::Renderer::draw_mesh(VkCommandBuffer commandBuffer, Matrix4 const& tr
 	shader.update_push_constant(commandBuffer, &info, sizeof(DrawCallObject3D));
 
 	// draw
-	vkCmdDrawIndexed(commandBuffer, meshComponent.mesh->get_index_count(), 1, 0, 0, 0);
+	vkCmdDrawIndexed(commandBuffer, mesh.get_index_count(), 1, 0, 0, 0);
 }
 
 void minty::Renderer::set_main_camera(Entity const entity)
@@ -1831,39 +1903,40 @@ void Renderer::destroy()
 
 	// clean up vulkan
 	cleanup_swap_chain();
-	/*
-		Register<Texture> _textures;
-		Register<Sprite> _sprites;
-		Register<MaterialTemplate> _materialTemplates;
-		Register<Material> _materials;
-		Register<Shader> _shaders;
-		Register<ShaderPass> _shaderPasses;
-		Register<rendering::Buffer> _buffers;
-	*/
+
+	// destroy assets
 	for (auto& tex : _textures)
 	{
 		tex.second.destroy();
 	}
+	_textures.clear();
 	for (auto& material : _materials)
 	{
 		material.second.destroy();
 	}
+	_materials.clear();
 	for (auto& materialTemplate : _materialTemplates)
 	{
 		materialTemplate.second.destroy();
 	}
+	_materialTemplates.clear();
 	for (auto& shaderPass : _shaderPasses)
 	{
 		shaderPass.second.destroy();
 	}
+	_shaderPasses.clear();
 	for (auto& shader : _shaders)
 	{
 		shader.second.destroy();
 	}
+	_shaders.clear();
 	for (auto& buffer : _buffers)
 	{
 		destroy_buffer(buffer.second);
 	}
+	_buffers.clear();
+
+	// destroy renderer data
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
 		vkDestroySemaphore(_device, renderFinishedSemaphores[i], nullptr);
 		vkDestroySemaphore(_device, imageAvailableSemaphores[i], nullptr);
@@ -1878,26 +1951,6 @@ void Renderer::destroy()
 	vkDestroySurfaceKHR(instance, surface, nullptr);
 	vkDestroyInstance(instance, nullptr);
 }
-
-//void minty::Renderer::bind_shader(VkCommandBuffer const commandBuffer, Shader* const shader)
-//{
-//	// if empty, set to empty
-//	if (shader == nullptr)
-//	{
-//		_boundShader = nullptr;
-//		return;
-//	}
-//
-//	// set to a new shader
-//	if (shader != _boundShader)
-//	{
-//		// set shader
-//		shader->bind(commandBuffer);
-//
-//		// update reference
-//		_boundShader = shader;
-//	}
-//}
 
 void minty::Renderer::bind(VkCommandBuffer const commandBuffer)
 {
