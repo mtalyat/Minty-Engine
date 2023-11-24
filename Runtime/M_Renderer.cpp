@@ -1308,6 +1308,9 @@ ID minty::Renderer::get_or_create_mesh(MeshType const type)
 	case MeshType::Cube:
 		Mesh::create_primitive_cube(mesh);
 		break;
+	case MeshType::Pyramid:
+		Mesh::create_primitive_pyramid(mesh);
+		break;
 	}
 
 	return id;

@@ -81,7 +81,7 @@ void minty::Mesh::create_primitive_quad(Mesh& mesh)
 
 	std::vector<Vertex3D> vertices =
 	{
-		// up?
+		// up
 		{ leftTopBack, up, bottomLeft},
 		{ leftTopFront, up, topLeft },
 		{ rightTopFront, up, topRight },
@@ -103,14 +103,14 @@ void minty::Mesh::create_primitive_cube(Mesh& mesh)
 	// create mesh data
 	const float SIZE = 0.5f;
 
-	Vector3 leftBottomBack = { -SIZE, -SIZE, -SIZE };
-	Vector3 leftBottomFront = { -SIZE, -SIZE, SIZE };
-	Vector3 leftTopBack = { -SIZE, SIZE, -SIZE };
-	Vector3 leftTopFront = { -SIZE, SIZE, SIZE };
-	Vector3 rightBottomBack = { SIZE, -SIZE, -SIZE };
-	Vector3 rightBottomFront = { SIZE, -SIZE, SIZE };
-	Vector3 rightTopBack = { SIZE, SIZE, -SIZE };
-	Vector3 rightTopFront = { SIZE, SIZE, SIZE };
+	Vector3 leftBottomBack = { -SIZE, SIZE, -SIZE };
+	Vector3 leftBottomFront = { -SIZE, SIZE, SIZE };
+	Vector3 leftTopBack = { -SIZE, -SIZE, -SIZE };
+	Vector3 leftTopFront = { -SIZE, -SIZE, SIZE };
+	Vector3 rightBottomBack = { SIZE, SIZE, -SIZE };
+	Vector3 rightBottomFront = { SIZE, SIZE, SIZE };
+	Vector3 rightTopBack = { SIZE, -SIZE, -SIZE };
+	Vector3 rightTopFront = { SIZE, -SIZE, SIZE };
 
 	Vector3 up = { 0.0f, -1.0f, 0.0f };
 	Vector3 down = { 0.0f, 1.0f, 0.0f };
@@ -119,10 +119,10 @@ void minty::Mesh::create_primitive_cube(Mesh& mesh)
 	Vector3 forward = { 0.0f, 0.0f, 1.0f };
 	Vector3 backward = { 0.0f, 0.0f, -1.0f };
 
-	Vector2 bottomLeft = { 0.0f, 0.0f };
-	Vector2 bottomRight = { 1.0f, 0.0f };
-	Vector2 topLeft = { 0.0f, 1.0f };
-	Vector2 topRight = { 1.0f, 1.0f };
+	Vector2 topLeft = { 0.0f, 0.0f };
+	Vector2 topRight = { 1.0f, 0.0f };
+	Vector2 bottomLeft = { 0.0f, 1.0f };
+	Vector2 bottomRight = { 1.0f, 1.0f };
 
 	std::vector<Vertex3D> vertices =
 	{
@@ -171,6 +171,72 @@ void minty::Mesh::create_primitive_cube(Mesh& mesh)
 		12, 13, 14, 12, 14, 15,
 		16, 17, 18, 16, 18, 19,
 		20, 21, 22, 20, 22, 23,
+	};
+
+	// set mesh data
+	mesh.set_vertices(vertices);
+	mesh.set_indices(indices);
+}
+
+void minty::Mesh::create_primitive_pyramid(Mesh& mesh)
+{
+	// create mesh data
+	const float SIZE = 0.5f;
+
+	Vector3 leftBottomBack = { -SIZE, SIZE, -SIZE };
+	Vector3 leftBottomFront = { -SIZE, SIZE, SIZE };
+	Vector3 rightBottomBack = { SIZE, SIZE, -SIZE };
+	Vector3 rightBottomFront = { SIZE, SIZE, SIZE };
+	Vector3 top = { 0.0f, -SIZE, 0.0f };
+
+	Vector3 down = { 0.0f, 1.0f, 0.0f };
+	Vector3 forward = glm::normalize(Vector3({ 0.0f, 1.0f, 2.0f }));
+	Vector3 backward = glm::normalize(Vector3({ 0.0f, 1.0f, -2.0f }));
+	Vector3 left = glm::normalize(Vector3({ -2.0f, 1.0f, 0.0f }));
+	Vector3 right = glm::normalize(Vector3({ 2.0f, 1.0f, 0.0f }));
+
+	Vector2 topLeft = { 0.0f, 0.0f };
+	Vector2 topRight = { 1.0f, 0.0f };
+	Vector2 topCenter = { 0.5f, 0.0f };
+	Vector2 bottomLeft = { 0.0f, 1.0f };
+	Vector2 bottomRight = { 1.0f, 1.0f };
+
+	std::vector<Vertex3D> vertices =
+	{
+		// up
+		{ rightBottomBack, down, bottomLeft },
+		{ rightBottomFront, down, topLeft },
+		{ leftBottomFront, down, topRight },
+		{ leftBottomBack, down, bottomRight },
+
+		// forward
+		{ rightBottomFront, forward, bottomLeft },
+		{ top, forward, topCenter },
+		{ leftBottomFront, forward, bottomRight },
+
+		// backward
+		{ leftBottomBack, backward, bottomLeft },
+		{ top, backward, topCenter },
+		{ rightBottomBack, backward, bottomRight },
+
+		// left
+		{ leftBottomFront, left, bottomLeft },
+		{ top, left, topCenter },
+		{ leftBottomBack, left, bottomRight },
+
+		// right
+		{ rightBottomBack, right, bottomLeft },
+		{ top, right, topCenter },
+		{ rightBottomFront, right, bottomRight },
+	};
+
+	std::vector<uint16_t> indices =
+	{
+		0, 1, 2, 0, 2, 3,
+		4, 5, 6,
+		7, 8, 9,
+		10, 11, 12,
+		13, 14, 15,
 	};
 
 	// set mesh data
@@ -296,6 +362,8 @@ std::string minty::to_string(MeshType const value)
 		return "Quad";
 	case MeshType::Cube:
 		return "Cube";
+	case MeshType::Pyramid:
+		return "Pyramid";
 	default:
 		return error::ERROR_TEXT;
 	}
@@ -314,6 +382,10 @@ MeshType minty::from_string_mesh_type(std::string const& value)
 	else if (value == "Cube")
 	{
 		return MeshType::Cube;
+	}
+	else if (value == "Pyramid")
+	{
+		return MeshType::Pyramid;
 	}
 	else
 	{

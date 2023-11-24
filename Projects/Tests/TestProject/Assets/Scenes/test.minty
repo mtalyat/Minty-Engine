@@ -11,7 +11,7 @@ Entities
             perspective: 1
             far: 1000
         Move
-    _
+    Test 0
         Renderable
         Mesh
             materialId: 0
@@ -22,7 +22,7 @@ Entities
         Test
             rotationSpeed
                 x: 1
-    _
+    Test 1
         Renderable
         Mesh
             materialId: 1
@@ -33,11 +33,11 @@ Entities
         Test
             rotationSpeed
                 y: 1
-    _
+    Test 2
         Renderable
         Mesh
             materialId: 2
-            meshType: Cube
+            meshType: Pyramid
         Transform
             position
                 x: 2
