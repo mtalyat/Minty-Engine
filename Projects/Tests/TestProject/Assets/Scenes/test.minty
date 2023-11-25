@@ -44,3 +44,16 @@ Entities
         Test
             rotationSpeed
                 z: 1
+    Test 3
+        Renderable
+        Mesh
+            materialId: 0
+            meshType: Sphere
+        Transform
+            position
+                x: 4
+        Test
+            rotationSpeed
+                x: 1
+                y: 0.5
+                z: -0.25

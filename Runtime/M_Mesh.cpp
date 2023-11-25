@@ -244,6 +244,78 @@ void minty::Mesh::create_primitive_pyramid(Mesh& mesh)
 	mesh.set_indices(indices);
 }
 
+void minty::Mesh::create_primitive_sphere(Mesh& mesh)
+{
+	float const RADIUS = 0.5f;
+	int const SECTORS = 100;
+	int const STACKS = 100;
+
+	{
+		float const PI = glm::pi<float>();
+
+		float const SECTOR_STEP = 2.0f * PI / SECTORS;
+		float const STACK_STEP = PI / STACKS;
+
+		std::vector<Vertex3D> vertices;
+
+		float stackAngle, sectorAngle;
+
+		for (int i = 0; i <= STACKS; i++)
+		{
+			stackAngle = PI / 2.0f - i * STACK_STEP;
+
+			float xy = RADIUS * math::cos(stackAngle);
+			float z = RADIUS * math::sin(stackAngle);
+
+			for (int j = 0; j <= SECTORS; j++)
+			{
+				sectorAngle = j * SECTOR_STEP;
+
+				float x = xy * math::cos(sectorAngle);
+
+				float y = xy * math::sin(sectorAngle);
+
+				float texCoordX = (x / (RADIUS * 2.0f)) + 0.5f;
+				float texCoordY = (y / (RADIUS * 2.0f)) + 0.5f;
+
+				Vector3 pos(x, y, z);
+				Vector3 normal = glm::normalize(pos);
+				Vector2 texCoord(texCoordX, texCoordY);
+
+				vertices.push_back(
+					{
+						pos, normal, texCoord
+					}
+				);
+			}
+		}
+
+		mesh.set_vertices(vertices);
+	}
+
+	{
+		std::vector<uint16_t> indices;
+
+		for (int i = 0; i < STACKS; i++)
+		{
+			for (int j = 0; j < SECTORS; j++)
+			{
+				int first = (i * (SECTORS + 1)) + j;
+				int second = first + SECTORS + 1;
+
+				indices.push_back(static_cast<uint16_t>(first + 1));
+				indices.push_back(static_cast<uint16_t>(second));
+				indices.push_back(static_cast<uint16_t>(first));
+				indices.push_back(static_cast<uint16_t>(first + 1));
+				indices.push_back(static_cast<uint16_t>(second + 1));
+				indices.push_back(static_cast<uint16_t>(second));
+			}
+		}
+
+		mesh.set_indices(indices);
+	}
+}
+
 void minty::Mesh::set_vertices(void const* const vertices, size_t const count, size_t const vertexSize)
 {
 	// if data already set, get rid of the old data
@@ -364,6 +436,8 @@ std::string minty::to_string(MeshType const value)
 		return "Cube";
 	case MeshType::Pyramid:
 		return "Pyramid";
+	case MeshType::Sphere:
+		return "Sphere";
 	default:
 		return error::ERROR_TEXT;
 	}
@@ -386,6 +460,10 @@ MeshType minty::from_string_mesh_type(std::string const& value)
 	else if (value == "Pyramid")
 	{
 		return MeshType::Pyramid;
+	}
+	else if (value == "Sphere")
+	{
+		return MeshType::Sphere;
 	}
 	else
 	{
