@@ -1302,6 +1302,10 @@ ID minty::Renderer::get_or_create_mesh(MeshType const type)
 
 	switch (type)
 	{
+	case MeshType::Custom:
+		// do nothing for now
+		console::todo("MeshType::Custom");
+		break;
 	case MeshType::Quad:
 		Mesh::create_primitive_quad(mesh);
 		break;
@@ -1313,6 +1317,13 @@ ID minty::Renderer::get_or_create_mesh(MeshType const type)
 		break;
 	case MeshType::Sphere:
 		Mesh::create_primitive_sphere(mesh);
+		break;
+	case MeshType::Cylinder:
+		Mesh::create_primitive_cylinder(mesh);
+		break;
+	default:
+		// empty mesh
+		mesh.clear();
 		break;
 	}
 

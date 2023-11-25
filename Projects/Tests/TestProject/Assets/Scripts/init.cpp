@@ -90,13 +90,14 @@ void init(Runtime &runtime)
             basic::create_basic_shader_pass_builder_3d(rb, spb);
             spb.emplace_stage(VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT, "Assets/Shaders/vert.spv", *renderer);
             spb.emplace_stage(VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT, "Assets/Shaders/frag.spv", *renderer);
-            
+
             // spb.set_front_face(VkFrontFace::VK_FRONT_FACE_COUNTER_CLOCKWISE);
             // spb.set_cull_mode(VkCullModeFlagBits::VK_CULL_MODE_FRONT_BIT);
 
-            // // Uncomment for outlines only
+            // Uncomment for outlines only
             // spb.set_polygon_mode(VkPolygonMode::VK_POLYGON_MODE_LINE);
             // spb.set_topology(VkPrimitiveTopology::VK_PRIMITIVE_TOPOLOGY_LINE_LIST);
+
             ID shaderPassId = rb.emplace_shader_pass(spb);
 
             // // create ui shader

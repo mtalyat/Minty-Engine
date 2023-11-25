@@ -316,6 +316,122 @@ void minty::Mesh::create_primitive_sphere(Mesh& mesh)
 	}
 }
 
+void minty::Mesh::create_primitive_cylinder(Mesh& mesh)
+{
+	float const RADIUS = 0.5f;
+	float const SIZE = 0.5f;
+	int const SECTORS = 36;
+
+	{
+		float const PI = glm::pi<float>();
+
+		float const STEP = 2.0f * PI / SECTORS;
+
+		Vector3 const UP(0.0f, -1.0f, 0.0f);
+		Vector3 const DOWN(0.0f, 1.0f, 0.0f);
+
+		std::vector<Vertex3D> vertices;
+
+		float angle;
+
+		// get circle points
+		std::vector<Vector2> points(SECTORS + 1);
+		for (int i = 0; i <= SECTORS; i++)
+		{
+			angle = i * STEP;
+
+			points[i].x = RADIUS * math::cos(angle);
+			points[i].y = RADIUS * math::sin(angle);
+		}
+
+		// add top center
+		vertices.push_back({
+			{0.0f, -SIZE, 0.0f}, UP, {0.5f, 0.5f}
+			});
+		// add top sides
+		for (int i = 0; i <= SECTORS; i++)
+		{
+			Vector2 point = points.at(i);
+
+			vertices.push_back({
+				{point.x, -SIZE, point.y}, UP, point
+				});
+		}
+
+		// add bottom center
+		vertices.push_back({
+			{0.0f, SIZE, 0.0f}, UP, {0.5f, 0.5f}
+			});
+		// add bottom sides
+		for (int i = 0; i <= SECTORS; i++)
+		{
+			Vector2 point = points.at(i);
+
+			vertices.push_back({
+				{point.x, SIZE, point.y}, UP, point
+				});
+		}
+
+		// add sides
+		for (int i = 0; i <= SECTORS; i++)
+		{
+			Vector2 point = points.at(i);
+
+			Vector3 normal = glm::normalize(Vector3(point.x, 0.0f, point.y));
+
+			vertices.push_back({
+				{point.x, -SIZE, point.y}, normal, { static_cast<float>(i) / SECTORS, 0.0f }
+				});
+			vertices.push_back({
+				{point.x, SIZE, point.y}, normal, { static_cast<float>(i) / SECTORS, 1.0f }
+				});
+		}
+
+		mesh.set_vertices(vertices);
+	}
+
+	{
+		std::vector<uint16_t> indices;
+
+		uint16_t center = 0;
+		uint16_t offset = center + 1;
+
+		// top
+		for (int i = 0; i < SECTORS; i++)
+		{
+			indices.push_back(offset + 1 + i);
+			indices.push_back(offset + i);
+			indices.push_back(center);
+		}
+
+		center += SECTORS + 2;
+		offset = center + 1;
+
+		// bottom
+		for (int i = 0; i < SECTORS; i++)
+		{
+			indices.push_back(center);
+			indices.push_back(offset + i);
+			indices.push_back(offset + 1 + i);
+		}
+
+		// side
+		offset += SECTORS + 1;
+
+		for (int i = 0; i < SECTORS * 2; i += 2)
+		{
+			indices.push_back(offset + i);
+			indices.push_back(offset + i + 2);
+			indices.push_back(offset + i + 1);
+			indices.push_back(offset + i + 2);
+			indices.push_back(offset + i + 3);
+			indices.push_back(offset + i + 1);
+		}
+
+		mesh.set_indices(indices);
+	}
+}
+
 void minty::Mesh::set_vertices(void const* const vertices, size_t const count, size_t const vertexSize)
 {
 	// if data already set, get rid of the old data
@@ -438,6 +554,8 @@ std::string minty::to_string(MeshType const value)
 		return "Pyramid";
 	case MeshType::Sphere:
 		return "Sphere";
+	case MeshType::Cylinder:
+		return "Cylinder";
 	default:
 		return error::ERROR_TEXT;
 	}
@@ -464,6 +582,10 @@ MeshType minty::from_string_mesh_type(std::string const& value)
 	else if (value == "Sphere")
 	{
 		return MeshType::Sphere;
+	}
+	else if (value == "Cylinder")
+	{
+		return MeshType::Cylinder;
 	}
 	else
 	{

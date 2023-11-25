@@ -15,6 +15,7 @@ namespace minty
 		Cube,
 		Pyramid,
 		Sphere,
+		Cylinder,
 	};
 
 	std::string to_string(MeshType const value);
@@ -84,6 +85,8 @@ namespace minty
 		static void create_primitive_pyramid(Mesh& mesh);
 
 		static void create_primitive_sphere(Mesh& mesh);
+
+		static void create_primitive_cylinder(Mesh& mesh);
 
 #pragma endregion
 
