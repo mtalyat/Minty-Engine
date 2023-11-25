@@ -247,8 +247,8 @@ void minty::Mesh::create_primitive_pyramid(Mesh& mesh)
 void minty::Mesh::create_primitive_sphere(Mesh& mesh)
 {
 	float const RADIUS = 0.5f;
-	int const SECTORS = 100;
-	int const STACKS = 100;
+	int const SECTORS = 36;
+	int const STACKS = 36;
 
 	{
 		float const PI = glm::pi<float>();
