@@ -41,6 +41,32 @@ float minty::Node::to_float(float const defaultValue) const
 	return defaultValue;
 }
 
+Node* minty::Node::find(std::string const& name)
+{
+	for (auto& pair : children)
+	{
+		if (pair.first == name)
+		{
+			return &pair.second;
+		}
+	}
+
+	return nullptr;
+}
+
+Node const* minty::Node::find(std::string const& name) const
+{
+	for (auto const& pair : children)
+	{
+		if (pair.first == name)
+		{
+			return &pair.second;
+		}
+	}
+
+	return nullptr;
+}
+
 void minty::Node::print(int const indent) const
 {
 	// print children
@@ -114,7 +140,7 @@ Node minty::Node::parse_file(std::string const& path)
 		if (indentChange > 0)
 		{
 			// add last child to node stack
-			nodeStack.push_back(&node->children.at(key));
+			nodeStack.push_back(&node->children.back().second);
 
 			// start using that as active node
 			node = nodeStack.back();
@@ -152,7 +178,7 @@ Node minty::Node::parse_file(std::string const& path)
 			key = line;
 
 			// add as child
-			node->children.emplace(key, Node());
+			node->children.push_back({ key, Node() });
 		}
 		else
 		{
@@ -161,7 +187,7 @@ Node minty::Node::parse_file(std::string const& path)
 			value = line.substr(split + 2, line.size() - split - 2); // ignore ": "
 
 			// add as child
-			node->children.emplace(key, Node{ .data = value });
+			node->children.push_back({ key, Node{.data = value } });
 		}
 	}
 

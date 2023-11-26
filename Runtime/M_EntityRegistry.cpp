@@ -130,7 +130,7 @@ void minty::EntityRegistry::print(Entity const entity) const
 {
 	// serialize entity, add it to parent, print that
 	Node root;
-	root.children.emplace(this->get_name(entity), serialize_entity(entity));
+	root.children.push_back({ this->get_name(entity), serialize_entity(entity) });
 	root.print();
 }
 

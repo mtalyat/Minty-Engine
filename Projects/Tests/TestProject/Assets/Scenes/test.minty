@@ -11,7 +11,7 @@ Entities
             perspective: 1
             far: 1000
         Move
-    Test 0
+    _
         Renderable
         Mesh
             materialId: 0
@@ -22,7 +22,7 @@ Entities
         Test
             rotationSpeed
                 x: 1
-    Test 1
+    _
         Renderable
         Mesh
             materialId: 1
@@ -33,7 +33,7 @@ Entities
         Test
             rotationSpeed
                 y: 1
-    Test 2
+    _
         Renderable
         Mesh
             materialId: 2
@@ -44,7 +44,7 @@ Entities
         Test
             rotationSpeed
                 z: 1
-    Test 3
+    _
         Renderable
         Mesh
             materialId: 0
@@ -57,7 +57,7 @@ Entities
                 x: 1
                 y: 0.5
                 z: -0.25
-    Test 4
+    _
         Renderable
         Mesh
             materialId: 1
