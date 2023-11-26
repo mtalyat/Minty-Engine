@@ -324,6 +324,7 @@ void minty::Mesh::create_primitive_cylinder(Mesh& mesh)
 
 	{
 		float const PI = glm::pi<float>();
+		float const PI2 = PI * 1.5f;
 
 		float const STEP = 2.0f * PI / SECTORS;
 
@@ -338,7 +339,7 @@ void minty::Mesh::create_primitive_cylinder(Mesh& mesh)
 		std::vector<Vector2> points(SECTORS + 1);
 		for (int i = 0; i <= SECTORS; i++)
 		{
-			angle = i * STEP;
+			angle = i * STEP + PI2;
 
 			points[i].x = RADIUS * math::cos(angle);
 			points[i].y = RADIUS * math::sin(angle);
@@ -354,13 +355,13 @@ void minty::Mesh::create_primitive_cylinder(Mesh& mesh)
 			Vector2 point = points.at(i);
 
 			vertices.push_back({
-				{point.x, -SIZE, point.y}, UP, point
+				{point.x, -SIZE, point.y}, UP, { point.x + 0.5f, point.y + 0.5f }
 				});
 		}
 
 		// add bottom center
 		vertices.push_back({
-			{0.0f, SIZE, 0.0f}, UP, {0.5f, 0.5f}
+			{0.0f, SIZE, 0.0f}, DOWN, {0.5f, 0.5f}
 			});
 		// add bottom sides
 		for (int i = 0; i <= SECTORS; i++)
@@ -368,7 +369,7 @@ void minty::Mesh::create_primitive_cylinder(Mesh& mesh)
 			Vector2 point = points.at(i);
 
 			vertices.push_back({
-				{point.x, SIZE, point.y}, UP, point
+				{point.x, SIZE, point.y}, DOWN, { point.x + 0.5f, point.y + 0.5f }
 				});
 		}
 
