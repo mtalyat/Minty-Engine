@@ -82,10 +82,10 @@ void minty::Mesh::create_primitive_quad(Mesh& mesh)
 	std::vector<Vertex3D> vertices =
 	{
 		// up
-		{ leftTopBack, up, bottomLeft},
-		{ leftTopFront, up, topLeft },
-		{ rightTopFront, up, topRight },
-		{ rightTopBack, up, bottomRight },
+		{ leftTopBack, up, topRight },
+		{ leftTopFront, up, bottomRight },
+		{ rightTopFront, up, bottomLeft },
+		{ rightTopBack, up, topLeft },
 	};
 
 	std::vector<uint16_t> indices =
@@ -127,16 +127,16 @@ void minty::Mesh::create_primitive_cube(Mesh& mesh)
 	std::vector<Vertex3D> vertices =
 	{
 		// up
-		{ leftTopBack, up, bottomLeft },
-		{ leftTopFront, up, topLeft },
-		{ rightTopFront, up, topRight },
-		{ rightTopBack, up, bottomRight },
+		{ leftTopBack, up, topRight },
+		{ leftTopFront, up, bottomRight },
+		{ rightTopFront, up, bottomLeft },
+		{ rightTopBack, up, topLeft },
 
 		// down
-		{ rightBottomBack, down, bottomLeft },
-		{ rightBottomFront, down, topLeft },
-		{ leftBottomFront, down, topRight },
-		{ leftBottomBack, down, bottomRight },
+		{ rightBottomBack, down, topRight },
+		{ rightBottomFront, down, bottomRight },
+		{ leftBottomFront, down, bottomLeft },
+		{ leftBottomBack, down, topLeft },
 
 		// right
 		{ rightBottomBack, right, bottomLeft },
@@ -204,10 +204,10 @@ void minty::Mesh::create_primitive_pyramid(Mesh& mesh)
 	std::vector<Vertex3D> vertices =
 	{
 		// up
-		{ rightBottomBack, down, bottomLeft },
-		{ rightBottomFront, down, topLeft },
-		{ leftBottomFront, down, topRight },
-		{ leftBottomBack, down, bottomRight },
+		{ rightBottomBack, down, topRight },
+		{ rightBottomFront, down, bottomRight },
+		{ leftBottomFront, down, bottomLeft },
+		{ leftBottomBack, down, topLeft },
 
 		// forward
 		{ rightBottomFront, forward, bottomLeft },
