@@ -6,6 +6,10 @@
 #include "M_SerializedNode.h"
 #include "M_Reader.h"
 #include "M_Console.h"
+#include "M_SerializationData.h"
+#include "M_Scene.h"
+#include "M_Engine.h"
+#include "M_Renderer.h"
 
 #include "M_NameComponent.h"
 
@@ -33,7 +37,13 @@ ID minty::SceneManager::create_scene(std::string const& path)
 
 	// load the data from the disk into the scene
 	Node node = Node::parse_file(path);
-	Reader reader(node, &scene);
+	SerializationData data =
+	{
+		.renderer = scene.get_engine()->get_renderer(),
+		.scene = &scene,
+		.entity = NULL_ENTITY
+	};
+	Reader reader(node, &data);
 	scene.deserialize(reader);
 
 	// all done

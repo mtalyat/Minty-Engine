@@ -9,7 +9,7 @@ namespace minty
 	struct MeshComponent
 		: public Component
 	{
-		Mesh* mesh;
+		ID meshId;
 		ID materialId;
 
 		void serialize(Writer& writer) const override;

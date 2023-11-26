@@ -7,6 +7,21 @@
 
 namespace minty
 {
+	enum class MeshType
+	{
+		Empty,
+		Custom,
+		Quad,
+		Cube,
+		Pyramid,
+		Sphere,
+		Cylinder,
+	};
+
+	std::string to_string(MeshType const value);
+
+	MeshType from_string_mesh_type(std::string const& value);
+
 	/// <summary>
 	/// Holds data for an object to be rendered to the screen.
 	/// </summary>
@@ -41,6 +56,8 @@ namespace minty
 		template<class T>
 		void set_indices(T* const indices, size_t const count);
 
+		void clear();
+
 #pragma endregion
 
 #pragma region Get
@@ -55,7 +72,24 @@ namespace minty
 
 		VkIndexType get_index_type() const;
 
+		bool empty() const;
+
 #pragma endregion
+
+#pragma region Primitives
+
+		static void create_primitive_quad(Mesh& mesh);
+
+		static void create_primitive_cube(Mesh& mesh);
+
+		static void create_primitive_pyramid(Mesh& mesh);
+
+		static void create_primitive_sphere(Mesh& mesh);
+
+		static void create_primitive_cylinder(Mesh& mesh);
+
+#pragma endregion
+
 
 	private:
 		void set_vertices(void const* const vertices, size_t const count, size_t const vertexSize);

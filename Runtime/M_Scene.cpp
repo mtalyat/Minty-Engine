@@ -49,6 +49,11 @@ Scene& minty::Scene::operator=(Scene&& other) noexcept
 	return *this;
 }
 
+Engine* minty::Scene::get_engine() const
+{
+	return _engine;
+}
+
 EntityRegistry* minty::Scene::get_entity_registry() const
 {
 	return _entities;

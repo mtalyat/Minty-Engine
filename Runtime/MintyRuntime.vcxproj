@@ -209,6 +209,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="M_Builtin_GlobalData.h" />
+    <ClInclude Include="M_SerializationData.h" />
     <ClInclude Include="M_Dynamic.h" />
     <ClInclude Include="M_Base.h" />
     <ClInclude Include="framework.h" />

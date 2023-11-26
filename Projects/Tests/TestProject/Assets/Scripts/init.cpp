@@ -16,7 +16,6 @@ using namespace minty::rendering;
 using namespace game;
 
 InputMap input;
-Mesh *mesh;
 
 // called when the engine is initialized
 void init(Runtime &runtime)
@@ -91,8 +90,14 @@ void init(Runtime &runtime)
             basic::create_basic_shader_pass_builder_3d(rb, spb);
             spb.emplace_stage(VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT, "Assets/Shaders/vert.spv", *renderer);
             spb.emplace_stage(VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT, "Assets/Shaders/frag.spv", *renderer);
+
             // spb.set_front_face(VkFrontFace::VK_FRONT_FACE_COUNTER_CLOCKWISE);
             // spb.set_cull_mode(VkCullModeFlagBits::VK_CULL_MODE_FRONT_BIT);
+
+            // Uncomment for outlines only
+            // spb.set_polygon_mode(VkPolygonMode::VK_POLYGON_MODE_LINE);
+            // spb.set_topology(VkPrimitiveTopology::VK_PRIMITIVE_TOPOLOGY_LINE_LIST);
+
             ID shaderPassId = rb.emplace_shader_pass(spb);
 
             // // create ui shader
@@ -152,22 +157,6 @@ void init(Runtime &runtime)
 
         // load the scene we created, with the camera
         sceneManager->load_scene(sceneId, cameraEntity);
-
-        // cubes all use same mesh, but different materials
-        mesh = new Mesh(*renderer);
-        basic::create_basic_cube(*mesh);
-        for (int i = 0; i < ENTITY_COUNT; i++)
-        {
-            Entity e = er->find_by_name(std::format("Cube {}", i));
-
-            if (e == NULL_ENTITY)
-            {
-                break;
-            }
-
-            MeshComponent &meshComponent = er->get<MeshComponent>(e);
-            meshComponent.mesh = mesh;
-        }
 
         // debug print scene:
         Node node;
@@ -256,8 +245,6 @@ void init(Runtime &runtime)
 void destroy(Runtime &runtime)
 {
     console::log("Game over.");
-
-    delete mesh;
 
     // wait for input to close
     // console::wait();

@@ -88,11 +88,12 @@ namespace minty
 
 		Register<Texture> _textures;
 		Register<Sprite> _sprites;
-		Register<MaterialTemplate> _materialTemplates;
 		Register<Material> _materials;
-		Register<Shader> _shaders;
+		Register<MaterialTemplate> _materialTemplates;
 		Register<ShaderPass> _shaderPasses;
+		Register<Shader> _shaders;
 		Register<rendering::Buffer> _buffers;
+		Register<Mesh> _meshes;
 
 		std::array<ID, BIND_COUNT> _boundIds;
 
@@ -352,6 +353,12 @@ namespace minty
 
 		ID create_material(rendering::MaterialBuilder const& builder);
 
+		ID create_mesh();
+
+		ID get_or_create_mesh(std::string const& name);
+
+		ID get_or_create_mesh(MeshType const type);
+
 	public:
 		Texture& get_texture(ID const id);
 
@@ -388,6 +395,10 @@ namespace minty
 		Material& get_material(ID const id);
 
 		Material const& get_material(ID const id) const;
+
+		Mesh& get_mesh(ID const id);
+
+		Mesh const& get_mesh(ID const id) const;
 
 #pragma endregion
 

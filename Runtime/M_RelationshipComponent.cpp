@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "M_RelationshipComponent.h"
 
+#include "M_SerializationData.h"
 #include "M_Scene.h"
 
 minty::RelationshipComponent::RelationshipComponent(size_t const children, Entity const first, Entity const prev, Entity const next, Entity const parent)
@@ -19,9 +20,9 @@ void minty::RelationshipComponent::serialize(Writer& writer) const
 		return;
 	}
 
-	Scene const* scene = static_cast<Scene const*>(writer.get_data());
+	SerializationData* data = static_cast<SerializationData*>(writer.get_data());
 
-	EntityRegistry const* er = scene->get_entity_registry();
+	EntityRegistry const* er = data->scene->get_entity_registry();
 
 	writer.write("children", children, 0ull);
 	writer.write("first", er->get_name(first), "");
@@ -38,9 +39,9 @@ void minty::RelationshipComponent::deserialize(Reader const& reader)
 		return;
 	}
 
-	Scene const* scene = static_cast<Scene const*>(reader.get_data());
+	SerializationData* data = static_cast<SerializationData*>(reader.get_data());
 
-	EntityRegistry const* er = scene->get_entity_registry();
+	EntityRegistry const* er = data->scene->get_entity_registry();
 
 	children = reader.read_size("children");
 	first = er->find_by_name(reader.read_string("first"));

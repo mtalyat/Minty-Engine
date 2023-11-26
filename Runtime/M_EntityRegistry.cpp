@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "M_EntityRegistry.h"
 
+#include "M_SerializationData.h"
+
 #include "M_Console.h"
 #include "M_NameComponent.h"
 #include "M_RelationshipComponent.h"
@@ -163,11 +165,13 @@ void minty::EntityRegistry::deserialize(Reader const& reader)
 	// read each entity, add name if it has one
 	
 	Node const* node = reader.get_node();
+	SerializationData* data = static_cast<SerializationData*>(reader.get_data());
 
 	for (auto const& pair : node->children)
 	{
 		// create entity
 		Entity const entity = entt::registry::create();
+		data->entity = entity;
 
 		// add name if there is one
 		// empty name is either "" or "_"
@@ -194,6 +198,9 @@ bool minty::EntityRegistry::is_name_empty(std::string const& name)
 
 void minty::EntityRegistry::serialize_entity(Writer& writer, Entity const entity) const
 {
+	SerializationData* data = static_cast<SerializationData*>(writer.get_data());
+	data->entity = entity;
+
 	for (auto&& curr : this->storage())
 	{
 		//auto cid = curr.first;

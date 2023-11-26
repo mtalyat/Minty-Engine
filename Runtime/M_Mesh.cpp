@@ -1,10 +1,12 @@
 #include "pch.h"
 #include "M_Mesh.h"
 
+#include "M_Basic_Vertex.h"
 #include "M_Renderer.h"
 #include "glm.hpp"
 
 using namespace minty;
+using namespace minty::basic;
 using namespace minty::rendering;
 
 minty::Mesh::Mesh(Renderer& renderer)
@@ -22,6 +24,12 @@ minty::Mesh::~Mesh()
 {
 	dispose_vertices();
 	dispose_indices();
+}
+
+void minty::Mesh::clear()
+{
+	set_vertices(nullptr, 0, 0);
+	set_indices(nullptr, 0, 0);
 }
 
 uint32_t minty::Mesh::get_vertex_count() const
@@ -47,6 +55,382 @@ ID minty::Mesh::get_index_buffer_id() const
 VkIndexType minty::Mesh::get_index_type() const
 {
 	return _indexType;
+}
+
+bool minty::Mesh::empty() const
+{
+	return _vertexCount == 0;
+}
+
+void minty::Mesh::create_primitive_quad(Mesh& mesh)
+{
+	// create mesh data
+	const float SIZE = 0.5f;
+
+	Vector3 leftTopBack = { -SIZE, 0.0f, -SIZE };
+	Vector3 leftTopFront = { -SIZE, 0.0f, SIZE };
+	Vector3 rightTopBack = { SIZE, 0.0f, -SIZE };
+	Vector3 rightTopFront = { SIZE, 0.0f, SIZE };
+
+	Vector3 up = { 0.0f, -1.0f, 0.0f };
+
+	Vector2 topLeft = { 0.0f, 0.0f };
+	Vector2 topRight = { 1.0f, 0.0f };
+	Vector2 bottomLeft = { 0.0f, 1.0f };
+	Vector2 bottomRight = { 1.0f, 1.0f };
+
+	std::vector<Vertex3D> vertices =
+	{
+		// up
+		{ leftTopBack, up, topRight },
+		{ leftTopFront, up, bottomRight },
+		{ rightTopFront, up, bottomLeft },
+		{ rightTopBack, up, topLeft },
+	};
+
+	std::vector<uint16_t> indices =
+	{
+		0, 1, 2, 0, 2, 3
+	};
+
+	// set mesh data
+	mesh.set_vertices(vertices);
+	mesh.set_indices(indices);
+}
+
+void minty::Mesh::create_primitive_cube(Mesh& mesh)
+{
+	// create mesh data
+	const float SIZE = 0.5f;
+
+	Vector3 leftBottomBack = { -SIZE, SIZE, -SIZE };
+	Vector3 leftBottomFront = { -SIZE, SIZE, SIZE };
+	Vector3 leftTopBack = { -SIZE, -SIZE, -SIZE };
+	Vector3 leftTopFront = { -SIZE, -SIZE, SIZE };
+	Vector3 rightBottomBack = { SIZE, SIZE, -SIZE };
+	Vector3 rightBottomFront = { SIZE, SIZE, SIZE };
+	Vector3 rightTopBack = { SIZE, -SIZE, -SIZE };
+	Vector3 rightTopFront = { SIZE, -SIZE, SIZE };
+
+	Vector3 up = { 0.0f, -1.0f, 0.0f };
+	Vector3 down = { 0.0f, 1.0f, 0.0f };
+	Vector3 left = { -1.0f, 0.0f, 0.0f };
+	Vector3 right = { 1.0f, 0.0f, 0.0f };
+	Vector3 forward = { 0.0f, 0.0f, 1.0f };
+	Vector3 backward = { 0.0f, 0.0f, -1.0f };
+
+	Vector2 topLeft = { 0.0f, 0.0f };
+	Vector2 topRight = { 1.0f, 0.0f };
+	Vector2 bottomLeft = { 0.0f, 1.0f };
+	Vector2 bottomRight = { 1.0f, 1.0f };
+
+	std::vector<Vertex3D> vertices =
+	{
+		// up
+		{ leftTopBack, up, topRight },
+		{ leftTopFront, up, bottomRight },
+		{ rightTopFront, up, bottomLeft },
+		{ rightTopBack, up, topLeft },
+
+		// down
+		{ rightBottomBack, down, topRight },
+		{ rightBottomFront, down, bottomRight },
+		{ leftBottomFront, down, bottomLeft },
+		{ leftBottomBack, down, topLeft },
+
+		// right
+		{ rightBottomBack, right, bottomLeft },
+		{ rightTopBack, right, topLeft },
+		{ rightTopFront, right, topRight },
+		{ rightBottomFront, right, bottomRight },
+
+		// left
+		{ leftBottomFront, left, bottomLeft },
+		{ leftTopFront, left, topLeft },
+		{ leftTopBack, left, topRight },
+		{ leftBottomBack, left, bottomRight },
+
+		// front
+		{ rightBottomFront, forward, bottomLeft },
+		{ rightTopFront, forward, topLeft },
+		{ leftTopFront, forward, topRight },
+		{ leftBottomFront, forward, bottomRight },
+
+		// back
+		{ leftBottomBack, backward, bottomLeft },
+		{ leftTopBack, backward, topLeft },
+		{ rightTopBack, backward, topRight },
+		{ rightBottomBack, backward, bottomRight },
+	};
+
+	std::vector<uint16_t> indices =
+	{
+		0, 1, 2, 0, 2, 3,
+		4, 5, 6, 4, 6, 7,
+		8, 9, 10, 8, 10, 11,
+		12, 13, 14, 12, 14, 15,
+		16, 17, 18, 16, 18, 19,
+		20, 21, 22, 20, 22, 23,
+	};
+
+	// set mesh data
+	mesh.set_vertices(vertices);
+	mesh.set_indices(indices);
+}
+
+void minty::Mesh::create_primitive_pyramid(Mesh& mesh)
+{
+	// create mesh data
+	const float SIZE = 0.5f;
+
+	Vector3 leftBottomBack = { -SIZE, SIZE, -SIZE };
+	Vector3 leftBottomFront = { -SIZE, SIZE, SIZE };
+	Vector3 rightBottomBack = { SIZE, SIZE, -SIZE };
+	Vector3 rightBottomFront = { SIZE, SIZE, SIZE };
+	Vector3 top = { 0.0f, -SIZE, 0.0f };
+
+	Vector3 down = { 0.0f, 1.0f, 0.0f };
+	Vector3 forward = glm::normalize(Vector3({ 0.0f, 1.0f, 2.0f }));
+	Vector3 backward = glm::normalize(Vector3({ 0.0f, 1.0f, -2.0f }));
+	Vector3 left = glm::normalize(Vector3({ -2.0f, 1.0f, 0.0f }));
+	Vector3 right = glm::normalize(Vector3({ 2.0f, 1.0f, 0.0f }));
+
+	Vector2 topLeft = { 0.0f, 0.0f };
+	Vector2 topRight = { 1.0f, 0.0f };
+	Vector2 topCenter = { 0.5f, 0.0f };
+	Vector2 bottomLeft = { 0.0f, 1.0f };
+	Vector2 bottomRight = { 1.0f, 1.0f };
+
+	std::vector<Vertex3D> vertices =
+	{
+		// up
+		{ rightBottomBack, down, topRight },
+		{ rightBottomFront, down, bottomRight },
+		{ leftBottomFront, down, bottomLeft },
+		{ leftBottomBack, down, topLeft },
+
+		// forward
+		{ rightBottomFront, forward, bottomLeft },
+		{ top, forward, topCenter },
+		{ leftBottomFront, forward, bottomRight },
+
+		// backward
+		{ leftBottomBack, backward, bottomLeft },
+		{ top, backward, topCenter },
+		{ rightBottomBack, backward, bottomRight },
+
+		// left
+		{ leftBottomFront, left, bottomLeft },
+		{ top, left, topCenter },
+		{ leftBottomBack, left, bottomRight },
+
+		// right
+		{ rightBottomBack, right, bottomLeft },
+		{ top, right, topCenter },
+		{ rightBottomFront, right, bottomRight },
+	};
+
+	std::vector<uint16_t> indices =
+	{
+		0, 1, 2, 0, 2, 3,
+		4, 5, 6,
+		7, 8, 9,
+		10, 11, 12,
+		13, 14, 15,
+	};
+
+	// set mesh data
+	mesh.set_vertices(vertices);
+	mesh.set_indices(indices);
+}
+
+void minty::Mesh::create_primitive_sphere(Mesh& mesh)
+{
+	float const RADIUS = 0.5f;
+	int const SECTORS = 36;
+	int const STACKS = 36;
+
+	{
+		float const PI = glm::pi<float>();
+
+		float const SECTOR_STEP = 2.0f * PI / SECTORS;
+		float const STACK_STEP = PI / STACKS;
+
+		std::vector<Vertex3D> vertices;
+
+		float stackAngle, sectorAngle;
+
+		for (int i = 0; i <= STACKS; i++)
+		{
+			stackAngle = PI / 2.0f - i * STACK_STEP;
+
+			float xy = RADIUS * math::cos(stackAngle);
+			float z = RADIUS * math::sin(stackAngle);
+
+			for (int j = 0; j <= SECTORS; j++)
+			{
+				sectorAngle = j * SECTOR_STEP;
+
+				float x = xy * math::cos(sectorAngle);
+
+				float y = xy * math::sin(sectorAngle);
+
+				float texCoordX = (x / (RADIUS * 2.0f)) + 0.5f;
+				float texCoordY = (y / (RADIUS * 2.0f)) + 0.5f;
+
+				Vector3 pos(x, y, z);
+				Vector3 normal = glm::normalize(pos);
+				Vector2 texCoord(texCoordX, texCoordY);
+
+				vertices.push_back(
+					{
+						pos, normal, texCoord
+					}
+				);
+			}
+		}
+
+		mesh.set_vertices(vertices);
+	}
+
+	{
+		std::vector<uint16_t> indices;
+
+		for (int i = 0; i < STACKS; i++)
+		{
+			for (int j = 0; j < SECTORS; j++)
+			{
+				int first = (i * (SECTORS + 1)) + j;
+				int second = first + SECTORS + 1;
+
+				indices.push_back(static_cast<uint16_t>(first + 1));
+				indices.push_back(static_cast<uint16_t>(second));
+				indices.push_back(static_cast<uint16_t>(first));
+				indices.push_back(static_cast<uint16_t>(first + 1));
+				indices.push_back(static_cast<uint16_t>(second + 1));
+				indices.push_back(static_cast<uint16_t>(second));
+			}
+		}
+
+		mesh.set_indices(indices);
+	}
+}
+
+void minty::Mesh::create_primitive_cylinder(Mesh& mesh)
+{
+	float const RADIUS = 0.5f;
+	float const SIZE = 0.5f;
+	int const SECTORS = 36;
+
+	{
+		float const PI = glm::pi<float>();
+		float const PI2 = PI * 1.5f;
+
+		float const STEP = 2.0f * PI / SECTORS;
+
+		Vector3 const UP(0.0f, -1.0f, 0.0f);
+		Vector3 const DOWN(0.0f, 1.0f, 0.0f);
+
+		std::vector<Vertex3D> vertices;
+
+		float angle;
+
+		// get circle points
+		std::vector<Vector2> points(SECTORS + 1);
+		for (int i = 0; i <= SECTORS; i++)
+		{
+			angle = i * STEP + PI2;
+
+			points[i].x = RADIUS * math::cos(angle);
+			points[i].y = RADIUS * math::sin(angle);
+		}
+
+		// add top center
+		vertices.push_back({
+			{0.0f, -SIZE, 0.0f}, UP, {0.5f, 0.5f}
+			});
+		// add top sides
+		for (int i = 0; i <= SECTORS; i++)
+		{
+			Vector2 point = points.at(i);
+
+			vertices.push_back({
+				{point.x, -SIZE, point.y}, UP, { point.x + 0.5f, point.y + 0.5f }
+				});
+		}
+
+		// add bottom center
+		vertices.push_back({
+			{0.0f, SIZE, 0.0f}, DOWN, {0.5f, 0.5f}
+			});
+		// add bottom sides
+		for (int i = 0; i <= SECTORS; i++)
+		{
+			Vector2 point = points.at(i);
+
+			vertices.push_back({
+				{point.x, SIZE, point.y}, DOWN, { point.x + 0.5f, point.y + 0.5f }
+				});
+		}
+
+		// add sides
+		for (int i = 0; i <= SECTORS; i++)
+		{
+			Vector2 point = points.at(i);
+
+			Vector3 normal = glm::normalize(Vector3(point.x, 0.0f, point.y));
+
+			vertices.push_back({
+				{point.x, -SIZE, point.y}, normal, { static_cast<float>(i) / SECTORS, 0.0f }
+				});
+			vertices.push_back({
+				{point.x, SIZE, point.y}, normal, { static_cast<float>(i) / SECTORS, 1.0f }
+				});
+		}
+
+		mesh.set_vertices(vertices);
+	}
+
+	{
+		std::vector<uint16_t> indices;
+
+		uint16_t center = 0;
+		uint16_t offset = center + 1;
+
+		// top
+		for (int i = 0; i < SECTORS; i++)
+		{
+			indices.push_back(offset + 1 + i);
+			indices.push_back(offset + i);
+			indices.push_back(center);
+		}
+
+		center += SECTORS + 2;
+		offset = center + 1;
+
+		// bottom
+		for (int i = 0; i < SECTORS; i++)
+		{
+			indices.push_back(center);
+			indices.push_back(offset + i);
+			indices.push_back(offset + 1 + i);
+		}
+
+		// side
+		offset += SECTORS + 1;
+
+		for (int i = 0; i < SECTORS * 2; i += 2)
+		{
+			indices.push_back(offset + i);
+			indices.push_back(offset + i + 2);
+			indices.push_back(offset + i + 1);
+			indices.push_back(offset + i + 2);
+			indices.push_back(offset + i + 3);
+			indices.push_back(offset + i + 1);
+		}
+
+		mesh.set_indices(indices);
+	}
 }
 
 void minty::Mesh::set_vertices(void const* const vertices, size_t const count, size_t const vertexSize)
@@ -153,6 +537,61 @@ void minty::Mesh::dispose_indices()
 	_renderer.destroy_buffer(_indexBufferId);
 	_indexCount = 0;
 	_indexSize = 0;
+}
+
+std::string minty::to_string(MeshType const value)
+{
+	switch (value)
+	{
+	case MeshType::Empty:
+		return "Empty";
+	case MeshType::Custom:
+		return "Custom";
+	case MeshType::Quad:
+		return "Quad";
+	case MeshType::Cube:
+		return "Cube";
+	case MeshType::Pyramid:
+		return "Pyramid";
+	case MeshType::Sphere:
+		return "Sphere";
+	case MeshType::Cylinder:
+		return "Cylinder";
+	default:
+		return error::ERROR_TEXT;
+	}
+}
+
+MeshType minty::from_string_mesh_type(std::string const& value)
+{
+	if (value == "Custom")
+	{
+		return MeshType::Custom;
+	}
+	else if (value == "Quad")
+	{
+		return MeshType::Quad;
+	}
+	else if (value == "Cube")
+	{
+		return MeshType::Cube;
+	}
+	else if (value == "Pyramid")
+	{
+		return MeshType::Pyramid;
+	}
+	else if (value == "Sphere")
+	{
+		return MeshType::Sphere;
+	}
+	else if (value == "Cylinder")
+	{
+		return MeshType::Cylinder;
+	}
+	else
+	{
+		return MeshType::Empty;
+	}
 }
 
 std::string minty::to_string(Mesh const& mesh)
