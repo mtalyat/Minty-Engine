@@ -1,0 +1,28 @@
+std::string to_string(PixelFormat const value);
+PixelFormat from_string_pixel_format(std::string const& value);
+
+
+std::string minty::vk::to_string(PixelFormat const value)
+{
+	switch (value)
+	{
+	case PixelFormat::None: return "None";
+	case PixelFormat::Gray: return "Gray";
+	case PixelFormat::GrayAlpha: return "GrayAlpha";
+	case PixelFormat::RedGreenBlue: return "RedGreenBlue";
+	case PixelFormat::RedGreenBlueAlpha: return "RedGreenBlueAlpha";
+	default: return "";
+	}
+}
+
+PixelFormat minty::vk::from_string_pixel_format(std::string const& value)
+{
+	std::string value2 = minty::string::to_upper(value);
+	if (value2 == "None") return PixelFormat::None;
+	if (value2 == "Gray") return PixelFormat::Gray;
+	if (value2 == "GrayAlpha") return PixelFormat::GrayAlpha;
+	if (value2 == "RedGreenBlue") return PixelFormat::RedGreenBlue;
+	if (value2 == "RedGreenBlueAlpha") return PixelFormat::RedGreenBlueAlpha;
+
+	return static_cast<PixelFormat>(0);
+}

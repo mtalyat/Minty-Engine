@@ -1,0 +1,7 @@
+enum PixelFormat {
+	None = 0,
+	Gray = 1,
+	GrayAlpha = 2,
+	RedGreenBlue = 3,
+	RedGreenBlueAlpha = 4,
+};
