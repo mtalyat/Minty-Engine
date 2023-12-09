@@ -38,114 +38,143 @@ void init(Runtime &runtime)
         Renderer *renderer = engine->get_renderer();
         SceneManager *sceneManager = engine->get_scene_manager();
 
-        {
-            // create renderer
-            Info info("TestProject", 1, 0, 0);
+        Info info("TestProject", 1, 0, 0);
 
-            // use defaults for most things
-            RendererBuilder rb(&info);
+        RendererBuilder rb;
+        rb.info = &info;
 
-            basic::create_basic_renderer_builder(rb);
+        renderer->init(rb);
 
-            // create textures
-            std::vector<TextureBuilder> textureBuilders =
-                {
-                    TextureBuilder("Assets/Textures/funny2.png"),
-                    TextureBuilder("Assets/Textures/funny.jpg"),
-                    TextureBuilder("Assets/Textures/texture.jpg"),
-                    TextureBuilder("Assets/Textures/brian.png"),
-                    TextureBuilder("Assets/Textures/crosshair.png"),
-                    TextureBuilder("Assets/Textures/ui.png"),
-                };
-            for (TextureBuilder &builder : textureBuilders)
-            {
-                // builder.set_filter(VkFilter::VK_FILTER_NEAREST);
-                rb.emplace_texture(builder);
-            }
+        /*
+        TextureBuilder("Assets/Textures/funny2.png"),
+        //             TextureBuilder("Assets/Textures/funny.jpg"),
+        //             TextureBuilder("Assets/Textures/texture.jpg"),
+        //             TextureBuilder("Assets/Textures/brian.png"),
+        //             TextureBuilder("Assets/Textures/crosshair.png"),
+        //             TextureBuilder("Assets/Textures/ui.png"),
+        */
 
-            // create shader
-            ShaderBuilder sb;
-            basic::create_basic_shader_builder_3d(rb, sb);
-            sb.emplace_uniform_constant(UniformConstantInfo(
-                "material",
-                VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT,
-                VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                sizeof(MaterialBufferObject),
-                DESCRIPTOR_SET_MATERIAL,
-                0));
-            sb.emplace_uniform_constant(UniformConstantInfo(
-                "textures",
-                VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT,
-                VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                sizeof(VkSampler),
-                DESCRIPTOR_SET_MATERIAL,
-                1,
-                4,
-                {0, 1, 2, 3}
-                ));
-            ID shaderId = rb.emplace_shader(sb);
+        renderer->load_texture("Textures/funny.jpg");
+        renderer->load_texture("Textures/funny2.png");
+        renderer->load_texture("Textures/texture.jpg");
+        renderer->load_texture("Textures/brian.png");
 
-            // create shader pass
-            ShaderPassBuilder spb(shaderId);
-            basic::create_basic_shader_pass_builder_3d(rb, spb);
-            spb.emplace_stage(VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT, "Assets/Shaders/vert.spv", *renderer);
-            spb.emplace_stage(VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT, "Assets/Shaders/frag.spv", *renderer);
+        renderer->load_shader("Shaders/shader.minty");
+        renderer->load_shader_pass("Shaders/shaderPass.minty");
+        renderer->load_material_template("Materials/materialTemplate.minty");
+        renderer->load_material_template("Materials/material1.minty");
+        renderer->load_material_template("Materials/material2.minty");
+        renderer->load_material_template("Materials/material3.minty");
+        renderer->load_material_template("Materials/material4.minty");
 
-            // spb.set_front_face(VkFrontFace::VK_FRONT_FACE_COUNTER_CLOCKWISE);
-            // spb.set_cull_mode(VkCullModeFlagBits::VK_CULL_MODE_FRONT_BIT);
+        // {
+        //     // create renderer
+        //     Info info("TestProject", 1, 0, 0);
 
-            // Uncomment for outlines only
-            // spb.set_polygon_mode(VkPolygonMode::VK_POLYGON_MODE_LINE);
-            // spb.set_topology(VkPrimitiveTopology::VK_PRIMITIVE_TOPOLOGY_LINE_LIST);
+        //     // use defaults for most things
+        //     RendererBuilder rb(&info);
 
-            ID shaderPassId = rb.emplace_shader_pass(spb);
+        //     basic::create_basic_renderer_builder(rb);
 
-            // // create ui shader
-            // ShaderBuilder sb2;
-            // basic::create_basic_shader_builder_ui(rb, sb2);
-            // sb2.emplace_uniform_constant(UniformConstantInfo(
-            //     "material",
-            //     VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT,
-            //     VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-            //     sizeof(MaterialBufferObject),
-            //     DESCRIPTOR_SET_MATERIAL,
-            //     0));
-            // ID shaderId2 = rb.emplace_shader(sb2);
+        //     // create textures
+        //     std::vector<TextureBuilder> textureBuilders =
+        //         {
+        //             TextureBuilder("Assets/Textures/funny2.png"),
+        //             TextureBuilder("Assets/Textures/funny.jpg"),
+        //             TextureBuilder("Assets/Textures/texture.jpg"),
+        //             TextureBuilder("Assets/Textures/brian.png"),
+        //             TextureBuilder("Assets/Textures/crosshair.png"),
+        //             TextureBuilder("Assets/Textures/ui.png"),
+        //         };
+        //     for (TextureBuilder &builder : textureBuilders)
+        //     {
+        //         // builder.set_filter(VkFilter::VK_FILTER_NEAREST);
+        //         rb.emplace_texture(builder);
+        //     }
 
-            // // create ui shader pass
-            // ShaderPassBuilder spb2(shaderId2);
-            // basic::create_basic_shader_pass_builder_3d(rb, spb2);
-            // spb2.emplace_stage(VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT, "Assets/Shaders/uivert.spv", *renderer);
-            // spb2.emplace_stage(VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT, "Assets/Shaders/uifrag.spv", *renderer);
-            // ID shaderPassId2 = rb.emplace_shader_pass(spb2);
+        //     // create shader
+        //     ShaderBuilder sb;
+        //     basic::create_basic_shader_builder_3d(rb, sb);
+        //     sb.emplace_uniform_constant(UniformConstantInfo(
+        //         "material",
+        //         VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT,
+        //         VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+        //         sizeof(MaterialBufferObject),
+        //         DESCRIPTOR_SET_MATERIAL,
+        //         0));
+        //     sb.emplace_uniform_constant(UniformConstantInfo(
+        //         "textures",
+        //         VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT,
+        //         VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
+        //         sizeof(VkSampler),
+        //         DESCRIPTOR_SET_MATERIAL,
+        //         1,
+        //         4,
+        //         {0, 1, 2, 3}
+        //         ));
+        //     ID shaderId = rb.emplace_shader(sb);
 
-            // create material templates
-            MaterialTemplateBuilder mtb({shaderPassId});
-            MaterialBufferObject mbo{
-                .textureId = 0,
-                .color = Vector4(1.0f, 1.0f, 1.0f, 1.0f)};
-            mtb.emplace_default_value("material", Dynamic(&mbo, sizeof(MaterialBufferObject)));
-            ID materialTemplateId = rb.emplace_material_template(mtb);
+        //     // create shader pass
+        //     ShaderPassBuilder spb(shaderId);
+        //     basic::create_basic_shader_pass_builder_3d(rb, spb);
+        //     spb.emplace_stage(VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT, "Assets/Shaders/vert.spv", *renderer);
+        //     spb.emplace_stage(VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT, "Assets/Shaders/frag.spv", *renderer);
 
-            // create materials
-            MaterialBuilder mb(materialTemplateId); // world
-            rb.emplace_material(mb);
-            MaterialBuilder mb2(materialTemplateId); // world 2
-            mbo.textureId = 1;
-            mb2.emplace_value("material", Dynamic(&mbo, sizeof(MaterialBufferObject)));
-            rb.emplace_material(mb2);
-            MaterialBuilder mb3(materialTemplateId); // world 3
-            mbo.textureId = 2;
-            mb3.emplace_value("material", Dynamic(&mbo, sizeof(MaterialBufferObject)));
-            rb.emplace_material(mb3);
-            // MaterialBuilder mb2(materialTemplateId2); // ui
+        //     // spb.set_front_face(VkFrontFace::VK_FRONT_FACE_COUNTER_CLOCKWISE);
+        //     // spb.set_cull_mode(VkCullModeFlagBits::VK_CULL_MODE_FRONT_BIT);
 
-            // init renderer with builders
-            renderer->init(rb);
-        }
+        //     // Uncomment for outlines only
+        //     // spb.set_polygon_mode(VkPolygonMode::VK_POLYGON_MODE_LINE);
+        //     // spb.set_topology(VkPrimitiveTopology::VK_PRIMITIVE_TOPOLOGY_LINE_LIST);
+
+        //     ID shaderPassId = rb.emplace_shader_pass(spb);
+
+        //     // // create ui shader
+        //     // ShaderBuilder sb2;
+        //     // basic::create_basic_shader_builder_ui(rb, sb2);
+        //     // sb2.emplace_uniform_constant(UniformConstantInfo(
+        //     //     "material",
+        //     //     VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT,
+        //     //     VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
+        //     //     sizeof(MaterialBufferObject),
+        //     //     DESCRIPTOR_SET_MATERIAL,
+        //     //     0));
+        //     // ID shaderId2 = rb.emplace_shader(sb2);
+
+        //     // // create ui shader pass
+        //     // ShaderPassBuilder spb2(shaderId2);
+        //     // basic::create_basic_shader_pass_builder_3d(rb, spb2);
+        //     // spb2.emplace_stage(VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT, "Assets/Shaders/uivert.spv", *renderer);
+        //     // spb2.emplace_stage(VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT, "Assets/Shaders/uifrag.spv", *renderer);
+        //     // ID shaderPassId2 = rb.emplace_shader_pass(spb2);
+
+        //     // create material templates
+        //     MaterialTemplateBuilder mtb({shaderPassId});
+        //     MaterialBufferObject mbo{
+        //         .textureId = 0,
+        //         .color = Vector4(1.0f, 1.0f, 1.0f, 1.0f)};
+        //     mtb.emplace_default_value("material", Dynamic(&mbo, sizeof(MaterialBufferObject)));
+        //     ID materialTemplateId = rb.emplace_material_template(mtb);
+
+        //     // create materials
+        //     MaterialBuilder mb(materialTemplateId); // world
+        //     rb.emplace_material(mb);
+        //     MaterialBuilder mb2(materialTemplateId); // world 2
+        //     mbo.textureId = 1;
+        //     mb2.emplace_value("material", Dynamic(&mbo, sizeof(MaterialBufferObject)));
+        //     rb.emplace_material(mb2);
+        //     MaterialBuilder mb3(materialTemplateId); // world 3
+        //     mbo.textureId = 2;
+        //     mb3.emplace_value("material", Dynamic(&mbo, sizeof(MaterialBufferObject)));
+        //     rb.emplace_material(mb3);
+        //     // MaterialBuilder mb2(materialTemplateId2); // ui
+
+        //     // init renderer with builders
+        //     renderer->init(rb);
+        // }
 
         // load scene from disk
-        ID sceneId = sceneManager->create_scene("Assets/Scenes/test.minty");
+        ID sceneId = sceneManager->create_scene("Scenes/test.minty");
         Scene &scene = sceneManager->get_scene(sceneId);
         EntityRegistry *er = scene.get_entity_registry();
         SystemRegistry *sr = scene.get_system_registry();
