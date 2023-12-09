@@ -25,6 +25,11 @@ void* minty::Reader::get_data() const
 	return _data;
 }
 
+bool minty::Reader::exists(std::string const& name) const
+{
+	return static_cast<bool>(_node.find(name));
+}
+
 void minty::Reader::read_object(std::string const& name, ISerializable* const value) const
 {
 	auto const* found = _node.find(name);

@@ -3,6 +3,7 @@
 
 #include "M_Renderer.h"
 #include "M_Rendering_TextureBuilder.h"
+#include "M_Assets.h"
 #include "M_File.h"
 #include "M_Error.h"
 #include <format>
@@ -15,28 +16,40 @@ using namespace minty::rendering;
 
 Texture::Texture(rendering::TextureBuilder const& builder, Renderer& renderer)
 	: RendererObject::RendererObject(renderer)
-	, _width(builder.get_width())
-	, _height(builder.get_height())
+	, _width(builder.width)
+	, _height(builder.height)
+	, _format()
+	, _image()
+	, _view()
+	, _memory()
+	, _sampler()
 {
 	// determine how to load data
-	stbi_uc* pixels = builder.get_pixel_data_raw();
+	stbi_uc* pixels = reinterpret_cast<stbi_uc*>(builder.pixelData);
 	bool allocated = false;
 
-	std::string const& path = builder.get_path();
+	std::string const& path = builder.path;
 	bool fromFile = path.size();
 
 	if (fromFile)
 	{
-		if (!file::exists(path))
+		if (!assets::exists(path))
 		{
 			console::error(std::format("Cannot load texture. File not found at: {}", path));
+			return;
+		}
+
+		if (builder.pixelFormat == TextureBuilder::PixelFormat::None)
+		{
+			console::error("Attempting to load texture with a pixelFormat of None.");
 			return;
 		}
 
 		// get data from file: pixels, width, height, color channels
 		int channels;
 
-		pixels = stbi_load(path.c_str(), &_width, &_height, &channels, static_cast<int>(builder.get_pixel_format()));
+		std::string absPath = assets::absolute(path);
+		pixels = stbi_load(absPath.c_str(), &_width, &_height, &channels, static_cast<int>(builder.pixelFormat));
 
 		// if no pixels, error
 		if (!pixels)
@@ -48,8 +61,8 @@ Texture::Texture(rendering::TextureBuilder const& builder, Renderer& renderer)
 	else
 	{
 		// get data from builder
-		_width = builder.get_width();
-		_height = builder.get_height();
+		_width = builder.width;
+		_height = builder.height;
 
 		// create color data if needed
 		if (!pixels && _width * _height > 0)
@@ -104,7 +117,7 @@ Texture::Texture(rendering::TextureBuilder const& builder, Renderer& renderer)
 	}
 
 	// image data
-	_format = static_cast<VkFormat>(builder.get_format());
+	_format = static_cast<VkFormat>(builder.format);
 
 	// create the image on gpu
 	renderer.create_image(_width, _height, _format, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, _image, _memory);
@@ -130,15 +143,15 @@ Texture::Texture(rendering::TextureBuilder const& builder, Renderer& renderer)
 	// create the sampler in constructor for now
 	VkSamplerCreateInfo samplerInfo{};
 	samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-	samplerInfo.magFilter = static_cast<VkFilter>(builder.get_filter());
-	samplerInfo.minFilter = static_cast<VkFilter>(builder.get_filter());
+	samplerInfo.magFilter = static_cast<VkFilter>(builder.filter);
+	samplerInfo.minFilter = static_cast<VkFilter>(builder.filter);
 	//samplerInfo.magFilter = VK_FILTER_LINEAR;
 	//samplerInfo.minFilter = VK_FILTER_LINEAR;
 
 	// how to draw if size is too small or big, etc.
-	samplerInfo.addressModeU = static_cast<VkSamplerAddressMode>(builder.get_sampler_address_mode());
-	samplerInfo.addressModeV = static_cast<VkSamplerAddressMode>(builder.get_sampler_address_mode());
-	samplerInfo.addressModeW = static_cast<VkSamplerAddressMode>(builder.get_sampler_address_mode());
+	samplerInfo.addressModeU = static_cast<VkSamplerAddressMode>(builder.addressMode);
+	samplerInfo.addressModeV = static_cast<VkSamplerAddressMode>(builder.addressMode);
+	samplerInfo.addressModeW = static_cast<VkSamplerAddressMode>(builder.addressMode);
 
 	VkPhysicalDeviceProperties properties{};
 	vkGetPhysicalDeviceProperties(renderer.get_physical_device(), &properties);
@@ -156,7 +169,7 @@ Texture::Texture(rendering::TextureBuilder const& builder, Renderer& renderer)
 	samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
 
 	// mip maps
-	samplerInfo.mipmapMode = static_cast<VkSamplerMipmapMode>(builder.get_sampler_mipmap_mode());
+	samplerInfo.mipmapMode = static_cast<VkSamplerMipmapMode>(builder.mipmapMode);
 	samplerInfo.mipLodBias = 0.0f;
 	samplerInfo.minLod = 0.0f;
 	samplerInfo.maxLod = 0.0f;

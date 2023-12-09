@@ -1,9 +1,10 @@
 #include "pch.h"
 #include "M_SceneManager.h"
 
+#include "M_Assets.h"
 #include "M_Runtime.h"
 #include "M_Engine.h"
-#include "M_SerializedNode.h"
+#include "M_Node.h"
 #include "M_Reader.h"
 #include "M_Console.h"
 #include "M_SerializationData.h"
@@ -36,7 +37,7 @@ ID minty::SceneManager::create_scene(std::string const& path)
 	Scene& scene = _scenes.at(id);
 
 	// load the data from the disk into the scene
-	Node node = Node::parse_file(path);
+	Node node = assets::load_node(path);
 	SerializationData data =
 	{
 		.renderer = scene.get_engine()->get_renderer(),

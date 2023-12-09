@@ -208,7 +208,9 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="M_Assets.h" />
     <ClInclude Include="M_Builtin_GlobalData.h" />
+    <ClInclude Include="M_Resources.h" />
     <ClInclude Include="M_SerializationData.h" />
     <ClInclude Include="M_Dynamic.h" />
     <ClInclude Include="M_Base.h" />
@@ -265,10 +267,11 @@
     <ClInclude Include="M_Rendering_UniformConstantInfo.h" />
     <ClInclude Include="M_Scene.h" />
     <ClInclude Include="M_SceneManager.h" />
-    <ClInclude Include="M_SerializedNode.h" />
+    <ClInclude Include="M_Node.h" />
     <ClInclude Include="M_Shader.h" />
     <ClInclude Include="M_ShaderPass.h" />
     <ClInclude Include="M_Sprite.h" />
+    <ClInclude Include="M_String.h" />
     <ClInclude Include="M_System.h" />
     <ClInclude Include="M_SystemRegistry.h" />
     <ClInclude Include="M_Texture.h" />
@@ -291,9 +294,11 @@
     <ClInclude Include="pch.h" />
     <ClInclude Include="M_Quaternion.h" />
     <ClInclude Include="resource.h" />
+    <ClInclude Include="vulkan.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="M_Assets.cpp" />
     <ClCompile Include="M_Dynamic.cpp" />
     <ClCompile Include="M_Basic.cpp" />
     <ClCompile Include="M_CameraComponent.cpp" />
@@ -307,6 +312,7 @@
     <ClCompile Include="M_Error.cpp" />
     <ClCompile Include="M_File.cpp" />
     <ClCompile Include="M_Engine.cpp" />
+    <ClCompile Include="M_Resources.cpp" />
     <ClCompile Include="M_Material.cpp" />
     <ClCompile Include="M_RelationshipComponent.cpp" />
     <ClCompile Include="M_Info.cpp" />
@@ -328,21 +334,16 @@
     <ClCompile Include="M_RenderableTag.cpp" />
     <ClCompile Include="M_Rendering_Buffer.cpp" />
     <ClCompile Include="M_Rendering_DescriptorSet.cpp" />
-    <ClCompile Include="M_Rendering_MaterialTemplateBuilder.cpp" />
-    <ClCompile Include="M_Rendering_MaterialBuilder.cpp" />
     <ClCompile Include="M_Rendering_Object.cpp" />
-    <ClCompile Include="M_Rendering_PushConstantInfo.cpp" />
-    <ClCompile Include="M_Rendering_RendererBuilder.cpp" />
     <ClCompile Include="M_Rendering_ShaderBuilder.cpp" />
-    <ClCompile Include="M_Rendering_ShaderPassBuilder.cpp" />
     <ClCompile Include="M_Rendering_TextureBuilder.cpp" />
-    <ClCompile Include="M_Rendering_UniformConstantInfo.cpp" />
     <ClCompile Include="M_Scene.cpp" />
     <ClCompile Include="M_SceneManager.cpp" />
-    <ClCompile Include="M_SerializedNode.cpp" />
+    <ClCompile Include="M_Node.cpp" />
     <ClCompile Include="M_Shader.cpp" />
     <ClCompile Include="M_ShaderPass.cpp" />
     <ClCompile Include="M_Sprite.cpp" />
+    <ClCompile Include="M_String.cpp" />
     <ClCompile Include="M_System.cpp" />
     <ClCompile Include="M_SystemRegistry.cpp" />
     <ClCompile Include="M_Texture.cpp" />
@@ -366,6 +367,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="vulkan.cpp" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="notes.txt" />

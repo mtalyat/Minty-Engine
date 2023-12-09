@@ -22,16 +22,27 @@ void minty::Writer::write(std::string const& name)
 
 void minty::Writer::write(std::string const& name, Node const& node)
 {
-	_node.children.push_back({ name, node });
+	auto const& found = _node.children.find(name);
+
+	if (found != _node.children.end())
+	{
+		// existing key/children list
+		found->second.push_back(node);
+	}
+	else
+	{
+		// new key and children list
+		_node.children.emplace(name, std::vector{ node });
+	}
 }
 
 void minty::Writer::write(std::string const& name, ISerializable const* const value)
 {
 	// add child object for this object to write
-	_node.children.push_back({ name, Node() });
+	write(name, Node());
 
 	// create a Writer to use
-	Writer Writer(_node.children.back().second, _data);
+	Writer Writer(_node.children.at(name).back(), _data);
 
 	// serialize the object into that node
 	value->serialize(Writer);
@@ -39,7 +50,7 @@ void minty::Writer::write(std::string const& name, ISerializable const* const va
 
 void minty::Writer::write(std::string const& name, std::string const& value)
 {
-	_node.children.push_back({ name, Node{.data = value } });
+	write(name, Node{.data = value });
 }
 
 void minty::Writer::write(std::string const& name, int const value)
@@ -160,7 +171,7 @@ void minty::Writer::write(std::string const& name, std::string const& value, std
 	if (value.compare(defaultValue))
 	{
 		// not default value
-		_node.children.push_back({ name, Node{.data = value } });
+		write(name, value);
 	}
 }
 

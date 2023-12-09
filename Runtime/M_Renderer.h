@@ -70,8 +70,8 @@ namespace minty
 
 	namespace rendering
 	{
-		class RendererBuilder;
-		class TextureBuilder;
+		struct RendererBuilder;
+		struct TextureBuilder;
 	}
 
 	/// <summary>
@@ -83,7 +83,7 @@ namespace minty
 	private:
 		rendering::RendererBuilder const* _builder;
 		Window* _window;
-		
+
 		// assets
 
 		Register<Texture> _textures;
@@ -359,6 +359,33 @@ namespace minty
 
 		ID get_or_create_mesh(MeshType const type);
 
+		ID find_texture(std::string const& name);
+
+		ID find_shader(std::string const& name);
+
+		ID find_shader_pass(std::string const& name);
+
+		ID find_material_template(std::string const& name);
+
+		ID find_material(std::string const& name);
+
+		ID load_texture(std::string const& path);
+
+		ID load_shader(std::string const& path);
+
+		ID load_shader_pass(std::string const& path);
+
+		ID load_material_template(std::string const& path);
+
+		ID load_material(std::string const& path);
+
+		ID load_mesh(std::string const& path);
+
+	private:
+		int check_asset(std::string const& path, bool const requiresMeta) const;
+
+		void load_mesh_obj(std::string const& path, ID const meshId);
+
 	public:
 		Texture& get_texture(ID const id);
 
@@ -404,37 +431,37 @@ namespace minty
 
 #pragma region Buffers
 
-		public:
-			/// <summary>
-			/// Creates a buffer.
-			/// </summary>
-			/// <param name="size">The size of the buffer.</param>
-			/// <param name="usage">How the buffer will be used.</param>
-			/// <param name="properties">The memory properties.</param>
-			ID create_buffer(VkDeviceSize const size, VkBufferUsageFlags const usage, VkMemoryPropertyFlags const properties);
+	public:
+		/// <summary>
+		/// Creates a buffer.
+		/// </summary>
+		/// <param name="size">The size of the buffer.</param>
+		/// <param name="usage">How the buffer will be used.</param>
+		/// <param name="properties">The memory properties.</param>
+		ID create_buffer(VkDeviceSize const size, VkBufferUsageFlags const usage, VkMemoryPropertyFlags const properties);
 
-			ID create_buffer_uniform(VkDeviceSize const size);
+		ID create_buffer_uniform(VkDeviceSize const size);
 
-			void destroy_buffer(ID const id);
+		void destroy_buffer(ID const id);
 
-			void* map_buffer(ID const id) const;
+		void* map_buffer(ID const id) const;
 
-			void unmap_buffer(ID const id) const;
+		void unmap_buffer(ID const id) const;
 
-			void set_buffer(ID const id, void* const data);
+		void set_buffer(ID const id, void* const data);
 
-			void set_buffer(ID const id, void* const data, VkDeviceSize const size, VkDeviceSize const offset = 0);
+		void set_buffer(ID const id, void* const data, VkDeviceSize const size, VkDeviceSize const offset = 0);
 
-			VkBuffer get_buffer(ID const id) const;
+		VkBuffer get_buffer(ID const id) const;
 
-			void get_buffer_data(ID const id, void* const out) const;
+		void get_buffer_data(ID const id, void* const out) const;
 
-			VkDeviceSize get_buffer_size(ID const id) const;
+		VkDeviceSize get_buffer_size(ID const id) const;
 
-			void copy_buffer(ID const srcId, ID const dstId, VkDeviceSize const size);
+		void copy_buffer(ID const srcId, ID const dstId, VkDeviceSize const size);
 
-			private:
-				void destroy_buffer(rendering::Buffer const& buffer);
+	private:
+		void destroy_buffer(rendering::Buffer const& buffer);
 
 #pragma endregion
 
@@ -451,7 +478,7 @@ namespace minty
 
 #pragma region Helper
 
-	public:	
+	public:
 
 		/// <summary>
 		/// Creates an image.
@@ -492,8 +519,6 @@ namespace minty
 		/// <param name="aspectFlags">The aspect flags of the image.</param>
 		/// <returns>The created image view.</returns>
 		VkImageView create_image_view(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
-
-		std::vector<char> load_file(std::string const& path) const;
 
 		VkShaderModule load_shader_module(std::string const& path) const;
 

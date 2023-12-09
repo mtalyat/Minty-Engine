@@ -20,3 +20,38 @@ namespace minty
 	std::string to_string(Vector3Int const& v);
 	std::string to_string(Vector4Int const& v);
 }
+
+template<>
+struct std::hash<minty::Vector2Int>
+{
+	size_t operator()(const minty::Vector2Int& key) const
+	{
+		return
+			(hash<int>()(key.x)
+				^ (hash<int>()(key.y) << 1)) >> 1;
+	}
+};
+
+template<>
+struct std::hash<minty::Vector3Int>
+{
+	size_t operator()(const minty::Vector3Int& key) const
+	{
+		return (
+			(hash<int>()(key.x)
+				^ (hash<int>()(key.y) << 1)) >> 1)
+			^ (hash<int>()(key.z) << 1);
+	}
+};
+
+template<>
+struct std::hash<minty::Vector4Int>
+{
+	size_t operator()(const minty::Vector4Int& key) const
+	{
+		return (
+			(hash<int>()(key.x)
+				^ (hash<int>()(key.y) << 1)) >> 1)
+			^ (hash<int>()(key.z) << 1) ^ (hash<int>()(key.w) << 2);
+	}
+};

@@ -1,15 +1,13 @@
 #pragma once
-#include "M_Object.h"
+#include "M_Base.h"
 
 #include "M_Color.h"
-#include <vulkan/vulkan.h>
+#include "vulkan.h"
 
 namespace minty::rendering
 {
-	class TextureBuilder :
-		public Object
+	struct TextureBuilder
 	{
-	public:
 		enum class PixelFormat
 		{
 			None = 0,
@@ -18,53 +16,19 @@ namespace minty::rendering
 			RedGreenBlue = 3,
 			RedGreenBlueAlpha = 4,
 		};
-	private:
-		std::string _path;
-		Color* _pixelData;
-		int _width, _height;
-		PixelFormat _pixelFormat;
-		VkFilter _filter;
-		VkSamplerAddressMode _addressMode;
-		VkSamplerMipmapMode _mipmapMode;
-		VkFormat _format;
 
-	public:
-		TextureBuilder(std::string const& path);
-
-		TextureBuilder(int const width, int const height);
-
-		TextureBuilder(int const width, int const height, Color* const pixels);
-
-		void set_filter(VkFilter const filter);
-
-		void set_sampler_address_mode(VkSamplerAddressMode const addressMode);
-
-		void set_sampler_mipmap_mode(VkSamplerMipmapMode const mipmapMode);
-
-		void set_format(VkFormat const format);
-
-		std::string const& get_path() const;
-
-		int get_width() const;
-
-		int get_height() const;
-
-		Color* get_pixel_data() const;
-
-		byte* get_pixel_data_raw() const;
-
-		PixelFormat get_pixel_format() const;
-
-		VkFilter get_filter() const;
-
-		VkSamplerAddressMode get_sampler_address_mode() const;
-
-		VkSamplerMipmapMode get_sampler_mipmap_mode() const;
-
-		VkFormat get_format() const;
-
-	public:
-		friend std::string to_string(TextureBuilder const& value);
+		std::string name;
+		std::string path;
+		Color* pixelData;
+		int width, height;
+		PixelFormat pixelFormat;
+		VkFilter filter;
+		VkSamplerAddressMode addressMode;
+		VkSamplerMipmapMode mipmapMode;
+		VkFormat format;
 	};
+
+	std::string to_string(TextureBuilder::PixelFormat const value);
+	TextureBuilder::PixelFormat from_string_texture_builder_pixel_format(std::string const& value);
 }
 

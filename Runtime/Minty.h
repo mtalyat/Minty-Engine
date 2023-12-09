@@ -10,8 +10,13 @@ access to the entire engine without needing include each file.
 */
 
 // LIBRARIES
-#include <vulkan/vulkan.h>
+#include "vulkan.h"
 #include "glm.hpp"
+
+// ASSETS
+#include "M_Assets.h"
+#include "M_File.h"
+#include "M_Resources.h"
 
 // BASIC
 #include "M_Basic.h"
@@ -58,8 +63,9 @@ access to the entire engine without needing include each file.
 
 // SERIALIZATION
 #include "M_ISerializable.h"
+#include "M_Node.h"
 #include "M_Reader.h"
-#include "M_SerializedNode.h"
+#include "M_SerializationData.h"
 #include "M_Writer.h"
 
 // SYSTEMS
@@ -69,6 +75,7 @@ access to the entire engine without needing include each file.
 
 
 // GENERAL
+#include "M_Base.h"
 #include "M_Color.h"
 #include "M_CommandLineParser.h"
 #include "M_Console.h"
@@ -76,8 +83,8 @@ access to the entire engine without needing include each file.
 #include "M_Dynamic.h"
 #include "M_Encoding.h"
 #include "M_Engine.h"
+#include "M_Error.h"
 #include "M_Event.h"
-#include "M_File.h"
 #include "M_Info.h"
 #include "M_Math.h"
 #include "M_Matrix.h"
@@ -86,8 +93,11 @@ access to the entire engine without needing include each file.
 #include "M_Quaternion.h"
 #include "M_Rect.h"
 #include "M_RectF.h"
+#include "M_Register.h"
 #include "M_Runtime.h"
 #include "M_Stopwatch.h"
+#include "M_String.h"
+#include "M_Transform.h"
 #include "M_Types.h"
 #include "M_Vector.h"
 #include "M_Window.h"

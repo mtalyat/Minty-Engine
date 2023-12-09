@@ -1,6 +1,7 @@
 #pragma once
 
 #include "M_Base.h"
+#include "M_ISerializable.h"
 
 namespace minty
 {
@@ -8,6 +9,7 @@ namespace minty
 	/// Holds a dynamic set of data, where its type can be unknown at compile and runtime.
 	/// </summary>
 	class Dynamic
+		: public ISerializable
 	{
 	private:
 		void* _data;
@@ -25,10 +27,10 @@ namespace minty
 		Dynamic& operator=(Dynamic const& other);
 
 		// move
-		Dynamic(Dynamic&& other);
+		Dynamic(Dynamic&& other) noexcept;
 
 		// move
-		Dynamic& operator=(Dynamic&& other);
+		Dynamic& operator=(Dynamic&& other) noexcept;
 
 		~Dynamic();
 
@@ -45,6 +47,10 @@ namespace minty
 		size_t size() const;
 
 		void clear();
+
+		void serialize(Writer& writer) const;
+
+		void deserialize(Reader const& reader);
 	};
 	template<typename T>
 	void Dynamic::set(T* const data, size_t const count)

@@ -13,8 +13,8 @@ using namespace minty::rendering;
 
 minty::MaterialTemplate::MaterialTemplate(rendering::MaterialTemplateBuilder const& builder, Renderer& renderer)
 	: RendererObject::RendererObject(renderer)
-	, _shaderPassIds(builder.get_shader_pass_ids())
-	, _defaultValues(builder.get_default_values())
+	, _shaderPassIds(builder.shaderPassIds)
+	, _defaultValues(builder.defaultValues)
 {}
 
 void minty::MaterialTemplate::destroy()

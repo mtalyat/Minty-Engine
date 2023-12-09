@@ -46,6 +46,7 @@ bool is_float(std::string const& string)
 
     char c;
     bool decimal = false;
+    bool digit = false;
     for (size_t i = 0; i < string.size(); i++)
     {
         c = string.at(i);
@@ -61,10 +62,13 @@ bool is_float(std::string const& string)
             break;
         default:
             if (!isdigit(c)) return false; // not a digit
+            digit = true;
+            break;
         }
     }
 
-    return true;
+    // can only be a number if there was a digit
+    return digit;
 }
 
 bool minty::parse::to_bool(std::string const& string)
@@ -131,12 +135,22 @@ bool minty::parse::try_int(std::string const& string, int& value)
     return false;
 }
 
-unsigned int minty::parse::to_unsigned_int(std::string const& string)
+ID minty::parse::to_id(std::string const& string)
+{
+    return to_int(string);
+}
+
+bool minty::parse::try_id(std::string const& string, ID& value)
+{
+    return try_int(string, value);
+}
+
+unsigned int minty::parse::to_uint(std::string const& string)
 {
     return static_cast<unsigned int>(std::stoul(string));
 }
 
-bool minty::parse::try_unsigned_int(std::string const& string, unsigned int& value)
+bool minty::parse::try_uint(std::string const& string, unsigned int& value)
 {
     if (is_unsigned_integer(string))
     {
@@ -189,6 +203,22 @@ bool minty::parse::try_double(std::string const& string, double& value)
     if (is_float(string))
     {
         value = std::stod(string);
+        return true;
+    }
+
+    return false;
+}
+
+size_t minty::parse::to_size_t(std::string const& string)
+{
+    return std::stoull(string);
+}
+
+bool minty::parse::try_size_t(std::string const& string, size_t& value)
+{
+    if (is_unsigned_integer(string))
+    {
+        value = std::stoull(string);
         return true;
     }
 

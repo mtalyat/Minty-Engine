@@ -2,7 +2,7 @@
 
 #include "M_Types.h"
 #include "M_Object.h"
-#include "M_SerializedNode.h"
+#include "M_Node.h"
 #include "M_Vector.h"
 #include "M_Quaternion.h"
 #include <map>
@@ -40,6 +40,8 @@ namespace minty
 		/// </summary>
 		/// <returns>The extra data as a void pointer.</returns>
 		void* get_data() const;
+
+		bool exists(std::string const& name) const;
 
 		void read_object(std::string const& name, ISerializable* const value) const;
 

@@ -76,6 +76,8 @@ namespace minty
 		/// <returns>The name of the Entity, or "" if no name.</returns>
 		std::string get_name(Entity const entity) const;
 
+		void set_name(Entity const entity, std::string const& name);
+
 		/// <summary>
 		/// Emplaces the Component onto the entity, by name.
 		/// </summary>
