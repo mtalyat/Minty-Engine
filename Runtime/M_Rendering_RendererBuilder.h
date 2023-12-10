@@ -26,11 +26,5 @@ namespace minty::rendering
 	struct RendererBuilder
 	{
 		Info const* info;
-
-		Register<TextureBuilder const*> textureBuilders;
-		Register<ShaderBuilder const*> shaderBuilders;
-		Register<ShaderPassBuilder const*> shaderPassBuilders;
-		Register<MaterialTemplateBuilder const*> materialTemplateBuilders;
-		Register<MaterialBuilder const*> materialBuilders;
 	};
 }

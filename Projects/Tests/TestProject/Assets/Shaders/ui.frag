@@ -11,6 +11,8 @@ layout(location = 0) out vec4 outColor;
 layout(set = 0, binding = 0) uniform sampler2D texSamplers[];
 
 void main() {
+    outColor = vec4(1.0, 0.0, 0.0, 1.0);
+    return;
     outColor = fragColor * texture(texSamplers[nonuniformEXT(fragTexId)], fragTexCoord);
     if(outColor.a <= 0.0)
     {

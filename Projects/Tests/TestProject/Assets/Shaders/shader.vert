@@ -28,7 +28,8 @@ layout(location = 2) out flat int fragTexId;
 
 void main() {
     gl_Position = camera.transform * object.transform * vec4(inPosition, 1.0);
-    fragColor = material.color;    
+    fragColor = vec4(1.0, 1.0, 1.0, 1.0);
+    // fragColor = material.color;
     fragTexCoord = inTexCoord;
     fragTexId = material.textureId;
 }

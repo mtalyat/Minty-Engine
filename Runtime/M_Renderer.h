@@ -244,23 +244,6 @@ namespace minty
 		void create_framebuffers();
 
 		/// <summary>
-		/// Creates all textures based on the builder plans.
-		/// </summary>
-		void build_textures();
-
-		/// <summary>
-		/// Creates all shaders based on the builder plans.
-		/// </summary>
-		void build_shaders();
-
-		/// <summary>
-		/// Creates all materials based on the builder plans.
-		/// </summary>
-		void build_materials();
-
-		void create_assets();
-
-		/// <summary>
 		/// Creates the command buffers.
 		/// </summary>
 		void create_command_buffers();

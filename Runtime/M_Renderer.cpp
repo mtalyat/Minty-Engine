@@ -123,9 +123,6 @@ void minty::Renderer::init(rendering::RendererBuilder const& builder)
 	create_command_pool(commandPool);
 	create_depth_resources();
 	create_framebuffers();
-
-	create_assets();
-
 	create_command_buffers();
 	create_sync_objects();
 
@@ -1851,57 +1848,6 @@ void Renderer::create_framebuffers()
 		if (vkCreateFramebuffer(_device, &framebufferInfo, nullptr, &swapChainFramebuffers[i]) != VK_SUCCESS) {
 			error::abort("Failed to create framebuffer.");
 		}
-	}
-}
-
-void minty::Renderer::build_textures()
-{
-	// go through each texture, create it with builder data
-
-}
-
-void minty::Renderer::build_shaders()
-{
-	// build custom
-
-}
-
-void minty::Renderer::build_materials()
-{
-	// not really a "pair"
-
-}
-
-void minty::Renderer::create_assets()
-{
-	// textures
-	for (auto const& builder : _builder->textureBuilders)
-	{
-		create_texture(*builder.second);
-	}
-
-	// shaders
-	for (auto const builder : _builder->shaderBuilders)
-	{
-		create_shader(*builder.second);
-	}
-
-	// shader passes
-	for (auto const builder : _builder->shaderPassBuilders)
-	{
-		create_shader_pass(*builder.second);
-	}
-
-	// material templates
-	for (auto const builder : _builder->materialTemplateBuilders)
-	{
-		create_material_template(*builder.second);
-	}
-
-	// materials
-	for (auto const& builder : _builder->materialBuilders)
-	{
-		create_material(*builder.second);
 	}
 }
 
