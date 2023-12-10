@@ -49,31 +49,25 @@ void init(Runtime &runtime)
             renderer->init(rb);
 
             // create textures
-            // std::vector<TextureBuilder> textureBuilders =
-            //     {
-            //         TextureBuilder("Assets/Textures/funny2.png"),
-            //         TextureBuilder("Assets/Textures/funny.jpg"),
-            //         TextureBuilder("Assets/Textures/texture.jpg"),
-            //         TextureBuilder("Assets/Textures/brian.png"),
-            //         TextureBuilder("Assets/Textures/crosshair.png"),
-            //         TextureBuilder("Assets/Textures/ui.png"),
-            //     };
-            TextureBuilder tb {
-                .name = "funny",
-                .path = "Textures/funny.jpg",
-                .pixelFormat = TextureBuilder::PixelFormat::RedGreenBlueAlpha,
-                .filter = VkFilter::VK_FILTER_NEAREST,
-                .addressMode = VkSamplerAddressMode::VK_SAMPLER_ADDRESS_MODE_REPEAT,
-                .mipmapMode = VkSamplerMipmapMode::VK_SAMPLER_MIPMAP_MODE_NEAREST,
-                .format = VkFormat::VK_FORMAT_R8G8B8A8_SRGB,
-            };
-            renderer->create_texture(tb);
-            tb.name = "funny2";
-            tb.path = "Textures/funny2.png";
-            renderer->create_texture(tb);
-            tb.name = "texture.jpg";
-            tb.path = "Textures/texture.jpg";
-            renderer->create_texture(tb);
+            // TextureBuilder tb {
+            //     .name = "funny",
+            //     .path = "Textures/funny.jpg",
+            //     .pixelFormat = TextureBuilder::PixelFormat::RedGreenBlueAlpha,
+            //     .filter = VkFilter::VK_FILTER_NEAREST,
+            //     .addressMode = VkSamplerAddressMode::VK_SAMPLER_ADDRESS_MODE_REPEAT,
+            //     .mipmapMode = VkSamplerMipmapMode::VK_SAMPLER_MIPMAP_MODE_NEAREST,
+            //     .format = VkFormat::VK_FORMAT_R8G8B8A8_SRGB,
+            // };
+            // renderer->create_texture(tb);
+            // tb.name = "funny2";
+            // tb.path = "Textures/funny2.png";
+            // renderer->create_texture(tb);
+            // tb.name = "texture.jpg";
+            // tb.path = "Textures/texture.jpg";
+            // renderer->create_texture(tb);
+            renderer->load_texture("Textures/funny.jpg");
+            renderer->load_texture("Textures/pattern.png");
+            renderer->load_texture("Textures/texture.jpg");
 
             // create shader
             ShaderBuilder sb;
