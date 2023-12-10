@@ -1656,7 +1656,7 @@ void minty::Renderer::load_mesh_obj(std::string const& path, ID const id)
 			// position
 			Vector3 position;
 			ss >> position.x >> position.y >> position.z;
-			position.y = -position.y; // negate Y
+			position.y = -position.y; // flip Y
 			positions.push_back(position);
 		}
 		else if(token == "vt")
