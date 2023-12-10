@@ -49,88 +49,12 @@ void init(Runtime &runtime)
             renderer->init(rb);
 
             // create textures
-            // TextureBuilder tb {
-            //     .name = "funny",
-            //     .path = "Textures/funny.jpg",
-            //     .pixelFormat = TextureBuilder::PixelFormat::RedGreenBlueAlpha,
-            //     .filter = VkFilter::VK_FILTER_NEAREST,
-            //     .addressMode = VkSamplerAddressMode::VK_SAMPLER_ADDRESS_MODE_REPEAT,
-            //     .mipmapMode = VkSamplerMipmapMode::VK_SAMPLER_MIPMAP_MODE_NEAREST,
-            //     .format = VkFormat::VK_FORMAT_R8G8B8A8_SRGB,
-            // };
-            // renderer->create_texture(tb);
-            // tb.name = "funny2";
-            // tb.path = "Textures/funny2.png";
-            // renderer->create_texture(tb);
-            // tb.name = "texture.jpg";
-            // tb.path = "Textures/texture.jpg";
-            // renderer->create_texture(tb);
             renderer->load_texture("Textures/funny.jpg");
             renderer->load_texture("Textures/pattern.png");
             renderer->load_texture("Textures/texture.jpg");
 
             // create shader
-            ShaderBuilder sb;
-            sb.name = "shader";
-            // basic::create_basic_shader_builder_3d(rb, sb);
-            // add uniform data that should be part of every shader
-            // shaderBuilder.emplace_uniform_constant(UniformConstantInfo("camera", VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT, VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER, sizeof(CameraBufferObject), DESCRIPTOR_SET_SHADER, 0));
-            sb.uniformConstantInfos.emplace("camera", UniformConstantInfo{
-                                                          .name = "camera",
-                                                          .type = VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                                                          .set = DESCRIPTOR_SET_SHADER,
-                                                          .binding = 0,
-                                                          .count = 1,
-                                                          .size = sizeof(CameraBufferObject),
-                                                          .stageFlags = VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT,
-                                                          .ids = {},
-                                                      });
-            // add push constant that should be part of every shader
-            // shaderBuilder.emplace_push_constant(PushConstantInfo("object", VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT, 0, sizeof(DrawCallObject3D)));
-            sb.pushConstantInfos.emplace("object", PushConstantInfo{
-                                                       .name = "object",
-                                                       .stageFlags = VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT,
-                                                       .offset = 0,
-                                                       .size = sizeof(DrawCallObject3D),
-                                                   });
-            // sb.emplace_uniform_constant(UniformConstantInfo(
-            //     "material",
-            //     VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT,
-            //     VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-            //     sizeof(MaterialBufferObject),
-            //     DESCRIPTOR_SET_MATERIAL,
-            //     0));
-            sb.uniformConstantInfos.emplace("material", UniformConstantInfo{
-                                                            .name = "material",
-                                                            .type = VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                                                            .set = DESCRIPTOR_SET_MATERIAL,
-                                                            .binding = 0,
-                                                            .count = 1,
-                                                            .size = sizeof(MaterialBufferObject),
-                                                            .stageFlags = VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT,
-                                                            .ids = {},
-                                                        });
-            // sb.emplace_uniform_constant(UniformConstantInfo(
-            //     "textures",
-            //     VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT,
-            //     VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-            //     sizeof(VkSampler),
-            //     DESCRIPTOR_SET_MATERIAL,
-            //     1,
-            //     4,
-            //     {0, 1, 2, 3}));
-            sb.uniformConstantInfos.emplace("textures", UniformConstantInfo{
-                                                            .name = "textures",
-                                                            .type = VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                                                            .set = DESCRIPTOR_SET_MATERIAL,
-                                                            .binding = 1,
-                                                            .count = 4,
-                                                            .size = sizeof(VkSampler),
-                                                            .stageFlags = VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT,
-                                                            .ids = {0, 1, 2, 0},
-                                                        });
-            // ID shaderId = rb.emplace_shader(sb);
-            ID shaderId = renderer->create_shader(sb);
+            ID shaderId = renderer->load_shader("Shaders/shader.minty");
 
             // create shader pass
             ShaderPassBuilder spb;
