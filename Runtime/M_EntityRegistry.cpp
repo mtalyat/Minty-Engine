@@ -108,7 +108,7 @@ void minty::EntityRegistry::set_name(Entity const entity, std::string const& nam
 	else
 	{
 		// name is occupied
-		NameComponent nameComponent = get_or_emplace<NameComponent>(entity);
+		NameComponent& nameComponent = get_or_emplace<NameComponent>(entity);
 		nameComponent.name = name;
 	}
 }
@@ -173,6 +173,9 @@ void minty::EntityRegistry::serialize(Writer& writer) const
 
 		// get entity name
 		entityName = this->get_name(entity);
+
+		// use "_" instead of ""
+		if (entityName.empty()) entityName = "_";
 
 		// write entity node
 		writer.write(entityName, entityNode);

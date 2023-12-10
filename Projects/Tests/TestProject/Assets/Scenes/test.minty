@@ -10,19 +10,20 @@ Entities
             perspective: 1
             far: 1000
         Move
-    _
-#        Renderable
-#        Transform
-#        Mesh
-#            type: cube
-#    _
+    Cube
+        Renderable
+        Transform
+        Mesh
+            material: material1
+            type: cube
+#    Sphere
 #        Renderable
 #        Transform
 #            position
 #                y: 2
 #        Mesh
 #            type: sphere
-#    _
+#    Cylinder
 #        Renderable
 #        Transform
 #            position

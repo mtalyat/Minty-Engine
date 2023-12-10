@@ -369,6 +369,8 @@ namespace minty
 
 		ID find_material(std::string const& name);
 
+		ID find_mesh(std::string const& name);
+
 		ID load_texture(std::string const& path);
 
 		ID load_shader(std::string const& path);

@@ -53,10 +53,10 @@ void init(Runtime &runtime)
         renderer->load_shader("Shaders/shader.minty");
         renderer->load_shader_pass("Shaders/shaderPass.minty");
         renderer->load_material_template("Materials/materialTemplate.minty");
-        renderer->load_material_template("Materials/material1.minty");
-        renderer->load_material_template("Materials/material2.minty");
-        renderer->load_material_template("Materials/material3.minty");
-        renderer->load_material_template("Materials/material4.minty");
+        renderer->load_material("Materials/material1.minty");
+        renderer->load_material("Materials/material2.minty");
+        renderer->load_material("Materials/material3.minty");
+        renderer->load_material("Materials/material4.minty");
 
         // load scene from disk
         ID sceneId = sceneManager->create_scene("Scenes/test.minty");

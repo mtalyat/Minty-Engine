@@ -1369,6 +1369,16 @@ ID minty::Renderer::find_material(std::string const& name)
 	return _materials.get_id(name);
 }
 
+ID minty::Renderer::find_mesh(std::string const& name)
+{
+	if (!_meshes.contains(name))
+	{
+		return ERROR_ID;
+	}
+
+	return _meshes.get_id(name);
+}
+
 ID minty::Renderer::load_texture(std::string const& path)
 {
 	if (check_asset(path, true))

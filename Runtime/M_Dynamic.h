@@ -55,7 +55,7 @@ namespace minty
 	template<typename T>
 	void Dynamic::set(T* const data, size_t const count)
 	{
-		set(data, sizeof(T) * count);
+		set(static_cast<void*>(data), sizeof(T) * count);
 	}
 	template<typename T>
 	T* Dynamic::get() const
