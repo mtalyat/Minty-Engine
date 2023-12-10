@@ -47,14 +47,24 @@ access to the entire engine without needing include each file.
 
 // RENDERING
 #include "M_Material.h"
+#include "M_MaterialTemplate.h"
 #include "M_Mesh.h"
 #include "M_Renderer.h"
+#include "M_Rendering_Buffer.h"
+#include "M_Rendering_DescriptorSet.h"
+#include "M_Rendering_DrawCallObjectInfo.h"
 #include "M_Rendering_MaterialBuilder.h"
+#include "M_Rendering_MaterialTemplateBuilder.h"
 #include "M_Rendering_Object.h"
+#include "M_Rendering_PushConstantInfo.h"
 #include "M_Rendering_RendererBuilder.h"
-#include "M_Rendering_TextureBuilder.h"
 #include "M_Rendering_ShaderBuilder.h"
+#include "M_Rendering_ShaderPassBuilder.h"
+#include "M_Rendering_TextureBuilder.h"
+#include "M_Rendering_UniformConstantInfo.h"
 #include "M_Shader.h"
+#include "M_ShaderPass.h"
+#include "M_Sprite.h"
 #include "M_Texture.h"
 
 // SCENES
