@@ -57,57 +57,7 @@ void init(Runtime &runtime)
             ID shaderId = renderer->load_shader("Shaders/shader.minty");
 
             // create shader pass
-            ShaderPassBuilder spb;
-            spb.name = "shaderPass";
-            spb.shaderId = shaderId;
-            spb.topology = VkPrimitiveTopology::VK_PRIMITIVE_TOPOLOGY_TRIANGLE_LIST;
-            spb.cullMode = VkCullModeFlagBits::VK_CULL_MODE_BACK_BIT;
-            spb.polygonMode = VkPolygonMode::VK_POLYGON_MODE_FILL;
-            spb.frontFace = VkFrontFace::VK_FRONT_FACE_CLOCKWISE;
-            spb.lineWidth = 1.0f;
-            // basic::create_basic_shader_pass_builder_3d(rb, spb);
-            // shaderPassBuilder.emplace_vertex_binding(0, sizeof(Vertex3D));
-            spb.vertexBindings.push_back(VkVertexInputBindingDescription{
-                .binding = 0,
-                .stride = sizeof(basic::Vertex3D),
-                .inputRate = VK_VERTEX_INPUT_RATE_VERTEX,
-            });
-            // shaderPassBuilder.emplace_vertex_attribute(0, 0, sizeof(Vector3), offsetof(Vertex3D, pos), VkFormat::VK_FORMAT_R32G32B32_SFLOAT);
-            spb.vertexAttributes.push_back(VkVertexInputAttributeDescription{
-                .location = 0,
-                .binding = 0,
-                .format = VkFormat::VK_FORMAT_R32G32B32_SFLOAT,
-                .offset = offsetof(basic::Vertex3D, pos),
-            });
-            // shaderPassBuilder.emplace_vertex_attribute(0, 1, sizeof(Vector3), offsetof(Vertex3D, normal), VkFormat::VK_FORMAT_R32G32B32_SFLOAT);
-            spb.vertexAttributes.push_back(VkVertexInputAttributeDescription{
-                .location = 1,
-                .binding = 0,
-                .format = VkFormat::VK_FORMAT_R32G32B32_SFLOAT,
-                .offset = offsetof(basic::Vertex3D, normal),
-            });
-            // shaderPassBuilder.emplace_vertex_attribute(0, 2, sizeof(Vector2), offsetof(Vertex3D, coord), VkFormat::VK_FORMAT_R32G32_SFLOAT);
-            spb.vertexAttributes.push_back(VkVertexInputAttributeDescription{
-                .location = 2,
-                .binding = 0,
-                .format = VkFormat::VK_FORMAT_R32G32_SFLOAT,
-                .offset = offsetof(basic::Vertex3D, coord),
-            });
-            // spb.emplace_stage(VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT, "Assets/Shaders/vert.spv", *renderer);
-            spb.stages.push_back(ShaderPassBuilder::ShaderStageInfo{
-                .stage = VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT,
-                .code = assets::load_chars("Shaders/vert.spv"),
-                .entry = "main",
-            });
-            // spb.emplace_stage(VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT, "Assets/Shaders/frag.spv", *renderer);
-            spb.stages.push_back(ShaderPassBuilder::ShaderStageInfo{
-                .stage = VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT,
-                .code = assets::load_chars("Shaders/frag.spv"),
-                .entry = "main",
-            });
-
-            // ID shaderPassId = rb.emplace_shader_pass(spb);
-            ID shaderPassId = renderer->create_shader_pass(spb);
+            ID shaderPassId = renderer->load_shader_pass("Shaders/shaderPass.minty");
 
             // create material templates
             MaterialTemplateBuilder mtb;
