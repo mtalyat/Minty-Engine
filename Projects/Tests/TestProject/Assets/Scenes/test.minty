@@ -16,17 +16,19 @@ Entities
         Mesh
             material: material1
             type: cube
-#    Sphere
-#        Renderable
-#        Transform
-#            position
-#                y: 2
-#        Mesh
-#            type: sphere
-#    Cylinder
-#        Renderable
-#        Transform
-#            position
-#                y: -2
-#        Mesh
-#            type: cylinder
+    Sphere
+        Renderable
+        Transform
+            position
+                y: 2
+        Mesh
+            material: material2
+            type: sphere
+    Cylinder
+        Renderable
+        Transform
+            position
+                y: -2
+        Mesh
+            material: material3
+            type: cylinder
