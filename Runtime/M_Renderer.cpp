@@ -1607,6 +1607,100 @@ ID minty::Renderer::load_mesh(std::string const& path)
 	return id;
 }
 
+void minty::Renderer::destroy_texture(ID const id)
+{
+	if (_textures.contains(id))
+	{
+		auto& value = _textures.at(id);
+		value.destroy();
+		_textures.erase(id);
+	}
+}
+
+void minty::Renderer::destroy_shader(ID const id)
+{
+	if (_shaders.contains(id))
+	{
+		auto& value = _shaders.at(id);
+		value.destroy();
+		_shaders.erase(id);
+	}
+}
+
+void minty::Renderer::destroy_shader_pass(ID const id)
+{
+	if (_shaderPasses.contains(id))
+	{
+		auto& value = _shaderPasses.at(id);
+		value.destroy();
+		_shaderPasses.erase(id);
+	}
+}
+
+void minty::Renderer::destroy_material_template(ID const id)
+{
+	if (_materialTemplates.contains(id))
+	{
+		MaterialTemplate& materialTemplate = _materialTemplates.at(id);
+		materialTemplate.destroy();
+		_materialTemplates.erase(id);
+	}
+}
+
+void minty::Renderer::destroy_material(ID const id)
+{
+	if (_materials.contains(id))
+	{
+		Material& material = _materials.at(id);
+		material.destroy();
+		_materials.erase(id);
+	}
+}
+
+void minty::Renderer::destroy_mesh(ID const id)
+{
+	if (_meshes.contains(id))
+	{
+		Mesh& mesh = _meshes.at(id);
+		mesh.clear();
+		_meshes.erase(id);
+	}
+}
+
+void minty::Renderer::destroy_assets()
+{
+	for (auto& tex : _textures)
+	{
+		tex.second.destroy();
+	}
+	_textures.clear();
+	for (auto& material : _materials)
+	{
+		material.second.destroy();
+	}
+	_materials.clear();
+	for (auto& materialTemplate : _materialTemplates)
+	{
+		materialTemplate.second.destroy();
+	}
+	_materialTemplates.clear();
+	for (auto& shaderPass : _shaderPasses)
+	{
+		shaderPass.second.destroy();
+	}
+	_shaderPasses.clear();
+	for (auto& shader : _shaders)
+	{
+		shader.second.destroy();
+	}
+	_shaders.clear();
+	for (auto& mesh : _meshes)
+	{
+		mesh.second.clear();
+	}
+	_meshes.clear();
+}
+
 int minty::Renderer::check_asset(std::string const& path, bool const requiresMeta) const
 {
 	// can load if assets exists, and if no meta is required, or if a meta is required, it exists
@@ -2275,31 +2369,7 @@ void Renderer::destroy()
 	cleanup_swap_chain();
 
 	// destroy assets
-	for (auto& tex : _textures)
-	{
-		tex.second.destroy();
-	}
-	_textures.clear();
-	for (auto& material : _materials)
-	{
-		material.second.destroy();
-	}
-	_materials.clear();
-	for (auto& materialTemplate : _materialTemplates)
-	{
-		materialTemplate.second.destroy();
-	}
-	_materialTemplates.clear();
-	for (auto& shaderPass : _shaderPasses)
-	{
-		shaderPass.second.destroy();
-	}
-	_shaderPasses.clear();
-	for (auto& shader : _shaders)
-	{
-		shader.second.destroy();
-	}
-	_shaders.clear();
+	destroy_assets();
 	for (auto& buffer : _buffers)
 	{
 		destroy_buffer(buffer.second);

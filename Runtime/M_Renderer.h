@@ -366,6 +366,19 @@ namespace minty
 
 		ID load_mesh(std::string const& path);
 
+		void destroy_texture(ID const id);
+
+		void destroy_shader(ID const id);
+
+		void destroy_shader_pass(ID const id);
+		
+		void destroy_material_template(ID const id);
+		
+		void destroy_material(ID const id);
+		
+		void destroy_mesh(ID const id);
+
+		void destroy_assets();
 	private:
 		int check_asset(std::string const& path, bool const requiresMeta) const;
 
