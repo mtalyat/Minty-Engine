@@ -20,8 +20,6 @@ InputMap input;
 // called when the engine is initialized
 void init(Runtime &runtime)
 {
-    // console::log(std::format("Vertex3D: {}", sizeof(basic::Vertex3D)));
-
     try
     {
         // components
@@ -49,7 +47,7 @@ void init(Runtime &runtime)
             renderer->init(rb);
 
             // create textures
-            renderer->load_texture("Textures/funny.jpg");
+            renderer->load_texture("Textures/oak_planks.png");
             renderer->load_texture("Textures/pattern.png");
             renderer->load_texture("Textures/texture.jpg");
 
@@ -59,17 +57,29 @@ void init(Runtime &runtime)
             // create shader pass
             ID shaderPassId = renderer->load_shader_pass("Shaders/shaderPass.minty");
 
-            // create material templates
-            MaterialTemplateBuilder mtb;
-            mtb.name = "materialTemplate";
-            mtb.shaderPassIds = {shaderPassId};
             MaterialBufferObject mbo{
                 .textureId = 0,
                 .color = Vector4(1.0f, 1.0f, 1.0f, 1.0f)};
-            // mtb.emplace_default_value("material", Dynamic(&mbo, sizeof(MaterialBufferObject)));
-            mtb.defaultValues.emplace("material", Dynamic(&mbo, sizeof(MaterialBufferObject)));
-            // ID materialTemplateId = rb.emplace_material_template(mtb);
-            ID materialTemplateId = renderer->create_material_template(mtb);
+
+            // create material templates
+            // MaterialTemplateBuilder mtb;
+            // mtb.name = "materialTemplate";
+            // mtb.shaderPassIds = {shaderPassId};
+
+            // // mtb.emplace_default_value("material", Dynamic(&mbo, sizeof(MaterialBufferObject)));
+            // mtb.defaultValues.emplace("material", Dynamic(&mbo, sizeof(MaterialBufferObject)));
+            // console::log(string::to_bytes(&mbo, sizeof(MaterialBufferObject)));
+            // // ID materialTemplateId = rb.emplace_material_template(mtb);
+            // ID materialTemplateId = renderer->create_material_template(mtb);
+            ID materialTemplateId = renderer->load_material_template("Materials/materialTemplate.minty");
+
+            // Node test = assets::load_node("Materials/materialTemplate.minty");
+            // Node* test2 = test.find("defaults");
+            // Node* test3 = test2->find("material");
+            // Reader reader(*test3);
+            // Dynamic testDynamic;
+            // testDynamic.deserialize(reader);
+            // console::log(string::to_bytes(testDynamic.data(), testDynamic.size()));
 
             // create materials
             MaterialBuilder mb; // world

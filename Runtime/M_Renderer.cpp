@@ -1539,7 +1539,13 @@ ID minty::Renderer::load_material_template(std::string const& path)
 	}
 	if (Node const* node = meta.find("defaults"))
 	{
-		console::todo("Renderer::load_material_template defaults");
+		for (auto const& child : node->children)
+		{
+			Dynamic d;
+			Reader reader(child.second.front());
+			d.deserialize(reader);
+			builder.defaultValues.emplace(child.first, d);
+		}
 	}
 
 	return create_material_template(builder);
@@ -1566,6 +1572,7 @@ ID minty::Renderer::load_material(std::string const& path)
 			Dynamic d;
 			Reader reader(child.second.front());
 			d.deserialize(reader);
+			builder.values.emplace(child.first, d);
 		}
 	}
 

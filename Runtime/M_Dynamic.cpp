@@ -131,6 +131,7 @@ void minty::Dynamic::deserialize(Reader const& reader)
 
 	// go through and get all possible combinations of bytes/bits, pack into data
 	byte* data = new byte[size];
+	memset(data, 0, size);
 
 	// assume 'x' is any number:
 	// x refers to the byte at x
