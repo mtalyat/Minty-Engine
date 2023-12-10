@@ -15,7 +15,8 @@ Entities
         Transform
         Mesh
             material: material1
-            type: cube
+            type: custom
+            name: creeper
     Sphere
         Renderable
         Transform

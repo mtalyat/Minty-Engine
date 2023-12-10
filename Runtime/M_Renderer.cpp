@@ -1681,17 +1681,18 @@ void minty::Renderer::load_mesh_obj(std::string const& path, ID const id)
 				std::istringstream setss(set);
 				Vector3Int faceIndices = Vector3Int();
 
+				// subtract 1, since all indices are 1 indexed apparently
 				if (std::getline(setss, token, '/'))
 				{
-					faceIndices.x = parse::to_int(token);
+					faceIndices.x = parse::to_int(token) - 1;
 
 					if (std::getline(setss, token, '/'))
 					{
-						faceIndices.y = parse::to_int(token);
+						faceIndices.y = parse::to_int(token) - 1;
 
 						if (std::getline(setss, token, '/'))
 						{
-							faceIndices.z = parse::to_int(token);
+							faceIndices.z = parse::to_int(token) - 1;
 						}
 					}
 				}

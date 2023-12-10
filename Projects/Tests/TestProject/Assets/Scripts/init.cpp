@@ -50,6 +50,9 @@ void init(Runtime &runtime)
         renderer->load_texture("Textures/pattern.png");
         renderer->load_texture("Textures/texture.jpg");
 
+        // create models
+        renderer->load_mesh("Resources/Models/creeper.obj");
+
         // create shader
         renderer->load_shader("Shaders/shader.minty");
 
