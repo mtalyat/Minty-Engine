@@ -49,9 +49,7 @@ void init(Runtime &runtime)
         renderer->load_texture("Textures/oak_planks.png");
         renderer->load_texture("Textures/pattern.png");
         renderer->load_texture("Textures/texture.jpg");
-
-        // create models
-        renderer->load_mesh("Resources/Models/creeper.obj");
+        renderer->load_texture("Resources/Models/pumpkin_tex.jpg");
 
         // create shader
         renderer->load_shader("Shaders/shader.minty");
@@ -66,6 +64,10 @@ void init(Runtime &runtime)
         renderer->load_material("Materials/material1.minty");
         renderer->load_material("Materials/material2.minty");
         renderer->load_material("Materials/material3.minty");
+        renderer->load_material("Materials/pumpkinMat.minty");
+
+        // create models
+        renderer->load_mesh("Resources/Models/pumpkin.obj");
 
         // load scene from disk
         ID sceneId = sceneManager->create_scene("Scenes/test.minty");

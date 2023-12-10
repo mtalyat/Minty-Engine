@@ -38,8 +38,13 @@ void minty::MeshComponent::deserialize(Reader const& reader)
 
 		if (meshId == ERROR_ID)
 		{
-			// mesh is not loaded, so load it
+			// mesh is not loaded, so load it using the path
 			meshId = data->renderer->load_mesh(path);
+		}
+
+		if (meshId == ERROR_ID)
+		{
+			console::error(std::format("Could not load mesh with path \"{}\" and name \"{}\".", path, name));
 		}
 		break;
 	}

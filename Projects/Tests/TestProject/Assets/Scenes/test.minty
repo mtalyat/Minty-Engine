@@ -10,26 +10,26 @@ Entities
             perspective: 1
             far: 1000
         Move
-    Cube
+    Model
         Renderable
         Transform
         Mesh
-            material: material1
+            material: pumpkinMat
             type: custom
-            name: creeper
-    Sphere
-        Renderable
-        Transform
-            position
-                y: 2
-        Mesh
-            material: material2
-            type: sphere
-    Cylinder
-        Renderable
-        Transform
-            position
-                y: -2
-        Mesh
-            material: material3
-            type: cylinder
+            name: pumpkin
+#    Sphere
+#        Renderable
+#        Transform
+#            position
+#                y: 2
+#        Mesh
+#            material: material2
+#            type: sphere
+#    Cylinder
+#        Renderable
+#        Transform
+#            position
+#                y: -2
+#        Mesh
+#            material: material3
+#            type: cylinder

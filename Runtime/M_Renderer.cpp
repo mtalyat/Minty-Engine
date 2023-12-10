@@ -1594,8 +1594,11 @@ ID minty::Renderer::load_mesh(std::string const& path)
 		return ERROR_ID;
 	}
 
-	ID id = create_mesh();
+	// override existing mesh with same name
+	std::string name = file::name(path);
+	ID id = get_or_create_mesh(name);
 
+	// determine how to load the file
 	if (extension == ".obj")
 	{
 		load_mesh_obj(path, id);
@@ -1653,6 +1656,7 @@ void minty::Renderer::load_mesh_obj(std::string const& path, ID const id)
 			// position
 			Vector3 position;
 			ss >> position.x >> position.y >> position.z;
+			position.y = -position.y; // negate Y
 			positions.push_back(position);
 		}
 		else if(token == "vt")
@@ -1660,6 +1664,7 @@ void minty::Renderer::load_mesh_obj(std::string const& path, ID const id)
 			// coord
 			Vector2 coord;
 			ss >> coord.x >> coord.y;
+			coord.y = -coord.y; // flip y
 			coords.push_back(coord);
 		}
 		else if (token == "vn")
