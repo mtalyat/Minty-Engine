@@ -36,93 +36,33 @@ void init(Runtime &runtime)
         Renderer *renderer = engine->get_renderer();
         SceneManager *sceneManager = engine->get_scene_manager();
 
-        {
-            // create renderer
-            Info info("TestProject", 1, 0, 0);
+        // create renderer
+        Info info("TestProject", 1, 0, 0);
 
-            // use defaults for most things
-            RendererBuilder rb(&info);
+        // use defaults for most things
+        RendererBuilder rb(&info);
 
-            // basic::create_basic_renderer_builder(rb);
-            renderer->init(rb);
+        // basic::create_basic_renderer_builder(rb);
+        renderer->init(rb);
 
-            // create textures
-            renderer->load_texture("Textures/oak_planks.png");
-            renderer->load_texture("Textures/pattern.png");
-            renderer->load_texture("Textures/texture.jpg");
+        // create textures
+        renderer->load_texture("Textures/oak_planks.png");
+        renderer->load_texture("Textures/pattern.png");
+        renderer->load_texture("Textures/texture.jpg");
 
-            // create shader
-            ID shaderId = renderer->load_shader("Shaders/shader.minty");
+        // create shader
+        renderer->load_shader("Shaders/shader.minty");
 
-            // create shader pass
-            ID shaderPassId = renderer->load_shader_pass("Shaders/shaderPass.minty");
+        // create shader pass
+        renderer->load_shader_pass("Shaders/shaderPass.minty");
 
-            MaterialBufferObject mbo{
-                .textureId = 0,
-                .color = Vector4(1.0f, 1.0f, 1.0f, 1.0f)};
+        // create material template
+        renderer->load_material_template("Materials/materialTemplate.minty");
 
-            // create material templates
-            // MaterialTemplateBuilder mtb;
-            // mtb.name = "materialTemplate";
-            // mtb.shaderPassIds = {shaderPassId};
-
-            // // mtb.emplace_default_value("material", Dynamic(&mbo, sizeof(MaterialBufferObject)));
-            // mtb.defaultValues.emplace("material", Dynamic(&mbo, sizeof(MaterialBufferObject)));
-            // console::log(string::to_bytes(&mbo, sizeof(MaterialBufferObject)));
-            // // ID materialTemplateId = rb.emplace_material_template(mtb);
-            // ID materialTemplateId = renderer->create_material_template(mtb);
-            ID materialTemplateId = renderer->load_material_template("Materials/materialTemplate.minty");
-
-            // Node test = assets::load_node("Materials/materialTemplate.minty");
-            // Node* test2 = test.find("defaults");
-            // Node* test3 = test2->find("material");
-            // Reader reader(*test3);
-            // Dynamic testDynamic;
-            // testDynamic.deserialize(reader);
-            // console::log(string::to_bytes(testDynamic.data(), testDynamic.size()));
-
-            // create materials
-            MaterialBuilder mb; // world
-            mb.templateId = materialTemplateId;
-            mb.name = "material1";
-            renderer->create_material(mb);
-
-            mb.name = "material2";
-            mbo.textureId = 1;
-            mb.values["material"] = Dynamic(&mbo, sizeof(MaterialBufferObject));
-            renderer->create_material(mb);
-
-            mb.name = "material3";
-            mbo.textureId = 2;
-            mb.values["material"] = Dynamic(&mbo, sizeof(MaterialBufferObject));
-            renderer->create_material(mb);
-            // MaterialBuilder mb2(materialTemplateId2); // ui
-
-            // init renderer with builders
-            // renderer->init(rb);
-        }
-
-        // {
-        //     Info info("TestProject", 1, 0, 0);
-
-        //     RendererBuilder rb;
-        //     rb.info = &info;
-
-        //     renderer->init(rb);
-
-        //     renderer->load_texture("Textures/funny.jpg");
-        //     renderer->load_texture("Textures/funny2.png");
-        //     renderer->load_texture("Textures/texture.jpg");
-        //     renderer->load_texture("Textures/brian.png");
-
-        //     renderer->load_shader("Shaders/shader.minty");
-        //     renderer->load_shader_pass("Shaders/shaderPass.minty");
-        //     renderer->load_material_template("Materials/materialTemplate.minty");
-        //     renderer->load_material("Materials/material1.minty");
-        //     renderer->load_material("Materials/material2.minty");
-        //     renderer->load_material("Materials/material3.minty");
-        //     renderer->load_material("Materials/material4.minty");
-        // }
+        // create materials
+        renderer->load_material("Materials/material1.minty");
+        renderer->load_material("Materials/material2.minty");
+        renderer->load_material("Materials/material3.minty");
 
         // load scene from disk
         ID sceneId = sceneManager->create_scene("Scenes/test.minty");
