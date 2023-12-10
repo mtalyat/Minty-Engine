@@ -15,7 +15,7 @@ Entities
         Renderable
         Mesh
             materialId: 0
-            meshType: Cube
+            type: Cube
         Transform
             position
                 x: -2
@@ -26,7 +26,7 @@ Entities
         Renderable
         Mesh
             materialId: 1
-            meshType: Quad
+            type: Quad
         Transform
             position
                 x: 0
@@ -37,7 +37,7 @@ Entities
         Renderable
         Mesh
             materialId: 2
-            meshType: Pyramid
+            type: Pyramid
         Transform
             position
                 x: 2
@@ -48,7 +48,7 @@ Entities
         Renderable
         Mesh
             materialId: 0
-            meshType: Sphere
+            type: Sphere
         Transform
             position
                 x: 4
@@ -61,7 +61,7 @@ Entities
         Renderable
         Mesh
             materialId: 1
-            meshType: Cylinder
+            type: Cylinder
         Transform
             position
                 x: 6

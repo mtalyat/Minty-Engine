@@ -20,7 +20,7 @@ void minty::MeshComponent::deserialize(Reader const& reader)
 	SerializationData* data = static_cast<SerializationData*>(reader.get_data());
 
 	materialId = reader.read_id("materialId");
-	std::string meshType = reader.read_string("meshType");
+	std::string meshType = reader.read_string("type");
 	if (meshType.size())
 	{
 		// if there was a type given, then use that type

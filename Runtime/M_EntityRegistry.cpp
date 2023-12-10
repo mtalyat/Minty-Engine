@@ -100,7 +100,10 @@ void minty::EntityRegistry::set_name(Entity const entity, std::string const& nam
 	if (name.empty() || (name.size() == 1 && name.front() == '_'))
 	{
 		// name is empty, remove the component if it exists
-		erase<NameComponent>(entity);
+		if(any_of<NameComponent>(entity))
+		{
+			erase<NameComponent>(entity);
+		}
 	}
 	else
 	{

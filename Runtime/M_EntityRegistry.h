@@ -76,6 +76,11 @@ namespace minty
 		/// <returns>The name of the Entity, or "" if no name.</returns>
 		std::string get_name(Entity const entity) const;
 
+		/// <summary>
+		/// Sets the NameComponent name of the Entity. Emplaces a NameComponent if needed. If no name is given ("" or "_"), then the NameComponent is removed.
+		/// </summary>
+		/// <param name="entity">The Entity to name.</param>
+		/// <param name="name">The new name of the Entity.</param>
 		void set_name(Entity const entity, std::string const& name);
 
 		/// <summary>

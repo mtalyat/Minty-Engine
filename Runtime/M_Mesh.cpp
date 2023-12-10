@@ -3,6 +3,7 @@
 
 #include "M_Basic_Vertex.h"
 #include "M_Renderer.h"
+#include "M_String.h"
 #include "glm.hpp"
 
 using namespace minty;
@@ -544,19 +545,19 @@ std::string minty::to_string(MeshType const value)
 	switch (value)
 	{
 	case MeshType::Empty:
-		return "Empty";
+		return "EMPTY";
 	case MeshType::Custom:
-		return "Custom";
+		return "CUSTOM";
 	case MeshType::Quad:
-		return "Quad";
+		return "QUAD";
 	case MeshType::Cube:
-		return "Cube";
+		return "CUBE";
 	case MeshType::Pyramid:
-		return "Pyramid";
+		return "PYRAMID";
 	case MeshType::Sphere:
-		return "Sphere";
+		return "SPHERE";
 	case MeshType::Cylinder:
-		return "Cylinder";
+		return "CYLINDER";
 	default:
 		return error::ERROR_TEXT;
 	}
@@ -564,27 +565,28 @@ std::string minty::to_string(MeshType const value)
 
 MeshType minty::from_string_mesh_type(std::string const& value)
 {
-	if (value == "Custom")
+	std::string value2 = string::to_upper(value);
+	if (value2 == "CUSTOM")
 	{
 		return MeshType::Custom;
 	}
-	else if (value == "Quad")
+	else if (value2 == "QUAD")
 	{
 		return MeshType::Quad;
 	}
-	else if (value == "Cube")
+	else if (value2 == "CUBE")
 	{
 		return MeshType::Cube;
 	}
-	else if (value == "Pyramid")
+	else if (value2 == "PYRAMID")
 	{
 		return MeshType::Pyramid;
 	}
-	else if (value == "Sphere")
+	else if (value2 == "SPHERE")
 	{
 		return MeshType::Sphere;
 	}
-	else if (value == "Cylinder")
+	else if (value2 == "CYLINDER")
 	{
 		return MeshType::Cylinder;
 	}
