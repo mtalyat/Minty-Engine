@@ -442,6 +442,12 @@ void minty::Mesh::set_vertices(void const* const vertices, size_t const count, s
 	_vertexCount = static_cast<uint32_t>(count);
 	_vertexSize = static_cast<uint32_t>(vertexSize);
 
+	if (!vertices || !_vertexCount || !_vertexSize)
+	{
+		// empty vertex array
+		return;
+	}
+
 	// get buffer size
 	VkDeviceSize bufferSize = static_cast<VkDeviceSize>(count * vertexSize);
 
@@ -458,11 +464,6 @@ void minty::Mesh::set_vertices(void const* const vertices, size_t const count, s
 
 	// unmap
 	_renderer.unmap_buffer(stagingBufferId);
-
-	//void* data;
-	//vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
-	//memcpy(data, vertices, static_cast<size_t>(bufferSize));
-	//vkUnmapMemory(device, stagingBufferMemory);
 
 	// copy into device memory
 	_vertexBufferId = _renderer.create_buffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
@@ -482,13 +483,16 @@ void minty::Mesh::set_indices(void const* const indices, size_t const count, siz
 	_indexSize = static_cast<uint32_t>(indexSize);
 	_indexType = type;
 
+	if (!indices || !_indexCount || !_indexSize)
+	{
+		// empty vertex array
+		return;
+	}
+
 	// get buffer size
 	VkDeviceSize bufferSize = static_cast<VkDeviceSize>(count * indexSize);
 
 	// use buffer to copy data into device memory
-	//VkBuffer stagingBuffer;
-	//VkDeviceMemory stagingBufferMemory;
-	//_renderer.create_buffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingBufferMemory);
 	ID stagingBufferId = _renderer.create_buffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
 	auto device = _renderer.get_device();
@@ -497,13 +501,8 @@ void minty::Mesh::set_indices(void const* const indices, size_t const count, siz
 	void* mappedData = _renderer.map_buffer(stagingBufferId);
 	memcpy(mappedData, indices, static_cast<size_t>(bufferSize));
 	_renderer.unmap_buffer(stagingBufferId);
-	//void* data;
-	//vkMapMemory(device, stagingBufferMemory, 0, bufferSize, 0, &data);
-	//memcpy(data, indices, (size_t)bufferSize);
-	//vkUnmapMemory(device, stagingBufferMemory);
 
 	// copy into device memory
-	//_renderer.create_buffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, _indexBuffer, _indexMemory);
 	_indexBufferId = _renderer.create_buffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
 
 	_renderer.copy_buffer(stagingBufferId, _indexBufferId, bufferSize);
