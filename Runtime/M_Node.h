@@ -29,6 +29,8 @@ namespace minty
 
 		float to_float(float const defaultValue = 0.0f) const;
 
+		bool to_bool(bool const defaultValue = false) const;
+
 #pragma endregion
 
 #pragma region Find
@@ -58,6 +60,8 @@ namespace minty
 		size_t get_size_t(std::string const& name, size_t const defaultValue = 0) const;
 
 		float get_float(std::string const& name, float const defaultValue = 0.0f) const;
+
+		bool get_bool(std::string const& name, bool const defaultValue = false) const;
 
 #pragma endregion
 

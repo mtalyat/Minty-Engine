@@ -34,7 +34,11 @@ void init(Runtime &runtime)
         Engine *engine = runtime.get_engine();
         Window *window = engine->get_window();
         Renderer *renderer = engine->get_renderer();
+        AudioEngine *audio = engine->get_audio_engine();
         SceneManager *sceneManager = engine->get_scene_manager();
+
+        ID audioId = audio->load_clip("Audio/blinking-forest.wav");
+        audio->play(audioId);
 
         // create renderer
         Info info("TestProject", 1, 0, 0);

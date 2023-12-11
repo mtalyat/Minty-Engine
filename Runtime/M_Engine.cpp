@@ -36,6 +36,11 @@ Renderer* minty::Engine::get_renderer()
 	return &_renderer;
 }
 
+AudioEngine* minty::Engine::get_audio_engine()
+{
+	return &_audioEngine;
+}
+
 SceneManager* minty::Engine::get_scene_manager()
 {
 	return &_sceneManager;
