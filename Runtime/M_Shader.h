@@ -6,6 +6,7 @@
 #include "M_Rendering_PushConstantInfo.h"
 #include "M_Rendering_UniformConstantInfo.h"
 #include "M_Rendering_DescriptorSet.h"
+#include "M_Rendering_ShaderBuilder.h"
 
 #include <vulkan/vulkan.h>
 #include <vector>
@@ -13,11 +14,6 @@
 
 namespace minty
 {
-	namespace rendering
-	{
-		class ShaderBuilder;
-	}
-
 	/// <summary>
 	/// Holds data for a Shader.
 	/// </summary>

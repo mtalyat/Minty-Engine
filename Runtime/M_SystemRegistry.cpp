@@ -224,7 +224,10 @@ namespace minty
 
 		for (auto const& pair : node->children)
 		{
-			emplace_by_name(pair.first, pair.second.to_int());
+			for (auto const& child : pair.second)
+			{
+				emplace_by_name(pair.first, child.to_int());
+			}			
 		}
 	}
 

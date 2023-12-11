@@ -1,5 +1,5 @@
 #pragma once
-#include "M_Object.h"
+#include "M_Base.h"
 
 #include "M_Dynamic.h"
 
@@ -8,30 +8,11 @@
 
 namespace minty::rendering
 {
-	class MaterialTemplateBuilder
-		: public Object
+	struct MaterialTemplateBuilder
 	{
-	private:
-		std::vector<ID> _shaderPassIds;
+		std::string name;
+		std::vector<ID> shaderPassIds;
 
-		std::unordered_map<std::string, Dynamic> _defaultValues;
-
-	public:
-		MaterialTemplateBuilder(std::vector<ID> const& shaderPassIds);
-
-#pragma region Set
-
-		void emplace_default_value(std::string const& name, Dynamic const& value);
-
-#pragma endregion
-
-#pragma region Get
-
-		std::vector<ID> const& get_shader_pass_ids() const;
-
-		std::unordered_map<std::string, Dynamic> const& get_default_values() const;
-
-#pragma endregion
-
+		std::unordered_map<std::string, Dynamic> defaultValues;
 	};
 }

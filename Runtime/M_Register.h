@@ -7,22 +7,25 @@
 
 namespace minty
 {
-	template<class T>
-	class Register :
-		public Object
+	template <class T>
+	class Register : public Object
 	{
 	private:
 		// the most amount of elements allowed
 		ID _capacity;
-		
+
 		// the data within the register
 		std::unordered_map<ID, T> _data;
+
+		// names
+		std::unordered_map<ID, std::string> _names;
 
 		// name lookup
 		std::unordered_map<std::string, ID> _lookup;
 
 		// next ID to be used
 		ID _next;
+
 	public:
 		/// <summary>
 		/// Create an empty Register.
@@ -40,7 +43,7 @@ namespace minty
 		/// </summary>
 		/// <param name="obj">The object values.</param>
 		/// <returns>The ID of the new object in this Register, or ERROR_ID if this Register is full.</returns>
-		ID emplace(T const& obj);
+		ID emplace(T const &obj);
 
 		/// <summary>
 		/// Creates a new named object within the Register with an alias.
@@ -48,26 +51,26 @@ namespace minty
 		/// <param name="name">The name of the object.</param>
 		/// <param name="obj">The object.</param>
 		/// <returns>The ID of the object in the Register, or ERROR_ID if the Register is full.</returns>
-		ID emplace(std::string const& name, T const& obj);
+		ID emplace(std::string const &name, T const &obj);
 
 		/// <summary>
-		/// Adds an alias for an ID in this Register.
+		/// Sets an alias for an ID in this Register.
 		/// </summary>
 		/// <param name="name">The alias name.</param>
 		/// <param name="id">The ID of the object.</param>
-		void emplace_alias(std::string const& name, ID const id);
-
-		void erase(ID const id);
-
-		void erase(std::string const& name);
+		void emplace_alias(std::string const &name, ID const id);
 
 		/// <summary>
 		/// Removes an alias for an ID in this Register.
 		/// </summary>
 		/// <param name="name">The alias name.</param>
-		void erase_alias(std::string const& name);
+		void erase_alias(std::string const &name);
 
-		bool contains(std::string const& name) const;
+		void erase(ID const id);
+
+		void erase(std::string const &name);
+
+		bool contains(std::string const &name) const;
 
 		bool contains(ID const id) const;
 
@@ -78,23 +81,25 @@ namespace minty
 		/// <returns>The ID of the object with the name.</returns>
 		ID get_id(std::string const name) const;
 
+		std::string const &get_alias(ID const id) const;
+
 		/// <summary>
 		/// Gets the object with the given ID.
 		/// </summary>
 		/// <param name="id">The ID of the object in this Register.</param>
 		/// <returns>A pointer to the object, or nullptr if the ID was invalid.</returns>
-		T const& at(ID const id) const;
+		T const &at(ID const id) const;
 
-		T& at(ID const id);
+		T &at(ID const id);
 
 		/// <summary>
 		/// Gets the object with the given name.
 		/// </summary>
 		/// <param name="name">The name of the object in this Register.</param>
 		/// <returns>A pointer to the object.</returns>
-		T const& at(std::string const& name) const;
+		T const &at(std::string const &name) const;
 
-		T& at(std::string const& name);
+		T &at(std::string const &name);
 
 		/// <summary>
 		/// Gets the number of objects within this Register.
@@ -113,9 +118,9 @@ namespace minty
 		/// </summary>
 		void clear();
 
-		auto& data();
+		auto &data();
 
-		auto const& data() const;
+		auto const &data() const;
 
 		void resize(ID const size);
 
@@ -139,31 +144,35 @@ namespace minty
 
 		auto end() const;
 
-		auto& front();
+		auto &front();
 
-		auto& back();
+		auto &back();
 
-		auto const& front() const;
+		auto const &front() const;
 
-		auto const& back() const;
+		auto const &back() const;
 	};
 
-	template<class T>
+	template <class T>
 	Register<T>::Register()
-		: _data()
-		, _capacity(MAX_ID)
-		, _next(0)
-	{}
+		: _data(), _capacity(MAX_ID), _next(0)
+	{
+	}
 
-	template<class T>
+	template <class T>
 	Register<T>::Register(ID const capacity)
-		: _data()
-		, _capacity(capacity)
-		, _next(0)
-	{}
+		: _data(), _capacity(capacity), _next(0)
+	{
+	}
 
-	template<class T>
-	ID Register<T>::emplace(T const& obj)
+	template <class T>
+	ID Register<T>::emplace(T const &obj)
+	{
+		return emplace("", obj);
+	}
+
+	template <class T>
+	ID Register<T>::emplace(std::string const &name, T const &obj)
 	{
 		// check if over capacity
 		if (_data.size() >= _capacity)
@@ -177,199 +186,210 @@ namespace minty
 		// add
 		_data.emplace(id, obj);
 
+		// add alias
+		if (!name.empty())
+		{
+			_names[id] = name;
+			_lookup[name] = id;
+		}
+
 		// return the id
 		return id;
 	}
 
-	template<class T>
-	ID Register<T>::emplace(std::string const& name, T const& obj)
-	{
-		// set object
-		ID id = emplace(obj);
-
-		// set lookup name
-		emplace_alias(name, id);
-
-		// return id
-		return id;
-	}
-
-	template<class T>
-	void Register<T>::emplace_alias(std::string const& name, ID const id)
+	template <class T>
+	void Register<T>::emplace_alias(std::string const &name, ID const id)
 	{
 		_lookup[name] = id;
+		_names[id] = name;
 	}
 
-	template<class T>
-	void Register<T>::erase(ID const id)
-	{
-		_data.erase(id);
-	}
-
-	template<class T>
-	void Register<T>::erase(std::string const& name)
+	template <class T>
+	void Register<T>::erase_alias(std::string const &name)
 	{
 		ID id = _lookup.at(name);
+		_lookup.erase(name);
+		_names.erase(id);
+	}
+
+	template <class T>
+	void Register<T>::erase(ID const id)
+	{
+		if (_names.contains(id))
+		{
+			std::string name = _names.at(id);
+			_lookup.erase(name);
+			_names.erase(id);
+		}
 
 		_data.erase(id);
 	}
 
-	template<class T>
-	void Register<T>::erase_alias(std::string const& name)
+	template <class T>
+	void Register<T>::erase(std::string const &name)
 	{
+		ID id = _lookup.at(name);
 		_lookup.erase(name);
+		_names.erase(id);
+		_data.erase(id);
 	}
 
-	template<class T>
-	bool Register<T>::contains(std::string const& name) const
+	template <class T>
+	bool Register<T>::contains(std::string const &name) const
 	{
 		return _lookup.contains(name);
 	}
 
-	template<class T>
+	template <class T>
 	bool Register<T>::contains(ID const id) const
 	{
 		return _data.contains(id);
 	}
 
-	template<class T>
+	template <class T>
 	ID Register<T>::get_id(std::string const name) const
 	{
 		return _lookup.at(name);
 	}
 
-	template<class T>
-	T const& Register<T>::at(ID const id) const
+	template <class T>
+	std::string const &Register<T>::get_alias(ID const id) const
+	{
+		return _names.at(id);
+	}
+
+	template <class T>
+	T const &Register<T>::at(ID const id) const
 	{
 		return _data.at(id);
 	}
 
-	template<class T>
-	T& Register<T>::at(ID const id)
+	template <class T>
+	T &Register<T>::at(ID const id)
 	{
 		return _data.at(id);
 	}
 
-	template<class T>
-	T const& Register<T>::at(std::string const& name) const
+	template <class T>
+	T const &Register<T>::at(std::string const &name) const
 	{
 		// use lookup to find id, then use that to get object
 		return at(_lookup.at(name));
 	}
 
-	template<class T>
-	T& Register<T>::at(std::string const& name)
+	template <class T>
+	T &Register<T>::at(std::string const &name)
 	{
 		// use lookup to find id, then use that to get object
 		return at(_lookup.at(name));
 	}
 
-	template<class T>
+	template <class T>
 	ID Register<T>::size() const
 	{
 		return static_cast<ID>(_data.size());
 	}
 
-	template<class T>
+	template <class T>
 	bool Register<T>::full() const
 	{
 		return _data.size() >= _capacity;
 	}
 
-	template<class T>
+	template <class T>
 	void Register<T>::clear()
 	{
 		_data.clear();
 		_lookup.clear();
 	}
 
-	template<class T>
-	auto& Register<T>::data()
+	template <class T>
+	auto &Register<T>::data()
 	{
 		return _data;
 	}
 
-	template<class T>
-	auto const& Register<T>::data() const
+	template <class T>
+	auto const &Register<T>::data() const
 	{
 		return _data;
 	}
 
-	template<class T>
+	template <class T>
 	void Register<T>::resize(ID const size)
 	{
 		_data.resize(size);
 	}
 
-	template<class T>
+	template <class T>
 	void Register<T>::reserve(ID const size)
 	{
 		_data.reserve(size);
 	}
 
-	template<class T>
+	template <class T>
 	void Register<T>::limit(ID const size)
 	{
 		clear();
 		_capacity = size;
 	}
 
-	template<class T>
+	template <class T>
 	auto Register<T>::begin()
 	{
 		return _data.begin();
 	}
 
-	template<class T>
+	template <class T>
 	auto Register<T>::end()
 	{
 		return _data.end();
 	}
 
-	template<class T>
+	template <class T>
 	auto Register<T>::cbegin() const
 	{
 		return _data.cbegin();
 	}
 
-	template<class T>
+	template <class T>
 	auto Register<T>::cend() const
 	{
 		return _data.cend();
 	}
 
-	template<class T>
+	template <class T>
 	auto Register<T>::begin() const
 	{
 		return _data.begin();
 	}
 
-	template<class T>
+	template <class T>
 	auto Register<T>::end() const
 	{
 		return _data.end();
 	}
 
-	template<class T>
-	auto& Register<T>::front()
+	template <class T>
+	auto &Register<T>::front()
 	{
 		return _data.front();
 	}
 
-	template<class T>
-	auto& Register<T>::back()
+	template <class T>
+	auto &Register<T>::back()
 	{
 		return _data.back();
 	}
 
-	template<class T>
-	auto const& Register<T>::front() const
+	template <class T>
+	auto const &Register<T>::front() const
 	{
 		return _data.front();
 	}
 
-	template<class T>
-	auto const& Register<T>::back() const
+	template <class T>
+	auto const &Register<T>::back() const
 	{
 		return _data.back();
 	}

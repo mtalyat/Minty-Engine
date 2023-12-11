@@ -7,9 +7,9 @@ namespace minty
 
 namespace minty::rendering
 {
-	class RendererBuilder;
-	class ShaderBuilder;
-	class ShaderPassBuilder;
+	struct RendererBuilder;
+	struct ShaderBuilder;
+	struct ShaderPassBuilder;
 }
 
 namespace minty::basic

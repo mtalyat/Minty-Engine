@@ -1,46 +1,70 @@
 Systems
-    Oscilate
+    CameraController
+    Move
+    Test
 Entities
     Camera
-        Position
-            x: 0
-            y: 3
-            z: -8
+        Transform
+            position
+                z: -4
         Camera
             perspective: 1
-    Cube 0
+            far: 1000
+        Move
+    _
+        Renderable
         Mesh
-        Origin
-            x: -3
-        Position
-        Oscilate
-            xScale: 0
-            zScale: 0
-            ySpeed: 1
-    Cube 1
+            materialId: 0
+            type: Cube
+        Transform
+            position
+                x: -2
+        Test
+            rotationSpeed
+                x: 1
+    _
+        Renderable
         Mesh
-        Origin
-            x: -1
-        Position
-        Oscilate
-            xScale: 0
-            zScale: 0
-            ySpeed: 0.9
-    Cube 2
+            materialId: 1
+            type: Quad
+        Transform
+            position
+                x: 0
+        Test
+            rotationSpeed
+                y: 1
+    _
+        Renderable
         Mesh
-        Origin
-            x: 1
-        Position
-        Oscilate
-            xScale: 0
-            zScale: 0
-            ySpeed: 0.8
-    Cube 3
+            materialId: 2
+            type: Pyramid
+        Transform
+            position
+                x: 2
+        Test
+            rotationSpeed
+                z: 1
+    _
+        Renderable
         Mesh
-        Origin
-            x: 3
-        Position
-        Oscilate
-            xScale: 0
-            zScale: 0
-            ySpeed: 0.7
+            materialId: 0
+            type: Sphere
+        Transform
+            position
+                x: 4
+        Test
+            rotationSpeed
+                x: 1
+                y: 0.5
+                z: -0.25
+    _
+        Renderable
+        Mesh
+            materialId: 1
+            type: Cylinder
+        Transform
+            position
+                x: 6
+        Test
+            rotationSpeed
+                y: -1

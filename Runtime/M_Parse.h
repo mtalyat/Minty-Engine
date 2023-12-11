@@ -3,40 +3,45 @@
 #include "M_Types.h"
 #include <string>
 
-namespace minty
+namespace minty::parse
 {
-	namespace parse
-	{
-		bool to_bool(std::string const& string);
+	bool to_bool(std::string const& string);
 
-		bool try_bool(std::string const& string, bool& value);
+	bool try_bool(std::string const& string, bool& value);
 
-		byte to_byte(std::string const& string);
+	byte to_byte(std::string const& string);
 
-		bool try_byte(std::string const& string, byte& value);
+	bool try_byte(std::string const& string, byte& value);
 
-		short to_short(std::string const& string);
+	short to_short(std::string const& string);
 
-		bool try_short(std::string const& string, short& value);
+	bool try_short(std::string const& string, short& value);
 
-		int to_int(std::string const& string);
+	int to_int(std::string const& string);
 
-		bool try_int(std::string const& string, int& value);
+	bool try_int(std::string const& string, int& value);
 
-		unsigned int to_unsigned_int(std::string const& string);
+	ID to_id(std::string const& string);
 
-		bool try_unsigned_int(std::string const& string, unsigned int& value);
+	bool try_id(std::string const& string, ID& value);
 
-		long to_long(std::string const& string);
+	unsigned int to_uint(std::string const& string);
 
-		bool try_long(std::string const& string, int& value);
+	bool try_uint(std::string const& string, unsigned int& value);
 
-		float to_float(std::string const& string);
+	long to_long(std::string const& string);
 
-		bool try_float(std::string const& string, float& value);
+	bool try_long(std::string const& string, int& value);
 
-		double to_double(std::string const& string);
+	float to_float(std::string const& string);
 
-		bool try_double(std::string const& string, double& value);
-	}
+	bool try_float(std::string const& string, float& value);
+
+	double to_double(std::string const& string);
+
+	bool try_double(std::string const& string, double& value);
+
+	size_t to_size_t(std::string const& string);
+
+	bool try_size_t(std::string const& string, size_t& value);
 }

@@ -94,6 +94,25 @@ std::string minty::EntityRegistry::get_name(Entity const entity) const
 	}
 }
 
+void minty::EntityRegistry::set_name(Entity const entity, std::string const& name)
+{
+	// check if name is a real name, or empty
+	if (name.empty() || (name.size() == 1 && name.front() == '_'))
+	{
+		// name is empty, remove the component if it exists
+		if(any_of<NameComponent>(entity))
+		{
+			erase<NameComponent>(entity);
+		}
+	}
+	else
+	{
+		// name is occupied
+		NameComponent& nameComponent = get_or_emplace<NameComponent>(entity);
+		nameComponent.name = name;
+	}
+}
+
 Component* minty::EntityRegistry::emplace_by_name(std::string const& name, Entity const entity)
 {
 	auto const& found = _components.find(name);
@@ -130,7 +149,7 @@ void minty::EntityRegistry::print(Entity const entity) const
 {
 	// serialize entity, add it to parent, print that
 	Node root;
-	root.children.push_back({ this->get_name(entity), serialize_entity(entity) });
+	root.children.emplace(this->get_name(entity), std::vector<Node>{ serialize_entity(entity) });
 	root.print();
 }
 
@@ -155,6 +174,9 @@ void minty::EntityRegistry::serialize(Writer& writer) const
 		// get entity name
 		entityName = this->get_name(entity);
 
+		// use "_" instead of ""
+		if (entityName.empty()) entityName = "_";
+
 		// write entity node
 		writer.write(entityName, entityNode);
 	}
@@ -167,26 +189,35 @@ void minty::EntityRegistry::deserialize(Reader const& reader)
 	Node const* node = reader.get_node();
 	SerializationData* data = static_cast<SerializationData*>(reader.get_data());
 
+	// for each entity name given
 	for (auto const& pair : node->children)
 	{
-		// create entity
-		Entity const entity = entt::registry::create();
-		data->entity = entity;
-
-		// add name if there is one
-		// empty name is either "" or "_"
-		if (pair.first.size() > 1 || (pair.first.size() == 1 && pair.first.at(0) != '_'))
+		// for each entity to be created with that name
+		for (auto const& entityNode : pair.second)
 		{
-			NameComponent& name = this->emplace<NameComponent>(entity);
-			name.name = pair.first;
-		}
+			// create the entity
+			Entity entity = create();
+			data->entity = entity;
 
-		// now add the other components (children)
-		for (auto& componentPair : pair.second.children)
-		{
-			Component* component = this->emplace_by_name(componentPair.first, entity);
-			Reader componentReader(componentPair.second, reader.get_data());
-			component->deserialize(componentReader);
+			// set name
+			set_name(entity, pair.first);
+
+			// cycle through each component on entity
+			for (auto const& compPair : entityNode.children)
+			{
+				// cannot have multiple of same component
+				if (compPair.second.size() > 1)
+				{
+					console::error(std::format("Attempting to deserialize entity \"{}\" with multiple instances of the \"{}\" component.", pair.first, compPair.first));
+				}
+
+				// get node to use to get data
+				Node const& compNode = compPair.second.front();
+
+				Component* comp = emplace_by_name(compPair.first, entity);
+				Reader compReader(compNode, data);
+				comp->deserialize(compReader);
+			}
 		}
 	}
 }

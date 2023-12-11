@@ -2,6 +2,7 @@
 #include "M_Dynamic.h"
 
 #include "M_Console.h"
+#include "M_Parse.h"
 
 using namespace minty;
 
@@ -34,7 +35,7 @@ Dynamic& minty::Dynamic::operator=(Dynamic const& other)
 	return *this;
 }
 
-minty::Dynamic::Dynamic(Dynamic&& other)
+minty::Dynamic::Dynamic(Dynamic&& other) noexcept
 	: _data(other._data)
 	, _size(other._size)
 {
@@ -42,7 +43,7 @@ minty::Dynamic::Dynamic(Dynamic&& other)
 	other._size = 0;
 }
 
-Dynamic& minty::Dynamic::operator=(Dynamic&& other)
+Dynamic& minty::Dynamic::operator=(Dynamic&& other) noexcept
 {
 	_data = other._data;
 	_size = other._size;
@@ -106,4 +107,114 @@ void minty::Dynamic::clear()
 
 	_data = nullptr;
 	_size = 0;
+}
+
+void minty::Dynamic::serialize(Writer& writer) const
+{
+	console::todo("Dynamic::serialize");
+}
+
+void minty::Dynamic::deserialize(Reader const& reader)
+{
+	// use node directly to have more control since this deserialization is tricky
+	Node const* node = reader.get_node();
+
+	// get size in bytes
+	size_t size = node->get_size_t("size", node->to_size_t());
+
+	// if no size, all done
+	if (!size)
+	{
+		clear();
+		return;
+	}
+
+	// go through and get all possible combinations of bytes/bits, pack into data
+	byte* data = new byte[size];
+	memset(data, 0, size);
+
+	// assume 'x' is any number:
+	// x refers to the byte at x
+	// xi refers to an integer starting at byte x
+	// xui refers to an unsigned integer starting at byte x
+	// xf refers to a float starting at byte f
+
+	size_t i;
+	std::string name;
+	for (auto const& childPair : node->children)
+	{
+		name = childPair.first;
+		if (name.empty() || !std::isdigit(name.front()))
+		{
+			// does not start with byte location, so, ignore
+			continue;
+		}
+
+		// get type
+		if (std::isdigit(name.back()))
+		{
+			// byte
+			i = parse::to_size_t(name);
+			byte temp = childPair.second.front().to_byte();
+			memcpy(&data[i], &temp, sizeof(byte));
+		}
+		else if (name.ends_with("ui"))
+		{
+			// unsigned int
+			i = parse::to_size_t(name.substr(0, name.size() - 2));
+			unsigned int temp = childPair.second.front().to_uint();
+			memcpy(&data[i], &temp, sizeof(unsigned int));
+		}
+		else if (name.ends_with("i"))
+		{
+			// int
+			i = parse::to_size_t(name.substr(0, name.size() - 1));
+			int temp = childPair.second.front().to_int();
+			memcpy(&data[i], &temp, sizeof(int));
+		}
+		else if (name.ends_with("f"))
+		{
+			// float
+			i = parse::to_size_t(name.substr(0, name.size() - 1));
+			float temp = childPair.second.front().to_float();
+			memcpy(&data[i], &temp, sizeof(float));
+		}
+		else
+		{
+
+		}
+	}
+
+	/*Node const* n;
+	std::string x;
+	for (size_t i = 0; i < size; i++)
+	{
+		x = std::to_string(i);
+		if (n = node->find(x))
+		{
+			
+		}
+		else if (n = node->find(x + "i"))
+		{
+			int temp = n->to_int();
+			memcpy(&data[i], &temp, sizeof(int));
+		}
+		else if (n = node->find(x + "ui"))
+		{
+			unsigned int temp = n->to_uint();
+			memcpy(&data[i], &temp, sizeof(unsigned int));
+		}
+		else if (n = node->find(x + "f"))
+		{
+			float temp = n->to_float();
+			memcpy(&data[i], &temp, sizeof(float));
+		}
+	}*/
+
+
+	// set new data
+	set(data, size);
+
+	// clean up
+	delete[] data;
 }

@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "M_Material.h"
 
-#include "M_Rendering_MaterialBuilder.h"
 #include "M_Renderer.h"
 
 using namespace minty;
@@ -9,7 +8,7 @@ using namespace minty::rendering;
 
 minty::Material::Material(rendering::MaterialBuilder const& builder, Renderer& renderer)
 	: rendering::RendererObject(renderer)
-	, _templateId(builder.get_template_id())
+	, _templateId(builder.templateId)
 	, _passDescriptorSets()
 {
 	// use template to generate descriptor sets
@@ -17,7 +16,6 @@ minty::Material::Material(rendering::MaterialBuilder const& builder, Renderer& r
 	auto const& passIds = materialTemplate.get_shader_pass_ids();
 
 	auto const& defaultValues = materialTemplate.get_default_values();
-	auto const& values = builder.get_values();
 
 	for (auto const passId : passIds)
 	{
@@ -34,8 +32,8 @@ minty::Material::Material(rendering::MaterialBuilder const& builder, Renderer& r
 		// set all values
 		for (auto const& defaultValue : defaultValues)
 		{
-			auto const& found = values.find(defaultValue.first);
-			if (found == values.end())
+			auto const& found = builder.values.find(defaultValue.first);
+			if (found == builder.values.end())
 			{
 				// if no value exists, use a default value
 				descriptorSet.set(defaultValue.first, defaultValue.second);

@@ -43,6 +43,9 @@
     <Filter Include="Header Files\Builtin">
       <UniqueIdentifier>{ddbf4554-4699-450d-a3d1-6498173672f0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Assets">
+      <UniqueIdentifier>{25b3dd32-a0eb-4c13-9cc9-efa7bee0e2f1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -93,16 +96,13 @@
     <ClInclude Include="M_Event.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="M_File.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="M_Viewport.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="M_NameComponent.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
-    <ClInclude Include="M_SerializedNode.h">
+    <ClInclude Include="M_Node.h">
       <Filter>Header Files\Serialization</Filter>
     </ClInclude>
     <ClInclude Include="M_ISerializable.h">
@@ -294,6 +294,21 @@
     <ClInclude Include="M_SerializationData.h">
       <Filter>Header Files\Serialization</Filter>
     </ClInclude>
+    <ClInclude Include="M_Resources.h">
+      <Filter>Header Files\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Assets.h">
+      <Filter>Header Files\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="M_File.h">
+      <Filter>Header Files\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="vulkan.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="M_String.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -368,7 +383,7 @@
     <ClCompile Include="M_SystemRegistry.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="M_SerializedNode.cpp">
+    <ClCompile Include="M_Node.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_EntityRegistry.cpp">
@@ -398,9 +413,6 @@
     <ClCompile Include="M_Info.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="M_Rendering_RendererBuilder.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="M_Rendering_TextureBuilder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -414,9 +426,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_Error.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="M_Rendering_MaterialTemplateBuilder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_Quaternion.cpp">
@@ -476,28 +485,28 @@
     <ClCompile Include="M_ShaderPass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="M_Rendering_ShaderPassBuilder.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="M_Rendering_MaterialBuilder.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="M_Material.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_Rendering_Buffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="M_Rendering_UniformConstantInfo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="M_Rendering_PushConstantInfo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="M_Rendering_DescriptorSet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_Dynamic.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_Resources.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_Assets.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="vulkan.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_String.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

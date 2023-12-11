@@ -7,7 +7,7 @@ namespace minty
 {
 	namespace rendering
 	{
-		class TextureBuilder;
+		struct TextureBuilder;
 	}
 
 	class Texture :

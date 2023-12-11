@@ -13,11 +13,6 @@
 
 namespace minty
 {
-	namespace rendering
-	{
-		class MaterialBuilder;
-	}
-
 	/// <summary>
 	/// Holds graphics information.
 	/// </summary>

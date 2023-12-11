@@ -3,14 +3,12 @@
 
 #include "M_Renderer.h"
 
-#include "M_Rendering_ShaderPassBuilder.h"
-
 using namespace minty;
 using namespace minty::rendering;
 
 minty::ShaderPass::ShaderPass(ShaderPassBuilder const& builder, Renderer& renderer)
 	: rendering::RendererObject(renderer)
-	, _shaderId(builder.get_shader_id())
+	, _shaderId(builder.shaderId)
 	, _pipeline()
 	, _descriptorSet(renderer)
 {
@@ -47,7 +45,7 @@ void minty::ShaderPass::create_pipeline(ShaderPassBuilder const& builder)
 	VkDevice device = _renderer.get_device();
 
 	// load shader stages
-	auto const& shaderStageInfos = builder.get_stages();
+	auto const& shaderStageInfos = builder.stages;
 	std::vector<VkPipelineShaderStageCreateInfo> shaderStages(shaderStageInfos.size());
 
 	for (size_t i = 0; i < shaderStages.size(); i++)
@@ -64,8 +62,8 @@ void minty::ShaderPass::create_pipeline(ShaderPassBuilder const& builder)
 	// set vertex buffer attributes, so GPU can map values to buffer
 
 	// get the vertex attribute description data
-	std::vector<VkVertexInputBindingDescription> bindingDescriptions = builder.get_vertex_bindings();
-	std::vector<VkVertexInputAttributeDescription> attributeDescriptions = builder.get_vertex_attributes();
+	std::vector<VkVertexInputBindingDescription> bindingDescriptions = builder.vertexBindings;
+	std::vector<VkVertexInputAttributeDescription> attributeDescriptions = builder.vertexAttributes;
 
 	// define how vertex data is passed in
 	VkPipelineVertexInputStateCreateInfo vertexInputInfo
@@ -113,14 +111,14 @@ void minty::ShaderPass::create_pipeline(ShaderPassBuilder const& builder)
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_RASTERIZATION_STATE_CREATE_INFO,
 		.depthClampEnable = VK_FALSE, // if true, near and var fragments are clamped instead of discarded
 		.rasterizerDiscardEnable = VK_FALSE, // if true, disables geometry shader, so nothing goes through the framebuffer
-		.polygonMode = builder.get_polygon_mode(), // fill polygon area with fragments (can also do line or point mode for frames/points)
-		.cullMode = builder.get_cull_mode(), // cull back faces
-		.frontFace = builder.get_front_face(), // how to determine front face/direction to rotate around on triangle vertices
+		.polygonMode = builder.polygonMode, // fill polygon area with fragments (can also do line or point mode for frames/points)
+		.cullMode = builder.cullMode, // cull back faces
+		.frontFace = builder.frontFace, // how to determine front face/direction to rotate around on triangle vertices
 		.depthBiasEnable = VK_FALSE,
 		.depthBiasConstantFactor = 0.0f, // Optional
 		.depthBiasClamp = 0.0f, // Optional
 		.depthBiasSlopeFactor = 0.0f, // Optional
-		.lineWidth = builder.get_line_width(), // use with anything other than fill
+		.lineWidth = builder.lineWidth, // use with anything other than fill
 	};
 
 	// create multisampling info

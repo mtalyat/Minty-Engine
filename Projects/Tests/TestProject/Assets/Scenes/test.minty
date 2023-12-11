@@ -1,7 +1,6 @@
 Systems
     CameraController
     Move
-    Test
 Entities
     Camera
         Transform
@@ -11,60 +10,26 @@ Entities
             perspective: 1
             far: 1000
         Move
-    _
+    Model
         Renderable
-        Mesh
-            materialId: 0
-            meshType: Cube
         Transform
-            position
-                x: -2
-        Test
-            rotationSpeed
-                x: 1
-    _
-        Renderable
         Mesh
-            materialId: 1
-            meshType: Quad
-        Transform
-            position
-                x: 0
-        Test
-            rotationSpeed
-                y: 1
-    _
-        Renderable
-        Mesh
-            materialId: 2
-            meshType: Pyramid
-        Transform
-            position
-                x: 2
-        Test
-            rotationSpeed
-                z: 1
-    _
-        Renderable
-        Mesh
-            materialId: 0
-            meshType: Sphere
-        Transform
-            position
-                x: 4
-        Test
-            rotationSpeed
-                x: 1
-                y: 0.5
-                z: -0.25
-    _
-        Renderable
-        Mesh
-            materialId: 1
-            meshType: Cylinder
-        Transform
-            position
-                x: 6
-        Test
-            rotationSpeed
-                y: -1
+            material: pumpkinMat
+            type: custom
+            name: pumpkin
+#    Sphere
+#        Renderable
+#        Transform
+#            position
+#                y: 2
+#        Mesh
+#            material: material2
+#            type: sphere
+#    Cylinder
+#        Renderable
+#        Transform
+#            position
+#                y: -2
+#        Mesh
+#            material: material3
+#            type: cylinder

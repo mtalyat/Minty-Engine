@@ -1,5 +1,6 @@
 #pragma once
 
+#include "M_Node.h"
 #include <string>
 #include <vector>
 
@@ -7,6 +8,8 @@ namespace minty
 {
 	namespace file
 	{
+		std::vector<char> read_all_chars(std::string const& path);
+
 		/// <summary>
 		/// Reads all of the text from the file at the given path.
 		/// </summary>
@@ -22,11 +25,31 @@ namespace minty
 		std::vector<std::string> read_all_lines(std::string const& path);
 
 		/// <summary>
+		/// Parses a Node from the file at the given path.
+		/// </summary>
+		/// <param name="path">The path of the file.</param>
+		/// <returns>A Node with the parsed data.</returns>
+		Node read_node(std::string const& path);
+
+		/// <summary>
 		/// Checks if the given path exists.
 		/// </summary>
 		/// <param name="path">The path to check.</param>
 		/// <returns>True if the path exists.</returns>
 		bool exists(std::string const& path);
+
+		std::string name(std::string const& path);
+
+		std::string extension(std::string const& path);
+
+		std::string absolute(std::string const& path);
+
+		/// <summary>
+		/// Returns the name of the file, relative to the current working directory.
+		/// </summary>
+		/// <param name="path"></param>
+		/// <returns></returns>
+		std::string relative_name(std::string const& path);
 
 		/// <summary>
 		/// Writes all of the given text to the file at the given path.

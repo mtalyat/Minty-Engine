@@ -20,8 +20,6 @@ InputMap input;
 // called when the engine is initialized
 void init(Runtime &runtime)
 {
-    int const ENTITY_COUNT = 10;
-
     try
     {
         // components
@@ -38,114 +36,41 @@ void init(Runtime &runtime)
         Renderer *renderer = engine->get_renderer();
         SceneManager *sceneManager = engine->get_scene_manager();
 
-        {
-            // create renderer
-            Info info("TestProject", 1, 0, 0);
+        // create renderer
+        Info info("TestProject", 1, 0, 0);
 
-            // use defaults for most things
-            RendererBuilder rb(&info);
+        // use defaults for most things
+        RendererBuilder rb(&info);
 
-            basic::create_basic_renderer_builder(rb);
+        // basic::create_basic_renderer_builder(rb);
+        renderer->init(rb);
 
-            // create textures
-            std::vector<TextureBuilder> textureBuilders =
-                {
-                    TextureBuilder("Assets/Textures/funny2.png"),
-                    TextureBuilder("Assets/Textures/funny.jpg"),
-                    TextureBuilder("Assets/Textures/texture.jpg"),
-                    TextureBuilder("Assets/Textures/brian.png"),
-                    TextureBuilder("Assets/Textures/crosshair.png"),
-                    TextureBuilder("Assets/Textures/ui.png"),
-                };
-            for (TextureBuilder &builder : textureBuilders)
-            {
-                // builder.set_filter(VkFilter::VK_FILTER_NEAREST);
-                rb.emplace_texture(builder);
-            }
+        // create textures
+        renderer->load_texture("Textures/oak_planks.png");
+        renderer->load_texture("Textures/pattern.png");
+        renderer->load_texture("Textures/texture.jpg");
+        renderer->load_texture("Resources/Models/pumpkin_tex.jpg");
 
-            // create shader
-            ShaderBuilder sb;
-            basic::create_basic_shader_builder_3d(rb, sb);
-            sb.emplace_uniform_constant(UniformConstantInfo(
-                "material",
-                VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT,
-                VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-                sizeof(MaterialBufferObject),
-                DESCRIPTOR_SET_MATERIAL,
-                0));
-            sb.emplace_uniform_constant(UniformConstantInfo(
-                "textures",
-                VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT,
-                VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER,
-                sizeof(VkSampler),
-                DESCRIPTOR_SET_MATERIAL,
-                1,
-                4,
-                {0, 1, 2, 3}
-                ));
-            ID shaderId = rb.emplace_shader(sb);
+        // create shader
+        renderer->load_shader("Shaders/shader.minty");
 
-            // create shader pass
-            ShaderPassBuilder spb(shaderId);
-            basic::create_basic_shader_pass_builder_3d(rb, spb);
-            spb.emplace_stage(VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT, "Assets/Shaders/vert.spv", *renderer);
-            spb.emplace_stage(VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT, "Assets/Shaders/frag.spv", *renderer);
+        // create shader pass
+        renderer->load_shader_pass("Shaders/shaderPass.minty");
 
-            // spb.set_front_face(VkFrontFace::VK_FRONT_FACE_COUNTER_CLOCKWISE);
-            // spb.set_cull_mode(VkCullModeFlagBits::VK_CULL_MODE_FRONT_BIT);
+        // create material template
+        renderer->load_material_template("Materials/materialTemplate.minty");
 
-            // Uncomment for outlines only
-            // spb.set_polygon_mode(VkPolygonMode::VK_POLYGON_MODE_LINE);
-            // spb.set_topology(VkPrimitiveTopology::VK_PRIMITIVE_TOPOLOGY_LINE_LIST);
+        // create materials
+        renderer->load_material("Materials/material1.minty");
+        renderer->load_material("Materials/material2.minty");
+        renderer->load_material("Materials/material3.minty");
+        renderer->load_material("Materials/pumpkinMat.minty");
 
-            ID shaderPassId = rb.emplace_shader_pass(spb);
-
-            // // create ui shader
-            // ShaderBuilder sb2;
-            // basic::create_basic_shader_builder_ui(rb, sb2);
-            // sb2.emplace_uniform_constant(UniformConstantInfo(
-            //     "material",
-            //     VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT,
-            //     VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER,
-            //     sizeof(MaterialBufferObject),
-            //     DESCRIPTOR_SET_MATERIAL,
-            //     0));
-            // ID shaderId2 = rb.emplace_shader(sb2);
-
-            // // create ui shader pass
-            // ShaderPassBuilder spb2(shaderId2);
-            // basic::create_basic_shader_pass_builder_3d(rb, spb2);
-            // spb2.emplace_stage(VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT, "Assets/Shaders/uivert.spv", *renderer);
-            // spb2.emplace_stage(VkShaderStageFlagBits::VK_SHADER_STAGE_FRAGMENT_BIT, "Assets/Shaders/uifrag.spv", *renderer);
-            // ID shaderPassId2 = rb.emplace_shader_pass(spb2);
-
-            // create material templates
-            MaterialTemplateBuilder mtb({shaderPassId});
-            MaterialBufferObject mbo{
-                .textureId = 0,
-                .color = Vector4(1.0f, 1.0f, 1.0f, 1.0f)};
-            mtb.emplace_default_value("material", Dynamic(&mbo, sizeof(MaterialBufferObject)));
-            ID materialTemplateId = rb.emplace_material_template(mtb);
-
-            // create materials
-            MaterialBuilder mb(materialTemplateId); // world
-            rb.emplace_material(mb);
-            MaterialBuilder mb2(materialTemplateId); // world 2
-            mbo.textureId = 1;
-            mb2.emplace_value("material", Dynamic(&mbo, sizeof(MaterialBufferObject)));
-            rb.emplace_material(mb2);
-            MaterialBuilder mb3(materialTemplateId); // world 3
-            mbo.textureId = 2;
-            mb3.emplace_value("material", Dynamic(&mbo, sizeof(MaterialBufferObject)));
-            rb.emplace_material(mb3);
-            // MaterialBuilder mb2(materialTemplateId2); // ui
-
-            // init renderer with builders
-            renderer->init(rb);
-        }
+        // create models
+        renderer->load_mesh("Resources/Models/pumpkin.obj");
 
         // load scene from disk
-        ID sceneId = sceneManager->create_scene("Assets/Scenes/test.minty");
+        ID sceneId = sceneManager->create_scene("Scenes/test.minty");
         Scene &scene = sceneManager->get_scene(sceneId);
         EntityRegistry *er = scene.get_entity_registry();
         SystemRegistry *sr = scene.get_system_registry();

@@ -17,8 +17,12 @@
 #include "M_RenderableTag.h"
 #include "M_RelationshipComponent.h"
 
+#include "M_Assets.h"
+#include "M_Parse.h"
+
 #include "M_Vector.h"
 #include "M_Matrix.h"
+#include "M_Basic_Vertex.h"
 
 //#include <vulkan/vulkan.h>
 #define GLFW_INCLUDE_VULKAN
@@ -39,9 +43,13 @@
 #include <chrono>
 #include <filesystem>
 #include <format>
+#include <sstream>
+#include <unordered_map>
 
 using namespace minty;
 using namespace minty::rendering;
+using namespace minty::vk;
+using namespace minty::basic;
 
 const std::vector<const char*> validationLayers = {
 	"VK_LAYER_KHRONOS_validation"
@@ -115,9 +123,6 @@ void minty::Renderer::init(rendering::RendererBuilder const& builder)
 	create_command_pool(commandPool);
 	create_depth_resources();
 	create_framebuffers();
-
-	create_assets();
-
 	create_command_buffers();
 	create_sync_objects();
 
@@ -238,7 +243,7 @@ void Renderer::create_instance()
 
 	VkApplicationInfo appInfo;
 
-	Info const* const info = _builder->get_info();
+	Info const* const info = _builder->info;
 
 	if (info)
 	{
@@ -545,28 +550,9 @@ VkImageView Renderer::create_image_view(VkImage image, VkFormat format, VkImageA
 	return imageView;
 }
 
-std::vector<char> minty::Renderer::load_file(std::string const& path) const
-{
-	std::ifstream file(path, std::ios::ate | std::ios::binary);
-
-	if (!file.is_open()) {
-		error::abort("Failed to open file!");
-	}
-
-	size_t fileSize = (size_t)file.tellg();
-	std::vector<char> buffer(fileSize);
-
-	file.seekg(0);
-	file.read(buffer.data(), fileSize);
-
-	file.close();
-
-	return buffer;
-}
-
 VkShaderModule minty::Renderer::load_shader_module(std::string const& path) const
 {
-	return create_shader_module(load_file(path));
+	return create_shader_module(assets::load_chars(path));
 }
 
 VkShaderModule minty::Renderer::create_shader_module(std::vector<char> const& code) const
@@ -1245,27 +1231,27 @@ void Renderer::populate_debug_messenger_create_info(VkDebugUtilsMessengerCreateI
 
 ID minty::Renderer::create_texture(rendering::TextureBuilder const& builder)
 {
-	return _textures.emplace(Texture(builder, *this));
+	return _textures.emplace(builder.name, Texture(builder, *this));
 }
 
 ID minty::Renderer::create_shader(rendering::ShaderBuilder const& builder)
 {
-	return _shaders.emplace(Shader(builder, *this));
+	return _shaders.emplace(builder.name, Shader(builder, *this));
 }
 
 ID minty::Renderer::create_shader_pass(rendering::ShaderPassBuilder const& builder)
 {
-	return _shaderPasses.emplace(ShaderPass(builder, *this));
+	return _shaderPasses.emplace(builder.name, ShaderPass(builder, *this));
 }
 
 ID minty::Renderer::create_material_template(rendering::MaterialTemplateBuilder const& builder)
 {
-	return _materialTemplates.emplace(MaterialTemplate(builder, *this));
+	return _materialTemplates.emplace(builder.name, MaterialTemplate(builder, *this));
 }
 
 ID minty::Renderer::create_material(rendering::MaterialBuilder const& builder)
 {
-	return _materials.emplace(Material(builder, *this));
+	return _materials.emplace(builder.name, Material(builder, *this));
 }
 
 ID minty::Renderer::create_mesh()
@@ -1328,6 +1314,518 @@ ID minty::Renderer::get_or_create_mesh(MeshType const type)
 	}
 
 	return id;
+}
+
+ID minty::Renderer::find_texture(std::string const& name)
+{
+	if (!_textures.contains(name))
+	{
+		return ERROR_ID;
+	}
+
+	return _textures.get_id(name);
+}
+
+ID minty::Renderer::find_shader(std::string const& name)
+{
+	if (!_shaders.contains(name))
+	{
+		return ERROR_ID;
+	}
+
+	return _shaders.get_id(name);
+}
+
+ID minty::Renderer::find_shader_pass(std::string const& name)
+{
+	if (!_shaderPasses.contains(name))
+	{
+		return ERROR_ID;
+	}
+
+	return _shaderPasses.get_id(name);
+}
+
+ID minty::Renderer::find_material_template(std::string const& name)
+{
+	if (!_materialTemplates.contains(name))
+	{
+		return ERROR_ID;
+	}
+
+	return _materialTemplates.get_id(name);
+}
+
+ID minty::Renderer::find_material(std::string const& name)
+{
+	if (!_materials.contains(name))
+	{
+		return ERROR_ID;
+	}
+
+	return _materials.get_id(name);
+}
+
+ID minty::Renderer::find_mesh(std::string const& name)
+{
+	if (!_meshes.contains(name))
+	{
+		return ERROR_ID;
+	}
+
+	return _meshes.get_id(name);
+}
+
+ID minty::Renderer::load_texture(std::string const& path)
+{
+	if (check_asset(path, true))
+	{
+		return ERROR_ID;
+	}
+
+	Node meta = assets::load_meta(path);
+
+	// create texture builder from path and meta file
+	TextureBuilder builder(file::name(path), path);
+
+	builder.filter = from_string_vk_filter(meta.get_string("filter"));
+	builder.format = from_string_vk_format(meta.get_string("format"));
+	builder.addressMode = from_string_vk_sampler_address_mode(meta.get_string("samplerAddressMode"));
+	builder.mipmapMode = from_string_vk_sampler_mipmap_mode(meta.get_string("samplerMipmapMode"));
+	builder.pixelFormat = from_string_texture_builder_pixel_format(meta.get_string("pixelFormat", "RGBA"));
+
+	return create_texture(builder);
+}
+
+ID minty::Renderer::load_shader(std::string const& path)
+{
+	if (check_asset(path, false))
+	{
+		return ERROR_ID;
+	}
+
+	Node meta = assets::load_node(path);
+
+	ShaderBuilder builder;
+	builder.name = file::name(path);
+
+	std::vector<Node> const* nodes;
+	if (nodes = meta.find_all("push"))
+	{
+		for (Node const& child : *nodes)
+		{
+			PushConstantInfo pushConstantInfo;
+
+			pushConstantInfo.name = child.get_string("name", child.to_string());
+			pushConstantInfo.stageFlags = from_string_vk_shader_stage_flag_bits(child.get_string("stageFlags"));
+			pushConstantInfo.offset = child.get_uint("offset");
+			pushConstantInfo.size = child.get_uint("size");
+
+			builder.pushConstantInfos.emplace(pushConstantInfo.name, pushConstantInfo);
+		}
+	}
+
+	if (nodes = meta.find_all("uniform"))
+	{
+		for (Node const& child : *nodes)
+		{
+			UniformConstantInfo uniformConstantInfo;
+
+			uniformConstantInfo.name = child.get_string("name", child.to_string());
+			uniformConstantInfo.type = from_string_vk_descriptor_type(child.get_string("type"));
+			uniformConstantInfo.set = child.get_uint("set");
+			uniformConstantInfo.binding = child.get_uint("binding");
+			uniformConstantInfo.count = child.get_uint("count", 1u);
+			uniformConstantInfo.size = static_cast<VkDeviceSize>(child.get_size_t("size"));
+			uniformConstantInfo.stageFlags = from_string_vk_shader_stage_flag_bits(child.get_string("stageFlags"));
+			if (std::vector<Node> const* ids = child.find_all("id"))
+			{
+				for (auto const& id : *ids)
+				{
+					uniformConstantInfo.ids.push_back(id.to_id());
+				}
+			}
+
+			builder.uniformConstantInfos.emplace(uniformConstantInfo.name, uniformConstantInfo);
+		}
+	}
+
+	return create_shader(builder);
+}
+
+ID minty::Renderer::load_shader_pass(std::string const& path)
+{
+	if (check_asset(path, false))
+	{
+		return ERROR_ID;
+	}
+
+	Node meta = assets::load_node(path);
+
+	ShaderPassBuilder builder;
+	builder.name = file::name(path);
+	builder.shaderId = find_shader(meta.get_string("shader", meta.to_string()));
+	builder.topology = from_string_vk_primitive_topology(meta.get_string("primitiveTopology"));
+	builder.polygonMode = from_string_vk_polygon_mode(meta.get_string("polygonMode"));
+	builder.cullMode = from_string_vk_cull_mode_flag_bits(meta.get_string("cullMode"));
+	builder.frontFace = from_string_vk_front_face(meta.get_string("frontFace"));
+	builder.lineWidth = meta.get_float("lineWidth", 1.0f);
+
+	std::vector<Node> const* nodes;
+	if (nodes = meta.find_all("binding"))
+	{
+		for (auto const& child : *nodes)
+		{
+			VkVertexInputBindingDescription binding = {};
+
+			binding.binding = child.get_uint("binding", child.to_uint());
+			binding.stride = child.get_uint("stride");
+			binding.inputRate = from_string_vk_vertex_input_rate(child.get_string("inputRate"));
+
+			builder.vertexBindings.push_back(binding);
+		}
+	}
+	if (nodes = meta.find_all("attribute"))
+	{
+		for (auto const& child : *nodes)
+		{
+			VkVertexInputAttributeDescription attribute = {};
+
+			attribute.location = child.get_uint("location", child.to_uint());
+			attribute.binding = child.get_uint("binding");
+			attribute.format = from_string_vk_format(child.get_string("format"));
+			attribute.offset = child.get_uint("offset");
+
+			builder.vertexAttributes.push_back(attribute);
+		}
+	}
+	if (nodes = meta.find_all("stage"))
+	{
+		for (auto const& child : *nodes)
+		{
+			ShaderPassBuilder::ShaderStageInfo info;
+
+			info.stage = from_string_vk_shader_stage_flag_bits(child.get_string("stage", child.to_string()));
+			std::string path = child.get_string("path");
+			info.code = assets::load_chars(path);
+			info.entry = child.get_string("entry", "main");
+
+			builder.stages.push_back(info);
+		}
+	}
+
+	return create_shader_pass(builder);
+}
+
+ID minty::Renderer::load_material_template(std::string const& path)
+{
+	if (check_asset(path, false))
+	{
+		return ERROR_ID;
+	}
+
+	Node meta = assets::load_node(path);
+
+	MaterialTemplateBuilder builder;
+	builder.name = file::name(path);
+
+	std::vector<Node> const* nodes;
+	if (nodes = meta.find_all("pass"))
+	{
+		for (auto const& child : *nodes)
+		{
+			builder.shaderPassIds.push_back(find_shader_pass(child.to_string()));
+		}
+	}
+	if (Node const* node = meta.find("defaults"))
+	{
+		for (auto const& child : node->children)
+		{
+			Dynamic d;
+			Reader reader(child.second.front());
+			d.deserialize(reader);
+			builder.defaultValues.emplace(child.first, d);
+		}
+	}
+
+	return create_material_template(builder);
+}
+
+ID minty::Renderer::load_material(std::string const& path)
+{
+	if (check_asset(path, false))
+	{
+		return ERROR_ID;
+	}
+
+	Node meta = assets::load_node(path);
+
+	MaterialBuilder builder;
+	builder.name = file::name(path);
+
+	builder.templateId = find_material_template(meta.get_string("template"));
+
+	if (Node const* node = meta.find("values"))
+	{
+		for (auto const& child : node->children)
+		{
+			Dynamic d;
+			Reader reader(child.second.front());
+			d.deserialize(reader);
+			builder.values.emplace(child.first, d);
+		}
+	}
+
+	return create_material(builder);
+}
+
+ID minty::Renderer::load_mesh(std::string const& path)
+{
+	if (check_asset(path, false))
+	{
+		return ERROR_ID;
+	}
+
+	std::string extension = file::extension(path);
+
+	if (extension != ".obj")
+	{
+		console::error(std::format("Cannot load mesh from file type \"{}\".", extension));
+		return ERROR_ID;
+	}
+
+	// override existing mesh with same name
+	std::string name = file::name(path);
+	ID id = get_or_create_mesh(name);
+
+	// determine how to load the file
+	if (extension == ".obj")
+	{
+		load_mesh_obj(path, id);
+	}
+
+	return id;
+}
+
+void minty::Renderer::destroy_texture(ID const id)
+{
+	if (_textures.contains(id))
+	{
+		auto& value = _textures.at(id);
+		value.destroy();
+		_textures.erase(id);
+	}
+}
+
+void minty::Renderer::destroy_shader(ID const id)
+{
+	if (_shaders.contains(id))
+	{
+		auto& value = _shaders.at(id);
+		value.destroy();
+		_shaders.erase(id);
+	}
+}
+
+void minty::Renderer::destroy_shader_pass(ID const id)
+{
+	if (_shaderPasses.contains(id))
+	{
+		auto& value = _shaderPasses.at(id);
+		value.destroy();
+		_shaderPasses.erase(id);
+	}
+}
+
+void minty::Renderer::destroy_material_template(ID const id)
+{
+	if (_materialTemplates.contains(id))
+	{
+		MaterialTemplate& materialTemplate = _materialTemplates.at(id);
+		materialTemplate.destroy();
+		_materialTemplates.erase(id);
+	}
+}
+
+void minty::Renderer::destroy_material(ID const id)
+{
+	if (_materials.contains(id))
+	{
+		Material& material = _materials.at(id);
+		material.destroy();
+		_materials.erase(id);
+	}
+}
+
+void minty::Renderer::destroy_mesh(ID const id)
+{
+	if (_meshes.contains(id))
+	{
+		Mesh& mesh = _meshes.at(id);
+		mesh.clear();
+		_meshes.erase(id);
+	}
+}
+
+void minty::Renderer::destroy_assets()
+{
+	for (auto& tex : _textures)
+	{
+		tex.second.destroy();
+	}
+	_textures.clear();
+	for (auto& material : _materials)
+	{
+		material.second.destroy();
+	}
+	_materials.clear();
+	for (auto& materialTemplate : _materialTemplates)
+	{
+		materialTemplate.second.destroy();
+	}
+	_materialTemplates.clear();
+	for (auto& shaderPass : _shaderPasses)
+	{
+		shaderPass.second.destroy();
+	}
+	_shaderPasses.clear();
+	for (auto& shader : _shaders)
+	{
+		shader.second.destroy();
+	}
+	_shaders.clear();
+	for (auto& mesh : _meshes)
+	{
+		mesh.second.clear();
+	}
+	_meshes.clear();
+}
+
+int minty::Renderer::check_asset(std::string const& path, bool const requiresMeta) const
+{
+	// can load if assets exists, and if no meta is required, or if a meta is required, it exists
+	if (!assets::exists(path))
+	{
+		console::error(std::format("Cannot find asset at path \"{}\".", path));
+		// cannot find asset itself
+		return 1;
+	}
+
+	if (requiresMeta && !assets::exists_meta(path))
+	{
+		console::error(std::format("Cannot find meta file for asset at path \"{}\".", path));
+		// cannot find asset meta file
+		return 2;
+	}
+
+	// found both
+	return 0;
+}
+
+void minty::Renderer::load_mesh_obj(std::string const& path, ID const id)
+{
+	Node meta = assets::load_meta(path);
+
+	Mesh& mesh = get_mesh(id);
+
+	std::vector<std::string> lines = assets::load_lines(path);
+
+	std::vector<Vector3> positions;
+	std::vector<Vector2> coords;
+	std::vector<Vector3> normals;
+
+	std::unordered_map<Vector3Int, uint16_t> faces;
+	std::vector<Vertex3D> vertices;
+	std::vector<uint16_t> indices;
+
+	std::istringstream ss;
+	std::string token;
+
+	for (auto const& line : lines)
+	{
+		ss = std::istringstream(line);
+		ss >> token;
+		if (token == "v")
+		{
+			// position
+			Vector3 position;
+			ss >> position.x >> position.y >> position.z;
+			position.y = -position.y; // flip Y
+			positions.push_back(position);
+		}
+		else if(token == "vt")
+		{
+			// coord
+			Vector2 coord;
+			ss >> coord.x >> coord.y;
+			coord.y = -coord.y; // flip y
+			coords.push_back(coord);
+		}
+		else if (token == "vn")
+		{
+			// normal
+			Vector3 normal;
+			ss >> normal.x >> normal.y >> normal.z;
+			normals.push_back(normal);
+		}
+		else if (token == "f")
+		{
+			// face
+			// get pairs
+			for (size_t i = 0; i < 3; i++)
+			{
+				std::string set;
+				ss >> set;
+
+				std::istringstream setss(set);
+				Vector3Int faceIndices = Vector3Int();
+
+				// subtract 1, since all indices are 1 indexed apparently
+				if (std::getline(setss, token, '/'))
+				{
+					faceIndices.x = parse::to_int(token) - 1;
+
+					if (std::getline(setss, token, '/'))
+					{
+						faceIndices.y = parse::to_int(token) - 1;
+
+						if (std::getline(setss, token, '/'))
+						{
+							faceIndices.z = parse::to_int(token) - 1;
+						}
+					}
+				}
+
+				// if combo exists, add that index
+				auto const& found = faces.find(faceIndices);
+				if (found == faces.end())
+				{
+					// vertex does not exist yet
+
+					uint16_t index = static_cast<uint16_t>(vertices.size());
+					vertices.push_back(Vertex3D
+						{
+							.pos = positions[faceIndices.x],
+							.normal = normals[faceIndices.z],
+							.coord = coords[faceIndices.y]
+						});
+					indices.push_back(index);
+					faces.emplace(faceIndices, index);
+				}
+				else
+				{
+					// vertex already exists
+
+					uint16_t index = found->second;
+					indices.push_back(index);
+				}
+			}
+		}
+	}
+
+	// all vertices and indices populated
+	mesh.set_vertices(vertices);
+	mesh.set_indices(indices);
 }
 
 void Renderer::setup_debug_messenger() {
@@ -1457,57 +1955,6 @@ void Renderer::create_framebuffers()
 		if (vkCreateFramebuffer(_device, &framebufferInfo, nullptr, &swapChainFramebuffers[i]) != VK_SUCCESS) {
 			error::abort("Failed to create framebuffer.");
 		}
-	}
-}
-
-void minty::Renderer::build_textures()
-{
-	// go through each texture, create it with builder data
-
-}
-
-void minty::Renderer::build_shaders()
-{
-	// build custom
-
-}
-
-void minty::Renderer::build_materials()
-{
-	// not really a "pair"
-
-}
-
-void minty::Renderer::create_assets()
-{
-	// textures
-	for (auto const& builder : _builder->get_texture_builders())
-	{
-		create_texture(*builder.second);
-	}
-
-	// shaders
-	for (auto const builder : _builder->get_shader_builders())
-	{
-		create_shader(*builder.second);
-	}
-
-	// shader passes
-	for (auto const builder : _builder->get_shader_pass_builders())
-	{
-		create_shader_pass(*builder.second);
-	}
-
-	// material templates
-	for (auto const builder : _builder->get_material_template_builders())
-	{
-		create_material_template(*builder.second);
-	}
-	
-	// materials
-	for (auto const& builder : _builder->get_material_builders())
-	{
-		create_material(*builder.second);
 	}
 }
 
@@ -1922,31 +2369,7 @@ void Renderer::destroy()
 	cleanup_swap_chain();
 
 	// destroy assets
-	for (auto& tex : _textures)
-	{
-		tex.second.destroy();
-	}
-	_textures.clear();
-	for (auto& material : _materials)
-	{
-		material.second.destroy();
-	}
-	_materials.clear();
-	for (auto& materialTemplate : _materialTemplates)
-	{
-		materialTemplate.second.destroy();
-	}
-	_materialTemplates.clear();
-	for (auto& shaderPass : _shaderPasses)
-	{
-		shaderPass.second.destroy();
-	}
-	_shaderPasses.clear();
-	for (auto& shader : _shaders)
-	{
-		shader.second.destroy();
-	}
-	_shaders.clear();
+	destroy_assets();
 	for (auto& buffer : _buffers)
 	{
 		destroy_buffer(buffer.second);
