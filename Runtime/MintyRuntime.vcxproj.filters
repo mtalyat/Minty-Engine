@@ -438,6 +438,12 @@
     <ClInclude Include="miniaudio.h">
       <Filter>Libraries\soloud</Filter>
     </ClInclude>
+    <ClInclude Include="M_AudioSourceComponent.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="M_AudioListenerComponent.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -714,6 +720,9 @@
       <Filter>Libraries\soloud</Filter>
     </ClCompile>
     <ClCompile Include="M_AudioClip.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_AudioSourceComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -5,6 +5,8 @@
 #include "M_UISystem.h"
 
 #include "M_EntityRegistry.h"
+#include "M_AudioListenerComponent.h"
+#include "M_AudioSourceComponent.h"
 #include "M_CameraComponent.h"
 #include "M_DirtyTag.h"
 #include "M_MeshComponent.h"
@@ -67,12 +69,14 @@ void minty::Runtime::register_builtin()
 	SystemRegistry::register_system<UISystem>("UI");
 
 	// components
+	EntityRegistry::register_component<AudioListener>("AudioListener");
+	EntityRegistry::register_component<AudioSource>("AudioSource");
 	EntityRegistry::register_component<CameraComponent>("Camera");
-	EntityRegistry::register_component<DirtyTag>("Dirty");
+	EntityRegistry::register_component<Dirty>("Dirty");
 	EntityRegistry::register_component<MeshComponent>("Mesh");
 	EntityRegistry::register_component<NameComponent>("Name");
 	EntityRegistry::register_component<RelationshipComponent>("Relationship");
-	EntityRegistry::register_component<RenderableTag>("Renderable");
+	EntityRegistry::register_component<Renderable>("Renderable");
 	EntityRegistry::register_component<SpriteComponent>("Sprite");
 	EntityRegistry::register_component<TransformComponent>("Transform");
 	EntityRegistry::register_component<UITransformComponent>("UITransform");

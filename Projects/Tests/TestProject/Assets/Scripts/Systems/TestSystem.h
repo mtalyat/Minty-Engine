@@ -8,7 +8,7 @@ namespace game
         : public minty::System
     {
     private:
-        bool _paused = true;
+        bool _paused = false;
 
     public:
         TestSystem(minty::Engine* const engine, minty::EntityRegistry* const registry);

@@ -22,7 +22,10 @@ void game::TestSystem::update()
     for(auto&& [entity, test, transform] : _registry->view<TestComponent, TransformComponent>().each())
     {
         test.rotation += test.rotationSpeed * deltaTime;
-        transform.local.rotation = Quaternion(test.rotation);
+        transform.local.position = Quaternion(test.rotation) * Vector3(0.0f, 0.0f, 10.0f);
+        _registry->emplace_or_replace<Dirty>(entity);
+
+        console::log(to_string(transform.local.position));
     }
 }
 

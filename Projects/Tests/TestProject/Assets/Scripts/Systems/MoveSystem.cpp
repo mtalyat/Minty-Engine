@@ -18,10 +18,15 @@ void game::MoveSystem::update()
     float const MOVE_SPEED = 1.0f;
     float movement = MOVE_SPEED * _engine->get_delta_time();
     
+    if(movement == 0.0f)
+    {
+        return;
+    }
+    
     // sprint multiplier
     if(faster)
     {
-        movement *= 2.0f;
+        movement *= 10.0f;
     }
 
     // m,
@@ -30,5 +35,6 @@ void game::MoveSystem::update()
         transform.local.position += transform.local.rotation.right() * movement * right;
         transform.local.position += transform.local.rotation.up() * movement * up;
         transform.local.position += transform.local.rotation.forward() * movement * forward;
+        _registry->emplace_or_replace<Dirty>(entity);
     }
 }

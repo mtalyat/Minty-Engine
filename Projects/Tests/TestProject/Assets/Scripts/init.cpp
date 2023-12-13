@@ -37,9 +37,6 @@ void init(Runtime &runtime)
         AudioEngine *audio = engine->get_audio_engine();
         SceneManager *sceneManager = engine->get_scene_manager();
 
-        ID audioId = audio->load_clip("Audio/blinking-forest.wav");
-        audio->play(audioId);
-
         // create renderer
         Info info("TestProject", 1, 0, 0);
 
@@ -73,25 +70,33 @@ void init(Runtime &runtime)
         // create models
         renderer->load_mesh("Resources/Models/pumpkin.obj");
 
+        // create audio
+        audio->load_clip("Audio/blinking-forest.wav");
+
         // load scene from disk
         ID sceneId = sceneManager->create_scene("Scenes/test.minty");
         Scene &scene = sceneManager->get_scene(sceneId);
         EntityRegistry *er = scene.get_entity_registry();
         SystemRegistry *sr = scene.get_system_registry();
 
-        // get camera
-        Entity cameraEntity = er->find_by_type<CameraComponent>();
-        // PositionComponent& cameraPosition = er->get<PositionComponent>(cameraEntity);
-        // cameraPosition.position = Vector3(0.0f, 0.0f, ENTITY_COUNT * -2.0f);
-
         // load the scene we created, with the camera
-        sceneManager->load_scene(sceneId, cameraEntity);
+        sceneManager->load_scene(sceneId);
 
         // debug print scene:
-        Node node;
-        Writer writer(node, &scene);
-        scene.serialize(writer);
-        node.print();
+        {
+            Node node;
+            SerializationData data{
+                .scene = &scene,
+                .entity = NULL_ENTITY};
+            Writer writer(node, &data);
+            scene.serialize(writer);
+            node.print();
+        }
+
+        //          audio
+
+        // play audio
+        audio->play(er->find_by_name("Model"));
 
         //          input
 

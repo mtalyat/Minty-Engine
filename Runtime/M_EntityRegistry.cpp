@@ -21,8 +21,8 @@ minty::EntityRegistry::EntityRegistry()
 	, Object()
 {
 	// make it so whenever a transform is editied, it is marked as dirty
-	on_construct<TransformComponent>().connect<&EntityRegistry::emplace_or_replace<DirtyTag>>();
-	on_update<TransformComponent>().connect<&EntityRegistry::emplace_or_replace<DirtyTag>>();
+	on_construct<TransformComponent>().connect<&EntityRegistry::emplace_or_replace<Dirty>>();
+	on_update<TransformComponent>().connect<&EntityRegistry::emplace_or_replace<Dirty>>();
 }
 
 minty::EntityRegistry::~EntityRegistry()

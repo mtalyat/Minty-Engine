@@ -1,15 +1,20 @@
 #pragma once
-
 #include "M_Component.h"
+
+#include "M_Audio.h"
 
 namespace minty
 {
-	struct Dirty
+	struct AudioSource
 		: public Component
 	{
+		ID clipId;
+
+		float attenuation;
+		float nearDistance;
+		float farDistance;
+
 		void serialize(Writer& writer) const override;
 		void deserialize(Reader const& reader) override;
-
-		friend std::string to_string(Dirty const& value);
 	};
 }

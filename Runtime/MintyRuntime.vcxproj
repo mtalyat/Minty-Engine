@@ -213,6 +213,8 @@
     <ClInclude Include="M_Audio.h" />
     <ClInclude Include="M_AudioClip.h" />
     <ClInclude Include="M_AudioEngine.h" />
+    <ClInclude Include="M_AudioListenerComponent.h" />
+    <ClInclude Include="M_AudioSourceComponent.h" />
     <ClInclude Include="M_Builtin_GlobalData.h" />
     <ClInclude Include="M_Resources.h" />
     <ClInclude Include="M_SerializationData.h" />
@@ -342,6 +344,7 @@
     <ClCompile Include="M_Assets.cpp" />
     <ClCompile Include="M_AudioClip.cpp" />
     <ClCompile Include="M_AudioEngine.cpp" />
+    <ClCompile Include="M_AudioSourceComponent.cpp" />
     <ClCompile Include="M_Dynamic.cpp" />
     <ClCompile Include="M_Basic.cpp" />
     <ClCompile Include="M_CameraComponent.cpp" />

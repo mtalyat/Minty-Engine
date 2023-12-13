@@ -46,7 +46,7 @@ namespace SoLoud
 
 		lockAudioMutex_internal();
 		int ch = findFreeVoice_internal();
-		if (ch < 0) 
+		if (ch < 0)
 		{
 			unlockAudioMutex_internal();
 			delete instance;

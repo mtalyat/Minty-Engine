@@ -122,7 +122,7 @@ void minty::Scene::update()
 		});
 
 	// update group
-	for (auto&& [entity, dirty, transform] : _entities->view<DirtyTag const, TransformComponent>().each())
+	for (auto&& [entity, dirty, transform] : _entities->view<Dirty const, TransformComponent>().each())
 	{
 		// get relationship, if there is one
 		RelationshipComponent const* relationshipComponent = er->try_get<RelationshipComponent>(entity);
@@ -162,6 +162,12 @@ void minty::Scene::fixed_update()
 void minty::Scene::unload()
 {
 	_systems->unload();
+}
+
+void minty::Scene::finalize()
+{
+	// remove all dirty tags
+	_entities->clear<Dirty>();
 }
 
 void minty::Scene::serialize(Writer& writer) const
