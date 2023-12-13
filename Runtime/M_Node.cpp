@@ -79,6 +79,17 @@ float minty::Node::to_float(float const defaultValue) const
 	return defaultValue;
 }
 
+bool minty::Node::to_bool(bool const defaultValue) const
+{
+	bool out;
+	if (parse::try_bool(data, out))
+	{
+		return out;
+	}
+
+	return defaultValue;
+}
+
 Node* minty::Node::find(std::string const& name)
 {
 	auto const& found = children.find(name);
@@ -211,6 +222,19 @@ float minty::Node::get_float(std::string const& name, float const defaultValue) 
 	if (node)
 	{
 		return node->to_float(defaultValue);
+	}
+	else
+	{
+		return defaultValue;
+	}
+}
+
+bool minty::Node::get_bool(std::string const& name, bool const defaultValue) const
+{
+	Node const* node = find(name);
+	if (node)
+	{
+		return node->to_bool(defaultValue);
 	}
 	else
 	{

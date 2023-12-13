@@ -1076,7 +1076,7 @@ void minty::Renderer::draw_scene(VkCommandBuffer commandBuffer)
 	TransformComponent const* transformComponent;
 
 	// draw all meshes in the scene
-	for (auto&& [entity, renderable, mesh] : _registry->view<RenderableTag const, MeshComponent>().each())
+	for (auto&& [entity, renderable, mesh] : _registry->view<Renderable const, MeshComponent>().each())
 	{
 		// get transform for entity
 		transformComponent = _registry->try_get<TransformComponent>(entity);
@@ -1097,7 +1097,7 @@ void minty::Renderer::draw_scene(VkCommandBuffer commandBuffer)
 	_registry->sort<UITransformComponent, SpriteComponent>();
 
 	// draw all UI in scene
-	for (auto&& [entity, renderable, ui, sprite] : _registry->view<RenderableTag const, UITransformComponent const, SpriteComponent const>().each())
+	for (auto&& [entity, renderable, ui, sprite] : _registry->view<Renderable const, UITransformComponent const, SpriteComponent const>().each())
 	{
 		draw_ui(commandBuffer, ui, sprite);
 	}
@@ -2247,7 +2247,7 @@ void minty::Renderer::set_scene(Scene const* const scene, Entity const camera)
 	_scene = scene;
 
 	// if scene is null, so are other things
-	if (_scene == nullptr)
+	if (!_scene)
 	{
 		_registry = nullptr;
 		_mainCamera = NULL_ENTITY;

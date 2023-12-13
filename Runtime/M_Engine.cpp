@@ -17,6 +17,7 @@ Engine::Engine(Info const* const info)
 	: _globalInput()
 	, _window(info->get_application_info().pApplicationName, WIDTH, HEIGHT, &_globalInput)
 	, _renderer(&_window)
+	, _audioEngine()
 	, _sceneManager(this)
 	, _deltaTime(0.02f)
 {}
@@ -34,6 +35,11 @@ Window* minty::Engine::get_window()
 Renderer* minty::Engine::get_renderer()
 {
 	return &_renderer;
+}
+
+AudioEngine* minty::Engine::get_audio_engine()
+{
+	return &_audioEngine;
 }
 
 SceneManager* minty::Engine::get_scene_manager()
@@ -93,8 +99,14 @@ void Engine::run()
 		// update scene(s)
 		_sceneManager.update();
 
+		// update audio engine
+		_audioEngine.update();
+
 		// update renderer
 		_renderer.update();
+
+		// cleanup scene
+		_sceneManager.finalize();
 
 		// render to the screen
 		_renderer.render_frame();

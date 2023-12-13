@@ -34,6 +34,7 @@ void init(Runtime &runtime)
         Engine *engine = runtime.get_engine();
         Window *window = engine->get_window();
         Renderer *renderer = engine->get_renderer();
+        AudioEngine *audio = engine->get_audio_engine();
         SceneManager *sceneManager = engine->get_scene_manager();
 
         // create renderer
@@ -69,27 +70,42 @@ void init(Runtime &runtime)
         // create models
         renderer->load_mesh("Resources/Models/pumpkin.obj");
 
+        // create audio
+        audio->load_clip("Audio/blinking-forest.wav");
+        audio->load_clip("Audio/cow-bells.wav");
+        audio->load_clip("Audio/ding.wav");
+        audio->load_clip("Audio/dong.wav");
+
         // load scene from disk
         ID sceneId = sceneManager->create_scene("Scenes/test.minty");
         Scene &scene = sceneManager->get_scene(sceneId);
         EntityRegistry *er = scene.get_entity_registry();
         SystemRegistry *sr = scene.get_system_registry();
 
-        // get camera
-        Entity cameraEntity = er->find_by_type<CameraComponent>();
-        // PositionComponent& cameraPosition = er->get<PositionComponent>(cameraEntity);
-        // cameraPosition.position = Vector3(0.0f, 0.0f, ENTITY_COUNT * -2.0f);
-
         // load the scene we created, with the camera
-        sceneManager->load_scene(sceneId, cameraEntity);
+        sceneManager->load_scene(sceneId);
 
         // debug print scene:
-        Node node;
-        Writer writer(node, &scene);
-        scene.serialize(writer);
-        node.print();
+        {
+            Node node;
+            SerializationData data{
+                .scene = &scene,
+                .entity = NULL_ENTITY};
+            Writer writer(node, &data);
+            scene.serialize(writer);
+            node.print();
+        }
+
+        //          audio
+
+        // play audio
+        audio->play_background("blinking-forest", 0.2f);
 
         //          input
+        input.emplace_key_down(Key::E, [audio, er](KeyPressEventArgs const &args)
+                               { audio->play_spatial("ding", er->find_by_name("Model")); });
+        input.emplace_key_up(Key::E, [audio, er](KeyPressEventArgs const &args)
+                               { audio->play_spatial("dong", er->find_by_name("Model")); });
 
         // quit on key close
         input.emplace_key_down(Key::Escape, [window](KeyPressEventArgs const &args)

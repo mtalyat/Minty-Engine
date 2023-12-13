@@ -1,13 +1,13 @@
 #include "pch.h"
 #include "M_DirtyTag.h"
 
-std::string minty::to_string(DirtyTag const& value)
+std::string minty::to_string(Dirty const& value)
 {
-    return std::format("DirtyTag()");
+    return std::format("Dirty()");
 }
 
-void minty::DirtyTag::serialize(Writer& writer) const
+void minty::Dirty::serialize(Writer& writer) const
 {}
 
-void minty::DirtyTag::deserialize(Reader const& reader)
+void minty::Dirty::deserialize(Reader const& reader)
 {}

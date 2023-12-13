@@ -1,6 +1,7 @@
 Systems
     CameraController
     Move
+    Test
 Entities
     Camera
         Transform
@@ -8,8 +9,10 @@ Entities
                 z: -4
         Camera
             perspective: 1
-            far: 1000
+            near: 0.1
+            far: 100.0
         Move
+        AudioListener
     Model
         Renderable
         Transform
@@ -17,6 +20,11 @@ Entities
             material: pumpkinMat
             type: custom
             name: pumpkin
+        AudioSource
+            clip: cow-bells
+        Test
+            rotationSpeed
+                y: 1.0
 #    Sphere
 #        Renderable
 #        Transform

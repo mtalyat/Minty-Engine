@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "M_Parse.h"
 
+#include "M_String.h"
+
 using namespace minty;
 using namespace minty::parse;
 
@@ -73,11 +75,35 @@ bool is_float(std::string const& string)
 
 bool minty::parse::to_bool(std::string const& string)
 {
+    // check for "true" or "false" as well
+    std::string upper = string::to_upper(string);
+    if (upper == "TRUE")
+    {
+        return true;
+    }
+    else if (upper == "FALSE")
+    {
+        return false;
+    }
+
+    // by default, parse the int to a bool
     return static_cast<bool>(std::stoi(string));
 }
 
 bool minty::parse::try_bool(std::string const& string, bool& value)
 {
+    // check for "true" or "false" as well
+    std::string upper = string::to_upper(string);
+    if (upper == "TRUE")
+    {
+        return true;
+    }
+    else if (upper == "FALSE")
+    {
+        return false;
+    }
+
+    // by default, parse the int to a bool
     if (is_signed_integer(string))
     {
         value = static_cast<bool>(std::stoi(string));

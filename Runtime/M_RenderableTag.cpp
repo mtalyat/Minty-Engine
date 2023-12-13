@@ -3,7 +3,7 @@
 
 using namespace minty;
 
-std::string minty::to_string(RenderableTag const& value)
+std::string minty::to_string(Renderable const& value)
 {
-	return std::format("RenderableTag()");
+	return std::format("Renderable()");
 }

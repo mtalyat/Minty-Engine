@@ -3,6 +3,7 @@
 #include "M_InputMap.h"
 #include "M_Window.h"
 #include "M_Renderer.h"
+#include "M_AudioEngine.h"
 #include "M_Rendering_RendererBuilder.h"
 #include "M_SceneManager.h"
 #include "M_Info.h"
@@ -21,6 +22,7 @@ namespace minty
 		InputMap _globalInput;
 		Window _window;
 		Renderer _renderer;
+		AudioEngine _audioEngine;
 		SceneManager _sceneManager;
 
 		float _deltaTime;
@@ -34,6 +36,8 @@ namespace minty
 		Window* get_window();
 
 		Renderer* get_renderer();
+
+		AudioEngine* get_audio_engine();
 
 		SceneManager* get_scene_manager();
 

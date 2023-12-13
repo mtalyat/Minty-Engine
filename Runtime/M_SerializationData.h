@@ -1,15 +1,14 @@
 #pragma once
 
 #include "M_EntityRegistry.h"
+#include "M_Engine.h"
+#include "M_Scene.h"
+#include "M_Renderer.h"
 
 namespace minty
 {
-	class Renderer;
-	class Scene;
-
 	struct SerializationData
 	{
-		Renderer* renderer;
 		Scene* scene;
 		Entity entity;
 	};

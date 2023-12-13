@@ -249,13 +249,31 @@ namespace minty
 	template <class T>
 	ID Register<T>::get_id(std::string const name) const
 	{
-		return _lookup.at(name);
+		auto const& found = _lookup.find(name);
+
+		if (found == _lookup.end())
+		{
+			return ERROR_ID;
+		}
+		else
+		{
+			return found->second;
+		}
 	}
 
 	template <class T>
 	std::string const &Register<T>::get_alias(ID const id) const
 	{
-		return _names.at(id);
+		auto const& found = _names.find(id);
+
+		if (found == _names.end())
+		{
+			return "";
+		}
+		else
+		{
+			return found->second;
+		}
 	}
 
 	template <class T>

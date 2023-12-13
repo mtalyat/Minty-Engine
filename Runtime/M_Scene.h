@@ -66,6 +66,8 @@ namespace minty
 		/// </summary>
 		void unload();
 
+		void finalize();
+
 		void serialize(Writer& writer) const override;
 		void deserialize(Reader const& reader) override;
 

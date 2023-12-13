@@ -4,9 +4,9 @@
 
 namespace minty
 {
-	struct RenderableTag
+	struct Renderable
 		: public Component
 	{
-		friend std::string to_string(RenderableTag const& value);
+		friend std::string to_string(Renderable const& value);
 	};
 }

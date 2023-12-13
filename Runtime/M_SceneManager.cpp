@@ -40,7 +40,6 @@ ID minty::SceneManager::create_scene(std::string const& path)
 	Node node = assets::load_node(path);
 	SerializationData data =
 	{
-		.renderer = scene.get_engine()->get_renderer(),
 		.scene = &scene,
 		.entity = NULL_ENTITY
 	};
@@ -51,7 +50,7 @@ ID minty::SceneManager::create_scene(std::string const& path)
 	return id;
 }
 
-void minty::SceneManager::load_scene(ID const id, Entity const camera)
+void minty::SceneManager::load_scene(ID const id)
 {
 	Scene* scene = &_scenes.at(id);
 
@@ -71,7 +70,8 @@ void minty::SceneManager::load_scene(ID const id, Entity const camera)
 	_loadedScene = scene;
 
 	// set renderer to use this new scene
-	_engine->get_renderer()->set_scene(_loadedScene, camera);
+	_engine->get_renderer()->set_scene(_loadedScene);
+	_engine->get_audio_engine()->set_scene(_loadedScene);
 
 	// load event
 	if (_loaded && _loadedScene)
@@ -145,6 +145,15 @@ void minty::SceneManager::unload()
 	if (_loadedScene)
 	{
 		_loadedScene->unload();
+	}
+}
+
+void minty::SceneManager::finalize()
+{
+	// finalize all active scenes if loaded
+	if (_loaded && _loadedScene)
+	{
+		_loadedScene->finalize();
 	}
 }
 
