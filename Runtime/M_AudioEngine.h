@@ -7,20 +7,19 @@
 #include "M_Audio.h"
 #include "M_EntityRegistry.h"
 #include <unordered_map>
+#include <climits>
 
 namespace minty
 {
 	class Scene;
 
+	typedef SoLoud::handle AudioHandle;
+	constexpr const AudioHandle ERROR_AUDIO_HANDLE = UINT_MAX;
+
 	class AudioEngine
 		: public Object
 	{
 	private:
-		struct SoundSource
-		{
-			Entity entity;
-			SoLoud::handle handle;
-		};
 		struct SoundData
 		{
 			Vector3 position;
@@ -29,7 +28,7 @@ namespace minty
 	private:
 		SoLoud::Soloud _engine;
 		Register<AudioClip> _clips;
-		std::unordered_map<ID, SoundSource> _playing;
+		std::unordered_map<AudioHandle, Entity> _playing;
 
 		Scene const* _scene;
 		EntityRegistry* _registry;
@@ -42,21 +41,27 @@ namespace minty
 
 		void update();
 
-		void play(ID const id, Entity const entity = NULL_ENTITY);
+		AudioHandle play(ID const id, float const volume = -1.0f, float const pan = 0.0f, bool const paused = false);
 
-		void play(std::string const& name, Entity const entity = NULL_ENTITY);
+		AudioHandle play(std::string const& name, float const volume = -1.0f, float const pan = 0.0f, bool const paused = false);
 
-		void play(Entity const entity);
+		AudioHandle play_spatial(Entity const entity, float const volume = -1.0f, bool const paused = false);
 
-		void play_background(ID const id);
+		AudioHandle play_spatial(ID const id, Entity const entity, float const volume = -1.0f, bool const paused = false);
 
-		void play_background(std::string const& name);
+		AudioHandle play_spatial(std::string const& name, Entity const entity, float const volume = -1.0f, bool const paused = false);
 
-		bool is_playing(ID const id) const;
+		AudioHandle play_background(ID const id, float const volume = -1.0f, bool const paused = false);
 
-		bool is_playing(std::string const& name) const;
+		AudioHandle play_background(std::string const& name, float const volume = -1.0f, bool const paused = false);
 
-		void stop(ID const id);
+		bool is_playing(AudioHandle const handle);
+
+		void set_pause(AudioHandle const handle, bool const paused);
+
+		bool get_pause(AudioHandle const handle);
+
+		void stop(AudioHandle const handle);
 
 		void stop_all();
 

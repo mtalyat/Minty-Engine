@@ -11,6 +11,7 @@ void minty::AudioSource::serialize(Writer& writer) const
 
 	AudioEngine* audio = data->scene->get_engine()->get_audio_engine();
 
+	writer.write("volume", volume, 1.0f);
 	writer.write("clip", audio->get_name(clipId));
 	writer.write("attenuation", attenuation);
 	writer.write("near", nearDistance);
@@ -23,6 +24,7 @@ void minty::AudioSource::deserialize(Reader const& reader)
 
 	AudioEngine* audio = data->scene->get_engine()->get_audio_engine();
 
+	volume = reader.read_float("volume", 1.0f);
 	clipId = audio->get_id(reader.read_string("clip"));
 	attenuation = reader.read_float("attenuation", 1.0f);
 	nearDistance = reader.read_float("near", 1.0f);

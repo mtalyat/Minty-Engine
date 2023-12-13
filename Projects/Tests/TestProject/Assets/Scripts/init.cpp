@@ -72,6 +72,9 @@ void init(Runtime &runtime)
 
         // create audio
         audio->load_clip("Audio/blinking-forest.wav");
+        audio->load_clip("Audio/cow-bells.wav");
+        audio->load_clip("Audio/ding.wav");
+        audio->load_clip("Audio/dong.wav");
 
         // load scene from disk
         ID sceneId = sceneManager->create_scene("Scenes/test.minty");
@@ -96,9 +99,13 @@ void init(Runtime &runtime)
         //          audio
 
         // play audio
-        audio->play(er->find_by_name("Model"));
+        audio->play_background("blinking-forest", 0.2f);
 
         //          input
+        input.emplace_key_down(Key::E, [audio, er](KeyPressEventArgs const &args)
+                               { audio->play_spatial("ding", er->find_by_name("Model")); });
+        input.emplace_key_up(Key::E, [audio, er](KeyPressEventArgs const &args)
+                               { audio->play_spatial("dong", er->find_by_name("Model")); });
 
         // quit on key close
         input.emplace_key_down(Key::Escape, [window](KeyPressEventArgs const &args)

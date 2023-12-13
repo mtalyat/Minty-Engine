@@ -10,6 +10,7 @@ namespace minty
 	{
 		ID clipId;
 
+		float volume;
 		float attenuation;
 		float nearDistance;
 		float farDistance;

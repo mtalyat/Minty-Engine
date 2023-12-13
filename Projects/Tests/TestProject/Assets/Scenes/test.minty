@@ -21,7 +21,7 @@ Entities
             type: custom
             name: pumpkin
         AudioSource
-            clip: blinking-forest
+            clip: cow-bells
         Test
             rotationSpeed
                 y: 1.0

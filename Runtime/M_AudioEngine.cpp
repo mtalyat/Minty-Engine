@@ -42,7 +42,7 @@ void minty::AudioEngine::update()
 {
 	TransformComponent* transComp;
 
-	bool listenerDirty = _registry->any_of<Dirty>(_listener);
+	bool listenerDirty = _registry->all_of<Dirty>(_listener);
 
 	// update listener data in engine
 	if (_listener != NULL_ENTITY && listenerDirty)
@@ -51,14 +51,17 @@ void minty::AudioEngine::update()
 
 		if (transComp)
 		{
+			// get data for listener
 			update_sound_data(_listenerData, _listener);
 			Vector3 up = transComp->get_up();
-
-			_engine.set3dListenerPosition(_listenerData.position.x, _listenerData.position.y, _listenerData.position.z);
-			_engine.set3dListenerVelocity(_listenerData.velocity.x, _listenerData.velocity.y, _listenerData.velocity.z);
-			_engine.set3dListenerUp(up.x, up.y, up.z);
-
-			//console::log(std::format("Listener: {}", to_string(_listenerData.position)));
+			Vector3 forward = transComp->get_forward();
+			
+			// update that data in the audio engine
+			_engine.set3dListenerParameters(
+				_listenerData.position.x, _listenerData.position.y, _listenerData.position.z,
+				forward.x, forward.y, forward.z,
+				up.x, up.y, up.z,
+				_listenerData.velocity.x, _listenerData.velocity.y, _listenerData.velocity.z);
 		}
 	}
 
@@ -72,19 +75,16 @@ void minty::AudioEngine::update()
 	// if they have not stopped, then update in 3D space relative to the camera
 	for (auto& pair : _playing)
 	{
-		if (_engine.isValidVoiceHandle(pair.second.handle) && pair.second.entity != NULL_ENTITY)
+		// check if sound is still playing
+		if (_engine.isValidVoiceHandle(pair.first))
 		{
-			// still playing, update 3d location
-			
-			// if entity dirty or needs updated AND has position component
-			if (_registry->all_of<Dirty>(pair.second.entity) && (transComp = _registry->try_get<TransformComponent>(pair.second.entity)))
+			// still playing, update 3d location if needed
+			if (pair.second != NULL_ENTITY && _registry->all_of<Dirty>(pair.second) && (transComp = _registry->try_get<TransformComponent>(pair.second)))
 			{
-				update_sound_data(sourceData, pair.second.entity);
+				update_sound_data(sourceData, pair.second);
 
-				_engine.set3dSourcePosition(pair.second.handle, sourceData.position.x, sourceData.position.y, sourceData.position.z);
-				_engine.set3dSourceVelocity(pair.second.handle, sourceData.velocity.x, sourceData.velocity.y, sourceData.velocity.z);
-
-				//console::log(std::format("Source: {}", to_string(sourceData.position)));
+				_engine.set3dSourcePosition(pair.first, sourceData.position.x, sourceData.position.y, sourceData.position.z);
+				_engine.set3dSourceVelocity(pair.first, sourceData.velocity.x, sourceData.velocity.y, sourceData.velocity.z);
 			}
 		}
 		else
@@ -104,111 +104,115 @@ void minty::AudioEngine::update()
 	_engine.update3dAudio();
 }
 
-void minty::AudioEngine::play(ID const id, Entity const entity)
+AudioHandle minty::AudioEngine::play(ID const id, float const volume, float const pan, bool const paused)
 {
-	if (id == ERROR_ID) return;
+	if (id == ERROR_ID) return ERROR_AUDIO_HANDLE;
 
 	// get clip to play
 	AudioClip& clip = at(id);
 
 	// start playing
-	SoLoud::handle handle;
-	if (entity == NULL_ENTITY)
-	{
-		// no entity tied to sound, so just play
-		handle = _engine.play(clip._clip);
-	}
-	else
-	{
-		// entity tied to sound, so play in 3d space
-		SoundData data{};
-		update_sound_data(data, entity);
-		handle = _engine.play3d(clip._clip, data.position.x, data.position.y, data.position.z, data.velocity.x, data.velocity.y, data.velocity.z);
+	AudioHandle handle = _engine.play(clip._clip, volume, pan, paused);
 
-		if (AudioSource* source = _registry->try_get<AudioSource>(entity))
-		{
-			_engine.set3dSourceAttenuation(handle, SoLoud::AudioSource::LINEAR_DISTANCE, source->attenuation);
-			_engine.set3dSourceMinMaxDistance(handle, source->nearDistance, source->farDistance);
-			_engine.update3dAudio();
-		}		
-	}
+	// mark as playing
+	_playing[handle] = NULL_ENTITY;
 
-	// add to playing
-	_playing[id] = SoundSource
-	{
-		.entity = entity,
-		.handle = handle
-	};
+	return handle;
 }
 
-void minty::AudioEngine::play(std::string const& name, Entity const entity)
+AudioHandle minty::AudioEngine::play(std::string const& name, float const volume, float const pan, bool const paused)
 {
-	play(_clips.get_id(name), entity);
+	return play(get_id(name), volume, pan, paused);
 }
 
-void minty::AudioEngine::play(Entity const entity)
+AudioHandle minty::AudioEngine::play_spatial(Entity const entity, float const volume, bool const paused)
 {
-	// if no registry, do nothing
-	if (!_registry)
-	{
-		return;
-	}
+	MINTY_ASSERT(_registry->all_of<AudioSource>(entity), "The entity for play_spatial must have an AudioSource component.");
 
-	// play sound if entity is not null and has an audio source
-	if (AudioSource* source = _registry->try_get<AudioSource>(entity))
-	{
-		play(source->clipId, entity);
-	}
+	AudioSource& source = _registry->get<AudioSource>(entity);
+
+	if (source.clipId == ERROR_ID) return ERROR_AUDIO_HANDLE;
+
+	return play_spatial(source.clipId, entity, volume, paused);
 }
 
-void minty::AudioEngine::play_background(ID const id)
+AudioHandle minty::AudioEngine::play_spatial(ID const id, Entity const entity, float const volume, bool const paused)
 {
-	if (id == ERROR_ID) return;
+	if (id == ERROR_ID) return ERROR_AUDIO_HANDLE;
+
+	MINTY_ASSERT(_registry->all_of<AudioSource>(entity), "The entity for play_spatial must have an AudioSource component.");
+
+	AudioSource& source = _registry->get<AudioSource>(entity);
+
+	// entity tied to sound, so play in 3d space
+	SoundData data{};
+	update_sound_data(data, entity);
+	AudioHandle handle = _engine.play3d(_clips.at(id)._clip, data.position.x, data.position.y, data.position.z, data.velocity.x, data.velocity.y, data.velocity.z, volume, paused);
+
+	_engine.set3dSourceAttenuation(handle, SoLoud::AudioSource::LINEAR_DISTANCE, source.attenuation);
+	_engine.set3dSourceMinMaxDistance(handle, source.nearDistance, source.farDistance);
+	_engine.update3dAudio();
+
+	_playing[handle] = entity;
+
+	return handle;
+}
+
+AudioHandle minty::AudioEngine::play_spatial(std::string const& name, Entity const entity, float const volume, bool const paused)
+{
+	return play_spatial(get_id(name), entity, volume, paused);
+}
+
+AudioHandle minty::AudioEngine::play_background(ID const id, float const volume, bool const paused)
+{
+	if (id == ERROR_ID) return ERROR_AUDIO_HANDLE;
 
 	// get clip to play
 	AudioClip& clip = at(id);
 
 	// start playing
-	SoLoud::handle handle = _engine.playBackground(clip._clip);
+	SoLoud::handle handle = _engine.playBackground(clip._clip, volume, paused);
 
 	// add to playing
-	_playing[id] = SoundSource
-	{
-		.entity = NULL_ENTITY,
-		.handle = handle
-	};
+	_playing[handle] = NULL_ENTITY;
+
+	return handle;
 }
 
-void minty::AudioEngine::play_background(std::string const& name)
+AudioHandle minty::AudioEngine::play_background(std::string const& name, float const volume, bool const paused)
 {
-	play_background(_clips.get_id(name));
+	return play_background(_clips.get_id(name), volume, paused);
 }
 
-bool minty::AudioEngine::is_playing(ID const id) const
+bool minty::AudioEngine::is_playing(AudioHandle const handle)
 {
-	return _playing.contains(id);
+	return _engine.isValidVoiceHandle(handle);
 }
 
-bool minty::AudioEngine::is_playing(std::string const& name) const
+void minty::AudioEngine::set_pause(AudioHandle const handle, bool const paused)
 {
-	return is_playing(_clips.get_id(name));
+	_engine.setPause(handle, paused);
 }
 
-void minty::AudioEngine::stop(ID const id)
+bool minty::AudioEngine::get_pause(AudioHandle const handle)
 {
-	auto const& found = _playing.find(id);
+	return _engine.getPause(handle);
+}
+
+void minty::AudioEngine::stop(AudioHandle const handle)
+{
+	auto const& found = _playing.find(handle);
 
 	if (found != _playing.end())
 	{
-		_engine.stop(found->second.handle);
-		_playing.erase(id);
+		_engine.stop(handle);
+		_playing.erase(handle);
 	}
 }
 
 void minty::AudioEngine::stop_all()
 {
 	_engine.stopAll();
-	_playing.clear();
 }
 
 ID minty::AudioEngine::load_clip(std::string const& name, std::string const& path)
