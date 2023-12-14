@@ -1,13 +1,13 @@
 #include "pch.h"
 #include "M_Material.h"
 
-#include "M_Renderer.h"
+#include "M_RenderEngine.h"
 
 using namespace minty;
 using namespace minty::rendering;
 
-minty::Material::Material(rendering::MaterialBuilder const& builder, Renderer& renderer)
-	: rendering::RendererObject(renderer)
+minty::Material::Material(rendering::MaterialBuilder const& builder, RenderEngine& renderer)
+	: rendering::RenderObject(renderer)
 	, _templateId(builder.templateId)
 	, _passDescriptorSets()
 {
@@ -68,6 +68,5 @@ DescriptorSet const& minty::Material::get_descriptor_set(uint32_t const pass) co
 
 std::string minty::to_string(Material const& value)
 {
-	//return std::format("Material(materialId = {})", value._materialId);
-	return error::ERROR_TEXT;
+	return std::format("Material()");
 }

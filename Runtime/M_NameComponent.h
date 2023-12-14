@@ -5,9 +5,15 @@
 
 namespace minty
 {
+	/// <summary>
+	/// Holds the name of an Entity.
+	/// </summary>
 	struct NameComponent
 		: public Component
 	{
+		/// <summary>
+		/// The name of the Entity.
+		/// </summary>
 		std::string name;
 
 		void serialize(Writer& writer) const override;

@@ -7,6 +7,9 @@ namespace minty
 {
 	typedef int color_t;
 
+	/// <summary>
+	/// Holds data for a RGBA Color.
+	/// </summary>
 	struct Color
 		: public Object
 	{

@@ -117,10 +117,10 @@ void minty::Dynamic::serialize(Writer& writer) const
 void minty::Dynamic::deserialize(Reader const& reader)
 {
 	// use node directly to have more control since this deserialization is tricky
-	Node const* node = reader.get_node();
+	Node const& node = reader.get_node();
 
 	// get size in bytes
-	size_t size = node->get_size_t("size", node->to_size_t());
+	size_t size = node.get_size("size", node.to_size());
 
 	// if no size, all done
 	if (!size)
@@ -141,7 +141,7 @@ void minty::Dynamic::deserialize(Reader const& reader)
 
 	size_t i;
 	std::string name;
-	for (auto const& childPair : node->children)
+	for (auto const& childPair : node.children)
 	{
 		name = childPair.first;
 		if (name.empty() || !std::isdigit(name.front()))
@@ -154,28 +154,28 @@ void minty::Dynamic::deserialize(Reader const& reader)
 		if (std::isdigit(name.back()))
 		{
 			// byte
-			i = parse::to_size_t(name);
+			i = parse::to_size(name);
 			byte temp = childPair.second.front().to_byte();
 			memcpy(&data[i], &temp, sizeof(byte));
 		}
 		else if (name.ends_with("ui"))
 		{
 			// unsigned int
-			i = parse::to_size_t(name.substr(0, name.size() - 2));
+			i = parse::to_size(name.substr(0, name.size() - 2));
 			unsigned int temp = childPair.second.front().to_uint();
 			memcpy(&data[i], &temp, sizeof(unsigned int));
 		}
 		else if (name.ends_with("i"))
 		{
 			// int
-			i = parse::to_size_t(name.substr(0, name.size() - 1));
+			i = parse::to_size(name.substr(0, name.size() - 1));
 			int temp = childPair.second.front().to_int();
 			memcpy(&data[i], &temp, sizeof(int));
 		}
 		else if (name.ends_with("f"))
 		{
 			// float
-			i = parse::to_size_t(name.substr(0, name.size() - 1));
+			i = parse::to_size(name.substr(0, name.size() - 1));
 			float temp = childPair.second.front().to_float();
 			memcpy(&data[i], &temp, sizeof(float));
 		}
@@ -184,33 +184,6 @@ void minty::Dynamic::deserialize(Reader const& reader)
 
 		}
 	}
-
-	/*Node const* n;
-	std::string x;
-	for (size_t i = 0; i < size; i++)
-	{
-		x = std::to_string(i);
-		if (n = node->find(x))
-		{
-			
-		}
-		else if (n = node->find(x + "i"))
-		{
-			int temp = n->to_int();
-			memcpy(&data[i], &temp, sizeof(int));
-		}
-		else if (n = node->find(x + "ui"))
-		{
-			unsigned int temp = n->to_uint();
-			memcpy(&data[i], &temp, sizeof(unsigned int));
-		}
-		else if (n = node->find(x + "f"))
-		{
-			float temp = n->to_float();
-			memcpy(&data[i], &temp, sizeof(float));
-		}
-	}*/
-
 
 	// set new data
 	set(data, size);

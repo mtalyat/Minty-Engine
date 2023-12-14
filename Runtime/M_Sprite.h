@@ -5,6 +5,9 @@
 
 namespace minty
 {
+	/// <summary>
+	/// Holds the data for a slice of a texture.
+	/// </summary>
 	class Sprite
 		: public Object
 	{

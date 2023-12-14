@@ -85,6 +85,9 @@ namespace minty
 		/// </summary>
 		void unload();
 
+		/// <summary>
+		/// Finalizes updating the active Scene.
+		/// </summary>
 		void finalize();
 
 	public:

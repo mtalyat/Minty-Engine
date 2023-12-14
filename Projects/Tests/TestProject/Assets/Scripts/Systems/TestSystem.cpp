@@ -23,7 +23,7 @@ void game::TestSystem::update()
     {
         test.rotation += test.rotationSpeed * deltaTime;
         transform.local.position = Quaternion(test.rotation) * Vector3(0.0f, 0.0f, 10.0f);
-        _registry->emplace_or_replace<Dirty>(entity);
+        _registry->emplace_or_replace<DirtyComponent>(entity);
     }
 }
 

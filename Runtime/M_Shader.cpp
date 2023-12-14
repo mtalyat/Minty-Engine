@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "M_Shader.h"
 
-#include "M_Renderer.h"
+#include "M_RenderEngine.h"
 
 #include "M_Math.h"
 #include "M_File.h"
@@ -10,8 +10,8 @@
 using namespace minty;
 using namespace minty::rendering;
 
-minty::Shader::Shader(rendering::ShaderBuilder const& builder, Renderer& renderer)
-	: RendererObject::RendererObject(renderer)
+minty::Shader::Shader(rendering::ShaderBuilder const& builder, RenderEngine& renderer)
+	: RenderObject::RenderObject(renderer)
 	, _descriptorSet(renderer)
 {
 	for (auto const& pair : builder.pushConstantInfos)

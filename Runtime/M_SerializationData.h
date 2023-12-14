@@ -3,7 +3,7 @@
 #include "M_EntityRegistry.h"
 #include "M_Engine.h"
 #include "M_Scene.h"
-#include "M_Renderer.h"
+#include "M_RenderEngine.h"
 
 namespace minty
 {

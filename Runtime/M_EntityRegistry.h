@@ -11,6 +11,8 @@ namespace minty
 	typedef entt::entity Entity;
 	constexpr Entity NULL_ENTITY = entt::null;
 
+	std::string to_string(Entity const value);
+
 	class EntityRegistry
 		: public Object, public entt::registry, public ISerializable
 	{

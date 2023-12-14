@@ -1,19 +1,19 @@
 #include "pch.h"
 #include "M_Rendering_Object.h"
 
-#include "M_Renderer.h"
+#include "M_RenderEngine.h"
 
 using namespace minty;
 using namespace minty::rendering;
 
-RendererObject::RendererObject(Renderer& renderer)
+RenderObject::RenderObject(RenderEngine& renderer)
 	: _renderer(renderer)
 {}
 
-RendererObject::~RendererObject()
+RenderObject::~RenderObject()
 {}
 
-std::string minty::rendering::to_string(RendererObject const& value)
+std::string minty::rendering::to_string(RenderObject const& value)
 {
-	return std::format("RendererObject()");
+	return std::format("RenderObject()");
 }

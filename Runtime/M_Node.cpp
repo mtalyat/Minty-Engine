@@ -57,10 +57,10 @@ unsigned int minty::Node::to_uint(unsigned int const defaultValue) const
 	return defaultValue;
 }
 
-size_t minty::Node::to_size_t(size_t const defaultValue) const
+size_t minty::Node::to_size(size_t const defaultValue) const
 {
 	size_t out;
-	if (parse::try_size_t(data, out))
+	if (parse::try_size(data, out))
 	{
 		return out;
 	}
@@ -203,12 +203,12 @@ unsigned int minty::Node::get_uint(std::string const& name, unsigned int const d
 	}
 }
 
-size_t minty::Node::get_size_t(std::string const& name, size_t const defaultValue) const
+size_t minty::Node::get_size(std::string const& name, size_t const defaultValue) const
 {
 	Node const* node = find(name);
 	if (node)
 	{
-		return node->to_size_t(defaultValue);
+		return node->to_size(defaultValue);
 	}
 	else
 	{

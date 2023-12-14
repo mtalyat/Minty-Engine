@@ -1,17 +1,17 @@
 #include "pch.h"
 #include "M_Mesh.h"
 
-#include "M_Basic_Vertex.h"
-#include "M_Renderer.h"
+#include "M_Builtin.h"
+#include "M_RenderEngine.h"
 #include "M_String.h"
 #include "glm.hpp"
 
 using namespace minty;
-using namespace minty::basic;
+using namespace minty::builtin;
 using namespace minty::rendering;
 
-minty::Mesh::Mesh(Renderer& renderer)
-	: rendering::RendererObject::RendererObject(renderer)
+minty::Mesh::Mesh(RenderEngine& renderer)
+	: rendering::RenderObject::RenderObject(renderer)
 	, _vertexCount()
 	, _vertexSize()
 	, _vertexBufferId(ERROR_ID)

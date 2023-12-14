@@ -10,9 +10,9 @@ minty::Reader::Reader(Node const& node, void* const data)
 	, _data(data)
 {}
 
-Node const* minty::Reader::get_node() const
+Node const& minty::Reader::get_node() const
 {
-	return &_node;
+	return _node;
 }
 
 Node const* minty::Reader::get_node(std::string const& name) const
@@ -52,68 +52,37 @@ void minty::Reader::read_object(std::string const& name, ISerializable* const va
 
 std::string minty::Reader::read_string(std::string const& name, std::string const& defaultValue) const
 {
-	auto const* found = _node.find(name);
-	if (found)
-	{
-		return found->data;
-	}
-
-	return defaultValue;
+	return _node.get_string(name, defaultValue);
 }
 
 int minty::Reader::read_int(std::string const& name, int const defaultValue) const
 {
-	auto const* found = _node.find(name);
-	if (found)
-	{
-		return std::stoi(found->data);
-	}
+	return _node.get_int(name, defaultValue);
+}
 
-	return defaultValue;
+unsigned int minty::Reader::read_uint(std::string const& name, unsigned int const defaultValue) const
+{
+	return _node.get_uint(name, defaultValue);
 }
 
 ID minty::Reader::read_id(std::string const& name, ID const defaultValue) const
 {
-	auto const* found = _node.find(name);
-	if (found)
-	{
-		return std::stoi(found->data);
-	}
-
-	return defaultValue;
+	return _node.get_id(name, defaultValue);
 }
 
 float minty::Reader::read_float(std::string const& name, float const defaultValue) const
 {
-	auto const* found = _node.find(name);
-	if (found)
-	{
-		return std::stof(found->data);
-	}
-
-	return defaultValue;
+	return _node.get_float(name, defaultValue);
 }
 
 byte minty::Reader::read_byte(std::string const& name, byte const defaultValue) const
 {
-	auto const* found = _node.find(name);
-	if (found)
-	{
-		return static_cast<byte>(std::stoi(found->data));
-	}
-
-	return defaultValue;
+	return _node.get_byte(name, defaultValue);
 }
 
 size_t minty::Reader::read_size(std::string const& name, size_t const defaultValue) const
 {
-	auto const* found = _node.find(name);
-	if (found)
-	{
-		return static_cast<size_t>(std::stoull(found->data));
-	}
-
-	return defaultValue;
+	return _node.get_size(name, defaultValue);
 }
 
 Vector2 minty::Reader::read_vector2(std::string const& name, Vector2 const& defaultValue) const

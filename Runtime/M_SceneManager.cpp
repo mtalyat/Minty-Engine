@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "M_SceneManager.h"
 
-#include "M_Assets.h"
+#include "M_Asset.h"
 #include "M_Runtime.h"
 #include "M_Engine.h"
 #include "M_Node.h"
@@ -10,7 +10,7 @@
 #include "M_SerializationData.h"
 #include "M_Scene.h"
 #include "M_Engine.h"
-#include "M_Renderer.h"
+#include "M_RenderEngine.h"
 
 #include "M_NameComponent.h"
 
@@ -37,7 +37,7 @@ ID minty::SceneManager::create_scene(std::string const& path)
 	Scene& scene = _scenes.at(id);
 
 	// load the data from the disk into the scene
-	Node node = assets::load_node(path);
+	Node node = asset::load_node(path);
 	SerializationData data =
 	{
 		.scene = &scene,
@@ -70,8 +70,8 @@ void minty::SceneManager::load_scene(ID const id)
 	_loadedScene = scene;
 
 	// set renderer to use this new scene
-	_engine->get_renderer()->set_scene(_loadedScene);
-	_engine->get_audio_engine()->set_scene(_loadedScene);
+	_engine->get_render_engine().set_scene(_loadedScene);
+	_engine->get_audio_engine().set_scene(_loadedScene);
 
 	// load event
 	if (_loaded && _loadedScene)

@@ -6,6 +6,9 @@
 
 namespace minty
 {
+	/// <summary>
+	/// Handles parsing the command line.
+	/// </summary>
 	class CommandLineParser
 	{
 	public:

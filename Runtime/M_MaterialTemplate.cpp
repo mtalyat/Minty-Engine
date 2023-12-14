@@ -3,7 +3,7 @@
 
 #include "M_Shader.h"
 
-#include "M_Renderer.h"
+#include "M_RenderEngine.h"
 #include "M_Console.h"
 #include "M_Color.h"
 #include "M_Error.h"
@@ -11,8 +11,8 @@
 using namespace minty;
 using namespace minty::rendering;
 
-minty::MaterialTemplate::MaterialTemplate(rendering::MaterialTemplateBuilder const& builder, Renderer& renderer)
-	: RendererObject::RendererObject(renderer)
+minty::MaterialTemplate::MaterialTemplate(rendering::MaterialTemplateBuilder const& builder, RenderEngine& renderer)
+	: RenderObject::RenderObject(renderer)
 	, _shaderPassIds(builder.shaderPassIds)
 	, _defaultValues(builder.defaultValues)
 {}
@@ -49,5 +49,5 @@ std::unordered_map<std::string, Dynamic> const& minty::MaterialTemplate::get_def
 
 std::string minty::to_string(MaterialTemplate const& value)
 {
-	return "";// std::format("MaterialTemplate(shaderId = {})", value.get_shader_pass_ids().size());
+	return std::format("MaterialTemplate()");
 }

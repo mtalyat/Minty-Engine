@@ -12,6 +12,9 @@ namespace minty
 {
 	class ISerializable;
 
+	/// <summary>
+	/// Writes data to a serialized Node.
+	/// </summary>
 	class Writer
 		: public Object
 	{
@@ -20,7 +23,25 @@ namespace minty
 		void* _data;
 
 	public:
+		/// <summary>
+		/// Creates a new Writer that will write to the given Node.
+		/// </summary>
+		/// <param name="node">The Node to write to.</param>
+		/// <param name="data">The user data that can be referenced while writing.</param>
 		Writer(Node& node, void* const data = nullptr);
+
+		/// <summary>
+		/// Gets the root node that this Writer is using.
+		/// </summary>
+		/// <returns>A pointer to the root node.</returns>
+		Node const& get_node() const;
+
+		/// <summary>
+		/// Gets the child node with the given name from the root node.
+		/// </summary>
+		/// <param name="name">The name of the child node.</param>
+		/// <returns>The child node, or null if it does not exist.</returns>
+		Node const* get_node(std::string const& name) const;
 
 		/// <summary>
 		/// Gets the extra data given to this Writer.
@@ -28,7 +49,14 @@ namespace minty
 		/// <returns>The extra data as a void pointer.</returns>
 		void* get_data() const;
 
-#pragma region Normal Writing
+		/// <summary>
+		/// Checks if a child with the given name exists.
+		/// </summary>
+		/// <param name="name">The name to check.</param>
+		/// <returns>True if a child with the given name exists.</returns>
+		bool exists(std::string const& name) const;
+
+#pragma region Writing
 
 		void write(std::string const& name);
 
@@ -39,6 +67,8 @@ namespace minty
 		void write(std::string const& name, std::string const& value);
 
 		void write(std::string const& name, int const value);
+
+		void write(std::string const& name, unsigned int const value);
 
 		void write(std::string const& name, float const value);
 
@@ -67,6 +97,8 @@ namespace minty
 		void write(std::string const& name, std::string const& value, std::string const& defaultValue);
 
 		void write(std::string const& name, int const value, int const defaultValue);
+
+		void write(std::string const& name, unsigned int const value, unsigned int const defaultValue);
 
 		void write(std::string const& name, float const value, float const defaultValue);
 

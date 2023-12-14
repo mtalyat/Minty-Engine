@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "M_Renderer.h"
+#include "M_RenderEngine.h"
 
 #include "M_Rendering_RendererBuilder.h"
 #include "M_Rendering_DrawCallObjectInfo.h"
@@ -14,15 +14,15 @@
 #include "M_TransformComponent.h"
 #include "M_CameraComponent.h"
 #include "M_MeshComponent.h"
-#include "M_RenderableTag.h"
+#include "M_RenderableComponent.h"
 #include "M_RelationshipComponent.h"
 
-#include "M_Assets.h"
+#include "M_Asset.h"
 #include "M_Parse.h"
 
 #include "M_Vector.h"
 #include "M_Matrix.h"
-#include "M_Basic_Vertex.h"
+#include "M_Builtin.h"
 
 //#include <vulkan/vulkan.h>
 #define GLFW_INCLUDE_VULKAN
@@ -49,7 +49,7 @@
 using namespace minty;
 using namespace minty::rendering;
 using namespace minty::vk;
-using namespace minty::basic;
+using namespace minty::builtin;
 
 const std::vector<const char*> validationLayers = {
 	"VK_LAYER_KHRONOS_validation"
@@ -82,7 +82,7 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
 	}
 }
 
-Renderer::Renderer(Window* const window)
+RenderEngine::RenderEngine(Window* const window)
 	: _builder(nullptr)
 	, _window(window)
 	, _textures()
@@ -103,10 +103,10 @@ Renderer::Renderer(Window* const window)
 	}
 }
 
-Renderer::~Renderer()
+RenderEngine::~RenderEngine()
 {}
 
-void minty::Renderer::init(rendering::RendererBuilder const& builder)
+void minty::RenderEngine::init(rendering::RenderEngineBuilder const& builder)
 {
 	// keep track of builder
 	_builder = &builder;
@@ -119,8 +119,8 @@ void minty::Renderer::init(rendering::RendererBuilder const& builder)
 	create_swap_chain();
 	create_image_views();
 	create_render_pass();
-	queueFamilyIndices = find_queue_families(_physicalDevice);
-	create_command_pool(commandPool);
+	_queueFamilyIndices = find_queue_families(_physicalDevice);
+	create_command_pool(_commandPool);
 	create_depth_resources();
 	create_framebuffers();
 	create_command_buffers();
@@ -132,14 +132,14 @@ void minty::Renderer::init(rendering::RendererBuilder const& builder)
 	_builder = nullptr;
 }
 
-void Renderer::render_frame()
+void RenderEngine::render_frame()
 {
 	// wait until previous draw has completed
-	vkWaitForFences(_device, 1, &inFlightFences[_frame], VK_TRUE, UINT64_MAX);
+	vkWaitForFences(_device, 1, &_inFlightFences[_frame], VK_TRUE, UINT64_MAX);
 
 	// recreate swap chain check
 	uint32_t imageIndex;
-	VkResult r = vkAcquireNextImageKHR(_device, swapChain, UINT64_MAX, imageAvailableSemaphores[_frame], VK_NULL_HANDLE, &imageIndex);
+	VkResult r = vkAcquireNextImageKHR(_device, _swapChain, UINT64_MAX, _imageAvailableSemaphores[_frame], VK_NULL_HANDLE, &imageIndex);
 
 	if (r == VK_ERROR_OUT_OF_DATE_KHR) {
 		recreate_swap_chain();
@@ -150,13 +150,13 @@ void Renderer::render_frame()
 	}
 
 	// reset the fence states so they can be used to wait again
-	vkResetFences(_device, 1, &inFlightFences[_frame]);
+	vkResetFences(_device, 1, &_inFlightFences[_frame]);
 
 	// reset command buffer
-	vkResetCommandBuffer(commandBuffers[_frame], 0);
+	vkResetCommandBuffer(_commandBuffers[_frame], 0);
 
 	// record the command buffer so we know what to do to render stuff to the screen
-	record_command_buffer(commandBuffers[_frame], imageIndex);
+	record_command_buffer(_commandBuffers[_frame], imageIndex);
 
 	// update uniform information
 	//update_uniform_buffer();
@@ -168,7 +168,7 @@ void Renderer::render_frame()
 	};
 
 	// specify how to wait, in this case, with the semaphores
-	VkSemaphore waitSemaphores[] = { imageAvailableSemaphores[_frame] };
+	VkSemaphore waitSemaphores[] = { _imageAvailableSemaphores[_frame] };
 	VkPipelineStageFlags waitStages[] = { VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT };
 	submitInfo.waitSemaphoreCount = 1;
 	submitInfo.pWaitSemaphores = waitSemaphores;
@@ -176,15 +176,15 @@ void Renderer::render_frame()
 
 	// set number of command buffers
 	submitInfo.commandBufferCount = 1;
-	submitInfo.pCommandBuffers = &commandBuffers[_frame];
+	submitInfo.pCommandBuffers = &_commandBuffers[_frame];
 
 	// specift what semaphores to signal when complete
-	VkSemaphore signalSemaphores[] = { renderFinishedSemaphores[_frame] };
+	VkSemaphore signalSemaphores[] = { _renderFinishedSemaphores[_frame] };
 	submitInfo.signalSemaphoreCount = 1;
 	submitInfo.pSignalSemaphores = signalSemaphores;
 
 	// submit the buffer
-	VK_ASSERT(vkQueueSubmit(graphicsQueue, 1, &submitInfo, inFlightFences[_frame]), "Failed to submit draw command buffer.");
+	VK_ASSERT(vkQueueSubmit(_graphicsQueue, 1, &submitInfo, _inFlightFences[_frame]), "Failed to submit draw command buffer.");
 
 	// submit to swap chain so it will show up on the screen
 	VkPresentInfoKHR presentInfo
@@ -195,17 +195,17 @@ void Renderer::render_frame()
 	};
 
 	// specify which swap chain to use (only 1 normally)
-	VkSwapchainKHR swapChains[] = { swapChain };
+	VkSwapchainKHR swapChains[] = { _swapChain };
 	presentInfo.swapchainCount = 1;
 	presentInfo.pSwapchains = swapChains;
 	presentInfo.pImageIndices = &imageIndex;
 	presentInfo.pResults = nullptr; // Optional
 
 	// present the visual to the screen
-	r = vkQueuePresentKHR(presentQueue, &presentInfo);
+	r = vkQueuePresentKHR(_presentQueue, &presentInfo);
 
-	if (r == VK_ERROR_OUT_OF_DATE_KHR || r == VK_SUBOPTIMAL_KHR || framebufferResized) {
-		framebufferResized = false;
+	if (r == VK_ERROR_OUT_OF_DATE_KHR || r == VK_SUBOPTIMAL_KHR || _framebufferResized) {
+		_framebufferResized = false;
 		recreate_swap_chain();
 	}
 	else if (r != VK_SUCCESS) {
@@ -217,17 +217,17 @@ void Renderer::render_frame()
 	if (_frame == MAX_FRAMES_IN_FLIGHT) _frame = 0;
 }
 
-bool Renderer::is_running() const
+bool RenderEngine::is_running() const
 {
 	return _window->is_open();
 }
 
-bool minty::Renderer::is_initialized() const
+bool minty::RenderEngine::is_initialized() const
 {
 	return _initialized;
 }
 
-void Renderer::create_instance()
+void RenderEngine::create_instance()
 {
 	// check if we can use validation layers
 	if (enableValidationLayers && !check_validation_layer_support())
@@ -293,7 +293,7 @@ void Renderer::create_instance()
 	}
 }
 
-VkFormat Renderer::find_depth_format() {
+VkFormat RenderEngine::find_depth_format() {
 	return find_supported_format(
 		{ VK_FORMAT_D32_SFLOAT, VK_FORMAT_D32_SFLOAT_S8_UINT, VK_FORMAT_D24_UNORM_S8_UINT },
 		VK_IMAGE_TILING_OPTIMAL,
@@ -301,11 +301,11 @@ VkFormat Renderer::find_depth_format() {
 	);
 }
 
-bool Renderer::has_stencil_component(VkFormat format) {
+bool RenderEngine::has_stencil_component(VkFormat format) {
 	return format == VK_FORMAT_D32_SFLOAT_S8_UINT || format == VK_FORMAT_D24_UNORM_S8_UINT;
 }
 
-VkFormat Renderer::find_supported_format(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features) {
+VkFormat RenderEngine::find_supported_format(const std::vector<VkFormat>& candidates, VkImageTiling tiling, VkFormatFeatureFlags features) {
 	for (VkFormat format : candidates) {
 		VkFormatProperties props;
 		vkGetPhysicalDeviceFormatProperties(_physicalDevice, format, &props);
@@ -323,15 +323,15 @@ VkFormat Renderer::find_supported_format(const std::vector<VkFormat>& candidates
 	return VkFormat();
 }
 
-void Renderer::create_depth_resources()
+void RenderEngine::create_depth_resources()
 {
 	VkFormat depthFormat = find_depth_format();
 
-	create_image(swapChainExtent.width, swapChainExtent.height, depthFormat, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, depthImage, depthImageMemory);
-	depthImageView = create_image_view(depthImage, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT);
+	create_image(_swapChainExtent.width, _swapChainExtent.height, depthFormat, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, _depthImage, _depthImageMemory);
+	_depthImageView = create_image_view(_depthImage, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT);
 }
 
-void Renderer::create_image(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory) {
+void RenderEngine::create_image(uint32_t width, uint32_t height, VkFormat format, VkImageTiling tiling, VkImageUsageFlags usage, VkMemoryPropertyFlags properties, VkImage& image, VkDeviceMemory& imageMemory) {
 	VkImageCreateInfo imageInfo{};
 	imageInfo.sType = VK_STRUCTURE_TYPE_IMAGE_CREATE_INFO;
 	imageInfo.imageType = VK_IMAGE_TYPE_2D;
@@ -366,7 +366,7 @@ void Renderer::create_image(uint32_t width, uint32_t height, VkFormat format, Vk
 	vkBindImageMemory(_device, image, imageMemory, 0);
 }
 
-void minty::Renderer::update()
+void minty::RenderEngine::update()
 {
 	// do nothing if no scene set
 	if (_scene == nullptr)
@@ -390,147 +390,127 @@ void minty::Renderer::update()
 	update_camera(camera, transformComponent);
 }
 
-VkDevice minty::Renderer::get_device() const
+VkDevice minty::RenderEngine::get_device() const
 {
 	return _device;
 }
 
-VkPhysicalDevice minty::Renderer::get_physical_device() const
+VkPhysicalDevice minty::RenderEngine::get_physical_device() const
 {
 	return _physicalDevice;
 }
 
-VkRenderPass minty::Renderer::get_render_pass() const
+VkRenderPass minty::RenderEngine::get_render_pass() const
 {
 	return _renderPass;
 }
 
-uint32_t minty::Renderer::get_shader_count() const
-{
-	return static_cast<uint32_t>(_shaders.size());
-}
-
-uint32_t minty::Renderer::get_texture_count() const
-{
-	return static_cast<uint32_t>(_textures.size());
-}
-
-uint32_t minty::Renderer::get_sprite_count() const
-{
-	return static_cast<uint32_t>(_sprites.size());
-}
-
-uint32_t minty::Renderer::get_material_count() const
-{
-	return static_cast<uint32_t>(_materialTemplates.size());
-}
-
-uint32_t minty::Renderer::get_frame() const
+uint32_t minty::RenderEngine::get_frame() const
 {
 	return _frame;
 }
 
-Texture& minty::Renderer::get_texture(ID const id)
+Texture& minty::RenderEngine::get_texture(ID const id)
 {
 	return _textures.at(id);
 }
 
-Texture const& minty::Renderer::get_texture(ID const id) const
+Texture const& minty::RenderEngine::get_texture(ID const id) const
 {
 	return _textures.at(id);
 }
 
-Sprite& minty::Renderer::get_sprite(ID const id)
+Sprite& minty::RenderEngine::get_sprite(ID const id)
 {
 	return _sprites.at(id);
 }
 
-Sprite const& minty::Renderer::get_sprite(ID const id) const
+Sprite const& minty::RenderEngine::get_sprite(ID const id) const
 {
 	return _sprites.at(id);
 }
 
-Shader& minty::Renderer::get_shader(ID const id)
+Shader& minty::RenderEngine::get_shader(ID const id)
 {
 	return _shaders.at(id);
 }
 
-Shader const& minty::Renderer::get_shader(ID const id) const
+Shader const& minty::RenderEngine::get_shader(ID const id) const
 {
 	return _shaders.at(id);
 }
 
-Shader& minty::Renderer::get_shader_from_material_id(ID const id)
+Shader& minty::RenderEngine::get_shader_from_material_id(ID const id)
 {
 	return get_shader(get_shader_pass(get_material_template(get_material(id).get_template_id()).get_shader_pass_ids().front()).get_shader_id());
 }
 
-Shader const& minty::Renderer::get_shader_from_material_id(ID const id) const
+Shader const& minty::RenderEngine::get_shader_from_material_id(ID const id) const
 {
 	return get_shader(get_shader_pass(get_material_template(get_material(id).get_template_id()).get_shader_pass_ids().front()).get_shader_id());
 }
 
-ShaderPass& minty::Renderer::get_shader_pass(ID const id)
+ShaderPass& minty::RenderEngine::get_shader_pass(ID const id)
 {
 	return _shaderPasses.at(id);
 }
 
-ShaderPass const& minty::Renderer::get_shader_pass(ID const id) const
+ShaderPass const& minty::RenderEngine::get_shader_pass(ID const id) const
 {
 	return _shaderPasses.at(id);
 }
 
-ShaderPass& minty::Renderer::get_shader_pass_from_material_id(ID const id)
+ShaderPass& minty::RenderEngine::get_shader_pass_from_material_id(ID const id)
 {
 	return get_shader_pass(get_material_template(get_material(id).get_template_id()).get_shader_pass_ids().front());
 }
 
-ShaderPass const& minty::Renderer::get_shader_pass_from_material_id(ID const id) const
+ShaderPass const& minty::RenderEngine::get_shader_pass_from_material_id(ID const id) const
 {
 	return get_shader_pass(get_material_template(get_material(id).get_template_id()).get_shader_pass_ids().front());
 }
 
-MaterialTemplate& minty::Renderer::get_material_template(ID const id)
+MaterialTemplate& minty::RenderEngine::get_material_template(ID const id)
 {
 	return _materialTemplates.at(id);
 }
 
-MaterialTemplate const& minty::Renderer::get_material_template(ID const id) const
+MaterialTemplate const& minty::RenderEngine::get_material_template(ID const id) const
 {
 	return _materialTemplates.at(id);
 }
 
-MaterialTemplate& minty::Renderer::get_material_template_from_material_id(ID const id)
+MaterialTemplate& minty::RenderEngine::get_material_template_from_material_id(ID const id)
 {
 	return get_material_template(get_material(id).get_template_id());
 }
 
-MaterialTemplate const& minty::Renderer::get_material_template_from_material_id(ID const id) const
+MaterialTemplate const& minty::RenderEngine::get_material_template_from_material_id(ID const id) const
 {
 	return get_material_template(get_material(id).get_template_id());
 }
 
-Material& minty::Renderer::get_material(ID const id)
+Material& minty::RenderEngine::get_material(ID const id)
 {
 	return _materials.at(id);
 }
 
-Material const& minty::Renderer::get_material(ID const id) const
+Material const& minty::RenderEngine::get_material(ID const id) const
 {
 	return _materials.at(id);
 }
 
-Mesh& minty::Renderer::get_mesh(ID const id)
+Mesh& minty::RenderEngine::get_mesh(ID const id)
 {
 	return _meshes.at(id);
 }
 
-Mesh const& minty::Renderer::get_mesh(ID const id) const
+Mesh const& minty::RenderEngine::get_mesh(ID const id) const
 {
 	return _meshes.at(id);
 }
 
-VkImageView Renderer::create_image_view(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags) {
+VkImageView RenderEngine::create_image_view(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags) {
 	VkImageViewCreateInfo viewInfo{};
 	viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
 	viewInfo.image = image;
@@ -550,12 +530,12 @@ VkImageView Renderer::create_image_view(VkImage image, VkFormat format, VkImageA
 	return imageView;
 }
 
-VkShaderModule minty::Renderer::load_shader_module(std::string const& path) const
+VkShaderModule minty::RenderEngine::load_shader_module(std::string const& path) const
 {
-	return create_shader_module(assets::load_chars(path));
+	return create_shader_module(asset::load_chars(path));
 }
 
-VkShaderModule minty::Renderer::create_shader_module(std::vector<char> const& code) const
+VkShaderModule minty::RenderEngine::create_shader_module(std::vector<char> const& code) const
 {
 	VkShaderModuleCreateInfo createInfo
 	{
@@ -572,7 +552,7 @@ VkShaderModule minty::Renderer::create_shader_module(std::vector<char> const& co
 	return shaderModule;
 }
 
-VkCommandBuffer Renderer::begin_single_time_commands(VkCommandPool commandPool) {
+VkCommandBuffer RenderEngine::begin_single_time_commands(VkCommandPool commandPool) {
 	VkCommandBufferAllocateInfo allocInfo{};
 	allocInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO;
 	allocInfo.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY;
@@ -591,7 +571,7 @@ VkCommandBuffer Renderer::begin_single_time_commands(VkCommandPool commandPool) 
 	return commandBuffer;
 }
 
-void Renderer::end_single_time_commands(VkCommandBuffer commandBuffer, VkCommandPool commandPool) {
+void RenderEngine::end_single_time_commands(VkCommandBuffer commandBuffer, VkCommandPool commandPool) {
 	vkEndCommandBuffer(commandBuffer);
 
 	VkSubmitInfo submitInfo{};
@@ -599,14 +579,14 @@ void Renderer::end_single_time_commands(VkCommandBuffer commandBuffer, VkCommand
 	submitInfo.commandBufferCount = 1;
 	submitInfo.pCommandBuffers = &commandBuffer;
 
-	vkQueueSubmit(graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
-	vkQueueWaitIdle(graphicsQueue);
+	vkQueueSubmit(_graphicsQueue, 1, &submitInfo, VK_NULL_HANDLE);
+	vkQueueWaitIdle(_graphicsQueue);
 
 	vkFreeCommandBuffers(_device, commandPool, 1, &commandBuffer);
 }
 
-void Renderer::change_image_layout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout) {
-	VkCommandBuffer commandBuffer = begin_single_time_commands(commandPool);
+void RenderEngine::change_image_layout(VkImage image, VkFormat format, VkImageLayout oldLayout, VkImageLayout newLayout) {
+	VkCommandBuffer commandBuffer = begin_single_time_commands(_commandPool);
 
 	VkImageMemoryBarrier barrier{};
 	barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
@@ -656,11 +636,11 @@ void Renderer::change_image_layout(VkImage image, VkFormat format, VkImageLayout
 		1, &barrier
 	);
 
-	end_single_time_commands(commandBuffer, commandPool);
+	end_single_time_commands(commandBuffer, _commandPool);
 }
 
-void Renderer::copy_buffer_to_image(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height) {
-	VkCommandBuffer commandBuffer = begin_single_time_commands(commandPool);
+void RenderEngine::copy_buffer_to_image(VkBuffer buffer, VkImage image, uint32_t width, uint32_t height) {
+	VkCommandBuffer commandBuffer = begin_single_time_commands(_commandPool);
 
 	VkBufferImageCopy region{};
 	region.bufferOffset = 0;
@@ -688,28 +668,28 @@ void Renderer::copy_buffer_to_image(VkBuffer buffer, VkImage image, uint32_t wid
 		&region
 	);
 
-	end_single_time_commands(commandBuffer, commandPool);
+	end_single_time_commands(commandBuffer, _commandPool);
 }
 
-void Renderer::create_image_views()
+void RenderEngine::create_image_views()
 {
 	// resize to fit all image views
-	swapChainImageViews.resize(swapChainImages.size());
+	_swapChainImageViews.resize(_swapChainImages.size());
 
-	for (uint32_t i = 0; i < swapChainImages.size(); i++) {
-		swapChainImageViews[i] = create_image_view(swapChainImages[i], swapChainImageFormat, VK_IMAGE_ASPECT_COLOR_BIT);
+	for (uint32_t i = 0; i < _swapChainImages.size(); i++) {
+		_swapChainImageViews[i] = create_image_view(_swapChainImages[i], _swapChainImageFormat, VK_IMAGE_ASPECT_COLOR_BIT);
 	}
 }
 
-void Renderer::create_surface()
+void RenderEngine::create_surface()
 {
 	// create window surface that vulkan can use to draw
-	if (glfwCreateWindowSurface(instance, _window->get_raw(), nullptr, &surface) != VK_SUCCESS) {
+	if (glfwCreateWindowSurface(instance, _window->get_raw(), nullptr, &_surface) != VK_SUCCESS) {
 		error::abort("Failed to create window surface.");
 	}
 }
 
-void Renderer::pick_physical_device()
+void RenderEngine::pick_physical_device()
 {
 	// find number of hardware GPUs
 	uint32_t deviceCount = 0;
@@ -739,7 +719,7 @@ void Renderer::pick_physical_device()
 	}
 }
 
-bool Renderer::is_device_suitable(VkPhysicalDevice device)
+bool RenderEngine::is_device_suitable(VkPhysicalDevice device)
 {
 	// define requirements for the GPU we want
 
@@ -767,7 +747,7 @@ bool Renderer::is_device_suitable(VkPhysicalDevice device)
 	return indices.isComplete() && extensionsSupported && swapChainAdequate && supportedFeatures.samplerAnisotropy && supportedFeatures.shaderSampledImageArrayDynamicIndexing;
 }
 
-void Renderer::create_swap_chain()
+void RenderEngine::create_swap_chain()
 {
 	SwapChainSupportDetails swapChainSupport = query_swap_chain_support(_physicalDevice);
 
@@ -787,7 +767,7 @@ void Renderer::create_swap_chain()
 	VkSwapchainCreateInfoKHR createInfo
 	{
 		.sType = VK_STRUCTURE_TYPE_SWAPCHAIN_CREATE_INFO_KHR,
-		.surface = surface,
+		.surface = _surface,
 		.minImageCount = imageCount,
 		.imageFormat = surfaceFormat.format,
 		.imageColorSpace = surfaceFormat.colorSpace,
@@ -824,39 +804,39 @@ void Renderer::create_swap_chain()
 	createInfo.oldSwapchain = VK_NULL_HANDLE;
 
 	// create swap chain
-	if (vkCreateSwapchainKHR(_device, &createInfo, nullptr, &swapChain) != VK_SUCCESS) {
+	if (vkCreateSwapchainKHR(_device, &createInfo, nullptr, &_swapChain) != VK_SUCCESS) {
 		error::abort("Failed to create swap chain.");
 	}
 
-	vkGetSwapchainImagesKHR(_device, swapChain, &imageCount, nullptr);
-	swapChainImages.resize(imageCount);
-	vkGetSwapchainImagesKHR(_device, swapChain, &imageCount, swapChainImages.data());
+	vkGetSwapchainImagesKHR(_device, _swapChain, &imageCount, nullptr);
+	_swapChainImages.resize(imageCount);
+	vkGetSwapchainImagesKHR(_device, _swapChain, &imageCount, _swapChainImages.data());
 
-	swapChainImageFormat = surfaceFormat.format;
-	swapChainExtent = extent;
+	_swapChainImageFormat = surfaceFormat.format;
+	_swapChainExtent = extent;
 
 	// update viewport and scissor
 	_view.set_extent(extent.width, extent.height);
 }
 
-void Renderer::cleanup_swap_chain()
+void RenderEngine::cleanup_swap_chain()
 {
-	vkDestroyImageView(_device, depthImageView, nullptr);
-	vkDestroyImage(_device, depthImage, nullptr);
-	vkFreeMemory(_device, depthImageMemory, nullptr);
+	vkDestroyImageView(_device, _depthImageView, nullptr);
+	vkDestroyImage(_device, _depthImage, nullptr);
+	vkFreeMemory(_device, _depthImageMemory, nullptr);
 
-	for (size_t i = 0; i < swapChainFramebuffers.size(); i++) {
-		vkDestroyFramebuffer(_device, swapChainFramebuffers[i], nullptr);
+	for (size_t i = 0; i < _swapChainFramebuffers.size(); i++) {
+		vkDestroyFramebuffer(_device, _swapChainFramebuffers[i], nullptr);
 	}
 
-	for (size_t i = 0; i < swapChainImageViews.size(); i++) {
-		vkDestroyImageView(_device, swapChainImageViews[i], nullptr);
+	for (size_t i = 0; i < _swapChainImageViews.size(); i++) {
+		vkDestroyImageView(_device, _swapChainImageViews[i], nullptr);
 	}
 
-	vkDestroySwapchainKHR(_device, swapChain, nullptr);
+	vkDestroySwapchainKHR(_device, _swapChain, nullptr);
 }
 
-void Renderer::recreate_swap_chain()
+void RenderEngine::recreate_swap_chain()
 {
 	// on window minimize, pause program until un-minimized
 	_window->refresh();
@@ -877,7 +857,7 @@ void Renderer::recreate_swap_chain()
 	create_framebuffers();
 }
 
-VkExtent2D Renderer::choose_swap_extent(const VkSurfaceCapabilitiesKHR& capabilities) {
+VkExtent2D RenderEngine::choose_swap_extent(const VkSurfaceCapabilitiesKHR& capabilities) {
 	if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max()) {
 		return capabilities.currentExtent;
 	}
@@ -896,7 +876,7 @@ VkExtent2D Renderer::choose_swap_extent(const VkSurfaceCapabilitiesKHR& capabili
 	}
 }
 
-VkPresentModeKHR Renderer::choose_swap_present_mode(const std::vector<VkPresentModeKHR>& availablePresentModes) {
+VkPresentModeKHR RenderEngine::choose_swap_present_mode(const std::vector<VkPresentModeKHR>& availablePresentModes) {
 	// essentially, check if v-sync exists, then use it
 	for (const auto& availablePresentMode : availablePresentModes) {
 		if (availablePresentMode == VK_PRESENT_MODE_MAILBOX_KHR) {
@@ -907,7 +887,7 @@ VkPresentModeKHR Renderer::choose_swap_present_mode(const std::vector<VkPresentM
 	return VK_PRESENT_MODE_FIFO_KHR; // v-sync
 }
 
-VkSurfaceFormatKHR Renderer::choose_swap_surface_format(const std::vector<VkSurfaceFormatKHR>& availableFormats) {
+VkSurfaceFormatKHR RenderEngine::choose_swap_surface_format(const std::vector<VkSurfaceFormatKHR>& availableFormats) {
 	for (const auto& availableFormat : availableFormats) {
 		// VK_FORMAT_R8G8B8A8_UINT?
 		if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
@@ -918,31 +898,31 @@ VkSurfaceFormatKHR Renderer::choose_swap_surface_format(const std::vector<VkSurf
 	return availableFormats[0];
 }
 
-SwapChainSupportDetails Renderer::query_swap_chain_support(VkPhysicalDevice device) {
+SwapChainSupportDetails RenderEngine::query_swap_chain_support(VkPhysicalDevice device) {
 	SwapChainSupportDetails details;
 
-	vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, surface, &details.capabilities);
+	vkGetPhysicalDeviceSurfaceCapabilitiesKHR(device, _surface, &details.capabilities);
 
 	uint32_t formatCount;
-	vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, nullptr);
+	vkGetPhysicalDeviceSurfaceFormatsKHR(device, _surface, &formatCount, nullptr);
 
 	if (formatCount != 0) {
 		details.formats.resize(formatCount);
-		vkGetPhysicalDeviceSurfaceFormatsKHR(device, surface, &formatCount, details.formats.data());
+		vkGetPhysicalDeviceSurfaceFormatsKHR(device, _surface, &formatCount, details.formats.data());
 	}
 
 	uint32_t presentModeCount;
-	vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount, nullptr);
+	vkGetPhysicalDeviceSurfacePresentModesKHR(device, _surface, &presentModeCount, nullptr);
 
 	if (presentModeCount != 0) {
 		details.presentModes.resize(presentModeCount);
-		vkGetPhysicalDeviceSurfacePresentModesKHR(device, surface, &presentModeCount, details.presentModes.data());
+		vkGetPhysicalDeviceSurfacePresentModesKHR(device, _surface, &presentModeCount, details.presentModes.data());
 	}
 
 	return details;
 }
 
-bool Renderer::check_device_extension_support(VkPhysicalDevice device)
+bool RenderEngine::check_device_extension_support(VkPhysicalDevice device)
 {
 	// check if all required extensions are there
 	uint32_t extensionCount;
@@ -960,7 +940,7 @@ bool Renderer::check_device_extension_support(VkPhysicalDevice device)
 	return requiredExtensions.empty();
 }
 
-QueueFamilyIndices Renderer::find_queue_families(VkPhysicalDevice device)
+QueueFamilyIndices RenderEngine::find_queue_families(VkPhysicalDevice device)
 {
 	// find graphics familes for queueing up commands
 	QueueFamilyIndices indices;
@@ -978,7 +958,7 @@ QueueFamilyIndices Renderer::find_queue_families(VkPhysicalDevice device)
 		}
 
 		VkBool32 presentSupport = false;
-		vkGetPhysicalDeviceSurfaceSupportKHR(device, i, surface, &presentSupport);
+		vkGetPhysicalDeviceSurfaceSupportKHR(device, i, _surface, &presentSupport);
 
 		if (presentSupport)
 		{
@@ -997,7 +977,7 @@ QueueFamilyIndices Renderer::find_queue_families(VkPhysicalDevice device)
 }
 
 // pick the software GPU to use (driver)
-void Renderer::create_logical_device()
+void RenderEngine::create_logical_device()
 {
 	QueueFamilyIndices indices = find_queue_families(_physicalDevice);
 
@@ -1061,11 +1041,11 @@ void Renderer::create_logical_device()
 		error::abort("Failed to create logical device.");
 	}
 
-	vkGetDeviceQueue(_device, indices.graphicsFamily.value(), 0, &graphicsQueue);
-	vkGetDeviceQueue(_device, indices.presentFamily.value(), 0, &presentQueue);
+	vkGetDeviceQueue(_device, indices.graphicsFamily.value(), 0, &_graphicsQueue);
+	vkGetDeviceQueue(_device, indices.presentFamily.value(), 0, &_presentQueue);
 }
 
-void minty::Renderer::draw_scene(VkCommandBuffer commandBuffer)
+void minty::RenderEngine::draw_scene(VkCommandBuffer commandBuffer)
 {
 	// sort sprites so they render in the correct order, since Z does not matter
 	_registry->sort<SpriteComponent>([](SpriteComponent const& left, SpriteComponent const& right)
@@ -1076,7 +1056,7 @@ void minty::Renderer::draw_scene(VkCommandBuffer commandBuffer)
 	TransformComponent const* transformComponent;
 
 	// draw all meshes in the scene
-	for (auto&& [entity, renderable, mesh] : _registry->view<Renderable const, MeshComponent>().each())
+	for (auto&& [entity, renderable, mesh] : _registry->view<RenderableComponent const, MeshComponent>().each())
 	{
 		// get transform for entity
 		transformComponent = _registry->try_get<TransformComponent>(entity);
@@ -1097,7 +1077,7 @@ void minty::Renderer::draw_scene(VkCommandBuffer commandBuffer)
 	_registry->sort<UITransformComponent, SpriteComponent>();
 
 	// draw all UI in scene
-	for (auto&& [entity, renderable, ui, sprite] : _registry->view<Renderable const, UITransformComponent const, SpriteComponent const>().each())
+	for (auto&& [entity, renderable, ui, sprite] : _registry->view<RenderableComponent const, UITransformComponent const, SpriteComponent const>().each())
 	{
 		draw_ui(commandBuffer, ui, sprite);
 	}
@@ -1107,7 +1087,7 @@ void minty::Renderer::draw_scene(VkCommandBuffer commandBuffer)
 	//bind_shader(commandBuffer, nullptr);
 }
 
-void minty::Renderer::draw_ui(VkCommandBuffer commandBuffer, UITransformComponent const& uiComponent, SpriteComponent const& spriteComponent)
+void minty::RenderEngine::draw_ui(VkCommandBuffer commandBuffer, UITransformComponent const& uiComponent, SpriteComponent const& spriteComponent)
 {
 	// get the sprite
 	Sprite& sprite = get_sprite(spriteComponent.id);
@@ -1180,7 +1160,7 @@ void minty::Renderer::draw_ui(VkCommandBuffer commandBuffer, UITransformComponen
 	vkCmdDraw(commandBuffer, 6, 1, 0, 0);
 }
 
-bool Renderer::check_validation_layer_support()
+bool RenderEngine::check_validation_layer_support()
 {
 	uint32_t layerCount;
 	vkEnumerateInstanceLayerProperties(&layerCount, nullptr);
@@ -1206,7 +1186,7 @@ bool Renderer::check_validation_layer_support()
 	return true;
 }
 
-std::vector<const char*> Renderer::get_required_extensions() {
+std::vector<const char*> RenderEngine::get_required_extensions() {
 	uint32_t glfwExtensionCount = 0;
 	const char** glfwExtensions;
 	glfwExtensions = glfwGetRequiredInstanceExtensions(&glfwExtensionCount);
@@ -1220,7 +1200,7 @@ std::vector<const char*> Renderer::get_required_extensions() {
 	return extensions;
 }
 
-void Renderer::populate_debug_messenger_create_info(VkDebugUtilsMessengerCreateInfoEXT& createInfo) {
+void RenderEngine::populate_debug_messenger_create_info(VkDebugUtilsMessengerCreateInfoEXT& createInfo) {
 	createInfo = {
 		.sType = VK_STRUCTURE_TYPE_DEBUG_UTILS_MESSENGER_CREATE_INFO_EXT,
 		.messageSeverity = VK_DEBUG_UTILS_MESSAGE_SEVERITY_VERBOSE_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT | VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT,
@@ -1229,38 +1209,38 @@ void Renderer::populate_debug_messenger_create_info(VkDebugUtilsMessengerCreateI
 	};
 }
 
-ID minty::Renderer::create_texture(rendering::TextureBuilder const& builder)
+ID minty::RenderEngine::create_texture(rendering::TextureBuilder const& builder)
 {
 	return _textures.emplace(builder.name, Texture(builder, *this));
 }
 
-ID minty::Renderer::create_shader(rendering::ShaderBuilder const& builder)
+ID minty::RenderEngine::create_shader(rendering::ShaderBuilder const& builder)
 {
 	return _shaders.emplace(builder.name, Shader(builder, *this));
 }
 
-ID minty::Renderer::create_shader_pass(rendering::ShaderPassBuilder const& builder)
+ID minty::RenderEngine::create_shader_pass(rendering::ShaderPassBuilder const& builder)
 {
 	return _shaderPasses.emplace(builder.name, ShaderPass(builder, *this));
 }
 
-ID minty::Renderer::create_material_template(rendering::MaterialTemplateBuilder const& builder)
+ID minty::RenderEngine::create_material_template(rendering::MaterialTemplateBuilder const& builder)
 {
 	return _materialTemplates.emplace(builder.name, MaterialTemplate(builder, *this));
 }
 
-ID minty::Renderer::create_material(rendering::MaterialBuilder const& builder)
+ID minty::RenderEngine::create_material(rendering::MaterialBuilder const& builder)
 {
 	return _materials.emplace(builder.name, Material(builder, *this));
 }
 
-ID minty::Renderer::create_mesh()
+ID minty::RenderEngine::create_mesh()
 {
 	// just create a brand new mesh
 	return _meshes.emplace(Mesh(*this));
 }
 
-ID minty::Renderer::get_or_create_mesh(std::string const& name)
+ID minty::RenderEngine::get_or_create_mesh(std::string const& name)
 {
 	// if contains name, return it
 	if (_meshes.contains(name))
@@ -1272,7 +1252,7 @@ ID minty::Renderer::get_or_create_mesh(std::string const& name)
 	return _meshes.emplace(name, Mesh(*this));
 }
 
-ID minty::Renderer::get_or_create_mesh(MeshType const type)
+ID minty::RenderEngine::get_or_create_mesh(MeshType const type)
 {
 	std::string name = to_string(type);
 
@@ -1316,7 +1296,7 @@ ID minty::Renderer::get_or_create_mesh(MeshType const type)
 	return id;
 }
 
-ID minty::Renderer::find_texture(std::string const& name)
+ID minty::RenderEngine::find_texture(std::string const& name)
 {
 	if (!_textures.contains(name))
 	{
@@ -1326,7 +1306,7 @@ ID minty::Renderer::find_texture(std::string const& name)
 	return _textures.get_id(name);
 }
 
-ID minty::Renderer::find_shader(std::string const& name)
+ID minty::RenderEngine::find_shader(std::string const& name)
 {
 	if (!_shaders.contains(name))
 	{
@@ -1336,7 +1316,7 @@ ID minty::Renderer::find_shader(std::string const& name)
 	return _shaders.get_id(name);
 }
 
-ID minty::Renderer::find_shader_pass(std::string const& name)
+ID minty::RenderEngine::find_shader_pass(std::string const& name)
 {
 	if (!_shaderPasses.contains(name))
 	{
@@ -1346,7 +1326,7 @@ ID minty::Renderer::find_shader_pass(std::string const& name)
 	return _shaderPasses.get_id(name);
 }
 
-ID minty::Renderer::find_material_template(std::string const& name)
+ID minty::RenderEngine::find_material_template(std::string const& name)
 {
 	if (!_materialTemplates.contains(name))
 	{
@@ -1356,7 +1336,7 @@ ID minty::Renderer::find_material_template(std::string const& name)
 	return _materialTemplates.get_id(name);
 }
 
-ID minty::Renderer::find_material(std::string const& name)
+ID minty::RenderEngine::find_material(std::string const& name)
 {
 	if (!_materials.contains(name))
 	{
@@ -1366,7 +1346,7 @@ ID minty::Renderer::find_material(std::string const& name)
 	return _materials.get_id(name);
 }
 
-ID minty::Renderer::find_mesh(std::string const& name)
+ID minty::RenderEngine::find_mesh(std::string const& name)
 {
 	if (!_meshes.contains(name))
 	{
@@ -1376,14 +1356,14 @@ ID minty::Renderer::find_mesh(std::string const& name)
 	return _meshes.get_id(name);
 }
 
-ID minty::Renderer::load_texture(std::string const& path)
+ID minty::RenderEngine::load_texture(std::string const& path)
 {
 	if (check_asset(path, true))
 	{
 		return ERROR_ID;
 	}
 
-	Node meta = assets::load_meta(path);
+	Node meta = asset::load_meta(path);
 
 	// create texture builder from path and meta file
 	TextureBuilder builder(file::name(path), path);
@@ -1397,14 +1377,14 @@ ID minty::Renderer::load_texture(std::string const& path)
 	return create_texture(builder);
 }
 
-ID minty::Renderer::load_shader(std::string const& path)
+ID minty::RenderEngine::load_shader(std::string const& path)
 {
 	if (check_asset(path, false))
 	{
 		return ERROR_ID;
 	}
 
-	Node meta = assets::load_node(path);
+	Node meta = asset::load_node(path);
 
 	ShaderBuilder builder;
 	builder.name = file::name(path);
@@ -1436,7 +1416,7 @@ ID minty::Renderer::load_shader(std::string const& path)
 			uniformConstantInfo.set = child.get_uint("set");
 			uniformConstantInfo.binding = child.get_uint("binding");
 			uniformConstantInfo.count = child.get_uint("count", 1u);
-			uniformConstantInfo.size = static_cast<VkDeviceSize>(child.get_size_t("size"));
+			uniformConstantInfo.size = static_cast<VkDeviceSize>(child.get_size("size"));
 			uniformConstantInfo.stageFlags = from_string_vk_shader_stage_flag_bits(child.get_string("stageFlags"));
 			if (std::vector<Node> const* ids = child.find_all("id"))
 			{
@@ -1453,14 +1433,14 @@ ID minty::Renderer::load_shader(std::string const& path)
 	return create_shader(builder);
 }
 
-ID minty::Renderer::load_shader_pass(std::string const& path)
+ID minty::RenderEngine::load_shader_pass(std::string const& path)
 {
 	if (check_asset(path, false))
 	{
 		return ERROR_ID;
 	}
 
-	Node meta = assets::load_node(path);
+	Node meta = asset::load_node(path);
 
 	ShaderPassBuilder builder;
 	builder.name = file::name(path);
@@ -1507,7 +1487,7 @@ ID minty::Renderer::load_shader_pass(std::string const& path)
 
 			info.stage = from_string_vk_shader_stage_flag_bits(child.get_string("stage", child.to_string()));
 			std::string path = child.get_string("path");
-			info.code = assets::load_chars(path);
+			info.code = asset::load_chars(path);
 			info.entry = child.get_string("entry", "main");
 
 			builder.stages.push_back(info);
@@ -1517,14 +1497,14 @@ ID minty::Renderer::load_shader_pass(std::string const& path)
 	return create_shader_pass(builder);
 }
 
-ID minty::Renderer::load_material_template(std::string const& path)
+ID minty::RenderEngine::load_material_template(std::string const& path)
 {
 	if (check_asset(path, false))
 	{
 		return ERROR_ID;
 	}
 
-	Node meta = assets::load_node(path);
+	Node meta = asset::load_node(path);
 
 	MaterialTemplateBuilder builder;
 	builder.name = file::name(path);
@@ -1551,14 +1531,14 @@ ID minty::Renderer::load_material_template(std::string const& path)
 	return create_material_template(builder);
 }
 
-ID minty::Renderer::load_material(std::string const& path)
+ID minty::RenderEngine::load_material(std::string const& path)
 {
 	if (check_asset(path, false))
 	{
 		return ERROR_ID;
 	}
 
-	Node meta = assets::load_node(path);
+	Node meta = asset::load_node(path);
 
 	MaterialBuilder builder;
 	builder.name = file::name(path);
@@ -1579,7 +1559,7 @@ ID minty::Renderer::load_material(std::string const& path)
 	return create_material(builder);
 }
 
-ID minty::Renderer::load_mesh(std::string const& path)
+ID minty::RenderEngine::load_mesh(std::string const& path)
 {
 	if (check_asset(path, false))
 	{
@@ -1607,7 +1587,7 @@ ID minty::Renderer::load_mesh(std::string const& path)
 	return id;
 }
 
-void minty::Renderer::destroy_texture(ID const id)
+void minty::RenderEngine::destroy_texture(ID const id)
 {
 	if (_textures.contains(id))
 	{
@@ -1617,7 +1597,7 @@ void minty::Renderer::destroy_texture(ID const id)
 	}
 }
 
-void minty::Renderer::destroy_shader(ID const id)
+void minty::RenderEngine::destroy_shader(ID const id)
 {
 	if (_shaders.contains(id))
 	{
@@ -1627,7 +1607,7 @@ void minty::Renderer::destroy_shader(ID const id)
 	}
 }
 
-void minty::Renderer::destroy_shader_pass(ID const id)
+void minty::RenderEngine::destroy_shader_pass(ID const id)
 {
 	if (_shaderPasses.contains(id))
 	{
@@ -1637,7 +1617,7 @@ void minty::Renderer::destroy_shader_pass(ID const id)
 	}
 }
 
-void minty::Renderer::destroy_material_template(ID const id)
+void minty::RenderEngine::destroy_material_template(ID const id)
 {
 	if (_materialTemplates.contains(id))
 	{
@@ -1647,7 +1627,7 @@ void minty::Renderer::destroy_material_template(ID const id)
 	}
 }
 
-void minty::Renderer::destroy_material(ID const id)
+void minty::RenderEngine::destroy_material(ID const id)
 {
 	if (_materials.contains(id))
 	{
@@ -1657,7 +1637,7 @@ void minty::Renderer::destroy_material(ID const id)
 	}
 }
 
-void minty::Renderer::destroy_mesh(ID const id)
+void minty::RenderEngine::destroy_mesh(ID const id)
 {
 	if (_meshes.contains(id))
 	{
@@ -1667,7 +1647,7 @@ void minty::Renderer::destroy_mesh(ID const id)
 	}
 }
 
-void minty::Renderer::destroy_assets()
+void minty::RenderEngine::destroy_assets()
 {
 	for (auto& tex : _textures)
 	{
@@ -1701,17 +1681,17 @@ void minty::Renderer::destroy_assets()
 	_meshes.clear();
 }
 
-int minty::Renderer::check_asset(std::string const& path, bool const requiresMeta) const
+int minty::RenderEngine::check_asset(std::string const& path, bool const requiresMeta) const
 {
 	// can load if assets exists, and if no meta is required, or if a meta is required, it exists
-	if (!assets::exists(path))
+	if (!asset::exists(path))
 	{
 		console::error(std::format("Cannot find asset at path \"{}\".", path));
 		// cannot find asset itself
 		return 1;
 	}
 
-	if (requiresMeta && !assets::exists_meta(path))
+	if (requiresMeta && !asset::exists_meta(path))
 	{
 		console::error(std::format("Cannot find meta file for asset at path \"{}\".", path));
 		// cannot find asset meta file
@@ -1722,13 +1702,13 @@ int minty::Renderer::check_asset(std::string const& path, bool const requiresMet
 	return 0;
 }
 
-void minty::Renderer::load_mesh_obj(std::string const& path, ID const id)
+void minty::RenderEngine::load_mesh_obj(std::string const& path, ID const id)
 {
-	Node meta = assets::load_meta(path);
+	Node meta = asset::load_meta(path);
 
 	Mesh& mesh = get_mesh(id);
 
-	std::vector<std::string> lines = assets::load_lines(path);
+	std::vector<std::string> lines = asset::load_lines(path);
 
 	std::vector<Vector3> positions;
 	std::vector<Vector2> coords;
@@ -1828,18 +1808,18 @@ void minty::Renderer::load_mesh_obj(std::string const& path, ID const id)
 	mesh.set_indices(indices);
 }
 
-void Renderer::setup_debug_messenger() {
+void RenderEngine::setup_debug_messenger() {
 	if (!enableValidationLayers) return;
 
 	VkDebugUtilsMessengerCreateInfoEXT createInfo;
 	populate_debug_messenger_create_info(createInfo);
 
-	if (CreateDebugUtilsMessengerEXT(instance, &createInfo, nullptr, &debugMessenger) != VK_SUCCESS) {
+	if (CreateDebugUtilsMessengerEXT(instance, &createInfo, nullptr, &_debugMessenger) != VK_SUCCESS) {
 		error::abort("Failed to set up debug messenger.");
 	}
 }
 
-VKAPI_ATTR VkBool32 VKAPI_CALL Renderer::debug_callback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData) {
+VKAPI_ATTR VkBool32 VKAPI_CALL RenderEngine::debug_callback(VkDebugUtilsMessageSeverityFlagBitsEXT messageSeverity, VkDebugUtilsMessageTypeFlagsEXT messageType, const VkDebugUtilsMessengerCallbackDataEXT* pCallbackData, void* pUserData) {
 	// change colors based on severity
 	if (messageSeverity & VkDebugUtilsMessageSeverityFlagBitsEXT::VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
 	{
@@ -1862,13 +1842,13 @@ VKAPI_ATTR VkBool32 VKAPI_CALL Renderer::debug_callback(VkDebugUtilsMessageSever
 	return VK_FALSE;
 }
 
-void Renderer::create_render_pass()
+void RenderEngine::create_render_pass()
 {
 	// need to tell vulkan how much of what to use for rendering
 
 	VkAttachmentDescription colorAttachment
 	{
-		.format = swapChainImageFormat,
+		.format = _swapChainImageFormat,
 		.samples = VK_SAMPLE_COUNT_1_BIT,
 		.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR,
 		.storeOp = VK_ATTACHMENT_STORE_OP_STORE,
@@ -1932,15 +1912,15 @@ void Renderer::create_render_pass()
 	}
 }
 
-void Renderer::create_framebuffers()
+void RenderEngine::create_framebuffers()
 {
 	// resize to hold all framebuffers
-	swapChainFramebuffers.resize(swapChainImageViews.size());
+	_swapChainFramebuffers.resize(_swapChainImageViews.size());
 
-	for (size_t i = 0; i < swapChainImageViews.size(); i++) {
+	for (size_t i = 0; i < _swapChainImageViews.size(); i++) {
 		std::array<VkImageView, 2> attachments = {
-			swapChainImageViews[i],
-			depthImageView
+			_swapChainImageViews[i],
+			_depthImageView
 		};
 
 		VkFramebufferCreateInfo framebufferInfo{};
@@ -1948,17 +1928,17 @@ void Renderer::create_framebuffers()
 		framebufferInfo.renderPass = _renderPass;
 		framebufferInfo.attachmentCount = static_cast<uint32_t>(attachments.size());
 		framebufferInfo.pAttachments = attachments.data();
-		framebufferInfo.width = swapChainExtent.width;
-		framebufferInfo.height = swapChainExtent.height;
+		framebufferInfo.width = _swapChainExtent.width;
+		framebufferInfo.height = _swapChainExtent.height;
 		framebufferInfo.layers = 1;
 
-		if (vkCreateFramebuffer(_device, &framebufferInfo, nullptr, &swapChainFramebuffers[i]) != VK_SUCCESS) {
+		if (vkCreateFramebuffer(_device, &framebufferInfo, nullptr, &_swapChainFramebuffers[i]) != VK_SUCCESS) {
 			error::abort("Failed to create framebuffer.");
 		}
 	}
 }
 
-void Renderer::update_camera(CameraComponent const& camera, TransformComponent const& transform)
+void RenderEngine::update_camera(CameraComponent const& camera, TransformComponent const& transform)
 {
 	Vector4 matPos = transform.global[3];
 	Vector3 globalPos = Vector3(matPos.x, matPos.y, matPos.z);
@@ -1973,7 +1953,7 @@ void Renderer::update_camera(CameraComponent const& camera, TransformComponent c
 	switch (camera.perspective)
 	{
 	case CameraComponent::Perspective::Perspective:
-		proj = glm::perspective(glm::radians(camera.fov), swapChainExtent.width / static_cast<float>(swapChainExtent.height), camera.nearPlane, camera.farPlane);
+		proj = glm::perspective(glm::radians(camera.fov), _swapChainExtent.width / static_cast<float>(_swapChainExtent.height), camera.nearPlane, camera.farPlane);
 		break;
 	default:
 		proj = Matrix4(1.0f);
@@ -2001,7 +1981,7 @@ void Renderer::update_camera(CameraComponent const& camera, TransformComponent c
 	}
 }
 
-ID minty::Renderer::create_buffer(VkDeviceSize const size, VkBufferUsageFlags const usage, VkMemoryPropertyFlags const properties)
+ID minty::RenderEngine::create_buffer(VkDeviceSize const size, VkBufferUsageFlags const usage, VkMemoryPropertyFlags const properties)
 {
 	VkBuffer buffer;
 	VkDeviceMemory bufferMemory;
@@ -2034,12 +2014,12 @@ ID minty::Renderer::create_buffer(VkDeviceSize const size, VkBufferUsageFlags co
 		});
 }
 
-ID minty::Renderer::create_buffer_uniform(VkDeviceSize const size)
+ID minty::RenderEngine::create_buffer_uniform(VkDeviceSize const size)
 {
 	return create_buffer(size, VkBufferUsageFlagBits::VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 }
 
-void minty::Renderer::destroy_buffer(ID const id)
+void minty::RenderEngine::destroy_buffer(ID const id)
 {
 	if (!_buffers.contains(id))
 	{
@@ -2053,7 +2033,7 @@ void minty::Renderer::destroy_buffer(ID const id)
 	_buffers.erase(id);
 }
 
-void* minty::Renderer::map_buffer(ID const id) const
+void* minty::RenderEngine::map_buffer(ID const id) const
 {
 	Buffer const& buffer = _buffers.at(id);
 
@@ -2064,14 +2044,14 @@ void* minty::Renderer::map_buffer(ID const id) const
 	return data;
 }
 
-void minty::Renderer::unmap_buffer(ID const id) const
+void minty::RenderEngine::unmap_buffer(ID const id) const
 {
 	Buffer const& buffer = _buffers.at(id);
 
 	vkUnmapMemory(_device, buffer.memory);
 }
 
-void minty::Renderer::set_buffer(ID const id, void* const data)
+void minty::RenderEngine::set_buffer(ID const id, void* const data)
 {
 	Buffer const& buffer = _buffers.at(id);
 
@@ -2079,7 +2059,7 @@ void minty::Renderer::set_buffer(ID const id, void* const data)
 	set_buffer(id, data, 0, buffer.size);
 }
 
-void minty::Renderer::set_buffer(ID const id, void* const data, VkDeviceSize const size, VkDeviceSize const offset)
+void minty::RenderEngine::set_buffer(ID const id, void* const data, VkDeviceSize const size, VkDeviceSize const offset)
 {
 	Buffer const& buffer = _buffers.at(id);
 
@@ -2103,12 +2083,12 @@ void minty::Renderer::set_buffer(ID const id, void* const data, VkDeviceSize con
 	unmap_buffer(id);
 }
 
-VkBuffer minty::Renderer::get_buffer(ID const id) const
+VkBuffer minty::RenderEngine::get_buffer(ID const id) const
 {
 	return _buffers.at(id).buffer;
 }
 
-void minty::Renderer::get_buffer_data(ID const id, void* const out) const
+void minty::RenderEngine::get_buffer_data(ID const id, void* const out) const
 {
 	// get buffer
 	Buffer const& buffer = _buffers.at(id);
@@ -2123,32 +2103,32 @@ void minty::Renderer::get_buffer_data(ID const id, void* const out) const
 	unmap_buffer(id);
 }
 
-VkDeviceSize minty::Renderer::get_buffer_size(ID const id) const
+VkDeviceSize minty::RenderEngine::get_buffer_size(ID const id) const
 {
 	return _buffers.at(id).size;
 }
 
-void minty::Renderer::copy_buffer(ID const srcId, ID const dstId, VkDeviceSize const size)
+void minty::RenderEngine::copy_buffer(ID const srcId, ID const dstId, VkDeviceSize const size)
 {
 	Buffer const& srcBuffer = _buffers.at(srcId);
 	Buffer const& dstBuffer = _buffers.at(dstId);
 
-	VkCommandBuffer commandBuffer = begin_single_time_commands(commandPool);
+	VkCommandBuffer commandBuffer = begin_single_time_commands(_commandPool);
 
 	VkBufferCopy copyRegion{};
 	copyRegion.size = size;
 	vkCmdCopyBuffer(commandBuffer, srcBuffer.buffer, dstBuffer.buffer, 1, &copyRegion);
 
-	end_single_time_commands(commandBuffer, commandPool);
+	end_single_time_commands(commandBuffer, _commandPool);
 }
 
-void minty::Renderer::destroy_buffer(rendering::Buffer const& buffer)
+void minty::RenderEngine::destroy_buffer(rendering::Buffer const& buffer)
 {
 	vkDestroyBuffer(_device, buffer.buffer, nullptr);
 	vkFreeMemory(_device, buffer.memory, nullptr);
 }
 
-uint32_t Renderer::find_memory_type(uint32_t typeFilter, VkMemoryPropertyFlags properties)
+uint32_t RenderEngine::find_memory_type(uint32_t typeFilter, VkMemoryPropertyFlags properties)
 {
 	VkPhysicalDeviceMemoryProperties memProperties;
 	vkGetPhysicalDeviceMemoryProperties(_physicalDevice, &memProperties);
@@ -2163,14 +2143,14 @@ uint32_t Renderer::find_memory_type(uint32_t typeFilter, VkMemoryPropertyFlags p
 	return 0;
 }
 
-void Renderer::create_command_pool(VkCommandPool& commandPool)
+void RenderEngine::create_command_pool(VkCommandPool& commandPool)
 {
 	// create info for command pool
 	VkCommandPoolCreateInfo poolInfo
 	{
 		.sType = VK_STRUCTURE_TYPE_COMMAND_POOL_CREATE_INFO,
 		.flags = VK_COMMAND_POOL_CREATE_RESET_COMMAND_BUFFER_BIT,
-		.queueFamilyIndex = queueFamilyIndices.graphicsFamily.value(),
+		.queueFamilyIndex = _queueFamilyIndices.graphicsFamily.value(),
 	};
 
 	if (vkCreateCommandPool(_device, &poolInfo, nullptr, &commandPool) != VK_SUCCESS) {
@@ -2178,26 +2158,26 @@ void Renderer::create_command_pool(VkCommandPool& commandPool)
 	}
 }
 
-void Renderer::create_command_buffers()
+void RenderEngine::create_command_buffers()
 {
 	// create space for all the buffers
-	commandBuffers.resize(MAX_FRAMES_IN_FLIGHT);
+	_commandBuffers.resize(MAX_FRAMES_IN_FLIGHT);
 
 	// allocate a command buffer
 	VkCommandBufferAllocateInfo allocInfo
 	{
 		.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_ALLOCATE_INFO,
-		.commandPool = commandPool,
+		.commandPool = _commandPool,
 		.level = VK_COMMAND_BUFFER_LEVEL_PRIMARY,
-		.commandBufferCount = (uint32_t)commandBuffers.size(),
+		.commandBufferCount = (uint32_t)_commandBuffers.size(),
 	};
 
-	if (vkAllocateCommandBuffers(_device, &allocInfo, commandBuffers.data()) != VK_SUCCESS) {
+	if (vkAllocateCommandBuffers(_device, &allocInfo, _commandBuffers.data()) != VK_SUCCESS) {
 		error::abort("Failed to allocate command buffers.");
 	}
 }
 
-void minty::Renderer::draw_mesh(VkCommandBuffer commandBuffer, Matrix4 const& transformationMatrix, MeshComponent const& meshComponent)
+void minty::RenderEngine::draw_mesh(VkCommandBuffer commandBuffer, Matrix4 const& transformationMatrix, MeshComponent const& meshComponent)
 {
 	// do nothing if null mesh
 	if (meshComponent.meshId == ERROR_ID)
@@ -2236,12 +2216,12 @@ void minty::Renderer::draw_mesh(VkCommandBuffer commandBuffer, Matrix4 const& tr
 	vkCmdDrawIndexed(commandBuffer, mesh.get_index_count(), 1, 0, 0, 0);
 }
 
-void minty::Renderer::set_main_camera(Entity const entity)
+void minty::RenderEngine::set_main_camera(Entity const entity)
 {
 	_mainCamera = entity;
 }
 
-void minty::Renderer::set_scene(Scene const* const scene, Entity const camera)
+void minty::RenderEngine::set_scene(Scene const* const scene, Entity const camera)
 {
 	// update scene that is being rendered
 	_scene = scene;
@@ -2270,7 +2250,7 @@ void minty::Renderer::set_scene(Scene const* const scene, Entity const camera)
 	}
 }
 
-void Renderer::record_command_buffer(VkCommandBuffer commandBuffer, uint32_t imageIndex)
+void RenderEngine::record_command_buffer(VkCommandBuffer commandBuffer, uint32_t imageIndex)
 {
 	VkCommandBufferBeginInfo beginInfo
 	{
@@ -2288,13 +2268,13 @@ void Renderer::record_command_buffer(VkCommandBuffer commandBuffer, uint32_t ima
 	{
 		.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO,
 		.renderPass = _renderPass,
-		.framebuffer = swapChainFramebuffers[imageIndex],
+		.framebuffer = _swapChainFramebuffers[imageIndex],
 	};
 
 	// match size of attachments for best performance
 	// define render area
 	renderPassInfo.renderArea.offset = { 0, 0 };
-	renderPassInfo.renderArea.extent = swapChainExtent;
+	renderPassInfo.renderArea.extent = _swapChainExtent;
 
 	// clear the background
 	std::array<VkClearValue, 2> clearValues{};
@@ -2327,12 +2307,12 @@ void Renderer::record_command_buffer(VkCommandBuffer commandBuffer, uint32_t ima
 	}
 }
 
-void Renderer::create_sync_objects()
+void RenderEngine::create_sync_objects()
 {
 	// resize to number of frames in flight
-	imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
-	renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
-	inFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
+	_imageAvailableSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
+	_renderFinishedSemaphores.resize(MAX_FRAMES_IN_FLIGHT);
+	_inFlightFences.resize(MAX_FRAMES_IN_FLIGHT);
 
 	// semaphore = lock
 	// fence = lock, but it waits instead of blocks?
@@ -2352,16 +2332,16 @@ void Renderer::create_sync_objects()
 
 	// create semaphores and fences
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-		if (vkCreateSemaphore(_device, &semaphoreInfo, nullptr, &imageAvailableSemaphores[i]) != VK_SUCCESS ||
-			vkCreateSemaphore(_device, &semaphoreInfo, nullptr, &renderFinishedSemaphores[i]) != VK_SUCCESS ||
-			vkCreateFence(_device, &fenceInfo, nullptr, &inFlightFences[i]) != VK_SUCCESS) {
+		if (vkCreateSemaphore(_device, &semaphoreInfo, nullptr, &_imageAvailableSemaphores[i]) != VK_SUCCESS ||
+			vkCreateSemaphore(_device, &semaphoreInfo, nullptr, &_renderFinishedSemaphores[i]) != VK_SUCCESS ||
+			vkCreateFence(_device, &fenceInfo, nullptr, &_inFlightFences[i]) != VK_SUCCESS) {
 
 			error::abort("Failed to create synchronization objects for a frame.");
 		}
 	}
 }
 
-void Renderer::destroy()
+void RenderEngine::destroy()
 {
 	sync();
 
@@ -2378,21 +2358,21 @@ void Renderer::destroy()
 
 	// destroy renderer data
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
-		vkDestroySemaphore(_device, renderFinishedSemaphores[i], nullptr);
-		vkDestroySemaphore(_device, imageAvailableSemaphores[i], nullptr);
-		vkDestroyFence(_device, inFlightFences[i], nullptr);
+		vkDestroySemaphore(_device, _renderFinishedSemaphores[i], nullptr);
+		vkDestroySemaphore(_device, _imageAvailableSemaphores[i], nullptr);
+		vkDestroyFence(_device, _inFlightFences[i], nullptr);
 	}
-	vkDestroyCommandPool(_device, commandPool, nullptr);
+	vkDestroyCommandPool(_device, _commandPool, nullptr);
 	vkDestroyRenderPass(_device, _renderPass, nullptr);
 	vkDestroyDevice(_device, nullptr);
 	if (enableValidationLayers) {
-		DestroyDebugUtilsMessengerEXT(instance, debugMessenger, nullptr);
+		DestroyDebugUtilsMessengerEXT(instance, _debugMessenger, nullptr);
 	}
-	vkDestroySurfaceKHR(instance, surface, nullptr);
+	vkDestroySurfaceKHR(instance, _surface, nullptr);
 	vkDestroyInstance(instance, nullptr);
 }
 
-void minty::Renderer::bind(VkCommandBuffer const commandBuffer)
+void minty::RenderEngine::bind(VkCommandBuffer const commandBuffer)
 {
 	// bind using the bound ids
 	if (_boundIds.at(0) == ERROR_ID)
@@ -2416,7 +2396,7 @@ void minty::Renderer::bind(VkCommandBuffer const commandBuffer)
 	vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, shader.get_pipeline_layout(), 0, DESCRIPTOR_SET_COUNT, descriptorSets.data(), 0, nullptr);
 }
 
-void minty::Renderer::bind(VkCommandBuffer const commandBuffer, ID const materialId, uint32_t const pass)
+void minty::RenderEngine::bind(VkCommandBuffer const commandBuffer, ID const materialId, uint32_t const pass)
 {
 	// if ERROR_ID material, unbind all
 	if (materialId == ERROR_ID)
@@ -2475,13 +2455,13 @@ void minty::Renderer::bind(VkCommandBuffer const commandBuffer, ID const materia
 	bind(commandBuffer);
 }
 
-void minty::Renderer::sync()
+void minty::RenderEngine::sync()
 {
 	// wait for logical device to finish rendering before closing program
 	vkDeviceWaitIdle(_device);
 }
 
-std::string minty::to_string(Renderer const& value)
+std::string minty::to_string(RenderEngine const& value)
 {
-	return std::format("Renderer()");
+	return std::format("RenderEngine()");
 }

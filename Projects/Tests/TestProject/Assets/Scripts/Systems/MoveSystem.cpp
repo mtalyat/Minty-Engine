@@ -42,7 +42,7 @@ void game::MoveSystem::update()
         }
         if (moved)
         {
-            _registry->emplace_or_replace<Dirty>(entity);
+            _registry->emplace_or_replace<DirtyComponent>(entity);
         }
     }
 }

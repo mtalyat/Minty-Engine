@@ -4,14 +4,6 @@
 #include "M_SerializationData.h"
 #include "M_Scene.h"
 
-minty::RelationshipComponent::RelationshipComponent(size_t const children, Entity const first, Entity const prev, Entity const next, Entity const parent)
-	: children(children)
-	, first(first)
-	, prev(prev)
-	, next(next)
-	, parent(parent)
-{}
-
 void minty::RelationshipComponent::serialize(Writer& writer) const
 {
 	if (!writer.get_data())
@@ -52,5 +44,5 @@ void minty::RelationshipComponent::deserialize(Reader const& reader)
 
 std::string minty::to_string(RelationshipComponent const& value)
 {
-	return std::format("RelationshipComponent()");
+	return std::format("RelationshipComponent(children = {}, first = {}, prev = {}, next = {}, parent = {})", std::to_string(value.children), to_string(value.first), to_string(value.prev), to_string(value.next), to_string(value.parent));
 }

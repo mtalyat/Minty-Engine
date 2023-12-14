@@ -2,33 +2,56 @@
 #include "M_Base.h"
 
 #include "M_Color.h"
+#include "M_Rendering_PixelFormat.h"
 #include "vulkan.h"
 
 namespace minty::rendering
 {
+	/// <summary>
+	/// Holds data to create a new Texture.
+	/// </summary>
 	struct TextureBuilder
 	{
-		enum class PixelFormat
-		{
-			None = 0,
-			Gray = 1,
-			GrayAlpha = 2,
-			RedGreenBlue = 3,
-			RedGreenBlueAlpha = 4,
-		};
-
+		/// <summary>
+		/// The name of the Texure.
+		/// </summary>
 		std::string name;
+		/// <summary>
+		/// The path to the Texture on the disk.
+		/// </summary>
 		std::string path;
+		/// <summary>
+		/// The raw pixel data for the Texture.
+		/// </summary>
 		Color* pixelData;
-		int width, height;
+		/// <summary>
+		/// The width of the Texture in pixels.
+		/// </summary>
+		int width;
+		/// <summary>
+		/// The height of the Texture in pixels.
+		/// </summary>
+		int height;
+		/// <summary>
+		/// The format to read the pixels in.
+		/// </summary>
 		PixelFormat pixelFormat;
+		/// <summary>
+		/// The filter for the Texture. How to get the color when between pixels.
+		/// </summary>
 		VkFilter filter;
+		/// <summary>
+		/// The address mode for the Texture. What to do when the texcoord is outside of [0.0, 1.0].
+		/// </summary>
 		VkSamplerAddressMode addressMode;
+		/// <summary>
+		/// The mipmap mode for the Texture. 
+		/// </summary>
 		VkSamplerMipmapMode mipmapMode;
+		/// <summary>
+		/// The format for the Texture. How the pixels are interpreted.
+		/// </summary>
 		VkFormat format;
 	};
-
-	std::string to_string(TextureBuilder::PixelFormat const value);
-	TextureBuilder::PixelFormat from_string_texture_builder_pixel_format(std::string const& value);
 }
 

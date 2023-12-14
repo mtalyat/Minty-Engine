@@ -7,6 +7,10 @@
 
 namespace minty
 {
+	/// <summary>
+	/// Holds a collection of data that is assigned an ID, and has an optional name (name).
+	/// </summary>
+	/// <typeparam name="T"></typeparam>
 	template <class T>
 	class Register : public Object
 	{
@@ -46,7 +50,7 @@ namespace minty
 		ID emplace(T const &obj);
 
 		/// <summary>
-		/// Creates a new named object within the Register with an alias.
+		/// Creates a new named object within the Register with an name.
 		/// </summary>
 		/// <param name="name">The name of the object.</param>
 		/// <param name="obj">The object.</param>
@@ -54,25 +58,43 @@ namespace minty
 		ID emplace(std::string const &name, T const &obj);
 
 		/// <summary>
-		/// Sets an alias for an ID in this Register.
+		/// Sets an name for an ID in this Register.
 		/// </summary>
-		/// <param name="name">The alias name.</param>
+		/// <param name="name">The name name.</param>
 		/// <param name="id">The ID of the object.</param>
-		void emplace_alias(std::string const &name, ID const id);
+		void emplace_name(std::string const &name, ID const id);
 
 		/// <summary>
-		/// Removes an alias for an ID in this Register.
+		/// Removes an name for an ID in this Register.
 		/// </summary>
-		/// <param name="name">The alias name.</param>
-		void erase_alias(std::string const &name);
+		/// <param name="name">The name name.</param>
+		void erase_name(std::string const &name);
 
+		/// <summary>
+		/// Erases the object with the given ID.
+		/// </summary>
+		/// <param name="id"></param>
 		void erase(ID const id);
 
+		/// <summary>
+		/// Erases the object with the given name.
+		/// </summary>
+		/// <param name="name"></param>
 		void erase(std::string const &name);
 
-		bool contains(std::string const &name) const;
-
+		/// <summary>
+		/// Checks if this Register has an object with the given ID.
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
 		bool contains(ID const id) const;
+
+		/// <summary>
+		/// Checks if this Register has an object with the given name.
+		/// </summary>
+		/// <param name="name"></param>
+		/// <returns></returns>
+		bool contains(std::string const &name) const;
 
 		/// <summary>
 		/// Gets the ID for the given name in this Register.
@@ -81,7 +103,19 @@ namespace minty
 		/// <returns>The ID of the object with the name.</returns>
 		ID get_id(std::string const name) const;
 
-		std::string const &get_alias(ID const id) const;
+		/// <summary>
+		/// Gets the name for the given ID in this Register.
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
+		std::string const &get_name(ID const id) const;
+
+		/// <summary>
+		/// Gets the object with the given ID.
+		/// </summary>
+		/// <param name="id">The ID of the object in this Register.</param>
+		/// <returns>A pointer to the object, or nullptr if the ID was invalid.</returns>
+		T& at(ID const id);
 
 		/// <summary>
 		/// Gets the object with the given ID.
@@ -90,7 +124,12 @@ namespace minty
 		/// <returns>A pointer to the object, or nullptr if the ID was invalid.</returns>
 		T const &at(ID const id) const;
 
-		T &at(ID const id);
+		/// <summary>
+		/// Gets the object with the given name.
+		/// </summary>
+		/// <param name="name">The name of the object in this Register.</param>
+		/// <returns>A pointer to the object.</returns>
+		T& at(std::string const& name);
 
 		/// <summary>
 		/// Gets the object with the given name.
@@ -98,8 +137,6 @@ namespace minty
 		/// <param name="name">The name of the object in this Register.</param>
 		/// <returns>A pointer to the object.</returns>
 		T const &at(std::string const &name) const;
-
-		T &at(std::string const &name);
 
 		/// <summary>
 		/// Gets the number of objects within this Register.
@@ -118,12 +155,28 @@ namespace minty
 		/// </summary>
 		void clear();
 
+		/// <summary>
+		/// Gets the vector containing all of this Register data.
+		/// </summary>
+		/// <returns></returns>
 		auto &data();
 
+		/// <summary>
+		/// Gets the vector containing all of this Register data.
+		/// </summary>
+		/// <returns></returns>
 		auto const &data() const;
 
+		/// <summary>
+		/// Resizes this Register.
+		/// </summary>
+		/// <param name="size"></param>
 		void resize(ID const size);
 
+		/// <summary>
+		/// Reserves this Register.
+		/// </summary>
+		/// <param name="size"></param>
 		void reserve(ID const size);
 
 		/// <summary>
@@ -133,23 +186,14 @@ namespace minty
 		void limit(ID const size);
 
 		auto begin();
-
 		auto end();
-
 		auto cbegin() const;
-
 		auto cend() const;
-
 		auto begin() const;
-
 		auto end() const;
-
-		auto &front();
-
-		auto &back();
-
-		auto const &front() const;
-
+		auto& front();
+		auto& back();
+		auto const& front() const;
 		auto const &back() const;
 	};
 
@@ -186,7 +230,7 @@ namespace minty
 		// add
 		_data.emplace(id, obj);
 
-		// add alias
+		// add name
 		if (!name.empty())
 		{
 			_names[id] = name;
@@ -198,14 +242,14 @@ namespace minty
 	}
 
 	template <class T>
-	void Register<T>::emplace_alias(std::string const &name, ID const id)
+	void Register<T>::emplace_name(std::string const &name, ID const id)
 	{
 		_lookup[name] = id;
 		_names[id] = name;
 	}
 
 	template <class T>
-	void Register<T>::erase_alias(std::string const &name)
+	void Register<T>::erase_name(std::string const &name)
 	{
 		ID id = _lookup.at(name);
 		_lookup.erase(name);
@@ -262,7 +306,7 @@ namespace minty
 	}
 
 	template <class T>
-	std::string const &Register<T>::get_alias(ID const id) const
+	std::string const &Register<T>::get_name(ID const id) const
 	{
 		auto const& found = _names.find(id);
 

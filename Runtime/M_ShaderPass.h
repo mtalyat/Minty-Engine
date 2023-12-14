@@ -11,7 +11,7 @@
 namespace minty
 {
 	class ShaderPass
-		: rendering::RendererObject
+		: rendering::RenderObject
 	{
 	private:
 		ID _shaderId;
@@ -21,17 +21,38 @@ namespace minty
 		rendering::DescriptorSet _descriptorSet;
 
 	public:
-		ShaderPass(rendering::ShaderPassBuilder const& builder, Renderer& renderer);
+		/// <summary>
+		/// Creates a new ShaderPass.
+		/// </summary>
+		/// <param name="builder"></param>
+		/// <param name="renderer"></param>
+		ShaderPass(rendering::ShaderPassBuilder const& builder, RenderEngine& renderer);
 
+		/// <summary>
+		/// Destroys all of the resources associated with this ShaderPass.
+		/// </summary>
 		void destroy();
 
+		/// <summary>
+		/// Gets the Shader ID for this ShaderPass.
+		/// </summary>
+		/// <returns></returns>
 		ID get_shader_id() const;
 
+		/// <summary>
+		/// Gets the pipeline for this ShaderPass.
+		/// </summary>
+		/// <returns></returns>
 		VkPipeline get_pipeline() const;
 
+		/// <summary>
+		/// Gets the descriptor set for this ShaderPass.
+		/// </summary>
+		/// <returns></returns>
 		rendering::DescriptorSet const& get_descriptor_set() const;
 
 	private:
+		// creates the graphics pipeline for this ShaderPass
 		void create_pipeline(rendering::ShaderPassBuilder const& builder);
 	};
 }

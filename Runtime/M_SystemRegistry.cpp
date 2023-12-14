@@ -220,9 +220,9 @@ namespace minty
 	void SystemRegistry::deserialize(Reader const& reader)
 	{
 		// read each one and set as we go, by name
-		Node const* node = reader.get_node();
+		Node const& node = reader.get_node();
 
-		for (auto const& pair : node->children)
+		for (auto const& pair : node.children)
 		{
 			for (auto const& child : pair.second)
 			{

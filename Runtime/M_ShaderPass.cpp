@@ -1,13 +1,13 @@
 #include "pch.h"
 #include "M_ShaderPass.h"
 
-#include "M_Renderer.h"
+#include "M_RenderEngine.h"
 
 using namespace minty;
 using namespace minty::rendering;
 
-minty::ShaderPass::ShaderPass(ShaderPassBuilder const& builder, Renderer& renderer)
-	: rendering::RendererObject(renderer)
+minty::ShaderPass::ShaderPass(ShaderPassBuilder const& builder, RenderEngine& renderer)
+	: rendering::RenderObject(renderer)
 	, _shaderId(builder.shaderId)
 	, _pipeline()
 	, _descriptorSet(renderer)

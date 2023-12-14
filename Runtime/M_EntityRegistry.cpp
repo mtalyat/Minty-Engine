@@ -7,7 +7,7 @@
 #include "M_NameComponent.h"
 #include "M_RelationshipComponent.h"
 #include "M_TransformComponent.h"
-#include "M_DirtyTag.h"
+#include "M_DirtyComponent.h"
 #include <sstream>
 #include <map>
 
@@ -21,8 +21,8 @@ minty::EntityRegistry::EntityRegistry()
 	, Object()
 {
 	// make it so whenever a transform is editied, it is marked as dirty
-	on_construct<TransformComponent>().connect<&EntityRegistry::emplace_or_replace<Dirty>>();
-	on_update<TransformComponent>().connect<&EntityRegistry::emplace_or_replace<Dirty>>();
+	on_construct<TransformComponent>().connect<&EntityRegistry::emplace_or_replace<DirtyComponent>>();
+	on_update<TransformComponent>().connect<&EntityRegistry::emplace_or_replace<DirtyComponent>>();
 }
 
 minty::EntityRegistry::~EntityRegistry()
@@ -186,11 +186,11 @@ void minty::EntityRegistry::deserialize(Reader const& reader)
 {
 	// read each entity, add name if it has one
 	
-	Node const* node = reader.get_node();
+	Node const& node = reader.get_node();
 	SerializationData* data = static_cast<SerializationData*>(reader.get_data());
 
 	// for each entity name given
-	for (auto const& pair : node->children)
+	for (auto const& pair : node.children)
 	{
 		// for each entity to be created with that name
 		for (auto const& entityNode : pair.second)
@@ -268,6 +268,11 @@ Node minty::EntityRegistry::serialize_entity(Entity const entity) const
 	Writer writer(node);
 	serialize_entity(writer, entity);
 	return node;
+}
+
+std::string minty::to_string(Entity const value)
+{
+	return std::to_string(static_cast<unsigned int>(value));
 }
 
 std::string minty::to_string(EntityRegistry const& value)

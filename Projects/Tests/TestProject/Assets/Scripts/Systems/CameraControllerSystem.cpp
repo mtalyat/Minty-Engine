@@ -19,7 +19,7 @@ void game::CameraControllerSystem::update()
         if (transform.local.rotation != quat)
         {
             transform.local.rotation = quat;
-            _registry->emplace_or_replace<Dirty>(entity);
+            _registry->emplace_or_replace<DirtyComponent>(entity);
         }
     }
 }

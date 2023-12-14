@@ -10,7 +10,14 @@
 
 namespace minty::error
 {
+	/// <summary>
+	/// The default error text.
+	/// </summary>
 	constexpr char const* ERROR_TEXT = "ERROR";
 
+	/// <summary>
+	/// Aborts the program with the given error message.
+	/// </summary>
+	/// <param name="message"></param>
 	void abort(std::string const& message);
 }

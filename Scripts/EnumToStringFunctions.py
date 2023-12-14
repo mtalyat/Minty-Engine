@@ -49,7 +49,7 @@ def main():
     
     PREFIX = find_prefix(values)
     pattern = fr'{PREFIX}(.*?)$'
-    values = [re.findall(pattern, value, re.DOTALL)[0] for value in values]
+    values = [re.findall(pattern, value, re.DOTALL)[0].upper() for value in values]
 
     # print found values
     print('name:', name)

@@ -7,7 +7,7 @@
 #include <filesystem>
 #include <array>
 
-namespace minty::assets
+namespace minty::asset
 {
 	constexpr char const* META_EXTENSION = ".meta";
 
@@ -17,10 +17,25 @@ namespace minty::assets
 	std::filesystem::path const BASE_PATH = std::filesystem::path("Assets/");
 #endif
 
+	/// <summary>
+	/// Checks if the asset at the given path exists.
+	/// </summary>
+	/// <param name="path"></param>
+	/// <returns></returns>
 	bool exists(std::string const& path);
 
+	/// <summary>
+	/// Checks if the meta file for the asset at the given path exists.
+	/// </summary>
+	/// <param name="path"></param>
+	/// <returns></returns>
 	bool exists_meta(std::string const& path);
 
+	/// <summary>
+	/// Returns the absolute path of the given asset path.
+	/// </summary>
+	/// <param name="path"></param>
+	/// <returns></returns>
 	std::string absolute(std::string const& path);
 
 	/// <summary>
@@ -37,9 +52,24 @@ namespace minty::assets
 	/// <returns>A node with the meta file contents.</returns>
 	Node load_meta(std::string const& path);
 
+	/// <summary>
+	/// Loads the given asset file into a vector of chars.
+	/// </summary>
+	/// <param name="path"></param>
+	/// <returns></returns>
 	std::vector<char> load_chars(std::string const& path);
 
+	/// <summary>
+	/// Loads the given asset file into a string.
+	/// </summary>
+	/// <param name="path"></param>
+	/// <returns></returns>
 	std::string load_text(std::string const& path);
 
+	/// <summary>
+	/// Loads the given asset file into a vector of line strings.
+	/// </summary>
+	/// <param name="path"></param>
+	/// <returns></returns>
 	std::vector<std::string> load_lines(std::string const& path);
 }

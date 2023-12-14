@@ -48,7 +48,7 @@ namespace minty
 		/// <summary>
 		/// Gets the title text of this Window.
 		/// </summary>
-		std::string get_title() const;
+		std::string const& get_title() const;
 
 		/// <summary>
 		/// Sets the cursor mode.

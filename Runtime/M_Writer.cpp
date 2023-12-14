@@ -10,9 +10,24 @@ minty::Writer::Writer(Node& node, void* const data)
 	, _data(data)
 {}
 
+Node const& minty::Writer::get_node() const
+{
+	return _node;
+}
+
+Node const* minty::Writer::get_node(std::string const& name) const
+{
+	return _node.find(name);
+}
+
 void* minty::Writer::get_data() const
 {
 	return _data;
+}
+
+bool minty::Writer::exists(std::string const& name) const
+{
+	return static_cast<bool>(_node.find(name));
 }
 
 void minty::Writer::write(std::string const& name)
@@ -54,6 +69,11 @@ void minty::Writer::write(std::string const& name, std::string const& value)
 }
 
 void minty::Writer::write(std::string const& name, int const value)
+{
+	write(name, std::to_string(value));
+}
+
+void minty::Writer::write(std::string const& name, unsigned int const value)
 {
 	write(name, std::to_string(value));
 }
@@ -176,6 +196,14 @@ void minty::Writer::write(std::string const& name, std::string const& value, std
 }
 
 void minty::Writer::write(std::string const& name, int const value, int const defaultValue)
+{
+	if (value != defaultValue)
+	{
+		write(name, std::to_string(value));
+	}
+}
+
+void minty::Writer::write(std::string const& name, unsigned int const value, unsigned int const defaultValue)
 {
 	if (value != defaultValue)
 	{

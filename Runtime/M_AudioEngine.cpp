@@ -6,10 +6,10 @@
 #include "M_AudioListenerComponent.h"
 
 #include "M_TransformComponent.h"
-#include "M_DirtyTag.h"
+#include "M_DirtyComponent.h"
 
 #include "M_File.h"
-#include "M_Assets.h"
+#include "M_Asset.h"
 #include "M_Console.h"
 #include "M_Scene.h"
 
@@ -42,7 +42,7 @@ void minty::AudioEngine::update()
 {
 	TransformComponent* transComp;
 
-	bool listenerDirty = _registry->all_of<Dirty>(_listener);
+	bool listenerDirty = _registry->all_of<DirtyComponent>(_listener);
 
 	// update listener data in engine
 	if (_listener != NULL_ENTITY && listenerDirty)
@@ -79,7 +79,7 @@ void minty::AudioEngine::update()
 		if (_engine.isValidVoiceHandle(pair.first))
 		{
 			// still playing, update 3d location if needed
-			if (pair.second != NULL_ENTITY && _registry->all_of<Dirty>(pair.second) && (transComp = _registry->try_get<TransformComponent>(pair.second)))
+			if (pair.second != NULL_ENTITY && _registry->all_of<DirtyComponent>(pair.second) && (transComp = _registry->try_get<TransformComponent>(pair.second)))
 			{
 				update_sound_data(sourceData, pair.second);
 
@@ -127,9 +127,9 @@ AudioHandle minty::AudioEngine::play(std::string const& name, float const volume
 
 AudioHandle minty::AudioEngine::play_spatial(Entity const entity, float const volume, bool const paused)
 {
-	MINTY_ASSERT(_registry->all_of<AudioSource>(entity), "The entity for play_spatial must have an AudioSource component.");
+	MINTY_ASSERT(_registry->all_of<AudioSourceComponent>(entity), "The entity for play_spatial must have an AudioSourceComponent component.");
 
-	AudioSource& source = _registry->get<AudioSource>(entity);
+	AudioSourceComponent& source = _registry->get<AudioSourceComponent>(entity);
 
 	if (source.clipId == ERROR_ID) return ERROR_AUDIO_HANDLE;
 
@@ -140,9 +140,9 @@ AudioHandle minty::AudioEngine::play_spatial(ID const id, Entity const entity, f
 {
 	if (id == ERROR_ID) return ERROR_AUDIO_HANDLE;
 
-	MINTY_ASSERT(_registry->all_of<AudioSource>(entity), "The entity for play_spatial must have an AudioSource component.");
+	MINTY_ASSERT(_registry->all_of<AudioSourceComponent>(entity), "The entity for play_spatial must have an AudioSourceComponent component.");
 
-	AudioSource& source = _registry->get<AudioSource>(entity);
+	AudioSourceComponent& source = _registry->get<AudioSourceComponent>(entity);
 
 	// entity tied to sound, so play in 3d space
 	SoundData data{};
@@ -231,6 +231,16 @@ ID minty::AudioEngine::load_clip(std::string const& path)
 	return load_clip(file::name(path), path);
 }
 
+bool minty::AudioEngine::contains(ID const id) const
+{
+	return _clips.contains(id);
+}
+
+bool minty::AudioEngine::contains(std::string const& name) const
+{
+	return _clips.contains(name);
+}
+
 AudioClip& minty::AudioEngine::at(ID const id)
 {
 	return _clips.at(id);
@@ -255,7 +265,7 @@ std::string const& minty::AudioEngine::get_name(ID const id) const
 {
 	if (id == ERROR_ID) return "";
 
-	return _clips.get_alias(id);
+	return _clips.get_name(id);
 }
 
 ID minty::AudioEngine::get_id(std::string const& name) const
@@ -285,11 +295,13 @@ void minty::AudioEngine::destroy_all_clips()
 
 void minty::AudioEngine::set_listener(Entity const entity)
 {
+	MINTY_ASSERT(_registry->all_of<AudioListenerComponent>(entity), "Listener Entity must have an AudioListenerComponent component.");
+
 	_listener = entity;
 	update_sound_data(_listenerData, entity);
 }
 
-void minty::AudioEngine::set_scene(Scene const* const scene, Entity const listener)
+void minty::AudioEngine::set_scene(Scene const* const scene)
 {
 	// update scene that is being used
 	_scene = scene;
@@ -305,17 +317,8 @@ void minty::AudioEngine::set_scene(Scene const* const scene, Entity const listen
 	// set registry to scene registry
 	_registry = _scene->get_entity_registry();
 
-	// update camera we are rendering from
-	if (listener == NULL_ENTITY)
-	{
-		// no listener provided, attempt to find first one in scene
-		set_listener(_scene->get_entity_registry()->find_by_type<AudioListener>());
-	}
-	else
-	{
-		// camera provided, use that
-		set_listener(listener);
-	}
+	// no listener provided, attempt to find first one in scene
+	set_listener(_scene->get_entity_registry()->find_by_type<AudioListenerComponent>());
 }
 
 void minty::AudioEngine::update_sound_data(SoundData& data, Entity const entity)

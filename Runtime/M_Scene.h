@@ -10,7 +10,7 @@ namespace minty
 	class Engine;
 
 	/// <summary>
-	/// 
+	/// Holds a collection of systems and entities that can interact with one another.
 	/// </summary>
 	class Scene :
 		public Object, public ISerializable
@@ -28,8 +28,10 @@ namespace minty
 
 		~Scene();
 
+		// move
 		Scene(Scene&& other) noexcept;
 
+		// move
 		Scene& operator=(Scene&& other) noexcept;
 
 		Engine* get_engine() const;
@@ -47,25 +49,28 @@ namespace minty
 		SystemRegistry* get_system_registry() const;
 
 		/// <summary>
-		/// Loads the Scene.
+		/// Loads this Scene.
 		/// </summary>
 		void load();
 
 		/// <summary>
-		/// Updates the Scene.
+		/// Updates this Scene.
 		/// </summary>
 		void update();
 
 		/// <summary>
-		/// Fixed updates the Scene.
+		/// Fixed updates this Scene.
 		/// </summary>
 		void fixed_update();
 
 		/// <summary>
-		/// Unloads the Scene.
+		/// Unloads this Scene.
 		/// </summary>
 		void unload();
 
+		/// <summary>
+		/// Finalized updating this Scene.
+		/// </summary>
 		void finalize();
 
 		void serialize(Writer& writer) const override;

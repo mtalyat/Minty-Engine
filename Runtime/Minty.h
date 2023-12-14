@@ -14,23 +14,29 @@ access to the entire engine without needing include each file.
 #include "glm.hpp"
 
 // ASSETS
-#include "M_Assets.h"
+#include "M_Asset.h"
 #include "M_File.h"
-#include "M_Resources.h"
+#include "M_Resource.h"
 
-// BASIC
-#include "M_Basic.h"
-#include "M_Basic_Vertex.h"
+// AUDIO
+#include "M_Audio.h"
+#include "M_AudioClip.h"
+#include "M_AudioEngine.h"
+
+// BUILTIN
+#include "M_Builtin.h"
 
 // COMPONENTS
 #include "M_Component.h"
 
+#include "M_AudioListenerComponent.h"
+#include "M_AudioSourceComponent.h"
 #include "M_CameraComponent.h"
-#include "M_DirtyTag.h"
+#include "M_DirtyComponent.h"
 #include "M_MeshComponent.h"
 #include "M_NameComponent.h"
 #include "M_RelationshipComponent.h"
-#include "M_RenderableTag.h"
+#include "M_RenderableComponent.h"
 #include "M_SpriteComponent.h"
 #include "M_TransformComponent.h"
 #include "M_UITransformComponent.h"
@@ -49,7 +55,7 @@ access to the entire engine without needing include each file.
 #include "M_Material.h"
 #include "M_MaterialTemplate.h"
 #include "M_Mesh.h"
-#include "M_Renderer.h"
+#include "M_RenderEngine.h"
 #include "M_Rendering_Buffer.h"
 #include "M_Rendering_DescriptorSet.h"
 #include "M_Rendering_DrawCallObjectInfo.h"

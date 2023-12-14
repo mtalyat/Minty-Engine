@@ -1,9 +1,9 @@
 #include "pch.h"
 #include "M_Texture.h"
 
-#include "M_Renderer.h"
+#include "M_RenderEngine.h"
 #include "M_Rendering_TextureBuilder.h"
-#include "M_Assets.h"
+#include "M_Asset.h"
 #include "M_File.h"
 #include "M_Error.h"
 #include <format>
@@ -14,8 +14,8 @@
 using namespace minty;
 using namespace minty::rendering;
 
-Texture::Texture(rendering::TextureBuilder const& builder, Renderer& renderer)
-	: RendererObject::RendererObject(renderer)
+Texture::Texture(rendering::TextureBuilder const& builder, RenderEngine& renderer)
+	: RenderObject::RenderObject(renderer)
 	, _width(builder.width)
 	, _height(builder.height)
 	, _format()
@@ -33,13 +33,13 @@ Texture::Texture(rendering::TextureBuilder const& builder, Renderer& renderer)
 
 	if (fromFile)
 	{
-		if (!assets::exists(path))
+		if (!asset::exists(path))
 		{
 			console::error(std::format("Cannot load texture. File not found at: {}", path));
 			return;
 		}
 
-		if (builder.pixelFormat == TextureBuilder::PixelFormat::None)
+		if (builder.pixelFormat == PixelFormat::None)
 		{
 			console::error("Attempting to load texture with a pixelFormat of None.");
 			return;
@@ -48,7 +48,7 @@ Texture::Texture(rendering::TextureBuilder const& builder, Renderer& renderer)
 		// get data from file: pixels, width, height, color channels
 		int channels;
 
-		std::string absPath = assets::absolute(path);
+		std::string absPath = asset::absolute(path);
 		pixels = stbi_load(absPath.c_str(), &_width, &_height, &channels, static_cast<int>(builder.pixelFormat));
 
 		// if no pixels, error
@@ -97,14 +97,6 @@ Texture::Texture(rendering::TextureBuilder const& builder, Renderer& renderer)
 	void* mappedData = renderer.map_buffer(stagingBufferId);
 	memcpy(mappedData, pixels, static_cast<size_t>(imageSize));
 	renderer.unmap_buffer(stagingBufferId);
-	//void* data;
-	//vkMapMemory(device, stagingMemory, 0, imageSize, 0, &data);
-
-	//// copy data over
-	//memcpy(data, pixels, static_cast<size_t>(imageSize));
-
-	//// no longer need access to the data
-	//vkUnmapMemory(device, stagingMemory);
 
 	// done with the pixels from file
 	if (fromFile)
@@ -133,8 +125,6 @@ Texture::Texture(rendering::TextureBuilder const& builder, Renderer& renderer)
 
 	// cleanup staging buffer, no longer needed
 	renderer.destroy_buffer(stagingBufferId);
-	//vkDestroyBuffer(device, stagingBuffer, nullptr);
-	//vkFreeMemory(device, stagingMemory, nullptr);
 
 	// create view, so the shaders can access the image data
 	_view = renderer.create_image_view(_image, _format, VK_IMAGE_ASPECT_COLOR_BIT);
@@ -145,8 +135,6 @@ Texture::Texture(rendering::TextureBuilder const& builder, Renderer& renderer)
 	samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
 	samplerInfo.magFilter = static_cast<VkFilter>(builder.filter);
 	samplerInfo.minFilter = static_cast<VkFilter>(builder.filter);
-	//samplerInfo.magFilter = VK_FILTER_LINEAR;
-	//samplerInfo.minFilter = VK_FILTER_LINEAR;
 
 	// how to draw if size is too small or big, etc.
 	samplerInfo.addressModeU = static_cast<VkSamplerAddressMode>(builder.addressMode);

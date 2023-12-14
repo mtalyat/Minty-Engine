@@ -12,6 +12,9 @@ namespace minty
 {
 	class ISerializable;
 
+	/// <summary>
+	/// Reads data from a serialized Node.
+	/// </summary>
 	class Reader
 		: public Object
 	{
@@ -20,13 +23,18 @@ namespace minty
 		void* _data;
 
 	public:
+		/// <summary>
+		/// Creates a new Reader that will read from the given Node.
+		/// </summary>
+		/// <param name="node">The Node to read from.</param>
+		/// <param name="data">The user data that can be referenced while reading.</param>
 		Reader(Node const& node, void* const data = nullptr);
 
 		/// <summary>
 		/// Gets the root node that this Reader is using.
 		/// </summary>
 		/// <returns>A pointer to the root node.</returns>
-		Node const* get_node() const;
+		Node const& get_node() const;
 
 		/// <summary>
 		/// Gets the child node with the given name from the root node.
@@ -41,13 +49,22 @@ namespace minty
 		/// <returns>The extra data as a void pointer.</returns>
 		void* get_data() const;
 
+		/// <summary>
+		/// Checks if a child with the given name exists.
+		/// </summary>
+		/// <param name="name">The name to check.</param>
+		/// <returns>True if a child with the given name exists.</returns>
 		bool exists(std::string const& name) const;
+
+#pragma region Reading
 
 		void read_object(std::string const& name, ISerializable* const value) const;
 
 		std::string read_string(std::string const& name, std::string const& defaultValue = "") const;
 
 		int read_int(std::string const& name, int const defaultValue = 0) const;
+
+		unsigned int read_uint(std::string const& name, unsigned int const defaultValue = 0) const;
 
 		ID read_id(std::string const& name, ID const defaultValue = ERROR_ID) const;
 
@@ -70,6 +87,8 @@ namespace minty
 		Vector4Int read_vector4int(std::string const& name, Vector4Int const& defaultValue = Vector4Int()) const;
 
 		Quaternion read_quaternion(std::string const& name, Quaternion const& defaultValue = Quaternion()) const;
+
+#pragma endregion
 
 	public:
 		friend std::string to_string(Reader const& value);

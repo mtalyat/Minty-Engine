@@ -70,18 +70,18 @@ namespace minty
 
 	namespace rendering
 	{
-		struct RendererBuilder;
+		struct RenderEngineBuilder;
 		struct TextureBuilder;
 	}
 
 	/// <summary>
 	/// Handles rendering for the game engine.
 	/// </summary>
-	class Renderer
+	class RenderEngine
 		: public Object
 	{
 	private:
-		rendering::RendererBuilder const* _builder;
+		rendering::RenderEngineBuilder const* _builder;
 		Window* _window;
 
 		// assets
@@ -100,7 +100,7 @@ namespace minty
 		Viewport _view;
 		Color _backgroundColor;
 		bool _initialized;
-	protected:
+
 		Scene const* _scene = nullptr;
 		EntityRegistry* _registry = nullptr;
 		Entity _mainCamera = NULL_ENTITY;
@@ -110,33 +110,36 @@ namespace minty
 		VkInstance instance;
 		VkPhysicalDevice _physicalDevice = nullptr;
 
-		VkDebugUtilsMessengerEXT debugMessenger;
-		VkQueue graphicsQueue;
-		VkSurfaceKHR surface;
-		VkQueue presentQueue;
-		VkSwapchainKHR swapChain;
-		std::vector<VkImage> swapChainImages;
-		VkFormat swapChainImageFormat;
-		VkExtent2D swapChainExtent;
-		std::vector<VkImageView> swapChainImageViews;
+		VkDebugUtilsMessengerEXT _debugMessenger;
+		VkQueue _graphicsQueue;
+		VkSurfaceKHR _surface;
+		VkQueue _presentQueue;
+		VkSwapchainKHR _swapChain;
+		std::vector<VkImage> _swapChainImages;
+		VkFormat _swapChainImageFormat;
+		VkExtent2D _swapChainExtent;
+		std::vector<VkImageView> _swapChainImageViews;
+		std::vector<VkFramebuffer> _swapChainFramebuffers;
 		VkRenderPass _renderPass;
-		std::vector<VkFramebuffer> swapChainFramebuffers;
-		VkCommandPool commandPool;
-		std::vector<VkCommandBuffer> commandBuffers;
-		QueueFamilyIndices queueFamilyIndices;
-		std::vector<VkSemaphore> imageAvailableSemaphores;
-		std::vector<VkSemaphore> renderFinishedSemaphores;
-		std::vector<VkFence> inFlightFences;
-		bool framebufferResized = false;
+		VkCommandPool _commandPool;
+		std::vector<VkCommandBuffer> _commandBuffers;
+		QueueFamilyIndices _queueFamilyIndices;
+		std::vector<VkSemaphore> _imageAvailableSemaphores;
+		std::vector<VkSemaphore> _renderFinishedSemaphores;
+		std::vector<VkFence> _inFlightFences;
+		bool _framebufferResized = false;
 		uint32_t _frame;
 
-		VkImage depthImage;
-		VkDeviceMemory depthImageMemory;
-		VkImageView depthImageView;
+		VkImage _depthImage;
+		VkDeviceMemory _depthImageMemory;
+		VkImageView _depthImageView;
 	public:
-		Renderer(Window* const window);
+		/// <summary>
+		/// Creates a new RenderEngine that will render to the given Window.
+		/// </summary>
+		RenderEngine(Window* const window);
 
-		~Renderer();
+		~RenderEngine();
 
 		/// <summary>
 		/// Draws a frame to the screen.
@@ -149,32 +152,36 @@ namespace minty
 		/// <returns>True if the engine is still running.</returns>
 		bool is_running() const;
 
+		/// <summary>
+		/// Checks if this RenderEngine has been initialized.
+		/// </summary>
+		/// <returns>True if the engine is initialized.</returns>
 		bool is_initialized() const;
 
 #pragma region Get
 
 		/// <summary>
-		/// Gets the device that this Renderer is rendering to.
+		/// Gets the device that this RenderEngine is rendering to.
 		/// </summary>
 		/// <returns></returns>
 		VkDevice get_device() const;
 
 		/// <summary>
-		/// Gets the physical graphics device that this Renderer is using to render.
+		/// Gets the physical graphics device that this RenderEngine is using to render.
 		/// </summary>
 		/// <returns></returns>
 		VkPhysicalDevice get_physical_device() const;
 
+		/// <summary>
+		/// Gets the render pass that this RenderEngine is using.
+		/// </summary>
+		/// <returns></returns>
 		VkRenderPass get_render_pass() const;
 
-		uint32_t get_shader_count() const;
-
-		uint32_t get_texture_count() const;
-
-		uint32_t get_sprite_count() const;
-
-		uint32_t get_material_count() const;
-
+		/// <summary>
+		/// Gets the current frame index.
+		/// </summary>
+		/// <returns>The current frame index.</returns>
 		uint32_t get_frame() const;
 
 #pragma endregion
@@ -183,9 +190,9 @@ namespace minty
 
 	public:
 		/// <summary>
-		/// Initializes the Renderer.
+		/// Initializes the RenderEngine.
 		/// </summary>
-		void init(rendering::RendererBuilder const& builder);
+		void init(rendering::RenderEngineBuilder const& builder);
 
 	private:
 		/// <summary>
@@ -259,7 +266,7 @@ namespace minty
 
 	public:
 		/// <summary>
-		/// Updates the Renderer.
+		/// Updates the Renderable components within the Scene.
 		/// </summary>
 		void update();
 
@@ -273,9 +280,19 @@ namespace minty
 #pragma region Binding
 
 	private:
+		/// <summary>
+		/// Rebinds the currently bound shader and material IDs.
+		/// </summary>
+		/// <param name="commandBuffer"></param>
 		void bind(VkCommandBuffer const commandBuffer);
 
-		void bind(VkCommandBuffer const commandBuffer, ID const materialId, uint32_t const pass = 0);
+		/// <summary>
+		/// Binds the Material using its given material ID.
+		/// </summary>
+		/// <param name="commandBuffer">The buffer to use to bind.</param>
+		/// <param name="materialId">The ID of the Material to bind.</param>
+		/// <param name="pass">The ShaderPass index.</param>
+		void bind(VkCommandBuffer const commandBuffer, ID const materialId, uint32_t const pass = 0); // TODO: easier way to select shader pass?
 
 #pragma endregion
 
@@ -298,13 +315,13 @@ namespace minty
 
 	public:
 		/// <summary>
-		/// Sets the Camera that this Renderer is rendering from.
+		/// Sets the Camera that this RenderEngine is rendering from.
 		/// </summary>
 		/// <param name="entity">The entity to render from.</param>
 		void set_main_camera(Entity const entity);
 
 		/// <summary>
-		/// Sets the Scene that this Renderer is rendering.
+		/// Sets the Scene that this RenderEngine is rendering.
 		/// </summary>
 		/// <param name="scene">The Scene to render.</param>
 		/// <param name="camera">The entity to render from.</param>
@@ -326,103 +343,337 @@ namespace minty
 #pragma region Assets
 
 	public:
+		/// <summary>
+		/// Creates a new Texture using the given builder, then returns its ID.
+		/// </summary>
+		/// <param name="builder">The rendering builder to use.</param>
+		/// <returns>The ID of the newly created asset.</returns>
 		ID create_texture(rendering::TextureBuilder const& builder);
 
+		/// <summary>
+		/// Creates a new Shader using the given builder, then returns its ID.
+		/// </summary>
+		/// <param name="builder">The rendering builder to use.</param>
+		/// <returns>The ID of the newly created asset.</returns>
 		ID create_shader(rendering::ShaderBuilder const& builder);
 
+		/// <summary>
+		/// Creates a new ShaderPass using the given builder, then returns its ID.
+		/// </summary>
+		/// <param name="builder">The rendering builder to use.</param>
+		/// <returns>The ID of the newly created asset.</returns>
 		ID create_shader_pass(rendering::ShaderPassBuilder const& builder);
 
+		/// <summary>
+		/// Creates a new MaterialTemplate using the given builder, then returns its ID.
+		/// </summary>
+		/// <param name="builder">The rendering builder to use.</param>
+		/// <returns>The ID of the newly created asset.</returns>
 		ID create_material_template(rendering::MaterialTemplateBuilder const& builder);
 
+		/// <summary>
+		/// Creates a new Material using the given builder, then returns its ID.
+		/// </summary>
+		/// <param name="builder">The rendering builder to use.</param>
+		/// <returns>The ID of the newly created asset.</returns>
 		ID create_material(rendering::MaterialBuilder const& builder);
 
+		/// <summary>
+		/// Creates a new Mesh using the given builder, then returns its ID.
+		/// </summary>
+		/// <param name="builder">The rendering builder to use.</param>
+		/// <returns>The ID of the newly created asset.</returns>
 		ID create_mesh();
 
+		/// <summary>
+		/// Finds a loaded mesh with the given name, or creates an empty Mesh with the given name if no Mesh exists.
+		/// </summary>
+		/// <param name="name">The name of the Mesh to get or create.</param>
+		/// <returns>The ID of the existing Mesh, or the ID of the new Mesh.</returns>
 		ID get_or_create_mesh(std::string const& name);
 
+		/// <summary>
+		/// Finds a loaded mesh with the given type, or creates a mesh of that type if no Mesh exists.
+		/// </summary>
+		/// <param name="name">The type of the Mesh to get or create.</param>
+		/// <returns>The ID of the existing Mesh, or the ID of the new Mesh.</returns>
 		ID get_or_create_mesh(MeshType const type);
 
+		/// <summary>
+		/// Finds the ID of the loaded Texture with the given name.
+		/// </summary>
+		/// <param name="name">The name of the asset to find.</param>
+		/// <returns>The ID of the asset, or ERROR_ID if none was found with the given name.</returns>
 		ID find_texture(std::string const& name);
 
+		/// <summary>
+		/// Finds the ID of the loaded Shader with the given name.
+		/// </summary>
+		/// <param name="name">The name of the asset to find.</param>
+		/// <returns>The ID of the asset, or ERROR_ID if none was found with the given name.</returns>
 		ID find_shader(std::string const& name);
 
+		/// <summary>
+		/// Finds the ID of the loaded ShaderPass with the given name.
+		/// </summary>
+		/// <param name="name">The name of the asset to find.</param>
+		/// <returns>The ID of the asset, or ERROR_ID if none was found with the given name.</returns>
 		ID find_shader_pass(std::string const& name);
 
+		/// <summary>
+		/// Finds the ID of the loaded MaterialTemplate with the given name.
+		/// </summary>
+		/// <param name="name">The name of the asset to find.</param>
+		/// <returns>The ID of the asset, or ERROR_ID if none was found with the given name.</returns>
 		ID find_material_template(std::string const& name);
 
+		/// <summary>
+		/// Finds the ID of the loaded Material with the given name.
+		/// </summary>
+		/// <param name="name">The name of the asset to find.</param>
+		/// <returns>The ID of the asset, or ERROR_ID if none was found with the given name.</returns>
 		ID find_material(std::string const& name);
 
+		/// <summary>
+		/// Finds the ID of the loaded Mesh with the given name.
+		/// </summary>
+		/// <param name="name">The name of the asset to find.</param>
+		/// <returns>The ID of the asset, or ERROR_ID if none was found with the given name.</returns>
 		ID find_mesh(std::string const& name);
 
+		/// <summary>
+		/// Loads the Texture at the given asset path into this RenderEngine.
+		/// </summary>
+		/// <param name="path">The path relative to the Assets folder.</param>
+		/// <returns>The ID of the newly loaded asset.</returns>
 		ID load_texture(std::string const& path);
 
+		/// <summary>
+		/// Loads the Shader at the given asset path into this RenderEngine.
+		/// </summary>
+		/// <param name="path">The path relative to the Assets folder.</param>
+		/// <returns>The ID of the newly loaded asset.</returns>
 		ID load_shader(std::string const& path);
 
+		/// <summary>
+		/// Loads the ShaderPass at the given asset path into this RenderEngine.
+		/// </summary>
+		/// <param name="path">The path relative to the Assets folder.</param>
+		/// <returns>The ID of the newly loaded asset.</returns>
 		ID load_shader_pass(std::string const& path);
 
+		/// <summary>
+		/// Loads the MaterialTemplate at the given asset path into this RenderEngine.
+		/// </summary>
+		/// <param name="path">The path relative to the Assets folder.</param>
+		/// <returns>The ID of the newly loaded asset.</returns>
 		ID load_material_template(std::string const& path);
 
+		/// <summary>
+		/// Loads the Material at the given asset path into this RenderEngine.
+		/// </summary>
+		/// <param name="path">The path relative to the Assets folder.</param>
+		/// <returns>The ID of the newly loaded asset.</returns>
 		ID load_material(std::string const& path);
 
+		/// <summary>
+		/// Loads the Mesh at the given asset path into this RenderEngine.
+		/// </summary>
+		/// <param name="path">The path relative to the Assets folder.</param>
+		/// <returns>The ID of the newly loaded asset.</returns>
 		ID load_mesh(std::string const& path);
 
+		/// <summary>
+		/// Destroys the Texture with the given ID.
+		/// </summary>
+		/// <param name="id">The ID of the asset to destroy.</param>
 		void destroy_texture(ID const id);
 
+		/// <summary>
+		/// Destroys the Shader with the given ID.
+		/// </summary>
+		/// <param name="id">The ID of the asset to destroy.</param>
 		void destroy_shader(ID const id);
 
+		/// <summary>
+		/// Destroys the ShaderPass with the given ID.
+		/// </summary>
+		/// <param name="id">The ID of the asset to destroy.</param>
 		void destroy_shader_pass(ID const id);
-		
+
+		/// <summary>
+		/// Destroys the MaterialTemplate with the given ID.
+		/// </summary>
+		/// <param name="id">The ID of the asset to destroy.</param>
 		void destroy_material_template(ID const id);
-		
+
+		/// <summary>
+		/// Destroys the Material with the given ID.
+		/// </summary>
+		/// <param name="id">The ID of the asset to destroy.</param>
 		void destroy_material(ID const id);
-		
+
+		/// <summary>
+		/// Destroys the Mesh with the given ID.
+		/// </summary>
+		/// <param name="id">The ID of the asset to destroy.</param>
 		void destroy_mesh(ID const id);
 
+		/// <summary>
+		/// Destroys the all of the assets.
+		/// </summary>
 		void destroy_assets();
 	private:
+		/// <summary>
+		/// Checks if the asset at the given path can be loaded.
+		/// </summary>
+		/// <param name="path">The path to the asset.</param>
+		/// <param name="requiresMeta">If true, the meta file will also be checked.</param>
+		/// <returns>0 if the asset can be loaded, 1 if there was a problem with the main file, or 2 if there was a problem with the meta file.</returns>
 		int check_asset(std::string const& path, bool const requiresMeta) const;
 
+		// loads a .obj file
 		void load_mesh_obj(std::string const& path, ID const meshId);
 
 	public:
+		/// <summary>
+		/// Gets the Texture with the given ID.
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
 		Texture& get_texture(ID const id);
 
+		/// <summary>
+		/// Gets the Texture with the given ID.
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
 		Texture const& get_texture(ID const id) const;
 
+		/// <summary>
+		/// Gets the Sprite with the given ID.
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
 		Sprite& get_sprite(ID const id);
 
+		/// <summary>
+		/// Gets the Sprite with the given ID.
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
 		Sprite const& get_sprite(ID const id) const;
 
+		/// <summary>
+		/// Gets the Shader with the given ID.
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
 		Shader& get_shader(ID const id);
 
+		/// <summary>
+		/// Gets the Shader with the given ID.
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
 		Shader const& get_shader(ID const id) const;
 
+		/// <summary>
+		/// Gets the Shader with the given Material ID.
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
 		Shader& get_shader_from_material_id(ID const id);
 
+		/// <summary>
+		/// Gets the Shader with the given Material ID.
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
 		Shader const& get_shader_from_material_id(ID const id) const;
 
+		/// <summary>
+		/// Gets the ShaderPass with the given ID.
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
 		ShaderPass& get_shader_pass(ID const id);
 
+		/// <summary>
+		/// Gets the ShaderPass with the given ID.
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
 		ShaderPass const& get_shader_pass(ID const id) const;
 
+		/// <summary>
+		/// Gets the ShaderPass with the given Material ID.
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
 		ShaderPass& get_shader_pass_from_material_id(ID const id);
 
+		/// <summary>
+		/// Gets the ShaderPass with the given Material ID.
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
 		ShaderPass const& get_shader_pass_from_material_id(ID const id) const;
 
+		/// <summary>
+		/// Gets the MaterialTemplate with the given ID.
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
 		MaterialTemplate& get_material_template(ID const id);
 
+		/// <summary>
+		/// Gets the MaterialTemplate with the given ID.
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
 		MaterialTemplate const& get_material_template(ID const id) const;
 
+		/// <summary>
+		/// Gets the MaterialTemplate with the given Material ID.
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
 		MaterialTemplate& get_material_template_from_material_id(ID const id);
 
+		/// <summary>
+		/// Gets the MaterialTemplate with the given Material ID.
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
 		MaterialTemplate const& get_material_template_from_material_id(ID const id) const;
 
+		/// <summary>
+		/// Gets the Material with the given ID.
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
 		Material& get_material(ID const id);
 
+		/// <summary>
+		/// Gets the Material with the given ID.
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
 		Material const& get_material(ID const id) const;
 
+		/// <summary>
+		/// Gets the Mesh with the given ID.
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
 		Mesh& get_mesh(ID const id);
 
+		/// <summary>
+		/// Gets the Mesh with the given ID.
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
 		Mesh const& get_mesh(ID const id) const;
 
 #pragma endregion
@@ -436,29 +687,82 @@ namespace minty
 		/// <param name="size">The size of the buffer.</param>
 		/// <param name="usage">How the buffer will be used.</param>
 		/// <param name="properties">The memory properties.</param>
+		/// <returns>The ID of the new buffer.</returns>
 		ID create_buffer(VkDeviceSize const size, VkBufferUsageFlags const usage, VkMemoryPropertyFlags const properties);
 
+		/// <summary>
+		/// Creates a uniform buffer.
+		/// </summary>
+		/// <param name="size">The size of the buffer.</param>
+		/// <returns>The ID of the new buffer.</returns>
 		ID create_buffer_uniform(VkDeviceSize const size);
 
+		/// <summary>
+		/// Destroys the buffer with the given ID.
+		/// </summary>
+		/// <param name="id"></param>
 		void destroy_buffer(ID const id);
 
+		/// <summary>
+		/// Maps the buffer data to a pointer in memory.
+		/// </summary>
+		/// <param name="id">The ID of the buffer to map.</param>
+		/// <returns>A pointer to the buffer data in memory.</returns>
 		void* map_buffer(ID const id) const;
 
+		/// <summary>
+		/// Unmaps the buffer data from memory. The invalidates the pointer given from map_buffer for the same ID.
+		/// </summary>
+		/// <param name="id">The ID of the buffer to unmap.</param>
 		void unmap_buffer(ID const id) const;
 
+		/// <summary>
+		/// Sets the data for the buffer with the given ID.
+		/// </summary>
+		/// <param name="id">The ID of the buffer to modify.</param>
+		/// <param name="data">The data to set to the buffer.</param>
 		void set_buffer(ID const id, void* const data);
 
+		/// <summary>
+		/// Sets the data for the buffer with the given ID.
+		/// </summary>
+		/// <param name="id">The ID of the buffer to modify.</param>
+		/// <param name="data">The data to set to the buffer.</param>
+		/// <param name="size">The size of the data in bytes.</param>
+		/// <param name="offset">The offset of the data within the buffer in bytes.</param>
 		void set_buffer(ID const id, void* const data, VkDeviceSize const size, VkDeviceSize const offset = 0);
 
+		/// <summary>
+		/// Gets the buffer with the given ID.
+		/// </summary>
+		/// <param name="id">The ID of the buffer.</param>
+		/// <returns>The buffer with the givne ID.</returns>
 		VkBuffer get_buffer(ID const id) const;
 
-		void get_buffer_data(ID const id, void* const out) const;
+		/// <summary>
+		/// Gets the data of the buffer with the given ID and stores it within the out pointer.
+		/// </summary>
+		/// <param name="id">The ID of the buffer to get the data from.</param>
+		/// <param name="out">The pointer to the location of the data to be set.</param>
+		void get_buffer_data(ID const id, void* const out) const; // TODO: test method
 
+		/// <summary>
+		/// Gets the size of the buffer with the given ID.
+		/// </summary>
+		/// <param name="id">The ID of the buffer to get the size of.</param>
+		/// <returns>The size of the buffer in bytes.</returns>
 		VkDeviceSize get_buffer_size(ID const id) const;
 
+		/// <summary>
+		/// Copies the buffer with the srcId to the buffer with the dstId.
+		/// </summary>
+		/// <param name="srcId">The ID of the source buffer.</param>
+		/// <param name="dstId">The ID of the destination buffer.</param>
+		/// <param name="size">The number of bytes to copy.</param>
 		void copy_buffer(ID const srcId, ID const dstId, VkDeviceSize const size);
 
 	private:
+		// destroys the buffer data directly
 		void destroy_buffer(rendering::Buffer const& buffer);
 
 #pragma endregion
@@ -518,8 +822,18 @@ namespace minty
 		/// <returns>The created image view.</returns>
 		VkImageView create_image_view(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags);
 
+		/// <summary>
+		/// Loads the shader module from the asset path.
+		/// </summary>
+		/// <param name="path">The path to the shader code (.spv).</param>
+		/// <returns>The shader module.</returns>
 		VkShaderModule load_shader_module(std::string const& path) const;
 
+		/// <summary>
+		/// Creates a shader module from the given code.
+		/// </summary>
+		/// <param name="code">The code loaded from a .spv file.</param>
+		/// <returns>The shader module.</returns>
 		VkShaderModule create_shader_module(std::vector<char> const& code) const;
 
 #pragma endregion
@@ -657,6 +971,6 @@ namespace minty
 
 	public:
 
-		friend std::string to_string(Renderer const& value);
+		friend std::string to_string(RenderEngine const& value);
 	};
 }

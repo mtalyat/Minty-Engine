@@ -10,7 +10,7 @@
 namespace minty
 {
 	/// <summary>
-	/// Holds and managers data relevant to systems. Can hold multiple types of systems.
+	/// Holds and managers data relevant to systems.
 	/// </summary>
 	class SystemRegistry
 		: public Object, public ISerializable
@@ -39,6 +39,7 @@ namespace minty
 		// move
 		SystemRegistry(SystemRegistry&& other) noexcept;
 
+		// move
 		SystemRegistry& operator=(SystemRegistry&& other) noexcept;
 
 	private:

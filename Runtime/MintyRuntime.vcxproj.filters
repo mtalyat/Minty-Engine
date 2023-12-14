@@ -159,9 +159,6 @@
     <ClInclude Include="M_Rendering_RendererBuilder.h">
       <Filter>Header Files\Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="M_Renderer.h">
-      <Filter>Header Files\Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="M_Rendering_TextureBuilder.h">
       <Filter>Header Files\Rendering</Filter>
     </ClInclude>
@@ -200,12 +197,6 @@
     </ClInclude>
     <ClInclude Include="glm.hpp">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="M_Basic_Vertex.h">
-      <Filter>Header Files\Basic</Filter>
-    </ClInclude>
-    <ClInclude Include="M_Basic.h">
-      <Filter>Header Files\Basic</Filter>
     </ClInclude>
     <ClInclude Include="M_Rendering_Object.h">
       <Filter>Header Files\Rendering</Filter>
@@ -246,12 +237,6 @@
     <ClInclude Include="M_Transform.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="M_DirtyTag.h">
-      <Filter>Header Files\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="M_Encoding.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -265,9 +250,6 @@
       <Filter>Header Files\Systems</Filter>
     </ClInclude>
     <ClInclude Include="M_UITransformComponent.h">
-      <Filter>Header Files\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="M_RenderableTag.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
     <ClInclude Include="M_ShaderPass.h">
@@ -297,17 +279,8 @@
     <ClInclude Include="M_Dynamic.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="M_Builtin_GlobalData.h">
-      <Filter>Header Files\Builtin</Filter>
-    </ClInclude>
     <ClInclude Include="M_SerializationData.h">
       <Filter>Header Files\Serialization</Filter>
-    </ClInclude>
-    <ClInclude Include="M_Resources.h">
-      <Filter>Header Files\Assets</Filter>
-    </ClInclude>
-    <ClInclude Include="M_Assets.h">
-      <Filter>Header Files\Assets</Filter>
     </ClInclude>
     <ClInclude Include="M_File.h">
       <Filter>Header Files\Assets</Filter>
@@ -444,6 +417,27 @@
     <ClInclude Include="M_AudioListenerComponent.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
+    <ClInclude Include="M_Asset.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Builtin.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Resource.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="M_RenderEngine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="M_DirtyComponent.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="M_RenderableComponent.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Rendering_PixelFormat.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -453,9 +447,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_Runtime.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="M_Renderer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_Engine.cpp">
@@ -548,16 +539,10 @@
     <ClCompile Include="M_Info.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="M_Rendering_TextureBuilder.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="M_Rendering_ShaderBuilder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_Rendering_Object.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="M_Basic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_Error.cpp">
@@ -590,16 +575,13 @@
     <ClCompile Include="M_RelationshipComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="M_RenderableTag.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="M_TransformComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_Transform.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="M_DirtyTag.cpp">
+    <ClCompile Include="M_DirtyComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_Encoding.cpp">
@@ -623,19 +605,10 @@
     <ClCompile Include="M_Material.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="M_Rendering_Buffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="M_Rendering_DescriptorSet.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_Dynamic.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="M_Resources.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="M_Assets.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="vulkan.cpp">
@@ -723,6 +696,21 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_AudioSourceComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_Asset.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_AudioListenerComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_RenderableComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_RenderEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_Rendering_PixelFormat.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

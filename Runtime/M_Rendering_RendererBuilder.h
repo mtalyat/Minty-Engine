@@ -15,15 +15,15 @@
 
 namespace minty
 {
-	class Renderer;
+	class RenderEngine;
 }
 
 namespace minty::rendering
 {
 	/// <summary>
-	/// Allows for the easiest creation of a renderer, by loading with defaults, and having many functions for configuration.
+	/// Holds data to create a new RenderEngine.
 	/// </summary>
-	struct RendererBuilder
+	struct RenderEngineBuilder
 	{
 		Info const* info;
 	};

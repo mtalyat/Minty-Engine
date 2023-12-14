@@ -5,7 +5,7 @@
 
 #include "M_TransformComponent.h"
 #include "M_RelationshipComponent.h"
-#include "M_DirtyTag.h"
+#include "M_DirtyComponent.h"
 
 using namespace minty;
 
@@ -122,7 +122,7 @@ void minty::Scene::update()
 		});
 
 	// update group
-	for (auto&& [entity, dirty, transform] : _entities->view<Dirty const, TransformComponent>().each())
+	for (auto&& [entity, dirty, transform] : _entities->view<DirtyComponent const, TransformComponent>().each())
 	{
 		// get relationship, if there is one
 		RelationshipComponent const* relationshipComponent = er->try_get<RelationshipComponent>(entity);
@@ -167,7 +167,7 @@ void minty::Scene::unload()
 void minty::Scene::finalize()
 {
 	// remove all dirty tags
-	_entities->clear<Dirty>();
+	_entities->clear<DirtyComponent>();
 }
 
 void minty::Scene::serialize(Writer& writer) const

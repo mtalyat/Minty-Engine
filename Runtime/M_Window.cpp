@@ -78,7 +78,7 @@ void minty::Window::set_title(std::string const& title)
 	glfwSetWindowTitle(_window, title.c_str());
 }
 
-std::string minty::Window::get_title() const
+std::string const& minty::Window::get_title() const
 {
 	return _title;
 }

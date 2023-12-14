@@ -1,18 +1,18 @@
 #include "pch.h"
 #include "M_Rendering_DescriptorSet.h"
 
-#include "M_Renderer.h"
+#include "M_RenderEngine.h"
 
 using namespace minty;
 using namespace minty::rendering;
 
-minty::rendering::DescriptorSet::DescriptorSet(Renderer& renderer)
-	: RendererObject::RendererObject(renderer)
+minty::rendering::DescriptorSet::DescriptorSet(RenderEngine& renderer)
+	: RenderObject::RenderObject(renderer)
 	, _descriptorSets()
 {}
 
-minty::rendering::DescriptorSet::DescriptorSet(std::array<VkDescriptorSet, MAX_FRAMES_IN_FLIGHT> const& descriptorSets, std::unordered_map<std::string, std::array<ID, MAX_FRAMES_IN_FLIGHT>> const& buffers, Renderer& renderer)
-	: RendererObject::RendererObject(renderer)
+minty::rendering::DescriptorSet::DescriptorSet(std::array<VkDescriptorSet, MAX_FRAMES_IN_FLIGHT> const& descriptorSets, std::unordered_map<std::string, std::array<ID, MAX_FRAMES_IN_FLIGHT>> const& buffers, RenderEngine& renderer)
+	: RenderObject::RenderObject(renderer)
 	, _descriptorSets(descriptorSets)
 	, _buffers(buffers)
 {}

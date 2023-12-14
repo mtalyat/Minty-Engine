@@ -6,6 +6,9 @@
 
 namespace minty
 {
+    /// <summary>
+    /// Handles User Interface (UI) inputs.
+    /// </summary>
     class UISystem
         : public System
     {

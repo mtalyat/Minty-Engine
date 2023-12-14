@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "M_AudioClip.h"
 
-#include "M_Assets.h"
+#include "M_Asset.h"
 #include "M_Console.h"
 
 minty::AudioClip::AudioClip()
@@ -13,16 +13,16 @@ minty::AudioClip::AudioClip()
 void minty::AudioClip::load(std::string const& path)
 {
 	// load clip
-	SoLoud::result result = _clip.load(assets::absolute(path).c_str());
+	SoLoud::result result = _clip.load(asset::absolute(path).c_str());
 
 	if (result != SoLoud::SOLOUD_ERRORS::SO_NO_ERROR)
 	{
-		console::error(std::format("Failed to load AudioClip at path \"{}\". Error code {}.", assets::absolute(path), result));
+		console::error(std::format("Failed to load AudioClip at path \"{}\". Error code {}.", asset::absolute(path), result));
 		return;
 	}
 
 	// load meta
-	Node meta = assets::load_meta(path);
+	Node meta = asset::load_meta(path);
 
 	set_volume(meta.get_float("volume", 1.0f));
 	set_looping(meta.get_bool("looping", false));

@@ -235,12 +235,12 @@ bool minty::parse::try_double(std::string const& string, double& value)
     return false;
 }
 
-size_t minty::parse::to_size_t(std::string const& string)
+size_t minty::parse::to_size(std::string const& string)
 {
     return std::stoull(string);
 }
 
-bool minty::parse::try_size_t(std::string const& string, size_t& value)
+bool minty::parse::try_size(std::string const& string, size_t& value)
 {
     if (is_unsigned_integer(string))
     {

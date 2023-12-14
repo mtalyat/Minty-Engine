@@ -13,10 +13,10 @@ using namespace minty::rendering;
 uint32_t const WIDTH = 800;
 uint32_t const HEIGHT = 600;
 
-Engine::Engine(Info const* const info)
+Engine::Engine(Info const& info)
 	: _globalInput()
-	, _window(info->get_application_info().pApplicationName, WIDTH, HEIGHT, &_globalInput)
-	, _renderer(&_window)
+	, _window(info.get_application_name(), WIDTH, HEIGHT, &_globalInput)
+	, _renderEngine(&_window)
 	, _audioEngine()
 	, _sceneManager(this)
 	, _deltaTime(0.02f)
@@ -24,40 +24,60 @@ Engine::Engine(Info const* const info)
 
 Engine::~Engine()
 {
-	_renderer.destroy();
+	_renderEngine.destroy();
 }
 
-Window* minty::Engine::get_window()
+InputMap& minty::Engine::get_global_input_map()
 {
-	return &_window;
+	return _globalInput;
 }
 
-Renderer* minty::Engine::get_renderer()
+InputMap const& minty::Engine::get_global_input_map() const
 {
-	return &_renderer;
+	return _globalInput;
 }
 
-AudioEngine* minty::Engine::get_audio_engine()
+Window& minty::Engine::get_window()
 {
-	return &_audioEngine;
+	return _window;
 }
 
-SceneManager* minty::Engine::get_scene_manager()
+Window const& minty::Engine::get_window() const
 {
-	return &_sceneManager;
+	return _window;
 }
 
-InputMap const* minty::Engine::get_input_map() const
+RenderEngine& minty::Engine::get_render_engine()
 {
-	return _window.get_input();
+	return _renderEngine;
 }
 
-InputMap* minty::Engine::get_global_input_map()
+RenderEngine const& minty::Engine::get_render_engine() const
 {
-	return &_globalInput;
+	return _renderEngine;
 }
 
-float minty::Engine::get_delta_time()
+AudioEngine& minty::Engine::get_audio_engine()
+{
+	return _audioEngine;
+}
+
+AudioEngine const& minty::Engine::get_audio_engine() const
+{
+	return _audioEngine;
+}
+
+SceneManager& minty::Engine::get_scene_manager()
+{
+	return _sceneManager;
+}
+
+SceneManager const& minty::Engine::get_scene_manager() const
+{
+	return _sceneManager;
+}
+
+float minty::Engine::get_delta_time() const
 {
 	return _deltaTime;
 }
@@ -91,7 +111,7 @@ void Engine::run()
 	time_point_t now;
 
 	// main loop
-	while (_renderer.is_running())
+	while (_renderEngine.is_running())
 	{
 		// run window events
 		glfwPollEvents();
@@ -103,13 +123,13 @@ void Engine::run()
 		_audioEngine.update();
 
 		// update renderer
-		_renderer.update();
+		_renderEngine.update();
 
 		// cleanup scene
 		_sceneManager.finalize();
 
 		// render to the screen
-		_renderer.render_frame();
+		_renderEngine.render_frame();
 
 		// frame complete
 		fpsCount++;
@@ -146,7 +166,7 @@ void Engine::run()
 	console::log(std::format("Elapsed time: {}s", std::chrono::duration_cast<std::chrono::milliseconds>(get_now() - start).count() / 1000.0f));
 
 	// wait for device to be safe
-	_renderer.sync();
+	_renderEngine.sync();
 }
 
 time_point_t minty::Engine::get_now() const

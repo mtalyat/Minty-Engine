@@ -7,12 +7,7 @@
 
 #include <filesystem>
 
-namespace minty
-{
-	class Renderer;
-}
-
-namespace minty::resources
+namespace minty::resource
 {
 
 }

@@ -8,11 +8,11 @@
 #include "M_AudioListenerComponent.h"
 #include "M_AudioSourceComponent.h"
 #include "M_CameraComponent.h"
-#include "M_DirtyTag.h"
+#include "M_DirtyComponent.h"
 #include "M_MeshComponent.h"
 #include "M_NameComponent.h"
 #include "M_RelationshipComponent.h"
-#include "M_RenderableTag.h"
+#include "M_RenderableComponent.h"
 #include "M_SpriteComponent.h"
 #include "M_TransformComponent.h"
 #include "M_UITransformComponent.h"
@@ -28,7 +28,7 @@
 
 using namespace minty;
 
-minty::Runtime::Runtime(Info const* const appInfo)
+minty::Runtime::Runtime(Info const& appInfo)
 	: _engine(appInfo)
 {
 	register_builtin();
@@ -39,9 +39,14 @@ Runtime::~Runtime()
 	
 }
 
-Engine* minty::Runtime::get_engine()
+Engine& minty::Runtime::get_engine()
 {
-	return &_engine;
+	return _engine;
+}
+
+Engine const& minty::Runtime::get_engine() const
+{
+	return _engine;
 }
 
 int Runtime::run()
@@ -69,14 +74,14 @@ void minty::Runtime::register_builtin()
 	SystemRegistry::register_system<UISystem>("UI");
 
 	// components
-	EntityRegistry::register_component<AudioListener>("AudioListener");
-	EntityRegistry::register_component<AudioSource>("AudioSource");
+	EntityRegistry::register_component<AudioListenerComponent>("AudioListener");
+	EntityRegistry::register_component<AudioSourceComponent>("AudioSource");
 	EntityRegistry::register_component<CameraComponent>("Camera");
-	EntityRegistry::register_component<Dirty>("Dirty");
+	EntityRegistry::register_component<DirtyComponent>("Dirty");
 	EntityRegistry::register_component<MeshComponent>("Mesh");
 	EntityRegistry::register_component<NameComponent>("Name");
 	EntityRegistry::register_component<RelationshipComponent>("Relationship");
-	EntityRegistry::register_component<Renderable>("Renderable");
+	EntityRegistry::register_component<RenderableComponent>("Renderable");
 	EntityRegistry::register_component<SpriteComponent>("Sprite");
 	EntityRegistry::register_component<TransformComponent>("Transform");
 	EntityRegistry::register_component<UITransformComponent>("UITransform");
