@@ -1,0 +1,8 @@
+template: materialTemplate
+values
+    material: 32
+        0i: 2
+        16f: 1
+        20f: 1
+        24f: 1
+        28f: 1

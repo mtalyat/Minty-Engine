@@ -1,9 +1,6 @@
 #pragma once
 
-#include <vulkan/vulkan.h>
 #include <string>
-
-#define VK_ASSERT(result, expression, message) VkResult result = expression; if(result != VkResult::VK_SUCCESS) minty::error::abort(std::format("[{}] {}", minty::error::result_to_string(result), message));
 
 #ifdef NDEBUG
 #define MINTY_ASSERT(expression, message)
@@ -13,9 +10,14 @@
 
 namespace minty::error
 {
+	/// <summary>
+	/// The default error text.
+	/// </summary>
 	constexpr char const* ERROR_TEXT = "ERROR";
 
-	std::string result_to_string(VkResult const result);
-
+	/// <summary>
+	/// Aborts the program with the given error message.
+	/// </summary>
+	/// <param name="message"></param>
 	void abort(std::string const& message);
 }

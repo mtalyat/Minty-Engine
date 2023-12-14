@@ -5,9 +5,30 @@
 
 using namespace minty;
 
-minty::Writer::Writer(Node& node)
+minty::Writer::Writer(Node& node, void* const data)
 	: _node(node)
+	, _data(data)
 {}
+
+Node const& minty::Writer::get_node() const
+{
+	return _node;
+}
+
+Node const* minty::Writer::get_node(std::string const& name) const
+{
+	return _node.find(name);
+}
+
+void* minty::Writer::get_data() const
+{
+	return _data;
+}
+
+bool minty::Writer::exists(std::string const& name) const
+{
+	return static_cast<bool>(_node.find(name));
+}
 
 void minty::Writer::write(std::string const& name)
 {
@@ -16,16 +37,27 @@ void minty::Writer::write(std::string const& name)
 
 void minty::Writer::write(std::string const& name, Node const& node)
 {
-	_node.children.emplace(name, node);
+	auto const& found = _node.children.find(name);
+
+	if (found != _node.children.end())
+	{
+		// existing key/children list
+		found->second.push_back(node);
+	}
+	else
+	{
+		// new key and children list
+		_node.children.emplace(name, std::vector{ node });
+	}
 }
 
 void minty::Writer::write(std::string const& name, ISerializable const* const value)
 {
 	// add child object for this object to write
-	_node.children.emplace(name, Node());
+	write(name, Node());
 
 	// create a Writer to use
-	Writer Writer(_node.children.at(name));
+	Writer Writer(_node.children.at(name).back(), _data);
 
 	// serialize the object into that node
 	value->serialize(Writer);
@@ -33,10 +65,15 @@ void minty::Writer::write(std::string const& name, ISerializable const* const va
 
 void minty::Writer::write(std::string const& name, std::string const& value)
 {
-	_node.children.emplace(name, Node{ .data = value });
+	write(name, Node{.data = value });
 }
 
 void minty::Writer::write(std::string const& name, int const value)
+{
+	write(name, std::to_string(value));
+}
+
+void minty::Writer::write(std::string const& name, unsigned int const value)
 {
 	write(name, std::to_string(value));
 }
@@ -47,6 +84,11 @@ void minty::Writer::write(std::string const& name, float const value)
 }
 
 void minty::Writer::write(std::string const& name, byte const value)
+{
+	write(name, std::to_string(value));
+}
+
+void minty::Writer::write(std::string const& name, size_t const value)
 {
 	write(name, std::to_string(value));
 }
@@ -149,11 +191,19 @@ void minty::Writer::write(std::string const& name, std::string const& value, std
 	if (value.compare(defaultValue))
 	{
 		// not default value
-		_node.children.emplace(name, Node{ .data = value });
+		write(name, value);
 	}
 }
 
 void minty::Writer::write(std::string const& name, int const value, int const defaultValue)
+{
+	if (value != defaultValue)
+	{
+		write(name, std::to_string(value));
+	}
+}
+
+void minty::Writer::write(std::string const& name, unsigned int const value, unsigned int const defaultValue)
 {
 	if (value != defaultValue)
 	{
@@ -170,6 +220,14 @@ void minty::Writer::write(std::string const& name, float const value, float cons
 }
 
 void minty::Writer::write(std::string const& name, byte const value, byte const defaultValue)
+{
+	if (value != defaultValue)
+	{
+		write(name, std::to_string(value));
+	}
+}
+
+void minty::Writer::write(std::string const& name, size_t const value, size_t const defaultValue)
 {
 	if (value != defaultValue)
 	{

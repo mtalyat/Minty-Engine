@@ -29,6 +29,10 @@ namespace minty
 		/// <param name="maxDepth">The maximum depth of the Viewport.</param>
 		Viewport(int const x, int const y, unsigned int const width, unsigned int const height, float const minDepth, float const maxDepth);
 
+		/// <summary>
+		/// Binds this Viewport.
+		/// </summary>
+		/// <param name="commandBuffer">The CommandBuffer to use to bind this Viewport.</param>
 		void bind(VkCommandBuffer const commandBuffer) const;
 
 		/// <summary>

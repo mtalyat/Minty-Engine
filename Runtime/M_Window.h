@@ -21,8 +21,11 @@ namespace minty
 
 		std::string _title;
 		GLFWwindow* _window;
+		int _frameWidth, _frameHeight;
+		int _width, _height;
 		bool _resized;
 		InputMap const* _activeInputMap;
+		InputMap const* _globalInputMap;
 		float _lastMouseX, _lastMouseY;
 		bool _mouseOutOfBounds;
 
@@ -33,7 +36,7 @@ namespace minty
 		/// <param name="title">The title to be displayed on the Window.</param>
 		/// <param name="width">The width of the Window in pixels.</param>
 		/// <param name="height">The height of the Window in pixels.</param>
-		Window(std::string const& title, int const width, int const height);
+		Window(std::string const& title, int const width, int const height, InputMap const* const globalInputMap = nullptr);
 
 		~Window();
 
@@ -45,7 +48,7 @@ namespace minty
 		/// <summary>
 		/// Gets the title text of this Window.
 		/// </summary>
-		std::string get_title() const;
+		std::string const& get_title() const;
 
 		/// <summary>
 		/// Sets the cursor mode.
@@ -71,11 +74,33 @@ namespace minty
 		void close();
 
 		/// <summary>
-		/// Gets the size of the Window, in pixels.
+		/// Refreshes the window's size.
 		/// </summary>
-		/// <param name="width">The width in pixels.</param>
-		/// <param name="height">The height in pixels.</param>
-		void get_framebuffer_size(int* const width, int* const height) const;
+		void refresh();
+
+		/// <summary>
+		/// Gets the framebuffer width of this Window.
+		/// </summary>
+		/// <returns></returns>
+		int get_frame_width() const;
+
+		/// <summary>
+		/// Gets the framebuffer height of this Window.
+		/// </summary>
+		/// <returns></returns>
+		int get_frame_height() const;
+
+		/// <summary>
+		/// Gets the width of this Window.
+		/// </summary>
+		/// <returns></returns>
+		int get_width() const;
+
+		/// <summary>
+		/// Gets the height of this Window.
+		/// </summary>
+		/// <returns></returns>
+		int get_height() const;
 
 		/// <summary>
 		/// Gets the raw GLFWwindow component.

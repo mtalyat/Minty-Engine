@@ -1,12 +1,13 @@
 #include "pch.h"
 #include "M_EntityRegistry.h"
 
+#include "M_SerializationData.h"
+
 #include "M_Console.h"
 #include "M_NameComponent.h"
-#include "M_OriginComponent.h"
-#include "M_PositionComponent.h"
-#include "M_RotationComponent.h"
-#include "M_ScaleComponent.h"
+#include "M_RelationshipComponent.h"
+#include "M_TransformComponent.h"
+#include "M_DirtyComponent.h"
 #include <sstream>
 #include <map>
 
@@ -18,7 +19,11 @@ std::map<uint32_t const, std::string const> EntityRegistry::_componentTypes = st
 minty::EntityRegistry::EntityRegistry()
 	: entt::registry()
 	, Object()
-{}
+{
+	// make it so whenever a transform is editied, it is marked as dirty
+	on_construct<TransformComponent>().connect<&EntityRegistry::emplace_or_replace<DirtyComponent>>();
+	on_update<TransformComponent>().connect<&EntityRegistry::emplace_or_replace<DirtyComponent>>();
+}
 
 minty::EntityRegistry::~EntityRegistry()
 {}
@@ -41,7 +46,7 @@ Entity minty::EntityRegistry::create()
 
 Entity minty::EntityRegistry::create(std::string const& name)
 {
-	Entity e = entt::registry::create();
+	Entity e = create();
 	NameComponent& nameComponent = this->emplace<NameComponent>(e);
 	nameComponent.name = name;
 	return e;
@@ -49,6 +54,11 @@ Entity minty::EntityRegistry::create(std::string const& name)
 
 Entity minty::EntityRegistry::find_by_name(std::string const& string) const
 {
+	if (is_name_empty(string))
+	{
+		return NULL_ENTITY;
+	}
+
 	for (auto [entity, name] : this->view<NameComponent const>().each())
 	{
 		if (name.name.compare(string) == 0)
@@ -67,7 +77,7 @@ std::string minty::EntityRegistry::get_name(Entity const entity) const
 	// if entity is null, return NULL
 	if (entity == NULL_ENTITY)
 	{
-		return "NULL";
+		return "";
 	}
 
 	// if entity has a name component, get the name
@@ -81,6 +91,25 @@ std::string minty::EntityRegistry::get_name(Entity const entity) const
 	else
 	{
 		return "";
+	}
+}
+
+void minty::EntityRegistry::set_name(Entity const entity, std::string const& name)
+{
+	// check if name is a real name, or empty
+	if (name.empty() || (name.size() == 1 && name.front() == '_'))
+	{
+		// name is empty, remove the component if it exists
+		if(any_of<NameComponent>(entity))
+		{
+			erase<NameComponent>(entity);
+		}
+	}
+	else
+	{
+		// name is occupied
+		NameComponent& nameComponent = get_or_emplace<NameComponent>(entity);
+		nameComponent.name = name;
 	}
 }
 
@@ -106,7 +135,7 @@ Component const* minty::EntityRegistry::get_by_name(std::string const& name, Ent
 	if (found == _components.end())
 	{
 		// name not found
-		console::error(std::format("Cannot get Component \"{}\". It has not been registered with the EntityRegistry.", name));
+		console::error(std::format("Cannot at Component \"{}\". It has not been registered with the EntityRegistry.", name));
 		return nullptr;
 	}
 	else
@@ -116,56 +145,11 @@ Component const* minty::EntityRegistry::get_by_name(std::string const& name, Ent
 	}
 }
 
-void minty::EntityRegistry::get_transform(Entity const entity, Transform& transform) const
-{
-	// get origin
-	OriginComponent const* const origin = this->try_get<OriginComponent>(entity);
-	if (origin)
-	{
-		// origin given
-		transform.position = origin->position;
-	}
-	else
-	{
-		// origin is at 0, 0, 0
-		transform.position = Vector3();
-	}
-
-	// get and add position to origin
-	PositionComponent const* const position = this->try_get<PositionComponent>(entity);
-	if (position)
-	{
-		transform.position += position->position;
-	}
-
-	// get rotation
-	RotationComponent const* const rotation = this->try_get<RotationComponent>(entity);
-	if (rotation)
-	{
-		transform.rotation = rotation->rotation;
-	}
-	else
-	{
-		transform.rotation = Quaternion();
-	}
-
-	// get scale
-	ScaleComponent const* const scale = this->try_get<ScaleComponent>(entity);
-	if (scale)
-	{
-		transform.scale = scale->scale;
-	}
-	else
-	{
-		transform.scale = Vector3(1.0f, 1.0f, 1.0f);
-	}
-}
-
 void minty::EntityRegistry::print(Entity const entity) const
 {
 	// serialize entity, add it to parent, print that
 	Node root;
-	root.children.emplace(this->get_name(entity), serialize_entity(entity));
+	root.children.emplace(this->get_name(entity), std::vector<Node>{ serialize_entity(entity) });
 	root.print();
 }
 
@@ -182,10 +166,16 @@ void minty::EntityRegistry::serialize(Writer& writer) const
 	for (auto [entity] : this->storage<Entity>()->each())
 	{
 		// serialize entity
-		Node entityNode = serialize_entity(entity);
+		Node entityNode;
+		Writer entityWriter(entityNode, writer.get_data());
+
+		serialize_entity(entityWriter, entity);
 
 		// get entity name
 		entityName = this->get_name(entity);
+
+		// use "_" instead of ""
+		if (entityName.empty()) entityName = "_";
 
 		// write entity node
 		writer.write(entityName, entityNode);
@@ -196,36 +186,51 @@ void minty::EntityRegistry::deserialize(Reader const& reader)
 {
 	// read each entity, add name if it has one
 	
-	Node const* node = reader.get_node();
+	Node const& node = reader.get_node();
+	SerializationData* data = static_cast<SerializationData*>(reader.get_data());
 
-	for (auto const& pair : node->children)
+	// for each entity name given
+	for (auto const& pair : node.children)
 	{
-		// create entity
-		Entity const entity = entt::registry::create();
-
-		// add name if there is one
-		// empty name is either "" or "_"
-		if (pair.first.size() > 1 || (pair.first.size() == 1 && pair.first.at(0) != '_'))
+		// for each entity to be created with that name
+		for (auto const& entityNode : pair.second)
 		{
-			NameComponent& name = this->emplace<NameComponent>(entity);
-			name.name = pair.first;
-		}
+			// create the entity
+			Entity entity = create();
+			data->entity = entity;
 
-		// now add the other components (children)
-		for (auto& componentPair : pair.second.children)
-		{
-			Component* component = this->emplace_by_name(componentPair.first, entity);
-			Reader reader(componentPair.second);
-			component->deserialize(reader);
+			// set name
+			set_name(entity, pair.first);
+
+			// cycle through each component on entity
+			for (auto const& compPair : entityNode.children)
+			{
+				// cannot have multiple of same component
+				if (compPair.second.size() > 1)
+				{
+					console::error(std::format("Attempting to deserialize entity \"{}\" with multiple instances of the \"{}\" component.", pair.first, compPair.first));
+				}
+
+				// get node to use to get data
+				Node const& compNode = compPair.second.front();
+
+				Component* comp = emplace_by_name(compPair.first, entity);
+				Reader compReader(compNode, data);
+				comp->deserialize(compReader);
+			}
 		}
 	}
 }
 
-Node minty::EntityRegistry::serialize_entity(Entity const entity) const
+bool minty::EntityRegistry::is_name_empty(std::string const& name)
 {
-	// populate a node with children
-	Node entityNode;
-	Writer entityWriter(entityNode);
+	return name.size() == 0 || (name.size() == 1 && name.at(0) == '_');
+}
+
+void minty::EntityRegistry::serialize_entity(Writer& writer, Entity const entity) const
+{
+	SerializationData* data = static_cast<SerializationData*>(writer.get_data());
+	data->entity = entity;
 
 	for (auto&& curr : this->storage())
 	{
@@ -252,11 +257,22 @@ Node minty::EntityRegistry::serialize_entity(Entity const entity) const
 			}
 
 			// write component with its name and serialized values
-			entityWriter.write(name, this->get_by_name(name, entity));
+			writer.write(name, this->get_by_name(name, entity));
 		}
 	}
-	
-	return entityNode;
+}
+
+Node minty::EntityRegistry::serialize_entity(Entity const entity) const
+{
+	Node node;
+	Writer writer(node);
+	serialize_entity(writer, entity);
+	return node;
+}
+
+std::string minty::to_string(Entity const value)
+{
+	return std::to_string(static_cast<unsigned int>(value));
 }
 
 std::string minty::to_string(EntityRegistry const& value)

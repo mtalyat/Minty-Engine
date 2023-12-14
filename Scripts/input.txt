@@ -1,0 +1,4 @@
+enum Perspective {
+	Orthographic = 0,
+	Perspective = 1,
+};

@@ -44,7 +44,7 @@ namespace minty
 		/// </summary>
 		/// <param name="id">The ID of the Scene to load.</param>
 		/// <param name="camera">The Entity with the CameraComponent to render to.</param>
-		void load_scene(ID const id, Entity const camera = NULL_ENTITY);
+		void load_scene(ID const id);
 
 		/// <summary>
 		/// Gets the loaded Scene.
@@ -84,6 +84,11 @@ namespace minty
 		/// Unloads the SceneManager and any active Scenes.
 		/// </summary>
 		void unload();
+
+		/// <summary>
+		/// Finalizes updating the active Scene.
+		/// </summary>
+		void finalize();
 
 	public:
 		friend std::string to_string(SceneManager const& value);

@@ -1,21 +1,29 @@
 #pragma once
-#include "M_Object.h"
+#include "M_Base.h"
+
+#include "M_Dynamic.h"
+#include <unordered_map>
 
 namespace minty::rendering
 {
-	class MaterialBuilder
-		: public Object
+	/// <summary>
+	/// Holds data to create a new Material.
+	/// </summary>
+	struct MaterialBuilder
 	{
-	private:
-		ID _shaderId;
+		/// <summary>
+		/// The name of the Material.
+		/// </summary>
+		std::string name;
+		
+		/// <summary>
+		/// The MaterialTemplate ID.
+		/// </summary>
+		ID templateId;
 
-	public:
-		MaterialBuilder(ID const shaderId);
-
-		void set_shader_id(ID const id);
-
-		ID get_shader_id() const;
-
-		std::string to_string(MaterialBuilder const& value);
+		/// <summary>
+		/// The values to set.
+		/// </summary>
+		std::unordered_map<std::string, Dynamic> values;
 	};
 }

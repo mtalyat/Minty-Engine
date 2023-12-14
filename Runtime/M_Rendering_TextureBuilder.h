@@ -1,40 +1,57 @@
 #pragma once
-#include "M_Object.h"
+#include "M_Base.h"
 
-#include <vulkan/vulkan.h>
+#include "M_Color.h"
+#include "M_Rendering_PixelFormat.h"
+#include "vulkan.h"
 
 namespace minty::rendering
 {
-	class TextureBuilder :
-		public Object
+	/// <summary>
+	/// Holds data to create a new Texture.
+	/// </summary>
+	struct TextureBuilder
 	{
-	private:
-		VkFilter _filter;
-		VkSamplerAddressMode _addressMode;
-		VkSamplerMipmapMode _mipmapMode;
-		VkFormat _format;
-
-	public:
-		TextureBuilder();
-
-		void set_filter(VkFilter const filter);
-
-		void set_sampler_address_mode(VkSamplerAddressMode const addressMode);
-
-		void set_sampler_mipmap_mode(VkSamplerMipmapMode const mipmapMode);
-
-		void set_format(VkFormat const format);
-
-		VkFilter get_filter() const;
-
-		VkSamplerAddressMode get_sampler_address_mode() const;
-
-		VkSamplerMipmapMode get_sampler_mipmap_mode() const;
-
-		VkFormat get_format() const;
-
-	public:
-		friend std::string to_string(TextureBuilder const& value);
+		/// <summary>
+		/// The name of the Texure.
+		/// </summary>
+		std::string name;
+		/// <summary>
+		/// The path to the Texture on the disk.
+		/// </summary>
+		std::string path;
+		/// <summary>
+		/// The raw pixel data for the Texture.
+		/// </summary>
+		Color* pixelData;
+		/// <summary>
+		/// The width of the Texture in pixels.
+		/// </summary>
+		int width;
+		/// <summary>
+		/// The height of the Texture in pixels.
+		/// </summary>
+		int height;
+		/// <summary>
+		/// The format to read the pixels in.
+		/// </summary>
+		PixelFormat pixelFormat;
+		/// <summary>
+		/// The filter for the Texture. How to get the color when between pixels.
+		/// </summary>
+		VkFilter filter;
+		/// <summary>
+		/// The address mode for the Texture. What to do when the texcoord is outside of [0.0, 1.0].
+		/// </summary>
+		VkSamplerAddressMode addressMode;
+		/// <summary>
+		/// The mipmap mode for the Texture. 
+		/// </summary>
+		VkSamplerMipmapMode mipmapMode;
+		/// <summary>
+		/// The format for the Texture. How the pixels are interpreted.
+		/// </summary>
+		VkFormat format;
 	};
 }
 

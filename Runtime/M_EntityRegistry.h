@@ -2,14 +2,16 @@
 
 #include "libraries/entt/entt.hpp"
 #include "M_Component.h"
+#include "M_Transform.h"
 #include "M_Console.h"
 #include "M_ISerializable.h"
-#include "M_Transform.h"
 
 namespace minty
 {
 	typedef entt::entity Entity;
 	constexpr Entity NULL_ENTITY = entt::null;
+
+	std::string to_string(Entity const value);
 
 	class EntityRegistry
 		: public Object, public entt::registry, public ISerializable
@@ -77,6 +79,13 @@ namespace minty
 		std::string get_name(Entity const entity) const;
 
 		/// <summary>
+		/// Sets the NameComponent name of the Entity. Emplaces a NameComponent if needed. If no name is given ("" or "_"), then the NameComponent is removed.
+		/// </summary>
+		/// <param name="entity">The Entity to name.</param>
+		/// <param name="name">The new name of the Entity.</param>
+		void set_name(Entity const entity, std::string const& name);
+
+		/// <summary>
 		/// Emplaces the Component onto the entity, by name.
 		/// </summary>
 		/// <param name="name">The name of the Component.</param>
@@ -91,14 +100,6 @@ namespace minty
 		/// <param name="entity">The Entity that has the Component.</param>
 		/// <returns>The Component, or null if it does not exist.</returns>
 		Component const* get_by_name(std::string const& name, Entity const entity) const;
-
-		/// <summary>
-		/// Gets the Transform for the given Entity.
-		/// </summary>
-		/// <param name="entity"></param>
-		/// <param name="transform"></param>
-		/// <returns></returns>
-		void get_transform(Entity const entity, Transform& transform) const;
 
 		/// <summary>
 		/// Prints an Entity's values to the screen.
@@ -122,10 +123,11 @@ namespace minty
 		static void register_component(std::string const& name);
 
 		void serialize(Writer& writer) const override;
+		void serialize_entity(Writer& writer, Entity const entity) const;
+		Node serialize_entity(Entity const entity) const;
 		void deserialize(Reader const& reader) override;
 
-	private:
-		Node serialize_entity(Entity const entity) const;
+		static bool is_name_empty(std::string const& name);
 	};
 
 	template<class T>

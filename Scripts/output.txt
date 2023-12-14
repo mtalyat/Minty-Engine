@@ -1,0 +1,22 @@
+std::string to_string(Perspective const value);
+Perspective from_string_perspective(std::string const& value);
+
+
+std::string minty::vk::to_string(Perspective const value)
+{
+	switch (value)
+	{
+	case Perspective::ORTHOGRAPHIC: return "ORTHOGRAPHIC";
+	case Perspective::PERSPECTIVE: return "PERSPECTIVE";
+	default: return "";
+	}
+}
+
+Perspective minty::vk::from_string_perspective(std::string const& value)
+{
+	std::string value2 = minty::string::to_upper(value);
+	if (value2 == "ORTHOGRAPHIC") return Perspective::ORTHOGRAPHIC;
+	if (value2 == "PERSPECTIVE") return Perspective::PERSPECTIVE;
+
+	return static_cast<Perspective>(0);
+}

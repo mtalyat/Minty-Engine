@@ -10,11 +10,14 @@ using namespace minty;
 
 int Window::_windowCount = 0;
 
-Window::Window(std::string const& title, int const width, int const height)
+Window::Window(std::string const& title, int const width, int const height, InputMap const* const globalInputMap)
 	: _title(title)
 	, _window()
+	, _width(width)
+	, _height(height)
 	, _resized(true) // start as "resized" so render engine regenerates data on start
 	, _activeInputMap()
+	, _globalInputMap(globalInputMap)
 	, _lastMouseX()
 	, _lastMouseY()
 	, _mouseOutOfBounds(true) // start as "out of bounds"
@@ -75,7 +78,7 @@ void minty::Window::set_title(std::string const& title)
 	glfwSetWindowTitle(_window, title.c_str());
 }
 
-std::string minty::Window::get_title() const
+std::string const& minty::Window::get_title() const
 {
 	return _title;
 }
@@ -119,9 +122,30 @@ void minty::Window::close()
 	glfwSetWindowShouldClose(_window, GLFW_TRUE);
 }
 
-void minty::Window::get_framebuffer_size(int* const width, int* const height) const
+void minty::Window::refresh()
 {
-	glfwGetFramebufferSize(_window, width, height);
+	glfwGetFramebufferSize(_window, &_frameWidth, &_frameHeight);
+	glfwGetWindowSize(_window, &_width, &_height);
+}
+
+int minty::Window::get_frame_width() const
+{
+	return _frameWidth;
+}
+
+int minty::Window::get_frame_height() const
+{
+	return _frameHeight;
+}
+
+int minty::Window::get_width() const
+{
+	return _width;
+}
+
+int minty::Window::get_height() const
+{
+	return _height;
 }
 
 GLFWwindow* minty::Window::get_raw() const
@@ -141,72 +165,92 @@ InputMap const* minty::Window::get_input() const
 
 void minty::Window::trigger_key(Key const key, KeyAction const action, KeyModifiers const mods)
 {
+	KeyPressEventArgs args{
+	.key = key,
+	.action = action,
+	.mods = mods
+	};
+
+	if (_globalInputMap)
+	{
+		_globalInputMap->invoke_key(args);
+	}
+
 	if (_activeInputMap)
 	{
-		KeyPressEventArgs args{
-			.key = key,
-			.action = action,
-			.mods = mods
-		};
-
 		_activeInputMap->invoke_key(args);
 	}
 }
 
 void minty::Window::trigger_button(MouseButton const button, KeyAction const action, KeyModifiers const mods)
 {
+	MouseClickEventArgs args{
+	.button = button,
+	.action = action,
+	.mods = mods,
+	.x = _lastMouseX,
+	.y = _lastMouseY
+	};
+
+	if (_globalInputMap)
+	{
+		_globalInputMap->invoke_mouse_click(args);
+	}
+
 	if (_activeInputMap)
 	{
-		MouseClickEventArgs args{
-			.button = button,
-			.action = action,
-			.mods = mods,
-			.x = _lastMouseX,
-			.y = _lastMouseY
-		};
-
 		_activeInputMap->invoke_mouse_click(args);
 	}
 }
 
 void minty::Window::trigger_scroll(float dx, float dy)
 {
+	MouseScrollEventArgs args{
+	.dx = dx,
+	.dy = dy
+	};
+
+	if (_globalInputMap)
+	{
+		_globalInputMap->invoke_mouse_scroll(args);
+	}
+
 	if (_activeInputMap)
 	{
-		MouseScrollEventArgs args{
-			.dx = dx,
-			.dy = dy
-		};
-
 		_activeInputMap->invoke_mouse_scroll(args);
 	}
 }
 
 void minty::Window::trigger_cursor(float x, float y)
 {
+	// find movement from last time the mouse moved
+
+	float dx, dy;
+	if (_mouseOutOfBounds)
+	{
+		dx = 0.0f;
+		dy = 0.0f;
+	}
+	else
+	{
+		dx = x - _lastMouseX;
+		dy = y - _lastMouseY;
+	}
+
+	MouseMoveEventArgs args{
+		.x = x,
+		.y = y,
+		.dx = dx,
+		.dy = dy
+	};
+
+	if (_globalInputMap)
+	{
+		_globalInputMap->invoke_mouse_move(args);
+	}
+
 	if (_activeInputMap)
 	{
-		// find movement from last time the mouse moved
-
-		float dx, dy;
-		if (_mouseOutOfBounds)
-		{
-			dx = 0.0f;
-			dy = 0.0f;
-		}
-		else
-		{
-			dx = x - _lastMouseX;
-			dy = y - _lastMouseY;
-		}
-
-		MouseMoveEventArgs args{
-			.x = x,
-			.y = y,
-			.dx = dx,
-			.dy = dy
-		};
-
 		_activeInputMap->invoke_mouse_move(args);
 	}
 

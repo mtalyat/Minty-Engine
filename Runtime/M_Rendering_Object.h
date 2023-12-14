@@ -3,23 +3,30 @@
 
 namespace minty
 {
-	class Renderer;
+	class RenderEngine;
 }
 
 namespace minty::rendering
 {
-	class RendererObject :
+	/// <summary>
+	/// Base class for an object that is used with the RenderEngine.
+	/// </summary>
+	class RenderObject :
 		public Object
 	{
 	protected:
-		minty::Renderer& _renderer;
+		minty::RenderEngine& _renderer;
 
 	public:
-		RendererObject(minty::Renderer& renderer);
+		/// <summary>
+		/// Creates a new RenderObject.
+		/// </summary>
+		/// <param name="renderer"></param>
+		RenderObject(minty::RenderEngine& renderer);
 
-		virtual ~RendererObject();
+		virtual ~RenderObject();
 
-		friend std::string to_string(RendererObject const& value);
+		friend std::string to_string(RenderObject const& value);
 	};
 }
 

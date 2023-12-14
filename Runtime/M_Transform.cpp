@@ -11,13 +11,8 @@ minty::Transform::Transform(Vector3 const& position, Vector3 const& rotation, Ve
 
 Matrix4 minty::Transform::get_matrix() const
 {
-    // get translation, rotation, scale matrices
-    Matrix4 translationMatrix = glm::translate(Matrix4(1.0f), position);
-    Matrix4 rotationMatrix = glm::mat4_cast(rotation);
-    Matrix4 scaleMatrix = glm::scale(Matrix4(1.0f), scale);
-
     // combine and return
-    return translationMatrix * rotationMatrix * scaleMatrix;
+    return glm::translate(Matrix4(1.0f), position) * glm::mat4_cast(rotation) * glm::scale(Matrix4(1.0f), scale);
 }
 
 std::string minty::to_string(Transform const& value)

@@ -1,8 +1,9 @@
 #include "pch.h"
 #include "M_Texture.h"
 
-#include "M_Renderer.h"
+#include "M_RenderEngine.h"
 #include "M_Rendering_TextureBuilder.h"
+#include "M_Asset.h"
 #include "M_File.h"
 #include "M_Error.h"
 #include <format>
@@ -13,19 +14,70 @@
 using namespace minty;
 using namespace minty::rendering;
 
-Texture::Texture(std::string const& path, rendering::TextureBuilder const& builder, Renderer& renderer)
-	: RendererObject::RendererObject(renderer)
+Texture::Texture(rendering::TextureBuilder const& builder, RenderEngine& renderer)
+	: RenderObject::RenderObject(renderer)
+	, _width(builder.width)
+	, _height(builder.height)
+	, _format()
+	, _image()
+	, _view()
+	, _memory()
+	, _sampler()
 {
-	// get data from file: pixels, width, height, color channels
-	int channels;
+	// determine how to load data
+	stbi_uc* pixels = reinterpret_cast<stbi_uc*>(builder.pixelData);
+	bool allocated = false;
 
-	// load a texture with r g b and a
-	stbi_uc* pixels = stbi_load(path.c_str(), &_width, &_height, &channels, STBI_rgb_alpha);
+	std::string const& path = builder.path;
+	bool fromFile = path.size();
 
-	// if no pixels, error
+	if (fromFile)
+	{
+		if (!asset::exists(path))
+		{
+			console::error(std::format("Cannot load texture. File not found at: {}", path));
+			return;
+		}
+
+		if (builder.pixelFormat == PixelFormat::None)
+		{
+			console::error("Attempting to load texture with a pixelFormat of None.");
+			return;
+		}
+
+		// get data from file: pixels, width, height, color channels
+		int channels;
+
+		std::string absPath = asset::absolute(path);
+		pixels = stbi_load(absPath.c_str(), &_width, &_height, &channels, static_cast<int>(builder.pixelFormat));
+
+		// if no pixels, error
+		if (!pixels)
+		{
+			console::error(std::format("Failed to load texture: {}", path));
+			return;
+		}
+	}
+	else
+	{
+		// get data from builder
+		_width = builder.width;
+		_height = builder.height;
+
+		// create color data if needed
+		if (!pixels && _width * _height > 0)
+		{
+			size_t size = _width * _height * 4;
+			pixels = new stbi_uc[size];
+			std::memset(pixels, 0, size);
+
+			allocated = true;
+		}
+	}
+
 	if (!pixels)
 	{
-		console::error(std::format("Failed to load texture: {}", path));
+		console::error("Failed to create texture. Pixels are null.");
 		return;
 	}
 
@@ -34,32 +86,30 @@ Texture::Texture(std::string const& path, rendering::TextureBuilder const& build
 
 	// copy to device via a staging buffer
 
-	VkBuffer stagingBuffer;
-	VkDeviceMemory stagingMemory;
-
 	// create a buffer that can be used as the source of a transfer command
 	// the memory can be mapped, and specify that flush is not needed (we do not need to flush to make writes)
-	renderer.create_buffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT, stagingBuffer, stagingMemory);
+	ID stagingBufferId = renderer.create_buffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
 	VkDevice device = renderer.get_device();
 
 	// map memory and copy it to buffer memory
 
-	// map memory: get pointer where we can actually copy data to
-	void* data;
-	vkMapMemory(device, stagingMemory, 0, imageSize, 0, &data);
-
-	// copy data over
-	memcpy(data, pixels, static_cast<size_t>(imageSize));
-
-	// no longer need access to the data
-	vkUnmapMemory(device, stagingMemory);
+	void* mappedData = renderer.map_buffer(stagingBufferId);
+	memcpy(mappedData, pixels, static_cast<size_t>(imageSize));
+	renderer.unmap_buffer(stagingBufferId);
 
 	// done with the pixels from file
-	stbi_image_free(pixels);
+	if (fromFile)
+	{
+		stbi_image_free(pixels);
+	}
+	else if (allocated)
+	{
+		delete[] pixels;
+	}
 
 	// image data
-	_format = static_cast<VkFormat>(builder.get_format());
+	_format = static_cast<VkFormat>(builder.format);
 
 	// create the image on gpu
 	renderer.create_image(_width, _height, _format, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, _image, _memory);
@@ -68,14 +118,13 @@ Texture::Texture(std::string const& path, rendering::TextureBuilder const& build
 	renderer.change_image_layout(_image, _format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
 	// copy pixel data to image
-	renderer.copy_buffer_to_image(stagingBuffer, _image, _width, _height);
+	renderer.copy_buffer_to_image(renderer.get_buffer(stagingBufferId), _image, _width, _height);
 
 	// prep texture for rendering
 	renderer.change_image_layout(_image, _format, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
 	// cleanup staging buffer, no longer needed
-	vkDestroyBuffer(device, stagingBuffer, nullptr);
-	vkFreeMemory(device, stagingMemory, nullptr);
+	renderer.destroy_buffer(stagingBufferId);
 
 	// create view, so the shaders can access the image data
 	_view = renderer.create_image_view(_image, _format, VK_IMAGE_ASPECT_COLOR_BIT);
@@ -84,15 +133,13 @@ Texture::Texture(std::string const& path, rendering::TextureBuilder const& build
 	// create the sampler in constructor for now
 	VkSamplerCreateInfo samplerInfo{};
 	samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
-	samplerInfo.magFilter = static_cast<VkFilter>(builder.get_filter());
-	samplerInfo.minFilter = static_cast<VkFilter>(builder.get_filter());
-	//samplerInfo.magFilter = VK_FILTER_LINEAR;
-	//samplerInfo.minFilter = VK_FILTER_LINEAR;
+	samplerInfo.magFilter = static_cast<VkFilter>(builder.filter);
+	samplerInfo.minFilter = static_cast<VkFilter>(builder.filter);
 
 	// how to draw if size is too small or big, etc.
-	samplerInfo.addressModeU = static_cast<VkSamplerAddressMode>(builder.get_sampler_address_mode());
-	samplerInfo.addressModeV = static_cast<VkSamplerAddressMode>(builder.get_sampler_address_mode());
-	samplerInfo.addressModeW = static_cast<VkSamplerAddressMode>(builder.get_sampler_address_mode());
+	samplerInfo.addressModeU = static_cast<VkSamplerAddressMode>(builder.addressMode);
+	samplerInfo.addressModeV = static_cast<VkSamplerAddressMode>(builder.addressMode);
+	samplerInfo.addressModeW = static_cast<VkSamplerAddressMode>(builder.addressMode);
 
 	VkPhysicalDeviceProperties properties{};
 	vkGetPhysicalDeviceProperties(renderer.get_physical_device(), &properties);
@@ -110,7 +157,7 @@ Texture::Texture(std::string const& path, rendering::TextureBuilder const& build
 	samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
 
 	// mip maps
-	samplerInfo.mipmapMode = static_cast<VkSamplerMipmapMode>(builder.get_sampler_mipmap_mode());
+	samplerInfo.mipmapMode = static_cast<VkSamplerMipmapMode>(builder.mipmapMode);
 	samplerInfo.mipLodBias = 0.0f;
 	samplerInfo.minLod = 0.0f;
 	samplerInfo.maxLod = 0.0f;

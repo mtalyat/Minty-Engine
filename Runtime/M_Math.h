@@ -1,5 +1,7 @@
 #pragma once
 
+#include <string>
+
 namespace minty::math
 {
 	float const PI = 3.14159265359f;
@@ -221,4 +223,11 @@ namespace minty::math
 	/// <param name="value">The value to get the sign of.</param>
 	/// <returns>The sign of the value.</returns>
 	float signz(float const value);
+
+	/// <summary>
+	/// Given a string expression, it is parsed and evaluated into a float value.
+	/// </summary>
+	/// <param name="expression">The expression to parse.</param>
+	/// <returns>The evaluated value.</returns>
+	float evaluate(std::string const& expression);
 }

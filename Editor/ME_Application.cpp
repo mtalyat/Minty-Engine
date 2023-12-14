@@ -763,8 +763,8 @@ void Application::generate_main()
 		"int main(int argc, char const* argv[]) {" << std::endl <<
 		"	std::filesystem::current_path(\"" << _info.project->get_base_path().generic_string() << "\");" << std::endl << // move out of Build/Debug or Build/Release folder, into base folder
 		"	minty::console::log(std::filesystem::current_path().string());" << std::endl <<
-		"	minty::Info info(\"TestProject - HARD CODED NAME\", 1, 0, 0);" << std::endl <<
-		"	minty::Runtime rt(&info);" << std::endl <<
+		"	minty::Info info(\"TestProject - HARD CODED NAME\", 0, 0, 0);" << std::endl <<
+		"	minty::Runtime rt(info);" << std::endl <<
 		"	init(rt);" << std::endl <<
 		"	int result = rt.run();" << std::endl <<
 		"	destroy(rt);" << std::endl <<
@@ -785,6 +785,16 @@ void Application::clean()
 void Application::build()
 {
 	_console.log_important("build");
+
+	_console.log_important("\tgenerating cmake");
+
+	generate_cmake();
+
+	_console.log_important("\tgenerating main");
+
+	generate_main();
+
+	_console.log_important("\tbuilding program");
 
 	std::string command = "cd " + _info.project->get_build_path().string() + " && " + std::filesystem::absolute(CMAKE_PATH).string();
 	_console.run_commands({
