@@ -102,6 +102,20 @@ namespace minty
 		Component const* get_by_name(std::string const& name, Entity const entity) const;
 
 		/// <summary>
+		/// Gets all Components that are attached to the given Entity.
+		/// </summary>
+		/// <param name="entity">The Entity with the components.</param>
+		/// <returns>A vector of components.</returns>
+		std::vector<Component const*> get_all(Entity const entity) const;
+
+		/// <summary>
+		/// Clones the given Entity and its components, and returns the new Entity.
+		/// </summary>
+		/// <param name="entity">The Entity to clone.</param>
+		/// <returns>The cloned Entity.</returns>
+		Entity clone(Entity const entity);
+
+		/// <summary>
 		/// Prints an Entity's values to the screen.
 		/// </summary>
 		/// <param name="entity"></param>

@@ -279,6 +279,7 @@
     <ClInclude Include="M_String.h" />
     <ClInclude Include="M_System.h" />
     <ClInclude Include="M_SystemRegistry.h" />
+    <ClInclude Include="M_Template.h" />
     <ClInclude Include="M_Texture.h" />
     <ClInclude Include="M_Rect.h" />
     <ClInclude Include="M_RectF.h" />
@@ -388,6 +389,7 @@
     <ClCompile Include="M_String.cpp" />
     <ClCompile Include="M_System.cpp" />
     <ClCompile Include="M_SystemRegistry.cpp" />
+    <ClCompile Include="M_Template.cpp" />
     <ClCompile Include="M_Texture.cpp" />
     <ClCompile Include="M_Rect.cpp" />
     <ClCompile Include="M_RectF.cpp" />
