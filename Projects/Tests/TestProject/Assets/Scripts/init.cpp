@@ -85,6 +85,25 @@ void init(Runtime &runtime)
         // load the scene we created, with the camera
         sceneManager.load_scene(sceneId);
 
+        // copy the model 5 times
+        Entity modelEntity = er->find_by_name("Model");
+        for(int y = 0; y < 5; y++)
+        {
+            for(int x = 0; x < 5; x++)
+            {
+                // ignore original
+                if(x == 0 && y == 0) continue;
+
+                // clone model, move it to the right 2 * i and down 2 * i
+                Entity clone = er->clone(modelEntity);
+                TransformComponent& cloneTransformComp = er->get<TransformComponent>(clone);
+                cloneTransformComp.local.position.x += static_cast<float>(x) * 4.0f;
+                cloneTransformComp.local.position.y += static_cast<float>(y) * 4.0f;
+                er->emplace_or_replace<DirtyComponent>(clone);
+                er->set_name(clone, std::format("Model {}", y * 5 + x));
+            }
+        }
+
         // debug print scene:
         {
             Node node;

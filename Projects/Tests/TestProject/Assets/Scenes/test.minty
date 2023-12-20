@@ -22,9 +22,9 @@ Entities
             name: pumpkin
         AudioSource
             clip: cow-bells
-        Test
-            rotationSpeed
-                y: 1.0
+#        Test
+#            rotationSpeed
+#                y: 1.0
 #    Sphere
 #        Renderable
 #        Transform
