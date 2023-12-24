@@ -6,6 +6,10 @@
 namespace minty
 {
 	constexpr char const* const WRAP_MAGIC = "WRAP";
+	constexpr int const WRAP_HEADER_ID_SIZE = 4;
+	constexpr int const WRAP_HEADER_PATH_SIZE = 100;
+	constexpr int const WRAP_HEADER_NAME_SIZE = 50;
+	constexpr int const WRAP_ENTRY_PATH_SIZE = 255;
 
 	/// <summary>
 	/// Handles dealing with one .wrap file.
@@ -17,7 +21,7 @@ namespace minty
 		/// <summary>
 		/// The type of the Wrap file.
 		/// </summary>
-		enum class Type
+		enum class Type : uint16_t
 		{
 			/// <summary>
 			/// This file has no type. Ignore it.
@@ -39,7 +43,7 @@ namespace minty
 		struct Header
 		{
 			// id to ensure this is a wrap file
-			char id[4] = { 'W', 'R', 'A', 'P' };
+			char id[WRAP_HEADER_ID_SIZE] = { 'W', 'R', 'A', 'P' };
 			// type of wrap
 			Type type = Type::None;
 			// version of wrap
@@ -47,11 +51,17 @@ namespace minty
 			// version of the data
 			uint32_t contentVersion = 0;
 			// base path of the physical folder that contains all of the entries
-			char basePath[100] = "";
+			char basePath[WRAP_HEADER_PATH_SIZE] = "";
 			// the name of the folder?
-			char name[50] = "";
+			char name[WRAP_HEADER_NAME_SIZE] = "";
 			// number of entries
 			uint32_t entryCount = 0;
+
+			Header();
+
+			Header(Header const& other);
+
+			Header& operator=(Header const& other);
 		};
 
 		/// <summary>
@@ -60,13 +70,19 @@ namespace minty
 		struct Entry
 		{
 			// old physical file path
-			char path[255] = "";
+			char path[WRAP_ENTRY_PATH_SIZE] = "";
 			// is the data compressed?
 			Byte compressed = 0;
 			// size of data
 			unsigned int size = 0;
 			// offset to from beginning
 			unsigned int offset = 0;
+
+			Entry();
+
+			Entry(Entry const& other);
+
+			Entry& operator=(Entry const& other);
 		};
 
 	private:
@@ -76,7 +92,12 @@ namespace minty
 
 	public:
 		/// <summary>
-		/// Creates a wrap file in memory.
+		/// Creates an empty wrap file in memory.
+		/// </summary>
+		Wrap();
+
+		/// <summary>
+		/// Loads the wrap file from the given path into memory.
 		/// </summary>
 		/// <param name="path">The path to the location of the base path for a new wrap file, or the location to a wrap file that is to be loaded.</param>
 		Wrap(Path const& path);
@@ -86,6 +107,10 @@ namespace minty
 		char const* get_base_path() const;
 
 		char const* get_name() const;
+
+		uint16_t get_wrap_version() const;
+
+		uint32_t get_content_version() const;
 
 		Entry const* get_entry(Path const& path) const;
 
@@ -112,7 +137,16 @@ namespace minty
 		std::unordered_map<String, Wrap> _wraps;
 
 	public:
-		Wrapper(Path const& path);
+		/// <summary>
+		/// Creates an empty Wrapper.
+		/// </summary>
+		Wrapper();
+
+		/// <summary>
+		/// Creates a Wrapper that will load the .wrap file at the given path, or all of the .wrap files within the given directory path.
+		/// </summary>
+		/// <param name="path"></param>
+		Wrapper(Path const& path, bool const recursive = false);
 
 		void load(Path const& path, bool const recursive = false);
 	};

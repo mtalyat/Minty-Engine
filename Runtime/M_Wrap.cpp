@@ -9,6 +9,11 @@
 
 using namespace minty;
 
+minty::Wrap::Wrap()
+    : _header()
+    , _entries()
+{}
+
 minty::Wrap::Wrap(Path const& path)
     : _header()
     , _entries()
@@ -63,6 +68,16 @@ char const* minty::Wrap::get_name() const
     return _header.name;
 }
 
+uint16_t minty::Wrap::get_wrap_version() const
+{
+    return _header.wrapVersion;
+}
+
+uint32_t minty::Wrap::get_content_version() const
+{
+    return _header.contentVersion;
+}
+
 Wrap::Entry const* minty::Wrap::get_entry(Path const& path) const
 {
     // get the entry if it exists
@@ -105,9 +120,15 @@ void minty::Wrap::set_type(Type const type)
     _header.type = type;
 }
 
-minty::Wrapper::Wrapper(Path const& path)
+minty::Wrapper::Wrapper()
     : _wraps()
 {}
+
+minty::Wrapper::Wrapper(Path const& path, bool const recursive)
+    : _wraps()
+{
+    load(path, recursive);
+}
 
 void minty::Wrapper::load(Path const& path, bool const recursive)
 {
@@ -132,7 +153,77 @@ void minty::Wrapper::load(Path const& path, bool const recursive)
         // create the wrap
         Wrap wrap(path);
 
-        // load it into data
-        _wraps.emplace(wrap.get_name(), wrap);
+        // determine what to do based on type
+        switch (wrap.get_type())
+        {
+        case Wrap::Type::File:
+            // load it into data
+            // if the name does not exist OR (the name does exist AND this content version is higher), add
+            auto const& found = _wraps.find(wrap.get_name());
+
+            if (found == _wraps.end() || wrap.get_content_version() > found->second.get_content_version())
+            {
+                // new OR replace
+                _wraps[wrap.get_name()] = wrap;
+            }
+        }
     }
+}
+
+minty::Wrap::Header::Header()
+{}
+
+minty::Wrap::Header::Header(Header const& other)
+    : id("")
+    , type(other.type)
+    , wrapVersion(other.wrapVersion)
+    , contentVersion(other.contentVersion)
+    , basePath("")
+    , name("")
+    , entryCount(other.entryCount)
+{
+    strncpy_s(id, other.id, WRAP_HEADER_ID_SIZE);
+    strncpy_s(basePath, other.basePath, WRAP_HEADER_PATH_SIZE);
+    strncpy_s(name, other.name, WRAP_HEADER_NAME_SIZE);
+}
+
+Wrap::Header& minty::Wrap::Header::operator=(Header const& other)
+{
+    if (&other != this)
+    {
+        strncpy_s(id, other.id, WRAP_HEADER_ID_SIZE);
+        type = other.type;
+        wrapVersion = other.wrapVersion;
+        contentVersion = other.contentVersion;
+        strncpy_s(basePath, other.basePath, WRAP_HEADER_PATH_SIZE);
+        strncpy_s(name, other.name, WRAP_HEADER_NAME_SIZE);
+        entryCount = other.entryCount;
+    }
+
+    return *this;
+}
+
+minty::Wrap::Entry::Entry()
+{}
+
+minty::Wrap::Entry::Entry(Entry const& other)
+    : path("")
+    , compressed(other.compressed)
+    , size(other.size)
+    , offset(other.offset)
+{
+    strncpy_s(path, other.path, WRAP_ENTRY_PATH_SIZE);
+}
+
+Wrap::Entry& minty::Wrap::Entry::operator=(Entry const& other)
+{
+    if (&other != this)
+    {
+        strncpy_s(path, other.path, WRAP_ENTRY_PATH_SIZE);
+        compressed = other.compressed;
+        size = other.size;
+        offset = other.offset;
+    }
+
+    return *this;
 }
