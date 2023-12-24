@@ -57,35 +57,100 @@ namespace minty
 
 		virtual ~File();
 
+		/// <summary>
+		/// Returns true if this File is open.
+		/// </summary>
+		/// <returns></returns>
 		bool is_open();
 
+		/// <summary>
+		/// Opens a file at the given path with the given flags. If a file is already open, it will be closed.
+		/// </summary>
+		/// <param name="path">The path of the file to load.</param>
+		/// <param name="flags">The flags to determine how to open the file.</param>
 		void open(Path const& path, Flags const flags);
 
+		/// <summary>
+		/// Closes the open file, if a file is open.
+		/// </summary>
 		void close();
 
+		/// <summary>
+		/// Moves the cursor to a new location within the file.
+		/// </summary>
+		/// <param name="offset">The offset at which the file is relative to the direction.</param>
+		/// <param name="dir">The anchor point of the offset.</param>
 		virtual void seek(Offset const offset, Direction const dir = Direction::Begin);
 
+		/// <summary>
+		/// Checks if the cursor is at or past the end of the file.
+		/// </summary>
+		/// <returns></returns>
 		virtual bool eof();
 
+		/// <summary>
+		/// Gets the current position of the cursor.
+		/// </summary>
+		/// <returns></returns>
 		virtual Offset tell();
 
+		/// <summary>
+		/// Gets the offset of the beginning of the data within the file.
+		/// </summary>
+		/// <returns></returns>
 		virtual Offset offset() const;
 
+		/// <summary>
+		/// Gets the size of the file.
+		/// </summary>
+		/// <returns></returns>
 		virtual Size size() const;
 
+		/// <summary>
+		/// Checks the next character after the cursor.
+		/// </summary>
+		/// <returns></returns>
 		virtual char peek();
 
+		/// <summary>
+		/// Gets the next character after the cursor, and moves the cursor to that position.
+		/// </summary>
+		/// <returns></returns>
 		virtual char get();
-
+		
+		/// <summary>
+		/// Reads the given size of data into the given buffer, and moves the cursor size bytes.
+		/// </summary>
+		/// <param name="buffer">The location to copy the data to.</param>
+		/// <param name="size">The number of bytes to copy.</param>
 		virtual void read(void* const buffer, Size const size);
 
+		/// <summary>
+		/// Reads the next bytes into the given data type T, and returns it.
+		/// </summary>
+		/// <typeparam name="T">The type of data to load and return.</typeparam>
+		/// <returns></returns>
 		template<typename T>
 		T read();
 
+		/// <summary>
+		/// Reads the next line of text, and moves the cursor the appropriate amount of bytes.
+		/// </summary>
+		/// <returns></returns>
 		virtual String read_line();
 
+		/// <summary>
+		/// Reads the next line of text, and moves the cursor the appropriate amount of bytes.
+		/// </summary>
+		/// <param name="delimiter">The separating character.</param>
+		/// <returns></returns>
 		virtual String read_line(char const delimiter);
 
+		/// <summary>
+		/// Reads all chars within the file at the given path.
+		/// </summary>
+		/// <param name="path">The path of the file.</param>
+		/// <returns>The chars from the file.</returns>
 		static std::vector<char> read_all_chars(Path const& path);
 
 		/// <summary>
