@@ -33,6 +33,7 @@ minty::Wrap::Wrap(Path const& path)
     {
         // else, use empty wrap file, creating a new one
         String pathstr = path.string();
+        _header.type = Type::File;
         strncpy_s(_header.basePath, pathstr.c_str(), min(pathstr.length(), 100));
         strncpy_s(_header.name, Path(path).stem().string().c_str(), 50);
     }
@@ -83,6 +84,16 @@ Wrap::Entry& minty::Wrap::at(Path const& path)
 Wrap::Entry const& minty::Wrap::at(Path const& path) const
 {
     return _entries.at(path);
+}
+
+Wrap::Type minty::Wrap::get_type() const
+{
+    return _header.type;
+}
+
+void minty::Wrap::set_type(Type const type)
+{
+    _header.type = type;
 }
 
 minty::Wrapper::Wrapper(Path const& path)

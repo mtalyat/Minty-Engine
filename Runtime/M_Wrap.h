@@ -13,14 +13,35 @@ namespace minty
 	{
 	public:
 		/// <summary>
+		/// The type of the Wrap file.
+		/// </summary>
+		enum class Type
+		{
+			/// <summary>
+			/// This file has no type. Ignore it.
+			/// </summary>
+			None = 0,
+			/// <summary>
+			/// This file is a base file.
+			/// </summary>
+			File = 1,
+			/// <summary>
+			/// This file should override some data.
+			/// </summary>
+			Update = 2,
+		};
+
+		/// <summary>
 		/// The header information for a .wrap file. Holds meta data about the file itself.
 		/// </summary>
 		struct Header
 		{
 			// id to ensure this is a wrap file
 			char id[4] = { 'W', 'R', 'A', 'P' };
+			// type of wrap
+			Type type = Type::None;
 			// version of wrap
-			uint32_t wrapVersion = 0;
+			uint16_t wrapVersion = 0;
 			// version of the data
 			uint32_t contentVersion = 0;
 			// base path of the physical folder that contains all of the entries
@@ -71,6 +92,10 @@ namespace minty
 		Entry& at(Path const& path);
 
 		Entry const& at(Path const& path) const;
+
+		Type get_type() const;
+
+		void set_type(Type const type);
 	};
 
 	/// <summary>
