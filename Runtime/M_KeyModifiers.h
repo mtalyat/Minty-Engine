@@ -17,5 +17,5 @@ namespace minty
 		NumLock =		0b100000
 	};
 
-	std::string to_string(KeyModifiers const value);
+	String to_string(KeyModifiers const value);
 }

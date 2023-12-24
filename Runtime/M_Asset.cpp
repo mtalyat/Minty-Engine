@@ -5,43 +5,43 @@
 #include "M_Console.h"
 
 using namespace minty;
-using namespace minty::asset;
+using namespace minty::Asset;
 
-std::string get_assets_path(std::string const& path)
+Path get_assets_path(Path const& path)
 {
-	return (BASE_PATH / path).string();
+	return BASE_PATH / path;
 }
 
-bool minty::asset::exists(std::string const& path)
+bool minty::Asset::exists(Path const& path)
 {
-	return file::exists(get_assets_path(path));
+	return std::filesystem::exists(get_assets_path(path));
 }
 
-bool minty::asset::exists_meta(std::string const& path)
+bool minty::Asset::exists_meta(Path const& path)
 {
-	return exists(path + ".meta");
+	return std::filesystem::exists(Path(path).replace_extension(".meta"));
 }
 
-std::string minty::asset::absolute(std::string const& path)
+Path minty::Asset::absolute(Path const& path)
 {
-	return file::absolute(get_assets_path(path));
+	return std::filesystem::absolute(get_assets_path(path));
 }
 
-Node minty::asset::load_node(std::string const& path)
+Node minty::Asset::load_node(Path const& path)
 {
 #if N_DEBUG
 	console::error("Asset loading not implemented for release builds.");
-	return std::string();
+	return String();
 #else
-	return file::read_node(get_assets_path(path));
+	return File::read_node(get_assets_path(path));
 #endif
 }
 
-Node minty::asset::load_meta(std::string const& path)
+Node minty::Asset::load_meta(Path const& path)
 {
-	std::string metaPath = path + ".meta";
+	Path metaPath = Path(path).replace_extension(".meta");
 
-	if (exists(metaPath))
+	if (std::filesystem::exists(metaPath))
 	{
 		return load_node(metaPath);
 	}
@@ -52,32 +52,32 @@ Node minty::asset::load_meta(std::string const& path)
 	}
 }
 
-std::vector<char> minty::asset::load_chars(std::string const& path)
+std::vector<char> minty::Asset::load_chars(Path const& path)
 {
 #if N_DEBUG
 	console::error("Asset loading not implemented for release builds.");
-	return std::string();
+	return String();
 #else
-	return file::read_all_chars(get_assets_path(path));
+	return File::read_all_chars(get_assets_path(path));
 #endif
 }
 
-std::string minty::asset::load_text(std::string const& path)
+String minty::Asset::load_text(Path const& path)
 {
 #if N_DEBUG
 	console::error("Asset loading not implemented for release builds.");
-	return std::string();
+	return String();
 #else
-	return file::read_all_text(get_assets_path(path));
+	return File::read_all_text(get_assets_path(path));
 #endif
 }
 
-std::vector<std::string> minty::asset::load_lines(std::string const& path)
+std::vector<String> minty::Asset::load_lines(Path const& path)
 {
 #if N_DEBUG
 	console::error("Asset loading not implemented for release builds.");
-	return std::vector<std::string>();
+	return std::vector<String>();
 #else
-	return file::read_all_lines(get_assets_path(path));
+	return File::read_all_lines(get_assets_path(path));
 #endif
 }

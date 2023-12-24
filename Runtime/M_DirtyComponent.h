@@ -10,6 +10,6 @@ namespace minty
 	struct DirtyComponent
 		: public Component
 	{
-		friend std::string to_string(DirtyComponent const& value);
+		friend String to_string(DirtyComponent const& value);
 	};
 }

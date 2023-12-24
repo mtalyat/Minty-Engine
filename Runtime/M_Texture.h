@@ -78,7 +78,7 @@ namespace minty
 		VkSampler get_sampler() const;
 		
 	public:
-		friend std::string to_string(Texture const& value);
+		friend String to_string(Texture const& value);
 	};
 }
 

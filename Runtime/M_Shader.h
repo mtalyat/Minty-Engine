@@ -70,7 +70,7 @@ namespace minty
 		/// <param name="value"></param>
 		/// <param name="size"></param>
 		/// <param name="offset"></param>
-		void update_push_constant(std::string const& name, VkCommandBuffer const commandBuffer, void* const value, uint32_t const size, uint32_t const offset = 0) const;
+		void update_push_constant(String const& name, VkCommandBuffer const commandBuffer, void* const value, uint32_t const size, uint32_t const offset = 0) const;
 
 		/// <summary>
 		/// Updates the global uniform constant.
@@ -79,7 +79,7 @@ namespace minty
 		/// <param name="value"></param>
 		/// <param name="size"></param>
 		/// <param name="offset"></param>
-		void update_global_uniform_constant(std::string const& name, void* const value, uint32_t const size, uint32_t const offset = 0) const;
+		void update_global_uniform_constant(String const& name, void* const value, uint32_t const size, uint32_t const offset = 0) const;
 
 		/// <summary>
 		/// Create a descriptor set based on the given set index.
@@ -106,7 +106,7 @@ namespace minty
 		std::array<VkDescriptorSet, MAX_FRAMES_IN_FLIGHT> create_descriptor_sets(uint32_t const set);
 
 	public:
-		friend std::string to_string(Shader const& shader);
+		friend String to_string(Shader const& shader);
 	};
 }
 

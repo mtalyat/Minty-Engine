@@ -3,7 +3,9 @@
 
 #include <iostream>
 
-void print_raw(std::ostream& stream, std::string const& message, minty::console::Color const color)
+using namespace minty;
+
+void print_raw(std::ostream& stream, String const& message, minty::console::Color const color)
 {
 	if (color < minty::console::Color::Gray)
 	{
@@ -17,7 +19,7 @@ void print_raw(std::ostream& stream, std::string const& message, minty::console:
 	}
 }
 
-std::string minty::console::to_string(Color const value)
+String minty::console::to_string(Color const value)
 {
 	switch (value) {
 	case Color::Black: return "Black";
@@ -40,12 +42,12 @@ std::string minty::console::to_string(Color const value)
 	}
 }
 
-void minty::console::print(std::string const& message)
+void minty::console::print(String const& message)
 {
 	std::cout << message << std::endl;
 }
 
-void minty::console::print(std::string const& message, Color const color)
+void minty::console::print(String const& message, Color const color)
 {
 	print_raw(std::cout, message, color);
 }
@@ -53,53 +55,53 @@ void minty::console::print(std::string const& message, Color const color)
 void minty::console::wait()
 {
 	print("\nPress enter to continue...");
-	std::string temp;
+	String temp;
 	std::getline(std::cin, temp);
 }
 
-void minty::console::log(std::string const& message, Color const color)
+void minty::console::log(String const& message, Color const color)
 {
 #ifndef NDEBUG
 	print_raw(std::cout, message, color);
 #endif
 }
 
-void minty::console::todo(std::string const& message)
+void minty::console::todo(String const& message)
 {
 #ifndef NDEBUG
 	print_raw(std::cout, "[todo]: " + message, Color::Magenta);
 #endif
 }
 
-void minty::console::test(std::string const& message, Color const color)
+void minty::console::test(String const& message, Color const color)
 {
 #ifndef NDEBUG
 	print_raw(std::cout, "[test]: " + message, color);
 #endif
 }
 
-void minty::console::info(std::string const& message)
+void minty::console::info(String const& message)
 {
 #ifndef NDEBUG
 	print_raw(std::cout, "[info]: " + message, Color::Gray);
 #endif
 }
 
-void minty::console::warn(std::string const& message)
+void minty::console::warn(String const& message)
 {
 #ifndef NDEBUG
 	print_raw(std::cout, "[warn]: " + message, Color::Yellow);
 #endif
 }
 
-void minty::console::error(std::string const& message)
+void minty::console::error(String const& message)
 {
 #ifndef NDEBUG
 	print_raw(std::cout, "[errr]: " + message, Color::Red);
 #endif
 }
 
-bool minty::console::ass(bool const value, std::string const& errorMessage)
+bool minty::console::ass(bool const value, String const& errorMessage)
 {
 #ifndef NDEBUG
 	if (!value)

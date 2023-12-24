@@ -14,7 +14,14 @@
 #include <unordered_set>
 #include <algorithm>
 
+using namespace minty;
+
 float minty::math::clamp(float const value, float const minimum, float const maximum)
+{
+	return std::max(minimum, std::min(maximum, value));
+}
+
+int minty::math::clamp(int const value, int const minimum, int const maximum)
 {
 	return std::max(minimum, std::min(maximum, value));
 }
@@ -159,7 +166,7 @@ float minty::math::signz(float const value)
 	return value < 0.0f ? -1.0f : (value > 0.0f ? 1.0f : 0.0f);
 }
 
-bool is_number(std::string const& str)
+bool is_number(String const& str)
 {
 	bool decimalPointFound = false;
 	for (char c : str) {
@@ -175,9 +182,9 @@ bool is_number(std::string const& str)
 	return true;
 }
 
-bool try_get_constant(std::string const& str, float& value)
+bool try_get_constant(String const& str, float& value)
 {
-	static std::unordered_map<std::string, float> const constants =
+	static std::unordered_map<String, float> const constants =
 	{
 		{"PI", minty::math::PI},
 		{"FLOAT", static_cast<float>(sizeof(float))},
@@ -211,9 +218,9 @@ bool try_get_constant(std::string const& str, float& value)
 	return true;
 }
 
-int is_function(std::string const& str)
+int is_function(String const& str)
 {
-	static std::unordered_map<std::string, int> const functionNames =
+	static std::unordered_map<String, int> const functionNames =
 	{
 
 	};
@@ -228,9 +235,9 @@ int is_function(std::string const& str)
 }
 
 // https://en.cppreference.com/w/c/language/operator_precedence
-int operator_precedence(std::string const& str)
+int operator_precedence(String const& str)
 {
-	static std::unordered_map<std::string, int> const precedence =
+	static std::unordered_map<String, int> const precedence =
 	{
 		{"^", 4},
 		{"*", 3},
@@ -252,9 +259,9 @@ int operator_precedence(std::string const& str)
 }
 
 // from chatgpt
-std::vector<std::string> split_into_tokens(std::string const& expression) {
+std::vector<String> split_into_tokens(String const& expression) {
 	std::regex tokenRegex(R"([[:digit:]]+(\.[[:digit:]]+)?|[a-zA-Z]+|\+|\-|\*|\/|\(|\))");
-	std::vector<std::string> tokens;
+	std::vector<String> tokens;
 
 	auto words_begin = std::sregex_iterator(expression.begin(), expression.end(), tokenRegex);
 	auto words_end = std::sregex_iterator();
@@ -267,18 +274,18 @@ std::vector<std::string> split_into_tokens(std::string const& expression) {
 }
 
 // https://en.wikipedia.org/wiki/Shunting_yard_algorithm
-void sort_infix_to_postfix(std::vector<std::string>& tokens)
+void sort_infix_to_postfix(std::vector<String>& tokens)
 {
 	// copy over to new list
-	std::vector<std::string> unsortedTokens(tokens);
+	std::vector<String> unsortedTokens(tokens);
 
 	// clear output
 	tokens.clear();
 
 	// temp stack of operators
-	std::vector<std::string> operators;
+	std::vector<String> operators;
 
-	std::string token;
+	String token;
 	float value;
 	for(auto const& token : unsortedTokens)
 	{
@@ -345,10 +352,10 @@ void sort_infix_to_postfix(std::vector<std::string>& tokens)
 	}
 }
 
-float minty::math::evaluate(std::string const& expression)
+float minty::math::evaluate(String const& expression)
 {
 	// get tokens
-	std::vector<std::string> tokens = split_into_tokens(expression);
+	std::vector<String> tokens = split_into_tokens(expression);
 
 	// sort into postfix
 	sort_infix_to_postfix(tokens);
@@ -357,7 +364,7 @@ float minty::math::evaluate(std::string const& expression)
 	std::vector<float> stack;
 
 	float left, right;
-	for (std::string const& token : tokens)
+	for (String const& token : tokens)
 	{
 		if (parse::try_float(token, left) || try_get_constant(token, left))
 		{

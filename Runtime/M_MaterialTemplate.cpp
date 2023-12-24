@@ -28,7 +28,7 @@ std::vector<ID> const& minty::MaterialTemplate::get_shader_pass_ids() const
 	return _shaderPassIds;
 }
 
-Dynamic minty::MaterialTemplate::get_defalt_value(std::string const& name) const
+Dynamic minty::MaterialTemplate::get_defalt_value(String const& name) const
 {
 	auto const& found = _defaultValues.find(name);
 
@@ -42,12 +42,12 @@ Dynamic minty::MaterialTemplate::get_defalt_value(std::string const& name) const
 	return Dynamic();
 }
 
-std::unordered_map<std::string, Dynamic> const& minty::MaterialTemplate::get_default_values() const
+std::unordered_map<String, Dynamic> const& minty::MaterialTemplate::get_default_values() const
 {
 	return _defaultValues;
 }
 
-std::string minty::to_string(MaterialTemplate const& value)
+String minty::to_string(MaterialTemplate const& value)
 {
 	return std::format("MaterialTemplate()");
 }

@@ -13,8 +13,8 @@
 
 using namespace minty;
 
-std::map<std::string const, EntityRegistry::ComponentFuncs const> EntityRegistry::_components = std::map<std::string const, EntityRegistry::ComponentFuncs const>();
-std::map<uint32_t const, std::string const> EntityRegistry::_componentTypes = std::map<uint32_t const, std::string const>();
+std::map<String const, EntityRegistry::ComponentFuncs const> EntityRegistry::_components = std::map<String const, EntityRegistry::ComponentFuncs const>();
+std::map<uint32_t const, String const> EntityRegistry::_componentTypes = std::map<uint32_t const, String const>();
 
 minty::EntityRegistry::EntityRegistry()
 	: entt::registry()
@@ -44,7 +44,7 @@ Entity minty::EntityRegistry::create()
 	return entt::registry::create();
 }
 
-Entity minty::EntityRegistry::create(std::string const& name)
+Entity minty::EntityRegistry::create(String const& name)
 {
 	Entity e = create();
 	NameComponent& nameComponent = this->emplace<NameComponent>(e);
@@ -52,7 +52,7 @@ Entity minty::EntityRegistry::create(std::string const& name)
 	return e;
 }
 
-Entity minty::EntityRegistry::find_by_name(std::string const& string) const
+Entity minty::EntityRegistry::find_by_name(String const& string) const
 {
 	if (is_name_empty(string))
 	{
@@ -72,7 +72,7 @@ Entity minty::EntityRegistry::find_by_name(std::string const& string) const
 	return NULL_ENTITY;
 }
 
-std::string minty::EntityRegistry::get_name(Entity const entity) const
+String minty::EntityRegistry::get_name(Entity const entity) const
 {
 	// if entity is null, return NULL
 	if (entity == NULL_ENTITY)
@@ -94,7 +94,7 @@ std::string minty::EntityRegistry::get_name(Entity const entity) const
 	}
 }
 
-void minty::EntityRegistry::set_name(Entity const entity, std::string const& name)
+void minty::EntityRegistry::set_name(Entity const entity, String const& name)
 {
 	// check if name is a real name, or empty
 	if (name.empty() || (name.size() == 1 && name.front() == '_'))
@@ -113,7 +113,7 @@ void minty::EntityRegistry::set_name(Entity const entity, std::string const& nam
 	}
 }
 
-Component* minty::EntityRegistry::emplace_by_name(std::string const& name, Entity const entity)
+Component* minty::EntityRegistry::emplace_by_name(String const& name, Entity const entity)
 {
 	auto const& found = _components.find(name);
 	if (found == _components.end())
@@ -129,7 +129,7 @@ Component* minty::EntityRegistry::emplace_by_name(std::string const& name, Entit
 	}
 }
 
-Component const* minty::EntityRegistry::get_by_name(std::string const& name, Entity const entity) const
+Component const* minty::EntityRegistry::get_by_name(String const& name, Entity const entity) const
 {
 	auto const& found = _components.find(name);
 	if (found == _components.end())
@@ -165,7 +165,7 @@ std::vector<Component const*> minty::EntityRegistry::get_all(Entity const entity
 				continue;
 			}
 
-			std::string name = found->second;
+			String name = found->second;
 
 			components.push_back(this->get_by_name(found->second, entity));
 		}
@@ -206,7 +206,7 @@ size_t minty::EntityRegistry::size() const
 void minty::EntityRegistry::serialize(Writer& writer) const
 {
 	// write each entity, and each component under it
-	std::string entityName;
+	String entityName;
 
 	for (auto [entity] : this->storage<Entity>()->each())
 	{
@@ -267,7 +267,7 @@ void minty::EntityRegistry::deserialize(Reader const& reader)
 	}
 }
 
-bool minty::EntityRegistry::is_name_empty(std::string const& name)
+bool minty::EntityRegistry::is_name_empty(String const& name)
 {
 	return name.size() == 0 || (name.size() == 1 && name.at(0) == '_');
 }
@@ -293,7 +293,7 @@ void minty::EntityRegistry::serialize_entity(Writer& writer, Entity const entity
 				continue;
 			}
 
-			std::string name = found->second;
+			String name = found->second;
 
 			// ignore NameComponent, that is used when writing the entity node
 			if (name.compare("Name") == 0)
@@ -315,12 +315,12 @@ Node minty::EntityRegistry::serialize_entity(Entity const entity) const
 	return node;
 }
 
-std::string minty::to_string(Entity const value)
+String minty::to_string(Entity const value)
 {
 	return std::to_string(static_cast<unsigned int>(value));
 }
 
-std::string minty::to_string(EntityRegistry const& value)
+String minty::to_string(EntityRegistry const& value)
 {
 	// total entities
 	size_t entityCount = value.size();
@@ -329,7 +329,7 @@ std::string minty::to_string(EntityRegistry const& value)
 	size_t namedCount = value.view<NameComponent const>().size();
 
 	// get a count of similarly named entities, so there isn't 100 of the same named entity
-	std::map<std::string, size_t> counts;
+	std::map<String, size_t> counts;
 
 	if (entityCount != namedCount)
 	{

@@ -82,7 +82,7 @@ namespace minty
 		VkRect2D get_scissor() const;
 
 	public:
-		friend std::string to_string(Viewport const& value);
+		friend String to_string(Viewport const& value);
 	};
 }
 

@@ -3,6 +3,7 @@
 #include "M_Base.h"
 
 #include "M_Audio.h"
+#include <filesystem>
 
 namespace minty
 {
@@ -22,7 +23,7 @@ namespace minty
 		/// Loads this AudioClip with the data from the sound at the given path.
 		/// </summary>
 		/// <param name="path">The path to the sound file.</param>
-		void load(std::string const& path);
+		void load(Path const& path);
 
 		/// <summary>
 		/// Sets the base volume of this AudioClip.

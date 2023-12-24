@@ -4,6 +4,8 @@
 #include "M_SerializationData.h"
 #include "M_Scene.h"
 
+using namespace minty;
+
 void minty::RelationshipComponent::serialize(Writer& writer) const
 {
 	if (!writer.get_data())
@@ -42,7 +44,7 @@ void minty::RelationshipComponent::deserialize(Reader const& reader)
 	parent = er->find_by_name(reader.read_string("parent"));
 }
 
-std::string minty::to_string(RelationshipComponent const& value)
+String minty::to_string(RelationshipComponent const& value)
 {
 	return std::format("RelationshipComponent(children = {}, first = {}, prev = {}, next = {}, parent = {})", std::to_string(value.children), to_string(value.first), to_string(value.prev), to_string(value.next), to_string(value.parent));
 }

@@ -98,7 +98,7 @@ Rect RectF::ceil(RectF const& rect)
 	return Rect(math::ceil_to_int(rect.x), math::ceil_to_int(rect.y), math::ceil_to_int(rect.width), math::ceil_to_int(rect.height));
 }
 
-std::string minty::to_string(RectF const& value)
+String minty::to_string(RectF const& value)
 {
 	return std::format("RectF({0}, {1}, {2}, {3})", value.x, value.y, value.width, value.height);
 }

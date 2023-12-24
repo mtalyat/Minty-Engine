@@ -38,7 +38,7 @@ void minty::TransformComponent::deserialize(Reader const& reader)
 	local.scale = reader.read_vector3("scale", Vector3(1.0f, 1.0f, 1.0f));
 }
 
-std::string minty::to_string(TransformComponent const& value)
+String minty::to_string(TransformComponent const& value)
 {
 	return std::format("TransformComponent(local = {})", to_string(value.local));
 }

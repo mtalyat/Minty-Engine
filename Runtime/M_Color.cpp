@@ -29,14 +29,14 @@ Color::Color()
 	, a(0)
 {}
 
-Color::Color(byte const r, byte const g, byte const b)
+Color::Color(Byte const r, Byte const g, Byte const b)
 	: r(r)
 	, g(g)
 	, b(b)
 	, a(0)
 {}
 
-Color::Color(byte const r, byte const g, byte const b, byte const a)
+Color::Color(Byte const r, Byte const g, Byte const b, Byte const a)
 	: r(r)
 	, g(g)
 	, b(b)
@@ -117,22 +117,22 @@ inline Color Color::lighten(float const percent) const
 Color Color::lerp(Color const left, Color const right, float const t)
 {
 	return Color(
-		static_cast<byte>(math::lerp(left.r, right.r, t)),
-		static_cast<byte>(math::lerp(left.g, right.g, t)),
-		static_cast<byte>(math::lerp(left.b, right.b, t)),
+		static_cast<Byte>(math::lerp(left.r, right.r, t)),
+		static_cast<Byte>(math::lerp(left.g, right.g, t)),
+		static_cast<Byte>(math::lerp(left.b, right.b, t)),
 		left.a);
 }
 
 Color Color::lerpa(Color const left, Color const right, float const t)
 {
 	return Color(
-		static_cast<byte>(math::lerp(left.r, right.r, t)),
-		static_cast<byte>(math::lerp(left.g, right.g, t)),
-		static_cast<byte>(math::lerp(left.b, right.b, t)),
-		static_cast<byte>(math::lerp(left.a, right.a, t)));
+		static_cast<Byte>(math::lerp(left.r, right.r, t)),
+		static_cast<Byte>(math::lerp(left.g, right.g, t)),
+		static_cast<Byte>(math::lerp(left.b, right.b, t)),
+		static_cast<Byte>(math::lerp(left.a, right.a, t)));
 }
 
-std::string minty::to_string(Color const color)
+String minty::to_string(Color const color)
 {
 	return std::format("Color({}, {}, {}, {})", color.r, color.g, color.b, color.a);
 }

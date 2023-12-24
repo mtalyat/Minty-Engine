@@ -70,6 +70,6 @@ namespace minty
 		virtual void unload() {}
 
 	public:
-		friend std::string to_string(System const& value);
+		friend String to_string(System const& value);
 	};
 }

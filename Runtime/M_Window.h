@@ -19,7 +19,7 @@ namespace minty
 	private:
 		static int _windowCount;
 
-		std::string _title;
+		String _title;
 		GLFWwindow* _window;
 		int _frameWidth, _frameHeight;
 		int _width, _height;
@@ -36,19 +36,19 @@ namespace minty
 		/// <param name="title">The title to be displayed on the Window.</param>
 		/// <param name="width">The width of the Window in pixels.</param>
 		/// <param name="height">The height of the Window in pixels.</param>
-		Window(std::string const& title, int const width, int const height, InputMap const* const globalInputMap = nullptr);
+		Window(String const& title, int const width, int const height, InputMap const* const globalInputMap = nullptr);
 
 		~Window();
 
 		/// <summary>
 		/// Sets the title text of this Window.
 		/// </summary>
-		void set_title(std::string const& title);
+		void set_title(String const& title);
 
 		/// <summary>
 		/// Gets the title text of this Window.
 		/// </summary>
-		std::string const& get_title() const;
+		String const& get_title() const;
 
 		/// <summary>
 		/// Sets the cursor mode.
@@ -148,7 +148,7 @@ namespace minty
 		static void cursor_callback(GLFWwindow* window, double xpos, double ypos);
 
 	public:
-		friend std::string to_string(Window const& value);
+		friend String to_string(Window const& value);
 	};
 }
 

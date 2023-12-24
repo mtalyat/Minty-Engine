@@ -87,7 +87,7 @@ void minty::Runtime::register_builtin()
 	EntityRegistry::register_component<UITransformComponent>("UITransform");
 }
 
-std::string minty::to_string(Runtime const& runtime)
+String minty::to_string(Runtime const& runtime)
 {
 	return std::format("Runtime()");
 }

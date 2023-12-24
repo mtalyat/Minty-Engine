@@ -22,10 +22,10 @@ namespace minty
 		std::unordered_map<ID, T> _data;
 
 		// names
-		std::unordered_map<ID, std::string> _names;
+		std::unordered_map<ID, String> _names;
 
 		// name lookup
-		std::unordered_map<std::string, ID> _lookup;
+		std::unordered_map<String, ID> _lookup;
 
 		// next ID to be used
 		ID _next;
@@ -55,20 +55,20 @@ namespace minty
 		/// <param name="name">The name of the object.</param>
 		/// <param name="obj">The object.</param>
 		/// <returns>The ID of the object in the Register, or ERROR_ID if the Register is full.</returns>
-		ID emplace(std::string const &name, T const &obj);
+		ID emplace(String const &name, T const &obj);
 
 		/// <summary>
 		/// Sets an name for an ID in this Register.
 		/// </summary>
 		/// <param name="name">The name name.</param>
 		/// <param name="id">The ID of the object.</param>
-		void emplace_name(std::string const &name, ID const id);
+		void emplace_name(String const &name, ID const id);
 
 		/// <summary>
 		/// Removes an name for an ID in this Register.
 		/// </summary>
 		/// <param name="name">The name name.</param>
-		void erase_name(std::string const &name);
+		void erase_name(String const &name);
 
 		/// <summary>
 		/// Erases the object with the given ID.
@@ -80,7 +80,7 @@ namespace minty
 		/// Erases the object with the given name.
 		/// </summary>
 		/// <param name="name"></param>
-		void erase(std::string const &name);
+		void erase(String const &name);
 
 		/// <summary>
 		/// Checks if this Register has an object with the given ID.
@@ -94,21 +94,21 @@ namespace minty
 		/// </summary>
 		/// <param name="name"></param>
 		/// <returns></returns>
-		bool contains(std::string const &name) const;
+		bool contains(String const &name) const;
 
 		/// <summary>
 		/// Gets the ID for the given name in this Register.
 		/// </summary>
 		/// <param name="name">The name of the object.</param>
 		/// <returns>The ID of the object with the name.</returns>
-		ID get_id(std::string const name) const;
+		ID get_id(String const name) const;
 
 		/// <summary>
 		/// Gets the name for the given ID in this Register.
 		/// </summary>
 		/// <param name="id"></param>
 		/// <returns></returns>
-		std::string const &get_name(ID const id) const;
+		String const &get_name(ID const id) const;
 
 		/// <summary>
 		/// Gets the object with the given ID.
@@ -129,14 +129,14 @@ namespace minty
 		/// </summary>
 		/// <param name="name">The name of the object in this Register.</param>
 		/// <returns>A pointer to the object.</returns>
-		T& at(std::string const& name);
+		T& at(String const& name);
 
 		/// <summary>
 		/// Gets the object with the given name.
 		/// </summary>
 		/// <param name="name">The name of the object in this Register.</param>
 		/// <returns>A pointer to the object.</returns>
-		T const &at(std::string const &name) const;
+		T const &at(String const &name) const;
 
 		/// <summary>
 		/// Gets the number of objects within this Register.
@@ -216,7 +216,7 @@ namespace minty
 	}
 
 	template <class T>
-	ID Register<T>::emplace(std::string const &name, T const &obj)
+	ID Register<T>::emplace(String const &name, T const &obj)
 	{
 		// check if over capacity
 		if (_data.size() >= _capacity)
@@ -242,14 +242,14 @@ namespace minty
 	}
 
 	template <class T>
-	void Register<T>::emplace_name(std::string const &name, ID const id)
+	void Register<T>::emplace_name(String const &name, ID const id)
 	{
 		_lookup[name] = id;
 		_names[id] = name;
 	}
 
 	template <class T>
-	void Register<T>::erase_name(std::string const &name)
+	void Register<T>::erase_name(String const &name)
 	{
 		ID id = _lookup.at(name);
 		_lookup.erase(name);
@@ -261,7 +261,7 @@ namespace minty
 	{
 		if (_names.contains(id))
 		{
-			std::string name = _names.at(id);
+			String name = _names.at(id);
 			_lookup.erase(name);
 			_names.erase(id);
 		}
@@ -270,7 +270,7 @@ namespace minty
 	}
 
 	template <class T>
-	void Register<T>::erase(std::string const &name)
+	void Register<T>::erase(String const &name)
 	{
 		ID id = _lookup.at(name);
 		_lookup.erase(name);
@@ -279,7 +279,7 @@ namespace minty
 	}
 
 	template <class T>
-	bool Register<T>::contains(std::string const &name) const
+	bool Register<T>::contains(String const &name) const
 	{
 		return _lookup.contains(name);
 	}
@@ -291,7 +291,7 @@ namespace minty
 	}
 
 	template <class T>
-	ID Register<T>::get_id(std::string const name) const
+	ID Register<T>::get_id(String const name) const
 	{
 		auto const& found = _lookup.find(name);
 
@@ -306,13 +306,13 @@ namespace minty
 	}
 
 	template <class T>
-	std::string const &Register<T>::get_name(ID const id) const
+	String const &Register<T>::get_name(ID const id) const
 	{
 		auto const& found = _names.find(id);
 
 		if (found == _names.end())
 		{
-			return "";
+			return string::EMPTY;
 		}
 		else
 		{
@@ -333,14 +333,14 @@ namespace minty
 	}
 
 	template <class T>
-	T const &Register<T>::at(std::string const &name) const
+	T const &Register<T>::at(String const &name) const
 	{
 		// use lookup to find id, then use that to get object
 		return at(_lookup.at(name));
 	}
 
 	template <class T>
-	T &Register<T>::at(std::string const &name)
+	T &Register<T>::at(String const &name)
 	{
 		// use lookup to find id, then use that to get object
 		return at(_lookup.at(name));

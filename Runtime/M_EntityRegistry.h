@@ -11,7 +11,7 @@ namespace minty
 	typedef entt::entity Entity;
 	constexpr Entity NULL_ENTITY = entt::null;
 
-	std::string to_string(Entity const value);
+	String to_string(Entity const value);
 
 	class EntityRegistry
 		: public Object, public entt::registry, public ISerializable
@@ -27,8 +27,8 @@ namespace minty
 			ComponentGetFunc get;
 		};
 
-		static std::map<std::string const, ComponentFuncs const> _components; // name -> creation/get funcs
-		static std::map<uint32_t const, std::string const> _componentTypes; // type id index -> name
+		static std::map<String const, ComponentFuncs const> _components; // name -> creation/get funcs
+		static std::map<uint32_t const, String const> _componentTypes; // type id index -> name
 
 	public:
 		EntityRegistry();
@@ -51,7 +51,7 @@ namespace minty
 		/// </summary>
 		/// <param name="name">The name of the Entity.</param>
 		/// <returns>The new Entity with a NameComponent attached, with the given name.</returns>
-		Entity create(std::string const& name);
+		Entity create(String const& name);
 
 		//~EntityRegistry();
 
@@ -60,7 +60,7 @@ namespace minty
 		/// </summary>
 		/// <param name="string"></param>
 		/// <returns>The Entity, if found, otherwise NULL_ENTITY.</returns>
-		Entity find_by_name(std::string const& string) const;
+		Entity find_by_name(String const& string) const;
 
 		/// <summary>
 		/// Finds the first Entity with the given Component type.
@@ -76,14 +76,14 @@ namespace minty
 		/// </summary>
 		/// <param name="entity">The Entity to get the name from.</param>
 		/// <returns>The name of the Entity, or "" if no name.</returns>
-		std::string get_name(Entity const entity) const;
+		String get_name(Entity const entity) const;
 
 		/// <summary>
 		/// Sets the NameComponent name of the Entity. Emplaces a NameComponent if needed. If no name is given ("" or "_"), then the NameComponent is removed.
 		/// </summary>
 		/// <param name="entity">The Entity to name.</param>
 		/// <param name="name">The new name of the Entity.</param>
-		void set_name(Entity const entity, std::string const& name);
+		void set_name(Entity const entity, String const& name);
 
 		/// <summary>
 		/// Emplaces the Component onto the entity, by name.
@@ -91,7 +91,7 @@ namespace minty
 		/// <param name="name">The name of the Component.</param>
 		/// <param name="entity">The Entity to set the Component onto.</param>
 		/// <returns>A pointer to the newly emplaced Component, or null if an error occured.</returns>
-		Component* emplace_by_name(std::string const& name, Entity const entity);
+		Component* emplace_by_name(String const& name, Entity const entity);
 
 		/// <summary>
 		/// Gets the Component, by name.
@@ -99,7 +99,7 @@ namespace minty
 		/// <param name="name">The name of the Component.</param>
 		/// <param name="entity">The Entity that has the Component.</param>
 		/// <returns>The Component, or null if it does not exist.</returns>
-		Component const* get_by_name(std::string const& name, Entity const entity) const;
+		Component const* get_by_name(String const& name, Entity const entity) const;
 
 		/// <summary>
 		/// Gets all Components that are attached to the given Entity.
@@ -127,21 +127,21 @@ namespace minty
 		/// <returns>The total number of Entities.</returns>
 		size_t size() const;
 
-		friend std::string to_string(EntityRegistry const& value);
+		friend String to_string(EntityRegistry const& value);
 
 		/// <summary>
 		/// Registers the Component, so the Component can be dynamically created by name.
 		/// </summary>
 		/// <typeparam name="T">The Component to register.</typeparam>
 		template <class T>
-		static void register_component(std::string const& name);
+		static void register_component(String const& name);
 
 		void serialize(Writer& writer) const override;
 		void serialize_entity(Writer& writer, Entity const entity) const;
 		Node serialize_entity(Entity const entity) const;
 		void deserialize(Reader const& reader) override;
 
-		static bool is_name_empty(std::string const& name);
+		static bool is_name_empty(String const& name);
 	};
 
 	template<class T>
@@ -159,7 +159,7 @@ namespace minty
 	}
 
 	template<class T>
-	void EntityRegistry::register_component(std::string const& name)
+	void EntityRegistry::register_component(String const& name)
 	{
 		// funcs
 		ComponentFuncs funcs = {

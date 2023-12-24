@@ -6,7 +6,9 @@ using namespace minty::rendering;
 
 #include "M_String.h"
 
-std::string minty::rendering::to_string(PixelFormat const value)
+using namespace minty;
+
+String minty::rendering::to_string(PixelFormat const value)
 {
     switch (value)
     {
@@ -18,9 +20,9 @@ std::string minty::rendering::to_string(PixelFormat const value)
     }
 }
 
-PixelFormat minty::rendering::from_string_texture_builder_pixel_format(std::string const& value)
+PixelFormat minty::rendering::from_string_texture_builder_pixel_format(String const& value)
 {
-    std::string value2 = minty::string::to_upper(value);
+    String value2 = minty::string::to_upper(value);
     if (value2 == "G") return PixelFormat::Gray;
     if (value2 == "GA") return PixelFormat::GrayAlpha;
     if (value2 == "RGB") return PixelFormat::RedGreenBlue;

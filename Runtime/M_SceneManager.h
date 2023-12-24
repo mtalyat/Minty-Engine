@@ -37,7 +37,7 @@ namespace minty
 		/// </summary>
 		/// <param name="path">The path to the .scene file.</param>
 		/// <returns>The ID of the new Scene.</returns>
-		ID create_scene(std::string const& path);
+		ID create_scene(String const& path);
 
 		/// <summary>
 		/// Loads the Scene with the given ID. Unloads the current Scene first.
@@ -91,6 +91,6 @@ namespace minty
 		void finalize();
 
 	public:
-		friend std::string to_string(SceneManager const& value);
+		friend String to_string(SceneManager const& value);
 	};
 }

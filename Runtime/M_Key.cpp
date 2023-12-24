@@ -1,7 +1,9 @@
 #include "pch.h"
 #include "M_Key.h"
 
-std::string minty::to_string(Key const value)
+using namespace minty;
+
+String minty::to_string(Key const value)
 {
 	switch (value) {
 	case Key::Unknown: return "Unknown";

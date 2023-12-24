@@ -1,6 +1,6 @@
 #pragma once
 
-#include <string>
+#include "M_Types.h"
 
 namespace minty::rendering
 {
@@ -31,6 +31,6 @@ namespace minty::rendering
 		RedGreenBlueAlpha = 4,
 	};
 
-	std::string to_string(PixelFormat const value);
-	PixelFormat from_string_texture_builder_pixel_format(std::string const& value);
+	minty::String to_string(PixelFormat const value);
+	PixelFormat from_string_texture_builder_pixel_format(minty::String const& value);
 }

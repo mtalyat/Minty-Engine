@@ -12,7 +12,7 @@ namespace minty::rendering
 		/// <summary>
 		/// The name of the push constant.
 		/// </summary>
-		std::string name;
+		String name;
 		
 		/// <summary>
 		/// The shader stage this push constant is in.

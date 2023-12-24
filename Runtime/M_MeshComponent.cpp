@@ -32,10 +32,10 @@ void minty::MeshComponent::deserialize(Reader const& reader)
 	case MeshType::Custom:
 	{
 		// use the asset path to get the mesh ( or use the name if no path given )
-		std::string path = reader.read_string("path", reader.read_string("name"));
+		String path = reader.read_string("path", reader.read_string("name"));
 
 		// check if mesh with name is loaded
-		std::string name = file::name(path);
+		String name = Path(path).stem().string();
 		meshId = renderer.find_mesh(name);
 
 		if (meshId == ERROR_ID)
@@ -57,7 +57,7 @@ void minty::MeshComponent::deserialize(Reader const& reader)
 	}
 }
 
-std::string minty::to_string(MeshComponent const& value)
+String minty::to_string(MeshComponent const& value)
 {
 	return std::format("MeshComponent(meshId = {}, materialId = {})", value.meshId, value.materialId);
 }

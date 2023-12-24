@@ -48,8 +48,8 @@ namespace minty
 		Cylinder,
 	};
 
-	std::string to_string(MeshType const value);
-	MeshType from_string_mesh_type(std::string const& value);
+	String to_string(MeshType const value);
+	MeshType from_string_mesh_type(String const& value);
 
 	/// <summary>
 	/// Holds data for a model to be rendered to the screen.
@@ -203,7 +203,7 @@ namespace minty
 		void dispose_indices();
 
 	public:
-		friend std::string to_string(Mesh const& mesh);
+		friend String to_string(Mesh const& mesh);
 	};
 
 	template<class T>

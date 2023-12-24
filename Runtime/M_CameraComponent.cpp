@@ -7,7 +7,7 @@ using namespace minty;
 
 void minty::CameraComponent::serialize(Writer& writer) const
 {
-	writer.write("perspective", static_cast<byte>(perspective), static_cast<byte>(0));
+	writer.write("perspective", static_cast<Byte>(perspective), static_cast<Byte>(0));
 	writer.write("fov", fov, DEFAULT_FOV);
 	writer.write("near", nearPlane, DEFAULT_NEAR);
 	writer.write("far", farPlane, DEFAULT_FAR);
@@ -21,12 +21,12 @@ void minty::CameraComponent::deserialize(Reader const& reader)
 	farPlane = reader.read_float("far", DEFAULT_FAR);
 }
 
-std::string minty::to_string(CameraComponent const& value)
+String minty::to_string(CameraComponent const& value)
 {
 	return std::format("CameraComponent(perspective = {}, fov = {}, near = {}, far = {})", static_cast<int>(value.perspective), value.fov, value.nearPlane, value.farPlane);
 }
 
-std::string minty::to_string(CameraComponent::Perspective const value)
+String minty::to_string(CameraComponent::Perspective const value)
 {
 	switch (value)
 	{
@@ -36,9 +36,9 @@ std::string minty::to_string(CameraComponent::Perspective const value)
 	}
 }
 
-CameraComponent::Perspective minty::from_string_camera_component_perspective(std::string const& value)
+CameraComponent::Perspective minty::from_string_camera_component_perspective(String const& value)
 {
-	std::string value2 = minty::string::to_upper(value);
+	String value2 = minty::string::to_upper(value);
 	if (value2 == "ORTHOGRAPHIC") return CameraComponent::Perspective::Orthographic;
 	if (value2 == "PERSPECTIVE") return CameraComponent::Perspective::Perspective;
 

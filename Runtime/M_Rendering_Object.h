@@ -26,7 +26,7 @@ namespace minty::rendering
 
 		virtual ~RenderObject();
 
-		friend std::string to_string(RenderObject const& value);
+		friend String to_string(RenderObject const& value);
 	};
 }
 

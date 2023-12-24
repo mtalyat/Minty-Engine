@@ -17,6 +17,7 @@ access to the entire engine without needing include each file.
 #include "M_Asset.h"
 #include "M_File.h"
 #include "M_Resource.h"
+#include "M_Wrap.h"
 
 // AUDIO
 #include "M_Audio.h"

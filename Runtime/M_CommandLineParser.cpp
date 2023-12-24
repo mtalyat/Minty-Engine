@@ -58,7 +58,7 @@ void CommandLineParser::parse(int argc, char const* argv[])
 	}
 }
 
-bool CommandLineParser::get_argument(std::string const& name, Argument& arg)
+bool CommandLineParser::get_argument(String const& name, Argument& arg)
 {
 	// try to find the arg
 	auto argFound = _args.find(name);
@@ -74,12 +74,12 @@ bool CommandLineParser::get_argument(std::string const& name, Argument& arg)
 	return false;
 }
 
-bool CommandLineParser::get_argument(std::string const& name)
+bool CommandLineParser::get_argument(String const& name)
 {
 	return _args.find(name) != _args.end();
 }
 
-std::string minty::to_string(CommandLineParser const& value)
+String minty::to_string(CommandLineParser const& value)
 {
 	return std::format("CommandLineParser()");
 }

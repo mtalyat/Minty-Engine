@@ -23,7 +23,7 @@ namespace minty
 		// the shader pass IDs for the material
 		std::vector<ID> _shaderPassIds;
 		// the default values for a new material
-		std::unordered_map<std::string, Dynamic> _defaultValues;
+		std::unordered_map<String, Dynamic> _defaultValues;
 
 	public:
 		/// <summary>
@@ -49,14 +49,14 @@ namespace minty
 		/// </summary>
 		/// <param name="name"></param>
 		/// <returns></returns>
-		Dynamic get_defalt_value(std::string const& name) const;
+		Dynamic get_defalt_value(String const& name) const;
 
 		/// <summary>
 		/// Gets all the default values.
 		/// </summary>
 		/// <returns></returns>
-		std::unordered_map<std::string, Dynamic> const& get_default_values() const;
+		std::unordered_map<String, Dynamic> const& get_default_values() const;
 
-		friend std::string to_string(MaterialTemplate const& value);
+		friend String to_string(MaterialTemplate const& value);
 	};
 }

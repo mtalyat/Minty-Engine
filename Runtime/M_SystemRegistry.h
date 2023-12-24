@@ -25,9 +25,9 @@ namespace minty
 
 		// the systems to manage
 		std::map<int, std::set<System*>> _orderedSystems;
-		std::map<std::string const, System*> _allSystems;
+		std::map<String const, System*> _allSystems;
 
-		static std::map<std::string const, SystemFunc const> _systemTypes;
+		static std::map<String const, SystemFunc const> _systemTypes;
 	public:
 		/// <summary>
 		/// Creates an empty SystemRegistry.
@@ -48,7 +48,7 @@ namespace minty
 		/// </summary>
 		/// <param name="system">The system to add.</param>
 		/// <param name="priority">The priority in which to update this System in.</param>
-		System* emplace(std::string const& name, System* const system, int const priority = 0);
+		System* emplace(String const& name, System* const system, int const priority = 0);
 
 	public:
 		/// <summary>
@@ -57,21 +57,21 @@ namespace minty
 		/// <typeparam name="T">The system to add.</typeparam>
 		/// <param name="priority">The priority in which to update this System in.</param>
 		template<class T>
-		T* emplace(std::string const& name, int const priority = 0);
+		T* emplace(String const& name, int const priority = 0);
 
 		/// <summary>
 		/// Creates and places a registered System within this SystemRegistry.
 		/// </summary>
 		/// <param name="name">The name of the System, registered with register_system.</param>
 		/// <param name="priority">The priority in which to update this System in.</param>
-		System* emplace_by_name(std::string const& name, int const priority = 0);
+		System* emplace_by_name(String const& name, int const priority = 0);
 
 		/// <summary>
 		/// Finds the System that matches the given name.
 		/// </summary>
 		/// <param name="name">The name to search by.</param>
 		/// <returns>The System if found, otherwise null.</returns>
-		System* find_by_name(std::string const& name) const;
+		System* find_by_name(String const& name) const;
 
 		/// <summary>
 		/// Finds the first System of the given type.
@@ -123,17 +123,17 @@ namespace minty
 		/// </summary>
 		/// <typeparam name="T">The System to be registered.</typeparam>
 		template <class T>
-		static void register_system(std::string const& name);
+		static void register_system(String const& name);
 
 		void serialize(Writer& writer) const override;
 		void deserialize(Reader const& reader) override;
 
 	public:
-		friend std::string to_string(SystemRegistry const& value);
+		friend String to_string(SystemRegistry const& value);
 };
 
 	template<class T>
-	T* SystemRegistry::emplace(std::string const& name, int const priority)
+	T* SystemRegistry::emplace(String const& name, int const priority)
 	{
 		return static_cast<T*>(this->emplace(name, new T(_engine, _registry), priority));
 	}
@@ -155,7 +155,7 @@ namespace minty
 	}
 
 	template<class T>
-	void SystemRegistry::register_system(std::string const& name)
+	void SystemRegistry::register_system(String const& name)
 	{
 		_systemTypes.emplace(name, [](Engine* const engine, EntityRegistry* const registry) { return new T(engine, registry); });
 

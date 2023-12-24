@@ -8,14 +8,14 @@
 
 using namespace minty;
 
-std::string const& minty::Node::to_string() const
+String const& minty::Node::to_string() const
 {
 	return data;
 }
 
-byte minty::Node::to_byte(byte const defaultValue) const
+Byte minty::Node::to_byte(Byte const defaultValue) const
 {
-	byte out;
+	Byte out;
 	if (parse::try_byte(data, out))
 	{
 		return out;
@@ -90,7 +90,7 @@ bool minty::Node::to_bool(bool const defaultValue) const
 	return defaultValue;
 }
 
-Node* minty::Node::find(std::string const& name)
+Node* minty::Node::find(String const& name)
 {
 	auto const& found = children.find(name);
 
@@ -102,7 +102,7 @@ Node* minty::Node::find(std::string const& name)
 	return nullptr;
 }
 
-Node const* minty::Node::find(std::string const& name) const
+Node const* minty::Node::find(String const& name) const
 {
 	auto const& found = children.find(name);
 
@@ -114,7 +114,7 @@ Node const* minty::Node::find(std::string const& name) const
 	return nullptr;
 }
 
-std::vector<Node>* minty::Node::find_all(std::string const& name)
+std::vector<Node>* minty::Node::find_all(String const& name)
 {
 	auto const& found = children.find(name);
 
@@ -126,7 +126,7 @@ std::vector<Node>* minty::Node::find_all(std::string const& name)
 	return nullptr;
 }
 
-std::vector<Node> const* minty::Node::find_all(std::string const& name) const
+std::vector<Node> const* minty::Node::find_all(String const& name) const
 {
 	auto const& found = children.find(name);
 
@@ -138,7 +138,7 @@ std::vector<Node> const* minty::Node::find_all(std::string const& name) const
 	return nullptr;
 }
 
-std::string const& minty::Node::get_string(std::string const& name, std::string const& defaultValue) const
+String const& minty::Node::get_string(String const& name, String const& defaultValue) const
 {
 	Node const* node = find(name);
 	if (node)
@@ -151,7 +151,7 @@ std::string const& minty::Node::get_string(std::string const& name, std::string 
 	}
 }
 
-byte minty::Node::get_byte(std::string const& name, byte const defaultValue) const
+Byte minty::Node::get_byte(String const& name, Byte const defaultValue) const
 {
 	Node const* node = find(name);
 	if (node)
@@ -164,7 +164,7 @@ byte minty::Node::get_byte(std::string const& name, byte const defaultValue) con
 	}
 }
 
-int minty::Node::get_int(std::string const& name, int const defaultValue) const
+int minty::Node::get_int(String const& name, int const defaultValue) const
 {
 	Node const* node = find(name);
 	if (node)
@@ -177,7 +177,7 @@ int minty::Node::get_int(std::string const& name, int const defaultValue) const
 	}
 }
 
-ID minty::Node::get_id(std::string const& name, ID const defaultValue) const
+ID minty::Node::get_id(String const& name, ID const defaultValue) const
 {
 	Node const* node = find(name);
 	if (node)
@@ -190,7 +190,7 @@ ID minty::Node::get_id(std::string const& name, ID const defaultValue) const
 	}
 }
 
-unsigned int minty::Node::get_uint(std::string const& name, unsigned int const defaultValue) const
+unsigned int minty::Node::get_uint(String const& name, unsigned int const defaultValue) const
 {
 	Node const* node = find(name);
 	if (node)
@@ -203,7 +203,7 @@ unsigned int minty::Node::get_uint(std::string const& name, unsigned int const d
 	}
 }
 
-size_t minty::Node::get_size(std::string const& name, size_t const defaultValue) const
+size_t minty::Node::get_size(String const& name, size_t const defaultValue) const
 {
 	Node const* node = find(name);
 	if (node)
@@ -216,7 +216,7 @@ size_t minty::Node::get_size(std::string const& name, size_t const defaultValue)
 	}
 }
 
-float minty::Node::get_float(std::string const& name, float const defaultValue) const
+float minty::Node::get_float(String const& name, float const defaultValue) const
 {
 	Node const* node = find(name);
 	if (node)
@@ -229,7 +229,7 @@ float minty::Node::get_float(std::string const& name, float const defaultValue) 
 	}
 }
 
-bool minty::Node::get_bool(std::string const& name, bool const defaultValue) const
+bool minty::Node::get_bool(String const& name, bool const defaultValue) const
 {
 	Node const* node = find(name);
 	if (node)
@@ -253,12 +253,12 @@ void minty::Node::print(int const indent) const
 			if (child.data.size())
 			{
 				// print data if there is something
-				console::print(std::format("{}{}: {}", std::string(indent, '\t'), pair.first, child.data));
+				console::print(std::format("{}{}: {}", String(indent, '\t'), pair.first, child.data));
 			}
 			else
 			{
 				// print normal if no data
-				console::print(std::format("{}{}", std::string(indent, '\t'), pair.first));
+				console::print(std::format("{}{}", String(indent, '\t'), pair.first));
 			}
 
 			// if child has children, print those, recusrively
@@ -267,7 +267,7 @@ void minty::Node::print(int const indent) const
 	}
 }
 
-std::string minty::to_string(Node const& value)
+String minty::to_string(Node const& value)
 {
 	return std::format("Node(data = {}, children size = {})", value.data, value.children.size());
 }

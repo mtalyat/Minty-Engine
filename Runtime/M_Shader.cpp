@@ -78,7 +78,7 @@ void minty::Shader::update_push_constant(VkCommandBuffer const commandBuffer, vo
 	vkCmdPushConstants(commandBuffer, _pipelineLayout, info.stageFlags, info.offset + offset, size, value);
 }
 
-void minty::Shader::update_push_constant(std::string const& name, VkCommandBuffer const commandBuffer, void* const value, uint32_t const size, uint32_t const offset) const
+void minty::Shader::update_push_constant(String const& name, VkCommandBuffer const commandBuffer, void* const value, uint32_t const size, uint32_t const offset) const
 {
 	// get info of push constant
 	auto const& info = _pushConstantInfos.at(name);
@@ -87,7 +87,7 @@ void minty::Shader::update_push_constant(std::string const& name, VkCommandBuffe
 	vkCmdPushConstants(commandBuffer, _pipelineLayout, info.stageFlags, info.offset + offset, size, value);
 }
 
-void minty::Shader::update_global_uniform_constant(std::string const& name, void* const value, uint32_t const size, uint32_t const offset) const
+void minty::Shader::update_global_uniform_constant(String const& name, void* const value, uint32_t const size, uint32_t const offset) const
 {
 	_descriptorSet.set(name, value, offset, size);
 }
@@ -272,7 +272,7 @@ DescriptorSet minty::Shader::create_descriptor_set(uint32_t const set)
 
 	std::vector<VkWriteDescriptorSet> descriptorWrites;
 	std::vector<VkDescriptorBufferInfo> bufferInfos;
-	std::unordered_map<std::string, std::array<ID, MAX_FRAMES_IN_FLIGHT>> buffers;
+	std::unordered_map<String, std::array<ID, MAX_FRAMES_IN_FLIGHT>> buffers;
 	std::vector<std::vector<VkDescriptorImageInfo>> imageInfos;
 
 	descriptorWrites.resize(constantInfos.size());
@@ -391,7 +391,7 @@ std::vector<rendering::UniformConstantInfo> minty::Shader::get_uniform_constant_
 	return infos;
 }
 
-std::string minty::to_string(Shader const& shader)
+String minty::to_string(Shader const& shader)
 {
 	return std::format("Shader()");
 }

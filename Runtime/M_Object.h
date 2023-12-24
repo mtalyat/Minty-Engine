@@ -13,7 +13,7 @@ namespace minty
 		virtual ~Object() {}
 
 	public:
-		friend std::string to_string(Object const& value);
+		friend String to_string(Object const& value);
 	};
 }
 

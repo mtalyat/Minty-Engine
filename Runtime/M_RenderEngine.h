@@ -41,6 +41,7 @@
 #include <optional>
 #include <string>
 #include <cstring>
+#include <filesystem>
 
 namespace minty
 {
@@ -390,7 +391,7 @@ namespace minty
 		/// </summary>
 		/// <param name="name">The name of the Mesh to get or create.</param>
 		/// <returns>The ID of the existing Mesh, or the ID of the new Mesh.</returns>
-		ID get_or_create_mesh(std::string const& name);
+		ID get_or_create_mesh(String const& name);
 
 		/// <summary>
 		/// Finds a loaded mesh with the given type, or creates a mesh of that type if no Mesh exists.
@@ -404,84 +405,84 @@ namespace minty
 		/// </summary>
 		/// <param name="name">The name of the asset to find.</param>
 		/// <returns>The ID of the asset, or ERROR_ID if none was found with the given name.</returns>
-		ID find_texture(std::string const& name);
+		ID find_texture(String const& name);
 
 		/// <summary>
 		/// Finds the ID of the loaded Shader with the given name.
 		/// </summary>
 		/// <param name="name">The name of the asset to find.</param>
 		/// <returns>The ID of the asset, or ERROR_ID if none was found with the given name.</returns>
-		ID find_shader(std::string const& name);
+		ID find_shader(String const& name);
 
 		/// <summary>
 		/// Finds the ID of the loaded ShaderPass with the given name.
 		/// </summary>
 		/// <param name="name">The name of the asset to find.</param>
 		/// <returns>The ID of the asset, or ERROR_ID if none was found with the given name.</returns>
-		ID find_shader_pass(std::string const& name);
+		ID find_shader_pass(String const& name);
 
 		/// <summary>
 		/// Finds the ID of the loaded MaterialTemplate with the given name.
 		/// </summary>
 		/// <param name="name">The name of the asset to find.</param>
 		/// <returns>The ID of the asset, or ERROR_ID if none was found with the given name.</returns>
-		ID find_material_template(std::string const& name);
+		ID find_material_template(String const& name);
 
 		/// <summary>
 		/// Finds the ID of the loaded Material with the given name.
 		/// </summary>
 		/// <param name="name">The name of the asset to find.</param>
 		/// <returns>The ID of the asset, or ERROR_ID if none was found with the given name.</returns>
-		ID find_material(std::string const& name);
+		ID find_material(String const& name);
 
 		/// <summary>
 		/// Finds the ID of the loaded Mesh with the given name.
 		/// </summary>
 		/// <param name="name">The name of the asset to find.</param>
 		/// <returns>The ID of the asset, or ERROR_ID if none was found with the given name.</returns>
-		ID find_mesh(std::string const& name);
+		ID find_mesh(String const& name);
 
 		/// <summary>
 		/// Loads the Texture at the given asset path into this RenderEngine.
 		/// </summary>
 		/// <param name="path">The path relative to the Assets folder.</param>
 		/// <returns>The ID of the newly loaded asset.</returns>
-		ID load_texture(std::string const& path);
+		ID load_texture(Path const& path);
 
 		/// <summary>
 		/// Loads the Shader at the given asset path into this RenderEngine.
 		/// </summary>
 		/// <param name="path">The path relative to the Assets folder.</param>
 		/// <returns>The ID of the newly loaded asset.</returns>
-		ID load_shader(std::string const& path);
+		ID load_shader(Path const& path);
 
 		/// <summary>
 		/// Loads the ShaderPass at the given asset path into this RenderEngine.
 		/// </summary>
 		/// <param name="path">The path relative to the Assets folder.</param>
 		/// <returns>The ID of the newly loaded asset.</returns>
-		ID load_shader_pass(std::string const& path);
+		ID load_shader_pass(Path const& path);
 
 		/// <summary>
 		/// Loads the MaterialTemplate at the given asset path into this RenderEngine.
 		/// </summary>
 		/// <param name="path">The path relative to the Assets folder.</param>
 		/// <returns>The ID of the newly loaded asset.</returns>
-		ID load_material_template(std::string const& path);
+		ID load_material_template(Path const& path);
 
 		/// <summary>
 		/// Loads the Material at the given asset path into this RenderEngine.
 		/// </summary>
 		/// <param name="path">The path relative to the Assets folder.</param>
 		/// <returns>The ID of the newly loaded asset.</returns>
-		ID load_material(std::string const& path);
+		ID load_material(Path const& path);
 
 		/// <summary>
 		/// Loads the Mesh at the given asset path into this RenderEngine.
 		/// </summary>
 		/// <param name="path">The path relative to the Assets folder.</param>
 		/// <returns>The ID of the newly loaded asset.</returns>
-		ID load_mesh(std::string const& path);
+		ID load_mesh(Path const& path);
 
 		/// <summary>
 		/// Destroys the Texture with the given ID.
@@ -530,10 +531,10 @@ namespace minty
 		/// <param name="path">The path to the asset.</param>
 		/// <param name="requiresMeta">If true, the meta file will also be checked.</param>
 		/// <returns>0 if the asset can be loaded, 1 if there was a problem with the main file, or 2 if there was a problem with the meta file.</returns>
-		int check_asset(std::string const& path, bool const requiresMeta) const;
+		int check_asset(Path const& path, bool const requiresMeta) const;
 
 		// loads a .obj file
-		void load_mesh_obj(std::string const& path, ID const meshId);
+		void load_mesh_obj(Path const& path, ID const meshId);
 
 	public:
 		/// <summary>
@@ -827,7 +828,7 @@ namespace minty
 		/// </summary>
 		/// <param name="path">The path to the shader code (.spv).</param>
 		/// <returns>The shader module.</returns>
-		VkShaderModule load_shader_module(std::string const& path) const;
+		VkShaderModule load_shader_module(String const& path) const;
 
 		/// <summary>
 		/// Creates a shader module from the given code.
@@ -971,6 +972,6 @@ namespace minty
 
 	public:
 
-		friend std::string to_string(RenderEngine const& value);
+		friend String to_string(RenderEngine const& value);
 	};
 }

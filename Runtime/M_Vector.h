@@ -1,7 +1,7 @@
 #pragma once
 
 #include "glm.hpp"
-#include <string>
+#include "M_Types.h"
 
 namespace minty
 {
@@ -13,12 +13,12 @@ namespace minty
 	typedef glm::ivec3 Vector3Int;
 	typedef glm::ivec4 Vector4Int;
 
-	std::string to_string(Vector2 const& v);
-	std::string to_string(Vector3 const& v);
-	std::string to_string(Vector4 const& v);
-	std::string to_string(Vector2Int const& v);
-	std::string to_string(Vector3Int const& v);
-	std::string to_string(Vector4Int const& v);
+	String to_string(Vector2 const& v);
+	String to_string(Vector3 const& v);
+	String to_string(Vector4 const& v);
+	String to_string(Vector2Int const& v);
+	String to_string(Vector3Int const& v);
+	String to_string(Vector4Int const& v);
 }
 
 template<>

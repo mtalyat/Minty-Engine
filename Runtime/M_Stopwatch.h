@@ -98,6 +98,6 @@ namespace minty
         static Stopwatch start_new() { Stopwatch watch; watch.start(); return watch; }
 
     public:
-        friend std::string to_string(Stopwatch const& value);
+        friend String to_string(Stopwatch const& value);
     };
 }

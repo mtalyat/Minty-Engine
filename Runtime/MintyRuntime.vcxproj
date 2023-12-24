@@ -220,7 +220,6 @@
     <ClInclude Include="M_Resource.h" />
     <ClInclude Include="M_SerializationData.h" />
     <ClInclude Include="M_Dynamic.h" />
-    <ClInclude Include="M_Base.h" />
     <ClInclude Include="framework.h" />
     <ClInclude Include="glfw.hpp" />
     <ClInclude Include="glm.hpp" />
@@ -296,6 +295,7 @@
     <ClInclude Include="M_Viewport.h" />
     <ClInclude Include="M_Window.h" />
     <ClInclude Include="M_NameComponent.h" />
+    <ClInclude Include="M_Wrap.h" />
     <ClInclude Include="M_Writer.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="M_Quaternion.h" />
@@ -404,6 +404,7 @@
     <ClCompile Include="M_Vector.cpp" />
     <ClCompile Include="M_Viewport.cpp" />
     <ClCompile Include="M_Window.cpp" />
+    <ClCompile Include="M_Wrap.cpp" />
     <ClCompile Include="M_Writer.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
@@ -441,6 +442,8 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="M_Constants.h" />
+    <None Include="packages.config" />
+    <None Include="README_Wrap_Files.md" />
     <None Include="ui.frag" />
     <None Include="ui.vert" />
     <None Include="uifrag.spv" />
@@ -448,5 +451,12 @@
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
+    <Import Project="packages\zlib_static.1.2.11.12\build\native\zlib_static.targets" Condition="Exists('packages\zlib_static.1.2.11.12\build\native\zlib_static.targets')" />
   </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('packages\zlib_static.1.2.11.12\build\native\zlib_static.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\zlib_static.1.2.11.12\build\native\zlib_static.targets'))" />
+  </Target>
 </Project>

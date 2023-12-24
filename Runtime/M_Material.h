@@ -51,6 +51,6 @@ namespace minty
 		rendering::DescriptorSet const& get_descriptor_set(uint32_t const pass) const;
 
 	public:
-		friend std::string to_string(Material const& value);
+		friend String to_string(Material const& value);
 	};
 }

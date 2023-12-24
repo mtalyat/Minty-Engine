@@ -34,9 +34,6 @@
     <Filter Include="Header Files\Input">
       <UniqueIdentifier>{24cc98a5-a6b9-4ac2-af22-33acf9381653}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Basic">
-      <UniqueIdentifier>{99d49d9a-3f7d-4ebd-be21-d325b215e22d}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Resource Files\Shaders">
       <UniqueIdentifier>{b7dff789-4b79-4049-aa6f-7ddcd995f28f}</UniqueIdentifier>
     </Filter>
@@ -223,9 +220,6 @@
       <Filter>Header Files\Input</Filter>
     </ClInclude>
     <ClInclude Include="glfw.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="M_Base.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="M_RelationshipComponent.h">
@@ -417,18 +411,6 @@
     <ClInclude Include="M_AudioListenerComponent.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
-    <ClInclude Include="M_Asset.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="M_Builtin.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="M_Resource.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="M_RenderEngine.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="M_DirtyComponent.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
@@ -437,6 +419,24 @@
     </ClInclude>
     <ClInclude Include="M_Rendering_PixelFormat.h">
       <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Template.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Asset.h">
+      <Filter>Header Files\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Builtin.h">
+      <Filter>Header Files\Builtin</Filter>
+    </ClInclude>
+    <ClInclude Include="M_RenderEngine.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Wrap.h">
+      <Filter>Header Files\Assets</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Resource.h">
+      <Filter>Header Files\Assets</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -713,6 +713,12 @@
     <ClCompile Include="M_Rendering_PixelFormat.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="M_Template.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_Wrap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Text Include="notes.txt" />
@@ -733,5 +739,7 @@
     <None Include="uivert.spv">
       <Filter>Resource Files\Shaders</Filter>
     </None>
+    <None Include="README_Wrap_Files.md" />
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>
