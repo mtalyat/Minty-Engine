@@ -5,6 +5,8 @@
 
 namespace minty
 {
+	constexpr char const* const WRAP_MAGIC = "WRAP";
+
 	/// <summary>
 	/// Handles dealing with one .wrap file.
 	/// </summary>

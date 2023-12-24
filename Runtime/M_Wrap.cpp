@@ -2,6 +2,7 @@
 #include "M_Wrap.h"
 
 #include "M_File.h"
+#include "M_Console.h"
 
 #include <filesystem>
 #include <zlib.h>
@@ -19,6 +20,14 @@ minty::Wrap::Wrap(Path const& path)
 
         // read the header
         file.read(&_header, sizeof(Header));
+
+        // verify it is a wrap header
+        if (std::memcmp(WRAP_MAGIC, _header.id, 4))
+        {
+            // not "WRAP"
+            console::error(std::format("Could not load Wrap file from path \"{}\". Missing magic data.", path.string()));
+            return;
+        }
 
         // read all of the entries
         Entry entry;
