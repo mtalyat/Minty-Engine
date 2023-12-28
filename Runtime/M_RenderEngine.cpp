@@ -1358,7 +1358,7 @@ ID minty::RenderEngine::find_mesh(String const& name)
 
 ID minty::RenderEngine::load_texture(Path const& path)
 {
-	if (check_asset(path, true))
+	if (check_asset(path, false))
 	{
 		return ERROR_ID;
 	}
@@ -1374,10 +1374,10 @@ ID minty::RenderEngine::load_texture(Path const& path)
 		.width = 0,
 		.height = 0,
 		.pixelFormat = from_string_texture_builder_pixel_format(meta.get_string("pixelFormat", "RGBA")),
-		.filter = from_string_vk_filter(meta.get_string("filter")),
-		.format = from_string_vk_format(meta.get_string("format")),
-		.addressMode = from_string_vk_sampler_address_mode(meta.get_string("samplerAddressMode")),
-		.mipmapMode = from_string_vk_sampler_mipmap_mode(meta.get_string("samplerMipmapMode")),
+		.filter = from_string_vk_filter(meta.get_string("filter", "NEAREST")),
+		.format = from_string_vk_format(meta.get_string("format", "R8G8B8A8_SRGB")),
+		.addressMode = from_string_vk_sampler_address_mode(meta.get_string("samplerAddressMode", "REPEAT")),
+		.mipmapMode = from_string_vk_sampler_mipmap_mode(meta.get_string("samplerMipmapMode", "NEAREST")),
 	};
 
 	return create_texture(builder);
