@@ -202,6 +202,8 @@ int init(Runtime &runtime)
     }
 
     console::log("Game start.");
+
+    return 0;
 }
 
 // called when the engine is destroyed
@@ -211,4 +213,6 @@ int destroy(Runtime &runtime)
 
     // wait for input to close
     // console::wait();
+
+    return 0;
 }
