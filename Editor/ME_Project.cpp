@@ -15,25 +15,25 @@ Project::Project(std::string const& path)
 	collect_assets();
 }
 
-filepath const Project::get_base_path() const
+Path const Project::get_base_path() const
 {
 	return _base;
 }
 
-filepath const Project::get_assets_path() const
+Path const Project::get_assets_path() const
 {
 	return (_base / "Assets");
 }
 
-filepath const Project::get_build_path() const
+Path const Project::get_build_path() const
 {
 	return (_base / "Build");
 }
 
-std::set<filepath> mintye::Project::find_assets(std::set<std::string> const& extensions) const
+std::set<Path> mintye::Project::find_assets(std::set<std::string> const& extensions) const
 {
 	// output files
-	std::set<filepath> result;
+	std::set<Path> result;
 
 	// find all files with headers and add to result
 	for (std::string const& extension : extensions)
@@ -49,7 +49,7 @@ std::set<filepath> mintye::Project::find_assets(std::set<std::string> const& ext
 	return result;
 }
 
-std::set<filepath> mintye::Project::find_assets(CommonFileTypes const commonFileTypes) const
+std::set<Path> mintye::Project::find_assets(CommonFileTypes const commonFileTypes) const
 {
 	// switch based on common file types
 	switch (commonFileTypes)
@@ -65,23 +65,23 @@ std::set<filepath> mintye::Project::find_assets(CommonFileTypes const commonFile
 	}
 }
 
-filepath mintye::Project::find_asset(std::string name) const
+Path mintye::Project::find_asset(std::string name) const
 {
 	// get the path
-	filepath path(name);
+	Path path(name);
 
 	// get the extension
 	std::string extension = path.extension().string();
 	
 	// get the name without the extension
-	filepath stem = path.stem();
+	Path stem = path.stem();
 
 	// check files with extension
 	auto const& found = _files.find(extension);
 	
 	if (found != _files.end())
 	{
-		for (filepath const& path : found->second)
+		for (Path const& path : found->second)
 		{
 			if (path.stem() == stem)
 			{
@@ -92,23 +92,23 @@ filepath mintye::Project::find_asset(std::string name) const
 	}
 
 	// no match found
-	return filepath();
+	return Path();
 }
 
 void Project::collect_assets()
 {
-	if (!file::exists(_base.string()))
+	if (!std::filesystem::exists(_base.string()))
 	{
 		return;
 	}
 
 	// list of directories to collect from
-	std::vector<filepath> directoriesToCollect;
+	std::vector<Path> directoriesToCollect;
 
 	// add base directory to get started
 	directoriesToCollect.push_back(get_assets_path());
 
-	filepath directory;
+	Path directory;
 
 	size_t count = 0;
 
@@ -124,7 +124,7 @@ void Project::collect_assets()
 		// search the path
 		for (const auto& entry : std::filesystem::directory_iterator(directory))
 		{
-			filepath path = entry.path();
+			Path path = entry.path();
 
 			if (entry.is_directory())
 			{
@@ -142,7 +142,7 @@ void Project::collect_assets()
 				if (found == _files.end())
 				{
 					// new list
-					_files.emplace(extension, std::set<filepath>());
+					_files.emplace(extension, std::set<Path>());
 					_files.at(extension).emplace(path);
 				}
 				else

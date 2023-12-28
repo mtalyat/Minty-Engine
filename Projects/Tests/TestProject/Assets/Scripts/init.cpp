@@ -18,7 +18,7 @@ using namespace game;
 InputMap input;
 
 // called when the engine is initialized
-void init(Runtime &runtime)
+int init(Runtime &runtime)
 {
     try
     {
@@ -205,7 +205,7 @@ void init(Runtime &runtime)
 }
 
 // called when the engine is destroyed
-void destroy(Runtime &runtime)
+int destroy(Runtime &runtime)
 {
     console::log("Game over.");
 

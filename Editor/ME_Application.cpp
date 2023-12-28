@@ -712,8 +712,8 @@ void Application::generate_cmake()
 
 	// get all local paths for source files
 	std::stringstream pathsStream;
-	filepath buildPath = _info.project->get_build_path();
-	for (filepath const& path : _info.project->find_assets(Project::CommonFileTypes::Source))
+	minty::Path buildPath = _info.project->get_build_path();
+	for (minty::Path const& path : _info.project->find_assets(Project::CommonFileTypes::Source))
 	{
 		pathsStream << " " << std::filesystem::relative(path, buildPath).generic_string();
 	}
@@ -758,6 +758,8 @@ void Application::generate_main()
 	file <<
 		"// " << std::format("{:%Y-%m-%d %H:%M:%OS}", now) << std::endl <<
 		"#include <Minty.h>" << std::endl <<
+		"#include <string>" << std::endl <<
+		"#include <format>" << std::endl <<
 		"#include <filesystem>" << std::endl <<
 		"#include \"../Assets/Scripts/init.h\"" << std::endl <<
 		"int main(int argc, char const* argv[]) {" << std::endl <<
@@ -765,9 +767,9 @@ void Application::generate_main()
 		"	minty::console::log(std::filesystem::current_path().string());" << std::endl <<
 		"	minty::Info info(\"TestProject - HARD CODED NAME\", 0, 0, 0);" << std::endl <<
 		"	minty::Runtime rt(info);" << std::endl <<
-		"	init(rt);" << std::endl <<
+		"	if(int code = init(rt)) minty::console::error(std::format(\"Failed to init program with error code {}.\", code));" << std::endl <<
 		"	int result = rt.run();" << std::endl <<
-		"	destroy(rt);" << std::endl <<
+		"	if(int code = destroy(rt)) minty::console::error(std::format(\"Failed to destroy program with error code {}.\", code));" << std::endl <<
 		"	return result;" << std::endl <<
 		"}";
 
