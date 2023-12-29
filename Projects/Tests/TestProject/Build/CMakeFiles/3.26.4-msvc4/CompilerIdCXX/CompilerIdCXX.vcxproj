@@ -21,7 +21,7 @@
   
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup>
-    <PreferredToolArchitecture>x64</PreferredToolArchitecture>
+    <PreferredToolArchitecture>x86</PreferredToolArchitecture>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
     <ConfigurationType>Application</ConfigurationType>

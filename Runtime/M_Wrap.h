@@ -1,6 +1,8 @@
 #pragma once
 
 #include "M_Object.h"
+#include "M_Register.h"
+#include "M_File.h"
 #include <unordered_map>
 
 namespace minty
@@ -10,6 +12,7 @@ namespace minty
 	constexpr int const WRAP_HEADER_PATH_SIZE = 100;
 	constexpr int const WRAP_HEADER_NAME_SIZE = 50;
 	constexpr int const WRAP_ENTRY_PATH_SIZE = 255;
+	constexpr uint16_t const WRAP_VERSION = 0;
 
 	/// <summary>
 	/// Handles dealing with one .wrap file.
@@ -35,6 +38,51 @@ namespace minty
 			/// This file should override some data.
 			/// </summary>
 			Update = 2,
+		};
+
+		/// <summary>
+		/// Determines when to compress data being stored in a wrap file.
+		/// </summary>
+		enum class Compression : Byte
+		{
+			Level0 = 0,
+			Level1 = 1,
+			Level2 = 2,
+			Level3 = 3,
+			Level4 = 4,
+			Level5 = 5,
+			Level6 = 6,
+			Level7 = 7,
+			Level8 = 8,
+			Level9 = 9,
+
+			/// <summary>
+			/// Do not compress the data.
+			/// </summary>
+			None = Level0,
+
+			/// <summary>
+			/// Lightly compresses the data, quickly.
+			/// </summary>
+			Fast = Level1,
+			/// <summary>
+			/// Heavily compresses the data, slowly.
+			/// </summary>
+			Slow = Level9,
+
+			/// <summary>
+			/// Lightly compress the data.
+			/// </summary>
+			Low = Level1,
+			/// <summary>
+			/// Heavily compress the data.
+			/// </summary>
+			High = Level9,
+
+			/// <summary>
+			/// Default compression.
+			/// </summary>
+			Default = Level6,
 		};
 
 		/// <summary>
@@ -92,15 +140,24 @@ namespace minty
 
 	public:
 		/// <summary>
-		/// Creates an empty wrap file in memory.
+		/// Creates an empty Wrap file.
 		/// </summary>
 		Wrap();
 
 		/// <summary>
-		/// Loads the wrap file from the given path into memory.
+		/// Creates a Wrap file.
 		/// </summary>
-		/// <param name="path">The path to the location of the base path for a new wrap file, or the location to a wrap file that is to be loaded.</param>
+		/// <param name="name">The base path.</param>
+		/// <param name="path">The base path.</param>
+		Wrap(String const& name, Path const& path, uint32_t const contentVersion = 0);
+
+		/// <summary>
+		/// Creates and loads a Wrap file at the given path.
+		/// </summary>
+		/// <param name="path">The path to the Wrap file on the disk.</param>
 		Wrap(Path const& path);
+
+#pragma region Get
 
 		uint32_t get_version() const;
 
@@ -112,17 +169,45 @@ namespace minty
 
 		uint32_t get_content_version() const;
 
-		Entry const* get_entry(Path const& path) const;
+		Type get_type() const;
 
-		bool contains(Path const& path);
+#pragma endregion
+
+#pragma region Set
+
+		void set_type(Type const type);
+
+#pragma endregion
+
+		bool contains(Path const& path) const;
 
 		Entry& at(Path const& path);
 
 		Entry const& at(Path const& path) const;
 
-		Type get_type() const;
+		/// <summary>
+		/// Adds the file at the given path to this Wrap file.
+		/// </summary>
+		/// <param name="path"></param>
+		/// <param name="recursive"></param>
+		/// <param name="compression"></param>
+		void emplace(Path const& path, bool const recursive = true, Compression const compression = Compression::Default);
 
-		void set_type(Type const type);
+#pragma region Saving and Loading
+
+		/// <summary>
+		/// Saves the Wrap file to the disk.
+		/// </summary>
+		/// <param name="path">The path to save to.</param>
+		void save(Path const& path) const;
+
+		/// <summary>
+		/// Loads the Wrap file from the disk.
+		/// </summary>
+		/// <param name="path">The path to load from.</param>
+		void load(Path const& path);
+
+#pragma endregion		
 	};
 
 	/// <summary>
@@ -131,10 +216,10 @@ namespace minty
 	class Wrapper
 		: public Object
 	{
-	public:
-
 	private:
 		std::unordered_map<String, Wrap> _wraps;
+
+		Register<File*> _files;
 
 	public:
 		/// <summary>
@@ -142,12 +227,22 @@ namespace minty
 		/// </summary>
 		Wrapper();
 
-		/// <summary>
-		/// Creates a Wrapper that will load the .wrap file at the given path, or all of the .wrap files within the given directory path.
-		/// </summary>
-		/// <param name="path"></param>
-		Wrapper(Path const& path, bool const recursive = false);
+		~Wrapper();
 
-		void load(Path const& path, bool const recursive = false);
+		void emplace(Wrap const& wrap);
+
+		void emplace(Path const& path, bool const recursive = true);
+
+		Wrap const& get(String const& name) const;
+
+		ID open(Path const& path);
+
+		File* at(ID const id) const;
+
+		File* at(Path const& path) const;
+
+		void close(ID const id);
+
+		void close(Path const& path);
 	};
 }

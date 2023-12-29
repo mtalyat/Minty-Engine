@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\mitch\source\repos\Minty-Engine\Projects\Tests\Headless\Build\CMakeFiles\75d2bbffa3881ecf7cc615d6f31cc82a\generate.stamp.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{AD533970-0E5E-3EC1-ABC6-50A280394F1B}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

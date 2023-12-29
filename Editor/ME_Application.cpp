@@ -767,9 +767,9 @@ void Application::generate_main()
 		"	minty::console::log(std::filesystem::current_path().string());" << std::endl <<
 		"	minty::Info info(\"TestProject - HARD CODED NAME\", 0, 0, 0);" << std::endl <<
 		"	minty::Runtime rt(info);" << std::endl <<
-		"	if(int code = init(rt)) minty::console::error(std::format(\"Failed to init program with error code {}.\", code));" << std::endl <<
+		"	if(int code = init(rt)) { minty::console::error(std::format(\"Failed to init program with error code {}.\", code)); return code; }" << std::endl <<
 		"	int result = rt.run();" << std::endl <<
-		"	if(int code = destroy(rt)) minty::console::error(std::format(\"Failed to destroy program with error code {}.\", code));" << std::endl <<
+		"	if(int code = destroy(rt)) { minty::console::error(std::format(\"Failed to destroy program with error code {}.\", code)); return code; }" << std::endl <<
 		"	return result;" << std::endl <<
 		"}";
 

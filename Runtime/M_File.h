@@ -22,7 +22,7 @@ namespace minty
 			Current = std::ios_base::cur,
 			End = std::ios_base::end,
 		};
-		enum class Flags
+		enum class Flags : int
 		{
 			None = 0,
 			Read = std::ios_base::in,
@@ -32,6 +32,10 @@ namespace minty
 			Truncate = std::ios_base::trunc,
 			Binary = std::ios_base::binary,
 		};
+		friend inline Flags operator|(Flags const left, Flags const right)
+		{
+			return static_cast<Flags>(static_cast<int>(left) | static_cast<int>(right));
+		}
 	protected:
 		// file stream, could be in or out
 		std::fstream _stream;
@@ -121,14 +125,14 @@ namespace minty
 		/// <summary>
 		/// Reads the given size of data into the given buffer, and moves the cursor size bytes.
 		/// </summary>
-		/// <param name="buffer">The location to copy the data to.</param>
-		/// <param name="size">The number of bytes to copy.</param>
+		/// <param name="buffer">The location to read the data to.</param>
+		/// <param name="size">The number of bytes to read.</param>
 		virtual void read(void* const buffer, Size const size);
 
 		/// <summary>
 		/// Reads the next bytes into the given data type T, and returns it.
 		/// </summary>
-		/// <typeparam name="T">The type of data to load and return.</typeparam>
+		/// <typeparam name="T">The type of object to read and return.</typeparam>
 		/// <returns></returns>
 		template<typename T>
 		T read();
@@ -175,6 +179,21 @@ namespace minty
 		static Node read_node(Path const& path);
 
 		/// <summary>
+		/// Writes the given size of data to the file, and moves the cursor size number of bytes.
+		/// </summary>
+		/// <param name="buffer">The location to write the data from.</param>
+		/// <param name="size">The number of bytes to write.</param>
+		virtual void write(void const* const buffer, Size const size);
+
+		/// <summary>
+		/// Writes the given object to the file, and moves the cursor sizeof(T) number of bytes.
+		/// </summary>
+		/// <typeparam name="T">The type of object to be written.</typeparam>
+		/// <param name="obj">The object to write to the file.</param>
+		template<typename T>
+		void write(T const& obj);
+
+		/// <summary>
 		/// Writes all of the given text to the file at the given path.
 		/// </summary>
 		/// <param name="path">The location of the file.</param>
@@ -197,6 +216,12 @@ namespace minty
 		T t;
 		read(&t, sizeof(T));
 		return t;
+	}
+
+	template<typename T>
+	void File::write(T const& obj)
+	{
+		write(&obj, sizeof(T));
 	}
 
 	/// <summary>
@@ -224,17 +249,19 @@ namespace minty
 	public:
 		VirtualFile(Path const& path, Flags const flags, Offset const offset, Size const size);
 
-		virtual void seek(Offset const offset, Direction dir = Direction::Begin) override;
+		void seek(Offset const offset, Direction dir = Direction::Begin) override;
 
-		virtual bool eof() override;
+		bool eof() override;
 
-		virtual Offset tell() override;
+		Offset tell() override;
 
-		virtual Offset offset() const override;
+		Offset offset() const override;
 
-		virtual Size size() const override;
+		Size size() const override;
 
-		virtual void read(void* const buffer, Size const size) override;
+		void read(void* const buffer, Size const size) override;
+
+		void write(void const* const buffer, Size const size) override;
 	};
 
 }

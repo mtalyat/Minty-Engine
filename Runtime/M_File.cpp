@@ -361,6 +361,11 @@ Node minty::File::read_node(Path const& path)
     return root;
 }
 
+void minty::File::write(void const* const buffer, Size const size)
+{
+    _stream.write(static_cast<char const* const>(buffer), size);
+}
+
 bool minty::File::write_all_text(Path const& path, String const& text)
 {
     std::fstream file(path, std::ios::out);
@@ -455,6 +460,12 @@ void minty::VirtualFile::read(void* const buffer, Size const size)
 
     // read as per normal
     File::read(buffer, size);
+}
+
+void minty::VirtualFile::write(void const* const buffer, Size const size)
+{
+    // write as per normal
+    File::write(buffer, size);
 }
 
 minty::PhysicalFile::PhysicalFile(Path const& path, Flags const flags)
