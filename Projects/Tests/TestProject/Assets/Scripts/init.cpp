@@ -30,18 +30,18 @@ int init(Runtime &runtime)
     wrap.emplace(Asset::absolute("Data/test.txt"), "test.txt", Wrap::Compression::None);
 
     // check if files are in there
-    console::log("pumpkin_tex.jpg: " + std::to_string(wrap.contains("Data/pumpkin_tex.jpg")));
-    console::log("pumpkin_tex.jpg.meta: " + std::to_string(wrap.contains("Data/pumpkin_tex.jpg.meta")));
-    console::log("pumpkin.obj: " + std::to_string(wrap.contains("Data/pumpkin.obj")));
-    console::log("test.txt: " + std::to_string(wrap.contains("Data/test.txt")));
+    console::log("pumpkin_tex.jpg: " + std::to_string(wrap.exists("Data/pumpkin_tex.jpg")));
+    console::log("pumpkin_tex.jpg.meta: " + std::to_string(wrap.exists("Data/pumpkin_tex.jpg.meta")));
+    console::log("pumpkin.obj: " + std::to_string(wrap.exists("Data/pumpkin.obj")));
+    console::log("test.txt: " + std::to_string(wrap.exists("Data/test.txt")));
 
     Wrap wrap2(Asset::absolute("wrap.wrap"));
 
     // check if files are in there
-    console::log("pumpkin_tex.jpg: " + std::to_string(wrap2.contains("Data/pumpkin_tex.jpg")));
-    console::log("pumpkin_tex.jpg.meta: " + std::to_string(wrap2.contains("Data/pumpkin_tex.jpg.meta")));
-    console::log("pumpkin.obj: " + std::to_string(wrap2.contains("Data/pumpkin.obj")));
-    console::log("test.txt: " + std::to_string(wrap2.contains("Data/test.txt")));
+    console::log("pumpkin_tex.jpg: " + std::to_string(wrap2.exists("Data/pumpkin_tex.jpg")));
+    console::log("pumpkin_tex.jpg.meta: " + std::to_string(wrap2.exists("Data/pumpkin_tex.jpg.meta")));
+    console::log("pumpkin.obj: " + std::to_string(wrap2.exists("Data/pumpkin.obj")));
+    console::log("test.txt: " + std::to_string(wrap2.exists("Data/test.txt")));
 
     return 1;
 

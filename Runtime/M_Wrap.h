@@ -187,6 +187,8 @@ namespace minty
 		// virtual paths indexed to entry indices
 		std::unordered_map<Path, size_t> _indexed;
 
+		// list of open files
+		Register<VirtualFile*> _files;
 	public:
 		Wrap();
 
@@ -219,7 +221,17 @@ namespace minty
 	public:
 		void emplace(Path const& physicalPath, Path const& virtualPath, Compression const compression = Compression::Default, uint32_t const reservedSize = 0);
 
-		bool contains(Path const& path) const;
+		bool exists(Path const& path) const;
+
+		inline bool contains(Path const& path) const;
+
+		ID open(Path const& path);
+
+		VirtualFile& at(ID const id);
+
+		VirtualFile const& at(ID const id) const;
+
+		void close(ID const id);
 
 		Entry const& get_entry(size_t const index) const;
 

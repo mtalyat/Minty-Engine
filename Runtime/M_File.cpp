@@ -22,9 +22,7 @@ minty::File::File(Path const& path, Flags const flags)
 }
 
 minty::File::~File()
-{
-    close();
-}
+{}
 
 bool minty::File::is_open()
 {

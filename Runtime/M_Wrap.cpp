@@ -294,9 +294,52 @@ void minty::Wrap::emplace(Path const& physicalPath, Path const& virtualPath, Com
     wrapFile.close();
 }
 
-bool minty::Wrap::contains(Path const& path) const
+bool minty::Wrap::exists(Path const& path) const
 {
     return _indexed.contains(path);
+}
+
+inline bool minty::Wrap::contains(Path const& path) const
+{
+    return exists(path);
+}
+
+ID minty::Wrap::open(Path const& path)
+{
+    // return error id if file dne
+    if (!exists(path)) return ERROR_ID;
+
+    // get entry
+    Entry const& entry = get_entry(path);
+
+    // create file and return it
+    VirtualFile* file = new VirtualFile(_path, File::Flags::Read | File::Flags::Binary, entry.offset, entry.size);
+
+    return _files.emplace(path.string(), file);
+}
+
+VirtualFile& minty::Wrap::at(ID const id)
+{
+    return *_files.at(id);
+}
+
+VirtualFile const& minty::Wrap::at(ID const id) const
+{
+    return *_files.at(id);
+}
+
+void minty::Wrap::close(ID const id)
+{
+    // find file
+    if (_files.contains(id))
+    {
+        VirtualFile* file = _files.at(id);
+        // close the file
+        file->close();
+        // destroy it
+        _files.erase(id);
+        delete file;
+    }
 }
 
 Wrap::Entry const& minty::Wrap::get_entry(size_t const index) const
