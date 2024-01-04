@@ -47,6 +47,11 @@ void minty::File::open(Path const& path, Flags const flags)
     }
 }
 
+void minty::File::flush()
+{
+    _stream.flush();
+}
+
 void minty::File::close()
 {
     if (is_open())
@@ -420,7 +425,23 @@ void minty::VirtualFile::seek_read(Position const offset, Direction seekDir)
         File::seek_read(offset);
         break;
     case Direction::End:
-        File::seek_read(offset + (size() - (_virtualOffset + _virtualSize)));
+        File::seek_read(offset + (_virtualOffset + _virtualSize));
+        break;
+    }
+}
+
+void minty::VirtualFile::seek_write(Position const offset, Direction const seekDir)
+{
+    switch (seekDir)
+    {
+    case Direction::Begin:
+        File::seek_write(_virtualOffset + offset);
+        break;
+    case Direction::Current:
+        File::seek_write(offset);
+        break;
+    case Direction::End:
+        File::seek_write(offset + (_virtualOffset + _virtualSize));
         break;
     }
 }
@@ -433,6 +454,11 @@ bool minty::VirtualFile::eof()
 File::Position minty::VirtualFile::tell_read()
 {
     return File::tell_read() - _virtualOffset;
+}
+
+File::Position minty::VirtualFile::tell_write()
+{
+    return File::tell_write() - _virtualOffset;
 }
 
 File::Size minty::VirtualFile::size() const

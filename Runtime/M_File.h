@@ -76,6 +76,8 @@ namespace minty
 		/// <param name="flags">The flags to determine how to open the file.</param>
 		void open(Path const& path, Flags const flags);
 
+		void flush();
+
 		/// <summary>
 		/// Closes the open file, if a file is open.
 		/// </summary>
@@ -253,9 +255,13 @@ namespace minty
 
 		void seek_read(Position const offset, Direction dir = Direction::Begin) override;
 
+		void seek_write(Position const offset, Direction const dir = Direction::Begin) override;
+
 		bool eof() override;
 
 		Position tell_read() override;
+
+		Position tell_write() override;
 
 		Size size() const override;
 
