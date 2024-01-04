@@ -8,16 +8,14 @@
 using namespace minty;
 
 minty::File::File()
-    : _stream()
-    , _streamOffset()
-    , _streamSize()
+    : _path()
+    , _stream()
     , _flags()
 {}
 
 minty::File::File(Path const& path, Flags const flags)
-    : _stream()
-    , _streamOffset()
-    , _streamSize()
+    : _path()
+    , _stream()
     , _flags(flags)
 {
     open(path, flags);
@@ -47,12 +45,6 @@ void minty::File::open(Path const& path, Flags const flags)
         console::error(std::format("Cannot open File at path: \"{}\"", path.string()));
         return;
     }
-
-    // get stream offset and size
-    _streamOffset = static_cast<size_t>(_stream.tellg());
-    _stream.seekg(0, std::ios_base::end);
-    _streamSize = static_cast<size_t>(_stream.tellg()) - _streamOffset;
-    _stream.seekg(0, std::ios_base::beg);
 }
 
 void minty::File::close()
@@ -60,18 +52,22 @@ void minty::File::close()
     if (is_open())
     {
         // close the stream
+        _stream.flush();
         _stream.close();
 
         // reset all data
-        _streamOffset = 0;
-        _streamSize = 0;
         _flags = Flags::None;
     }
 }
 
-void minty::File::seek(Offset const offset, Direction dir)
+void minty::File::seek_read(Position const offset, Direction dir)
 {
     _stream.seekg(offset, static_cast<std::ios_base::seekdir>(dir));
+}
+
+void minty::File::seek_write(Position const offset, Direction const dir)
+{
+    _stream.seekp(offset, static_cast<std::ios_base::seekdir>(dir));
 }
 
 bool minty::File::eof()
@@ -79,19 +75,19 @@ bool minty::File::eof()
     return _stream.eof();
 }
 
-File::Offset minty::File::tell()
+File::Position minty::File::tell_read()
 {
-    return static_cast<size_t>(_stream.tellg()) - _streamOffset;
+    return _stream.tellg();
 }
 
-File::Offset minty::File::offset() const
+File::Position minty::File::tell_write()
 {
-    return _streamOffset;
+    return _stream.tellp();
 }
 
 File::Size minty::File::size() const
 {
-    return _streamSize;
+    return _stream.gcount();
 }
 
 char minty::File::peek()
@@ -407,41 +403,36 @@ bool minty::File::write_all_lines(Path const& path, std::vector<String> const& l
     return true;
 }
 
-minty::VirtualFile::VirtualFile(Path const& path, Flags const flags, Offset const offset, Size const size)
+minty::VirtualFile::VirtualFile(Path const& path, Flags const flags, Position const offset, Size const size)
     : File(path, flags)
     , _virtualOffset(offset)
     , _virtualSize(size)
 {}
 
-void minty::VirtualFile::seek(Offset const offset, Direction seekDir)
+void minty::VirtualFile::seek_read(Position const offset, Direction seekDir)
 {
     switch (seekDir)
     {
     case Direction::Begin:
-        File::seek(_virtualOffset + offset);
+        File::seek_read(_virtualOffset + offset);
         break;
     case Direction::Current:
-        File::seek(offset);
+        File::seek_read(offset);
         break;
     case Direction::End:
-        File::seek(offset + (_streamSize - (_virtualOffset + _virtualSize)));
+        File::seek_read(offset + (size() - (_virtualOffset + _virtualSize)));
         break;
     }
 }
 
 bool minty::VirtualFile::eof()
 {
-    return File::eof() || (tell() >= _virtualSize);
+    return File::eof() || (tell_read() >= _virtualSize);
 }
 
-File::Offset minty::VirtualFile::tell()
+File::Position minty::VirtualFile::tell_read()
 {
-    return File::tell() - _virtualOffset;
-}
-
-File::Offset minty::VirtualFile::offset() const
-{
-    return File::offset() + _virtualOffset;
+    return File::tell_read() - _virtualOffset;
 }
 
 File::Size minty::VirtualFile::size() const
@@ -464,9 +455,20 @@ void minty::VirtualFile::read(void* const buffer, Size const size)
 
 void minty::VirtualFile::write(void const* const buffer, Size const size)
 {
+    // ensure will not write out of bounds
+    if (tell_read() + size >= _virtualSize)
+    {
+        console::error("Failed to write to virtual file. Out of bounds.");
+        return;
+    }
+
     // write as per normal
     File::write(buffer, size);
 }
+
+minty::PhysicalFile::PhysicalFile()
+    : File::File()
+{}
 
 minty::PhysicalFile::PhysicalFile(Path const& path, Flags const flags)
     : File::File(path, flags)

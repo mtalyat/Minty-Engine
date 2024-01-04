@@ -21,32 +21,28 @@ InputMap input;
 int init(Runtime &runtime)
 {
     // create wrap file
-    Wrap wrap("data", Asset::absolute("Data/"));
+    Wrap wrap(Asset::absolute("wrap.wrap"), "test", "Data/");
 
     // add files in Assets folder only, no sub folders
-    wrap.emplace(".", false, Wrap::Compression::None);
+    wrap.emplace(Asset::absolute("Data/pumpkin_tex.jpg"), "pumpkin_tex.jpg", Wrap::Compression::None);
+    wrap.emplace(Asset::absolute("Data/pumpkin_tex.jpg.meta"), "pumpkin_tex.jpg.meta", Wrap::Compression::None);
+    wrap.emplace(Asset::absolute("Data/pumpkin.obj"), "pumpkin.obj", Wrap::Compression::None);
+    wrap.emplace(Asset::absolute("Data/test.txt"), "test.txt", Wrap::Compression::None);
 
     // check if files are in there
-    console::log("pumpkin_tex.jpg: " + std::to_string(wrap.contains("pumpkin_tex.jpg")));
-    console::log("pumpkin_tex.jpg.meta: " + std::to_string(wrap.contains("pumpkin_tex.jpg.meta")));
-    console::log("pumpkin.obj: " + std::to_string(wrap.contains("pumpkin.obj")));
-    console::log("test.txt: " + std::to_string(wrap.contains("test.txt")));
-    console::log("Test/test2.txt: " + std::to_string(wrap.contains("Test/test2.txt")));
+    console::log("pumpkin_tex.jpg: " + std::to_string(wrap.contains("Data/pumpkin_tex.jpg")));
+    console::log("pumpkin_tex.jpg.meta: " + std::to_string(wrap.contains("Data/pumpkin_tex.jpg.meta")));
+    console::log("pumpkin.obj: " + std::to_string(wrap.contains("Data/pumpkin.obj")));
+    console::log("test.txt: " + std::to_string(wrap.contains("Data/test.txt")));
 
-    // save
-    wrap.save("wrap.wrap");
-
-    // load
-    wrap.load("wrap.wrap");
+    Wrap wrap2(Asset::absolute("wrap.wrap"));
 
     // check if files are in there
-    console::log("pumpkin_tex.jpg: " + std::to_string(wrap.contains("pumpkin_tex.jpg")));
-    console::log("pumpkin_tex.jpg.meta: " + std::to_string(wrap.contains("pumpkin_tex.jpg.meta")));
-    console::log("pumpkin.obj: " + std::to_string(wrap.contains("pumpkin.obj")));
-    console::log("test.txt: " + std::to_string(wrap.contains("test.txt")));
-    console::log("Test/test2.txt: " + std::to_string(wrap.contains("Test/test2.txt")));
+    console::log("pumpkin_tex.jpg: " + std::to_string(wrap2.contains("Data/pumpkin_tex.jpg")));
+    console::log("pumpkin_tex.jpg.meta: " + std::to_string(wrap2.contains("Data/pumpkin_tex.jpg.meta")));
+    console::log("pumpkin.obj: " + std::to_string(wrap2.contains("Data/pumpkin.obj")));
+    console::log("test.txt: " + std::to_string(wrap2.contains("Data/test.txt")));
 
-    // do not run app, just this
     return 1;
 
     try
@@ -60,11 +56,11 @@ int init(Runtime &runtime)
         SystemRegistry::register_system<game::CameraControllerSystem>("CameraController");
         SystemRegistry::register_system<game::MoveSystem>("Move");
 
-        Engine& engine = runtime.get_engine();
-        Window& window = engine.get_window();
-        RenderEngine& renderer = engine.get_render_engine();
-        AudioEngine& audio = engine.get_audio_engine();
-        SceneManager& sceneManager = engine.get_scene_manager();
+        Engine &engine = runtime.get_engine();
+        Window &window = engine.get_window();
+        RenderEngine &renderer = engine.get_render_engine();
+        AudioEngine &audio = engine.get_audio_engine();
+        SceneManager &sceneManager = engine.get_scene_manager();
 
         // create renderer
         Info info("TestProject", 0, 0, 0);
@@ -116,16 +112,17 @@ int init(Runtime &runtime)
 
         // copy the model 5 times
         Entity modelEntity = er->find_by_name("Model");
-        for(int y = 0; y < 5; y++)
+        for (int y = 0; y < 5; y++)
         {
-            for(int x = 0; x < 5; x++)
+            for (int x = 0; x < 5; x++)
             {
                 // ignore original
-                if(x == 0 && y == 0) continue;
+                if (x == 0 && y == 0)
+                    continue;
 
                 // clone model, move it to the right 2 * i and down 2 * i
                 Entity clone = er->clone(modelEntity);
-                TransformComponent& cloneTransformComp = er->get<TransformComponent>(clone);
+                TransformComponent &cloneTransformComp = er->get<TransformComponent>(clone);
                 cloneTransformComp.local.position.x += static_cast<float>(x) * 4.0f;
                 cloneTransformComp.local.position.y += static_cast<float>(y) * 4.0f;
                 er->emplace_or_replace<DirtyComponent>(clone);
@@ -149,14 +146,14 @@ int init(Runtime &runtime)
         // play audio
         audio.play_background("blinking-forest", 0.2f);
 
-        AudioEngine* audioPtr = &audio;
-        Window* windowPtr = &window;
+        AudioEngine *audioPtr = &audio;
+        Window *windowPtr = &window;
 
         //          input
         input.emplace_key_down(Key::E, [audioPtr, er](KeyPressEventArgs const &args)
                                { audioPtr->play_spatial("ding", er->find_by_name("Model")); });
         input.emplace_key_up(Key::E, [audioPtr, er](KeyPressEventArgs const &args)
-                               { audioPtr->play_spatial("dong", er->find_by_name("Model")); });
+                             { audioPtr->play_spatial("dong", er->find_by_name("Model")); });
 
         // quit on key close
         input.emplace_key_down(Key::Escape, [windowPtr](KeyPressEventArgs const &args)

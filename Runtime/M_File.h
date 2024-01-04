@@ -8,13 +8,13 @@
 namespace minty
 {
 	/// <summary>
-		/// Handles reading/writing to a file.
-		/// </summary>
+	/// Handles reading/writing to a file.
+	/// </summary>
 	class File
 		: public Object
 	{
 	public:
-		typedef std::streamoff Offset;
+		typedef std::streampos Position;
 		typedef std::streamsize Size;
 		enum class Direction
 		{
@@ -27,6 +27,7 @@ namespace minty
 			None = 0,
 			Read = std::ios_base::in,
 			Write = std::ios_base::out,
+			ReadWrite = std::ios_base::in | std::ios_base::out,
 			End = std::ios_base::end,
 			Append = std::ios_base::app,
 			Truncate = std::ios_base::trunc,
@@ -36,14 +37,15 @@ namespace minty
 		{
 			return static_cast<Flags>(static_cast<int>(left) | static_cast<int>(right));
 		}
+		friend inline Flags operator&(Flags const left, Flags const right)
+		{
+			return static_cast<Flags>(static_cast<int>(left) & static_cast<int>(right));
+		}
 	protected:
+		Path _path;
+
 		// file stream, could be in or out
 		std::fstream _stream;
-
-		// offset of the stream
-		Offset _streamOffset;
-		// size of the stream
-		Size _streamSize;
 
 		// the file mode
 		Flags _flags;
@@ -84,7 +86,9 @@ namespace minty
 		/// </summary>
 		/// <param name="offset">The offset at which the file is relative to the direction.</param>
 		/// <param name="dir">The anchor point of the offset.</param>
-		virtual void seek(Offset const offset, Direction const dir = Direction::Begin);
+		virtual void seek_read(Position const offset, Direction const dir = Direction::Begin);
+
+		virtual void seek_write(Position const offset, Direction const dir = Direction::Begin);
 
 		/// <summary>
 		/// Checks if the cursor is at or past the end of the file.
@@ -96,13 +100,9 @@ namespace minty
 		/// Gets the current position of the cursor.
 		/// </summary>
 		/// <returns></returns>
-		virtual Offset tell();
+		virtual Position tell_read();
 
-		/// <summary>
-		/// Gets the offset of the beginning of the data within the file.
-		/// </summary>
-		/// <returns></returns>
-		virtual Offset offset() const;
+		virtual Position tell_write();
 
 		/// <summary>
 		/// Gets the size of the file.
@@ -121,7 +121,7 @@ namespace minty
 		/// </summary>
 		/// <returns></returns>
 		virtual char get();
-		
+
 		/// <summary>
 		/// Reads the given size of data into the given buffer, and moves the cursor size bytes.
 		/// </summary>
@@ -231,6 +231,8 @@ namespace minty
 		: public File
 	{
 	public:
+		PhysicalFile();
+
 		PhysicalFile(Path const& path, Flags const flags);
 	};
 
@@ -242,20 +244,18 @@ namespace minty
 	{
 	protected:
 		// offset within the physical file
-		Offset _virtualOffset;
+		Position _virtualOffset;
 		// size within the physical file
 		Size _virtualSize;
 
 	public:
-		VirtualFile(Path const& path, Flags const flags, Offset const offset, Size const size);
+		VirtualFile(Path const& path, Flags const flags, Position const offset, Size const size);
 
-		void seek(Offset const offset, Direction dir = Direction::Begin) override;
+		void seek_read(Position const offset, Direction dir = Direction::Begin) override;
 
 		bool eof() override;
 
-		Offset tell() override;
-
-		Offset offset() const override;
+		Position tell_read() override;
 
 		Size size() const override;
 

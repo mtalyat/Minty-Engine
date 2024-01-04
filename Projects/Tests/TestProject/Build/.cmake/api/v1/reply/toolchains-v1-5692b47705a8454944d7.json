@@ -13,7 +13,7 @@
 					"linkFrameworkDirectories" : [],
 					"linkLibraries" : []
 				},
-				"path" : "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.37.32822/bin/Hostx64/x64/cl.exe",
+				"path" : "C:/Program Files/Microsoft Visual Studio/2022/Community/VC/Tools/MSVC/14.37.32822/bin/Hostx86/x64/cl.exe",
 				"version" : "19.37.32822.0"
 			},
 			"language" : "CXX",
@@ -30,17 +30,14 @@
 				"mpp",
 				"CPP",
 				"ixx",
-				"cppm",
-				"ccm",
-				"cxxm",
-				"c++m"
+				"cppm"
 			]
 		},
 		{
 			"compiler" : 
 			{
 				"implicit" : {},
-				"path" : "rc"
+				"path" : "C:/Program Files (x86)/Windows Kits/10/bin/10.0.22621.0/x86/rc.exe"
 			},
 			"language" : "RC",
 			"sourceFileExtensions" : 

@@ -3,12 +3,14 @@
 #include "M_Object.h"
 #include "M_Register.h"
 #include "M_File.h"
+#include <unordered_set>
 #include <unordered_map>
 
 namespace minty
 {
 	constexpr char const* const WRAP_MAGIC = "WRAP";
-	constexpr int const WRAP_HEADER_ID_SIZE = 4;
+	constexpr int const WRAP_MAGIC_SIZE = 4;
+	constexpr char const* const WRAP_EXTENSION = ".wrap";
 	constexpr int const WRAP_HEADER_PATH_SIZE = 100;
 	constexpr int const WRAP_HEADER_NAME_SIZE = 50;
 	constexpr int const WRAP_ENTRY_PATH_SIZE = 255;
@@ -90,19 +92,39 @@ namespace minty
 		/// </summary>
 		struct Header
 		{
-			// id to ensure this is a wrap file
-			char id[WRAP_HEADER_ID_SIZE] = { 'W', 'R', 'A', 'P' };
-			// type of wrap
+			/// <summary>
+			/// The ID to ensure that this is in fact a Wrap file.
+			/// </summary>
+			char id[WRAP_MAGIC_SIZE] = { 'W', 'R', 'A', 'P' };
+
+			/// <summary>
+			/// The type of Wrap file.
+			/// </summary>
 			Type type = Type::None;
-			// version of wrap
+
+			/// <summary>
+			/// The Wrap version.
+			/// </summary>
 			uint16_t wrapVersion = 0;
-			// version of the data
+
+			/// <summary>
+			/// The content version.
+			/// </summary>
 			uint32_t contentVersion = 0;
-			// base path of the physical folder that contains all of the entries
+
+			/// <summary>
+			/// The base path of every virtual file Entry within this Wrap.
+			/// </summary>
 			char basePath[WRAP_HEADER_PATH_SIZE] = "";
-			// the name of the folder?
+
+			/// <summary>
+			/// The name of this Wrap.
+			/// </summary>
 			char name[WRAP_HEADER_NAME_SIZE] = "";
-			// number of entries
+
+			/// <summary>
+			/// The number of Entries within this Wrap.
+			/// </summary>
 			uint32_t entryCount = 0;
 
 			Header();
@@ -113,43 +135,60 @@ namespace minty
 		};
 
 		/// <summary>
-		/// The entry information for a physical file that is stored within the .wrap file.
+		/// The entry information for a virtual file that is stored within the .wrap file.
 		/// </summary>
 		struct Entry
 		{
-			// old physical file path
+			/// <summary>
+			/// The path to this Entry within the Wrap file.
+			/// </summary>
 			char path[WRAP_ENTRY_PATH_SIZE] = "";
-			// is the data compressed?
+
+			/// <summary>
+			/// The compression level of this data in the Wrap file.
+			/// </summary>
 			Byte compressed = 0;
-			// size of data
-			unsigned int size = 0;
-			// offset to from beginning
-			unsigned int offset = 0;
+
+			/// <summary>
+			/// The reserved size of the data within the Wrap file.
+			/// </summary>
+			uint32_t reservedSize = 0;
+
+			/// <summary>
+			/// The actual size of the data within the Wrap file.
+			/// </summary>
+			uint32_t size = 0;
+
+			/// <summary>
+			/// The offset to the data within the Wrap file.
+			/// </summary>
+			uint32_t offset = 0;
 
 			Entry();
 
 			Entry(Entry const& other);
 
 			Entry& operator=(Entry const& other);
+
+			bool empty() const;
 		};
 
 	private:
+		// path to the wrap file on the disk
+		Path _path;
+
+		// header in the wrap file
 		Header _header;
 
-		std::unordered_map<Path, Entry> _entries;
+		// list of entries in the wrap file
+		std::vector<Entry> _entries;
+		// list of empty gaps in the wrap file, where files used to be
+		std::unordered_set<uint32_t> _empties;
+		// virtual paths indexed to entry indices
+		std::unordered_map<Path, size_t> _indexed;
 
 	public:
-		/// <summary>
-		/// Creates an empty Wrap file.
-		/// </summary>
 		Wrap();
-
-		/// <summary>
-		/// Creates a Wrap file.
-		/// </summary>
-		/// <param name="name">The base path.</param>
-		/// <param name="path">The base path.</param>
-		Wrap(String const& name, Path const& path, uint32_t const contentVersion = 0);
 
 		/// <summary>
 		/// Creates and loads a Wrap file at the given path.
@@ -157,13 +196,51 @@ namespace minty
 		/// <param name="path">The path to the Wrap file on the disk.</param>
 		Wrap(Path const& path);
 
-#pragma region Get
+		/// <summary>
+		/// Creates a new Wrap file with the given name, base path, and content version.
+		/// </summary>
+		/// <param name="path">The path to the Wrap file on the disk.</param>
+		/// <param name="name">The name of the Wrap file.</param>
+		/// <param name="base">The base path all files within the Wrap file.</param>
+		/// <param name="contentVersion">The version of the content within the Wrap file.</param>
+		Wrap(Path const& path, String const& name, Path const& base = "", uint32_t const contentVersion = 0);
 
+	private:
+		void load();
+
+		void write_header(PhysicalFile& wrapFile) const;
+
+		void write_entry(PhysicalFile& wrapFile, size_t const index) const;
+
+		uint32_t emplace_entry(Entry& entry);
+
+#pragma region Files
+
+	public:
+		void emplace(Path const& physicalPath, Path const& virtualPath, Compression const compression = Compression::Default, uint32_t const reservedSize = 0);
+
+		bool contains(Path const& path) const;
+
+		Entry const& get_entry(size_t const index) const;
+
+		Entry const& get_entry(Path const& path) const;
+#pragma endregion
+
+
+#pragma region Get Set
+
+	public:
 		uint32_t get_version() const;
 
 		char const* get_base_path() const;
 
+		void set_base_path(Path const& path);
+
+		Path const& get_path() const;
+
 		char const* get_name() const;
+
+		void set_name(String const& name);
 
 		uint16_t get_wrap_version() const;
 
@@ -171,78 +248,8 @@ namespace minty
 
 		Type get_type() const;
 
-#pragma endregion
-
-#pragma region Set
-
 		void set_type(Type const type);
 
 #pragma endregion
-
-		bool contains(Path const& path) const;
-
-		Entry& at(Path const& path);
-
-		Entry const& at(Path const& path) const;
-
-		/// <summary>
-		/// Adds the file at the given path to this Wrap file.
-		/// </summary>
-		/// <param name="path"></param>
-		/// <param name="recursive"></param>
-		/// <param name="compression"></param>
-		void emplace(Path const& path, bool const recursive = true, Compression const compression = Compression::Default);
-
-#pragma region Saving and Loading
-
-		/// <summary>
-		/// Saves the Wrap file to the disk.
-		/// </summary>
-		/// <param name="path">The path to save to.</param>
-		void save(Path const& path) const;
-
-		/// <summary>
-		/// Loads the Wrap file from the disk.
-		/// </summary>
-		/// <param name="path">The path to load from.</param>
-		void load(Path const& path);
-
-#pragma endregion		
-	};
-
-	/// <summary>
-	/// Handles dealing with .wrap files.
-	/// </summary>
-	class Wrapper
-		: public Object
-	{
-	private:
-		std::unordered_map<String, Wrap> _wraps;
-
-		Register<File*> _files;
-
-	public:
-		/// <summary>
-		/// Creates an empty Wrapper.
-		/// </summary>
-		Wrapper();
-
-		~Wrapper();
-
-		void emplace(Wrap const& wrap);
-
-		void emplace(Path const& path, bool const recursive = true);
-
-		Wrap const& get(String const& name) const;
-
-		ID open(Path const& path);
-
-		File* at(ID const id) const;
-
-		File* at(Path const& path) const;
-
-		void close(ID const id);
-
-		void close(Path const& path);
 	};
 }

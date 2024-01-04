@@ -11,27 +11,169 @@
 using namespace minty;
 
 minty::Wrap::Wrap()
-    : _header()
+    : _path()
+    , _header()
     , _entries()
+    , _indexed()
 {}
 
-minty::Wrap::Wrap(String const& name, Path const& path, uint32_t const contentVersion)
-    : _header()
+minty::Wrap::Wrap(Path const& path)
+    : _path(path)
+    , _header()
     , _entries()
+    , _indexed()
 {
+    load();
+}
+
+minty::Wrap::Wrap(Path const& path, String const& name, Path const& base, uint32_t const contentVersion)
+    : _path(path)
+    , _header()
+    , _entries()
+    , _indexed()
+{
+    // set header data
     _header.type = Type::File;
     _header.wrapVersion = WRAP_VERSION;
     _header.contentVersion = contentVersion;
-    strncpy_s(_header.name, name.c_str(), WRAP_HEADER_NAME_SIZE);
-    strncpy_s(_header.basePath, path.string().c_str(), WRAP_HEADER_PATH_SIZE);
+    set_name(name);
+    set_base_path(base);
     _header.entryCount = 0;
+
+    // open file, open with truncate to override any existing file
+    PhysicalFile file(path, File::Flags::Write | File::Flags::Binary | File::Flags::Truncate);
+
+    // write header
+    write_header(file);
+    
+    file.close();
 }
 
-minty::Wrap::Wrap(Path const& path)
-    : _header()
-    , _entries()
+void minty::Wrap::load()
 {
-    load(path);
+    // check if file exists and is valid
+    if (!std::filesystem::exists(_path))
+    {
+        // file does not exist
+        console::error(std::format("Cannot load \"{}\" Wrap file: file does not exist.", _path.string()));
+        return;
+    }
+    else if (!std::filesystem::is_regular_file(_path))
+    {
+        // not a file
+        console::error(std::format("Cannot load \"{}\" Wrap file: not a regular file.", _path.string()));
+        return;
+    }
+    else if (_path.extension() != WRAP_EXTENSION)
+    {
+        // not a .wrap file
+        console::error(std::format("Cannot load \"{}\" Wrap file: missing .wrap file extension.", _path.string()));
+        return;
+    }
+
+    // open the file
+    PhysicalFile file(_path, File::Flags::Read | File::Flags::Binary);
+
+    // read header data
+    file.read(&_header, sizeof(Header));
+
+    // ensure it is a valid wrap file by checking the magic data
+    if (memcmp(_header.id, WRAP_MAGIC, WRAP_MAGIC_SIZE))
+    {
+        // does not have the correct "WRAP" id magic
+        console::error(std::format("Cannot emplace \"{}\" into Wrap file: invalid data.", _path.string()));
+        _header = Header();
+        return;
+    }
+
+    // read entries
+    Path basePath(_header.basePath);
+    _entries.resize(_header.entryCount);
+    _indexed.reserve(_header.entryCount);
+    for (uint32_t i = 0; i < _header.entryCount; i++)
+    {
+        // read entry
+        Entry& entry = _entries.at(i);
+        file.read(&entry, sizeof(Entry));
+        // add path and index
+        _indexed.emplace(basePath / entry.path, i);
+        // add to empties if empty
+        if (entry.empty())
+        {
+            _empties.emplace(i);
+        }
+    }
+
+    file.close();
+}
+
+void minty::Wrap::write_header(PhysicalFile& wrapFile) const
+{
+    wrapFile.seek_write(0);
+    wrapFile.write(_header);
+}
+
+void minty::Wrap::write_entry(PhysicalFile& wrapFile, size_t const index) const
+{
+    wrapFile.seek_write(sizeof(Header) + sizeof(Entry) * index);
+    wrapFile.write(_entries.at(index));
+}
+
+uint32_t minty::Wrap::emplace_entry(Entry& entry)
+{
+    int64_t bestIndex = -1;
+
+    // search through empty entries to find best fit
+    for (uint32_t const index : _empties)
+    {
+        Entry& entry = _entries.at(index);
+
+        if (entry.reservedSize < entry.reservedSize)
+        {
+            // not big enough
+            continue;
+        }
+
+        // big enough
+
+        // replace best index if no index yet, or this is a closer reserved size
+        if (bestIndex == -1 || entry.reservedSize < _entries.at(bestIndex).reservedSize)
+        {
+            bestIndex = index;
+        }
+    }
+
+    // if index, replace that entry and return that index
+    if (bestIndex >= 0)
+    {
+        // TODO: if not an exact size match, then split the entry
+        uint32_t index = static_cast<uint32_t>(bestIndex);
+
+        // remove index from empties
+        _empties.erase(index);
+
+        // replace old indexed path
+        _indexed.erase(Path(_header.basePath) / _entries[index].path);
+
+        // move some data to new entry (pos, size, etc.)
+        Entry const& oldEntry = _entries.at(index);
+        entry.offset = oldEntry.offset;
+        entry.reservedSize = oldEntry.reservedSize;
+
+        // officially replace it
+        _entries[index] = entry;
+        _indexed[Path(_header.basePath) / entry.path] = index;
+
+        // return that index
+        return static_cast<uint32_t>(index);
+    }
+
+    // create new entry
+    uint32_t index = static_cast<uint32_t>(_entries.size());
+    _entries.push_back(entry);
+    _indexed.emplace(Path(_header.basePath) / entry.path, index);
+
+    return index;
 }
 
 uint32_t minty::Wrap::get_version() const
@@ -44,9 +186,37 @@ char const* minty::Wrap::get_base_path() const
     return _header.basePath;
 }
 
+void minty::Wrap::set_base_path(Path const& path)
+{
+    // set the base path
+    memcpy(_header.basePath, path.string().c_str(), WRAP_HEADER_PATH_SIZE);
+    _header.basePath[WRAP_HEADER_PATH_SIZE - 1] = '\0';
+
+    // replace indexed
+    _indexed.clear();
+    Path basePath(_header.basePath);
+    for (size_t i = 0; i < _header.entryCount; i++)
+    {
+        Entry const& entry = _entries.at(i);
+        _indexed.emplace(basePath / entry.path, i);
+    }
+}
+
+Path const& minty::Wrap::get_path() const
+{
+    return _path;
+}
+
 char const* minty::Wrap::get_name() const
 {
     return _header.name;
+}
+
+void minty::Wrap::set_name(String const& name)
+{
+    // set name
+    memcpy(_header.name, name.c_str(), WRAP_HEADER_NAME_SIZE);
+    _header.name[WRAP_HEADER_NAME_SIZE - 1] = '\0';
 }
 
 uint16_t minty::Wrap::get_wrap_version() const
@@ -59,19 +229,84 @@ uint32_t minty::Wrap::get_content_version() const
     return _header.contentVersion;
 }
 
+void minty::Wrap::emplace(Path const& physicalPath, Path const& virtualPath, Compression const compression, uint32_t const reservedSize)
+{
+    // check if file exists and is valid
+    if (!std::filesystem::exists(physicalPath))
+    {
+        // file does not exist
+        console::error(std::format("Cannot emplace \"{}\" into Wrap file: file does not exist.", physicalPath.string()));
+        return;
+    }
+    else if (!std::filesystem::is_regular_file(physicalPath))
+    {
+        // not a file
+        console::error(std::format("Cannot emplace \"{}\" into Wrap file: not a regular file.", physicalPath.string()));
+        return;
+    }
+
+    // open wrap file
+    PhysicalFile wrapFile(_path, File::Flags::ReadWrite | File::Flags::Binary);
+
+    // open file
+    PhysicalFile file(physicalPath, File::Flags::Read | File::Flags::Binary);
+
+    // read the data from the file
+    File::Size fileSize = file.size();
+    Byte* fileData = new Byte[fileSize];
+    file.read(fileData, fileSize);
+
+    // done with that file
+    file.close();
+
+    // TODO: compress the data
+
+    // create an entry for the new file
+    Entry entry;
+    memcpy(entry.path, virtualPath.string().c_str(), WRAP_ENTRY_PATH_SIZE);
+    entry.path[WRAP_ENTRY_PATH_SIZE - 1] = '\0';
+    entry.compressed = 0; // TODO: use actual compression level once compression is added
+
+    // set size and offset
+    entry.offset = static_cast<uint32_t>(wrapFile.size());
+    entry.size = static_cast<uint32_t>(fileSize);
+    if (reservedSize)
+    {
+        entry.reservedSize = reservedSize;
+    }
+    else
+    {
+        entry.reservedSize = entry.size;
+    }
+    
+    // add entry
+    size_t index = emplace_entry(entry);
+
+    // update header
+    _header.entryCount++;
+
+    // write to file
+    write_header(wrapFile);
+    write_entry(wrapFile, index);
+    wrapFile.seek_write(entry.offset, File::Direction::End);
+    // TODO: write contents to file
+
+    wrapFile.close();
+}
+
 bool minty::Wrap::contains(Path const& path) const
 {
-    return _entries.contains(_header.basePath / path);
+    return _indexed.contains(path);
 }
 
-Wrap::Entry& minty::Wrap::at(Path const& path)
+Wrap::Entry const& minty::Wrap::get_entry(size_t const index) const
 {
-    return _entries.at(_header.basePath / path);
+    return _entries.at(index);
 }
 
-Wrap::Entry const& minty::Wrap::at(Path const& path) const
+Wrap::Entry const& minty::Wrap::get_entry(Path const& path) const
 {
-    return _entries.at(_header.basePath / path);
+    return _entries.at(_indexed.at(path));
 }
 
 Wrap::Type minty::Wrap::get_type() const
@@ -82,252 +317,6 @@ Wrap::Type minty::Wrap::get_type() const
 void minty::Wrap::set_type(Type const type)
 {
     _header.type = type;
-}
-
-void minty::Wrap::emplace(Path const& path, bool const recursive, Compression const compression)
-{
-    Path fixedPath;
-
-    if (path.string().starts_with("."))
-    {
-        if (path.string().size() > 1)
-        {
-            // ignore hidden files and folders
-            return;
-        }
-        else
-        {
-            // use base path
-            fixedPath = "";
-        }
-    }
-    else
-    {
-        // get relative path from base path
-        fixedPath = std::filesystem::relative(path, _header.basePath);
-    }
-
-    fixedPath = _header.basePath / fixedPath;
-
-    // if directory, load all files within the directory
-    // if file, load
-    if (std::filesystem::is_directory(fixedPath))
-    {
-        for (auto const& iter : std::filesystem::directory_iterator(fixedPath))
-        {
-            Path const& subpath = iter.path();
-
-            // if another directory and recursive, then load it as well
-            // if a file, load it
-            if (std::filesystem::is_directory(subpath) && recursive)
-            {
-                emplace(subpath, true, compression);
-            }
-            else if (std::filesystem::is_regular_file(subpath))
-            {
-                emplace(subpath, false, compression);
-            }
-        }
-    }
-    else if (std::filesystem::is_regular_file(fixedPath))
-    {
-        // add as a file entry
-        Entry entry;
-        strncpy_s(entry.path, fixedPath.string().c_str(), WRAP_ENTRY_PATH_SIZE);
-        entry.compressed = static_cast<Byte>(compression);
-        entry.offset = 0;
-        entry.size = 0;
-        _entries.emplace(fixedPath, entry);
-        console::log("added: " + fixedPath.string());
-    }
-}
-
-void minty::Wrap::save(Path const& path) const
-{
-    // write header
-    // write entries
-    // write all entry's file datas, compress if needed
-    
-    // open file at path, or create a new one if needed
-    PhysicalFile file(path, File::Flags::Write);
-
-    // write header
-    file.write(_header);
-
-    // temp write fake entries
-    Entry emptyEntry;
-    for (size_t i = 0; i < _entries.size(); i++)
-    {
-        file.write(emptyEntry);
-    }
-
-    // now write each file, and calculate the size and offset, then re-write each entry on the file
-    size_t headerSize = sizeof(Header);
-    size_t entrySize = sizeof(Entry);
-
-    for (auto const& pair : _entries)
-    {
-        // load file from disk
-        PhysicalFile assetFile(pair.first, File::Flags::Read | File::Flags::Binary);
-
-        // determine size
-        File::Size assetSize = assetFile.size();
-
-
-    }
-}
-
-void minty::Wrap::load(Path const& path)
-{
-    if (!std::filesystem::exists(path))
-    {
-        // invalid path
-        console::error(std::format("Cannot load wrap file at path \"{}\": file does not exist.", path.string()));
-        return;
-    }
-
-    // load wrap file
-    PhysicalFile file(path, File::Flags::Read);
-
-    // read the header
-    file.read(&_header, sizeof(Header));
-
-    // verify it is a wrap header
-    if (std::memcmp(WRAP_MAGIC, _header.id, 4))
-    {
-        // not "WRAP"
-        console::error(std::format("Could not load Wrap file from path \"{}\". Missing magic data.", path.string()));
-        return;
-    }
-
-    // read all of the entries
-    Entry entry;
-    for (uint32_t i = 0; i < _header.entryCount; i++)
-    {
-        file.read(&entry, sizeof(Entry));
-
-        _entries.emplace(entry.path, entry);
-    }
-}
-
-minty::Wrapper::Wrapper()
-    : _wraps()
-{}
-
-minty::Wrapper::~Wrapper()
-{
-}
-
-void minty::Wrapper::emplace(Wrap const& wrap)
-{
-    // load it into data
-    // if the name does not exist OR (the name does exist AND this content version is higher), add
-    auto const& found = _wraps.find(wrap.get_name());
-
-    if (found == _wraps.end() || wrap.get_content_version() > found->second.get_content_version())
-    {
-        // new OR replace
-        _wraps[wrap.get_name()] = wrap;
-    }
-
-    // determine what to do based on type
-    switch (wrap.get_type())
-    {
-    case Wrap::Type::File:
-        break;
-    default:
-        console::todo(std::format("Wrap file type \"{}\".", static_cast<uint16_t>(wrap.get_type())));
-        break;
-    }
-}
-
-void minty::Wrapper::emplace(Path const& path, bool const recursive)
-{
-    // if given a path to a directory, load all .wrap files within it
-    // otherwise just load the file itself, if its a .wrap file
-
-    if (std::filesystem::is_directory(path)) // directory
-    {
-        for (auto const& entry : std::filesystem::directory_iterator(path))
-        {
-            // if a directory and recursive is true
-            // or if a file
-            if ((entry.is_directory() && recursive) || (entry.is_regular_file()))
-            {
-                // load the other directory, or the next file
-                emplace(entry.path().string(), recursive);
-            }
-        }
-    }
-    else if (std::filesystem::is_regular_file(path) && path.has_extension() && path.extension() == ".wrap") // file
-    {
-        // create the wrap
-        Wrap wrap(path.stem().string(), Asset::absolute(path));
-
-        // load it
-        wrap.load(path);
-
-        // add it to the wrapper
-        emplace(wrap);
-    }
-}
-
-Wrap const& minty::Wrapper::get(String const& name) const
-{
-    return _wraps.at(name);
-}
-
-ID minty::Wrapper::open(Path const& path)
-{
-    // find file
-    for (auto const& pair : _wraps)
-    {
-        // if wrap file contains the target path...
-        if (pair.second.contains(path))
-        {
-            // create a virtual file of that entry
-            Wrap::Entry const& entry = pair.second.at(path);
-
-            File* file = new VirtualFile(pair.second.get_base_path(), File::Flags::Read | File::Flags::Binary, entry.offset, entry.size);
-
-            ID id = _files.emplace(path.string(), file);
-
-            return id;
-        }
-    }
-
-    // no file found at path in Wrapper
-    return ERROR_ID;
-}
-
-File* minty::Wrapper::at(ID const id) const
-{
-    return _files.at(id);
-}
-
-File* minty::Wrapper::at(Path const& path) const
-{
-    return _files.at(path.string());
-}
-
-void minty::Wrapper::close(ID const id)
-{
-    if (_files.contains(id))
-    {
-        delete _files.at(id);
-        _files.erase(id);
-    }
-}
-
-void minty::Wrapper::close(Path const& path)
-{
-    std::string strPath = path.string();
-
-    if (_files.contains(strPath))
-    {
-        delete _files.at(strPath);
-        _files.erase(strPath);
-    }
 }
 
 minty::Wrap::Header::Header()
@@ -342,21 +331,25 @@ minty::Wrap::Header::Header(Header const& other)
     , name("")
     , entryCount(other.entryCount)
 {
-    strncpy_s(id, other.id, WRAP_HEADER_ID_SIZE);
-    strncpy_s(basePath, other.basePath, WRAP_HEADER_PATH_SIZE);
-    strncpy_s(name, other.name, WRAP_HEADER_NAME_SIZE);
+    memcpy(id, other.id, WRAP_MAGIC_SIZE);
+    memcpy(basePath, other.basePath, WRAP_HEADER_PATH_SIZE);
+    basePath[WRAP_HEADER_PATH_SIZE - 1] = '\0';
+    memcpy(name, other.name, WRAP_HEADER_NAME_SIZE);
+    name[WRAP_HEADER_NAME_SIZE - 1] = '\0';
 }
 
 Wrap::Header& minty::Wrap::Header::operator=(Header const& other)
 {
     if (&other != this)
     {
-        strncpy_s(id, other.id, WRAP_HEADER_ID_SIZE);
+        memcpy(id, other.id, WRAP_MAGIC_SIZE);
         type = other.type;
         wrapVersion = other.wrapVersion;
         contentVersion = other.contentVersion;
-        strncpy_s(basePath, other.basePath, WRAP_HEADER_PATH_SIZE);
-        strncpy_s(name, other.name, WRAP_HEADER_NAME_SIZE);
+        memcpy(basePath, other.basePath, WRAP_HEADER_PATH_SIZE);
+        basePath[WRAP_HEADER_PATH_SIZE - 1] = '\0';
+        memcpy(name, other.name, WRAP_HEADER_NAME_SIZE);
+        name[WRAP_HEADER_NAME_SIZE - 1] = '\0';
         entryCount = other.entryCount;
     }
 
@@ -369,21 +362,30 @@ minty::Wrap::Entry::Entry()
 minty::Wrap::Entry::Entry(Entry const& other)
     : path("")
     , compressed(other.compressed)
+    , reservedSize(other.reservedSize)
     , size(other.size)
     , offset(other.offset)
 {
-    strncpy_s(path, other.path, WRAP_ENTRY_PATH_SIZE);
+    memcpy(path, other.path, WRAP_ENTRY_PATH_SIZE);
+    path[WRAP_ENTRY_PATH_SIZE - 1] = '\0';
 }
 
 Wrap::Entry& minty::Wrap::Entry::operator=(Entry const& other)
 {
     if (&other != this)
     {
-        strncpy_s(path, other.path, WRAP_ENTRY_PATH_SIZE);
+        memcpy(path, other.path, WRAP_ENTRY_PATH_SIZE);
+        path[WRAP_ENTRY_PATH_SIZE - 1] = '\0';
         compressed = other.compressed;
+        reservedSize = other.reservedSize;
         size = other.size;
         offset = other.offset;
     }
 
     return *this;
+}
+
+bool minty::Wrap::Entry::empty() const
+{
+    return size == 0;
 }
