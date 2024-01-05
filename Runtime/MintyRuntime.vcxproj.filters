@@ -438,6 +438,9 @@
     <ClInclude Include="M_Resource.h">
       <Filter>Header Files\Assets</Filter>
     </ClInclude>
+    <ClInclude Include="M_Wrapper.h">
+      <Filter>Header Files\Assets</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -717,6 +720,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_Wrap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_Wrapper.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
