@@ -111,7 +111,7 @@ void minty::File::read(void* const buffer, Size const size)
     _stream.read(static_cast<char*>(buffer), size);
 }
 
-inline bool minty::File::read_line(String& line)
+bool minty::File::read_line(String& line)
 {
     return read_line(line, '\n');
 }

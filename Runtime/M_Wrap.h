@@ -241,7 +241,7 @@ namespace minty
 		/// </summary>
 		/// <param name="path">The path to check.</param>
 		/// <returns></returns>
-		inline bool contains(Path const& path) const;
+		bool contains(Path const& path) const;
 
 		/// <summary>
 		/// Opens a file at the given path using the given VirtualFile.

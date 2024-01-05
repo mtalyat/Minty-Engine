@@ -315,7 +315,7 @@ bool minty::Wrap::exists(Path const& path) const
     return _indexed.contains(path);
 }
 
-inline bool minty::Wrap::contains(Path const& path) const
+bool minty::Wrap::contains(Path const& path) const
 {
     return exists(path);
 }

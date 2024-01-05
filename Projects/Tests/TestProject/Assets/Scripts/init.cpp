@@ -51,12 +51,11 @@ int init(Runtime &runtime)
     console::log("Test.txt contents from .wrap file:");
     VirtualFile file;
     wrap2.open("Data/test.txt", file);
-    size_t fileSize = file.size();
-    Byte* data = new Byte[fileSize + 1];
-    file.read(data, fileSize);
-    data[fileSize] = '\0';
-    console::log(String(static_cast<char*>(static_cast<void*>(data))));
-    delete data;
+    String line;
+    while(file.read_line(line))
+    {
+        console::log(line);
+    }
     file.close();
 
     // create Wrapper
@@ -67,13 +66,11 @@ int init(Runtime &runtime)
 
     // print text file again
     wrapper.open("Data/test.txt", file);
-
-    fileSize = file.size();
-    data = new Byte[fileSize + 1];
-    file.read(data, fileSize);
-    data[fileSize] = '\0';
-    console::log(String(static_cast<char*>(static_cast<void*>(data))));
-    delete data;
+    
+    while(file.read_line(line))
+    {
+        console::log(line);
+    }
     file.close();
 
     return 1;

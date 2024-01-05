@@ -152,7 +152,7 @@ namespace minty
 		/// Reads the next line of text, and moves the cursor the appropriate amount of bytes.
 		/// </summary>
 		/// <returns></returns>
-		inline bool read_line(String& line);
+		bool read_line(String& line);
 
 		/// <summary>
 		/// Reads the next line of text, and moves the cursor the appropriate amount of bytes.
