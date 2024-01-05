@@ -49,15 +49,32 @@ int init(Runtime &runtime)
 
     // write test.txt file
     console::log("Test.txt contents from .wrap file:");
-    ID fileId = wrap2.open("Data/test.txt");
-    VirtualFile& file = wrap2.at(fileId);
+    VirtualFile file;
+    wrap2.open("Data/test.txt", file);
     size_t fileSize = file.size();
     Byte* data = new Byte[fileSize + 1];
     file.read(data, fileSize);
     data[fileSize] = '\0';
     console::log(String(static_cast<char*>(static_cast<void*>(data))));
     delete data;
-    wrap2.close(fileId);
+    file.close();
+
+    // create Wrapper
+    Wrapper wrapper;
+
+    // add the wrap file
+    wrapper.emplace(Asset::absolute("wrap.wrap"));
+
+    // print text file again
+    wrapper.open("Data/test.txt", file);
+
+    fileSize = file.size();
+    data = new Byte[fileSize + 1];
+    file.read(data, fileSize);
+    data[fileSize] = '\0';
+    console::log(String(static_cast<char*>(static_cast<void*>(data))));
+    delete data;
+    file.close();
 
     return 1;
 

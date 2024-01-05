@@ -409,6 +409,12 @@ bool minty::File::write_all_lines(Path const& path, std::vector<String> const& l
     return true;
 }
 
+minty::VirtualFile::VirtualFile()
+    : File()
+    , _virtualOffset()
+    , _virtualSize()
+{}
+
 minty::VirtualFile::VirtualFile(Path const& path, Flags const flags, Position const offset, Size const size)
     : File()
     , _virtualOffset()

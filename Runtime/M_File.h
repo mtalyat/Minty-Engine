@@ -251,6 +251,8 @@ namespace minty
 		Size _virtualSize;
 
 	public:
+		VirtualFile();
+
 		VirtualFile(Path const& path, Flags const flags, Position const offset, Size const size);
 
 		void open(Path const& path, Flags const flags, Position const offset, Size const size);

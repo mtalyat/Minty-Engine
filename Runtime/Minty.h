@@ -18,6 +18,7 @@ access to the entire engine without needing include each file.
 #include "M_File.h"
 #include "M_Resource.h"
 #include "M_Wrap.h"
+#include "M_Wrapper.h"
 
 // AUDIO
 #include "M_Audio.h"
