@@ -152,14 +152,14 @@ namespace minty
 		/// Reads the next line of text, and moves the cursor the appropriate amount of bytes.
 		/// </summary>
 		/// <returns></returns>
-		virtual String read_line();
+		inline bool read_line(String& line);
 
 		/// <summary>
 		/// Reads the next line of text, and moves the cursor the appropriate amount of bytes.
 		/// </summary>
 		/// <param name="delimiter">The separating character.</param>
 		/// <returns></returns>
-		virtual String read_line(char const delimiter);
+		virtual bool read_line(String& line, char const delimiter);
 
 		/// <summary>
 		/// Reads all chars within the file at the given path.

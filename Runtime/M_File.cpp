@@ -111,22 +111,14 @@ void minty::File::read(void* const buffer, Size const size)
     _stream.read(static_cast<char*>(buffer), size);
 }
 
-String minty::File::read_line()
+inline bool minty::File::read_line(String& line)
 {
-    String line;
-
-    std::getline(_stream, line);
-
-    return line;
+    return read_line(line, '\n');
 }
 
-String minty::File::read_line(char const delimiter)
+bool minty::File::read_line(String& line, char const delimiter)
 {
-    String line;
-
-    std::getline(_stream, line, delimiter);
-
-    return line;
+    return static_cast<bool>(std::getline(_stream, line, delimiter));
 }
 
 std::vector<char> minty::File::read_all_chars(Path const& path)
