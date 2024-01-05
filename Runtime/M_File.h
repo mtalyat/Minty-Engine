@@ -84,12 +84,17 @@ namespace minty
 		void close();
 
 		/// <summary>
-		/// Moves the cursor to a new location within the file.
+		/// Moves the read cursor to a new location within the file.
 		/// </summary>
 		/// <param name="offset">The offset at which the file is relative to the direction.</param>
 		/// <param name="dir">The anchor point of the offset.</param>
 		virtual void seek_read(Position const offset, Direction const dir = Direction::Begin);
 
+		/// <summary>
+		/// Moves the write cursor to a new location within the file.
+		/// </summary>
+		/// <param name="offset">The offset at which the file is relative to the direction.</param>
+		/// <param name="dir">The anchor point of the offset.</param>
 		virtual void seek_write(Position const offset, Direction const dir = Direction::Begin);
 
 		/// <summary>
@@ -99,11 +104,15 @@ namespace minty
 		virtual bool eof();
 
 		/// <summary>
-		/// Gets the current position of the cursor.
+		/// Gets the current position of the read cursor.
 		/// </summary>
 		/// <returns></returns>
 		virtual Position tell_read();
 
+		/// <summary>
+		/// Gets the current position of the write cursor.
+		/// </summary>
+		/// <returns></returns>
 		virtual Position tell_write();
 
 		/// <summary>

@@ -205,52 +205,122 @@ namespace minty
 		Wrap(Path const& path, String const& name, uint32_t const entryCount, Path const& base = "", uint32_t const contentVersion = 0);
 
 	private:
+		// loads the Wrap file using the _path
 		void load();
 
+		// writes the header to the file
 		void write_header(PhysicalFile& wrapFile) const;
 
+		// writes the entry at the given index to the file
 		void write_entry(PhysicalFile& wrapFile, size_t const index) const;
 
+		// adds the given entry to _wraps, then returns the index of it
 		uint32_t emplace_entry(Entry& entry);
 
 #pragma region Files
 
 	public:
+		/// <summary>
+		/// Adds the file at the given physicalPath to the Wrap at the given virtualPath.
+		/// </summary>
+		/// <param name="physicalPath">The path to the file to read and add to the Wrap file.</param>
+		/// <param name="virtualPath">The path of the file within the Wrap file.</param>
+		/// <param name="compression">The level of compression for the given file.</param>
+		/// <param name="reservedSize">The reserved size of the chunk to store the file within. If the reservedSize is 0, it will default to the size of the file at the physicalPath.</param>
 		void emplace(Path const& physicalPath, Path const& virtualPath, Compression const compression = Compression::Default, uint32_t const reservedSize = 0);
 
+		/// <summary>
+		/// Checks if the Wrap contains a file with the given path.
+		/// </summary>
+		/// <param name="path">The path to check.</param>
+		/// <returns></returns>
 		bool exists(Path const& path) const;
 
+		/// <summary>
+		/// Checks if the Wrap contains a file with the given path.
+		/// </summary>
+		/// <param name="path">The path to check.</param>
+		/// <returns></returns>
 		inline bool contains(Path const& path) const;
 
+		/// <summary>
+		/// Opens a file at the given path using the given VirtualFile.
+		/// </summary>
+		/// <param name="path">The path at which to open a file.</param>
+		/// <param name="file">The file object to use to open with.</param>
+		/// <returns></returns>
 		bool open(Path const& path, VirtualFile& file) const;
 
+		/// <summary>
+		/// Gets the Entry at the given index.
+		/// </summary>
+		/// <param name="index"></param>
+		/// <returns></returns>
 		Entry const& get_entry(size_t const index) const;
 
+		/// <summary>
+		/// Gets the Entry at the given path.
+		/// </summary>
+		/// <param name="index"></param>
+		/// <returns></returns>
 		Entry const& get_entry(Path const& path) const;
 #pragma endregion
-
 
 #pragma region Get Set
 
 	public:
-		uint32_t get_version() const;
-
+		/// <summary>
+		/// Gets the base path of each file within this Wrap.
+		/// </summary>
+		/// <returns></returns>
 		char const* get_base_path() const;
 
+		/// <summary>
+		/// Sets the base path of each file within this Wrap.
+		/// </summary>
+		/// <param name="path"></param>
 		void set_base_path(Path const& path);
 
+		/// <summary>
+		/// Gets the Path that this Wrap file is located at.
+		/// </summary>
+		/// <returns></returns>
 		Path const& get_path() const;
 
+		/// <summary>
+		/// Gets the name of this Wrap file.
+		/// </summary>
+		/// <returns></returns>
 		char const* get_name() const;
 
+		/// <summary>
+		/// Sets the name of this Wrap file.
+		/// </summary>
+		/// <param name="name"></param>
 		void set_name(String const& name);
 
+		/// <summary>
+		/// Gets the Wrap version of this Wrap file.
+		/// </summary>
+		/// <returns></returns>
 		uint16_t get_wrap_version() const;
 
+		/// <summary>
+		/// Gets the content version of this Wrap file.
+		/// </summary>
+		/// <returns></returns>
 		uint32_t get_content_version() const;
 
+		/// <summary>
+		/// Gets the type of this Wrap file.
+		/// </summary>
+		/// <returns></returns>
 		Type get_type() const;
 
+		/// <summary>
+		/// Sets the Type for this Wrap file.
+		/// </summary>
+		/// <param name="type"></param>
 		void set_type(Type const type);
 
 #pragma endregion

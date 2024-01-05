@@ -201,11 +201,6 @@ uint32_t minty::Wrap::emplace_entry(Entry& newEntry)
     return -1;
 }
 
-uint32_t minty::Wrap::get_version() const
-{
-    return _header.contentVersion;
-}
-
 char const* minty::Wrap::get_base_path() const
 {
     return _header.basePath;
