@@ -205,7 +205,7 @@ namespace minty
 		/// <param name="name">The name of the Wrap file.</param>
 		/// <param name="base">The base path all files within the Wrap file.</param>
 		/// <param name="contentVersion">The version of the content within the Wrap file.</param>
-		Wrap(Path const& path, String const& name, Path const& base = "", uint32_t const contentVersion = 0);
+		Wrap(Path const& path, String const& name, uint32_t const entryCount, Path const& base = "", uint32_t const contentVersion = 0);
 
 	private:
 		void load();

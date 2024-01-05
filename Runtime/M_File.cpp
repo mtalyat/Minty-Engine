@@ -34,6 +34,8 @@ void minty::File::open(Path const& path, Flags const flags)
     // close if open
     close();
 
+    _path = path;
+
     // open the file
     _stream = std::fstream(path, static_cast<std::ios_base::openmode>(flags));
 
@@ -60,6 +62,7 @@ void minty::File::close()
 
         // reset all data
         _flags = Flags::None;
+        _path = "";
     }
 }
 
@@ -90,7 +93,7 @@ File::Position minty::File::tell_write()
 
 File::Size minty::File::size() const
 {
-    return _stream.gcount();
+    return std::filesystem::file_size(_path);
 }
 
 char minty::File::peek()
@@ -410,7 +413,11 @@ minty::VirtualFile::VirtualFile(Path const& path, Flags const flags, Position co
     : File(path, flags)
     , _virtualOffset(offset)
     , _virtualSize(size)
-{}
+{
+    // seek to beginning of the virtual file
+    seek_write(0);
+    seek_read(0);
+}
 
 void minty::VirtualFile::seek_read(Position const offset, Direction seekDir)
 {

@@ -95,6 +95,7 @@ RenderEngine::RenderEngine(Window* const window)
 	, _boundIds()
 	, _view()
 	, _backgroundColor({ 250, 220, 192, 255 }) // light tan color
+	, _initialized()
 	, _frame(1)
 {
 	for (size_t i = 0; i < _boundIds.size(); i++)
@@ -104,7 +105,9 @@ RenderEngine::RenderEngine(Window* const window)
 }
 
 RenderEngine::~RenderEngine()
-{}
+{
+	destroy();
+}
 
 void minty::RenderEngine::init(rendering::RenderEngineBuilder const& builder)
 {
@@ -2349,6 +2352,11 @@ void RenderEngine::create_sync_objects()
 
 void RenderEngine::destroy()
 {
+	if (!_initialized)
+	{
+		return;
+	}
+
 	sync();
 
 	// clean up vulkan
@@ -2376,6 +2384,8 @@ void RenderEngine::destroy()
 	}
 	vkDestroySurfaceKHR(instance, _surface, nullptr);
 	vkDestroyInstance(instance, nullptr);
+
+	_initialized = false;
 }
 
 void minty::RenderEngine::bind(VkCommandBuffer const commandBuffer)

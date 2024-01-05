@@ -26,7 +26,7 @@ minty::Wrap::Wrap(Path const& path)
     load();
 }
 
-minty::Wrap::Wrap(Path const& path, String const& name, Path const& base, uint32_t const contentVersion)
+minty::Wrap::Wrap(Path const& path, String const& name, uint32_t const entryCount, Path const& base, uint32_t const contentVersion)
     : _path(path)
     , _header()
     , _entries()
@@ -38,13 +38,25 @@ minty::Wrap::Wrap(Path const& path, String const& name, Path const& base, uint32
     _header.contentVersion = contentVersion;
     set_name(name);
     set_base_path(base);
-    _header.entryCount = 0;
+    _header.entryCount = entryCount;
+
+    _entries.resize(entryCount);
+    for (uint32_t i = 0; i < entryCount; i++)
+    {
+        _empties.emplace(i);
+    }
 
     // open file, open with truncate to override any existing file
     PhysicalFile file(path, File::Flags::Write | File::Flags::Binary | File::Flags::Truncate);
 
     // write header
     write_header(file);
+
+    // write entries
+    for (uint32_t i = 0; i < entryCount; i++)
+    {
+        write_entry(file, i);
+    }
     
     file.close();
 }
@@ -119,7 +131,7 @@ void minty::Wrap::write_entry(PhysicalFile& wrapFile, size_t const index) const
     wrapFile.write(_entries.at(index));
 }
 
-uint32_t minty::Wrap::emplace_entry(Entry& entry)
+uint32_t minty::Wrap::emplace_entry(Entry& newEntry)
 {
     int64_t bestIndex = -1;
 
@@ -128,7 +140,7 @@ uint32_t minty::Wrap::emplace_entry(Entry& entry)
     {
         Entry& entry = _entries.at(index);
 
-        if (entry.reservedSize < entry.reservedSize)
+        if (entry.reservedSize && entry.reservedSize < newEntry.reservedSize)
         {
             // not big enough
             continue;
@@ -137,8 +149,18 @@ uint32_t minty::Wrap::emplace_entry(Entry& entry)
         // big enough
 
         // replace best index if no index yet, or this is a closer reserved size
-        if (bestIndex == -1 || entry.reservedSize < _entries.at(bestIndex).reservedSize)
+        if(bestIndex == -1)
         {
+            // no best index yet, so place the index unconditionally
+            bestIndex = index;
+            continue;
+        }
+
+        Entry const& bestEntry = _entries.at(bestIndex);
+        if ((entry.reservedSize && !bestEntry.reservedSize) || (entry.reservedSize && bestEntry.reservedSize && entry.reservedSize < bestEntry.reservedSize))
+        {
+            // place if best has no reserved size and this does, OR
+            // if both have a size and this one is smaller
             bestIndex = index;
         }
     }
@@ -157,23 +179,26 @@ uint32_t minty::Wrap::emplace_entry(Entry& entry)
 
         // move some data to new entry (pos, size, etc.)
         Entry const& oldEntry = _entries.at(index);
-        entry.offset = oldEntry.offset;
-        entry.reservedSize = oldEntry.reservedSize;
+
+        // if there already was a size and offset reserved, use those, otherwise accept the incoming size and offset
+        if (oldEntry.reservedSize)
+        {
+            newEntry.offset = oldEntry.offset;
+            newEntry.reservedSize = oldEntry.reservedSize;
+        }
 
         // officially replace it
-        _entries[index] = entry;
-        _indexed[Path(_header.basePath) / entry.path] = index;
+        _entries[index] = newEntry;
+        _indexed[Path(_header.basePath) / newEntry.path] = index;
 
         // return that index
         return static_cast<uint32_t>(index);
     }
 
-    // create new entry
-    uint32_t index = static_cast<uint32_t>(_entries.size());
-    _entries.push_back(entry);
-    _indexed.emplace(Path(_header.basePath) / entry.path, index);
+    // cannot fit
+    console::error("Cannot emplace entry to Wrap file. Entry count surpassed.");
 
-    return index;
+    return -1;
 }
 
 uint32_t minty::Wrap::get_version() const
@@ -282,14 +307,10 @@ void minty::Wrap::emplace(Path const& physicalPath, Path const& virtualPath, Com
     // add entry
     size_t index = emplace_entry(entry);
 
-    // update header
-    _header.entryCount++;
-
     // write to file
-    write_header(wrapFile);
     write_entry(wrapFile, index);
-    wrapFile.seek_write(entry.offset, File::Direction::End);
-    // TODO: write contents to file
+    wrapFile.seek_write(entry.offset, File::Direction::Begin);
+    wrapFile.write(fileData, fileSize);
 
     wrapFile.close();
 }

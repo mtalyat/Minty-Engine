@@ -21,7 +21,7 @@ InputMap input;
 int init(Runtime &runtime)
 {
     // create wrap file
-    Wrap wrap(Asset::absolute("wrap.wrap"), "test", "Data/");
+    Wrap wrap(Asset::absolute("wrap.wrap"), "test", 10, "Data/");
 
     // add files in Assets folder only, no sub folders
     wrap.emplace(Asset::absolute("Data/pumpkin_tex.jpg"), "pumpkin_tex.jpg", Wrap::Compression::None);
@@ -30,18 +30,34 @@ int init(Runtime &runtime)
     wrap.emplace(Asset::absolute("Data/test.txt"), "test.txt", Wrap::Compression::None);
 
     // check if files are in there
+    console::log("After writing:");
     console::log("pumpkin_tex.jpg: " + std::to_string(wrap.exists("Data/pumpkin_tex.jpg")));
     console::log("pumpkin_tex.jpg.meta: " + std::to_string(wrap.exists("Data/pumpkin_tex.jpg.meta")));
     console::log("pumpkin.obj: " + std::to_string(wrap.exists("Data/pumpkin.obj")));
     console::log("test.txt: " + std::to_string(wrap.exists("Data/test.txt")));
+    console::log("");
 
     Wrap wrap2(Asset::absolute("wrap.wrap"));
 
     // check if files are in there
+    console::log("After reading:");
     console::log("pumpkin_tex.jpg: " + std::to_string(wrap2.exists("Data/pumpkin_tex.jpg")));
     console::log("pumpkin_tex.jpg.meta: " + std::to_string(wrap2.exists("Data/pumpkin_tex.jpg.meta")));
     console::log("pumpkin.obj: " + std::to_string(wrap2.exists("Data/pumpkin.obj")));
     console::log("test.txt: " + std::to_string(wrap2.exists("Data/test.txt")));
+    console::log("");
+
+    // write test.txt file
+    console::log("Test.txt contents from .wrap file:");
+    ID fileId = wrap2.open("Data/test.txt");
+    VirtualFile& file = wrap2.at(fileId);
+    size_t fileSize = file.size();
+    Byte* data = new Byte[fileSize + 1];
+    file.read(data, fileSize);
+    data[fileSize] = '\0';
+    console::log(String(static_cast<char*>(static_cast<void*>(data))));
+    delete data;
+    wrap2.close(fileId);
 
     return 1;
 

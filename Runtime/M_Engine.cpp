@@ -23,9 +23,7 @@ Engine::Engine(Info const& info)
 {}
 
 Engine::~Engine()
-{
-	_renderEngine.destroy();
-}
+{}
 
 InputMap& minty::Engine::get_global_input_map()
 {
