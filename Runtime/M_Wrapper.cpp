@@ -19,7 +19,35 @@ void minty::Wrapper::emplace(Path const& path)
 	emplace(Wrap(path));
 }
 
-Wrap* minty::Wrapper::find_by_path(String const& name)
+Wrap* minty::Wrapper::find_by_path(Path const& path)
+{
+	for (Wrap& wrap : _wraps)
+	{
+		if (wrap.exists(path))
+		{
+			return &wrap;
+		}
+	}
+
+	// not found
+	return nullptr;
+}
+
+Wrap const* minty::Wrapper::find_by_path(Path const& path) const
+{
+	for (Wrap const& wrap : _wraps)
+	{
+		if (wrap.exists(path))
+		{
+			return &wrap;
+		}
+	}
+
+	// not found
+	return nullptr;
+}
+
+Wrap* minty::Wrapper::find_by_name(String const& name)
 {
 	for (Wrap& wrap : _wraps)
 	{
@@ -33,11 +61,11 @@ Wrap* minty::Wrapper::find_by_path(String const& name)
 	return nullptr;
 }
 
-Wrap* minty::Wrapper::find_by_name(Path const& path)
+Wrap const* minty::Wrapper::find_by_name(String const& name) const
 {
-	for (Wrap& wrap : _wraps)
+	for (Wrap const& wrap : _wraps)
 	{
-		if (wrap.exists(path))
+		if (wrap.get_name() == name)
 		{
 			return &wrap;
 		}
@@ -45,4 +73,15 @@ Wrap* minty::Wrapper::find_by_name(Path const& path)
 
 	// not found
 	return nullptr;
+}
+
+bool minty::Wrapper::open(Path const& path, VirtualFile& file) const
+{
+	// find wrapper
+	Wrap const* wrap = find_by_path(path);
+
+	if (!wrap) return false;
+
+	// open file
+	return wrap->open(path, file);
 }

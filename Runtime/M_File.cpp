@@ -410,10 +410,19 @@ bool minty::File::write_all_lines(Path const& path, std::vector<String> const& l
 }
 
 minty::VirtualFile::VirtualFile(Path const& path, Flags const flags, Position const offset, Size const size)
-    : File(path, flags)
-    , _virtualOffset(offset)
-    , _virtualSize(size)
+    : File()
+    , _virtualOffset()
+    , _virtualSize()
 {
+    open(path, flags, offset, size);
+}
+
+void minty::VirtualFile::open(Path const& path, Flags const flags, Position const offset, Size const size)
+{
+    File::open(path, flags);
+    _virtualOffset = offset;
+    _virtualSize = size;
+
     // seek to beginning of the virtual file
     seek_write(0);
     seek_read(0);

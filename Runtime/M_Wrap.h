@@ -186,9 +186,6 @@ namespace minty
 		std::unordered_set<uint32_t> _empties;
 		// virtual paths indexed to entry indices
 		std::unordered_map<Path, size_t> _indexed;
-
-		// list of open files
-		Register<VirtualFile*> _files;
 	public:
 		Wrap();
 
@@ -225,13 +222,7 @@ namespace minty
 
 		inline bool contains(Path const& path) const;
 
-		ID open(Path const& path);
-
-		VirtualFile& at(ID const id);
-
-		VirtualFile const& at(ID const id) const;
-
-		void close(ID const id);
+		bool open(Path const& path, VirtualFile& file) const;
 
 		Entry const& get_entry(size_t const index) const;
 

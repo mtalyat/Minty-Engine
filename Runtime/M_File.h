@@ -253,6 +253,8 @@ namespace minty
 	public:
 		VirtualFile(Path const& path, Flags const flags, Position const offset, Size const size);
 
+		void open(Path const& path, Flags const flags, Position const offset, Size const size);
+
 		void seek_read(Position const offset, Direction dir = Direction::Begin) override;
 
 		void seek_write(Position const offset, Direction const dir = Direction::Begin) override;
