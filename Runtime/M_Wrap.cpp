@@ -6,7 +6,6 @@
 #include "M_Asset.h"
 
 #include <filesystem>
-#include <zlib.h>
 
 using namespace minty;
 
@@ -249,7 +248,7 @@ uint32_t minty::Wrap::get_content_version() const
     return _header.contentVersion;
 }
 
-void minty::Wrap::emplace(Path const& physicalPath, Path const& virtualPath, Compression const compression, uint32_t const reservedSize)
+void minty::Wrap::emplace(Path const& physicalPath, Path const& virtualPath, CompressionLevel const compressionLevel, uint32_t const reservedSize)
 {
     // check if file exists and is valid
     if (!std::filesystem::exists(physicalPath))
@@ -279,24 +278,48 @@ void minty::Wrap::emplace(Path const& physicalPath, Path const& virtualPath, Com
     // done with that file
     file.close();
 
-    // TODO: compress the data
-
     // create an entry for the new file
     Entry entry;
     memcpy(entry.path, virtualPath.string().c_str(), WRAP_ENTRY_PATH_SIZE);
     entry.path[WRAP_ENTRY_PATH_SIZE - 1] = '\0';
-    entry.compressed = 0; // TODO: use actual compression level once compression is added
+    entry.compressionLevel = static_cast<Byte>(compressionLevel);
+    entry.uncompressedSize = static_cast<uint32_t>(fileSize);
+
+    // compress the data, if needed
+    if (static_cast<bool>(compressionLevel))
+    {
+        // calculate sizes
+        unsigned long sourceSize = static_cast<unsigned long>(fileSize);
+        unsigned long destSize = compress_bound(sourceSize);
+
+        // create dest buffer
+        Byte* compressedData = new Byte[destSize];
+
+        // compress it
+        if (compress(compressedData, destSize, fileData, sourceSize, compressionLevel))
+        {
+            console::error(std::format("Cannot emplace \"{}\" into Wrap file: failed to compress file with compression level {}.", physicalPath.string(), static_cast<int>(compressionLevel)));
+            return;
+        }
+
+        // replace source
+        delete[] fileData;
+        fileData = compressedData;
+        fileSize = static_cast<File::Size>(destSize);
+
+        console::log(std::format("Compressed {} from {} bytes to {} bytes.", physicalPath.string(), std::to_string(sourceSize), std::to_string(destSize)));
+    }
 
     // set size and offset
     entry.offset = static_cast<uint32_t>(wrapFile.size());
-    entry.size = static_cast<uint32_t>(fileSize);
+    entry.compressedSize = static_cast<uint32_t>(fileSize);
     if (reservedSize)
     {
         entry.reservedSize = reservedSize;
     }
     else
     {
-        entry.reservedSize = entry.size;
+        entry.reservedSize = entry.compressedSize;
     }
     
     // add entry
@@ -307,6 +330,8 @@ void minty::Wrap::emplace(Path const& physicalPath, Path const& virtualPath, Com
     wrapFile.seek_write(entry.offset, File::Direction::Begin);
     wrapFile.write(fileData, fileSize);
 
+    // cleanup
+    delete[] fileData;
     wrapFile.close();
 }
 
@@ -331,7 +356,7 @@ bool minty::Wrap::open(Path const& path, VirtualFile& file) const
     Entry const& entry = get_entry(path);
 
     // open file in the given virtual file
-    file.open(_path, File::Flags::Read | File::Flags::Binary, entry.offset, entry.size);
+    file.open(_path, File::Flags::Read | File::Flags::Binary, entry.offset, entry.uncompressedSize);
 
     return true;
 }
@@ -398,9 +423,10 @@ minty::Wrap::Entry::Entry()
 
 minty::Wrap::Entry::Entry(Entry const& other)
     : path("")
-    , compressed(other.compressed)
+    , compressionLevel(other.compressionLevel)
     , reservedSize(other.reservedSize)
-    , size(other.size)
+    , compressedSize(other.compressedSize)
+    , uncompressedSize(other.uncompressedSize)
     , offset(other.offset)
 {
     memcpy(path, other.path, WRAP_ENTRY_PATH_SIZE);
@@ -413,9 +439,10 @@ Wrap::Entry& minty::Wrap::Entry::operator=(Entry const& other)
     {
         memcpy(path, other.path, WRAP_ENTRY_PATH_SIZE);
         path[WRAP_ENTRY_PATH_SIZE - 1] = '\0';
-        compressed = other.compressed;
+        compressionLevel = other.compressionLevel;
         reservedSize = other.reservedSize;
-        size = other.size;
+        compressedSize = other.compressedSize;
+        uncompressedSize = other.uncompressedSize;
         offset = other.offset;
     }
 
@@ -424,5 +451,5 @@ Wrap::Entry& minty::Wrap::Entry::operator=(Entry const& other)
 
 bool minty::Wrap::Entry::empty() const
 {
-    return size == 0;
+    return uncompressedSize == 0;
 }

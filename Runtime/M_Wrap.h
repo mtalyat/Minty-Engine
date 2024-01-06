@@ -3,6 +3,7 @@
 #include "M_Object.h"
 #include "M_Register.h"
 #include "M_File.h"
+#include "M_Compression.h"
 #include <unordered_set>
 #include <unordered_map>
 
@@ -40,51 +41,6 @@ namespace minty
 			/// This file should override some data.
 			/// </summary>
 			Update = 2,
-		};
-
-		/// <summary>
-		/// Determines when to compress data being stored in a wrap file.
-		/// </summary>
-		enum class Compression : Byte
-		{
-			Level0 = 0,
-			Level1 = 1,
-			Level2 = 2,
-			Level3 = 3,
-			Level4 = 4,
-			Level5 = 5,
-			Level6 = 6,
-			Level7 = 7,
-			Level8 = 8,
-			Level9 = 9,
-
-			/// <summary>
-			/// Do not compress the data.
-			/// </summary>
-			None = Level0,
-
-			/// <summary>
-			/// Lightly compresses the data, quickly.
-			/// </summary>
-			Fast = Level1,
-			/// <summary>
-			/// Heavily compresses the data, slowly.
-			/// </summary>
-			Slow = Level9,
-
-			/// <summary>
-			/// Lightly compress the data.
-			/// </summary>
-			Low = Level1,
-			/// <summary>
-			/// Heavily compress the data.
-			/// </summary>
-			High = Level9,
-
-			/// <summary>
-			/// Default compression.
-			/// </summary>
-			Default = Level6,
 		};
 
 		/// <summary>
@@ -147,7 +103,7 @@ namespace minty
 			/// <summary>
 			/// The compression level of this data in the Wrap file.
 			/// </summary>
-			Byte compressed = 0;
+			Byte compressionLevel = 0;
 
 			/// <summary>
 			/// The reserved size of the data within the Wrap file.
@@ -155,9 +111,14 @@ namespace minty
 			uint32_t reservedSize = 0;
 
 			/// <summary>
-			/// The actual size of the data within the Wrap file.
+			/// The size of the data after compression, if any.
 			/// </summary>
-			uint32_t size = 0;
+			uint32_t compressedSize = 0;
+
+			/// <summary>
+			/// The size of the data before compression, if any.
+			/// </summary>
+			uint32_t uncompressedSize = 0;
 
 			/// <summary>
 			/// The offset to the data within the Wrap file.
@@ -227,7 +188,7 @@ namespace minty
 		/// <param name="virtualPath">The path of the file within the Wrap file.</param>
 		/// <param name="compression">The level of compression for the given file.</param>
 		/// <param name="reservedSize">The reserved size of the chunk to store the file within. If the reservedSize is 0, it will default to the size of the file at the physicalPath.</param>
-		void emplace(Path const& physicalPath, Path const& virtualPath, Compression const compression = Compression::Default, uint32_t const reservedSize = 0);
+		void emplace(Path const& physicalPath, Path const& virtualPath, CompressionLevel const compression = CompressionLevel::Default, uint32_t const reservedSize = 0);
 
 		/// <summary>
 		/// Checks if the Wrap contains a file with the given path.

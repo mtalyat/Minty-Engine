@@ -20,14 +20,17 @@ InputMap input;
 // called when the engine is initialized
 int init(Runtime &runtime)
 {
+    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+    // TODO: READ COMPRESSED FILE HOW? INCLUDE UNCOMPRESSED SIZE IN ENTRY???
+
     // create wrap file
     Wrap wrap(Asset::absolute("wrap.wrap"), "test", 10, "Data/");
 
     // add files in Assets folder only, no sub folders
-    wrap.emplace(Asset::absolute("Data/pumpkin_tex.jpg"), "pumpkin_tex.jpg", Wrap::Compression::None);
-    wrap.emplace(Asset::absolute("Data/pumpkin_tex.jpg.meta"), "pumpkin_tex.jpg.meta", Wrap::Compression::None);
-    wrap.emplace(Asset::absolute("Data/pumpkin.obj"), "pumpkin.obj", Wrap::Compression::None);
-    wrap.emplace(Asset::absolute("Data/test.txt"), "test.txt", Wrap::Compression::None);
+    wrap.emplace(Asset::absolute("Data/pumpkin_tex.jpg"), "pumpkin_tex.jpg", CompressionLevel::None);
+    wrap.emplace(Asset::absolute("Data/pumpkin_tex.jpg.meta"), "pumpkin_tex.jpg.meta", CompressionLevel::None);
+    wrap.emplace(Asset::absolute("Data/pumpkin.obj"), "pumpkin.obj", CompressionLevel::Default);
+    wrap.emplace(Asset::absolute("Data/test.txt"), "test.txt", CompressionLevel::None);
 
     // check if files are in there
     console::log("After writing:");
@@ -66,7 +69,7 @@ int init(Runtime &runtime)
 
     // print text file again
     wrapper.open("Data/test.txt", file);
-    
+
     while(file.read_line(line))
     {
         console::log(line);
