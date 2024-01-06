@@ -121,13 +121,13 @@ void minty::Wrap::load()
 void minty::Wrap::write_header(PhysicalFile& wrapFile) const
 {
     wrapFile.seek_write(0);
-    wrapFile.write(_header);
+    wrapFile.write(&_header, sizeof(Header));
 }
 
 void minty::Wrap::write_entry(PhysicalFile& wrapFile, size_t const index) const
 {
     wrapFile.seek_write(sizeof(Header) + sizeof(Entry) * index);
-    wrapFile.write(_entries.at(index));
+    wrapFile.write(&_entries.at(index), sizeof(Entry));
 }
 
 uint32_t minty::Wrap::emplace_entry(Entry& newEntry)

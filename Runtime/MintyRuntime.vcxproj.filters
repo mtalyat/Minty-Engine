@@ -40,9 +40,6 @@
     <Filter Include="Header Files\Builtin">
       <UniqueIdentifier>{ddbf4554-4699-450d-a3d1-6498173672f0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Assets">
-      <UniqueIdentifier>{25b3dd32-a0eb-4c13-9cc9-efa7bee0e2f1}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Header Files\Audio">
       <UniqueIdentifier>{285b8544-8a3e-417a-91a5-c676b72da849}</UniqueIdentifier>
     </Filter>
@@ -51,6 +48,9 @@
     </Filter>
     <Filter Include="Libraries\soloud">
       <UniqueIdentifier>{619426d2-06dd-4adc-9b9c-cad41effa3ae}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Files">
+      <UniqueIdentifier>{25b3dd32-a0eb-4c13-9cc9-efa7bee0e2f1}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -277,7 +277,7 @@
       <Filter>Header Files\Serialization</Filter>
     </ClInclude>
     <ClInclude Include="M_File.h">
-      <Filter>Header Files\Assets</Filter>
+      <Filter>Header Files\Files</Filter>
     </ClInclude>
     <ClInclude Include="vulkan.h">
       <Filter>Header Files</Filter>
@@ -424,7 +424,7 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="M_Asset.h">
-      <Filter>Header Files\Assets</Filter>
+      <Filter>Header Files\Files</Filter>
     </ClInclude>
     <ClInclude Include="M_Builtin.h">
       <Filter>Header Files\Builtin</Filter>
@@ -433,16 +433,25 @@
       <Filter>Header Files\Rendering</Filter>
     </ClInclude>
     <ClInclude Include="M_Wrap.h">
-      <Filter>Header Files\Assets</Filter>
+      <Filter>Header Files\Files</Filter>
     </ClInclude>
     <ClInclude Include="M_Resource.h">
-      <Filter>Header Files\Assets</Filter>
+      <Filter>Header Files\Files</Filter>
     </ClInclude>
     <ClInclude Include="M_Wrapper.h">
-      <Filter>Header Files\Assets</Filter>
+      <Filter>Header Files\Files</Filter>
     </ClInclude>
     <ClInclude Include="M_Compression.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="M_PhysicalFile.h">
+      <Filter>Header Files\Files</Filter>
+    </ClInclude>
+    <ClInclude Include="M_VirtualFile.h">
+      <Filter>Header Files\Files</Filter>
+    </ClInclude>
+    <ClInclude Include="M_ZipFile.h">
+      <Filter>Header Files\Files</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -729,6 +738,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_Compression.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_PhysicalFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_VirtualFile.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

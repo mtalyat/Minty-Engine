@@ -217,6 +217,7 @@
     <ClInclude Include="M_AudioSourceComponent.h" />
     <ClInclude Include="M_Builtin.h" />
     <ClInclude Include="M_Compression.h" />
+    <ClInclude Include="M_PhysicalFile.h" />
     <ClInclude Include="M_Rendering_PixelFormat.h" />
     <ClInclude Include="M_Resource.h" />
     <ClInclude Include="M_SerializationData.h" />
@@ -294,11 +295,13 @@
     <ClInclude Include="M_UISystem.h" />
     <ClInclude Include="M_Vector.h" />
     <ClInclude Include="M_Viewport.h" />
+    <ClInclude Include="M_VirtualFile.h" />
     <ClInclude Include="M_Window.h" />
     <ClInclude Include="M_NameComponent.h" />
     <ClInclude Include="M_Wrap.h" />
     <ClInclude Include="M_Wrapper.h" />
     <ClInclude Include="M_Writer.h" />
+    <ClInclude Include="M_ZipFile.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="M_Quaternion.h" />
     <ClInclude Include="soloud.h" />
@@ -360,6 +363,7 @@
     <ClCompile Include="M_Error.cpp" />
     <ClCompile Include="M_File.cpp" />
     <ClCompile Include="M_Engine.cpp" />
+    <ClCompile Include="M_PhysicalFile.cpp" />
     <ClCompile Include="M_Rendering_PixelFormat.cpp" />
     <ClCompile Include="M_Material.cpp" />
     <ClCompile Include="M_RelationshipComponent.cpp" />
@@ -406,6 +410,7 @@
     <ClCompile Include="M_UISystem.cpp" />
     <ClCompile Include="M_Vector.cpp" />
     <ClCompile Include="M_Viewport.cpp" />
+    <ClCompile Include="M_VirtualFile.cpp" />
     <ClCompile Include="M_Window.cpp" />
     <ClCompile Include="M_Wrap.cpp" />
     <ClCompile Include="M_Wrapper.cpp" />

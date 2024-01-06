@@ -2,7 +2,7 @@
 
 #include "M_Object.h"
 #include "M_Register.h"
-#include "M_File.h"
+#include "M_VirtualFile.h"
 #include "M_Compression.h"
 #include <unordered_set>
 #include <unordered_map>

@@ -20,9 +20,6 @@ InputMap input;
 // called when the engine is initialized
 int init(Runtime &runtime)
 {
-    // !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-    // TODO: READ COMPRESSED FILE HOW? INCLUDE UNCOMPRESSED SIZE IN ENTRY???
-
     // create wrap file
     Wrap wrap(Asset::absolute("wrap.wrap"), "test", 10, "Data/");
 
