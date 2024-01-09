@@ -14,11 +14,11 @@ namespace minty
 		/// <summary>
 		/// The name of the Entity.
 		/// </summary>
-		std::string name;
+		String name;
 
 		void serialize(Writer& writer) const override;
 		void deserialize(Reader const& reader) override;
 
-		friend std::string to_string(NameComponent const& value);
+		friend String to_string(NameComponent const& value);
 	};
 }

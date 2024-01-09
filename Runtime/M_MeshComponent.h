@@ -25,6 +25,6 @@ namespace minty
 		void serialize(Writer& writer) const override;
 		void deserialize(Reader const& reader) override;
 
-		friend std::string to_string(MeshComponent const& value);
+		friend String to_string(MeshComponent const& value);
 	};
 }

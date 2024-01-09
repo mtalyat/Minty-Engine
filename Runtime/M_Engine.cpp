@@ -23,9 +23,7 @@ Engine::Engine(Info const& info)
 {}
 
 Engine::~Engine()
-{
-	_renderEngine.destroy();
-}
+{}
 
 InputMap& minty::Engine::get_global_input_map()
 {
@@ -174,7 +172,7 @@ time_point_t minty::Engine::get_now() const
 	return std::chrono::steady_clock::now();
 }
 
-std::string minty::to_string(Engine const& value)
+String minty::to_string(Engine const& value)
 {
 	return std::format("Engine()");
 }

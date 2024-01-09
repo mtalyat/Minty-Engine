@@ -120,7 +120,7 @@ AudioHandle minty::AudioEngine::play(ID const id, float const volume, float cons
 	return handle;
 }
 
-AudioHandle minty::AudioEngine::play(std::string const& name, float const volume, float const pan, bool const paused)
+AudioHandle minty::AudioEngine::play(String const& name, float const volume, float const pan, bool const paused)
 {
 	return play(get_id(name), volume, pan, paused);
 }
@@ -158,7 +158,7 @@ AudioHandle minty::AudioEngine::play_spatial(ID const id, Entity const entity, f
 	return handle;
 }
 
-AudioHandle minty::AudioEngine::play_spatial(std::string const& name, Entity const entity, float const volume, bool const paused)
+AudioHandle minty::AudioEngine::play_spatial(String const& name, Entity const entity, float const volume, bool const paused)
 {
 	return play_spatial(get_id(name), entity, volume, paused);
 }
@@ -179,7 +179,7 @@ AudioHandle minty::AudioEngine::play_background(ID const id, float const volume,
 	return handle;
 }
 
-AudioHandle minty::AudioEngine::play_background(std::string const& name, float const volume, bool const paused)
+AudioHandle minty::AudioEngine::play_background(String const& name, float const volume, bool const paused)
 {
 	return play_background(_clips.get_id(name), volume, paused);
 }
@@ -215,7 +215,7 @@ void minty::AudioEngine::stop_all()
 	_engine.stopAll();
 }
 
-ID minty::AudioEngine::load_clip(std::string const& name, std::string const& path)
+ID minty::AudioEngine::load_clip(String const& name, Path const& path)
 {
 	// add to clips
 	ID id = _clips.emplace(name, AudioClip());
@@ -226,9 +226,9 @@ ID minty::AudioEngine::load_clip(std::string const& name, std::string const& pat
 	return id;
 }
 
-ID minty::AudioEngine::load_clip(std::string const& path)
+ID minty::AudioEngine::load_clip(Path const& path)
 {
-	return load_clip(file::name(path), path);
+	return load_clip(Path(path).stem().string(), path);
 }
 
 bool minty::AudioEngine::contains(ID const id) const
@@ -236,7 +236,7 @@ bool minty::AudioEngine::contains(ID const id) const
 	return _clips.contains(id);
 }
 
-bool minty::AudioEngine::contains(std::string const& name) const
+bool minty::AudioEngine::contains(String const& name) const
 {
 	return _clips.contains(name);
 }
@@ -251,24 +251,22 @@ AudioClip const& minty::AudioEngine::at(ID const id) const
 	return _clips.at(id);
 }
 
-AudioClip& minty::AudioEngine::at(std::string const& name)
+AudioClip& minty::AudioEngine::at(String const& name)
 {
 	return _clips.at(name);
 }
 
-AudioClip const& minty::AudioEngine::at(std::string const& name) const
+AudioClip const& minty::AudioEngine::at(String const& name) const
 {
 	return _clips.at(name);
 }
 
-std::string const& minty::AudioEngine::get_name(ID const id) const
+String const& minty::AudioEngine::get_name(ID const id) const
 {
-	if (id == ERROR_ID) return "";
-
 	return _clips.get_name(id);
 }
 
-ID minty::AudioEngine::get_id(std::string const& name) const
+ID minty::AudioEngine::get_id(String const& name) const
 {
 	if (name.empty()) return ERROR_ID;
 
@@ -335,7 +333,7 @@ void minty::AudioEngine::update_sound_data(SoundData& data, Entity const entity)
 	}
 }
 
-std::string minty::to_string(AudioEngine const& value)
+String minty::to_string(AudioEngine const& value)
 {
 	return "AudioEngine()";
 }

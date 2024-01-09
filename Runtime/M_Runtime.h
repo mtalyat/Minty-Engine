@@ -46,6 +46,6 @@ namespace minty
 		void register_builtin();
 
 	public:
-		friend std::string to_string(Runtime const& runtime);
+		friend String to_string(Runtime const& runtime);
 	};
 }

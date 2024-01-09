@@ -9,7 +9,7 @@
 
 namespace minty
 {
-	std::map<std::string const, SystemRegistry::SystemFunc const> SystemRegistry::_systemTypes = std::map<std::string const, SystemRegistry::SystemFunc const>();
+	std::map<String const, SystemRegistry::SystemFunc const> SystemRegistry::_systemTypes = std::map<String const, SystemRegistry::SystemFunc const>();
 
 	SystemRegistry::SystemRegistry(Engine* const engine, EntityRegistry* const registry)
 		: _engine(engine)
@@ -53,7 +53,7 @@ namespace minty
 		return *this;
 	}
 
-	System* SystemRegistry::emplace(std::string const& name, System* const system, int const priority)
+	System* SystemRegistry::emplace(String const& name, System* const system, int const priority)
 	{
 		// if exists in all, do not add a duplicate
 		if (_allSystems.contains(name))
@@ -82,7 +82,7 @@ namespace minty
 		return system;
 	}
 
-	System* SystemRegistry::emplace_by_name(std::string const& name, int const priority)
+	System* SystemRegistry::emplace_by_name(String const& name, int const priority)
 	{
 		auto const& found = _systemTypes.find(name);
 		if (found == _systemTypes.end())
@@ -100,7 +100,7 @@ namespace minty
 		}
 	}
 
-	System* SystemRegistry::find_by_name(std::string const& name) const
+	System* SystemRegistry::find_by_name(String const& name) const
 	{
 		for (auto const& pair : _allSystems)
 		{
@@ -198,7 +198,7 @@ namespace minty
 	void SystemRegistry::serialize(Writer& writer) const
 	{
 		// create reverse lookup for names
-		std::map<System* const, std::string> lookup;
+		std::map<System* const, String> lookup;
 
 		for (auto const& pair : _allSystems)
 		{
@@ -231,7 +231,7 @@ namespace minty
 		}
 	}
 
-	std::string to_string(SystemRegistry const& value)
+	String to_string(SystemRegistry const& value)
 	{
 		// if no systems in registry
 		if (value._orderedSystems.size() == 0)

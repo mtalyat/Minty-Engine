@@ -31,7 +31,7 @@ void minty::AudioSourceComponent::deserialize(Reader const& reader)
 	farDistance = reader.read_float("far", 100.0f);
 }
 
-std::string minty::to_string(AudioSourceComponent const& value)
+String minty::to_string(AudioSourceComponent const& value)
 {
 	return std::format("AudioSourceComponent(clipId = {})", value.clipId);
 }

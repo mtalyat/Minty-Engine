@@ -15,7 +15,7 @@ Matrix4 minty::Transform::get_matrix() const
     return glm::translate(Matrix4(1.0f), position) * glm::mat4_cast(rotation) * glm::scale(Matrix4(1.0f), scale);
 }
 
-std::string minty::to_string(Transform const& value)
+String minty::to_string(Transform const& value)
 {
     return std::format("Transform(position = {}, rotation = {}, scale = {})", to_string(value.position), to_string(value.rotation), to_string(value.scale));
 }

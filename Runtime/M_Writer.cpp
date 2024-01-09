@@ -15,7 +15,7 @@ Node const& minty::Writer::get_node() const
 	return _node;
 }
 
-Node const* minty::Writer::get_node(std::string const& name) const
+Node const* minty::Writer::get_node(String const& name) const
 {
 	return _node.find(name);
 }
@@ -25,17 +25,17 @@ void* minty::Writer::get_data() const
 	return _data;
 }
 
-bool minty::Writer::exists(std::string const& name) const
+bool minty::Writer::exists(String const& name) const
 {
 	return static_cast<bool>(_node.find(name));
 }
 
-void minty::Writer::write(std::string const& name)
+void minty::Writer::write(String const& name)
 {
 	write(name, "");
 }
 
-void minty::Writer::write(std::string const& name, Node const& node)
+void minty::Writer::write(String const& name, Node const& node)
 {
 	auto const& found = _node.children.find(name);
 
@@ -51,7 +51,7 @@ void minty::Writer::write(std::string const& name, Node const& node)
 	}
 }
 
-void minty::Writer::write(std::string const& name, ISerializable const* const value)
+void minty::Writer::write(String const& name, ISerializable const* const value)
 {
 	// add child object for this object to write
 	write(name, Node());
@@ -63,37 +63,37 @@ void minty::Writer::write(std::string const& name, ISerializable const* const va
 	value->serialize(Writer);
 }
 
-void minty::Writer::write(std::string const& name, std::string const& value)
+void minty::Writer::write(String const& name, String const& value)
 {
 	write(name, Node{.data = value });
 }
 
-void minty::Writer::write(std::string const& name, int const value)
+void minty::Writer::write(String const& name, int const value)
 {
 	write(name, std::to_string(value));
 }
 
-void minty::Writer::write(std::string const& name, unsigned int const value)
+void minty::Writer::write(String const& name, unsigned int const value)
 {
 	write(name, std::to_string(value));
 }
 
-void minty::Writer::write(std::string const& name, float const value)
+void minty::Writer::write(String const& name, float const value)
 {
 	write(name, std::to_string(value));
 }
 
-void minty::Writer::write(std::string const& name, byte const value)
+void minty::Writer::write(String const& name, Byte const value)
 {
 	write(name, std::to_string(value));
 }
 
-void minty::Writer::write(std::string const& name, size_t const value)
+void minty::Writer::write(String const& name, size_t const value)
 {
 	write(name, std::to_string(value));
 }
 
-void minty::Writer::write(std::string const& name, Vector2 const& value)
+void minty::Writer::write(String const& name, Vector2 const& value)
 {
 	Node node;
 
@@ -105,46 +105,7 @@ void minty::Writer::write(std::string const& name, Vector2 const& value)
 	write(name, node);
 }
 
-void minty::Writer::write(std::string const& name, Vector3 const& value)
-{
-	Node node;
-
-	Writer writer(node);
-
-	writer.write("x", value.x);
-	writer.write("y", value.y);
-	writer.write("z", value.z);
-
-	write(name, node);
-}
-
-void minty::Writer::write(std::string const& name, Vector4 const& value)
-{
-	Node node;
-
-	Writer writer(node);
-
-	writer.write("x", value.x);
-	writer.write("y", value.y);
-	writer.write("z", value.z);
-	writer.write("w", value.w);
-
-	write(name, node);
-}
-
-void minty::Writer::write(std::string const& name, Vector2Int const& value)
-{
-	Node node;
-
-	Writer writer(node);
-
-	writer.write("x", value.x);
-	writer.write("y", value.y);
-
-	write(name, node);
-}
-
-void minty::Writer::write(std::string const& name, Vector3Int const& value)
+void minty::Writer::write(String const& name, Vector3 const& value)
 {
 	Node node;
 
@@ -157,7 +118,7 @@ void minty::Writer::write(std::string const& name, Vector3Int const& value)
 	write(name, node);
 }
 
-void minty::Writer::write(std::string const& name, Vector4Int const& value)
+void minty::Writer::write(String const& name, Vector4 const& value)
 {
 	Node node;
 
@@ -171,7 +132,46 @@ void minty::Writer::write(std::string const& name, Vector4Int const& value)
 	write(name, node);
 }
 
-void minty::Writer::write(std::string const& name, Quaternion const& value)
+void minty::Writer::write(String const& name, Vector2Int const& value)
+{
+	Node node;
+
+	Writer writer(node);
+
+	writer.write("x", value.x);
+	writer.write("y", value.y);
+
+	write(name, node);
+}
+
+void minty::Writer::write(String const& name, Vector3Int const& value)
+{
+	Node node;
+
+	Writer writer(node);
+
+	writer.write("x", value.x);
+	writer.write("y", value.y);
+	writer.write("z", value.z);
+
+	write(name, node);
+}
+
+void minty::Writer::write(String const& name, Vector4Int const& value)
+{
+	Node node;
+
+	Writer writer(node);
+
+	writer.write("x", value.x);
+	writer.write("y", value.y);
+	writer.write("z", value.z);
+	writer.write("w", value.w);
+
+	write(name, node);
+}
+
+void minty::Writer::write(String const& name, Quaternion const& value)
 {
 	Node node;
 
@@ -186,7 +186,7 @@ void minty::Writer::write(std::string const& name, Quaternion const& value)
 	write(name, node);
 }
 
-void minty::Writer::write(std::string const& name, std::string const& value, std::string const& defaultValue)
+void minty::Writer::write(String const& name, String const& value, String const& defaultValue)
 {
 	if (value.compare(defaultValue))
 	{
@@ -195,7 +195,7 @@ void minty::Writer::write(std::string const& name, std::string const& value, std
 	}
 }
 
-void minty::Writer::write(std::string const& name, int const value, int const defaultValue)
+void minty::Writer::write(String const& name, int const value, int const defaultValue)
 {
 	if (value != defaultValue)
 	{
@@ -203,7 +203,7 @@ void minty::Writer::write(std::string const& name, int const value, int const de
 	}
 }
 
-void minty::Writer::write(std::string const& name, unsigned int const value, unsigned int const defaultValue)
+void minty::Writer::write(String const& name, unsigned int const value, unsigned int const defaultValue)
 {
 	if (value != defaultValue)
 	{
@@ -211,7 +211,7 @@ void minty::Writer::write(std::string const& name, unsigned int const value, uns
 	}
 }
 
-void minty::Writer::write(std::string const& name, float const value, float const defaultValue)
+void minty::Writer::write(String const& name, float const value, float const defaultValue)
 {
 	if (value != defaultValue)
 	{
@@ -219,7 +219,7 @@ void minty::Writer::write(std::string const& name, float const value, float cons
 	}
 }
 
-void minty::Writer::write(std::string const& name, byte const value, byte const defaultValue)
+void minty::Writer::write(String const& name, Byte const value, Byte const defaultValue)
 {
 	if (value != defaultValue)
 	{
@@ -227,7 +227,7 @@ void minty::Writer::write(std::string const& name, byte const value, byte const 
 	}
 }
 
-void minty::Writer::write(std::string const& name, size_t const value, size_t const defaultValue)
+void minty::Writer::write(String const& name, size_t const value, size_t const defaultValue)
 {
 	if (value != defaultValue)
 	{
@@ -235,7 +235,7 @@ void minty::Writer::write(std::string const& name, size_t const value, size_t co
 	}
 }
 
-void minty::Writer::write(std::string const& name, Vector2 const& value, Vector2 const& defaultValue)
+void minty::Writer::write(String const& name, Vector2 const& value, Vector2 const& defaultValue)
 {
 	if (value != defaultValue)
 	{
@@ -250,55 +250,7 @@ void minty::Writer::write(std::string const& name, Vector2 const& value, Vector2
 	}
 }
 
-void minty::Writer::write(std::string const& name, Vector3 const& value, Vector3 const& defaultValue)
-{
-	if (value != defaultValue)
-	{
-		Node node;
-
-		Writer writer(node);
-
-		writer.write("x", value.x, defaultValue.x);
-		writer.write("y", value.y, defaultValue.y);
-		writer.write("z", value.z, defaultValue.z);
-
-		write(name, node);
-	}
-}
-
-void minty::Writer::write(std::string const& name, Vector4 const& value, Vector4 const& defaultValue)
-{
-	if (value != defaultValue)
-	{
-		Node node;
-
-		Writer writer(node);
-
-		writer.write("x", value.x, defaultValue.x);
-		writer.write("y", value.y, defaultValue.y);
-		writer.write("z", value.z, defaultValue.z);
-		writer.write("w", value.w, defaultValue.w);
-
-		write(name, node);
-	}
-}
-
-void minty::Writer::write(std::string const& name, Vector2Int const& value, Vector2Int const& defaultValue)
-{
-	if (value != defaultValue)
-	{
-		Node node;
-
-		Writer writer(node);
-
-		writer.write("x", value.x, defaultValue.x);
-		writer.write("y", value.y, defaultValue.y);
-
-		write(name, node);
-	}
-}
-
-void minty::Writer::write(std::string const& name, Vector3Int const& value, Vector3Int const& defaultValue)
+void minty::Writer::write(String const& name, Vector3 const& value, Vector3 const& defaultValue)
 {
 	if (value != defaultValue)
 	{
@@ -314,7 +266,7 @@ void minty::Writer::write(std::string const& name, Vector3Int const& value, Vect
 	}
 }
 
-void minty::Writer::write(std::string const& name, Vector4Int const& value, Vector4Int const& defaultValue)
+void minty::Writer::write(String const& name, Vector4 const& value, Vector4 const& defaultValue)
 {
 	if (value != defaultValue)
 	{
@@ -331,7 +283,55 @@ void minty::Writer::write(std::string const& name, Vector4Int const& value, Vect
 	}
 }
 
-void minty::Writer::write(std::string const& name, Quaternion const& value, Quaternion const& defaultValue)
+void minty::Writer::write(String const& name, Vector2Int const& value, Vector2Int const& defaultValue)
+{
+	if (value != defaultValue)
+	{
+		Node node;
+
+		Writer writer(node);
+
+		writer.write("x", value.x, defaultValue.x);
+		writer.write("y", value.y, defaultValue.y);
+
+		write(name, node);
+	}
+}
+
+void minty::Writer::write(String const& name, Vector3Int const& value, Vector3Int const& defaultValue)
+{
+	if (value != defaultValue)
+	{
+		Node node;
+
+		Writer writer(node);
+
+		writer.write("x", value.x, defaultValue.x);
+		writer.write("y", value.y, defaultValue.y);
+		writer.write("z", value.z, defaultValue.z);
+
+		write(name, node);
+	}
+}
+
+void minty::Writer::write(String const& name, Vector4Int const& value, Vector4Int const& defaultValue)
+{
+	if (value != defaultValue)
+	{
+		Node node;
+
+		Writer writer(node);
+
+		writer.write("x", value.x, defaultValue.x);
+		writer.write("y", value.y, defaultValue.y);
+		writer.write("z", value.z, defaultValue.z);
+		writer.write("w", value.w, defaultValue.w);
+
+		write(name, node);
+	}
+}
+
+void minty::Writer::write(String const& name, Quaternion const& value, Quaternion const& defaultValue)
 {
 	if (value != defaultValue)
 	{
@@ -350,7 +350,7 @@ void minty::Writer::write(std::string const& name, Quaternion const& value, Quat
 	}
 }
 
-std::string minty::to_string(Writer const& value)
+String minty::to_string(Writer const& value)
 {
 	return std::format("Writer(node = {})", to_string(value._node));
 }

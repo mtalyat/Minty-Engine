@@ -110,6 +110,6 @@ namespace minty
 		time_point_t get_now() const;
 
 	public:
-		friend std::string to_string(Engine const& value);
+		friend String to_string(Engine const& value);
 	};
 }

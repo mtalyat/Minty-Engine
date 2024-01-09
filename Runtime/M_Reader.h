@@ -41,7 +41,7 @@ namespace minty
 		/// </summary>
 		/// <param name="name">The name of the child node.</param>
 		/// <returns>The child node, or null if it does not exist.</returns>
-		Node const* get_node(std::string const& name) const;
+		Node const* get_node(String const& name) const;
 
 		/// <summary>
 		/// Gets the extra data given to this Reader.
@@ -54,43 +54,43 @@ namespace minty
 		/// </summary>
 		/// <param name="name">The name to check.</param>
 		/// <returns>True if a child with the given name exists.</returns>
-		bool exists(std::string const& name) const;
+		bool exists(String const& name) const;
 
 #pragma region Reading
 
-		void read_object(std::string const& name, ISerializable* const value) const;
+		void read_object(String const& name, ISerializable* const value) const;
 
-		std::string read_string(std::string const& name, std::string const& defaultValue = "") const;
+		String read_string(String const& name, String const& defaultValue = "") const;
 
-		int read_int(std::string const& name, int const defaultValue = 0) const;
+		int read_int(String const& name, int const defaultValue = 0) const;
 
-		unsigned int read_uint(std::string const& name, unsigned int const defaultValue = 0) const;
+		unsigned int read_uint(String const& name, unsigned int const defaultValue = 0) const;
 
-		ID read_id(std::string const& name, ID const defaultValue = ERROR_ID) const;
+		ID read_id(String const& name, ID const defaultValue = ERROR_ID) const;
 
-		float read_float(std::string const& name, float const defaultValue = 0.0f) const;
+		float read_float(String const& name, float const defaultValue = 0.0f) const;
 
-		byte read_byte(std::string const& name, byte const defaultValue = 0) const;
+		Byte read_byte(String const& name, Byte const defaultValue = 0) const;
 
-		size_t read_size(std::string const& name, size_t const defaultValue = 0) const;
+		size_t read_size(String const& name, size_t const defaultValue = 0) const;
 
-		Vector2 read_vector2(std::string const& name, Vector2 const& defaultValue = Vector2()) const;
+		Vector2 read_vector2(String const& name, Vector2 const& defaultValue = Vector2()) const;
 
-		Vector3 read_vector3(std::string const& name, Vector3 const& defaultValue = Vector3()) const;
+		Vector3 read_vector3(String const& name, Vector3 const& defaultValue = Vector3()) const;
 
-		Vector4 read_vector4(std::string const& name, Vector4 const& defaultValue = Vector4()) const;
+		Vector4 read_vector4(String const& name, Vector4 const& defaultValue = Vector4()) const;
 
-		Vector2Int read_vector2int(std::string const& name, Vector2Int const& defaultValue = Vector2Int()) const;
+		Vector2Int read_vector2int(String const& name, Vector2Int const& defaultValue = Vector2Int()) const;
 
-		Vector3Int read_vector3int(std::string const& name, Vector3Int const& defaultValue = Vector3Int()) const;
+		Vector3Int read_vector3int(String const& name, Vector3Int const& defaultValue = Vector3Int()) const;
 
-		Vector4Int read_vector4int(std::string const& name, Vector4Int const& defaultValue = Vector4Int()) const;
+		Vector4Int read_vector4int(String const& name, Vector4Int const& defaultValue = Vector4Int()) const;
 
-		Quaternion read_quaternion(std::string const& name, Quaternion const& defaultValue = Quaternion()) const;
+		Quaternion read_quaternion(String const& name, Quaternion const& defaultValue = Quaternion()) const;
 
 #pragma endregion
 
 	public:
-		friend std::string to_string(Reader const& value);
+		friend String to_string(Reader const& value);
 	};
 }

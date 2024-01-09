@@ -52,12 +52,12 @@ Quaternion minty::Quaternion::from_euler_angles(Vector3 const v)
     return Quaternion(v);
 }
 
-std::string minty::to_string(Quaternion const& value)
+String minty::to_string(Quaternion const& value)
 {
     return std::format("Quaternion({})", to_string(value.to_euler_angles()));
 }
 
-std::string minty::to_string(glm::quat const& value)
+String minty::to_string(glm::quat const& value)
 {
     return std::format("Quaternion({})", to_string(glm::eulerAngles(value)));
 }

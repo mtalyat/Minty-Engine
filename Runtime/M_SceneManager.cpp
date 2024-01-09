@@ -30,14 +30,14 @@ ID minty::SceneManager::create_scene()
 	return id;
 }
 
-ID minty::SceneManager::create_scene(std::string const& path)
+ID minty::SceneManager::create_scene(String const& path)
 {
 	// create the scene
 	ID id = create_scene();
 	Scene& scene = _scenes.at(id);
 
 	// load the data from the disk into the scene
-	Node node = asset::load_node(path);
+	Node node = Asset::load_node(path);
 	SerializationData data =
 	{
 		.scene = &scene,
@@ -157,7 +157,7 @@ void minty::SceneManager::finalize()
 	}
 }
 
-std::string minty::to_string(SceneManager const& value)
+String minty::to_string(SceneManager const& value)
 {
 	return std::format("SceneManager(scenes size = {})", value.size());
 }

@@ -75,8 +75,8 @@ namespace minty
 		/// <returns>A Quaternion representing the same orientation.</returns>
 		static Quaternion from_euler_angles(Vector3 const v);
 
-		friend std::string to_string(Quaternion const& value);
+		friend String to_string(Quaternion const& value);
 	};
 
-	std::string to_string(glm::quat const& value);
+	String to_string(glm::quat const& value);
 }

@@ -66,7 +66,7 @@ DescriptorSet const& minty::Material::get_descriptor_set(uint32_t const pass) co
 	return _passDescriptorSets.at(pass);
 }
 
-std::string minty::to_string(Material const& value)
+String minty::to_string(Material const& value)
 {
 	return std::format("Material()");
 }

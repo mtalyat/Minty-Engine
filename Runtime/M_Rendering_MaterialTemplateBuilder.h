@@ -16,7 +16,7 @@ namespace minty::rendering
 		/// <summary>
 		/// The name of the MaterialTemplate.
 		/// </summary>
-		std::string name;
+		String name;
 
 		/// <summary>
 		/// The IDs of the ShaderPasses.
@@ -26,6 +26,6 @@ namespace minty::rendering
 		/// <summary>
 		/// The default values.
 		/// </summary>
-		std::unordered_map<std::string, Dynamic> defaultValues;
+		std::unordered_map<String, Dynamic> defaultValues;
 	};
 }

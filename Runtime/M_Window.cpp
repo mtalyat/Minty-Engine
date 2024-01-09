@@ -10,7 +10,7 @@ using namespace minty;
 
 int Window::_windowCount = 0;
 
-Window::Window(std::string const& title, int const width, int const height, InputMap const* const globalInputMap)
+Window::Window(String const& title, int const width, int const height, InputMap const* const globalInputMap)
 	: _title(title)
 	, _window()
 	, _width(width)
@@ -72,13 +72,13 @@ Window::~Window()
 	}
 }
 
-void minty::Window::set_title(std::string const& title)
+void minty::Window::set_title(String const& title)
 {
 	_title = title;
 	glfwSetWindowTitle(_window, title.c_str());
 }
 
-std::string const& minty::Window::get_title() const
+String const& minty::Window::get_title() const
 {
 	return _title;
 }
@@ -310,7 +310,7 @@ void minty::Window::scroll_callback(GLFWwindow* window, double xoffset, double y
 	}
 }
 
-std::string minty::to_string(Window const& value)
+String minty::to_string(Window const& value)
 {
 	return std::format("Window(title = {})", value._title);
 }

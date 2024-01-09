@@ -178,6 +178,6 @@ namespace minty
 		static Rect round(RectF const& rect);
 
 	public:
-		friend std::string to_string(Rect const& rect);
+		friend String to_string(Rect const& rect);
 	};
 }

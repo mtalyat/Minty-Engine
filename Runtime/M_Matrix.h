@@ -9,7 +9,7 @@ namespace minty
 	typedef glm::mat3 Matrix3;
 	typedef glm::mat4 Matrix4;
 
-	std::string to_string(Matrix2 const& value);
-	std::string to_string(Matrix3 const& value);
-	std::string to_string(Matrix4 const& value);
+	String to_string(Matrix2 const& value);
+	String to_string(Matrix3 const& value);
+	String to_string(Matrix4 const& value);
 }

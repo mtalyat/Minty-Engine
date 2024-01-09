@@ -68,7 +68,7 @@ namespace minty
 		/// <param name="pan">The pan of the AudioClip. -1.0 is left, 0.0 is centered, and 1.0 is right.</param>
 		/// <param name="paused">The pause state of the AudioClip. If true, the clip starts paused.</param>
 		/// <returns>A handle to the instance of the AudioClip being played.</returns>
-		AudioHandle play(std::string const& name, float const volume = -1.0f, float const pan = 0.0f, bool const paused = false);
+		AudioHandle play(String const& name, float const volume = -1.0f, float const pan = 0.0f, bool const paused = false);
 
 		/// <summary>
 		/// Plays the clip on the Entity's AudioSource, in 3D space.
@@ -97,7 +97,7 @@ namespace minty
 		/// <param name="volume">The volume at which to play the AudioClip. If -1.0, the AudioClip volume is used.</param>
 		/// <param name="paused">The pause state of the AudioClip. If true, the clip starts paused.</param>
 		/// <returns>A handle to the instance of the AudioClip being played.</returns>
-		AudioHandle play_spatial(std::string const& name, Entity const entity, float const volume = -1.0f, bool const paused = false);
+		AudioHandle play_spatial(String const& name, Entity const entity, float const volume = -1.0f, bool const paused = false);
 
 		/// <summary>
 		/// Plays the AudioClip using the given ID in the background.
@@ -115,7 +115,7 @@ namespace minty
 		/// <param name="volume">The volume at which to play the AudioClip. If -1.0, the AudioClip volume is used.</param>
 		/// <param name="paused">The pause state of the AudioClip. If true, the clip starts paused.</param>
 		/// <returns>A handle to the instance of the AudioClip being played.</returns>
-		AudioHandle play_background(std::string const& name, float const volume = -1.0f, bool const paused = false);
+		AudioHandle play_background(String const& name, float const volume = -1.0f, bool const paused = false);
 
 		/// <summary>
 		/// Checks if the audio clip with the given handle is still playing.
@@ -155,14 +155,14 @@ namespace minty
 		/// <param name="name">The name of the AudioClip.</param>
 		/// <param name="path">The path to the AudioClip file.</param>
 		/// <returns>The ID of the AudioClip.</returns>
-		ID load_clip(std::string const& name, std::string const& path);
+		ID load_clip(String const& name, Path const& path);
 
 		/// <summary>
 		/// Loads the AudioClip into this AudioEngine. The name is the name of the given file at the path.
 		/// </summary>
 		/// <param name="path">The path to the AudioClip file.</param>
 		/// <returns>The ID of the AudioClip.</returns>
-		ID load_clip(std::string const& path);
+		ID load_clip(Path const& path);
 
 		/// <summary>
 		/// Checks if an AudioClip with the given ID has been loaded.
@@ -176,7 +176,7 @@ namespace minty
 		/// </summary>
 		/// <param name="name">The name to check.</param>
 		/// <returns>True if there is an AudioClip with the given name loaded.</returns>
-		bool contains(std::string const& name) const;
+		bool contains(String const& name) const;
 
 		/// <summary>
 		/// Gets the AudioClip with the given ID.
@@ -197,28 +197,28 @@ namespace minty
 		/// </summary>
 		/// <param name="name">The name of the AudioClip.</param>
 		/// <returns>A reference to the AudioClip.</returns>
-		AudioClip& at(std::string const& name);
+		AudioClip& at(String const& name);
 
 		/// <summary>
 		/// Gets the AudioClip with the given name.
 		/// </summary>
 		/// <param name="name">The name of the AudioClip.</param>
 		/// <returns>A reference to the AudioClip.</returns>
-		AudioClip const& at(std::string const& name) const;
+		AudioClip const& at(String const& name) const;
 
 		/// <summary>
 		/// Gets the name of the loaded AudioClip with the given ID.
 		/// </summary>
 		/// <param name="id">The ID of the AudioClip.</param>
 		/// <returns>The name of the AudioClip.</returns>
-		std::string const& get_name(ID const id) const;
+		String const& get_name(ID const id) const;
 
 		/// <summary>
 		/// Gets the ID of the loaded AudioClip with the given name.
 		/// </summary>
 		/// <param name="name">The name of the AudioClip.</param>
 		/// <returns>The ID of the AudioClip.</returns>
-		ID get_id(std::string const& name) const;
+		ID get_id(String const& name) const;
 
 		/// <summary>
 		/// Unloads the AudioClip with the given ID.
@@ -248,6 +248,6 @@ namespace minty
 		void update_sound_data(SoundData& data, Entity const entity);
 
 	public:
-		friend std::string to_string(AudioEngine const& value);
+		friend String to_string(AudioEngine const& value);
 	};
 }

@@ -3,10 +3,10 @@
 
 using namespace minty;
 
-std::string minty::to_string(AnchorMode const anchor)
+String minty::to_string(AnchorMode const anchor)
 {
 	int mode = static_cast<int>(anchor);
-	std::string result;
+	String result;
 
 	if (mode & static_cast<int>(AnchorMode::Top))
 	{
@@ -42,32 +42,32 @@ std::string minty::to_string(AnchorMode const anchor)
 	return result;
 }
 
-AnchorMode minty::from_string_anchor_mode(std::string const& string)
+AnchorMode minty::from_string_anchor_mode(String const& string)
 {
 	int mode = 0;
 
-	if (string.find("Top") != std::string::npos)
+	if (string.find("Top") != String::npos)
 	{
 		mode |= static_cast<int>(AnchorMode::Top);
 	}
-	if (string.find("Middle") != std::string::npos)
+	if (string.find("Middle") != String::npos)
 	{
 		mode |= static_cast<int>(AnchorMode::Middle);
 	}
-	if (string.find("Bottom") != std::string::npos)
+	if (string.find("Bottom") != String::npos)
 	{
 		mode |= static_cast<int>(AnchorMode::Bottom);
 	}
 
-	if (string.find("Left") != std::string::npos)
+	if (string.find("Left") != String::npos)
 	{
 		mode |= static_cast<int>(AnchorMode::Left);
 	}
-	if (string.find("Center") != std::string::npos)
+	if (string.find("Center") != String::npos)
 	{
 		mode |= static_cast<int>(AnchorMode::Center);
 	}
-	if (string.find("Right") != std::string::npos)
+	if (string.find("Right") != String::npos)
 	{
 		mode |= static_cast<int>(AnchorMode::Right);
 	}
@@ -75,9 +75,9 @@ AnchorMode minty::from_string_anchor_mode(std::string const& string)
 	return static_cast<AnchorMode>(mode);
 }
 
-std::string minty::to_string(UITransformComponent const& value)
+String minty::to_string(UITransformComponent const& value)
 {
-	return std::format("SpriteComponent(anchor = {}, x/left = {}, y/top = {}, width/right = {}, height/bottom = {})", static_cast<byte>(value.anchorMode), value.x, value.y, value.width, value.height);
+	return std::format("SpriteComponent(anchor = {}, x/left = {}, y/top = {}, width/right = {}, height/bottom = {})", static_cast<Byte>(value.anchorMode), value.x, value.y, value.width, value.height);
 }
 
 void minty::UITransformComponent::serialize(Writer& writer) const

@@ -43,6 +43,6 @@ namespace minty
 		Matrix4 get_matrix() const;
 
 	public:
-		friend std::string to_string(Transform const& value);
+		friend String to_string(Transform const& value);
 	};
 }

@@ -21,13 +21,13 @@ namespace minty::rendering
 		{
 			VkShaderStageFlagBits stage;
 			std::vector<char> code;
-			std::string entry;
+			String entry;
 		};
 
 		/// <summary>
 		/// The name of the ShaderPass.
 		/// </summary>
-		std::string name;
+		String name;
 
 		/// <summary>
 		/// The ID of the Shader.

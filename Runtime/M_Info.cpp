@@ -10,14 +10,14 @@ minty::Info::Info()
 	, _applicationPatch()
 {}
 
-Info::Info(std::string const& name, uint32_t const major, uint32_t const minor, uint32_t const patch)
+Info::Info(String const& name, uint32_t const major, uint32_t const minor, uint32_t const patch)
 	: _applicationName(name)
 	, _applicationMajor(major)
 	, _applicationMinor(minor)
 	, _applicationPatch(patch)
 {}
 
-std::string const& minty::Info::get_application_name() const
+String const& minty::Info::get_application_name() const
 {
 	return _applicationName;
 }
@@ -56,7 +56,7 @@ void minty::Info::deserialize(Reader const& reader)
 	_applicationPatch = reader.read_uint("patch");
 }
 
-std::string minty::to_string(Info const& value)
+String minty::to_string(Info const& value)
 {
 	return std::format("Info(application name = {}, application version = {}, engine name = {}, engine version = {}, Vulkan version = {})", value.get_application_name(), value.get_application_version(), MINTY_NAME, MINTY_VERSION, MINTY_API_VERSION);
 }

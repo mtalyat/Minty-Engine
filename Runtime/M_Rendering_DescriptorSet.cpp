@@ -11,7 +11,7 @@ minty::rendering::DescriptorSet::DescriptorSet(RenderEngine& renderer)
 	, _descriptorSets()
 {}
 
-minty::rendering::DescriptorSet::DescriptorSet(std::array<VkDescriptorSet, MAX_FRAMES_IN_FLIGHT> const& descriptorSets, std::unordered_map<std::string, std::array<ID, MAX_FRAMES_IN_FLIGHT>> const& buffers, RenderEngine& renderer)
+minty::rendering::DescriptorSet::DescriptorSet(std::array<VkDescriptorSet, MAX_FRAMES_IN_FLIGHT> const& descriptorSets, std::unordered_map<String, std::array<ID, MAX_FRAMES_IN_FLIGHT>> const& buffers, RenderEngine& renderer)
 	: RenderObject::RenderObject(renderer)
 	, _descriptorSets(descriptorSets)
 	, _buffers(buffers)
@@ -32,7 +32,7 @@ void minty::rendering::DescriptorSet::destroy()
 	_buffers.clear();
 }
 
-void minty::rendering::DescriptorSet::set(std::string const& name, void* const value) const
+void minty::rendering::DescriptorSet::set(String const& name, void* const value) const
 {
 	// get buffer ids
 	auto const& bufferIds = _buffers.at(name);
@@ -44,7 +44,7 @@ void minty::rendering::DescriptorSet::set(std::string const& name, void* const v
 	}
 }
 
-void minty::rendering::DescriptorSet::set(std::string const& name, int const frame, void* const value) const
+void minty::rendering::DescriptorSet::set(String const& name, int const frame, void* const value) const
 {
 	// get buffer id
 	ID bufferId = _buffers.at(name).at(frame);
@@ -53,7 +53,7 @@ void minty::rendering::DescriptorSet::set(std::string const& name, int const fra
 	_renderer.set_buffer(bufferId, value);
 }
 
-void minty::rendering::DescriptorSet::set(std::string const& name, void* const value, VkDeviceSize const size, VkDeviceSize const offset) const
+void minty::rendering::DescriptorSet::set(String const& name, void* const value, VkDeviceSize const size, VkDeviceSize const offset) const
 {
 	// get buffer ids
 	auto const& bufferIds = _buffers.at(name);
@@ -65,7 +65,7 @@ void minty::rendering::DescriptorSet::set(std::string const& name, void* const v
 	}
 }
 
-void minty::rendering::DescriptorSet::set(std::string const& name, int const frame, void* const value, VkDeviceSize const size, VkDeviceSize const offset) const
+void minty::rendering::DescriptorSet::set(String const& name, int const frame, void* const value, VkDeviceSize const size, VkDeviceSize const offset) const
 {
 	// get buffer id
 	ID bufferId = _buffers.at(name).at(frame);
@@ -74,7 +74,7 @@ void minty::rendering::DescriptorSet::set(std::string const& name, int const fra
 	_renderer.set_buffer(bufferId, value, offset, size);
 }
 
-void minty::rendering::DescriptorSet::set(std::string const& name, Dynamic const& value, VkDeviceSize const offset) const
+void minty::rendering::DescriptorSet::set(String const& name, Dynamic const& value, VkDeviceSize const offset) const
 {
 	auto const& bufferIds = _buffers.at(name);
 
@@ -84,14 +84,14 @@ void minty::rendering::DescriptorSet::set(std::string const& name, Dynamic const
 	}
 }
 
-void minty::rendering::DescriptorSet::set(std::string const& name, int const frame, Dynamic const& value, VkDeviceSize const offset) const
+void minty::rendering::DescriptorSet::set(String const& name, int const frame, Dynamic const& value, VkDeviceSize const offset) const
 {
 	ID bufferId = _buffers.at(name).at(frame);
 
 	_renderer.set_buffer(bufferId, value.data(), static_cast<VkDeviceSize>(value.size()), offset);
 }
 
-void minty::rendering::DescriptorSet::get(std::string const& name, int const frame, void* const out) const
+void minty::rendering::DescriptorSet::get(String const& name, int const frame, void* const out) const
 {
 	ID bufferId = _buffers.at(name).at(frame);
 

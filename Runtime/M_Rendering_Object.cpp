@@ -13,7 +13,7 @@ RenderObject::RenderObject(RenderEngine& renderer)
 RenderObject::~RenderObject()
 {}
 
-std::string minty::rendering::to_string(RenderObject const& value)
+String minty::rendering::to_string(RenderObject const& value)
 {
 	return std::format("RenderObject()");
 }

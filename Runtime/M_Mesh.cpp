@@ -539,7 +539,7 @@ void minty::Mesh::dispose_indices()
 	_indexSize = 0;
 }
 
-std::string minty::to_string(MeshType const value)
+String minty::to_string(MeshType const value)
 {
 	switch (value)
 	{
@@ -562,9 +562,9 @@ std::string minty::to_string(MeshType const value)
 	}
 }
 
-MeshType minty::from_string_mesh_type(std::string const& value)
+MeshType minty::from_string_mesh_type(String const& value)
 {
-	std::string value2 = string::to_upper(value);
+	String value2 = string::to_upper(value);
 	if (value2 == "CUSTOM")
 	{
 		return MeshType::Custom;
@@ -595,7 +595,7 @@ MeshType minty::from_string_mesh_type(std::string const& value)
 	}
 }
 
-std::string minty::to_string(Mesh const& mesh)
+String minty::to_string(Mesh const& mesh)
 {
 	return std::format("Mesh()");
 }

@@ -1,6 +1,6 @@
 #pragma once
 
-#include <string>
+#include "M_Types.h"
 
 #ifdef NDEBUG
 #define MINTY_ASSERT(expression, message)
@@ -19,5 +19,5 @@ namespace minty::error
 	/// Aborts the program with the given error message.
 	/// </summary>
 	/// <param name="message"></param>
-	void abort(std::string const& message);
+	void abort(minty::String const& message);
 }

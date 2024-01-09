@@ -182,7 +182,7 @@ void minty::Scene::deserialize(Reader const& reader)
 	reader.read_object("Entities", _entities);
 }
 
-std::string minty::to_string(Scene const& value)
+String minty::to_string(Scene const& value)
 {
 	return std::format("Scene({}, {})", to_string(*value._systems), to_string(*value._entities));
 }

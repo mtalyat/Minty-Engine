@@ -28,14 +28,14 @@ Texture::Texture(rendering::TextureBuilder const& builder, RenderEngine& rendere
 	stbi_uc* pixels = reinterpret_cast<stbi_uc*>(builder.pixelData);
 	bool allocated = false;
 
-	std::string const& path = builder.path;
-	bool fromFile = path.size();
+	Path const& path = builder.path;
+	bool fromFilePathSize = path.string().size();
 
-	if (fromFile)
+	if (fromFilePathSize)
 	{
-		if (!asset::exists(path))
+		if (!Asset::exists(path))
 		{
-			console::error(std::format("Cannot load texture. File not found at: {}", path));
+			console::error(std::format("Cannot load texture. File not found at: {}", path.string()));
 			return;
 		}
 
@@ -48,13 +48,13 @@ Texture::Texture(rendering::TextureBuilder const& builder, RenderEngine& rendere
 		// get data from file: pixels, width, height, color channels
 		int channels;
 
-		std::string absPath = asset::absolute(path);
+		String absPath = Asset::absolute(path).string();
 		pixels = stbi_load(absPath.c_str(), &_width, &_height, &channels, static_cast<int>(builder.pixelFormat));
 
 		// if no pixels, error
 		if (!pixels)
 		{
-			console::error(std::format("Failed to load texture: {}", path));
+			console::error(std::format("Failed to load texture: {}", path.string()));
 			return;
 		}
 	}
@@ -99,7 +99,7 @@ Texture::Texture(rendering::TextureBuilder const& builder, RenderEngine& rendere
 	renderer.unmap_buffer(stagingBufferId);
 
 	// done with the pixels from file
-	if (fromFile)
+	if (fromFilePathSize)
 	{
 		stbi_image_free(pixels);
 	}
@@ -163,7 +163,7 @@ Texture::Texture(rendering::TextureBuilder const& builder, RenderEngine& rendere
 	samplerInfo.maxLod = 0.0f;
 
 	if (vkCreateSampler(device, &samplerInfo, nullptr, &_sampler) != VK_SUCCESS) {
-		error::abort(std::format("Failed to load texture: {}", path));
+		error::abort(std::format("Failed to load texture: {}", path.string()));
 	}
 }
 
@@ -212,7 +212,7 @@ VkSampler minty::Texture::get_sampler() const
 	return _sampler;
 }
 
-std::string minty::to_string(Texture const& value)
+String minty::to_string(Texture const& value)
 {
 	return std::format("Texture(width = {}, height = {})", value._width, value._height);
 }

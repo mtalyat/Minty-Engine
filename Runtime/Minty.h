@@ -13,11 +13,6 @@ access to the entire engine without needing include each file.
 #include "vulkan.h"
 #include "glm.hpp"
 
-// ASSETS
-#include "M_Asset.h"
-#include "M_File.h"
-#include "M_Resource.h"
-
 // AUDIO
 #include "M_Audio.h"
 #include "M_AudioClip.h"
@@ -43,6 +38,15 @@ access to the entire engine without needing include each file.
 
 // ENTITIES
 #include "M_EntityRegistry.h"
+
+// FILES
+#include "M_Asset.h"
+#include "M_File.h"
+#include "M_PhysicalFile.h"
+#include "M_Resource.h"
+#include "M_VirtualFile.h"
+#include "M_Wrap.h"
+#include "M_Wrapper.h"
 
 // INPUT
 #include "M_InputMap.h"
@@ -94,6 +98,7 @@ access to the entire engine without needing include each file.
 #include "M_Base.h"
 #include "M_Color.h"
 #include "M_CommandLineParser.h"
+#include "M_Compression.h"
 #include "M_Console.h"
 #include "M_Constants.h"
 #include "M_Dynamic.h"

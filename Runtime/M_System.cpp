@@ -21,7 +21,7 @@ bool minty::System::is_enabled() const
 	return _enabled;
 }
 
-std::string minty::to_string(System const& value)
+String minty::to_string(System const& value)
 {
 	return std::format("System()");
 }

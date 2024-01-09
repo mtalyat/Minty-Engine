@@ -204,7 +204,7 @@ size_t mintye::Console::execute_command(std::string const& command)
 	std::string result;
 	bool changeColor = true;
 	console::Color color = console::Color::White;
-	while (fgets(buffer.data(), buffer.size(), pipe.get()) != nullptr) {
+	while (fgets(buffer.data(), static_cast<int>(buffer.size()), pipe.get()) != nullptr) {
 
 		// get text
 		result = buffer.data();
@@ -215,16 +215,16 @@ size_t mintye::Console::execute_command(std::string const& command)
 		if (changeColor)
 		{
 			// check for [type]
-			if (result.starts_with("[errr]"))
+			if (/*result.starts_with("[errr]") || */result.find("err") != std::string::npos)
 			{
 				color = console::Color::Red;
 				errorCount++;
 			}
-			else if (result.starts_with("[warn]"))
+			else if (/*result.starts_with("[warn]") || */result.find("warn") != std::string::npos)
 			{
 				color = console::Color::Yellow;
 			}
-			else if (result.starts_with("[info]"))
+			else if (/*result.starts_with("[info]") || */result.find("info") != std::string::npos)
 			{
 				color = console::Color::Gray;
 			}

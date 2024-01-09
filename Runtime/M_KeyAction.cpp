@@ -1,7 +1,9 @@
 #include "pch.h"
 #include "M_KeyAction.h"
 
-std::string minty::to_string(KeyAction const value)
+using namespace minty;
+
+String minty::to_string(KeyAction const value)
 {
     switch (value) {
     case KeyAction::Up: return "Up";

@@ -17,7 +17,7 @@ namespace minty
 		float const DEFAULT_FAR = 100.0f;
 
 	public:
-		enum class Perspective : byte
+		enum class Perspective : Byte
 		{
 			Orthographic,
 			Perspective,
@@ -45,9 +45,9 @@ namespace minty
 		void serialize(Writer& writer) const override;
 		void deserialize(Reader const& reader) override;
 
-		friend std::string to_string(CameraComponent const& value);
+		friend String to_string(CameraComponent const& value);
 	};
 
-	std::string to_string(CameraComponent::Perspective const value);
-	CameraComponent::Perspective from_string_camera_component_perspective(std::string const& value);
+	String to_string(CameraComponent::Perspective const value);
+	CameraComponent::Perspective from_string_camera_component_perspective(String const& value);
 }

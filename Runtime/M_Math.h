@@ -1,6 +1,6 @@
 #pragma once
 
-#include <string>
+#include "M_Types.h"
 
 namespace minty::math
 {
@@ -12,8 +12,17 @@ namespace minty::math
 	/// <param name="value">The value to clamp.</param>
 	/// <param name="minimum">The minimum value.</param>
 	/// <param name="maximum">The maximum value.</param>
-	/// <returns>A value clamped between minimum and maximum.</returns>
+	/// <returns>A value clamped within the range of [minimum, maximum].</returns>
 	float clamp(float const value, float const minimum, float const maximum);
+
+	/// <summary>
+	/// Clamps the given value between the other two values.
+	/// </summary>
+	/// <param name="value">The value to clamp.</param>
+	/// <param name="minimum">The minimum value.</param>
+	/// <param name="maximum">The maximum value.</param>
+	/// <returns>A value clamped within the range of [minimum, maximum].</returns>
+	int clamp(int const value, int const minimum, int const maximum);
 
 	/// <summary>
 	/// Gets the position between left and right, given the percentage t.
@@ -229,5 +238,5 @@ namespace minty::math
 	/// </summary>
 	/// <param name="expression">The expression to parse.</param>
 	/// <returns>The evaluated value.</returns>
-	float evaluate(std::string const& expression);
+	float evaluate(String const& expression);
 }

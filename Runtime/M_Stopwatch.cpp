@@ -82,7 +82,7 @@ namespace minty
 	{
 		return elapsed() / static_cast<float>(ONE_SECOND);
 	}
-	std::string to_string(Stopwatch const& value)
+	String to_string(Stopwatch const& value)
 	{
 		// convert to seconds, minutes, and hours
 		elapsed_t ns = value.elapsed();
@@ -96,7 +96,7 @@ namespace minty
 
 		// print in format: HH:MM:SS:nnnnnn
 
-		std::string temp = std::format("{}:{}:{}.{}",
+		String temp = std::format("{}:{}:{}.{}",
 			std::to_string(hours),
 			std::to_string(minutes),
 			std::to_string(seconds),

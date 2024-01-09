@@ -14,7 +14,7 @@ namespace minty::rendering
 		/// <summary>
 		/// The name of the uniform constant.
 		/// </summary>
-		std::string name;
+		String name;
 
 		/// <summary>
 		/// The type of uniform constant.

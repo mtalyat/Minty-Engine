@@ -77,6 +77,6 @@ namespace minty
 		void deserialize(Reader const& reader) override;
 
 	public:
-		friend std::string to_string(Scene const& value);
+		friend String to_string(Scene const& value);
 	};
 }

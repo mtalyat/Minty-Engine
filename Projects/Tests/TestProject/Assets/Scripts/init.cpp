@@ -18,7 +18,7 @@ using namespace game;
 InputMap input;
 
 // called when the engine is initialized
-void init(Runtime &runtime)
+int init(Runtime &runtime)
 {
     try
     {
@@ -31,11 +31,11 @@ void init(Runtime &runtime)
         SystemRegistry::register_system<game::CameraControllerSystem>("CameraController");
         SystemRegistry::register_system<game::MoveSystem>("Move");
 
-        Engine& engine = runtime.get_engine();
-        Window& window = engine.get_window();
-        RenderEngine& renderer = engine.get_render_engine();
-        AudioEngine& audio = engine.get_audio_engine();
-        SceneManager& sceneManager = engine.get_scene_manager();
+        Engine &engine = runtime.get_engine();
+        Window &window = engine.get_window();
+        RenderEngine &renderer = engine.get_render_engine();
+        AudioEngine &audio = engine.get_audio_engine();
+        SceneManager &sceneManager = engine.get_scene_manager();
 
         // create renderer
         Info info("TestProject", 0, 0, 0);
@@ -87,16 +87,17 @@ void init(Runtime &runtime)
 
         // copy the model 5 times
         Entity modelEntity = er->find_by_name("Model");
-        for(int y = 0; y < 5; y++)
+        for (int y = 0; y < 5; y++)
         {
-            for(int x = 0; x < 5; x++)
+            for (int x = 0; x < 5; x++)
             {
                 // ignore original
-                if(x == 0 && y == 0) continue;
+                if (x == 0 && y == 0)
+                    continue;
 
                 // clone model, move it to the right 2 * i and down 2 * i
                 Entity clone = er->clone(modelEntity);
-                TransformComponent& cloneTransformComp = er->get<TransformComponent>(clone);
+                TransformComponent &cloneTransformComp = er->get<TransformComponent>(clone);
                 cloneTransformComp.local.position.x += static_cast<float>(x) * 4.0f;
                 cloneTransformComp.local.position.y += static_cast<float>(y) * 4.0f;
                 er->emplace_or_replace<DirtyComponent>(clone);
@@ -120,14 +121,14 @@ void init(Runtime &runtime)
         // play audio
         audio.play_background("blinking-forest", 0.2f);
 
-        AudioEngine* audioPtr = &audio;
-        Window* windowPtr = &window;
+        AudioEngine *audioPtr = &audio;
+        Window *windowPtr = &window;
 
         //          input
         input.emplace_key_down(Key::E, [audioPtr, er](KeyPressEventArgs const &args)
                                { audioPtr->play_spatial("ding", er->find_by_name("Model")); });
         input.emplace_key_up(Key::E, [audioPtr, er](KeyPressEventArgs const &args)
-                               { audioPtr->play_spatial("dong", er->find_by_name("Model")); });
+                             { audioPtr->play_spatial("dong", er->find_by_name("Model")); });
 
         // quit on key close
         input.emplace_key_down(Key::Escape, [windowPtr](KeyPressEventArgs const &args)
@@ -202,13 +203,17 @@ void init(Runtime &runtime)
     }
 
     console::log("Game start.");
+
+    return 0;
 }
 
 // called when the engine is destroyed
-void destroy(Runtime &runtime)
+int destroy(Runtime &runtime)
 {
     console::log("Game over.");
 
     // wait for input to close
     // console::wait();
+
+    return 0;
 }

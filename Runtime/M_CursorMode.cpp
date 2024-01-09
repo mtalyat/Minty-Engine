@@ -1,7 +1,9 @@
 #include "pch.h"
 #include "M_CursorMode.h"
 
-std::string minty::to_string(CursorMode const mode)
+using namespace minty;
+
+String minty::to_string(CursorMode const mode)
 {
     switch (mode)
     {

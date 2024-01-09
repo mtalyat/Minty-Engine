@@ -17,7 +17,7 @@ namespace minty::rendering
 	private:
 		std::array<VkDescriptorSet, MAX_FRAMES_IN_FLIGHT> _descriptorSets;
 
-		std::unordered_map<std::string, std::array<ID, MAX_FRAMES_IN_FLIGHT>> _buffers;
+		std::unordered_map<String, std::array<ID, MAX_FRAMES_IN_FLIGHT>> _buffers;
 
 	public:
 		/// <summary>
@@ -32,7 +32,7 @@ namespace minty::rendering
 		/// <param name="descriptorSets">The descriptor sets for one flight.</param>
 		/// <param name="buffers">The buffers associated with this DescriptorSet.</param>
 		/// <param name="renderer"></param>
-		DescriptorSet(std::array<VkDescriptorSet, MAX_FRAMES_IN_FLIGHT> const& descriptorSets, std::unordered_map<std::string, std::array<ID, MAX_FRAMES_IN_FLIGHT>> const& buffers, RenderEngine& renderer);
+		DescriptorSet(std::array<VkDescriptorSet, MAX_FRAMES_IN_FLIGHT> const& descriptorSets, std::unordered_map<String, std::array<ID, MAX_FRAMES_IN_FLIGHT>> const& buffers, RenderEngine& renderer);
 
 		// copy
 		void operator=(DescriptorSet const& other);
@@ -49,7 +49,7 @@ namespace minty::rendering
 		/// </summary>
 		/// <param name="name">The name of the buffer.</param>
 		/// <param name="value">The value to set.</param>
-		void set(std::string const& name, void* const value) const;
+		void set(String const& name, void* const value) const;
 
 		/// <summary>
 		/// Sets the value of the buffer with the given name for one frame in the flight.
@@ -57,7 +57,7 @@ namespace minty::rendering
 		/// <param name="name">The name of the buffer.</param>
 		/// <param name="frame">The frame to set the values on.</param>
 		/// <param name="value">The value to set.</param>
-		void set(std::string const& name, int const frame, void* const value) const;
+		void set(String const& name, int const frame, void* const value) const;
 
 		/// <summary>
 		/// Sets the value of the buffer with the given name for all frames in the flight.
@@ -66,7 +66,7 @@ namespace minty::rendering
 		/// <param name="value">The value to set.</param>
 		/// <param name="size">The number of bytes to set.</param>
 		/// <param name="offset">The offset in the buffer in bytes.</param>
-		void set(std::string const& name, void* const value, VkDeviceSize const size, VkDeviceSize const offset = 0) const;
+		void set(String const& name, void* const value, VkDeviceSize const size, VkDeviceSize const offset = 0) const;
 
 		/// <summary>
 		/// Sets the value of the buffer with the given name for one frame in the flight.
@@ -76,7 +76,7 @@ namespace minty::rendering
 		/// <param name="value">The value to set.</param>
 		/// <param name="size">The number of bytes to set.</param>
 		/// <param name="offset">The offset in the buffer in bytes.</param>
-		void set(std::string const& name, int const frame, void* const value, VkDeviceSize const size, VkDeviceSize const offset = 0) const;
+		void set(String const& name, int const frame, void* const value, VkDeviceSize const size, VkDeviceSize const offset = 0) const;
 
 		/// <summary>
 		/// Sets the value of the buffer with the given name for all frames in the flight.
@@ -84,7 +84,7 @@ namespace minty::rendering
 		/// <param name="name">The name of the buffer.</param>
 		/// <param name="value">The value to set.</param>
 		/// <param name="offset">The offset in the buffer in bytes.</param>
-		void set(std::string const& name, Dynamic const& value, VkDeviceSize const offset = 0) const;
+		void set(String const& name, Dynamic const& value, VkDeviceSize const offset = 0) const;
 
 		/// <summary>
 		/// Sets the value of the buffer with the given name for one frame in the flight.
@@ -93,7 +93,7 @@ namespace minty::rendering
 		/// <param name="frame">The frame to set the values on.</param>
 		/// <param name="value">The value to set.</param>
 		/// <param name="offset">The offset in the buffer in bytes.</param>
-		void set(std::string const& name, int const frame, Dynamic const& value, VkDeviceSize const offset = 0) const;
+		void set(String const& name, int const frame, Dynamic const& value, VkDeviceSize const offset = 0) const;
 
 #pragma endregion
 
@@ -105,7 +105,7 @@ namespace minty::rendering
 		/// <param name="name">The name of the buffer.</param>
 		/// <param name="frame">The frame to get the values from.</param>
 		/// <param name="out">The pointer to the location to copy the values to.</param>
-		void get(std::string const& name, int const frame, void* const out) const;
+		void get(String const& name, int const frame, void* const out) const;
 
 		/// <summary>
 		/// Gets the specific VkDescriptorSet at the given index.

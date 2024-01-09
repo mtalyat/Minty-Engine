@@ -130,7 +130,7 @@ void minty::Dynamic::deserialize(Reader const& reader)
 	}
 
 	// go through and get all possible combinations of bytes/bits, pack into data
-	byte* data = new byte[size];
+	Byte* data = new Byte[size];
 	memset(data, 0, size);
 
 	// assume 'x' is any number:
@@ -140,7 +140,7 @@ void minty::Dynamic::deserialize(Reader const& reader)
 	// xf refers to a float starting at byte f
 
 	size_t i;
-	std::string name;
+	String name;
 	for (auto const& childPair : node.children)
 	{
 		name = childPair.first;
@@ -155,8 +155,8 @@ void minty::Dynamic::deserialize(Reader const& reader)
 		{
 			// byte
 			i = parse::to_size(name);
-			byte temp = childPair.second.front().to_byte();
-			memcpy(&data[i], &temp, sizeof(byte));
+			Byte temp = childPair.second.front().to_byte();
+			memcpy(&data[i], &temp, sizeof(Byte));
 		}
 		else if (name.ends_with("ui"))
 		{

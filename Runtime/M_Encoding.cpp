@@ -6,12 +6,12 @@
 using namespace minty;
 
 // https://stackoverflow.com/questions/180947/base64-decode-snippet-in-c
-std::string minty::encoding::encode_base64(std::string const& in)
+String minty::encoding::encode_base64(String const& in)
 {
-    std::string out;
+    String out;
 
     int val = 0, valb = -6;
-    for (byte c : in) {
+    for (Byte c : in) {
         val = (val << 8) + c;
         valb += 8;
         while (valb >= 0) {
@@ -25,15 +25,15 @@ std::string minty::encoding::encode_base64(std::string const& in)
 }
 
 // https://stackoverflow.com/questions/180947/base64-decode-snippet-in-c
-std::string minty::encoding::decode_base64(std::string const& in)
+String minty::encoding::decode_base64(String const& in)
 {
-    std::string out;
+    String out;
 
     std::vector<int> T(256, -1);
     for (int i = 0; i < 64; i++) T["ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"[i]] = i;
 
     int val = 0, valb = -8;
-    for (byte c : in) {
+    for (Byte c : in) {
         if (T[c] == -1) break;
         val = (val << 6) + T[c];
         valb += 6;

@@ -14,5 +14,5 @@ namespace minty
 		Hold = 2
 	};
 
-	std::string to_string(KeyAction const value);
+	String to_string(KeyAction const value);
 }

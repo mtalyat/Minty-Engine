@@ -22,5 +22,5 @@ namespace minty
 		Middle = 2
 	};
 
-	std::string to_string(MouseButton const value);
+	String to_string(MouseButton const value);
 }

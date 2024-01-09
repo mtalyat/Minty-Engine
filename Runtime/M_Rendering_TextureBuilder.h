@@ -15,11 +15,11 @@ namespace minty::rendering
 		/// <summary>
 		/// The name of the Texure.
 		/// </summary>
-		std::string name;
+		String name;
 		/// <summary>
 		/// The path to the Texture on the disk.
 		/// </summary>
-		std::string path;
+		Path path;
 		/// <summary>
 		/// The raw pixel data for the Texture.
 		/// </summary>
@@ -41,6 +41,10 @@ namespace minty::rendering
 		/// </summary>
 		VkFilter filter;
 		/// <summary>
+		/// The format for the Texture. How the pixels are interpreted.
+		/// </summary>
+		VkFormat format;
+		/// <summary>
 		/// The address mode for the Texture. What to do when the texcoord is outside of [0.0, 1.0].
 		/// </summary>
 		VkSamplerAddressMode addressMode;
@@ -48,10 +52,6 @@ namespace minty::rendering
 		/// The mipmap mode for the Texture. 
 		/// </summary>
 		VkSamplerMipmapMode mipmapMode;
-		/// <summary>
-		/// The format for the Texture. How the pixels are interpreted.
-		/// </summary>
-		VkFormat format;
 	};
 }
 

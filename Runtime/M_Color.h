@@ -17,22 +17,22 @@ namespace minty
 		/// <summary>
 		/// The red component.
 		/// </summary>
-		byte r;
+		Byte r;
 		
 		/// <summary>
 		/// The green component.
 		/// </summary>
-		byte g;
+		Byte g;
 
 		/// <summary>
 		/// The blue component.
 		/// </summary>
-		byte b;
+		Byte b;
 
 		/// <summary>
 		/// The alpha component.
 		/// </summary>
-		byte a;
+		Byte a;
 
 	public:
 		/// <summary>
@@ -46,7 +46,7 @@ namespace minty
 		/// <param name="r"></param>
 		/// <param name="g"></param>
 		/// <param name="b"></param>
-		Color(byte const r, byte const g, byte const b);
+		Color(Byte const r, Byte const g, Byte const b);
 
 		/// <summary>
 		/// Creates a color using the given red, green, blue and alpha values.
@@ -55,7 +55,7 @@ namespace minty
 		/// <param name="g"></param>
 		/// <param name="b"></param>
 		/// <param name="a"></param>
-		Color(byte const r, byte const g, byte const b, byte const a);
+		Color(Byte const r, Byte const g, Byte const b, Byte const a);
 
 		/// <summary>
 		/// Creates a color using the given packed color value.
@@ -186,7 +186,7 @@ namespace minty
 		inline static Color error() { return Color(255, 0, 255, 255); }
 
 	public:
-		friend std::string to_string(Color const color);
+		friend String to_string(Color const color);
 	};
 }
 

@@ -19,17 +19,17 @@ namespace minty::rendering
 		/// <summary>
 		/// The name of the Shader.
 		/// </summary>
-		std::string name;
+		String name;
 
 		/// <summary>
 		/// The push constant infos.
 		/// </summary>
-		std::unordered_map<std::string, PushConstantInfo> pushConstantInfos;
+		std::unordered_map<String, PushConstantInfo> pushConstantInfos;
 
 		/// <summary>
 		/// The uniform constant infos.
 		/// </summary>
-		std::unordered_map<std::string, UniformConstantInfo> uniformConstantInfos;
+		std::unordered_map<String, UniformConstantInfo> uniformConstantInfos;
 
 		/// <summary>
 		/// Gets the descriptor set layout bindings for the given set.

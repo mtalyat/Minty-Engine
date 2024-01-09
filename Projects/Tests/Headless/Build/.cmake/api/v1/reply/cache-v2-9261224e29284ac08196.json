@@ -27,7 +27,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "c:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build"
+			"value" : "c:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/Headless/Build"
 		},
 		{
 			"name" : "CMAKE_CACHE_MAJOR_VERSION",
@@ -51,7 +51,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "26"
+			"value" : "27"
 		},
 		{
 			"name" : "CMAKE_CACHE_PATCH_VERSION",
@@ -63,7 +63,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "4"
+			"value" : "5"
 		},
 		{
 			"name" : "CMAKE_COMMAND",
@@ -75,7 +75,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cmake.exe"
+			"value" : "C:/Users/mitch/source/repos/Minty-Engine/Editor/cmake/bin/cmake.exe"
 		},
 		{
 			"name" : "CMAKE_CONFIGURATION_TYPES",
@@ -99,7 +99,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/cpack.exe"
+			"value" : "C:/Users/mitch/source/repos/Minty-Engine/Editor/cmake/bin/cpack.exe"
 		},
 		{
 			"name" : "CMAKE_CTEST_COMMAND",
@@ -111,7 +111,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/bin/ctest.exe"
+			"value" : "C:/Users/mitch/source/repos/Minty-Engine/Editor/cmake/bin/ctest.exe"
 		},
 		{
 			"name" : "CMAKE_CXX_FLAGS",
@@ -302,18 +302,6 @@
 			"value" : "/debug /INCREMENTAL"
 		},
 		{
-			"name" : "CMAKE_EXPORT_COMPILE_COMMANDS",
-			"properties" : 
-			[
-				{
-					"name" : "HELPSTRING",
-					"value" : "No help, variable specified on the command line."
-				}
-			],
-			"type" : "BOOL",
-			"value" : "TRUE"
-		},
-		{
 			"name" : "CMAKE_EXTRA_GENERATOR",
 			"properties" : 
 			[
@@ -335,7 +323,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build/CMakeFiles/pkgRedirects"
+			"value" : "C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/Headless/Build/CMakeFiles/pkgRedirects"
 		},
 		{
 			"name" : "CMAKE_GENERATOR",
@@ -395,7 +383,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build"
+			"value" : "C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/Headless/Build"
 		},
 		{
 			"name" : "CMAKE_INSTALL_PREFIX",
@@ -519,7 +507,7 @@
 				}
 			],
 			"type" : "FILEPATH",
-			"value" : "C:/Program Files (x86)/Windows Kits/10/bin/10.0.22621.0/x86/mt.exe"
+			"value" : "CMAKE_MT-NOTFOUND"
 		},
 		{
 			"name" : "CMAKE_NUMBER_OF_MAKEFILES",
@@ -711,7 +699,7 @@
 				}
 			],
 			"type" : "INTERNAL",
-			"value" : "C:/Program Files/Microsoft Visual Studio/2022/Community/Common7/IDE/CommonExtensions/Microsoft/CMake/CMake/share/cmake-3.26"
+			"value" : "C:/Users/mitch/source/repos/Minty-Engine/Editor/cmake/share/cmake-3.27"
 		},
 		{
 			"name" : "CMAKE_SHARED_LINKER_FLAGS",
@@ -934,18 +922,6 @@
 			"value" : "[C:/Libraries/VulkanSDK/1.3.261.1/Lib/vulkan-1.lib][C:/Libraries/VulkanSDK/1.3.261.1/Include][cfound components: glslc glslangValidator ][v1.3.261()]"
 		},
 		{
-			"name" : "SOURCES",
-			"properties" : 
-			[
-				{
-					"name" : "HELPSTRING",
-					"value" : "STRINGS"
-				}
-			],
-			"type" : "INTERNAL",
-			"value" : "main.cpp"
-		},
-		{
 			"name" : "TestProject_BINARY_DIR",
 			"properties" : 
 			[
@@ -955,7 +931,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build"
+			"value" : "C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/Headless/Build"
 		},
 		{
 			"name" : "TestProject_IS_TOP_LEVEL",
@@ -979,7 +955,7 @@
 				}
 			],
 			"type" : "STATIC",
-			"value" : "C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build"
+			"value" : "C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/Headless/Build"
 		},
 		{
 			"name" : "Vulkan_GLSLANG_VALIDATOR_EXECUTABLE",

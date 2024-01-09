@@ -34,8 +34,8 @@ namespace minty
 			};
 
 			Type const type;
-			std::string const name;
-			std::string const flag;
+			String const name;
+			String const flag;
 			int const index;
 			int const argc;
 
@@ -45,7 +45,7 @@ namespace minty
 			/// <param name="name">The name of the parameter, to get the argument values later.</param>
 			/// <param name="index">The index of the parameter, including the name of the program.</param>
 			/// <param name="argc">The maximum number of string arguments to capture.</param>
-			Parameter(std::string const& name, int const index, int const argc = 1)
+			Parameter(String const& name, int const index, int const argc = 1)
 				: type(Type::POSITIONAL)
 				, name(name)
 				, flag("")
@@ -59,7 +59,7 @@ namespace minty
 			/// <param name="name">The name of the parameter, to get the argument values later.</param>
 			/// <param name="flag">The index of the parameter, including the name of the program.</param>
 			/// <param name="argc">The maximum number of string arguments to capture.</param>
-			Parameter(std::string const& name, std::string const& flag, int const argc = 1)
+			Parameter(String const& name, String const& flag, int const argc = 1)
 				: type(Type::FLAG)
 				, name(name)
 				, flag(flag)
@@ -73,13 +73,13 @@ namespace minty
 		/// </summary>
 		struct Argument
 		{
-			std::vector<std::string> args;
+			std::vector<String> args;
 		};
 
 	private:
 		std::map<int, Parameter> _positionalParams;
-		std::map<std::string, Parameter> _flagParams;
-		std::map<std::string, Argument> _args;
+		std::map<String, Parameter> _flagParams;
+		std::map<String, Argument> _args;
 
 	public:
 		/// <summary>
@@ -100,17 +100,17 @@ namespace minty
 		/// </summary>
 		/// <param name="name">The name of the parameter.</param>
 		/// <returns>True if the argument was found.</returns>
-		bool get_argument(std::string const& name, Argument& arg);
+		bool get_argument(String const& name, Argument& arg);
 
 		/// <summary>
 		/// Checks if the argument was provided, using the given parameter name.
 		/// </summary>
 		/// <param name="name">The name of the parameter to check if it exists.</param>
 		/// <returns>True if the argument was given.</returns>
-		bool get_argument(std::string const& name);
+		bool get_argument(String const& name);
 
 	public:
-		friend std::string to_string(CommandLineParser const& value);
+		friend String to_string(CommandLineParser const& value);
 	};
 }
 

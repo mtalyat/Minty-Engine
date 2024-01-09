@@ -79,7 +79,7 @@ Rect Rect::round(RectF const& rect)
 	return Rect(math::round_to_int(rect.x), math::round_to_int(rect.y), math::round_to_int(rect.width), math::round_to_int(rect.height));
 }
 
-std::string minty::to_string(Rect const& rect)
+String minty::to_string(Rect const& rect)
 {
 	return std::format("Rect({}, {}, {}, {})", rect.x, rect.y, rect.width, rect.height);
 }

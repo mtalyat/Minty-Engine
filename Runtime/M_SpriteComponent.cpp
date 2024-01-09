@@ -15,7 +15,7 @@ void minty::SpriteComponent::deserialize(Reader const& reader)
 	layer = reader.read_int("layer");
 }
 
-std::string minty::to_string(SpriteComponent const& value)
+String minty::to_string(SpriteComponent const& value)
 {
 	return std::format("SpriteComponent(id = {}, layer = {})", value.id, value.layer);
 }

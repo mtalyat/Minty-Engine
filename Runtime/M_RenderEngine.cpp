@@ -95,6 +95,7 @@ RenderEngine::RenderEngine(Window* const window)
 	, _boundIds()
 	, _view()
 	, _backgroundColor({ 250, 220, 192, 255 }) // light tan color
+	, _initialized()
 	, _frame(1)
 {
 	for (size_t i = 0; i < _boundIds.size(); i++)
@@ -104,7 +105,9 @@ RenderEngine::RenderEngine(Window* const window)
 }
 
 RenderEngine::~RenderEngine()
-{}
+{
+	destroy();
+}
 
 void minty::RenderEngine::init(rendering::RenderEngineBuilder const& builder)
 {
@@ -530,9 +533,9 @@ VkImageView RenderEngine::create_image_view(VkImage image, VkFormat format, VkIm
 	return imageView;
 }
 
-VkShaderModule minty::RenderEngine::load_shader_module(std::string const& path) const
+VkShaderModule minty::RenderEngine::load_shader_module(String const& path) const
 {
-	return create_shader_module(asset::load_chars(path));
+	return create_shader_module(Asset::load_chars(path));
 }
 
 VkShaderModule minty::RenderEngine::create_shader_module(std::vector<char> const& code) const
@@ -931,7 +934,7 @@ bool RenderEngine::check_device_extension_support(VkPhysicalDevice device)
 	std::vector<VkExtensionProperties> availableExtensions(extensionCount);
 	vkEnumerateDeviceExtensionProperties(device, nullptr, &extensionCount, availableExtensions.data());
 
-	std::set<std::string> requiredExtensions(deviceExtensions.begin(), deviceExtensions.end());
+	std::set<String> requiredExtensions(deviceExtensions.begin(), deviceExtensions.end());
 
 	for (const auto& extension : availableExtensions) {
 		requiredExtensions.erase(extension.extensionName);
@@ -1240,7 +1243,7 @@ ID minty::RenderEngine::create_mesh()
 	return _meshes.emplace(Mesh(*this));
 }
 
-ID minty::RenderEngine::get_or_create_mesh(std::string const& name)
+ID minty::RenderEngine::get_or_create_mesh(String const& name)
 {
 	// if contains name, return it
 	if (_meshes.contains(name))
@@ -1254,7 +1257,7 @@ ID minty::RenderEngine::get_or_create_mesh(std::string const& name)
 
 ID minty::RenderEngine::get_or_create_mesh(MeshType const type)
 {
-	std::string name = to_string(type);
+	String name = to_string(type);
 
 	// if contains type, return that
 	if (_meshes.contains(name))
@@ -1296,7 +1299,7 @@ ID minty::RenderEngine::get_or_create_mesh(MeshType const type)
 	return id;
 }
 
-ID minty::RenderEngine::find_texture(std::string const& name)
+ID minty::RenderEngine::find_texture(String const& name)
 {
 	if (!_textures.contains(name))
 	{
@@ -1306,7 +1309,7 @@ ID minty::RenderEngine::find_texture(std::string const& name)
 	return _textures.get_id(name);
 }
 
-ID minty::RenderEngine::find_shader(std::string const& name)
+ID minty::RenderEngine::find_shader(String const& name)
 {
 	if (!_shaders.contains(name))
 	{
@@ -1316,7 +1319,7 @@ ID minty::RenderEngine::find_shader(std::string const& name)
 	return _shaders.get_id(name);
 }
 
-ID minty::RenderEngine::find_shader_pass(std::string const& name)
+ID minty::RenderEngine::find_shader_pass(String const& name)
 {
 	if (!_shaderPasses.contains(name))
 	{
@@ -1326,7 +1329,7 @@ ID minty::RenderEngine::find_shader_pass(std::string const& name)
 	return _shaderPasses.get_id(name);
 }
 
-ID minty::RenderEngine::find_material_template(std::string const& name)
+ID minty::RenderEngine::find_material_template(String const& name)
 {
 	if (!_materialTemplates.contains(name))
 	{
@@ -1336,7 +1339,7 @@ ID minty::RenderEngine::find_material_template(std::string const& name)
 	return _materialTemplates.get_id(name);
 }
 
-ID minty::RenderEngine::find_material(std::string const& name)
+ID minty::RenderEngine::find_material(String const& name)
 {
 	if (!_materials.contains(name))
 	{
@@ -1346,7 +1349,7 @@ ID minty::RenderEngine::find_material(std::string const& name)
 	return _materials.get_id(name);
 }
 
-ID minty::RenderEngine::find_mesh(std::string const& name)
+ID minty::RenderEngine::find_mesh(String const& name)
 {
 	if (!_meshes.contains(name))
 	{
@@ -1356,38 +1359,44 @@ ID minty::RenderEngine::find_mesh(std::string const& name)
 	return _meshes.get_id(name);
 }
 
-ID minty::RenderEngine::load_texture(std::string const& path)
-{
-	if (check_asset(path, true))
-	{
-		return ERROR_ID;
-	}
-
-	Node meta = asset::load_meta(path);
-
-	// create texture builder from path and meta file
-	TextureBuilder builder(file::name(path), path);
-
-	builder.filter = from_string_vk_filter(meta.get_string("filter"));
-	builder.format = from_string_vk_format(meta.get_string("format"));
-	builder.addressMode = from_string_vk_sampler_address_mode(meta.get_string("samplerAddressMode"));
-	builder.mipmapMode = from_string_vk_sampler_mipmap_mode(meta.get_string("samplerMipmapMode"));
-	builder.pixelFormat = from_string_texture_builder_pixel_format(meta.get_string("pixelFormat", "RGBA"));
-
-	return create_texture(builder);
-}
-
-ID minty::RenderEngine::load_shader(std::string const& path)
+ID minty::RenderEngine::load_texture(Path const& path)
 {
 	if (check_asset(path, false))
 	{
 		return ERROR_ID;
 	}
 
-	Node meta = asset::load_node(path);
+	Node meta = Asset::load_meta(path);
+
+	// create texture builder from path and meta file
+	TextureBuilder builder
+	{
+		.name = Path(path).stem().string(),
+		.path = path,
+		.pixelData = nullptr,
+		.width = 0,
+		.height = 0,
+		.pixelFormat = from_string_texture_builder_pixel_format(meta.get_string("pixelFormat", "RGBA")),
+		.filter = from_string_vk_filter(meta.get_string("filter", "NEAREST")),
+		.format = from_string_vk_format(meta.get_string("format", "R8G8B8A8_SRGB")),
+		.addressMode = from_string_vk_sampler_address_mode(meta.get_string("samplerAddressMode", "REPEAT")),
+		.mipmapMode = from_string_vk_sampler_mipmap_mode(meta.get_string("samplerMipmapMode", "NEAREST")),
+	};
+
+	return create_texture(builder);
+}
+
+ID minty::RenderEngine::load_shader(Path const& path)
+{
+	if (check_asset(path, false))
+	{
+		return ERROR_ID;
+	}
+
+	Node meta = Asset::load_node(path);
 
 	ShaderBuilder builder;
-	builder.name = file::name(path);
+	builder.name = path.stem().string();
 
 	std::vector<Node> const* nodes;
 	if (nodes = meta.find_all("push"))
@@ -1433,17 +1442,17 @@ ID minty::RenderEngine::load_shader(std::string const& path)
 	return create_shader(builder);
 }
 
-ID minty::RenderEngine::load_shader_pass(std::string const& path)
+ID minty::RenderEngine::load_shader_pass(Path const& path)
 {
 	if (check_asset(path, false))
 	{
 		return ERROR_ID;
 	}
 
-	Node meta = asset::load_node(path);
+	Node meta = Asset::load_node(path);
 
 	ShaderPassBuilder builder;
-	builder.name = file::name(path);
+	builder.name = path.stem().string();
 	builder.shaderId = find_shader(meta.get_string("shader", meta.to_string()));
 	builder.topology = from_string_vk_primitive_topology(meta.get_string("primitiveTopology"));
 	builder.polygonMode = from_string_vk_polygon_mode(meta.get_string("polygonMode"));
@@ -1486,8 +1495,8 @@ ID minty::RenderEngine::load_shader_pass(std::string const& path)
 			ShaderPassBuilder::ShaderStageInfo info;
 
 			info.stage = from_string_vk_shader_stage_flag_bits(child.get_string("stage", child.to_string()));
-			std::string path = child.get_string("path");
-			info.code = asset::load_chars(path);
+			String path = child.get_string("path");
+			info.code = Asset::load_chars(path);
 			info.entry = child.get_string("entry", "main");
 
 			builder.stages.push_back(info);
@@ -1497,17 +1506,17 @@ ID minty::RenderEngine::load_shader_pass(std::string const& path)
 	return create_shader_pass(builder);
 }
 
-ID minty::RenderEngine::load_material_template(std::string const& path)
+ID minty::RenderEngine::load_material_template(Path const& path)
 {
 	if (check_asset(path, false))
 	{
 		return ERROR_ID;
 	}
 
-	Node meta = asset::load_node(path);
+	Node meta = Asset::load_node(path);
 
 	MaterialTemplateBuilder builder;
-	builder.name = file::name(path);
+	builder.name = path.stem().string();
 
 	std::vector<Node> const* nodes;
 	if (nodes = meta.find_all("pass"))
@@ -1531,17 +1540,17 @@ ID minty::RenderEngine::load_material_template(std::string const& path)
 	return create_material_template(builder);
 }
 
-ID minty::RenderEngine::load_material(std::string const& path)
+ID minty::RenderEngine::load_material(Path const& path)
 {
 	if (check_asset(path, false))
 	{
 		return ERROR_ID;
 	}
 
-	Node meta = asset::load_node(path);
+	Node meta = Asset::load_node(path);
 
 	MaterialBuilder builder;
-	builder.name = file::name(path);
+	builder.name = Path(path).stem().string();
 
 	builder.templateId = find_material_template(meta.get_string("template"));
 
@@ -1559,14 +1568,14 @@ ID minty::RenderEngine::load_material(std::string const& path)
 	return create_material(builder);
 }
 
-ID minty::RenderEngine::load_mesh(std::string const& path)
+ID minty::RenderEngine::load_mesh(Path const& path)
 {
 	if (check_asset(path, false))
 	{
 		return ERROR_ID;
 	}
 
-	std::string extension = file::extension(path);
+	String extension = path.extension().string();
 
 	if (extension != ".obj")
 	{
@@ -1575,7 +1584,7 @@ ID minty::RenderEngine::load_mesh(std::string const& path)
 	}
 
 	// override existing mesh with same name
-	std::string name = file::name(path);
+	String name = path.stem().string();
 	ID id = get_or_create_mesh(name);
 
 	// determine how to load the file
@@ -1681,19 +1690,19 @@ void minty::RenderEngine::destroy_assets()
 	_meshes.clear();
 }
 
-int minty::RenderEngine::check_asset(std::string const& path, bool const requiresMeta) const
+int minty::RenderEngine::check_asset(Path const& path, bool const requiresMeta) const
 {
 	// can load if assets exists, and if no meta is required, or if a meta is required, it exists
-	if (!asset::exists(path))
+	if (!Asset::exists(path))
 	{
-		console::error(std::format("Cannot find asset at path \"{}\".", path));
+		console::error(std::format("Cannot find asset at path \"{}\".", path.string()));
 		// cannot find asset itself
 		return 1;
 	}
 
-	if (requiresMeta && !asset::exists_meta(path))
+	if (requiresMeta && !Asset::exists_meta(path))
 	{
-		console::error(std::format("Cannot find meta file for asset at path \"{}\".", path));
+		console::error(std::format("Cannot find meta file for asset at path \"{}\".", path.string()));
 		// cannot find asset meta file
 		return 2;
 	}
@@ -1702,13 +1711,13 @@ int minty::RenderEngine::check_asset(std::string const& path, bool const require
 	return 0;
 }
 
-void minty::RenderEngine::load_mesh_obj(std::string const& path, ID const id)
+void minty::RenderEngine::load_mesh_obj(Path const& path, ID const id)
 {
-	Node meta = asset::load_meta(path);
+	Node meta = Asset::load_meta(path);
 
 	Mesh& mesh = get_mesh(id);
 
-	std::vector<std::string> lines = asset::load_lines(path);
+	std::vector<String> lines = Asset::load_lines(path);
 
 	std::vector<Vector3> positions;
 	std::vector<Vector2> coords;
@@ -1719,7 +1728,7 @@ void minty::RenderEngine::load_mesh_obj(std::string const& path, ID const id)
 	std::vector<uint16_t> indices;
 
 	std::istringstream ss;
-	std::string token;
+	String token;
 
 	for (auto const& line : lines)
 	{
@@ -1754,7 +1763,7 @@ void minty::RenderEngine::load_mesh_obj(std::string const& path, ID const id)
 			// get pairs
 			for (size_t i = 0; i < 3; i++)
 			{
-				std::string set;
+				String set;
 				ss >> set;
 
 				std::istringstream setss(set);
@@ -2069,7 +2078,7 @@ void minty::RenderEngine::set_buffer(ID const id, void* const data, VkDeviceSize
 	// offset if needed
 	if (offset)
 	{
-		byte* temp = static_cast<byte*>(mappedData);
+		Byte* temp = static_cast<Byte*>(mappedData);
 
 		temp += offset;
 
@@ -2343,6 +2352,11 @@ void RenderEngine::create_sync_objects()
 
 void RenderEngine::destroy()
 {
+	if (!_initialized)
+	{
+		return;
+	}
+
 	sync();
 
 	// clean up vulkan
@@ -2370,6 +2384,8 @@ void RenderEngine::destroy()
 	}
 	vkDestroySurfaceKHR(instance, _surface, nullptr);
 	vkDestroyInstance(instance, nullptr);
+
+	_initialized = false;
 }
 
 void minty::RenderEngine::bind(VkCommandBuffer const commandBuffer)
@@ -2461,7 +2477,7 @@ void minty::RenderEngine::sync()
 	vkDeviceWaitIdle(_device);
 }
 
-std::string minty::to_string(RenderEngine const& value)
+String minty::to_string(RenderEngine const& value)
 {
 	return std::format("RenderEngine()");
 }

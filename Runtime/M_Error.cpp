@@ -7,7 +7,7 @@
 using namespace minty;
 using namespace minty::error;
 
-void minty::error::abort(std::string const& message)
+void minty::error::abort(String const& message)
 {
 	// print error
 	console::error(message);

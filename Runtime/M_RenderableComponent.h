@@ -10,6 +10,6 @@ namespace minty
 	struct RenderableComponent
 		: public Component
 	{
-		friend std::string to_string(RenderableComponent const& value);
+		friend String to_string(RenderableComponent const& value);
 	};
 }

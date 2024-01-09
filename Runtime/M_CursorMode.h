@@ -11,5 +11,5 @@ namespace minty
 		Disabled,
 	};
 
-	std::string to_string(CursorMode const mode);
+	String to_string(CursorMode const mode);
 }

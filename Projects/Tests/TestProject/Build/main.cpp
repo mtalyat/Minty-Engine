@@ -1,5 +1,7 @@
-// 2023-12-14 04:05:49
+// 2023-12-29 04:34:32
 #include <Minty.h>
+#include <string>
+#include <format>
 #include <filesystem>
 #include "../Assets/Scripts/init.h"
 int main(int argc, char const* argv[]) {
@@ -7,8 +9,8 @@ int main(int argc, char const* argv[]) {
 	minty::console::log(std::filesystem::current_path().string());
 	minty::Info info("TestProject - HARD CODED NAME", 0, 0, 0);
 	minty::Runtime rt(info);
-	init(rt);
+	if(int code = init(rt)) { minty::console::error(std::format("Failed to init program with error code {}.", code)); return code; }
 	int result = rt.run();
-	destroy(rt);
+	if(int code = destroy(rt)) { minty::console::error(std::format("Failed to destroy program with error code {}.", code)); return code; }
 	return result;
 }

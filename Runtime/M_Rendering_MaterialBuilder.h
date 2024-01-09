@@ -14,7 +14,7 @@ namespace minty::rendering
 		/// <summary>
 		/// The name of the Material.
 		/// </summary>
-		std::string name;
+		String name;
 		
 		/// <summary>
 		/// The MaterialTemplate ID.
@@ -24,6 +24,6 @@ namespace minty::rendering
 		/// <summary>
 		/// The values to set.
 		/// </summary>
-		std::unordered_map<std::string, Dynamic> values;
+		std::unordered_map<String, Dynamic> values;
 	};
 }
