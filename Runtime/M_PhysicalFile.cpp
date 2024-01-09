@@ -10,8 +10,10 @@ minty::PhysicalFile::PhysicalFile()
 {}
 
 minty::PhysicalFile::PhysicalFile(Path const& path, Flags const flags)
-    : File::File(path, flags)
-{}
+    : File::File()
+{
+    open(path, flags);
+}
 
 minty::PhysicalFile::~PhysicalFile()
 {}
@@ -27,6 +29,7 @@ void minty::PhysicalFile::open(Path const& path, Flags const flags)
     close();
 
     _path = path;
+    _flags = flags;
 
     // open the file
     _stream = std::fstream(path, static_cast<std::ios_base::openmode>(flags));

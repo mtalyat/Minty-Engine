@@ -213,6 +213,13 @@ namespace minty
 		bool open(Path const& path, VirtualFile& file) const;
 
 		/// <summary>
+		/// Opens, reads, uncompresses (if needed) and returns the data from the file at the given path.
+		/// </summary>
+		/// <param name="path">The path at which to open a file.</param>
+		/// <returns>The uncompressed data from the file, or an empty vector if no file found.</returns>
+		std::vector<char> read(Path const& path) const;
+
+		/// <summary>
 		/// Gets the Entry at the given index.
 		/// </summary>
 		/// <param name="index"></param>

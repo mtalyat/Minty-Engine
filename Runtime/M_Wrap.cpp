@@ -361,6 +361,45 @@ bool minty::Wrap::open(Path const& path, VirtualFile& file) const
     return true;
 }
 
+std::vector<char> minty::Wrap::read(Path const& path) const
+{
+    VirtualFile file;
+
+    if (!open(path, file))
+    {
+        // could not open
+        return std::vector<char>();
+    }
+
+    // read all data from file
+    Entry const& entry = get_entry(path);
+    File::Size fileSize = static_cast<File::Size>(entry.compressedSize);
+    Byte* fileData = new Byte[fileSize];
+    file.read(fileData, fileSize);
+
+    // uncompress it
+    unsigned long sourceSize = static_cast<unsigned long>(entry.compressedSize);
+    unsigned long size = static_cast<unsigned long>(entry.uncompressedSize);
+    Byte* data = new Byte[size];
+    if (uncompress(data, size, fileData, sourceSize))
+    {
+        console::error(std::format("Failed to uncompress file \"{}\" in Wrap file.", path.string()));
+        return std::vector<char>();
+    }
+
+    // done with file data
+    delete[] fileData;
+
+    // add to vector
+    std::vector<char> result(size);
+    memcpy(result.data(), data, size);
+
+    // done with data
+    delete[] data;
+
+    return result;
+}
+
 Wrap::Entry const& minty::Wrap::get_entry(size_t const index) const
 {
     return _entries.at(index);

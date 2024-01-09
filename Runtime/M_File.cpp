@@ -7,26 +7,6 @@
 
 using namespace minty;
 
-minty::File::File()
-    : _path()
-    , _flags()
-{}
-
-minty::File::File(Path const& path, Flags const flags)
-    : _path()
-    , _flags()
-{
-    open(path, flags);
-}
-
-minty::File::~File()
-{}
-
-bool minty::File::read_line(String& line)
-{
-    return read_line(line, '\n');
-}
-
 std::vector<char> minty::File::read_all_chars(Path const& path)
 {
     if (!std::filesystem::exists(path))

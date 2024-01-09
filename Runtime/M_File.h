@@ -50,15 +50,21 @@ namespace minty
 		/// <summary>
 		/// Creates an empty File object.
 		/// </summary>
-		File();
+		File()
+			: _path()
+			, _flags()
+		{}
 
 		/// <summary>
-		/// Creates a File object and opens the file at the given path.
+		/// Creates a File object and saves the given path and open flags.
 		/// </summary>
 		/// <param name="path">The path to the file.</param>
-		File(Path const& path, Flags const flags);
+		File(Path const& path, Flags const flags)
+			: _path(path)
+			, _flags(_flags)
+		{}
 
-		virtual ~File();
+		virtual ~File() {}
 
 		/// <summary>
 		/// Returns true if this File is open.
@@ -157,7 +163,10 @@ namespace minty
 		/// Reads the next line of text, and moves the cursor the appropriate amount of bytes.
 		/// </summary>
 		/// <returns></returns>
-		bool read_line(String& line);
+		bool read_line(String& line)
+		{
+			return read_line(line, '\n');
+		}
 
 		/// <summary>
 		/// Reads the next line of text, and moves the cursor the appropriate amount of bytes.

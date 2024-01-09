@@ -21,6 +21,8 @@ namespace minty
 
 		VirtualFile(Path const& path, Flags const flags, Position const offset, Size const size);
 
+		virtual ~VirtualFile();
+
 		virtual void open(Path const& path, Flags const flags, Position const offset, Size const size);
 
 		virtual void seek_read(Position const offset, Direction dir = Direction::Begin) override;

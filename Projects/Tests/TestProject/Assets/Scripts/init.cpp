@@ -25,9 +25,9 @@ int init(Runtime &runtime)
 
     // add files in Assets folder only, no sub folders
     wrap.emplace(Asset::absolute("Data/pumpkin_tex.jpg"), "pumpkin_tex.jpg", CompressionLevel::None);
-    wrap.emplace(Asset::absolute("Data/pumpkin_tex.jpg.meta"), "pumpkin_tex.jpg.meta", CompressionLevel::None);
-    wrap.emplace(Asset::absolute("Data/pumpkin.obj"), "pumpkin.obj", CompressionLevel::Default);
-    wrap.emplace(Asset::absolute("Data/test.txt"), "test.txt", CompressionLevel::None);
+    wrap.emplace(Asset::absolute("Data/pumpkin_tex.jpg.meta"), "pumpkin_tex.jpg.meta", CompressionLevel::Low);
+    wrap.emplace(Asset::absolute("Data/pumpkin.obj"), "pumpkin.obj", CompressionLevel::High);
+    wrap.emplace(Asset::absolute("Data/test.txt"), "test.txt", CompressionLevel::Default);
 
     // check if files are in there
     console::log("After writing:");
@@ -49,29 +49,9 @@ int init(Runtime &runtime)
 
     // write test.txt file
     console::log("Test.txt contents from .wrap file:");
-    VirtualFile file;
-    wrap2.open("Data/test.txt", file);
-    String line;
-    while(file.read_line(line))
-    {
-        console::log(line);
-    }
-    file.close();
-
-    // create Wrapper
-    Wrapper wrapper;
-
-    // add the wrap file
-    wrapper.emplace(Asset::absolute("wrap.wrap"));
-
-    // print text file again
-    wrapper.open("Data/test.txt", file);
-
-    while(file.read_line(line))
-    {
-        console::log(line);
-    }
-    file.close();
+    std::vector<char> text = wrap2.read("Data/test.txt");
+    text.push_back(0);
+    console::log(text.data());
 
     return 1;
 

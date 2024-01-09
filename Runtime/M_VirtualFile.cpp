@@ -19,6 +19,9 @@ minty::VirtualFile::VirtualFile(Path const& path, Flags const flags, Position co
     open(path, flags, offset, size);
 }
 
+minty::VirtualFile::~VirtualFile()
+{}
+
 void minty::VirtualFile::open(Path const& path, Flags const flags, Position const offset, Size const size)
 {
     PhysicalFile::open(path, flags);

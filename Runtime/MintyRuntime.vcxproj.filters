@@ -450,9 +450,6 @@
     <ClInclude Include="M_VirtualFile.h">
       <Filter>Header Files\Files</Filter>
     </ClInclude>
-    <ClInclude Include="M_ZipFile.h">
-      <Filter>Header Files\Files</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
