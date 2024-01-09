@@ -20,41 +20,6 @@ InputMap input;
 // called when the engine is initialized
 int init(Runtime &runtime)
 {
-    // create wrap file
-    Wrap wrap(Asset::absolute("wrap.wrap"), "test", 10, "Data/");
-
-    // add files in Assets folder only, no sub folders
-    wrap.emplace(Asset::absolute("Data/pumpkin_tex.jpg"), "pumpkin_tex.jpg", CompressionLevel::None);
-    wrap.emplace(Asset::absolute("Data/pumpkin_tex.jpg.meta"), "pumpkin_tex.jpg.meta", CompressionLevel::Low);
-    wrap.emplace(Asset::absolute("Data/pumpkin.obj"), "pumpkin.obj", CompressionLevel::High);
-    wrap.emplace(Asset::absolute("Data/test.txt"), "test.txt", CompressionLevel::Default);
-
-    // check if files are in there
-    console::log("After writing:");
-    console::log("pumpkin_tex.jpg: " + std::to_string(wrap.exists("Data/pumpkin_tex.jpg")));
-    console::log("pumpkin_tex.jpg.meta: " + std::to_string(wrap.exists("Data/pumpkin_tex.jpg.meta")));
-    console::log("pumpkin.obj: " + std::to_string(wrap.exists("Data/pumpkin.obj")));
-    console::log("test.txt: " + std::to_string(wrap.exists("Data/test.txt")));
-    console::log("");
-
-    Wrap wrap2(Asset::absolute("wrap.wrap"));
-
-    // check if files are in there
-    console::log("After reading:");
-    console::log("pumpkin_tex.jpg: " + std::to_string(wrap2.exists("Data/pumpkin_tex.jpg")));
-    console::log("pumpkin_tex.jpg.meta: " + std::to_string(wrap2.exists("Data/pumpkin_tex.jpg.meta")));
-    console::log("pumpkin.obj: " + std::to_string(wrap2.exists("Data/pumpkin.obj")));
-    console::log("test.txt: " + std::to_string(wrap2.exists("Data/test.txt")));
-    console::log("");
-
-    // write test.txt file
-    console::log("Test.txt contents from .wrap file:");
-    std::vector<char> text = wrap2.read("Data/test.txt");
-    text.push_back(0);
-    console::log(text.data());
-
-    return 1;
-
     try
     {
         // components
