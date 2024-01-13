@@ -1,7 +1,7 @@
 # Minty Engine
 A 3D game engine.
 
-NOTE: This project is in development. More info on how to use, etc. will come in due time.
+NOTE: This project is in development. More info on how to use, etc. will come in due time. Please check out the development branch for the most recent features that have been added.
 
 ## About
 
