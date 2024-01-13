@@ -1536,8 +1536,8 @@ ID minty::RenderEngine::load_sprite(Path const& path, String const& name)
 		.textureId = find_texture(meta.get_string("texture")),
 		.materialId = find_material(meta.get_string("material")),
 		.mode = from_string_pixel_coordinate_mode(meta.get_string("coordinateMode")),
-		.minimum = meta.get_vector2("min", Vector2(0.0f, 0.0f)),
-		.maximum = meta.get_vector2("max", Vector2(1.0f, 1.0f)),
+		.minCoords = meta.get_vector2("min", Vector2(0.0f, 0.0f)),
+		.maxCoords = meta.get_vector2("max", Vector2(1.0f, 1.0f)),
 		.pivot = meta.get_vector2("pivot", Vector2(0.5f, 0.5f)),
 		.size = meta.get_vector2("size", Vector2(1.0f, 1.0f)),
 	};

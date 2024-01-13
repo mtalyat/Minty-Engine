@@ -11,8 +11,8 @@ minty::Sprite::Sprite(rendering::SpriteBuilder const& builder, RenderEngine& ren
 	: RenderObject::RenderObject(renderer)
 	, _textureId(builder.textureId)
 	, _materialId(builder.materialId)
-	, _minCoords(builder.minimum)
-	, _maxCoords(builder.maximum)
+	, _minCoords(builder.minCoords)
+	, _maxCoords(builder.maxCoords)
 	, _pivot(builder.pivot)
 	, _size(builder.size)
 {

@@ -37,12 +37,12 @@ namespace minty::rendering
 		/// <summary>
 		/// The minimum position of the Sprite within the Texture.
 		/// </summary>
-		Vector2 minimum = Vector2(0.0f, 0.0f);
+		Vector2 minCoords = Vector2(0.0f, 0.0f);
 
 		/// <summary>
 		/// The maximum position of the Sprite within the Texture.
 		/// </summary>
-		Vector2 maximum = Vector2(1.0f, 1.0f);
+		Vector2 maxCoords = Vector2(1.0f, 1.0f);
 
 		/// <summary>
 		/// The offset to the center of the Sprite when rendered.

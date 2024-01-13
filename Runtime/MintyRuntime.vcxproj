@@ -229,6 +229,7 @@
     <ClInclude Include="M_Rendering_PixelFormat.h" />
     <ClInclude Include="M_Rendering_SpritePushData.h" />
     <ClInclude Include="M_Rendering_SpriteBuilder.h" />
+    <ClInclude Include="M_Rendering_TextureAtlasBuilder.h" />
     <ClInclude Include="M_Rendering_UIPushData.h" />
     <ClInclude Include="M_Resource.h" />
     <ClInclude Include="M_SerializationData.h" />
@@ -298,6 +299,7 @@
     <ClInclude Include="M_RenderEngine.h" />
     <ClInclude Include="M_Runtime.h" />
     <ClInclude Include="M_Stopwatch.h" />
+    <ClInclude Include="M_TextureAtlas.h" />
     <ClInclude Include="M_Transform.h" />
     <ClInclude Include="M_TransformComponent.h" />
     <ClInclude Include="M_Types.h" />
@@ -414,6 +416,7 @@
     <ClCompile Include="M_RenderEngine.cpp" />
     <ClCompile Include="M_Runtime.cpp" />
     <ClCompile Include="M_Stopwatch.cpp" />
+    <ClCompile Include="M_TextureAtlas.cpp" />
     <ClCompile Include="M_Transform.cpp" />
     <ClCompile Include="M_TransformComponent.cpp" />
     <ClCompile Include="M_SpriteComponent.cpp" />
