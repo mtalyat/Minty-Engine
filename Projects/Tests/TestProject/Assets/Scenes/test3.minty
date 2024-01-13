@@ -1,0 +1,43 @@
+Systems
+    CameraController
+    Move
+    Test
+Entities
+    Camera
+        Transform
+            position
+                z: -4
+        Camera
+            perspective: 1
+            near: 0.1
+            far: 100.0
+        Move
+        AudioListener
+    Model
+        Renderable
+        Transform
+        Mesh
+            material: pumpkinMat
+            type: custom
+            name: pumpkin
+        AudioSource
+            clip: cow-bells
+#        Test
+#            rotationSpeed
+#                y: 1.0
+#    Sphere
+#        Renderable
+#        Transform
+#            position
+#                y: 2
+#        Mesh
+#            material: material2
+#            type: sphere
+#    Cylinder
+#        Renderable
+#        Transform
+#            position
+#                y: -2
+#        Mesh
+#            material: material3
+#            type: cylinder

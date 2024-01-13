@@ -35,11 +35,11 @@ String minty::string::to_upper(String const& string)
 	return String(data.data());
 }
 
-String minty::string::to_bytes(void* const data, size_t const size)
+String minty::string::to_bytes(void const* const data, size_t const size)
 {
 	String result = "";
 
-	Byte* bytes = static_cast<Byte*>(data);
+	Byte const* bytes = static_cast<Byte const*>(data);
 
 	for (size_t i = size; i-- > 0;)
 	{
@@ -54,11 +54,11 @@ String minty::string::to_bytes(void* const data, size_t const size)
 	return result;
 }
 
-String minty::string::to_bits(void* const data, size_t const size)
+String minty::string::to_bits(void const* const data, size_t const size)
 {
 	String result = "";
 
-	Byte* bytes = static_cast<Byte*>(data);
+	Byte const* bytes = static_cast<Byte const*>(data);
 
 	for (size_t i = size; i-- > 0;)
 	{

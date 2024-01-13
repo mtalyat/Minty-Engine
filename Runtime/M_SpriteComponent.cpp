@@ -1,21 +1,29 @@
 #include "pch.h"
 #include "M_SpriteComponent.h"
 
+#include "M_SerializationData.h"
+
 using namespace minty;
 
 void minty::SpriteComponent::serialize(Writer& writer) const
 {
-	writer.write("id", id, 0);
+	SerializationData const* data = static_cast<SerializationData const*>(writer.get_data());
+	RenderEngine const& renderEngine = data->scene->get_engine()->get_render_engine();
+
+	writer.write("sprite", renderEngine.get_sprite_name(spriteId));
 	writer.write("layer", layer, 0);
 }
 
 void minty::SpriteComponent::deserialize(Reader const& reader)
 {
-	id = reader.read_id("id");
+	SerializationData const* data = static_cast<SerializationData const*>(reader.get_data());
+	RenderEngine const& renderEngine = data->scene->get_engine()->get_render_engine();
+
+	spriteId = renderEngine.find_sprite(reader.read_string("sprite"));
 	layer = reader.read_int("layer");
 }
 
 String minty::to_string(SpriteComponent const& value)
 {
-	return std::format("SpriteComponent(id = {}, layer = {})", value.id, value.layer);
+	return std::format("SpriteComponent(id = {}, layer = {})", value.spriteId, value.layer);
 }

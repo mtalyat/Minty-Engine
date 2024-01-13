@@ -25,6 +25,7 @@
 
 #include "M_Rendering_Buffer.h"
 #include "M_Rendering_TextureBuilder.h"
+#include "M_Rendering_SpriteBuilder.h"
 #include "M_Rendering_ShaderBuilder.h"
 #include "M_Rendering_ShaderPassBuilder.h"
 #include "M_Rendering_MaterialTemplateBuilder.h"
@@ -352,6 +353,13 @@ namespace minty
 		ID create_texture(rendering::TextureBuilder const& builder);
 
 		/// <summary>
+		/// Creates a new Sprite using the given builder, then returns its ID.
+		/// </summary>
+		/// <param name="builder">The rendering builder to use.</param>
+		/// <returns>The ID of the newly created asset.</returns>
+		ID create_sprite(rendering::SpriteBuilder const& builder);
+
+		/// <summary>
 		/// Creates a new Shader using the given builder, then returns its ID.
 		/// </summary>
 		/// <param name="builder">The rendering builder to use.</param>
@@ -405,42 +413,98 @@ namespace minty
 		/// </summary>
 		/// <param name="name">The name of the asset to find.</param>
 		/// <returns>The ID of the asset, or ERROR_ID if none was found with the given name.</returns>
-		ID find_texture(String const& name);
+		ID find_texture(String const& name) const;
+
+		/// <summary>
+		/// Finds the ID of the loaded Sprite with the given name.
+		/// </summary>
+		/// <param name="name">The name of the asset to find.</param>
+		/// <returns>The ID of the asset, or ERROR_ID if none was found with the given name.</returns>
+		ID find_sprite(String const& name) const;
 
 		/// <summary>
 		/// Finds the ID of the loaded Shader with the given name.
 		/// </summary>
 		/// <param name="name">The name of the asset to find.</param>
 		/// <returns>The ID of the asset, or ERROR_ID if none was found with the given name.</returns>
-		ID find_shader(String const& name);
+		ID find_shader(String const& name) const;
 
 		/// <summary>
 		/// Finds the ID of the loaded ShaderPass with the given name.
 		/// </summary>
 		/// <param name="name">The name of the asset to find.</param>
 		/// <returns>The ID of the asset, or ERROR_ID if none was found with the given name.</returns>
-		ID find_shader_pass(String const& name);
+		ID find_shader_pass(String const& name) const;
 
 		/// <summary>
 		/// Finds the ID of the loaded MaterialTemplate with the given name.
 		/// </summary>
 		/// <param name="name">The name of the asset to find.</param>
 		/// <returns>The ID of the asset, or ERROR_ID if none was found with the given name.</returns>
-		ID find_material_template(String const& name);
+		ID find_material_template(String const& name) const;
 
 		/// <summary>
 		/// Finds the ID of the loaded Material with the given name.
 		/// </summary>
 		/// <param name="name">The name of the asset to find.</param>
 		/// <returns>The ID of the asset, or ERROR_ID if none was found with the given name.</returns>
-		ID find_material(String const& name);
+		ID find_material(String const& name) const;
 
 		/// <summary>
 		/// Finds the ID of the loaded Mesh with the given name.
 		/// </summary>
 		/// <param name="name">The name of the asset to find.</param>
 		/// <returns>The ID of the asset, or ERROR_ID if none was found with the given name.</returns>
-		ID find_mesh(String const& name);
+		ID find_mesh(String const& name) const;
+
+		/// <summary>
+		/// Finds the name of the loaded Texture with the given ID.
+		/// </summary>
+		/// <param name="id">The ID of the asset to get the name of.</param>
+		/// <returns>The name of the given asset, or "" if no asset was found with the given ID.</returns>
+		String get_texture_name(ID const id) const;
+
+		/// <summary>
+		/// Finds the name of the loaded Sprite with the given ID.
+		/// </summary>
+		/// <param name="id">The ID of the asset to get the name of.</param>
+		/// <returns>The name of the given asset, or "" if no asset was found with the given ID.</returns>
+		String get_sprite_name(ID const id) const;
+
+		/// <summary>
+		/// Finds the name of the loaded Shader with the given ID.
+		/// </summary>
+		/// <param name="id">The ID of the asset to get the name of.</param>
+		/// <returns>The name of the given asset, or "" if no asset was found with the given ID.</returns>
+		String get_shader_name(ID const id) const;
+
+		/// <summary>
+		/// Finds the name of the loaded ShaderPass with the given ID.
+		/// </summary>
+		/// <param name="id">The ID of the asset to get the name of.</param>
+		/// <returns>The name of the given asset, or "" if no asset was found with the given ID.</returns>
+		String get_shader_pass_name(ID const id) const;
+
+		/// <summary>
+		/// Finds the name of the loaded MaterialTemplate with the given ID.
+		/// </summary>
+		/// <param name="id">The ID of the asset to get the name of.</param>
+		/// <returns>The name of the given asset, or "" if no asset was found with the given ID.</returns>
+		String get_material_template_name(ID const id) const;
+
+		/// <summary>
+		/// Finds the name of the loaded Material with the given ID.
+		/// </summary>
+		/// <param name="id">The ID of the asset to get the name of.</param>
+		/// <returns>The name of the given asset, or "" if no asset was found with the given ID.</returns>
+		String get_material_name(ID const id) const;
+
+		/// <summary>
+		/// Finds the name of the loaded Mesh with the given ID.
+		/// </summary>
+		/// <param name="id">The ID of the asset to get the name of.</param>
+		/// <returns>The name of the given asset, or "" if no asset was found with the given ID.</returns>
+		String get_mesh_name(ID const id) const;
 
 		/// <summary>
 		/// Loads the Texture at the given asset path into this RenderEngine.
@@ -448,6 +512,13 @@ namespace minty
 		/// <param name="path">The path relative to the Assets folder.</param>
 		/// <returns>The ID of the newly loaded asset.</returns>
 		ID load_texture(Path const& path);
+
+		/// <summary>
+		/// Loads the Sprite at the given asset path into this RenderEngine.
+		/// </summary>
+		/// <param name="path">The path relative to the Assets folder.</param>
+		/// <returns>The ID of the newly loaded asset.</returns>
+		ID load_sprite(Path const& path);
 
 		/// <summary>
 		/// Loads the Shader at the given asset path into this RenderEngine.
@@ -491,6 +562,12 @@ namespace minty
 		void destroy_texture(ID const id);
 
 		/// <summary>
+		/// Destroys the Sprite with the given ID.
+		/// </summary>
+		/// <param name="id">The ID of the asset to destroy.</param>
+		void destroy_sprite(ID const id);
+
+		/// <summary>
 		/// Destroys the Shader with the given ID.
 		/// </summary>
 		/// <param name="id">The ID of the asset to destroy.</param>
@@ -525,6 +602,8 @@ namespace minty
 		/// </summary>
 		void destroy_assets();
 	private:
+		void load_descriptor_values(std::unordered_map<String, Dynamic>& values, Node const& node, std::vector<rendering::UniformConstantInfo> const& infos) const;
+
 		/// <summary>
 		/// Checks if the asset at the given path can be loaded.
 		/// </summary>
@@ -722,7 +801,7 @@ namespace minty
 		/// </summary>
 		/// <param name="id">The ID of the buffer to modify.</param>
 		/// <param name="data">The data to set to the buffer.</param>
-		void set_buffer(ID const id, void* const data);
+		void set_buffer(ID const id, void const* const data);
 
 		/// <summary>
 		/// Sets the data for the buffer with the given ID.
@@ -731,7 +810,7 @@ namespace minty
 		/// <param name="data">The data to set to the buffer.</param>
 		/// <param name="size">The size of the data in bytes.</param>
 		/// <param name="offset">The offset of the data within the buffer in bytes.</param>
-		void set_buffer(ID const id, void* const data, VkDeviceSize const size, VkDeviceSize const offset = 0);
+		void set_buffer(ID const id, void const* const data, VkDeviceSize const size, VkDeviceSize const offset = 0);
 
 		/// <summary>
 		/// Gets the buffer with the given ID.
@@ -771,9 +850,11 @@ namespace minty
 #pragma region Drawing
 
 	private:
+		void draw_scene(VkCommandBuffer commandBuffer);
+
 		void draw_mesh(VkCommandBuffer commandBuffer, Matrix4 const& transformationMatrix, MeshComponent const& meshComponent);
 
-		void draw_scene(VkCommandBuffer commandBuffer);
+		void draw_sprite(VkCommandBuffer commandBuffer, TransformComponent const& transformComponent, SpriteComponent const& spriteComponent);
 
 		void draw_ui(VkCommandBuffer commandBuffer, UITransformComponent const& uiComponent, SpriteComponent const& spriteComponent);
 

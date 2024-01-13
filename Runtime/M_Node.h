@@ -1,6 +1,7 @@
 #pragma once
 
 #include "M_Types.h"
+#include "M_Vector.h"
 #include <string>
 #include <vector>
 #include <map>
@@ -163,6 +164,8 @@ namespace minty
 		/// <param name="defaultValue">The default value to use if no child found.</param>
 		/// <returns>The value found within the child node.</returns>
 		bool get_bool(String const& name, bool const defaultValue = false) const;
+
+		Vector2 get_vector2(String const& name, Vector2 const defaultValue = Vector2()) const;
 
 #pragma endregion
 

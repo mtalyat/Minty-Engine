@@ -223,8 +223,13 @@
     <ClInclude Include="M_AudioSourceComponent.h" />
     <ClInclude Include="M_Builtin.h" />
     <ClInclude Include="M_Compression.h" />
+    <ClInclude Include="M_Macros.h" />
     <ClInclude Include="M_PhysicalFile.h" />
+    <ClInclude Include="M_PixelCoordinateMode.h" />
     <ClInclude Include="M_Rendering_PixelFormat.h" />
+    <ClInclude Include="M_Rendering_SpritePushData.h" />
+    <ClInclude Include="M_Rendering_SpriteBuilder.h" />
+    <ClInclude Include="M_Rendering_UIPushData.h" />
     <ClInclude Include="M_Resource.h" />
     <ClInclude Include="M_SerializationData.h" />
     <ClInclude Include="M_Dynamic.h" />
@@ -369,6 +374,7 @@
     <ClCompile Include="M_File.cpp" />
     <ClCompile Include="M_Engine.cpp" />
     <ClCompile Include="M_PhysicalFile.cpp" />
+    <ClCompile Include="M_PixelCoordinateMode.cpp" />
     <ClCompile Include="M_Rendering_PixelFormat.cpp" />
     <ClCompile Include="M_Material.cpp" />
     <ClCompile Include="M_RelationshipComponent.cpp" />

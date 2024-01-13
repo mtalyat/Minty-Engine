@@ -17,27 +17,15 @@ Entities
         Renderable
         Transform
         Mesh
-            material: pumpkinMat
-            type: custom
-            name: pumpkin
+            material: material1
+            type: cube
         AudioSource
             clip: cow-bells
-#        Test
-#            rotationSpeed
-#                y: 1.0
-#    Sphere
-#        Renderable
-#        Transform
-#            position
-#                y: 2
-#        Mesh
-#            material: material2
-#            type: sphere
-#    Cylinder
-#        Renderable
-#        Transform
-#            position
-#                y: -2
-#        Mesh
-#            material: material3
-#            type: cylinder
+    Sprite
+        Renderable
+        Transform
+            position
+                y: -1.5
+        Sprite
+            sprite: brian
+            layer: 0

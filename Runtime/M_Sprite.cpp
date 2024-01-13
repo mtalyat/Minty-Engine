@@ -1,25 +1,26 @@
 #include "pch.h"
 #include "M_Sprite.h"
 
+#include "M_RenderEngine.h"
+#include "M_Texture.h"
+
 using namespace minty;
+using namespace minty::rendering;
 
-minty::Sprite::Sprite(ID const materialId)
-	: Sprite(materialId, Vector2(0.0f, 0.0f), Vector2(1.0f, 1.0f), Vector2(0.0f, 0.0f))
-{}
+minty::Sprite::Sprite(rendering::SpriteBuilder const& builder, RenderEngine& renderer)
+	: RenderObject::RenderObject(renderer)
+	, _textureId(builder.textureId)
+	, _materialId(builder.materialId)
+	, _minCoords(builder.minimum)
+	, _maxCoords(builder.maximum)
+	, _pivot(builder.pivot)
+	, _size(builder.size)
+{
+	MINTY_ASSERT(builder.textureId != ERROR_ID, "Cannot create a sprite with ERROR_ID texture id.");
+	MINTY_ASSERT(builder.materialId != ERROR_ID, "Cannot create a sprite with ERROR_ID material id.");
+}
 
-minty::Sprite::Sprite(ID const materialId, Vector2 const pivot)
-	: Sprite(materialId, Vector2(0.0f, 0.0f), Vector2(1.0f, 1.0f), pivot)
-{}
-
-minty::Sprite::Sprite(ID const materialId, Vector2 const minCoords, Vector2 const maxCoords)
-	: Sprite(materialId, minCoords, maxCoords, Vector2(0.0f, 0.0f))
-{}
-
-minty::Sprite::Sprite(ID const materialId, Vector2 const minCoords, Vector2 const maxCoords, Vector2 const pivot)
-	: _materialId(materialId)
-	, _min(minCoords)
-	, _max(maxCoords)
-	, _pivot(pivot)
+void minty::Sprite::destroy()
 {}
 
 ID minty::Sprite::get_material_id() const
@@ -29,12 +30,12 @@ ID minty::Sprite::get_material_id() const
 
 Vector2 minty::Sprite::get_min_coords() const
 {
-	return _min;
+	return _minCoords;
 }
 
 Vector2 minty::Sprite::get_max_coords() const
 {
-	return _max;
+	return _maxCoords;
 }
 
 Vector2 minty::Sprite::get_pivot() const
@@ -42,17 +43,59 @@ Vector2 minty::Sprite::get_pivot() const
 	return _pivot;
 }
 
-void minty::Sprite::set_min_coords(Vector2 const coords)
+Vector2 minty::Sprite::get_size() const
 {
-	_min = coords;
+	return _size;
 }
 
-void minty::Sprite::set_max_coords(Vector2 const coords)
+void minty::Sprite::set_min_coords(Vector2 const coords, PixelCoordinateMode const coordinateMode)
 {
-	_max = coords;
+	switch (coordinateMode)
+	{
+	case PixelCoordinateMode::Normalized:
+		_minCoords = coords;
+		break;
+	case PixelCoordinateMode::Pixel:
+		_minCoords = normalize_coords(coords);
+		break;
+	default:
+		console::error("set_min_coords invalid PixelCoordinateMode.");
+	}
 }
 
-void minty::Sprite::set_pivot(Vector2 const pivot)
+void minty::Sprite::set_max_coords(Vector2 const coords, PixelCoordinateMode const coordinateMode)
 {
-	_pivot = pivot;
+	switch (coordinateMode)
+	{
+	case PixelCoordinateMode::Normalized:
+		_maxCoords = coords;
+		break;
+	case PixelCoordinateMode::Pixel:
+		_maxCoords = normalize_coords(coords);
+		break;
+	default:
+		console::error("set_max_coords invalid PixelCoordinateMode.");
+	}
+}
+
+void minty::Sprite::set_pivot(Vector2 const pivot, PixelCoordinateMode const coordinateMode)
+{
+	switch (coordinateMode)
+	{
+	case PixelCoordinateMode::Normalized:
+		_pivot = pivot;
+		break;
+	case PixelCoordinateMode::Pixel:
+		_pivot = normalize_coords(pivot);
+		break;
+	default:
+		console::error("set_pivot invalid PixelCoordinateMode.");
+	}
+}
+
+Vector2 minty::Sprite::normalize_coords(Vector2 const coords) const
+{
+	Texture const& tex = _renderer.get_texture(_textureId);
+
+	return Vector2(coords.x / static_cast<float>(tex.get_width()), coords.y / static_cast<float>(tex.get_height()));
 }

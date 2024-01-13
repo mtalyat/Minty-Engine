@@ -108,7 +108,7 @@ namespace minty
 		/// </summary>
 		/// <param name="id"></param>
 		/// <returns></returns>
-		String const &get_name(ID const id) const;
+		String get_name(ID const id) const;
 
 		/// <summary>
 		/// Gets the object with the given ID.
@@ -306,7 +306,7 @@ namespace minty
 	}
 
 	template <class T>
-	String const &Register<T>::get_name(ID const id) const
+	String Register<T>::get_name(ID const id) const
 	{
 		auto const& found = _names.find(id);
 

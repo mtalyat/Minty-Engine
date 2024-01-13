@@ -9,93 +9,314 @@ using namespace minty::rendering;
 minty::rendering::DescriptorSet::DescriptorSet(RenderEngine& renderer)
 	: RenderObject::RenderObject(renderer)
 	, _descriptorSets()
+	, _descriptors()
+	, _dirties()
 {}
 
-minty::rendering::DescriptorSet::DescriptorSet(std::array<VkDescriptorSet, MAX_FRAMES_IN_FLIGHT> const& descriptorSets, std::unordered_map<String, std::array<ID, MAX_FRAMES_IN_FLIGHT>> const& buffers, RenderEngine& renderer)
+minty::rendering::DescriptorSet::DescriptorSet(std::array<VkDescriptorSet, MAX_FRAMES_IN_FLIGHT> const& descriptorSets, std::unordered_map<String, std::array<DescriptorData, MAX_FRAMES_IN_FLIGHT>> const& datas, RenderEngine& renderer)
 	: RenderObject::RenderObject(renderer)
 	, _descriptorSets(descriptorSets)
-	, _buffers(buffers)
-{}
-
-void minty::rendering::DescriptorSet::operator=(DescriptorSet const& other)
+	, _descriptors(datas)
+	, _dirties()
 {
-	_descriptorSets = other._descriptorSets;
-	_buffers = other._buffers;
+	// dirty all frames on the start so that they can all be set
+	for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+	{
+		_dirties.emplace(i);
+	}
+}
+
+DescriptorSet& minty::rendering::DescriptorSet::operator=(DescriptorSet const& other)
+{
+	if (&other != this)
+	{
+		_descriptorSets = other._descriptorSets;
+		_descriptors = other._descriptors;
+	}
+
+	return *this;
 }
 
 void minty::rendering::DescriptorSet::destroy()
 {
+	// remove references to all VK descriptor sets, since they not need be destroyed
 	for (size_t i = 0; i < _descriptorSets.size(); i++)
 	{
 		_descriptorSets[i] = VK_NULL_HANDLE;
 	}
-	_buffers.clear();
+	// destroy all buffers for each descriptor
+	for (auto const& data : _descriptors)
+	{
+		for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+		{
+			for (auto const id : data.second.at(i).ids)
+			{
+				_renderer.destroy_buffer(id);
+			}
+		}
+	}
+	_descriptors.clear();
 }
 
-void minty::rendering::DescriptorSet::set(String const& name, void* const value) const
+void minty::rendering::DescriptorSet::set(String const& name, void const* const value)
 {
-	// get buffer ids
-	auto const& bufferIds = _buffers.at(name);
-
-	// set all buffers
-	for (auto const id : bufferIds)
+	if (auto* datas = find_descriptors(name))
 	{
-		_renderer.set_buffer(id, value);
+		for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+		{
+			// assuming size is the same as the buffer
+			set_descriptor(datas->at(i), i, value, 0, 0);
+		}
 	}
 }
 
-void minty::rendering::DescriptorSet::set(String const& name, int const frame, void* const value) const
+void minty::rendering::DescriptorSet::set(String const& name, int const frame, void const* const value)
 {
-	// get buffer id
-	ID bufferId = _buffers.at(name).at(frame);
-
-	// set buffer
-	_renderer.set_buffer(bufferId, value);
-}
-
-void minty::rendering::DescriptorSet::set(String const& name, void* const value, VkDeviceSize const size, VkDeviceSize const offset) const
-{
-	// get buffer ids
-	auto const& bufferIds = _buffers.at(name);
-
-	// set all buffers
-	for (auto const id : bufferIds)
+	if (DescriptorData* data = find_descriptor(name, frame))
 	{
-		_renderer.set_buffer(id, value, offset, size);
+		// assuming size is the same as the buffer
+		set_descriptor(*data, frame, value, 0, 0);
 	}
 }
 
-void minty::rendering::DescriptorSet::set(String const& name, int const frame, void* const value, VkDeviceSize const size, VkDeviceSize const offset) const
+void minty::rendering::DescriptorSet::set(String const& name, void const* const value, VkDeviceSize const size, VkDeviceSize const offset)
 {
-	// get buffer id
-	ID bufferId = _buffers.at(name).at(frame);
-
-	// set buffer
-	_renderer.set_buffer(bufferId, value, offset, size);
-}
-
-void minty::rendering::DescriptorSet::set(String const& name, Dynamic const& value, VkDeviceSize const offset) const
-{
-	auto const& bufferIds = _buffers.at(name);
-
-	for (auto const id : bufferIds)
+	if (auto* datas = find_descriptors(name))
 	{
-		_renderer.set_buffer(id, value.data(), static_cast<VkDeviceSize>(value.size()), offset);
+		for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+		{
+			set_descriptor(datas->at(i), i, value, size, offset);
+		}
 	}
 }
 
-void minty::rendering::DescriptorSet::set(String const& name, int const frame, Dynamic const& value, VkDeviceSize const offset) const
+void minty::rendering::DescriptorSet::set(String const& name, int const frame, void const* const value, VkDeviceSize const size, VkDeviceSize const offset)
 {
-	ID bufferId = _buffers.at(name).at(frame);
-
-	_renderer.set_buffer(bufferId, value.data(), static_cast<VkDeviceSize>(value.size()), offset);
+	if (DescriptorData* data = find_descriptor(name, frame))
+	{
+		set_descriptor(*data, frame, value, size, offset);
+	}
 }
 
-void minty::rendering::DescriptorSet::get(String const& name, int const frame, void* const out) const
+void minty::rendering::DescriptorSet::set(String const& name, Dynamic const& value, VkDeviceSize const offset)
 {
-	ID bufferId = _buffers.at(name).at(frame);
+	if (auto* datas = find_descriptors(name))
+	{
+		for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+		{
+			set_descriptor(datas->at(i), i, value.data(), value.size(), offset);
+		}
+	}
+}
 
-	_renderer.get_buffer_data(bufferId, out);
+void minty::rendering::DescriptorSet::set(String const& name, int const frame, Dynamic const& value, VkDeviceSize const offset)
+{
+	if (DescriptorData* data = find_descriptor(name, frame))
+	{
+		set_descriptor(*data, frame, value.data(), value.size(), offset);
+	}
+}
+
+void minty::rendering::DescriptorSet::apply(int const frame)
+{
+	if (!_dirties.contains(frame))
+	{
+		// this frame is not dirty, do not write descriptors
+		return;
+	}
+
+	// mark as clean
+	_dirties.erase(frame);
+
+	// get the appropriate vk descriptor set for the frame
+	VkDescriptorSet const& set = _descriptorSets.at(frame);
+
+	std::vector<VkWriteDescriptorSet> writes;
+	std::vector<VkDescriptorBufferInfo> bufferInfos;
+	std::vector<std::vector<VkDescriptorImageInfo>> imageInfos;
+
+	for (auto const& pair : _descriptors)
+	{
+		DescriptorData const& data = pair.second.at(frame);
+
+		// if data is empty, skip it
+		if (data.empty)
+		{
+			continue;
+		}
+
+		// create the write data
+		writes.push_back(VkWriteDescriptorSet
+			{
+				.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
+				.pNext = nullptr,
+				.dstSet = set,
+				.dstBinding = data.binding,
+				.dstArrayElement = 0,
+				.descriptorCount = data.count,
+				.descriptorType = data.type,
+				.pImageInfo = nullptr,
+				.pBufferInfo = nullptr,
+				.pTexelBufferView = nullptr,
+			});
+		auto& write = writes.back();
+
+		// do something based on type
+		switch (data.type)
+		{
+		case VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER:
+		{
+			// get buffer id
+			ID bufferId = data.ids.at(0);
+
+			// add buffer info(s)
+			bufferInfos.push_back(VkDescriptorBufferInfo());
+
+			// set buffer info
+			VkDescriptorBufferInfo& bufferInfo = bufferInfos.back();
+			bufferInfo.buffer = _renderer.get_buffer(bufferId);
+			bufferInfo.offset = 0;
+			bufferInfo.range = _renderer.get_buffer_size(bufferId);
+
+			// add buffer info to write
+			write.pBufferInfo = &bufferInfo;
+
+			break;
+		}
+		case VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER:
+		{
+			// create image info descriptor(s)
+			imageInfos.push_back(std::vector<VkDescriptorImageInfo>(data.ids.size()));
+			auto& infos = imageInfos.back();
+
+			// populate with images based on ids
+			for (size_t i = 0; i < data.ids.size(); i++)
+			{
+				ID textureId = data.ids.at(i);
+
+				Texture const& texture = _renderer.get_texture(textureId);
+
+				VkDescriptorImageInfo& info = infos.at(i);
+
+				info.sampler = texture.get_sampler();
+				info.imageView = texture.get_image_view();
+				info.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+			}
+
+			// add image info to write
+			write.pImageInfo = infos.data();
+
+			break;
+		}
+		}
+	}
+
+	// apply all changes, if there were some
+	if (uint32_t count = static_cast<uint32_t>(writes.size()))
+	{
+		vkUpdateDescriptorSets(_renderer.get_device(), count, writes.data(), 0, nullptr);
+	}
+}
+
+void minty::rendering::DescriptorSet::apply()
+{
+	for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+	{
+		apply(i);
+	}
+}
+
+std::array<DescriptorSet::DescriptorData, MAX_FRAMES_IN_FLIGHT>* minty::rendering::DescriptorSet::find_descriptors(String const& name)
+{
+	auto const& found = _descriptors.find(name);
+
+	if (found == _descriptors.end())
+	{
+		return nullptr;
+	}
+
+	return &found->second;
+}
+
+DescriptorSet::DescriptorData* minty::rendering::DescriptorSet::find_descriptor(String const& name, int const frame)
+{
+	if (auto* descriptors = find_descriptors(name))
+	{
+		return &descriptors->at(frame);
+	}
+
+	return nullptr;
+}
+
+void minty::rendering::DescriptorSet::set_descriptor(DescriptorData& data, int const frame, void const* const value, VkDeviceSize const size, VkDeviceSize const offset)
+{
+	// do something based on type
+	switch (data.type)
+	{
+	case VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER:
+	{
+		// get buffer
+		ID bufferId = data.ids.front();
+
+		// set buffer
+		_renderer.set_buffer(bufferId, value, size, offset);
+
+		break;
+	}
+	case VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER:
+	{
+		// assume the input for this was an array of IDs
+		ID const* ids = static_cast<ID const*>(value);
+		size_t count = size / sizeof(ID);
+
+		// apply those to ids in data
+		data.ids.resize(count);
+		memcpy(data.ids.data(), ids, size);
+
+		// mark set as dirty
+		_dirties.emplace(frame);
+
+		break;
+	}
+	default:
+		// do nothing if not any of the above
+		return;
+	}
+
+	// mark as not empty, since it has been set
+	data.empty = false;
+}
+
+bool minty::rendering::DescriptorSet::get(String const& name, int const frame, void* const out) const
+{
+	auto const& found = _descriptors.find(name);
+
+	if (found == _descriptors.end())
+	{
+		return false;
+	}
+
+	switch (found->second.at(frame).type)
+	{
+	case VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER:
+	{
+		// get buffer id
+		ID bufferId = found->second.at(frame).ids.front();
+
+		// set the data
+		_renderer.get_buffer_data(bufferId, out);
+
+		return true;
+	}
+	case VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER:
+	{
+		// do nothing
+		return false;
+	}
+	}
+
+	// type not supported
+	return false;
 }
 
 VkDescriptorSet minty::rendering::DescriptorSet::at(uint32_t const index) const

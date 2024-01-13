@@ -261,7 +261,7 @@ AudioClip const& minty::AudioEngine::at(String const& name) const
 	return _clips.at(name);
 }
 
-String const& minty::AudioEngine::get_name(ID const id) const
+String minty::AudioEngine::get_name(ID const id) const
 {
 	return _clips.get_name(id);
 }

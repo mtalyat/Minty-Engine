@@ -14,7 +14,7 @@ namespace minty
 		/// <summary>
 		/// The ID of the Sprite to render.
 		/// </summary>
-		ID id;
+		ID spriteId;
 
 		/// <summary>
 		/// The layer on which to render the Sprite.

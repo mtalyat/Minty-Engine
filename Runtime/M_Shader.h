@@ -60,7 +60,7 @@ namespace minty
 		/// <param name="value"></param>
 		/// <param name="size"></param>
 		/// <param name="offset"></param>
-		void update_push_constant(VkCommandBuffer const commandBuffer, void* const value, uint32_t const size, uint32_t const offset = 0) const;
+		void update_push_constant(VkCommandBuffer const commandBuffer, void const* const value, uint32_t const size, uint32_t const offset = 0);
 
 		/// <summary>
 		/// Updates the push constant with the given name.
@@ -70,7 +70,7 @@ namespace minty
 		/// <param name="value"></param>
 		/// <param name="size"></param>
 		/// <param name="offset"></param>
-		void update_push_constant(String const& name, VkCommandBuffer const commandBuffer, void* const value, uint32_t const size, uint32_t const offset = 0) const;
+		void update_push_constant(String const& name, VkCommandBuffer const commandBuffer, void const* const value, uint32_t const size, uint32_t const offset = 0);
 
 		/// <summary>
 		/// Updates the global uniform constant.
@@ -79,21 +79,31 @@ namespace minty
 		/// <param name="value"></param>
 		/// <param name="size"></param>
 		/// <param name="offset"></param>
-		void update_global_uniform_constant(String const& name, void* const value, uint32_t const size, uint32_t const offset = 0) const;
+		void update_global_uniform_constant(String const& name, void const* const value, uint32_t const size, uint32_t const offset);
+
+		/// <summary>
+		/// Updates the global uniform constant.
+		/// </summary>
+		/// <param name="name"></param>
+		/// <param name="frame"></param>
+		/// <param name="value"></param>
+		/// <param name="size"></param>
+		/// <param name="offset"></param>
+		void update_global_uniform_constant(String const& name, int const frame, void const* const value, uint32_t const size, uint32_t const offset);
 
 		/// <summary>
 		/// Create a descriptor set based on the given set index.
 		/// </summary>
 		/// <param name="set"></param>
 		/// <returns></returns>
-		rendering::DescriptorSet create_descriptor_set(uint32_t const set);
+		rendering::DescriptorSet create_descriptor_set(uint32_t const set, bool const initialize);
 
 		/// <summary>
 		/// Gets the uniform constant infos for the given set index.
 		/// </summary>
 		/// <param name="set"></param>
 		/// <returns></returns>
-		std::vector<rendering::UniformConstantInfo> get_uniform_constant_infos(uint32_t const set);
+		std::vector<rendering::UniformConstantInfo> get_uniform_constant_infos(uint32_t const set) const;
 	private:
 		void create_descriptor_set_layouts(rendering::ShaderBuilder const& builder);
 

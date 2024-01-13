@@ -5,7 +5,7 @@
 namespace minty
 {
 	/// <summary>
-	/// Used to mark when the Entity has been dirtied/updated.
+	/// Used to mark when the Entity has been dirtied/changed.
 	/// </summary>
 	struct DirtyComponent
 		: public Component

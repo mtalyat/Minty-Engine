@@ -9,9 +9,6 @@ using namespace minty::error;
 
 void minty::error::abort(String const& message)
 {
-	// print error
-	console::error(message);
-
 	// abort program
 	throw std::runtime_error(message);
 }

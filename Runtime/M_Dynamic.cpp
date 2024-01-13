@@ -153,10 +153,22 @@ void minty::Dynamic::deserialize(Reader const& reader)
 		// get type
 		if (std::isdigit(name.back()))
 		{
-			// byte
-			i = parse::to_size(name);
-			Byte temp = childPair.second.front().to_byte();
-			memcpy(&data[i], &temp, sizeof(Byte));
+			size_t sIndex = name.rfind('s');
+			if (sIndex == std::string::npos)
+			{
+				// byte
+				i = parse::to_size(name);
+				Byte temp = childPair.second.front().to_byte();
+				memcpy(&data[i], &temp, sizeof(Byte));
+			}
+			else
+			{
+				// string
+				size_t stringSize = parse::to_size(name.substr(sIndex + 1, name.length() - 1 - sIndex));
+				String temp = childPair.second.front().to_string();
+				memcpy(&data[i], temp.data(), sizeof(char) * stringSize);
+				data[i + stringSize - 1] = '\0';
+			}
 		}
 		else if (name.ends_with("ui"))
 		{

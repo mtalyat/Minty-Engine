@@ -45,10 +45,5 @@ namespace minty::rendering
 		/// The shader stage this uniform constant is part of.
 		/// </summary>
 		VkShaderStageFlags stageFlags;
-
-		/// <summary>
-		/// Any IDs needed, depending on the type.
-		/// </summary>
-		std::vector<ID> ids;
 	};
 }

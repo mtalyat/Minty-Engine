@@ -50,25 +50,33 @@ int init(Runtime &runtime)
         renderer.load_texture("Textures/oak_planks.png");
         renderer.load_texture("Textures/pattern.png");
         renderer.load_texture("Textures/texture.jpg");
+        renderer.load_texture("Textures/brian.png");
         renderer.load_texture("Resources/Models/pumpkin_tex.jpg");
 
-        // create shader
+        // create shaders
         renderer.load_shader("Shaders/shader.minty");
+        renderer.load_shader("Shaders/spriteShader.minty");
 
-        // create shader pass
+        // create shader passes
         renderer.load_shader_pass("Shaders/shaderPass.minty");
+        renderer.load_shader_pass("Shaders/spriteShaderPass.minty");
 
-        // create material template
+        // create material templates
         renderer.load_material_template("Materials/materialTemplate.minty");
+        renderer.load_material_template("Materials/spriteMaterialTemplate.minty");
 
         // create materials
         renderer.load_material("Materials/material1.minty");
-        renderer.load_material("Materials/material2.minty");
-        renderer.load_material("Materials/material3.minty");
-        renderer.load_material("Materials/pumpkinMat.minty");
+        // renderer.load_material("Materials/material2.minty");
+        // renderer.load_material("Materials/material3.minty");
+        // renderer.load_material("Materials/pumpkinMat.minty");
+        renderer.load_material("Materials/spriteMaterial.minty");
 
-        // create models
-        renderer.load_mesh("Resources/Models/pumpkin.obj");
+        // // create models
+        // renderer.load_mesh("Resources/Models/pumpkin.obj");
+
+        // create sprites
+        renderer.load_sprite("Sprites/brian.minty");
 
         // create audio
         audio.load_clip("Audio/blinking-forest.wav");
@@ -85,25 +93,25 @@ int init(Runtime &runtime)
         // load the scene we created, with the camera
         sceneManager.load_scene(sceneId);
 
-        // copy the model 5 times
-        Entity modelEntity = er->find_by_name("Model");
-        for (int y = 0; y < 5; y++)
-        {
-            for (int x = 0; x < 5; x++)
-            {
-                // ignore original
-                if (x == 0 && y == 0)
-                    continue;
+        // // copy the model 5 times
+        // Entity modelEntity = er->find_by_name("Model");
+        // for (int y = 0; y < 5; y++)
+        // {
+        //     for (int x = 0; x < 5; x++)
+        //     {
+        //         // ignore original
+        //         if (x == 0 && y == 0)
+        //             continue;
 
-                // clone model, move it to the right 2 * i and down 2 * i
-                Entity clone = er->clone(modelEntity);
-                TransformComponent &cloneTransformComp = er->get<TransformComponent>(clone);
-                cloneTransformComp.local.position.x += static_cast<float>(x) * 4.0f;
-                cloneTransformComp.local.position.y += static_cast<float>(y) * 4.0f;
-                er->emplace_or_replace<DirtyComponent>(clone);
-                er->set_name(clone, std::format("Model {}", y * 5 + x));
-            }
-        }
+        //         // clone model, move it to the right 2 * i and down 2 * i
+        //         Entity clone = er->clone(modelEntity);
+        //         TransformComponent &cloneTransformComp = er->get<TransformComponent>(clone);
+        //         cloneTransformComp.local.position.x += static_cast<float>(x) * 4.0f;
+        //         cloneTransformComp.local.position.y += static_cast<float>(y) * 4.0f;
+        //         er->emplace_or_replace<DirtyComponent>(clone);
+        //         er->set_name(clone, std::format("Model {}", y * 5 + x));
+        //     }
+        // }
 
         // debug print scene:
         {
@@ -199,7 +207,7 @@ int init(Runtime &runtime)
     }
     catch (const std::exception &e)
     {
-        std::cerr << e.what() << '\n';
+        std::cerr << "Failed to init: \"" << e.what() << '"' << std::endl;
     }
 
     console::log("Game start.");
