@@ -1152,7 +1152,6 @@ void minty::RenderEngine::draw_sprite(VkCommandBuffer commandBuffer, TransformCo
 		.minCoords = sprite.get_min_coords(),
 		.maxCoords = sprite.get_max_coords(),
 		.pivot = sprite.get_pivot(),
-		.size = sprite.get_size(),
 	};
 
 	// push data to shader
@@ -1486,6 +1485,11 @@ String minty::RenderEngine::get_mesh_name(ID const id) const
 
 ID minty::RenderEngine::load_texture(Path const& path)
 {
+	return load_texture(path, path.stem().string());
+}
+
+ID minty::RenderEngine::load_texture(Path const& path, String const& name)
+{
 	if (check_asset(path, false))
 	{
 		return ERROR_ID;
@@ -1496,7 +1500,7 @@ ID minty::RenderEngine::load_texture(Path const& path)
 	// create texture builder from path and meta file
 	TextureBuilder builder
 	{
-		.name = path.stem().string(),
+		.name = name,
 		.path = path,
 		.pixelData = nullptr,
 		.width = 0,
@@ -1513,6 +1517,11 @@ ID minty::RenderEngine::load_texture(Path const& path)
 
 ID minty::RenderEngine::load_sprite(Path const& path)
 {
+	return load_sprite(path, path.stem().string());
+}
+
+ID minty::RenderEngine::load_sprite(Path const& path, String const& name)
+{
 	if (check_asset(path, false))
 	{
 		return ERROR_ID;
@@ -1522,7 +1531,7 @@ ID minty::RenderEngine::load_sprite(Path const& path)
 
 	SpriteBuilder builder
 	{
-		.name = path.stem().string(),
+		.name = name,
 		.textureId = find_texture(meta.get_string("texture")),
 		.materialId = find_material(meta.get_string("material")),
 		.mode = from_string_pixel_coordinate_mode(meta.get_string("coordinateMode")),
@@ -1536,6 +1545,11 @@ ID minty::RenderEngine::load_sprite(Path const& path)
 }
 
 ID minty::RenderEngine::load_shader(Path const& path)
+{
+	return load_shader(path, path.stem().string());
+}
+
+ID minty::RenderEngine::load_shader(Path const& path, String const& name)
 {
 	if (check_asset(path, false))
 	{
@@ -1585,6 +1599,11 @@ ID minty::RenderEngine::load_shader(Path const& path)
 }
 
 ID minty::RenderEngine::load_shader_pass(Path const& path)
+{
+	return load_shader_pass(path, path.stem().string());
+}
+
+ID minty::RenderEngine::load_shader_pass(Path const& path, String const& name)
 {
 	if (check_asset(path, false))
 	{
@@ -1650,6 +1669,11 @@ ID minty::RenderEngine::load_shader_pass(Path const& path)
 
 ID minty::RenderEngine::load_material_template(Path const& path)
 {
+	return load_material_template(path, path.stem().string());
+}
+
+ID minty::RenderEngine::load_material_template(Path const& path, String const& name)
+{
 	if (check_asset(path, false))
 	{
 		return ERROR_ID;
@@ -1682,6 +1706,11 @@ ID minty::RenderEngine::load_material_template(Path const& path)
 
 ID minty::RenderEngine::load_material(Path const& path)
 {
+	return load_material(path, path.stem().string());
+}
+
+ID minty::RenderEngine::load_material(Path const& path, String const& name)
+{
 	if (check_asset(path, false))
 	{
 		return ERROR_ID;
@@ -1709,6 +1738,11 @@ ID minty::RenderEngine::load_material(Path const& path)
 
 ID minty::RenderEngine::load_mesh(Path const& path)
 {
+	return load_mesh(path, path.stem().string());
+}
+
+ID minty::RenderEngine::load_mesh(Path const& path, String const& name)
+{
 	if (check_asset(path, false))
 	{
 		return ERROR_ID;
@@ -1723,7 +1757,6 @@ ID minty::RenderEngine::load_mesh(Path const& path)
 	}
 
 	// override existing mesh with same name
-	String name = path.stem().string();
 	ID id = get_or_create_mesh(name);
 
 	// determine how to load the file

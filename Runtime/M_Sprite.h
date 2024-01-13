@@ -19,7 +19,6 @@ namespace minty
 		Vector2 _minCoords;
 		Vector2 _maxCoords;
 		Vector2 _pivot;
-		Vector2 _size;
 	public:
 #pragma region Get
 		Sprite(rendering::SpriteBuilder const& builder, RenderEngine& renderer);
@@ -36,8 +35,6 @@ namespace minty
 		Vector2 get_max_coords() const;
 
 		Vector2 get_pivot() const;
-
-		Vector2 get_size() const;
 #pragma endregion
 
 #pragma region Set

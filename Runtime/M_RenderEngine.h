@@ -514,11 +514,27 @@ namespace minty
 		ID load_texture(Path const& path);
 
 		/// <summary>
+		/// Loads the Texture at the given asset path with the given name into this RenderEngine.
+		/// </summary>
+		/// <param name="path">The path relative to the Assets folder.</param>
+		/// <param name="name">The name of the newly loaded asset.</param>
+		/// <returns>The ID of the newly loaded asset.</returns>
+		ID load_texture(Path const& path, String const& name);
+
+		/// <summary>
 		/// Loads the Sprite at the given asset path into this RenderEngine.
 		/// </summary>
 		/// <param name="path">The path relative to the Assets folder.</param>
 		/// <returns>The ID of the newly loaded asset.</returns>
 		ID load_sprite(Path const& path);
+
+		/// <summary>
+		/// Loads the Sprite at the given asset path with the given name into this RenderEngine.
+		/// </summary>
+		/// <param name="path">The path relative to the Assets folder.</param>
+		/// <param name="name">The name of the newly loaded asset.</param>
+		/// <returns>The ID of the newly loaded asset.</returns>
+		ID load_sprite(Path const& path, String const& name);
 
 		/// <summary>
 		/// Loads the Shader at the given asset path into this RenderEngine.
@@ -528,11 +544,27 @@ namespace minty
 		ID load_shader(Path const& path);
 
 		/// <summary>
+		/// Loads the Shader at the given asset path with the given name into this RenderEngine.
+		/// </summary>
+		/// <param name="path">The path relative to the Assets folder.</param>
+		/// <param name="name">The name of the newly loaded asset.</param>
+		/// <returns>The ID of the newly loaded asset.</returns>
+		ID load_shader(Path const& path, String const& name);
+
+		/// <summary>
 		/// Loads the ShaderPass at the given asset path into this RenderEngine.
 		/// </summary>
 		/// <param name="path">The path relative to the Assets folder.</param>
 		/// <returns>The ID of the newly loaded asset.</returns>
 		ID load_shader_pass(Path const& path);
+
+		/// <summary>
+		/// Loads the ShaderPass at the given asset path with the given name into this RenderEngine.
+		/// </summary>
+		/// <param name="path">The path relative to the Assets folder.</param>
+		/// <param name="name">The name of the newly loaded asset.</param>
+		/// <returns>The ID of the newly loaded asset.</returns>
+		ID load_shader_pass(Path const& path, String const& name);
 
 		/// <summary>
 		/// Loads the MaterialTemplate at the given asset path into this RenderEngine.
@@ -542,6 +574,14 @@ namespace minty
 		ID load_material_template(Path const& path);
 
 		/// <summary>
+		/// Loads the MaterialTemplate at the given asset path with the given name into this RenderEngine.
+		/// </summary>
+		/// <param name="path">The path relative to the Assets folder.</param>
+		/// <param name="name">The name of the newly loaded asset.</param>
+		/// <returns>The ID of the newly loaded asset.</returns>
+		ID load_material_template(Path const& path, String const& name);
+
+		/// <summary>
 		/// Loads the Material at the given asset path into this RenderEngine.
 		/// </summary>
 		/// <param name="path">The path relative to the Assets folder.</param>
@@ -549,11 +589,27 @@ namespace minty
 		ID load_material(Path const& path);
 
 		/// <summary>
+		/// Loads the Material at the given asset path with the given name into this RenderEngine.
+		/// </summary>
+		/// <param name="path">The path relative to the Assets folder.</param>
+		/// <param name="name">The name of the newly loaded asset.</param>
+		/// <returns>The ID of the newly loaded asset.</returns>
+		ID load_material(Path const& path, String const& name);
+
+		/// <summary>
 		/// Loads the Mesh at the given asset path into this RenderEngine.
 		/// </summary>
 		/// <param name="path">The path relative to the Assets folder.</param>
 		/// <returns>The ID of the newly loaded asset.</returns>
 		ID load_mesh(Path const& path);
+
+		/// <summary>
+		/// Loads the Mesh at the given asset path with the given name into this RenderEngine.
+		/// </summary>
+		/// <param name="path">The path relative to the Assets folder.</param>
+		/// <param name="name">The name of the newly loaded asset.</param>
+		/// <returns>The ID of the newly loaded asset.</returns>
+		ID load_mesh(Path const& path, String const& name);
 
 		/// <summary>
 		/// Destroys the Texture with the given ID.

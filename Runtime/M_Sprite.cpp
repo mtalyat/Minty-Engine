@@ -14,7 +14,6 @@ minty::Sprite::Sprite(rendering::SpriteBuilder const& builder, RenderEngine& ren
 	, _minCoords(builder.minimum)
 	, _maxCoords(builder.maximum)
 	, _pivot(builder.pivot)
-	, _size(builder.size)
 {
 	MINTY_ASSERT(builder.textureId != ERROR_ID, "Cannot create a sprite with ERROR_ID texture id.");
 	MINTY_ASSERT(builder.materialId != ERROR_ID, "Cannot create a sprite with ERROR_ID material id.");
@@ -41,11 +40,6 @@ Vector2 minty::Sprite::get_max_coords() const
 Vector2 minty::Sprite::get_pivot() const
 {
 	return _pivot;
-}
-
-Vector2 minty::Sprite::get_size() const
-{
-	return _size;
 }
 
 void minty::Sprite::set_min_coords(Vector2 const coords, PixelCoordinateMode const coordinateMode)
