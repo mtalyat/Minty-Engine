@@ -13,19 +13,17 @@ Entities
             far: 100.0
         Move
         AudioListener
-    Model
-        Renderable
-        Transform
-        Mesh
-            material: material1
-            type: cube
-        AudioSource
-            clip: cow-bells
-    Sprite
-        Renderable
-        Transform
-            position
-                y: -1.5
-        Sprite
-            sprite: brian
-            layer: 0
+#    Model
+#        Renderable
+#        Transform
+#        Mesh
+#            material: material1
+#            type: cube
+#        AudioSource
+#            clip: cow-bells
+#    Sprite
+#        Renderable
+#        Transform
+#        Sprite
+#            sprite: brian
+#            layer: 0

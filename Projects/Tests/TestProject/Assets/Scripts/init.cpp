@@ -51,6 +51,7 @@ int init(Runtime &runtime)
         renderer.load_texture("Textures/pattern.png");
         renderer.load_texture("Textures/texture.jpg");
         renderer.load_texture("Textures/brian.png");
+        renderer.load_texture("Textures/x.png");
         renderer.load_texture("Resources/Models/pumpkin_tex.jpg");
 
         // create shaders
@@ -71,12 +72,14 @@ int init(Runtime &runtime)
         // renderer.load_material("Materials/material3.minty");
         // renderer.load_material("Materials/pumpkinMat.minty");
         renderer.load_material("Materials/spriteMaterial.minty");
+        renderer.load_material("Materials/xSpriteMaterial.minty");
 
         // // create models
         // renderer.load_mesh("Resources/Models/pumpkin.obj");
 
-        // create sprites
+        // creat sprites
         renderer.load_sprite("Sprites/brian.minty");
+        ID xId = renderer.load_sprite("Sprites/x.minty");
 
         // create audio
         audio.load_clip("Audio/blinking-forest.wav");
@@ -92,6 +95,39 @@ int init(Runtime &runtime)
 
         // load the scene we created, with the camera
         sceneManager.load_scene(sceneId);
+        
+        // create sprites
+        for(int i = 0; i < 3; i++)
+        {
+            for (int j = 0; j < 3; j++)
+            {
+                // load sprite
+                String name = std::format("sprite_{}_{}", i, j);
+                ID id = renderer.load_sprite("Sprites/brian.minty", name);
+                Sprite& sprite = renderer.get_sprite(id);
+                sprite.set_pivot(Vector2(static_cast<float>(i) / 2.0f, static_cast<float>(j) / 2.0f));
+
+                // create sprite in scene
+                Entity entity = er->create(name);
+                er->emplace<RenderableComponent>(entity);
+                SpriteComponent& spriteComponent = er->emplace<SpriteComponent>(entity);
+                spriteComponent.spriteId = id;
+                spriteComponent.layer = 0;
+                TransformComponent& transformComponent = er->emplace<TransformComponent>(entity);
+                Vector3 position(static_cast<float>(i) * 2.0f, static_cast<float>(j) * 2.0f, 0.0f);
+                transformComponent.local.position = position;
+
+                // create x in scene
+                entity = er->create();
+                er->emplace<RenderableComponent>(entity);
+                SpriteComponent& xSpriteComponent = er->emplace<SpriteComponent>(entity);
+                xSpriteComponent.spriteId = xId;
+                TransformComponent& xTransformComponent = er->emplace<TransformComponent>(entity);
+                position.z = -0.01f;
+                xTransformComponent.local.position = position;
+                xTransformComponent.local.scale = Vector3(0.2f, 0.2f, 0.2f);
+            }
+        }
 
         // // copy the model 5 times
         // Entity modelEntity = er->find_by_name("Model");
@@ -127,7 +163,7 @@ int init(Runtime &runtime)
         //          audio
 
         // play audio
-        audio.play_background("blinking-forest", 0.2f);
+        // audio.play_background("blinking-forest", 0.2f);
 
         AudioEngine *audioPtr = &audio;
         Window *windowPtr = &window;
