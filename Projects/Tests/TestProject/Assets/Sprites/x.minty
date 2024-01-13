@@ -10,3 +10,6 @@ max
 pivot
     x: 0.5
     y: 0.5
+size
+    x: 0.2
+    y: 0.2

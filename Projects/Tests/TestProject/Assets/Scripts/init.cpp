@@ -105,7 +105,7 @@ int init(Runtime &runtime)
                 String name = std::format("sprite_{}_{}", i, j);
                 ID id = renderer.load_sprite("Sprites/brian.minty", name);
                 Sprite& sprite = renderer.get_sprite(id);
-                sprite.set_pivot(Vector2(static_cast<float>(i) / 2.0f, static_cast<float>(j) / 2.0f));
+                sprite.set_pivot(Vector2(1.0f - static_cast<float>(i) / 2.0f, 1.0f - static_cast<float>(j) / 2.0f));
 
                 // create sprite in scene
                 Entity entity = er->create(name);
@@ -114,7 +114,7 @@ int init(Runtime &runtime)
                 spriteComponent.spriteId = id;
                 spriteComponent.layer = 0;
                 TransformComponent& transformComponent = er->emplace<TransformComponent>(entity);
-                Vector3 position(static_cast<float>(i) * 2.0f, static_cast<float>(j) * 2.0f, 0.0f);
+                Vector3 position(static_cast<float>(i), static_cast<float>(j), 0.0f);
                 transformComponent.local.position = position;
 
                 // create x in scene
@@ -125,7 +125,6 @@ int init(Runtime &runtime)
                 TransformComponent& xTransformComponent = er->emplace<TransformComponent>(entity);
                 position.z = -0.01f;
                 xTransformComponent.local.position = position;
-                xTransformComponent.local.scale = Vector3(0.2f, 0.2f, 0.2f);
             }
         }
 

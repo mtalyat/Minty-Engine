@@ -12,6 +12,6 @@ namespace minty::rendering
 		alignas(16) Vector2 minCoords;
 		Vector2 maxCoords;
 		alignas(16) Vector2 pivot;
-		Vector2 unused1;
+		Vector2 size;
 	};
 }
