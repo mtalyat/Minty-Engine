@@ -1,5 +1,5 @@
 # Minty Engine
-A dynamic and advanced voxel engine.
+A 3D game engine.
 
 NOTE: This project is in development. More info on how to use, etc. will come in due time.
 
@@ -17,7 +17,7 @@ Performace, in terms of the CPU and the GPU. On the CPU, libraries such as [EnTT
 The engine itself will be portable to many devices. This is to allow for all sorts of people to use the engine. All libraries and dependencies of this project will also be portable.
 
 #### Networking
-Who doesn't love playing with your friends? The Minty engine will have built-in networking capabilities to make it easy (easier- its not easy) to implement multiplayer games. This might not be the first feature, but I hope to implement it one day.
+Who doesn't love playing with your friends? The Minty engine will have built-in networking capabilities to make it easy (easier- its not easy) to implement multiplayer games. This might not be the first feature, but I hope to implement it one day...
 
 #### Ease of Use
 After the base of the engine has been designed, a user interface will be created to help advance the creation of games using the engine, as well as support for a scripting language (likely Lua, but it is still TBD).
@@ -32,3 +32,4 @@ The Minty Engine will use a multitude of advanced and new technologies to make t
 * [GLFW](https://www.glfw.org), for windows.
 * [GLM](https://github.com/g-truc/glm), for linear mathematics.
 * [EnTT](https://github.com/skypjack/entt), for the entity component system.
+* [stb](https://github.com/nothings/stb), for stb_image.h, for loading images from the disk.
