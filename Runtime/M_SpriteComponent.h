@@ -17,9 +17,9 @@ namespace minty
 		ID spriteId;
 
 		/// <summary>
-		/// The layer on which to render the Sprite.
+		/// The order in which to render the Sprite, when it has equal distance to the Camera as another Sprite.
 		/// </summary>
-		int layer;
+		int order;
 
 		void serialize(Writer& writer) const override;
 		void deserialize(Reader const& reader) override;

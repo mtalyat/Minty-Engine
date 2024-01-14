@@ -1055,7 +1055,7 @@ void minty::RenderEngine::draw_scene(VkCommandBuffer commandBuffer)
 	// sort sprites so they render in the correct order, since Z does not matter
 	_registry->sort<SpriteComponent>([](SpriteComponent const& left, SpriteComponent const& right)
 		{
-			return left.layer < right.layer;
+			return left.order < right.order;
 		});
 
 	TransformComponent const* transformComponent;
@@ -1078,14 +1078,14 @@ void minty::RenderEngine::draw_scene(VkCommandBuffer commandBuffer)
 		}
 	}
 
-	// sort UITransforms so that it matches order of sprites for rendering
-	_registry->sort<UITransformComponent, SpriteComponent>();
-
 	// draw all world sprites in the scene
 	for (auto&& [entity, renderable, transform, sprite] : _registry->view<RenderableComponent const, TransformComponent const, SpriteComponent const>().each())
 	{
 		draw_sprite(commandBuffer, transform, sprite);
 	}
+
+	// sort UITransforms so that it matches order of sprites for rendering
+	_registry->sort<UITransformComponent, SpriteComponent>();
 
 	// draw all UI in scene
 	for (auto&& [entity, renderable, ui, sprite] : _registry->view<RenderableComponent const, UITransformComponent const, SpriteComponent const>().each())

@@ -11,7 +11,7 @@ void minty::SpriteComponent::serialize(Writer& writer) const
 	RenderEngine const& renderEngine = data->scene->get_engine()->get_render_engine();
 
 	writer.write("sprite", renderEngine.get_sprite_name(spriteId));
-	writer.write("layer", layer, 0);
+	writer.write("order", order, 0);
 }
 
 void minty::SpriteComponent::deserialize(Reader const& reader)
@@ -20,10 +20,10 @@ void minty::SpriteComponent::deserialize(Reader const& reader)
 	RenderEngine const& renderEngine = data->scene->get_engine()->get_render_engine();
 
 	spriteId = renderEngine.find_sprite(reader.read_string("sprite"));
-	layer = reader.read_int("layer");
+	order = reader.read_int("order");
 }
 
 String minty::to_string(SpriteComponent const& value)
 {
-	return std::format("SpriteComponent(id = {}, layer = {})", value.spriteId, value.layer);
+	return std::format("SpriteComponent(id = {}, layer = {})", value.spriteId, value.order);
 }

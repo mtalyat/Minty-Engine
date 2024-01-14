@@ -121,9 +121,9 @@ int init(Runtime &runtime)
                 er->emplace<RenderableComponent>(entity);
                 SpriteComponent &spriteComponent = er->emplace<SpriteComponent>(entity);
                 spriteComponent.spriteId = atlas.create_sprite(x, y);
-                spriteComponent.layer = 0;
                 TransformComponent &transformComponent = er->emplace<TransformComponent>(entity);
-                Vector3 position(static_cast<float>(x), static_cast<float>(y), 0.0f);
+                Vector3 position(0.0f, 0.0f, 0.0f);
+                // Vector3 position(static_cast<float>(x), static_cast<float>(y), 0.0f);
                 transformComponent.local.position = position;
             }
         }

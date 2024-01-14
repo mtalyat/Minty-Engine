@@ -26,4 +26,4 @@ Entities
 #        Transform
 #        Sprite
 #            sprite: brian
-#            layer: 0
+#            order: 0
