@@ -33,6 +33,10 @@ namespace minty
 
 		void set_pivot(Vector2 const size, PixelCoordinateMode const coordinateMode = PixelCoordinateMode::Normalized);
 
+		Vector2Int get_size_in_slices() const;
+
+		Vector2Int get_size() const;
+
 		ID create_sprite(int const x, int const y, Vector2 const pivot = Vector2(0.5f, 0.5f), Vector2 const size = Vector2(1.0f, 1.0f), PixelCoordinateMode const coordinateMode = PixelCoordinateMode::Normalized) const;
 
 		ID create_sprite(int const x, int const y, Vector2 const pivot, Vector2 const size, String const& name, PixelCoordinateMode const coordinateMode = PixelCoordinateMode::Normalized) const;

@@ -52,6 +52,7 @@ int init(Runtime &runtime)
         renderer.load_texture("Textures/texture.jpg");
         renderer.load_texture("Textures/brian.png");
         renderer.load_texture("Textures/x.png");
+        ID deathId = renderer.load_texture("Textures/death.png");
         renderer.load_texture("Resources/Models/pumpkin_tex.jpg");
 
         // create shaders
@@ -81,6 +82,15 @@ int init(Runtime &runtime)
         renderer.load_sprite("Sprites/brian.minty");
         ID xId = renderer.load_sprite("Sprites/x.minty");
 
+        TextureAtlasBuilder atlasBuilder{
+            .textureId = deathId,
+            .materialId = ERROR_ID,
+            .coordinateMode = PixelCoordinateMode::Pixel,
+            .slice = Vector2(90.0f, 90.0f),
+            .pivot = Vector2(45.0f, 45.0f)};
+
+        TextureAtlas atlas(atlasBuilder, renderer);
+
         // create audio
         audio.load_clip("Audio/blinking-forest.wav");
         audio.load_clip("Audio/cow-bells.wav");
@@ -95,36 +105,26 @@ int init(Runtime &runtime)
 
         // load the scene we created, with the camera
         sceneManager.load_scene(sceneId);
-        
+
+        Vector2Int atlasSize = atlas.get_size_in_slices();
+
         // create sprites
-        for(int i = 0; i < 3; i++)
+        for (int x = 0; x < atlasSize.x; x++)
         {
-            for (int j = 0; j < 3; j++)
+            for (int y = 0; y < atlasSize.y; y++)
             {
-                // load sprite
-                String name = std::format("sprite_{}_{}", i, j);
-                ID id = renderer.load_sprite("Sprites/brian.minty", name);
-                Sprite& sprite = renderer.get_sprite(id);
-                sprite.set_pivot(Vector2(1.0f - static_cast<float>(i) / 2.0f, 1.0f - static_cast<float>(j) / 2.0f));
+                // get name
+                String name = std::format("sprite_{}_{}", x, y);
 
                 // create sprite in scene
                 Entity entity = er->create(name);
                 er->emplace<RenderableComponent>(entity);
-                SpriteComponent& spriteComponent = er->emplace<SpriteComponent>(entity);
-                spriteComponent.spriteId = id;
+                SpriteComponent &spriteComponent = er->emplace<SpriteComponent>(entity);
+                spriteComponent.spriteId = atlas.create_sprite(x, y);
                 spriteComponent.layer = 0;
-                TransformComponent& transformComponent = er->emplace<TransformComponent>(entity);
-                Vector3 position(static_cast<float>(i), static_cast<float>(j), 0.0f);
+                TransformComponent &transformComponent = er->emplace<TransformComponent>(entity);
+                Vector3 position(static_cast<float>(x), static_cast<float>(y), 0.0f);
                 transformComponent.local.position = position;
-
-                // create x in scene
-                entity = er->create();
-                er->emplace<RenderableComponent>(entity);
-                SpriteComponent& xSpriteComponent = er->emplace<SpriteComponent>(entity);
-                xSpriteComponent.spriteId = xId;
-                TransformComponent& xTransformComponent = er->emplace<TransformComponent>(entity);
-                position.z = -0.01f;
-                xTransformComponent.local.position = position;
             }
         }
 

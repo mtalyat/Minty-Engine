@@ -70,12 +70,15 @@ access to the entire engine without needing include each file.
 #include "M_Rendering_RendererBuilder.h"
 #include "M_Rendering_ShaderBuilder.h"
 #include "M_Rendering_ShaderPassBuilder.h"
+#include "M_Rendering_SpriteBuilder.h"
+#include "M_Rendering_TextureAtlasBuilder.h"
 #include "M_Rendering_TextureBuilder.h"
 #include "M_Rendering_UniformConstantInfo.h"
 #include "M_Shader.h"
 #include "M_ShaderPass.h"
 #include "M_Sprite.h"
 #include "M_Texture.h"
+#include "M_TextureAtlas.h"
 
 // SCENES
 #include "M_Scene.h"

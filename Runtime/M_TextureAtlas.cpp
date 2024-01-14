@@ -26,7 +26,7 @@ minty::TextureAtlas::TextureAtlas(rendering::TextureAtlasBuilder const& builder,
 		rendering::MaterialBuilder materialBuilder
 		{
 			.name = std::format("{}_atlas", _renderer.get_texture_name(_textureId)),
-			.templateId = _renderer.find_material_template("spriteMaterial"), // TODO: hard coded name
+			.templateId = _renderer.find_material_template("spriteMaterialTemplate"), // TODO: hard coded name
 		};
 
 		// add texture to values
@@ -76,6 +76,20 @@ void minty::TextureAtlas::set_pivot(Vector2 const pivot, PixelCoordinateMode con
 	default:
 		return;
 	}
+}
+
+Vector2Int minty::TextureAtlas::get_size_in_slices() const
+{
+	Texture const& texture = _renderer.get_texture(_textureId);
+
+	return Vector2Int(math::floor_to_int(static_cast<float>(texture.get_width()) / _slice.x), math::floor_to_int(static_cast<float>(texture.get_height()) / _slice.y));
+}
+
+Vector2Int minty::TextureAtlas::get_size() const
+{
+	Texture const& texture = _renderer.get_texture(_textureId);
+
+	return Vector2Int(texture.get_width(), texture.get_height());
 }
 
 ID minty::TextureAtlas::create_sprite(int const x, int const y, Vector2 const pivot, Vector2 const size, PixelCoordinateMode const coordinateMode) const
