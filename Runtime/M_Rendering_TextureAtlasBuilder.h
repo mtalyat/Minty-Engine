@@ -1,7 +1,7 @@
 #pragma once
 
 #include "M_Base.h"
-#include "M_PixelCoordinateMode.h"
+#include "M_CoordinateMode.h"
 #include "M_Vector.h"
 
 namespace minty::rendering
@@ -24,7 +24,7 @@ namespace minty::rendering
 		/// <summary>
 		/// The coordinate mode for the pivot and slice data.
 		/// </summary>
-		PixelCoordinateMode coordinateMode = PixelCoordinateMode::Normalized;
+		CoordinateMode coordinateMode = CoordinateMode::Normalized;
 
 		/// <summary>
 		/// The size of a slice within the atlas.

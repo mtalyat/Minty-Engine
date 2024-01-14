@@ -462,7 +462,7 @@
     <ClInclude Include="M_Rendering_SpriteBuilder.h">
       <Filter>Header Files\Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="M_PixelCoordinateMode.h">
+    <ClInclude Include="M_CoordinateMode.h">
       <Filter>Header Files\Rendering</Filter>
     </ClInclude>
     <ClInclude Include="M_TextureAtlas.h">

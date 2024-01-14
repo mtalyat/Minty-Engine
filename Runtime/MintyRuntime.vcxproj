@@ -225,7 +225,7 @@
     <ClInclude Include="M_Compression.h" />
     <ClInclude Include="M_Macros.h" />
     <ClInclude Include="M_PhysicalFile.h" />
-    <ClInclude Include="M_PixelCoordinateMode.h" />
+    <ClInclude Include="M_CoordinateMode.h" />
     <ClInclude Include="M_Rendering_PixelFormat.h" />
     <ClInclude Include="M_Rendering_SpritePushData.h" />
     <ClInclude Include="M_Rendering_SpriteBuilder.h" />

@@ -48,48 +48,48 @@ Vector2 minty::Sprite::get_size() const
 	return _size;
 }
 
-void minty::Sprite::set_min_coords(Vector2 const coords, PixelCoordinateMode const coordinateMode)
+void minty::Sprite::set_min_coords(Vector2 const coords, CoordinateMode const coordinateMode)
 {
 	switch (coordinateMode)
 	{
-	case PixelCoordinateMode::Normalized:
+	case CoordinateMode::Normalized:
 		_minCoords = coords;
 		break;
-	case PixelCoordinateMode::Pixel:
+	case CoordinateMode::Pixel:
 		_minCoords = normalize_coords(coords);
 		break;
 	default:
-		console::error("set_min_coords invalid PixelCoordinateMode.");
+		console::error("set_min_coords invalid CoordinateMode.");
 	}
 }
 
-void minty::Sprite::set_max_coords(Vector2 const coords, PixelCoordinateMode const coordinateMode)
+void minty::Sprite::set_max_coords(Vector2 const coords, CoordinateMode const coordinateMode)
 {
 	switch (coordinateMode)
 	{
-	case PixelCoordinateMode::Normalized:
+	case CoordinateMode::Normalized:
 		_maxCoords = coords;
 		break;
-	case PixelCoordinateMode::Pixel:
+	case CoordinateMode::Pixel:
 		_maxCoords = normalize_coords(coords);
 		break;
 	default:
-		console::error("set_max_coords invalid PixelCoordinateMode.");
+		console::error("set_max_coords invalid CoordinateMode.");
 	}
 }
 
-void minty::Sprite::set_pivot(Vector2 const pivot, PixelCoordinateMode const coordinateMode)
+void minty::Sprite::set_pivot(Vector2 const pivot, CoordinateMode const coordinateMode)
 {
 	switch (coordinateMode)
 	{
-	case PixelCoordinateMode::Normalized:
+	case CoordinateMode::Normalized:
 		_pivot = pivot;
 		break;
-	case PixelCoordinateMode::Pixel:
+	case CoordinateMode::Pixel:
 		_pivot = normalize_coords(pivot);
 		break;
 	default:
-		console::error("set_pivot invalid PixelCoordinateMode.");
+		console::error("set_pivot invalid CoordinateMode.");
 	}
 }
 

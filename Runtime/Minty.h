@@ -56,6 +56,7 @@ access to the entire engine without needing include each file.
 #include "M_MouseButton.h"
 
 // RENDERING
+#include "M_CoordinateMode.h"
 #include "M_Material.h"
 #include "M_MaterialTemplate.h"
 #include "M_Mesh.h"

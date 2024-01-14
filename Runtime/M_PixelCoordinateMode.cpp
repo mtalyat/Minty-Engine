@@ -1,23 +1,23 @@
 #include "pch.h"
-#include "M_PixelCoordinateMode.h"
+#include "M_CoordinateMode.h"
 
 using namespace minty;
 
-std::string minty::to_string(PixelCoordinateMode const value)
+std::string minty::to_string(CoordinateMode const value)
 {
 	switch (value)
 	{
-	case PixelCoordinateMode::Normalized: return "NORMALIZED";
-	case PixelCoordinateMode::Pixel: return "PIXEL";
+	case CoordinateMode::Normalized: return "NORMALIZED";
+	case CoordinateMode::Pixel: return "PIXEL";
 	default: return "";
 	}
 }
 
-PixelCoordinateMode minty::from_string_pixel_coordinate_mode(std::string const& value)
+CoordinateMode minty::from_string_pixel_coordinate_mode(std::string const& value)
 {
 	std::string value2 = minty::string::to_upper(value);
-	if (value2 == "NORMALIZED") return PixelCoordinateMode::Normalized;
-	if (value2 == "PIXEL") return PixelCoordinateMode::Pixel;
+	if (value2 == "NORMALIZED") return CoordinateMode::Normalized;
+	if (value2 == "PIXEL") return CoordinateMode::Pixel;
 
-	return static_cast<PixelCoordinateMode>(0);
+	return static_cast<CoordinateMode>(0);
 }

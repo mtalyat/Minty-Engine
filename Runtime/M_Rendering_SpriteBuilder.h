@@ -3,7 +3,7 @@
 
 #include "M_Color.h"
 #include "M_Rendering_PixelFormat.h"
-#include "M_PixelCoordinateMode.h"
+#include "M_CoordinateMode.h"
 #include "M_Vector.h"
 #include "vulkan.h"
 
@@ -32,7 +32,7 @@ namespace minty::rendering
 		/// <summary>
 		/// The type of input of the data within minimum, maximum and pivot.
 		/// </summary>
-		PixelCoordinateMode mode = PixelCoordinateMode::Normalized;
+		CoordinateMode mode = CoordinateMode::Normalized;
 
 		/// <summary>
 		/// The minimum position of the Sprite within the Texture.

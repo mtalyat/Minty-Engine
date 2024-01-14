@@ -43,11 +43,11 @@ namespace minty
 #pragma region Set
 
 	public:
-		void set_min_coords(Vector2 const coords, PixelCoordinateMode const coordinateMode = PixelCoordinateMode::Normalized);
+		void set_min_coords(Vector2 const coords, CoordinateMode const coordinateMode = CoordinateMode::Normalized);
 
-		void set_max_coords(Vector2 const coords, PixelCoordinateMode const coordinateMode = PixelCoordinateMode::Normalized);
+		void set_max_coords(Vector2 const coords, CoordinateMode const coordinateMode = CoordinateMode::Normalized);
 
-		void set_pivot(Vector2 const pivot, PixelCoordinateMode const coordinateMode = PixelCoordinateMode::Normalized);
+		void set_pivot(Vector2 const pivot, CoordinateMode const coordinateMode = CoordinateMode::Normalized);
 
 	private:
 		Vector2 normalize_coords(Vector2 const coords) const;
