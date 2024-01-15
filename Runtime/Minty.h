@@ -110,6 +110,7 @@ access to the entire engine without needing include each file.
 #include "M_Engine.h"
 #include "M_Error.h"
 #include "M_Event.h"
+#include "M_FiniteStateMachine.h"
 #include "M_Info.h"
 #include "M_Math.h"
 #include "M_Matrix.h"
