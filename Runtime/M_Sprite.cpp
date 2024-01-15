@@ -14,7 +14,6 @@ minty::Sprite::Sprite(rendering::SpriteBuilder const& builder, RenderEngine& ren
 	, _minCoords()
 	, _maxCoords()
 	, _pivot()
-	, _size(builder.size)
 {
 	MINTY_ASSERT(builder.textureId != ERROR_ID, "Cannot create a sprite with ERROR_ID texture id.");
 	MINTY_ASSERT(builder.materialId != ERROR_ID, "Cannot create a sprite with ERROR_ID material id.");
