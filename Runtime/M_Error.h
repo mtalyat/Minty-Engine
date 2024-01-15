@@ -1,8 +1,9 @@
 #pragma once
 
+#include "M_Macros.h"
 #include "M_Types.h"
 
-#ifdef NDEBUG
+#ifdef MINTY_RELEASE
 #define MINTY_ASSERT(expression, message)
 #else
 #define MINTY_ASSERT(expression, message) if(!(expression)) minty::error::abort(message);

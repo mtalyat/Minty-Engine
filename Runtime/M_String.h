@@ -27,7 +27,7 @@ namespace minty::string
 	/// <param name="data">A pointer to the data to be converted.</param>
 	/// <param name="size">The number of bytes to convert to a string.</param>
 	/// <returns>A string containing all of the bytes.</returns>
-	String to_bytes(void* const data, size_t const size);
+	String to_bytes(void const* const data, size_t const size);
 
 	/// <summary>
 	/// Converts the given data to a string of binary number values, separated by spaces.
@@ -35,7 +35,7 @@ namespace minty::string
 	/// <param name="data">A pointer to the data to be converted.</param>
 	/// <param name="size">The number of bytes to convert to a string.</param>
 	/// <returns>A string contining all of the bits.</returns>
-	String to_bits(void* const data, size_t const size);
+	String to_bits(void const* const data, size_t const size);
 	
 	/// <summary>
 	/// Checks if the two strings are equal, disregarding case sensitivity.

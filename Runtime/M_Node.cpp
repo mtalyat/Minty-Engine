@@ -140,106 +140,92 @@ std::vector<Node> const* minty::Node::find_all(String const& name) const
 
 String const& minty::Node::get_string(String const& name, String const& defaultValue) const
 {
-	Node const* node = find(name);
-	if (node)
+	if (Node const* node = find(name))
 	{
 		return node->to_string();
 	}
-	else
-	{
-		return defaultValue;
-	}
+
+	return defaultValue;
 }
 
 Byte minty::Node::get_byte(String const& name, Byte const defaultValue) const
 {
-	Node const* node = find(name);
-	if (node)
+	if (Node const* node = find(name))
 	{
 		return node->to_byte(defaultValue);
 	}
-	else
-	{
-		return defaultValue;
-	}
+
+	return defaultValue;
 }
 
 int minty::Node::get_int(String const& name, int const defaultValue) const
 {
-	Node const* node = find(name);
-	if (node)
+	if (Node const* node = find(name))
 	{
 		return node->to_int(defaultValue);
 	}
-	else
-	{
-		return defaultValue;
-	}
+
+	return defaultValue;
 }
 
 ID minty::Node::get_id(String const& name, ID const defaultValue) const
 {
-	Node const* node = find(name);
-	if (node)
+	if (Node const* node = find(name))
 	{
 		return node->to_id(defaultValue);
 	}
-	else
-	{
-		return defaultValue;
-	}
+
+	return defaultValue;
 }
 
 unsigned int minty::Node::get_uint(String const& name, unsigned int const defaultValue) const
 {
-	Node const* node = find(name);
-	if (node)
+	if (Node const* node = find(name))
 	{
 		return node->to_uint(defaultValue);
 	}
-	else
-	{
-		return defaultValue;
-	}
+
+	return defaultValue;
 }
 
 size_t minty::Node::get_size(String const& name, size_t const defaultValue) const
 {
-	Node const* node = find(name);
-	if (node)
+	if (Node const* node = find(name))
 	{
 		return node->to_size(defaultValue);
 	}
-	else
-	{
-		return defaultValue;
-	}
+
+	return defaultValue;
 }
 
 float minty::Node::get_float(String const& name, float const defaultValue) const
 {
-	Node const* node = find(name);
-	if (node)
+	if (Node const* node = find(name))
 	{
 		return node->to_float(defaultValue);
 	}
-	else
-	{
-		return defaultValue;
-	}
+
+	return defaultValue;
 }
 
 bool minty::Node::get_bool(String const& name, bool const defaultValue) const
 {
-	Node const* node = find(name);
-	if (node)
+	if (Node const* node = find(name))
 	{
 		return node->to_bool(defaultValue);
 	}
-	else
+
+	return defaultValue;
+}
+
+Vector2 minty::Node::get_vector2(String const& name, Vector2 const defaultValue) const
+{
+	if (Node const* node = find(name))
 	{
-		return defaultValue;
+		return Vector2(node->get_float("x"), node->get_float("y"));
 	}
+
+	return defaultValue;
 }
 
 void minty::Node::print(int const indent) const

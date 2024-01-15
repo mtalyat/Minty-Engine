@@ -13,7 +13,7 @@ namespace minty::rendering
 	struct TextureBuilder
 	{
 		/// <summary>
-		/// The name of the Texure.
+		/// The name of the Texture.
 		/// </summary>
 		String name;
 		/// <summary>

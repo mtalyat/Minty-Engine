@@ -6,3 +6,8 @@ defaults
         20f: 1
         24f: 1
         28f: 1
+    textures
+        0: oak_planks
+        1: pattern
+        2: texture
+        3: pumpkin_tex

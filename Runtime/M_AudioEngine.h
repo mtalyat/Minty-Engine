@@ -211,7 +211,7 @@ namespace minty
 		/// </summary>
 		/// <param name="id">The ID of the AudioClip.</param>
 		/// <returns>The name of the AudioClip.</returns>
-		String const& get_name(ID const id) const;
+		String get_name(ID const id) const;
 
 		/// <summary>
 		/// Gets the ID of the loaded AudioClip with the given name.

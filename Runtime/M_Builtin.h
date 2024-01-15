@@ -6,7 +6,8 @@
 
 namespace minty::builtin
 {
-	struct GlobalData
+	// global uniform buffer object
+	struct GlobalUBO
 	{
 		alignas(16) float time;
 		float deltaTime;

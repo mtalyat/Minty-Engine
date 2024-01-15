@@ -14,12 +14,17 @@ namespace minty
 		/// <summary>
 		/// The ID of the Sprite to render.
 		/// </summary>
-		ID id;
+		ID spriteId;
 
 		/// <summary>
-		/// The layer on which to render the Sprite.
+		/// The size of the Sprite in world space.
 		/// </summary>
-		int layer;
+		Vector2 size;
+
+		/// <summary>
+		/// The order in which to render the Sprite, when it has equal distance to the Camera as another Sprite.
+		/// </summary>
+		int order;
 
 		void serialize(Writer& writer) const override;
 		void deserialize(Reader const& reader) override;

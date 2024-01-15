@@ -15,7 +15,7 @@ minty::ShaderPass::ShaderPass(ShaderPassBuilder const& builder, RenderEngine& re
 	create_pipeline(builder);
 
 	Shader& shader = renderer.get_shader(_shaderId);
-	_descriptorSet = shader.create_descriptor_set(DESCRIPTOR_SET_SHADER_PASS);
+	_descriptorSet = shader.create_descriptor_set(DESCRIPTOR_SET_SHADER_PASS, true);
 }
 
 void minty::ShaderPass::destroy()

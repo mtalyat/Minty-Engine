@@ -1,0 +1,4 @@
+template: spriteMaterialTemplate
+values
+    texture
+        0: x

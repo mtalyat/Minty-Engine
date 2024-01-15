@@ -27,7 +27,7 @@ minty::Material::Material(rendering::MaterialBuilder const& builder, RenderEngin
 		auto& shader = _renderer.get_shader(shaderId);
 
 		// get the descriptor set for the pass
-		DescriptorSet descriptorSet = shader.create_descriptor_set(DESCRIPTOR_SET_MATERIAL);
+		DescriptorSet descriptorSet = shader.create_descriptor_set(DESCRIPTOR_SET_MATERIAL, false);
 		
 		// set all values
 		for (auto const& defaultValue : defaultValues)
@@ -44,6 +44,9 @@ minty::Material::Material(rendering::MaterialBuilder const& builder, RenderEngin
 				descriptorSet.set(found->first, found->second);
 			}
 		}
+
+		// apply changes
+		descriptorSet.apply();
 
 		// add to pass descriptor sets
 		_passDescriptorSets.push_back(descriptorSet);

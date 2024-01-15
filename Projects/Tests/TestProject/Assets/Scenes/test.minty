@@ -13,31 +13,17 @@ Entities
             far: 100.0
         Move
         AudioListener
-    Model
-        Renderable
-        Transform
-        Mesh
-            material: pumpkinMat
-            type: custom
-            name: pumpkin
-        AudioSource
-            clip: cow-bells
-#        Test
-#            rotationSpeed
-#                y: 1.0
-#    Sphere
+#    Model
 #        Renderable
 #        Transform
-#            position
-#                y: 2
 #        Mesh
-#            material: material2
-#            type: sphere
-#    Cylinder
+#            material: material1
+#            type: cube
+#        AudioSource
+#            clip: cow-bells
+#    Sprite
 #        Renderable
 #        Transform
-#            position
-#                y: -2
-#        Mesh
-#            material: material3
-#            type: cylinder
+#        Sprite
+#            sprite: brian
+#            order: 0

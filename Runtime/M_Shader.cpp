@@ -29,7 +29,7 @@ minty::Shader::Shader(rendering::ShaderBuilder const& builder, RenderEngine& ren
 	create_pipeline_layout(builder);
 
 	// create global descriptor set
-	_descriptorSet = create_descriptor_set(DESCRIPTOR_SET_SHADER);
+	_descriptorSet = create_descriptor_set(DESCRIPTOR_SET_SHADER, true);
 }
 
 void minty::Shader::destroy()
@@ -63,13 +63,7 @@ rendering::DescriptorSet const& minty::Shader::get_global_descriptor_set() const
 	return _descriptorSet;
 }
 
-//void minty::Shader::bind(VkCommandBuffer const commandBuffer) const
-//{
-//	// bind descriptors
-//	//vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, _pipelineLayout, 0, 1, &_descriptorSets[_renderer.get_frame()], 0, nullptr);
-//}
-
-void minty::Shader::update_push_constant(VkCommandBuffer const commandBuffer, void* const value, uint32_t const size, uint32_t const offset) const
+void minty::Shader::update_push_constant(VkCommandBuffer const commandBuffer, void const* const value, uint32_t const size, uint32_t const offset)
 {
 	// get info of push constant
 	auto const& info = _pushConstantInfos.at(0);
@@ -78,7 +72,7 @@ void minty::Shader::update_push_constant(VkCommandBuffer const commandBuffer, vo
 	vkCmdPushConstants(commandBuffer, _pipelineLayout, info.stageFlags, info.offset + offset, size, value);
 }
 
-void minty::Shader::update_push_constant(String const& name, VkCommandBuffer const commandBuffer, void* const value, uint32_t const size, uint32_t const offset) const
+void minty::Shader::update_push_constant(String const& name, VkCommandBuffer const commandBuffer, void const* const value, uint32_t const size, uint32_t const offset)
 {
 	// get info of push constant
 	auto const& info = _pushConstantInfos.at(name);
@@ -87,9 +81,16 @@ void minty::Shader::update_push_constant(String const& name, VkCommandBuffer con
 	vkCmdPushConstants(commandBuffer, _pipelineLayout, info.stageFlags, info.offset + offset, size, value);
 }
 
-void minty::Shader::update_global_uniform_constant(String const& name, void* const value, uint32_t const size, uint32_t const offset) const
+void minty::Shader::update_global_uniform_constant(String const& name, void const* const value, uint32_t const size, uint32_t const offset)
 {
-	_descriptorSet.set(name, value, offset, size);
+	_descriptorSet.set(name, value, size, offset);
+	_descriptorSet.apply();
+}
+
+void minty::Shader::update_global_uniform_constant(String const& name, int const frame, void const* const value, uint32_t const size, uint32_t const offset)
+{
+	_descriptorSet.set(name, frame, value, size, offset);
+	_descriptorSet.apply(frame);
 }
 
 void minty::Shader::create_descriptor_set_layouts(rendering::ShaderBuilder const& builder)
@@ -260,8 +261,14 @@ std::array<VkDescriptorSet, MAX_FRAMES_IN_FLIGHT> minty::Shader::create_descript
 	return descriptorSets;
 }
 
-DescriptorSet minty::Shader::create_descriptor_set(uint32_t const set)
+DescriptorSet minty::Shader::create_descriptor_set(uint32_t const set, bool const initialize)
 {
+	if (set == DESCRIPTOR_SET_INVALID)
+	{
+		// invalid set, so just create an empty descriptor
+		return DescriptorSet(_renderer);
+	}
+
 	// create and allocate sets
 	auto descriptorSets = create_descriptor_sets(set);
 
@@ -269,114 +276,85 @@ DescriptorSet minty::Shader::create_descriptor_set(uint32_t const set)
 	auto const& constantInfos = get_uniform_constant_infos(set);
 
 	// update descriptor set with data
+	std::unordered_map<String, std::array<DescriptorSet::DescriptorData, MAX_FRAMES_IN_FLIGHT>> datas;
 
-	std::vector<VkWriteDescriptorSet> descriptorWrites;
-	std::vector<VkDescriptorBufferInfo> bufferInfos;
-	std::unordered_map<String, std::array<ID, MAX_FRAMES_IN_FLIGHT>> buffers;
-	std::vector<std::vector<VkDescriptorImageInfo>> imageInfos;
-
-	descriptorWrites.resize(constantInfos.size());
-
-	int setIndex = 0;
+	int frame = 0;
 
 	for (auto const set : descriptorSets)
 	{
 		int i = 0;
+
 		// iterate through Vulkan descriptor sets, set to default Material template values
 		for (auto const& info : constantInfos)
 		{
 			auto const type = info.type;
 
+			// create a new data for this constant, if needed
+			auto const& found = datas.find(info.name);
+			if (found == datas.end())
+			{
+				// add new array
+				datas.emplace(info.name, std::array<DescriptorSet::DescriptorData, MAX_FRAMES_IN_FLIGHT>());
+			}
+
+			// get the data we are using
+			auto& data = datas.at(info.name).at(frame);
+
+			// set the shared data for each write
+			data.empty = true;
+			data.type = type;
+			data.binding = info.binding;
+			data.count = info.count;
+			data.ids.clear();
+
 			switch (type)
 			{
 			case VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER:
 			{
+				// resize ids to one
+				data.ids.resize(1);
+
 				// create a buffer
 				ID bufferId = _renderer.create_buffer_uniform(static_cast<VkDeviceSize>(info.size));
 
 				// add to buffers
-				auto const& found = buffers.find(info.name);
-				if (found == buffers.end())
-				{
-					buffers.emplace(info.name, std::array<ID, MAX_FRAMES_IN_FLIGHT>());
-				}
-				buffers.at(info.name)[setIndex] = bufferId;
+				data.ids[0] = bufferId;
 
-				// add buffer info
-				bufferInfos.push_back(VkDescriptorBufferInfo());
-
-				// set buffer info
-				VkDescriptorBufferInfo& bufferInfo = bufferInfos.back();
-				bufferInfo.buffer = _renderer.get_buffer(bufferId);
-				bufferInfo.offset = 0;
-				bufferInfo.range = _renderer.get_buffer_size(bufferId);
-
-				// create write
-				descriptorWrites[i] = {
-						.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-						.pNext = nullptr,
-						.dstSet = set,
-						.dstBinding = info.binding,
-						.dstArrayElement = 0,
-						.descriptorCount = info.count,
-						.descriptorType = type,
-						.pImageInfo = nullptr,
-						.pBufferInfo = &bufferInfo,
-						.pTexelBufferView = nullptr,
-				};
+				// not empty by default
+				data.empty = false;
 
 				break;
 			}
 			case VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER:
-				// create new array of image infos
-				imageInfos.push_back(std::vector<VkDescriptorImageInfo>());
-				auto& list = imageInfos.back();
-				auto const& imageIds = info.ids;
-				list.resize(imageIds.size());
+			{
+				// resize image infos
+				data.ids.resize(static_cast<size_t>(info.count));
 
-				// populate with images based on ids
-				for (size_t k = 0; k < imageIds.size(); k++)
-				{
-					ID textureId = imageIds.at(k);
+				// empty by default, until ids are populated
 
-					Texture const& texture = _renderer.get_texture(textureId);
-
-					VkDescriptorImageInfo& imageInfo = list.at(k);
-
-					imageInfo.sampler = texture.get_sampler();
-					imageInfo.imageView = texture.get_image_view();
-					imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-				}
-
-				// create write
-				descriptorWrites[i] = {
-						.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET,
-						.pNext = nullptr,
-						.dstSet = set,
-						.dstBinding = info.binding,
-						.dstArrayElement = 0,
-						.descriptorCount = info.count,
-						.descriptorType = type,
-						.pImageInfo = list.data(),
-						.pBufferInfo = nullptr,
-						.pTexelBufferView = nullptr,
-				};
 				break;
+			}
 			}
 
 			i++;
 		}
 
-		vkUpdateDescriptorSets(_renderer.get_device(), static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
-
-		setIndex++;
+		frame++;
 	}
 
-	// all done
-	return DescriptorSet(descriptorSets, buffers, _renderer);
+	// all done, create set
+	DescriptorSet descriptorSet(descriptorSets, datas, _renderer);
+
+	// "initialize" it if told to
+	if (initialize)
+	{
+		descriptorSet.apply();
+	}
+
+	return descriptorSet;
 }
 
-std::vector<rendering::UniformConstantInfo> minty::Shader::get_uniform_constant_infos(uint32_t const set)
+std::vector<rendering::UniformConstantInfo> minty::Shader::get_uniform_constant_infos(uint32_t const set) const
 {
 	std::vector<rendering::UniformConstantInfo> infos;
 

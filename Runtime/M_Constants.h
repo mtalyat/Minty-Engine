@@ -17,6 +17,8 @@ namespace minty
 	/// </summary>
 	constexpr int DESCRIPTOR_SET_COUNT = 3;
 
+	constexpr unsigned int DESCRIPTOR_SET_INVALID = -1;
+
 	constexpr unsigned int DESCRIPTOR_SET_SHADER = 0;
 	constexpr unsigned int DESCRIPTOR_SET_SHADER_PASS = 1;
 	constexpr unsigned int DESCRIPTOR_SET_MATERIAL = 2;

@@ -3,6 +3,7 @@
 
 #include "M_Rendering_RendererBuilder.h"
 #include "M_Rendering_DrawCallObjectInfo.h"
+#include "M_Rendering_SpritePushData.h"
 
 #include "M_Console.h"
 #include "M_Engine.h"
@@ -19,6 +20,7 @@
 
 #include "M_Asset.h"
 #include "M_Parse.h"
+#include "M_String.h"
 
 #include "M_Vector.h"
 #include "M_Matrix.h"
@@ -96,7 +98,7 @@ RenderEngine::RenderEngine(Window* const window)
 	, _view()
 	, _backgroundColor({ 250, 220, 192, 255 }) // light tan color
 	, _initialized()
-	, _frame(1)
+	, _frame(0)
 {
 	for (size_t i = 0; i < _boundIds.size(); i++)
 	{
@@ -1053,7 +1055,7 @@ void minty::RenderEngine::draw_scene(VkCommandBuffer commandBuffer)
 	// sort sprites so they render in the correct order, since Z does not matter
 	_registry->sort<SpriteComponent>([](SpriteComponent const& left, SpriteComponent const& right)
 		{
-			return left.layer < right.layer;
+			return left.order < right.order;
 		});
 
 	TransformComponent const* transformComponent;
@@ -1076,6 +1078,12 @@ void minty::RenderEngine::draw_scene(VkCommandBuffer commandBuffer)
 		}
 	}
 
+	// draw all world sprites in the scene
+	for (auto&& [entity, renderable, transform, sprite] : _registry->view<RenderableComponent const, TransformComponent const, SpriteComponent const>().each())
+	{
+		draw_sprite(commandBuffer, transform, sprite);
+	}
+
 	// sort UITransforms so that it matches order of sprites for rendering
 	_registry->sort<UITransformComponent, SpriteComponent>();
 
@@ -1090,77 +1098,144 @@ void minty::RenderEngine::draw_scene(VkCommandBuffer commandBuffer)
 	//bind_shader(commandBuffer, nullptr);
 }
 
-void minty::RenderEngine::draw_ui(VkCommandBuffer commandBuffer, UITransformComponent const& uiComponent, SpriteComponent const& spriteComponent)
+void minty::RenderEngine::draw_mesh(VkCommandBuffer commandBuffer, Matrix4 const& transformationMatrix, MeshComponent const& meshComponent)
+{
+	// do nothing if null mesh
+	if (meshComponent.meshId == ERROR_ID)
+	{
+		return;
+	}
+
+	Mesh& mesh = get_mesh(meshComponent.meshId);
+
+	// do nothing if empty mesh
+	if (mesh.empty())
+	{
+		return;
+	}
+
+	// bind the material, which will bind the shader and update its values
+	//bind_shader(commandBuffer, &shader);
+	bind(commandBuffer, meshComponent.materialId);
+
+	// bind vertex data
+	VkBuffer vertexBuffers[] = { get_buffer(mesh.get_vertex_buffer_id()) };
+	VkDeviceSize offsets[] = { 0 };
+	vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+	vkCmdBindIndexBuffer(commandBuffer, get_buffer(mesh.get_index_buffer_id()), 0, mesh.get_index_type());
+
+	// send push constants so we know where to draw
+	Matrix4 tmatrix = transformationMatrix;
+	DrawCallObject3D info
+	{
+		.transform = tmatrix,
+	};
+	Shader& shader = get_shader_from_material_id(meshComponent.materialId);
+	shader.update_push_constant(commandBuffer, &info, sizeof(DrawCallObject3D));
+
+	// draw
+	vkCmdDrawIndexed(commandBuffer, mesh.get_index_count(), 1, 0, 0, 0);
+}
+
+void minty::RenderEngine::draw_sprite(VkCommandBuffer commandBuffer, TransformComponent const& transformComponent, SpriteComponent const& spriteComponent)
 {
 	// get the sprite
-	Sprite& sprite = get_sprite(spriteComponent.id);
+	Sprite const& sprite = get_sprite(spriteComponent.spriteId);
 
 	// bind the material the sprite is using
 	bind(commandBuffer, sprite.get_material_id());
 
-	// adjust info based on anchor and pivot
-	float width = static_cast<float>(_window->get_width());
-	float height = static_cast<float>(_window->get_height());
-	float left, top, right, bottom;
-
-	int anchor = static_cast<int>(uiComponent.anchorMode);
-
-	// do x, then y
-	if (anchor & static_cast<int>(AnchorMode::Left))
+	// get the data
+	SpritePushData pushData
 	{
-		left = uiComponent.x / width;
-		right = (uiComponent.x + uiComponent.width) / width;
-	}
-	else if (anchor & static_cast<int>(AnchorMode::Center))
-	{
-		left = uiComponent.x / width + 0.5f;
-		right = (uiComponent.x + uiComponent.width) / width + 0.5f;
-	}
-	else if (anchor & static_cast<int>(AnchorMode::Right))
-	{
-		left = uiComponent.x / width + 1.0f;
-		right = (uiComponent.x + uiComponent.width) / width + 1.0f;
-	}
-	else
-	{
-		left = uiComponent.left;
-		right = uiComponent.right;
-	}
-
-	if (anchor & static_cast<int>(AnchorMode::Top))
-	{
-		top = uiComponent.y / height;
-		bottom = (uiComponent.y + uiComponent.height) / height;
-	}
-	else if (anchor & static_cast<int>(AnchorMode::Middle))
-	{
-		top = uiComponent.y / height + 0.5f;
-		bottom = (uiComponent.y + uiComponent.height) / height + 0.5f;
-	}
-	else if (anchor & static_cast<int>(AnchorMode::Bottom))
-	{
-		top = uiComponent.y / height + 1.0f;
-		bottom = (uiComponent.y + uiComponent.height) / height + 1.0f;
-	}
-	else
-	{
-		top = uiComponent.top;
-		bottom = uiComponent.bottom;
-	}
-
-	// set draw call info
-	DrawCallObjectUI info
-	{
-		.materialId = sprite.get_material_id(),
-		.layer = spriteComponent.layer,
-		.coords = Vector4(sprite.get_min_coords(), sprite.get_max_coords()),
-		.pos = Vector4(left, top, right, bottom),
+		.transform = transformComponent.global,
+		.minCoords = sprite.get_min_coords(),
+		.maxCoords = sprite.get_max_coords(),
+		.pivot = sprite.get_pivot(),
+		.size = spriteComponent.size,
 	};
+
+	// push data to shader
 	Shader& shader = get_shader_from_material_id(sprite.get_material_id());
-	shader.update_push_constant(commandBuffer, &info, sizeof(DrawCallObjectUI));
+	shader.update_push_constant(commandBuffer, &pushData, sizeof(SpritePushData));
 
 	// draw
 	vkCmdDraw(commandBuffer, 6, 1, 0, 0);
+}
+
+void minty::RenderEngine::draw_ui(VkCommandBuffer commandBuffer, UITransformComponent const& uiComponent, SpriteComponent const& spriteComponent)
+{
+	console::todo("fix draw_ui");
+	//// get the sprite
+	//Sprite const& sprite = get_sprite(spriteComponent.spriteId);
+
+	//// bind the material the sprite is using
+	//bind(commandBuffer, sprite.get_material_id());
+
+	//// adjust info based on anchor and pivot
+	//float width = static_cast<float>(_window->get_width());
+	//float height = static_cast<float>(_window->get_height());
+	//float left, top, right, bottom;
+
+	//int anchor = static_cast<int>(uiComponent.anchorMode);
+
+	//// do x, then y
+	//if (anchor & static_cast<int>(AnchorMode::Left))
+	//{
+	//	left = uiComponent.x / width;
+	//	right = (uiComponent.x + uiComponent.width) / width;
+	//}
+	//else if (anchor & static_cast<int>(AnchorMode::Center))
+	//{
+	//	left = uiComponent.x / width + 0.5f;
+	//	right = (uiComponent.x + uiComponent.width) / width + 0.5f;
+	//}
+	//else if (anchor & static_cast<int>(AnchorMode::Right))
+	//{
+	//	left = uiComponent.x / width + 1.0f;
+	//	right = (uiComponent.x + uiComponent.width) / width + 1.0f;
+	//}
+	//else
+	//{
+	//	left = uiComponent.left;
+	//	right = uiComponent.right;
+	//}
+
+	//if (anchor & static_cast<int>(AnchorMode::Top))
+	//{
+	//	top = uiComponent.y / height;
+	//	bottom = (uiComponent.y + uiComponent.height) / height;
+	//}
+	//else if (anchor & static_cast<int>(AnchorMode::Middle))
+	//{
+	//	top = uiComponent.y / height + 0.5f;
+	//	bottom = (uiComponent.y + uiComponent.height) / height + 0.5f;
+	//}
+	//else if (anchor & static_cast<int>(AnchorMode::Bottom))
+	//{
+	//	top = uiComponent.y / height + 1.0f;
+	//	bottom = (uiComponent.y + uiComponent.height) / height + 1.0f;
+	//}
+	//else
+	//{
+	//	top = uiComponent.top;
+	//	bottom = uiComponent.bottom;
+	//}
+
+	//// set draw call info
+	//DrawCallObjectUI info
+	//{
+	//	.materialId = sprite.get_material_id(),
+	//	.layer = spriteComponent.layer,
+	//	.coords = Vector4(sprite.get_min_coords(), sprite.get_max_coords()),
+	//	.pos = Vector4(left, top, right, bottom),
+	//};
+
+	//Shader& shader = get_shader_from_material_id(sprite.get_material_id());
+	//shader.update_push_constant(commandBuffer, &info, sizeof(DrawCallObjectUI));
+
+	//// draw
+	//vkCmdDraw(commandBuffer, 6, 1, 0, 0);
 }
 
 bool RenderEngine::check_validation_layer_support()
@@ -1215,6 +1290,11 @@ void RenderEngine::populate_debug_messenger_create_info(VkDebugUtilsMessengerCre
 ID minty::RenderEngine::create_texture(rendering::TextureBuilder const& builder)
 {
 	return _textures.emplace(builder.name, Texture(builder, *this));
+}
+
+ID minty::RenderEngine::create_sprite(rendering::SpriteBuilder const& builder)
+{
+	return _sprites.emplace(builder.name, Sprite(builder, *this));
 }
 
 ID minty::RenderEngine::create_shader(rendering::ShaderBuilder const& builder)
@@ -1299,7 +1379,7 @@ ID minty::RenderEngine::get_or_create_mesh(MeshType const type)
 	return id;
 }
 
-ID minty::RenderEngine::find_texture(String const& name)
+ID minty::RenderEngine::find_texture(String const& name) const
 {
 	if (!_textures.contains(name))
 	{
@@ -1309,7 +1389,17 @@ ID minty::RenderEngine::find_texture(String const& name)
 	return _textures.get_id(name);
 }
 
-ID minty::RenderEngine::find_shader(String const& name)
+ID minty::RenderEngine::find_sprite(String const& name) const
+{
+	if (!_sprites.contains(name))
+	{
+		return ERROR_ID;
+	}
+
+	return _sprites.get_id(name);
+}
+
+ID minty::RenderEngine::find_shader(String const& name) const
 {
 	if (!_shaders.contains(name))
 	{
@@ -1319,7 +1409,7 @@ ID minty::RenderEngine::find_shader(String const& name)
 	return _shaders.get_id(name);
 }
 
-ID minty::RenderEngine::find_shader_pass(String const& name)
+ID minty::RenderEngine::find_shader_pass(String const& name) const
 {
 	if (!_shaderPasses.contains(name))
 	{
@@ -1329,7 +1419,7 @@ ID minty::RenderEngine::find_shader_pass(String const& name)
 	return _shaderPasses.get_id(name);
 }
 
-ID minty::RenderEngine::find_material_template(String const& name)
+ID minty::RenderEngine::find_material_template(String const& name) const
 {
 	if (!_materialTemplates.contains(name))
 	{
@@ -1339,7 +1429,7 @@ ID minty::RenderEngine::find_material_template(String const& name)
 	return _materialTemplates.get_id(name);
 }
 
-ID minty::RenderEngine::find_material(String const& name)
+ID minty::RenderEngine::find_material(String const& name) const
 {
 	if (!_materials.contains(name))
 	{
@@ -1349,7 +1439,7 @@ ID minty::RenderEngine::find_material(String const& name)
 	return _materials.get_id(name);
 }
 
-ID minty::RenderEngine::find_mesh(String const& name)
+ID minty::RenderEngine::find_mesh(String const& name) const
 {
 	if (!_meshes.contains(name))
 	{
@@ -1359,7 +1449,47 @@ ID minty::RenderEngine::find_mesh(String const& name)
 	return _meshes.get_id(name);
 }
 
+String minty::RenderEngine::get_texture_name(ID const id) const
+{
+	return _textures.get_name(id);
+}
+
+String minty::RenderEngine::get_sprite_name(ID const id) const
+{
+	return _sprites.get_name(id);
+}
+
+String minty::RenderEngine::get_shader_name(ID const id) const
+{
+	return _shaders.get_name(id);
+}
+
+String minty::RenderEngine::get_shader_pass_name(ID const id) const
+{
+	return _shaderPasses.get_name(id);
+}
+
+String minty::RenderEngine::get_material_template_name(ID const id) const
+{
+	return _materialTemplates.get_name(id);
+}
+
+String minty::RenderEngine::get_material_name(ID const id) const
+{
+	return _materials.get_name(id);
+}
+
+String minty::RenderEngine::get_mesh_name(ID const id) const
+{
+	return _meshes.get_name(id);
+}
+
 ID minty::RenderEngine::load_texture(Path const& path)
+{
+	return load_texture(path, path.stem().string());
+}
+
+ID minty::RenderEngine::load_texture(Path const& path, String const& name)
 {
 	if (check_asset(path, false))
 	{
@@ -1371,7 +1501,7 @@ ID minty::RenderEngine::load_texture(Path const& path)
 	// create texture builder from path and meta file
 	TextureBuilder builder
 	{
-		.name = Path(path).stem().string(),
+		.name = name,
 		.path = path,
 		.pixelData = nullptr,
 		.width = 0,
@@ -1386,7 +1516,40 @@ ID minty::RenderEngine::load_texture(Path const& path)
 	return create_texture(builder);
 }
 
+ID minty::RenderEngine::load_sprite(Path const& path)
+{
+	return load_sprite(path, path.stem().string());
+}
+
+ID minty::RenderEngine::load_sprite(Path const& path, String const& name)
+{
+	if (check_asset(path, false))
+	{
+		return ERROR_ID;
+	}
+
+	Node meta = Asset::load_node(path);
+
+	SpriteBuilder builder
+	{
+		.name = name,
+		.textureId = find_texture(meta.get_string("texture")),
+		.materialId = find_material(meta.get_string("material")),
+		.coordinateMode = from_string_pixel_coordinate_mode(meta.get_string("coordinateMode")),
+		.minCoords = meta.get_vector2("min", Vector2(0.0f, 0.0f)),
+		.maxCoords = meta.get_vector2("max", Vector2(1.0f, 1.0f)),
+		.pivot = meta.get_vector2("pivot", Vector2(0.5f, 0.5f)),
+	};
+
+	return create_sprite(builder);
+}
+
 ID minty::RenderEngine::load_shader(Path const& path)
+{
+	return load_shader(path, path.stem().string());
+}
+
+ID minty::RenderEngine::load_shader(Path const& path, String const& name)
 {
 	if (check_asset(path, false))
 	{
@@ -1427,13 +1590,6 @@ ID minty::RenderEngine::load_shader(Path const& path)
 			uniformConstantInfo.count = child.get_uint("count", 1u);
 			uniformConstantInfo.size = static_cast<VkDeviceSize>(child.get_size("size"));
 			uniformConstantInfo.stageFlags = from_string_vk_shader_stage_flag_bits(child.get_string("stageFlags"));
-			if (std::vector<Node> const* ids = child.find_all("id"))
-			{
-				for (auto const& id : *ids)
-				{
-					uniformConstantInfo.ids.push_back(id.to_id());
-				}
-			}
 
 			builder.uniformConstantInfos.emplace(uniformConstantInfo.name, uniformConstantInfo);
 		}
@@ -1443,6 +1599,11 @@ ID minty::RenderEngine::load_shader(Path const& path)
 }
 
 ID minty::RenderEngine::load_shader_pass(Path const& path)
+{
+	return load_shader_pass(path, path.stem().string());
+}
+
+ID minty::RenderEngine::load_shader_pass(Path const& path, String const& name)
 {
 	if (check_asset(path, false))
 	{
@@ -1508,6 +1669,11 @@ ID minty::RenderEngine::load_shader_pass(Path const& path)
 
 ID minty::RenderEngine::load_material_template(Path const& path)
 {
+	return load_material_template(path, path.stem().string());
+}
+
+ID minty::RenderEngine::load_material_template(Path const& path, String const& name)
+{
 	if (check_asset(path, false))
 	{
 		return ERROR_ID;
@@ -1528,19 +1694,22 @@ ID minty::RenderEngine::load_material_template(Path const& path)
 	}
 	if (Node const* node = meta.find("defaults"))
 	{
-		for (auto const& child : node->children)
-		{
-			Dynamic d;
-			Reader reader(child.second.front());
-			d.deserialize(reader);
-			builder.defaultValues.emplace(child.first, d);
-		}
+		// get shader uniform constant values so we know how to interpret the values in the materials
+		ShaderPass const& shaderPass = get_shader_pass(builder.shaderPassIds.front());
+		Shader const& shader = get_shader(shaderPass.get_shader_id());
+
+		load_descriptor_values(builder.defaultValues, *node, shader.get_uniform_constant_infos(DESCRIPTOR_SET_MATERIAL));
 	}
 
 	return create_material_template(builder);
 }
 
 ID minty::RenderEngine::load_material(Path const& path)
+{
+	return load_material(path, path.stem().string());
+}
+
+ID minty::RenderEngine::load_material(Path const& path, String const& name)
 {
 	if (check_asset(path, false))
 	{
@@ -1556,19 +1725,23 @@ ID minty::RenderEngine::load_material(Path const& path)
 
 	if (Node const* node = meta.find("values"))
 	{
-		for (auto const& child : node->children)
-		{
-			Dynamic d;
-			Reader reader(child.second.front());
-			d.deserialize(reader);
-			builder.values.emplace(child.first, d);
-		}
+		// get shader uniform constant values so we know how to interpret the values in the materials
+		MaterialTemplate const& materialTemplate = get_material_template(builder.templateId);
+		ShaderPass const& shaderPass = get_shader_pass(materialTemplate.get_shader_pass_ids().front());
+		Shader const& shader = get_shader(shaderPass.get_shader_id());
+
+		load_descriptor_values(builder.values, *node, shader.get_uniform_constant_infos(DESCRIPTOR_SET_MATERIAL));
 	}
 
 	return create_material(builder);
 }
 
 ID minty::RenderEngine::load_mesh(Path const& path)
+{
+	return load_mesh(path, path.stem().string());
+}
+
+ID minty::RenderEngine::load_mesh(Path const& path, String const& name)
 {
 	if (check_asset(path, false))
 	{
@@ -1584,7 +1757,6 @@ ID minty::RenderEngine::load_mesh(Path const& path)
 	}
 
 	// override existing mesh with same name
-	String name = path.stem().string();
 	ID id = get_or_create_mesh(name);
 
 	// determine how to load the file
@@ -1603,6 +1775,16 @@ void minty::RenderEngine::destroy_texture(ID const id)
 		auto& value = _textures.at(id);
 		value.destroy();
 		_textures.erase(id);
+	}
+}
+
+void minty::RenderEngine::destroy_sprite(ID const id)
+{
+	if (_sprites.contains(id))
+	{
+		auto& value = _sprites.at(id);
+		value.destroy();
+		_sprites.erase(id);
 	}
 }
 
@@ -1663,6 +1845,11 @@ void minty::RenderEngine::destroy_assets()
 		tex.second.destroy();
 	}
 	_textures.clear();
+	for (auto& sprite : _sprites)
+	{
+		sprite.second.destroy();
+	}
+	_sprites.clear();
 	for (auto& material : _materials)
 	{
 		material.second.destroy();
@@ -1688,6 +1875,69 @@ void minty::RenderEngine::destroy_assets()
 		mesh.second.clear();
 	}
 	_meshes.clear();
+}
+
+void minty::RenderEngine::load_descriptor_values(std::unordered_map<String, Dynamic>& values, Node const& node, std::vector<rendering::UniformConstantInfo> const& infos) const
+{
+	// go through all the constant values
+	for (auto const& info : infos)
+	{
+		// if the name exists in the node, interpret the values from the node
+		auto const& found = node.children.find(info.name);
+		if (found == node.children.end())
+		{
+			// not found in values, so skip it
+			continue;
+		}
+#ifdef MINTY_DEBUG
+		if (found->second.size() > 1)
+		{
+			console::warn(std::format("Duplicate descriptors named \"{}\" found. Only the first one is being used.", info.name));
+		}
+#endif
+		Node const& child = found->second.front();
+
+		switch (info.type)
+		{
+		case VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER:
+		{
+			// create list of ids from given texture names
+			size_t size = child.children.size();
+			ID* ids = new ID[size];
+			for (size_t i = 0; i < size; i++)
+			{
+				// if child with the index name exists, use that
+				if (Node const* c = child.find(std::to_string(i)))
+				{
+					// should be a texture name, so load that into ids
+					ids[i] = find_texture(c->to_string());
+				}
+				else
+				{
+					// if index name does not exist, show warning and set to ERROR_ID
+					console::warn(std::format("Failed to load texture with index {} into descriptor named \"{}\".", i, info.name));
+					ids[i] = ERROR_ID;
+				}
+			}
+
+			// add to values
+			values.emplace(found->first, Dynamic(ids, sizeof(ID) * size));
+			// done with original ids array
+			delete[] ids;
+
+			break;
+		}
+		case VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER:
+		{
+			// read raw data from files directly into the dynamic, for now
+			Dynamic d;
+			Reader reader(child);
+			d.deserialize(reader);
+			values.emplace(found->first, d);
+			break;
+		}
+		}
+	}
 }
 
 int minty::RenderEngine::check_asset(Path const& path, bool const requiresMeta) const
@@ -1985,7 +2235,7 @@ void RenderEngine::update_camera(CameraComponent const& camera, TransformCompone
 	// update all shaders
 	for (auto& shader : _shaders)
 	{
-		shader.second.update_global_uniform_constant("camera", &obj, sizeof(CameraBufferObject));
+		shader.second.update_global_uniform_constant("camera", _frame, &obj, sizeof(CameraBufferObject), 0);
 		//shader.update_uniform_constant_frame("camera", &obj, sizeof(CameraBufferObject));
 	}
 }
@@ -2060,7 +2310,7 @@ void minty::RenderEngine::unmap_buffer(ID const id) const
 	vkUnmapMemory(_device, buffer.memory);
 }
 
-void minty::RenderEngine::set_buffer(ID const id, void* const data)
+void minty::RenderEngine::set_buffer(ID const id, void const* const data)
 {
 	Buffer const& buffer = _buffers.at(id);
 
@@ -2068,7 +2318,7 @@ void minty::RenderEngine::set_buffer(ID const id, void* const data)
 	set_buffer(id, data, 0, buffer.size);
 }
 
-void minty::RenderEngine::set_buffer(ID const id, void* const data, VkDeviceSize const size, VkDeviceSize const offset)
+void minty::RenderEngine::set_buffer(ID const id, void const* const data, VkDeviceSize const size, VkDeviceSize const offset)
 {
 	Buffer const& buffer = _buffers.at(id);
 
@@ -2184,45 +2434,6 @@ void RenderEngine::create_command_buffers()
 	if (vkAllocateCommandBuffers(_device, &allocInfo, _commandBuffers.data()) != VK_SUCCESS) {
 		error::abort("Failed to allocate command buffers.");
 	}
-}
-
-void minty::RenderEngine::draw_mesh(VkCommandBuffer commandBuffer, Matrix4 const& transformationMatrix, MeshComponent const& meshComponent)
-{
-	// do nothing if null mesh
-	if (meshComponent.meshId == ERROR_ID)
-	{
-		return;
-	}
-
-	Mesh& mesh = get_mesh(meshComponent.meshId);
-
-	// do nothing if empty mesh
-	if (mesh.empty())
-	{
-		return;
-	}
-
-	// bind the material, which will bind the shader and update its values
-	//bind_shader(commandBuffer, &shader);
-	bind(commandBuffer, meshComponent.materialId);
-
-	// bind vertex data
-	VkBuffer vertexBuffers[] = { get_buffer(mesh.get_vertex_buffer_id()) };
-	VkDeviceSize offsets[] = { 0 };
-	vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
-	vkCmdBindIndexBuffer(commandBuffer, get_buffer(mesh.get_index_buffer_id()), 0, mesh.get_index_type());
-
-	// send push constants so we know where to draw
-	Matrix4 tmatrix = transformationMatrix;
-	DrawCallObject3D info
-	{
-		.transform = tmatrix,
-	};
-	Shader& shader = get_shader_from_material_id(meshComponent.materialId);
-	shader.update_push_constant(commandBuffer, &info, sizeof(DrawCallObject3D));
-
-	// draw
-	vkCmdDrawIndexed(commandBuffer, mesh.get_index_count(), 1, 0, 0, 0);
 }
 
 void minty::RenderEngine::set_main_camera(Entity const entity)
