@@ -17,6 +17,11 @@ namespace minty
 		ID spriteId;
 
 		/// <summary>
+		/// The size of the Sprite in world space.
+		/// </summary>
+		Vector2 size;
+
+		/// <summary>
 		/// The order in which to render the Sprite, when it has equal distance to the Camera as another Sprite.
 		/// </summary>
 		int order;

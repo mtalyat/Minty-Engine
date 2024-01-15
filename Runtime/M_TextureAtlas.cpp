@@ -92,35 +92,37 @@ Vector2Int minty::TextureAtlas::get_size() const
 	return Vector2Int(texture.get_width(), texture.get_height());
 }
 
-ID minty::TextureAtlas::create_sprite(int const x, int const y, Vector2 const pivot, Vector2 const size, CoordinateMode const coordinateMode) const
+ID minty::TextureAtlas::slice_sprite(Vector2 const minCoords, Vector2 const maxCoords, String const& name, CoordinateMode const coordinateMode) const
 {
-	// create name from the texture name and the x/y position
-	return create_sprite(x, y, pivot, size, std::format("{}_{}_{}", _renderer.get_texture_name(_textureId), x, y), coordinateMode);
+	return slice_sprite(minCoords, maxCoords, Vector2(0.5f, 0.5f), name, coordinateMode);
 }
 
-ID minty::TextureAtlas::create_sprite(int const x, int const y, Vector2 const pivot, Vector2 const size, String const& name, CoordinateMode const coordinateMode) const
+ID minty::TextureAtlas::slice_sprite(Vector2 const minCoords, Vector2 const maxCoords, Vector2 const pivot, String const& name, CoordinateMode const coordinateMode) const
 {
-	// get the appropriate pivot
-	Vector2 fixedPivot;
+	// create builder
+	rendering::SpriteBuilder builder
+	{
+		.name = name,
+		.textureId = _textureId,
+		.materialId = _materialId,
+		.coordinateMode = CoordinateMode::Normalized,
+		.minCoords = minCoords,
+		.maxCoords = maxCoords,
+		.pivot = pivot,
+	};
 
-	switch (coordinateMode)
-	{
-	case CoordinateMode::Normalized:
-	{
-		fixedPivot = pivot;
-		break;
-	}
-	case CoordinateMode::Pixel:
-	{
-		// convert from pixel to normalized
-		Texture const& texture = _renderer.get_texture(_textureId);
-		fixedPivot = Vector2(pivot.x / static_cast<float>(texture.get_width()), pivot.y / static_cast<float>(texture.get_height()));
-		break;
-	}
-	default:
-		return ERROR_ID;
-	}
+	// create the sprite
+	return _renderer.create_sprite(builder);
+}
 
+ID minty::TextureAtlas::create_sprite(int const x, int const y, Vector2 const pivot, CoordinateMode const coordinateMode) const
+{
+	// create name from the texture name and the x/y position
+	return create_sprite(x, y, pivot, std::format("{}_{}_{}", _renderer.get_texture_name(_textureId), x, y), coordinateMode);
+}
+
+ID minty::TextureAtlas::create_sprite(int const x, int const y, Vector2 const pivot, String const& name, CoordinateMode const coordinateMode) const
+{
 	// get texture
 	Texture const& texture = _renderer.get_texture(_textureId);
 	float width = static_cast<float>(texture.get_width());
@@ -130,19 +132,17 @@ ID minty::TextureAtlas::create_sprite(int const x, int const y, Vector2 const pi
 	Vector2 minCoords(static_cast<float>(x) * _slice.x / width, static_cast<float>(y) * _slice.y / height);
 	Vector2 maxCoords(static_cast<float>(x + 1) * _slice.x / width, static_cast<float>(y + 1) * _slice.y / height);
 
-	// create builder
-	rendering::SpriteBuilder builder
+	switch (coordinateMode)
 	{
-		.name = name,
-		.textureId = _textureId,
-		.materialId = _materialId,
-		.mode = CoordinateMode::Normalized,
-		.minCoords = minCoords,
-		.maxCoords = maxCoords,
-		.pivot = fixedPivot,
-		.size = Vector2(1.0f, 1.0f),
-	};
+	case CoordinateMode::Normalized:
 
-	// create the sprite
-	return _renderer.create_sprite(builder);
+		break;
+	case CoordinateMode::Pixel:
+
+		break;
+	default:
+		return ERROR_ID;
+	}
+
+	return slice_sprite(minCoords, maxCoords, pivot, name, coordinateMode);
 }

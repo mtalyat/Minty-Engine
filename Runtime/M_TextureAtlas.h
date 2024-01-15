@@ -7,6 +7,9 @@
 
 namespace minty
 {
+	/// <summary>
+	/// A collection of Sprites that originate from a Texture.
+	/// </summary>
 	class TextureAtlas
 		: public rendering::RenderObject
 	{
@@ -37,8 +40,29 @@ namespace minty
 
 		Vector2Int get_size() const;
 
-		ID create_sprite(int const x, int const y, Vector2 const pivot = Vector2(0.5f, 0.5f), Vector2 const size = Vector2(1.0f, 1.0f), CoordinateMode const coordinateMode = CoordinateMode::Normalized) const;
+		ID slice_sprite(Vector2 const minCoords, Vector2 const maxCoords, String const& name, CoordinateMode const coordinateMode = CoordinateMode::Normalized) const;
+		
+		ID slice_sprite(Vector2 const minCoords, Vector2 const maxCoords, Vector2 const pivot, String const& name, CoordinateMode const coordinateMode = CoordinateMode::Normalized) const;
 
-		ID create_sprite(int const x, int const y, Vector2 const pivot, Vector2 const size, String const& name, CoordinateMode const coordinateMode = CoordinateMode::Normalized) const;
+		/// <summary>
+		/// Creates a new Sprite using the given X and Y slice coordinates.
+		/// </summary>
+		/// <param name="x">The X slice coordinate.</param>
+		/// <param name="y">The Y slice coordiante.</param>
+		/// <param name="pivot">The pivot of the newly created Sprite.</param>
+		/// <param name="coordinateMode">The coordinate mode to interpret the pivot and size in.</param>
+		/// <returns>The ID to the newly created Sprite.</returns>
+		ID create_sprite(int const x, int const y, Vector2 const pivot = Vector2(0.5f, 0.5f), CoordinateMode const coordinateMode = CoordinateMode::Normalized) const;
+
+		/// <summary>
+		/// Creates a new Sprite using the given X and Y slice coordinates.
+		/// </summary>
+		/// <param name="x">The X slice coordinate.</param>
+		/// <param name="y">The Y slice coordiante.</param>
+		/// <param name="pivot">The pivot of the newly created Sprite.</param>
+		/// <param name="name">The name of the new Sprite.</param>
+		/// <param name="coordinateMode">The coordinate mode to interpret the pivot and size in.</param>
+		/// <returns>The ID to the newly created Sprite.</returns>
+		ID create_sprite(int const x, int const y, Vector2 const pivot, String const& name, CoordinateMode const coordinateMode = CoordinateMode::Normalized) const;
 	};
 }

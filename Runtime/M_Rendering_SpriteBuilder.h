@@ -32,7 +32,7 @@ namespace minty::rendering
 		/// <summary>
 		/// The type of input of the data within minimum, maximum and pivot.
 		/// </summary>
-		CoordinateMode mode = CoordinateMode::Normalized;
+		CoordinateMode coordinateMode = CoordinateMode::Normalized;
 
 		/// <summary>
 		/// The minimum position of the Sprite within the Texture.
@@ -48,11 +48,6 @@ namespace minty::rendering
 		/// The offset to the center of the Sprite when rendered.
 		/// </summary>
 		Vector2 pivot = Vector2(0.5f, 0.5f);
-
-		/// <summary>
-		/// The size of the Sprite in pixels.
-		/// </summary>
-		Vector2 size = Vector2();
 	};
 }
 

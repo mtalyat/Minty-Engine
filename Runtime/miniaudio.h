@@ -8656,11 +8656,11 @@ ma_result ma_device_init_internal__wasapi(ma_context* pContext, ma_device_type d
         if (FAILED(hr)) {
             /* Failed to initialize in exclusive mode. Don't fall back to shared mode - instead tell the client about it. They can reinitialize in shared mode if they want. */
             if (hr == E_ACCESSDENIED) {
-                errorMsg = "[WASAPI] Failed to initialize device in exclusive mode. Access denied.", result = MA_ACCESS_DENIED;
+                errorMsg = "[WASAPI] Failed to initialize device in exclusive coordinateMode. Access denied.", result = MA_ACCESS_DENIED;
             } else if (hr == MA_AUDCLNT_E_DEVICE_IN_USE) {
-                errorMsg = "[WASAPI] Failed to initialize device in exclusive mode. Device in use.", result = MA_DEVICE_BUSY;
+                errorMsg = "[WASAPI] Failed to initialize device in exclusive coordinateMode. Device in use.", result = MA_DEVICE_BUSY;
             } else {
-                errorMsg = "[WASAPI] Failed to initialize device in exclusive mode."; result = MA_SHARE_MODE_NOT_SUPPORTED;
+                errorMsg = "[WASAPI] Failed to initialize device in exclusive coordinateMode."; result = MA_SHARE_MODE_NOT_SUPPORTED;
             }
             goto done;
         }
@@ -14157,7 +14157,7 @@ ma_result ma_device_init_by_type__alsa(ma_context* pContext, const ma_device_con
         if (((ma_snd_pcm_hw_params_set_access_proc)pContext->alsa.snd_pcm_hw_params_set_access)(pPCM, pHWParams, MA_SND_PCM_ACCESS_RW_INTERLEAVED) < 0) {
             ma_free(pHWParams);
             ((ma_snd_pcm_close_proc)pDevice->pContext->alsa.snd_pcm_close)(pPCM);
-            return ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[ALSA] Failed to set access mode to neither SND_PCM_ACCESS_MMAP_INTERLEAVED nor SND_PCM_ACCESS_RW_INTERLEAVED. snd_pcm_hw_params_set_access() failed.", MA_FORMAT_NOT_SUPPORTED);
+            return ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[ALSA] Failed to set access coordinateMode to neither SND_PCM_ACCESS_MMAP_INTERLEAVED nor SND_PCM_ACCESS_RW_INTERLEAVED. snd_pcm_hw_params_set_access() failed.", MA_FORMAT_NOT_SUPPORTED);
         }
     }
 

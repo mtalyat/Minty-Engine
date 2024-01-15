@@ -11,13 +11,19 @@ minty::Sprite::Sprite(rendering::SpriteBuilder const& builder, RenderEngine& ren
 	: RenderObject::RenderObject(renderer)
 	, _textureId(builder.textureId)
 	, _materialId(builder.materialId)
-	, _minCoords(builder.minCoords)
-	, _maxCoords(builder.maxCoords)
-	, _pivot(builder.pivot)
+	, _minCoords()
+	, _maxCoords()
+	, _pivot()
 	, _size(builder.size)
 {
 	MINTY_ASSERT(builder.textureId != ERROR_ID, "Cannot create a sprite with ERROR_ID texture id.");
 	MINTY_ASSERT(builder.materialId != ERROR_ID, "Cannot create a sprite with ERROR_ID material id.");
+
+	// set values based on coordinate mode
+	// all values should be normalized inside of Sprite
+	set_min_coords(builder.minCoords, builder.coordinateMode);
+	set_max_coords(builder.maxCoords, builder.coordinateMode);
+	set_pivot(builder.pivot, builder.coordinateMode);
 }
 
 void minty::Sprite::destroy()
@@ -41,11 +47,6 @@ Vector2 minty::Sprite::get_max_coords() const
 Vector2 minty::Sprite::get_pivot() const
 {
 	return _pivot;
-}
-
-Vector2 minty::Sprite::get_size() const
-{
-	return _size;
 }
 
 void minty::Sprite::set_min_coords(Vector2 const coords, CoordinateMode const coordinateMode)
