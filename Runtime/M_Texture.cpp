@@ -35,13 +35,13 @@ Texture::Texture(rendering::TextureBuilder const& builder, RenderEngine& rendere
 	{
 		if (!Asset::exists(path))
 		{
-			console::error(std::format("Cannot load texture. File not found at: {}", path.string()));
+			console::error(std::format("Cannot load_animation texture. File not found at: {}", path.string()));
 			return;
 		}
 
 		if (builder.pixelFormat == PixelFormat::None)
 		{
-			console::error("Attempting to load texture with a pixelFormat of None.");
+			console::error("Attempting to load_animation texture with a pixelFormat of None.");
 			return;
 		}
 
@@ -54,7 +54,7 @@ Texture::Texture(rendering::TextureBuilder const& builder, RenderEngine& rendere
 		// if no pixels, error
 		if (!pixels)
 		{
-			console::error(std::format("Failed to load texture: {}", path.string()));
+			console::error(std::format("Failed to load_animation texture: {}", path.string()));
 			return;
 		}
 	}
@@ -163,7 +163,7 @@ Texture::Texture(rendering::TextureBuilder const& builder, RenderEngine& rendere
 	samplerInfo.maxLod = 0.0f;
 
 	if (vkCreateSampler(device, &samplerInfo, nullptr, &_sampler) != VK_SUCCESS) {
-		error::abort(std::format("Failed to load texture: {}", path.string()));
+		error::abort(std::format("Failed to load_animation texture: {}", path.string()));
 	}
 }
 

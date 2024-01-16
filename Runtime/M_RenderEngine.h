@@ -660,14 +660,6 @@ namespace minty
 	private:
 		void load_descriptor_values(std::unordered_map<String, Dynamic>& values, Node const& node, std::vector<rendering::UniformConstantInfo> const& infos) const;
 
-		/// <summary>
-		/// Checks if the asset at the given path can be loaded.
-		/// </summary>
-		/// <param name="path">The path to the asset.</param>
-		/// <param name="requiresMeta">If true, the meta file will also be checked.</param>
-		/// <returns>0 if the asset can be loaded, 1 if there was a problem with the main file, or 2 if there was a problem with the meta file.</returns>
-		int check_asset(Path const& path, bool const requiresMeta) const;
-
 		// loads a .obj file
 		void load_mesh_obj(Path const& path, ID const meshId);
 

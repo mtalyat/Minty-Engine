@@ -161,7 +161,7 @@ std::vector<Component const*> minty::EntityRegistry::get_all(Entity const entity
 			auto const& found = _componentTypes.find(ctype.index());
 			if (found == _componentTypes.end())
 			{
-				console::error(std::format("Cannot find component type with id: {}, name: {}", ctype.index(), ctype.name().data()));
+				console::error(std::format("Cannot find_animation component type with id: {}, name: {}", ctype.index(), ctype.name().data()));
 				continue;
 			}
 
@@ -289,7 +289,7 @@ void minty::EntityRegistry::serialize_entity(Writer& writer, Entity const entity
 			auto const& found = _componentTypes.find(ctype.index());
 			if (found == _componentTypes.end())
 			{
-				console::error(std::format("Cannot find component type with id: {}, name: {}", ctype.index(), ctype.name().data()));
+				console::error(std::format("Cannot find_animation component type with id: {}, name: {}", ctype.index(), ctype.name().data()));
 				continue;
 			}
 

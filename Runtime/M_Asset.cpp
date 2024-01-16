@@ -12,6 +12,27 @@ Path get_assets_path(Path const& path)
 	return BASE_PATH / path;
 }
 
+int minty::Asset::check(Path const& path, bool const requiresMeta)
+{
+	// can load if assets exists, and if no meta is required, or if a meta is required, it exists
+	if (!Asset::exists(path))
+	{
+		//console::error(std::format("Cannot find_animation asset at path \"{}\".", path.string()));
+		// cannot find asset itself
+		return 1;
+	}
+
+	if (requiresMeta && !Asset::exists_meta(path))
+	{
+		//console::error(std::format("Cannot find_animation meta file for asset at path \"{}\".", path.string()));
+		// cannot find asset meta file
+		return 2;
+	}
+
+	// found both
+	return 0;
+}
+
 bool minty::Asset::exists(Path const& path)
 {
 	return std::filesystem::exists(get_assets_path(path));

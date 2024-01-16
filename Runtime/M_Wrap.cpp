@@ -66,19 +66,19 @@ void minty::Wrap::load()
     if (!std::filesystem::exists(_path))
     {
         // file does not exist
-        console::error(std::format("Cannot load \"{}\" Wrap file: file does not exist.", _path.string()));
+        console::error(std::format("Cannot load_animation \"{}\" Wrap file: file does not exist.", _path.string()));
         return;
     }
     else if (!std::filesystem::is_regular_file(_path))
     {
         // not a file
-        console::error(std::format("Cannot load \"{}\" Wrap file: not a regular file.", _path.string()));
+        console::error(std::format("Cannot load_animation \"{}\" Wrap file: not a regular file.", _path.string()));
         return;
     }
     else if (_path.extension() != WRAP_EXTENSION)
     {
         // not a .wrap file
-        console::error(std::format("Cannot load \"{}\" Wrap file: missing .wrap file extension.", _path.string()));
+        console::error(std::format("Cannot load_animation \"{}\" Wrap file: missing .wrap file extension.", _path.string()));
         return;
     }
 

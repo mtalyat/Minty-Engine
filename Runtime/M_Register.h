@@ -101,7 +101,7 @@ namespace minty
 		/// </summary>
 		/// <param name="name">The name of the object.</param>
 		/// <returns>The ID of the object with the name.</returns>
-		ID get_id(String const name) const;
+		ID get_id(String const& name) const;
 
 		/// <summary>
 		/// Gets the name for the given ID in this Register.
@@ -109,6 +109,13 @@ namespace minty
 		/// <param name="id"></param>
 		/// <returns></returns>
 		String get_name(ID const id) const;
+
+		/// <summary>
+		/// Finds the ID that is associated with the given name in this Register.
+		/// </summary>
+		/// <param name="name">The name of the element.</param>
+		/// <returns>The ID of the element, or ERROR_ID if the name does not exist.</returns>
+		ID find(String const& name) const;
 
 		/// <summary>
 		/// Gets the object with the given ID.
@@ -291,7 +298,7 @@ namespace minty
 	}
 
 	template <class T>
-	ID Register<T>::get_id(String const name) const
+	ID Register<T>::get_id(String const& name) const
 	{
 		auto const& found = _lookup.find(name);
 
@@ -318,6 +325,18 @@ namespace minty
 		{
 			return found->second;
 		}
+	}
+
+	template<class T>
+	ID Register<T>::find(String const& name) const
+	{
+		auto const& found = _lookup.find(name);
+		if (found != _lookup.end())
+		{
+			return found->second;
+		}
+
+		return ERROR_ID;
 	}
 
 	template <class T>

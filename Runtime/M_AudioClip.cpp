@@ -17,7 +17,7 @@ void minty::AudioClip::load(Path const& path)
 
 	if (result != SoLoud::SOLOUD_ERRORS::SO_NO_ERROR)
 	{
-		console::error(std::format("Failed to load AudioClip at path \"{}\". Error code {}.", Asset::absolute(path).string(), result));
+		console::error(std::format("Failed to load_animation AudioClip at path \"{}\". Error code {}.", Asset::absolute(path).string(), result));
 		return;
 	}
 

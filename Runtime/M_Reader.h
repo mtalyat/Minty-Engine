@@ -88,6 +88,8 @@ namespace minty
 
 		Quaternion read_quaternion(String const& name, Quaternion const& defaultValue = Quaternion()) const;
 
+		std::vector<String> read_vector_string(String const& name, std::vector<String> const& defaultValue = {}) const;
+
 #pragma endregion
 
 	public:

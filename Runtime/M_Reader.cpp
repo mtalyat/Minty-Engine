@@ -87,95 +87,42 @@ size_t minty::Reader::read_size(String const& name, size_t const defaultValue) c
 
 Vector2 minty::Reader::read_vector2(String const& name, Vector2 const& defaultValue) const
 {
-	auto const* found = _node.find(name);
-	if (found)
-	{
-		Reader r(*found);
-
-		return Vector2(r.read_float("x", defaultValue.x), r.read_float("y", defaultValue.y));
-	}
-
-	return defaultValue;
+	return _node.get_vector2(name, defaultValue);
 }
 
 Vector3 minty::Reader::read_vector3(String const& name, Vector3 const& defaultValue) const
 {
-	auto const* found = _node.find(name);
-	if (found)
-	{
-		Reader r(*found);
-
-		return Vector3(r.read_float("x", defaultValue.x), r.read_float("y", defaultValue.y), r.read_float("z", defaultValue.z));
-	}
-
-	return defaultValue;
+	return _node.get_vector3(name, defaultValue);
 }
 
 Vector4 minty::Reader::read_vector4(String const& name, Vector4 const& defaultValue) const
 {
-	auto const* found = _node.find(name);
-	if (found)
-	{
-		Reader r(*found);
-
-		return Vector4(r.read_float("x", defaultValue.x), r.read_float("y", defaultValue.y), r.read_float("z", defaultValue.z), r.read_float("w", defaultValue.w));
-	}
-
-	return defaultValue;
+	return _node.get_vector4(name, defaultValue);
 }
 
 Vector2Int minty::Reader::read_vector2int(String const& name, Vector2Int const& defaultValue) const
 {
-	auto const* found = _node.find(name);
-	if (found)
-	{
-		Reader r(*found);
-
-		return Vector2Int(r.read_int("x", defaultValue.x), r.read_int("y", defaultValue.y));
-	}
-
-	return defaultValue;
+	return _node.get_vector2int(name, defaultValue);
 }
 
 Vector3Int minty::Reader::read_vector3int(String const& name, Vector3Int const& defaultValue) const
 {
-	auto const* found = _node.find(name);
-	if (found)
-	{
-		Reader r(*found);
-
-		return Vector3Int(r.read_int("x", defaultValue.x), r.read_int("y", defaultValue.y), r.read_int("z", defaultValue.z));
-	}
-
-	return defaultValue;
+	return _node.get_vector3int(name, defaultValue);
 }
 
 Vector4Int minty::Reader::read_vector4int(String const& name, Vector4Int const& defaultValue) const
 {
-	auto const* found = _node.find(name);
-	if (found)
-	{
-		Reader r(*found);
-
-		return Vector4Int(r.read_int("x", defaultValue.x), r.read_int("y", defaultValue.y), r.read_int("z", defaultValue.z), r.read_int("w", defaultValue.w));
-	}
-
-	return defaultValue;
+	return _node.get_vector4int(name, defaultValue);
 }
 
 Quaternion minty::Reader::read_quaternion(String const& name, Quaternion const& defaultValue) const
 {
-	auto const* found = _node.find(name);
-	if (found)
-	{
-		Reader r(*found);
+	return _node.get_quaternion(name, defaultValue);
+}
 
-		Vector3 defaultValueEuler = defaultValue.to_euler_angles();
-
-		return Quaternion::from_euler_angles(r.read_float("x", defaultValueEuler.x), r.read_float("y", defaultValueEuler.y), r.read_float("z", defaultValueEuler.z));
-	}
-
-	return defaultValue;
+std::vector<String> minty::Reader::read_vector_string(String const& name, std::vector<String> const& defaultValue) const
+{
+	return _node.get_vector_string(name, defaultValue);
 }
 
 String minty::to_string(Reader const& value)

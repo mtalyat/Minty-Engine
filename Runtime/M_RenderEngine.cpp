@@ -323,7 +323,7 @@ VkFormat RenderEngine::find_supported_format(const std::vector<VkFormat>& candid
 		}
 	}
 
-	error::abort("Failed to find supported format.");
+	error::abort("Failed to find_animation supported format.");
 
 	return VkFormat();
 }
@@ -703,7 +703,7 @@ void RenderEngine::pick_physical_device()
 	// if zero, error
 	if (deviceCount == 0)
 	{
-		error::abort("Failed to find GPU's with Vulkan support.");
+		error::abort("Failed to find_animation GPU's with Vulkan support.");
 	}
 
 	// get devices
@@ -720,7 +720,7 @@ void RenderEngine::pick_physical_device()
 
 	// none found
 	if (_physicalDevice == VK_NULL_HANDLE) {
-		error::abort("Failed to find a suitable GPU.");
+		error::abort("Failed to find_animation a suitable GPU.");
 	}
 }
 
@@ -1491,7 +1491,7 @@ ID minty::RenderEngine::load_texture(Path const& path)
 
 ID minty::RenderEngine::load_texture(Path const& path, String const& name)
 {
-	if (check_asset(path, false))
+	if (Asset::check(path, false))
 	{
 		return ERROR_ID;
 	}
@@ -1523,7 +1523,7 @@ ID minty::RenderEngine::load_sprite(Path const& path)
 
 ID minty::RenderEngine::load_sprite(Path const& path, String const& name)
 {
-	if (check_asset(path, false))
+	if (Asset::check(path, false))
 	{
 		return ERROR_ID;
 	}
@@ -1551,7 +1551,7 @@ ID minty::RenderEngine::load_shader(Path const& path)
 
 ID minty::RenderEngine::load_shader(Path const& path, String const& name)
 {
-	if (check_asset(path, false))
+	if (Asset::check(path, false))
 	{
 		return ERROR_ID;
 	}
@@ -1605,7 +1605,7 @@ ID minty::RenderEngine::load_shader_pass(Path const& path)
 
 ID minty::RenderEngine::load_shader_pass(Path const& path, String const& name)
 {
-	if (check_asset(path, false))
+	if (Asset::check(path, false))
 	{
 		return ERROR_ID;
 	}
@@ -1674,7 +1674,7 @@ ID minty::RenderEngine::load_material_template(Path const& path)
 
 ID minty::RenderEngine::load_material_template(Path const& path, String const& name)
 {
-	if (check_asset(path, false))
+	if (Asset::check(path, false))
 	{
 		return ERROR_ID;
 	}
@@ -1711,7 +1711,7 @@ ID minty::RenderEngine::load_material(Path const& path)
 
 ID minty::RenderEngine::load_material(Path const& path, String const& name)
 {
-	if (check_asset(path, false))
+	if (Asset::check(path, false))
 	{
 		return ERROR_ID;
 	}
@@ -1743,7 +1743,7 @@ ID minty::RenderEngine::load_mesh(Path const& path)
 
 ID minty::RenderEngine::load_mesh(Path const& path, String const& name)
 {
-	if (check_asset(path, false))
+	if (Asset::check(path, false))
 	{
 		return ERROR_ID;
 	}
@@ -1752,7 +1752,7 @@ ID minty::RenderEngine::load_mesh(Path const& path, String const& name)
 
 	if (extension != ".obj")
 	{
-		console::error(std::format("Cannot load mesh from file type \"{}\".", extension));
+		console::error(std::format("Cannot load_animation mesh from file type \"{}\".", extension));
 		return ERROR_ID;
 	}
 
@@ -1915,7 +1915,7 @@ void minty::RenderEngine::load_descriptor_values(std::unordered_map<String, Dyna
 				else
 				{
 					// if index name does not exist, show warning and set to ERROR_ID
-					console::warn(std::format("Failed to load texture with index {} into descriptor named \"{}\".", i, info.name));
+					console::warn(std::format("Failed to load_animation texture with index {} into descriptor named \"{}\".", i, info.name));
 					ids[i] = ERROR_ID;
 				}
 			}
@@ -1938,27 +1938,6 @@ void minty::RenderEngine::load_descriptor_values(std::unordered_map<String, Dyna
 		}
 		}
 	}
-}
-
-int minty::RenderEngine::check_asset(Path const& path, bool const requiresMeta) const
-{
-	// can load if assets exists, and if no meta is required, or if a meta is required, it exists
-	if (!Asset::exists(path))
-	{
-		console::error(std::format("Cannot find asset at path \"{}\".", path.string()));
-		// cannot find asset itself
-		return 1;
-	}
-
-	if (requiresMeta && !Asset::exists_meta(path))
-	{
-		console::error(std::format("Cannot find meta file for asset at path \"{}\".", path.string()));
-		// cannot find asset meta file
-		return 2;
-	}
-
-	// found both
-	return 0;
 }
 
 void minty::RenderEngine::load_mesh_obj(Path const& path, ID const id)
@@ -2398,7 +2377,7 @@ uint32_t RenderEngine::find_memory_type(uint32_t typeFilter, VkMemoryPropertyFla
 		}
 	}
 
-	error::abort("Failed to find suitable memory type.");
+	error::abort("Failed to find_animation suitable memory type.");
 	return 0;
 }
 

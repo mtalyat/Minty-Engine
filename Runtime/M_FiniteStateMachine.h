@@ -255,6 +255,8 @@ namespace minty
 		/// </summary>
 		FSM();
 
+		~FSM();
+
 		/// <summary>
 		/// Creates a State within the FSM.
 		/// </summary>
@@ -268,14 +270,20 @@ namespace minty
 		/// </summary>
 		/// <param name="id"></param>
 		/// <returns></returns>
-		State& get_state(ID const id);
+		FSM<ValueType>::State& get_state(ID const id)
+		{
+			return _states.at(id);
+		}
 
 		/// <summary>
 		/// Gets the State with the given ID.
 		/// </summary>
 		/// <param name="id"></param>
 		/// <returns></returns>
-		State const& get_state(ID const id) const;
+		FSM<ValueType>::State const& get_state(ID const id) const
+		{
+			return _states.at(id);
+		}
 
 		/// <summary>
 		/// Sets the current State to the State with the given ID.
@@ -293,13 +301,19 @@ namespace minty
 		/// Gets the current State.
 		/// </summary>
 		/// <returns></returns>
-		State& get_current_state();
+		State& get_current_state()
+		{
+			return _states.at(_currentStateId);
+		}
 
 		/// <summary>
 		/// Gets the current State.
 		/// </summary>
 		/// <returns></returns>
-		State const& get_current_state() const;
+		State const& get_current_state() const
+		{
+			return _states.at(_currentStateId);
+		}
 
 		/// <summary>
 		/// Gets the value from the current State.
@@ -353,7 +367,7 @@ namespace minty
 		/// Evaluates the FSM. 
 		/// The current state will attempt to transition to another State based on its Transitions and values stored within this FSM.
 		/// </summary>
-		/// <returns>0 on a successful evaluation, 1 if there is no current state, or 2 if there was an infinite loop while transitioning.</returns>
+		/// <returns>0 on a successful evaluation, 1 on no transition, 2 if there is no current state, or 3 if there was an infinite loop while transitioning.</returns>
 		int evaluate();
 	};
 
@@ -417,7 +431,7 @@ namespace minty
 	bool FSM<ValueType>::Condition::evaluate(Scope const& scope) const
 	{
 		// get value of variable from the scope
-		VariableType value = scope.at(_variableId);
+		VariableType value = scope.get(_variableId);
 
 		// evaluate
 		switch (_conditional)
@@ -513,20 +527,23 @@ namespace minty
 		, _currentStateId(ERROR_ID)
 	{}
 	template<typename ValueType>
+	FSM<ValueType>::~FSM()
+	{}
+	template<typename ValueType>
 	ID FSM<ValueType>::create_state(String const& name, ValueType const& value)
 	{
 		return _states.emplace(name, State(name, value));
 	}
-	template<typename ValueType>
-	FSM<ValueType>::State& FSM<ValueType>::get_state(ID const id)
-	{
-		return _states.at(id);
-	}
-	template<typename ValueType>
-	FSM<ValueType>::State const& FSM<ValueType>::get_state(ID const id) const
-	{
-		return _states.at(id);
-	}
+	//template<typename ValueType>
+	//FSM<ValueType>::State& FSM<ValueType>::get_state(ID const id)
+	//{
+	//	return _states.at(id);
+	//}
+	//template<typename ValueType>
+	//FSM<ValueType>::State const& FSM<ValueType>::get_state(ID const id) const
+	//{
+	//	return _states.at(id);
+	//}
 	template<typename ValueType>
 	void FSM<ValueType>::set_current_state(ID const id)
 	{
@@ -537,16 +554,16 @@ namespace minty
 	{
 		_currentStateId = _states.get_id(name);
 	}
-	template<typename ValueType>
-	FSM<ValueType>::State& FSM<ValueType>::get_current_state()
-	{
-		return _states.at(_currentStateId);
-	}
-	template<typename ValueType>
-	FSM<ValueType>::State const& FSM<ValueType>::get_current_state() const
-	{
-		return _states.at(_currentStateId);
-	}
+	//template<typename ValueType>
+	//FSM<ValueType>::State& FSM<ValueType>::get_current_state()
+	//{
+	//	return _states.at(_currentStateId);
+	//}
+	//template<typename ValueType>
+	//FSM<ValueType>::State const& FSM<ValueType>::get_current_state() const
+	//{
+	//	return _states.at(_currentStateId);
+	//}
 	template<typename ValueType>
 	ValueType& FSM<ValueType>::get_current_value()
 	{
@@ -570,7 +587,7 @@ namespace minty
 	template<typename ValueType>
 	void FSM<ValueType>::set_variable(String const& name, VariableType const value)
 	{
-		_scope.set(id, value);
+		_scope.set(name, value);
 	}
 	template<typename ValueType>
 	FSM<ValueType>::VariableType FSM<ValueType>::get_variable(ID const id) const
@@ -605,11 +622,17 @@ namespace minty
 			next = get_state(next).evaluate(_scope);
 
 			// if we have visited this state, then an infinite loop has occured
-			if (!_visitedStates.emplace(next)->second)
+			if (!_visitedStates.emplace(next).second)
 			{
 				// could not add: already been visited
 				return 2;
 			}
+		}
+
+		// if nothing happened, return -1
+		if (state == _currentStateId)
+		{
+			return -1;
 		}
 
 		// successfully transitioned to the next state

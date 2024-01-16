@@ -3982,7 +3982,7 @@ public:
      * @param value A desired maximum average number of elements per bucket.
      */
     void max_load_factor(const float value) {
-        ENTT_ASSERT(value > 0.f, "Invalid load factor");
+        ENTT_ASSERT(value > 0.f, "Invalid load_animation factor");
         threshold = value;
         rehash(0u);
     }
@@ -4896,7 +4896,7 @@ public:
      * @param value A desired maximum average number of elements per bucket.
      */
     void max_load_factor(const float value) {
-        ENTT_ASSERT(value > 0.f, "Invalid load factor");
+        ENTT_ASSERT(value > 0.f, "Invalid load_animation factor");
         threshold = value;
         rehash(0u);
     }
@@ -29754,7 +29754,7 @@ public:
      * @param value A desired maximum average number of elements per bucket.
      */
     void max_load_factor(const float value) {
-        ENTT_ASSERT(value > 0.f, "Invalid load factor");
+        ENTT_ASSERT(value > 0.f, "Invalid load_animation factor");
         threshold = value;
         rehash(0u);
     }
@@ -30668,7 +30668,7 @@ public:
      * @param value A desired maximum average number of elements per bucket.
      */
     void max_load_factor(const float value) {
-        ENTT_ASSERT(value > 0.f, "Invalid load factor");
+        ENTT_ASSERT(value > 0.f, "Invalid load_animation factor");
         threshold = value;
         rehash(0u);
     }
@@ -37273,7 +37273,7 @@ public:
      * @param value A desired maximum average number of elements per bucket.
      */
     void max_load_factor(const float value) {
-        ENTT_ASSERT(value > 0.f, "Invalid load factor");
+        ENTT_ASSERT(value > 0.f, "Invalid load_animation factor");
         threshold = value;
         rehash(0u);
     }
@@ -47855,7 +47855,7 @@ public:
      * @param value A desired maximum average number of elements per bucket.
      */
     void max_load_factor(const float value) {
-        ENTT_ASSERT(value > 0.f, "Invalid load factor");
+        ENTT_ASSERT(value > 0.f, "Invalid load_animation factor");
         threshold = value;
         rehash(0u);
     }
@@ -48769,7 +48769,7 @@ public:
      * @param value A desired maximum average number of elements per bucket.
      */
     void max_load_factor(const float value) {
-        ENTT_ASSERT(value > 0.f, "Invalid load factor");
+        ENTT_ASSERT(value > 0.f, "Invalid load_animation factor");
         threshold = value;
         rehash(0u);
     }
@@ -54999,7 +54999,7 @@ public:
      * @param value A desired maximum average number of elements per bucket.
      */
     void max_load_factor(const float value) {
-        ENTT_ASSERT(value > 0.f, "Invalid load factor");
+        ENTT_ASSERT(value > 0.f, "Invalid load_animation factor");
         threshold = value;
         rehash(0u);
     }
@@ -55913,7 +55913,7 @@ public:
      * @param value A desired maximum average number of elements per bucket.
      */
     void max_load_factor(const float value) {
-        ENTT_ASSERT(value > 0.f, "Invalid load factor");
+        ENTT_ASSERT(value > 0.f, "Invalid load_animation factor");
         threshold = value;
         rehash(0u);
     }
@@ -76625,7 +76625,7 @@ public:
      * @param value A desired maximum average number of elements per bucket.
      */
     void max_load_factor(const float value) {
-        ENTT_ASSERT(value > 0.f, "Invalid load factor");
+        ENTT_ASSERT(value > 0.f, "Invalid load_animation factor");
         threshold = value;
         rehash(0u);
     }
@@ -84768,7 +84768,7 @@ public:
      * @param value A desired maximum average number of elements per bucket.
      */
     void max_load_factor(const float value) {
-        ENTT_ASSERT(value > 0.f, "Invalid load factor");
+        ENTT_ASSERT(value > 0.f, "Invalid load_animation factor");
         threshold = value;
         rehash(0u);
     }

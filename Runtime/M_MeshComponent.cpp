@@ -46,7 +46,7 @@ void minty::MeshComponent::deserialize(Reader const& reader)
 
 		if (meshId == ERROR_ID)
 		{
-			console::error(std::format("Could not load mesh with path \"{}\" and name \"{}\".", path, name));
+			console::error(std::format("Could not load_animation mesh with path \"{}\" and name \"{}\".", path, name));
 		}
 		break;
 	}

@@ -90,6 +90,9 @@ namespace minty
 
 		void write(String const& name, Quaternion const& value);
 
+		template<typename T>
+		void write(String const& name, std::vector<T> const& value);
+
 #pragma endregion
 
 #pragma region Default Writing
@@ -120,9 +123,38 @@ namespace minty
 
 		void write(String const& name, Quaternion const& value, Quaternion const& defaultValue);
 
+		template<typename T>
+		void write(String const& name, std::vector<T> const& value, std::vector<T> const& defaultValue);
+
 #pragma endregion
 
 	public:
 		friend String to_string(Writer const& value);
 	};
+
+	template<typename T>
+	void Writer::write(String const& name, std::vector<T> const& value)
+	{
+		// add all values to a child node
+		Node node;
+
+		Writer writer(node);
+
+		for (size_t i = 0; i < value.size(); i++)
+		{
+			writer.write(std::to_string(i), value.at(i));
+		}
+		
+		// write child to normal node
+		write(name, node);
+	}
+
+	template<typename T>
+	void Writer::write(String const& name, std::vector<T> const& value, std::vector<T> const& defaultValue)
+	{
+		if (value != defaultValue)
+		{
+			write(name, value);
+		}
+	}
 }

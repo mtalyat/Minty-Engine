@@ -85,7 +85,7 @@ int init(Runtime &runtime)
         TextureAtlasBuilder atlasBuilder{
             .textureId = deathId,
             .materialId = ERROR_ID,
-            .coordinateMode = PixelCoordinateMode::Pixel,
+            .coordinateMode = CoordinateMode::Pixel,
             .slice = Vector2(90.0f, 90.0f),
             .pivot = Vector2(45.0f, 45.0f)};
 

@@ -2,6 +2,7 @@
 
 #include "M_Types.h"
 #include "M_Vector.h"
+#include "M_Quaternion.h"
 #include <string>
 #include <vector>
 #include <map>
@@ -166,6 +167,20 @@ namespace minty
 		bool get_bool(String const& name, bool const defaultValue = false) const;
 
 		Vector2 get_vector2(String const& name, Vector2 const defaultValue = Vector2()) const;
+
+		Vector3 get_vector3(String const& name, Vector3 const defaultValue = Vector3()) const;
+
+		Vector4 get_vector4(String const& name, Vector4 const defaultValue = Vector4()) const;
+
+		Vector2Int get_vector2int(String const& name, Vector2Int const defaultValue = Vector2Int()) const;
+
+		Vector3Int get_vector3int(String const& name, Vector3Int const defaultValue = Vector3Int()) const;
+
+		Vector4Int get_vector4int(String const& name, Vector4Int const defaultValue = Vector4Int()) const;
+
+		Quaternion get_quaternion(String const& name, Quaternion const defaultValue = Quaternion()) const;
+
+		std::vector<String> get_vector_string(String const& name, std::vector<String> const& defaultValue = {}) const;
 
 #pragma endregion
 
