@@ -14,18 +14,49 @@ minty::AnimationSystem::AnimationSystem(minty::Engine* const engine, minty::Enti
 
 void minty::AnimationSystem::update()
 {
+	float deltaTime = _engine->get_delta_time();
+
 	for (auto&& [entity, animator] : _registry->view<AnimatorComponent>().each())
 	{
+		// skip if no animation
+		if (animator.current == ERROR_ID)
+		{
+			continue;
+		}
+
+		// elapse time
+		animator.time -= deltaTime;
+
+		// if time is over, move to next animation stage
+		if (animator.time > 0.0f)
+		{
+			// do nothing, keep rendering current frame
+			continue;
+		}
+
+		// frame over: move to the next frame
+		animator.index++;
+
+		Animation const& animation = _animations.at(animator.current);
+
+		// if still on animation, reset frame time and move on
+		if (animator.index < animation.get_frame_count())
+		{
+			update_animation(animator, animation);
+
+			continue;
+		}
+
+		// animation over: move to the next animation
+
 		// evaluate the animator
 		// if the animator is at a new state, update the SpriteComponent sprite id
-		if (int error = animator.fsm.evaluate())
+		int fsmResult = animator.fsm.evaluate();
+		if (fsmResult > 1)
 		{
 			// an error occured
-			switch (error)
+			switch (fsmResult)
 			{
-			case 1:
-				// just didn't transition
-				break;
 			case 2:
 				// no current state
 				break;
@@ -34,7 +65,7 @@ void minty::AnimationSystem::update()
 				console::warn(std::format("Infinite loop indicated in AnimatorComponent for entity \"{}\".", _registry->get_name(entity)));
 				break;
 			default:
-				console::error(std::format("Unrecognized FSM error code in AnimationSystem: {}", error));
+				console::error(std::format("Unrecognized FSM fsmResult code in AnimationSystem: {}", fsmResult));
 				break;
 			}
 
@@ -42,10 +73,31 @@ void minty::AnimationSystem::update()
 			continue;
 		}
 
-		// get new sprite ID, set it to the sprite component
-		SpriteComponent& spriteComponent = _registry->get<SpriteComponent>(animator.entity);
-		spriteComponent.spriteId = animator.fsm.get_current_value();
+		if (fsmResult == 0)
+		{
+			// new animation
+
+			// get new animation id
+			animator.current = animator.fsm.get_current_value();
+		} // else, same animation
+
+		// go to first frame
+		animator.index = 0;
+
+		// set sprite id and time
+		update_animation(animator, animation);
 	}
+}
+
+void minty::AnimationSystem::update_animation(AnimatorComponent& animator, Animation const& animation) const
+{
+	// set time
+	float frameTime = animation.get_frame_time();
+	animator.time = math::mod(animator.time, frameTime) + frameTime;
+
+	// set frame
+	SpriteComponent& spriteComponent = _registry->get<SpriteComponent>(animator.entity);
+	spriteComponent.spriteId = animation.get_frame(animator.index);
 }
 
 ID minty::AnimationSystem::create_animation(AnimationBuilder const& builder)

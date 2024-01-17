@@ -28,6 +28,12 @@ namespace minty
 		/// <param name="frameTime">The time to elapse per frame.</param>
 		Animation(AnimationBuilder const& builder);
 
+		float get_frame_time() const;
+
+		size_t get_frame_count() const;
+
+		ID get_frame(size_t const index) const;
+
 		void serialize(Writer& writer) const override;
 		void deserialize(Reader const& reader) override;
 	};

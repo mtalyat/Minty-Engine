@@ -21,6 +21,10 @@ namespace minty
 
         void update() override;
 
+    private:
+        void update_animation(AnimatorComponent& animator, Animation const& animation) const;
+
+    public:
         ID create_animation(AnimationBuilder const& builder);
 
         ID find_animation(String const& name) const;

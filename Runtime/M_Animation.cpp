@@ -16,6 +16,21 @@ minty::Animation::Animation(AnimationBuilder const& builder)
 	, _frames(builder.frames)
 {}
 
+float minty::Animation::get_frame_time() const
+{
+	return _frameTime;
+}
+
+size_t minty::Animation::get_frame_count() const
+{
+	return _frames.size();
+}
+
+ID minty::Animation::get_frame(size_t const index) const
+{
+	return _frames.at(index);
+}
+
 void minty::Animation::serialize(Writer& writer) const
 {
 	SerializationData* data = static_cast<SerializationData*>(writer.get_data());
