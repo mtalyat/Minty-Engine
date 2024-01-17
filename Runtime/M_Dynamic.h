@@ -1,6 +1,6 @@
 #pragma once
 
-#include "M_Base.h"
+#include "M_Object.h"
 #include "M_ISerializable.h"
 
 namespace minty
@@ -9,7 +9,7 @@ namespace minty
 	/// Holds a dynamic set of data, where its type can be unknown at compile and runtime.
 	/// </summary>
 	class Dynamic
-		: public ISerializable
+		: public Object, ISerializable
 	{
 	private:
 		void* _data;
