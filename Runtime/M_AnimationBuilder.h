@@ -5,7 +5,7 @@
 namespace minty
 {
 	/// <summary>
-	/// Holds data to create a new Material.
+	/// Holds data to create a new Animation.
 	/// </summary>
 	struct AnimationBuilder
 	{
