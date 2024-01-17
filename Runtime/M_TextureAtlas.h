@@ -22,6 +22,8 @@ namespace minty
 		Vector2 _slice;
 		// pivot of each sprite when sliced, in pixels
 		Vector2 _pivot;
+		// number of slices that have been made
+		size_t _createdSlices;
 	public:
 		TextureAtlas(rendering::TextureAtlasBuilder const& builder, RenderEngine& renderer);
 
@@ -40,9 +42,11 @@ namespace minty
 
 		Vector2Int get_size() const;
 
-		ID slice_sprite(Vector2 const minCoords, Vector2 const maxCoords, String const& name, CoordinateMode const coordinateMode = CoordinateMode::Normalized) const;
+		ID slice_sprite(Vector2 const minCoords, Vector2 const maxCoords, CoordinateMode const coordinateMode = CoordinateMode::Normalized);
+
+		ID slice_sprite(Vector2 const minCoords, Vector2 const maxCoords, String const& name, CoordinateMode const coordinateMode = CoordinateMode::Normalized);
 		
-		ID slice_sprite(Vector2 const minCoords, Vector2 const maxCoords, Vector2 const pivot, String const& name, CoordinateMode const coordinateMode = CoordinateMode::Normalized) const;
+		ID slice_sprite(Vector2 const minCoords, Vector2 const maxCoords, Vector2 const pivot, String const& name, CoordinateMode const coordinateMode = CoordinateMode::Normalized);
 
 		/// <summary>
 		/// Creates a new Sprite using the given X and Y slice coordinates.
@@ -50,9 +54,9 @@ namespace minty
 		/// <param name="x">The X slice coordinate.</param>
 		/// <param name="y">The Y slice coordiante.</param>
 		/// <param name="pivot">The pivot of the newly created Sprite.</param>
-		/// <param name="coordinateMode">The coordinate mode to interpret the pivot and size in.</param>
+		/// <param name="coordinateMode">The coordinate mode to interpret the pivot in.</param>
 		/// <returns>The ID to the newly created Sprite.</returns>
-		ID create_sprite(int const x, int const y, Vector2 const pivot = Vector2(0.5f, 0.5f), CoordinateMode const coordinateMode = CoordinateMode::Normalized) const;
+		ID create_sprite(int const x, int const y, Vector2 const pivot = Vector2(0.5f, 0.5f), CoordinateMode const coordinateMode = CoordinateMode::Normalized);
 
 		/// <summary>
 		/// Creates a new Sprite using the given X and Y slice coordinates.
@@ -61,8 +65,18 @@ namespace minty
 		/// <param name="y">The Y slice coordiante.</param>
 		/// <param name="pivot">The pivot of the newly created Sprite.</param>
 		/// <param name="name">The name of the new Sprite.</param>
-		/// <param name="coordinateMode">The coordinate mode to interpret the pivot and size in.</param>
+		/// <param name="coordinateMode">The coordinate mode to interpret the pivot in.</param>
 		/// <returns>The ID to the newly created Sprite.</returns>
-		ID create_sprite(int const x, int const y, Vector2 const pivot, String const& name, CoordinateMode const coordinateMode = CoordinateMode::Normalized) const;
+		ID create_sprite(int const x, int const y, Vector2 const pivot, String const& name, CoordinateMode const coordinateMode = CoordinateMode::Normalized);
+
+		/// <summary>
+		/// Creates a Sprite of all possible full slices that can be created within this TextureAtlas.
+		/// </summary>
+		/// <param name="pivot">The pivot to apply to all the Sprites.</param>
+		/// <param name="coordinateMode">The coordinate mode to interpret the pivot in.</param>
+		/// <returns>A list of all new Sprite IDs.</returns>
+		std::vector<ID> create_all(Vector2 const pivot = Vector2(0.5f, 0.5f), CoordinateMode const coordinateMode = CoordinateMode::Normalized);
+	private:
+		String get_next_slice_name() const;
 	};
 }
