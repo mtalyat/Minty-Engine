@@ -13,7 +13,7 @@ namespace minty
 	/// Holds a collection of systems and entities that can interact with one another.
 	/// </summary>
 	class Scene :
-		public Object, public ISerializable
+		public Object
 	{
 	private:
 		Engine* _engine;

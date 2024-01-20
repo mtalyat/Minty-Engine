@@ -1,22 +1,22 @@
 #pragma once
 
-#include "M_Types.h"
-#include "M_Object.h"
+#include "M_Base.h"
 #include "M_Node.h"
-#include "M_Vector.h"
 #include <map>
+#include <unordered_map>
+#include <set>
+#include <unordered_set>
 #include <vector>
-#include "M_Quaternion.h"
 
 namespace minty
 {
+	class Object;
 	class ISerializable;
 
 	/// <summary>
 	/// Writes data to a serialized Node.
 	/// </summary>
 	class Writer
-		: public Object
 	{
 	private:
 		Node& _node;
@@ -76,22 +76,137 @@ namespace minty
 
 		void write(String const& name, size_t const value);
 
-		void write(String const& name, Vector2 const& value);
-
-		void write(String const& name, Vector3 const& value);
-
-		void write(String const& name, Vector4 const& value);
-
-		void write(String const& name, Vector2Int const& value);
-
-		void write(String const& name, Vector3Int const& value);
-
-		void write(String const& name, Vector4Int const& value);
-
-		void write(String const& name, Quaternion const& value);
+		void write(String const& name, bool const value);
 
 		template<typename T>
-		void write(String const& name, std::vector<T> const& value);
+		void write_object(String const& name, T const& value)
+		{
+			if (Object const* obj = try_cast<T, Object>(&value))
+			{
+				// write as a serializable
+				write(name, obj);
+			}
+			else
+			{
+				// write as direct value
+				std::ostringstream stream;
+				stream << value;
+				write(name, stream.str());
+			}
+		}
+
+		template<typename T>
+		void write(String const& name, std::vector<T> const& value, bool ordered = false)
+		{
+			if (!value.size())
+			{
+				return;
+			}
+
+			Node node;
+			Writer writer(node);
+
+			if (ordered)
+			{
+				// ordered
+				size_t i = 0;
+				for (auto const& v : value)
+				{
+					writer.write_object(std::to_string(i), v);
+					i++;
+				}
+			}
+			else
+			{
+				// unordered
+				for (auto const& v : value)
+				{
+					writer.write_object(BLANK, v);
+				}
+			}
+
+			write(name, node);
+		}
+
+		template<typename T>
+		void write(String const& name, std::set<T> const& value)
+		{
+			if (!value.size())
+			{
+				return;
+			}
+
+			Node node;
+			Writer writer(node);
+
+			for (auto const& v : value)
+			{
+				writer.write_object(BLANK, v);
+			}
+
+			write(name, node);
+		}
+
+		template<typename T>
+		void write(String const& name, std::unordered_set<T> const& value)
+		{
+			if (!value.size())
+			{
+				return;
+			}
+
+			Node node;
+			Writer writer(node);
+
+			for (auto const& v : value)
+			{
+				writer.write_object(BLANK, v);
+			}
+
+			write(name, node);
+		}
+
+		template<typename T, typename U>
+		void write(String const& name, std::map<T, U> const& value)
+		{
+			if (!value.size())
+			{
+				return;
+			}
+
+			Node node;
+			Writer writer(node);
+
+			for (auto const& pair : value)
+			{
+				std::stringstream stream;
+				stream << pair.first;
+				writer.write_object(stream.str(), pair.second);
+			}
+
+			write(name, node);
+		}
+
+		template<typename T, typename U>
+		void write(String const& name, std::unordered_map<T, U> const& value)
+		{
+			if (!value.size())
+			{
+				return;
+			}
+
+			Node node;
+			Writer writer(node);
+
+			for (auto const& pair : value)
+			{
+				std::stringstream stream;
+				stream << pair.first;
+				writer.write_object(stream.str(), pair.second);
+			}
+
+			write(name, node);
+		}
 
 #pragma endregion
 
@@ -109,52 +224,20 @@ namespace minty
 
 		void write(String const& name, size_t const value, size_t const defaultValue);
 
-		void write(String const& name, Vector2 const& value, Vector2 const& defaultValue);
-
-		void write(String const& name, Vector3 const& value, Vector3 const& defaultValue);
-
-		void write(String const& name, Vector4 const& value, Vector4 const& defaultValue);
-
-		void write(String const& name, Vector2Int const& value, Vector2Int const& defaultValue);
-
-		void write(String const& name, Vector3Int const& value, Vector3Int const& defaultValue);
-
-		void write(String const& name, Vector4Int const& value, Vector4Int const& defaultValue);
-
-		void write(String const& name, Quaternion const& value, Quaternion const& defaultValue);
+		void write(String const& name, bool const value, bool const defaultValue);
 
 		template<typename T>
-		void write(String const& name, std::vector<T> const& value, std::vector<T> const& defaultValue);
+		void write_object(String const& name, T const& value, T const& defaultValue)
+		{
+			if (value != defaultValue)
+			{
+				write_object(name, value);
+			}
+		}
 
 #pragma endregion
 
 	public:
 		friend String to_string(Writer const& value);
 	};
-
-	template<typename T>
-	void Writer::write(String const& name, std::vector<T> const& value)
-	{
-		// add all values to a child node
-		Node node;
-
-		Writer writer(node);
-
-		for (size_t i = 0; i < value.size(); i++)
-		{
-			writer.write(std::to_string(i), value.at(i));
-		}
-		
-		// write child to normal node
-		write(name, node);
-	}
-
-	template<typename T>
-	void Writer::write(String const& name, std::vector<T> const& value, std::vector<T> const& defaultValue)
-	{
-		if (value != defaultValue)
-		{
-			write(name, value);
-		}
-	}
 }

@@ -24,6 +24,11 @@ namespace minty
 
 	public:
 		/// <summary>
+		/// Creates an empty Texture.
+		/// </summary>
+		Texture();
+
+		/// <summary>
 		/// Creates a new Texture.
 		/// </summary>
 		/// <param name="builder"></param>

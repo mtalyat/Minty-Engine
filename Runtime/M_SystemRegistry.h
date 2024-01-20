@@ -13,7 +13,7 @@ namespace minty
 	/// Holds and managers data relevant to systems.
 	/// </summary>
 	class SystemRegistry
-		: public Object, public ISerializable
+		: public Object
 	{
 	public:
 		typedef std::function<System* (Engine* const, EntityRegistry* const)> SystemFunc;

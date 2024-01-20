@@ -23,11 +23,12 @@ void minty::AudioClip::load(Path const& path)
 
 	// load meta
 	Node meta = Asset::load_meta(path);
+	Reader reader(meta);
 
-	set_volume(meta.get_float("volume", 1.0f));
-	set_looping(meta.get_bool("looping", false));
-	set_loop_point(meta.get_float("loopPoint", 0.0f));
-	set_single_instance(meta.get_bool("singleInstance", false));
+	set_volume(reader.read_float("volume", 1.0f));
+	set_looping(reader.read_bool("looping", false));
+	set_loop_point(reader.read_float("loopPoint", 0.0f));
+	set_single_instance(reader.read_bool("singleInstance", false));
 }
 
 void minty::AudioClip::set_volume(float const value)

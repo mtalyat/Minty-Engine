@@ -178,8 +178,8 @@ void minty::Scene::serialize(Writer& writer) const
 
 void minty::Scene::deserialize(Reader const& reader)
 {
-	reader.read_object("Systems", _systems);
-	reader.read_object("Entities", _entities);
+	reader.read_serializable("Systems", _systems);
+	reader.read_serializable("Entities", _entities);
 }
 
 String minty::to_string(Scene const& value)

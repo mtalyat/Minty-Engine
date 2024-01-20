@@ -27,6 +27,11 @@ namespace minty
 
 	public:
 		/// <summary>
+		/// Creates an empty MaterialTemplate.
+		/// </summary>
+		MaterialTemplate();
+
+		/// <summary>
 		/// Creates a new MaterialTemplate.
 		/// </summary>
 		/// <param name="builder"></param>

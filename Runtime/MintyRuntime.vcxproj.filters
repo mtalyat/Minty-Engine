@@ -489,6 +489,15 @@
     <ClInclude Include="M_AnimationBuilder.h">
       <Filter>Header Files\Animation</Filter>
     </ClInclude>
+    <ClInclude Include="M_Animator.h">
+      <Filter>Header Files\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="M_AnimatorBuilder.h">
+      <Filter>Header Files\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Lookup.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -792,6 +801,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_Animation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_FiniteStateMachine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_Rendering_PushConstantInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_Rendering_Buffer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

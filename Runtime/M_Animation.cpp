@@ -58,7 +58,8 @@ void minty::Animation::deserialize(Reader const& reader)
 	_frameTime = reader.read_float("frameTime");
 
 	// convert all names to IDs
-	std::vector<String> names = reader.read_vector_string("frames");
+	std::vector<String> names;
+	reader.read_vector("frames", names);
 	_frames.clear();
 	_frames.resize(names.size());
 	for (size_t i = 0; i < names.size(); i++)

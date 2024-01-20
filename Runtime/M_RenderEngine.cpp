@@ -1497,6 +1497,7 @@ ID minty::RenderEngine::load_texture(Path const& path, String const& name)
 	}
 
 	Node meta = Asset::load_meta(path);
+	Reader reader(meta);
 
 	// create texture builder from path and meta file
 	TextureBuilder builder
@@ -1506,11 +1507,11 @@ ID minty::RenderEngine::load_texture(Path const& path, String const& name)
 		.pixelData = nullptr,
 		.width = 0,
 		.height = 0,
-		.pixelFormat = from_string_texture_builder_pixel_format(meta.get_string("pixelFormat", "RGBA")),
-		.filter = from_string_vk_filter(meta.get_string("filter", "NEAREST")),
-		.format = from_string_vk_format(meta.get_string("format", "R8G8B8A8_SRGB")),
-		.addressMode = from_string_vk_sampler_address_mode(meta.get_string("samplerAddressMode", "REPEAT")),
-		.mipmapMode = from_string_vk_sampler_mipmap_mode(meta.get_string("samplerMipmapMode", "NEAREST")),
+		.pixelFormat = from_string_texture_builder_pixel_format(reader.read_string("pixelFormat", "RGBA")),
+		.filter = from_string_vk_filter(reader.read_string("filter", "NEAREST")),
+		.format = from_string_vk_format(reader.read_string("format", "R8G8B8A8_SRGB")),
+		.addressMode = from_string_vk_sampler_address_mode(reader.read_string("samplerAddressMode", "REPEAT")),
+		.mipmapMode = from_string_vk_sampler_mipmap_mode(reader.read_string("samplerMipmapMode", "NEAREST")),
 	};
 
 	return create_texture(builder);
@@ -1529,17 +1530,22 @@ ID minty::RenderEngine::load_sprite(Path const& path, String const& name)
 	}
 
 	Node meta = Asset::load_node(path);
+	Reader reader(meta);
 
 	SpriteBuilder builder
 	{
 		.name = name,
-		.textureId = find_texture(meta.get_string("texture")),
-		.materialId = find_material(meta.get_string("material")),
-		.coordinateMode = from_string_pixel_coordinate_mode(meta.get_string("coordinateMode")),
-		.minCoords = meta.get_vector2("min", Vector2(0.0f, 0.0f)),
-		.maxCoords = meta.get_vector2("max", Vector2(1.0f, 1.0f)),
-		.pivot = meta.get_vector2("pivot", Vector2(0.5f, 0.5f)),
+		.textureId = find_texture(reader.read_string("texture")),
+		.materialId = find_material(reader.read_string("material")),
+		.coordinateMode = from_string_pixel_coordinate_mode(reader.read_string("coordinateMode")),
+		.minCoords = Vector2(0.0f, 0.0f),
+		.maxCoords = Vector2(1.0f, 1.0f),
+		.pivot = Vector2(0.5f, 0.5f),
 	};
+
+	reader.read_object("min", builder.minCoords);
+	reader.read_object("max", builder.maxCoords);
+	reader.read_object("pivot", builder.pivot);
 
 	return create_sprite(builder);
 }
@@ -1567,11 +1573,12 @@ ID minty::RenderEngine::load_shader(Path const& path, String const& name)
 		for (Node const& child : *nodes)
 		{
 			PushConstantInfo pushConstantInfo;
+			Reader reader(child);
 
-			pushConstantInfo.name = child.get_string("name", child.to_string());
-			pushConstantInfo.stageFlags = from_string_vk_shader_stage_flag_bits(child.get_string("stageFlags"));
-			pushConstantInfo.offset = child.get_uint("offset");
-			pushConstantInfo.size = child.get_uint("size");
+			pushConstantInfo.name = reader.read_string("name", child.to_string());
+			pushConstantInfo.stageFlags = from_string_vk_shader_stage_flag_bits(reader.read_string("stageFlags"));
+			pushConstantInfo.offset = reader.read_uint("offset");
+			pushConstantInfo.size = reader.read_uint("size");
 
 			builder.pushConstantInfos.emplace(pushConstantInfo.name, pushConstantInfo);
 		}
@@ -1582,14 +1589,15 @@ ID minty::RenderEngine::load_shader(Path const& path, String const& name)
 		for (Node const& child : *nodes)
 		{
 			UniformConstantInfo uniformConstantInfo;
+			Reader reader(child);
 
-			uniformConstantInfo.name = child.get_string("name", child.to_string());
-			uniformConstantInfo.type = from_string_vk_descriptor_type(child.get_string("type"));
-			uniformConstantInfo.set = child.get_uint("set");
-			uniformConstantInfo.binding = child.get_uint("binding");
-			uniformConstantInfo.count = child.get_uint("count", 1u);
-			uniformConstantInfo.size = static_cast<VkDeviceSize>(child.get_size("size"));
-			uniformConstantInfo.stageFlags = from_string_vk_shader_stage_flag_bits(child.get_string("stageFlags"));
+			uniformConstantInfo.name = reader.read_string("name", child.to_string());
+			uniformConstantInfo.type = from_string_vk_descriptor_type(reader.read_string("type"));
+			uniformConstantInfo.set = reader.read_uint("set");
+			uniformConstantInfo.binding = reader.read_uint("binding");
+			uniformConstantInfo.count = reader.read_uint("count", 1u);
+			uniformConstantInfo.size = static_cast<VkDeviceSize>(reader.read_size("size"));
+			uniformConstantInfo.stageFlags = from_string_vk_shader_stage_flag_bits(reader.read_string("stageFlags"));
 
 			builder.uniformConstantInfos.emplace(uniformConstantInfo.name, uniformConstantInfo);
 		}
@@ -1611,15 +1619,16 @@ ID minty::RenderEngine::load_shader_pass(Path const& path, String const& name)
 	}
 
 	Node meta = Asset::load_node(path);
+	Reader reader(meta);
 
 	ShaderPassBuilder builder;
 	builder.name = path.stem().string();
-	builder.shaderId = find_shader(meta.get_string("shader", meta.to_string()));
-	builder.topology = from_string_vk_primitive_topology(meta.get_string("primitiveTopology"));
-	builder.polygonMode = from_string_vk_polygon_mode(meta.get_string("polygonMode"));
-	builder.cullMode = from_string_vk_cull_mode_flag_bits(meta.get_string("cullMode"));
-	builder.frontFace = from_string_vk_front_face(meta.get_string("frontFace"));
-	builder.lineWidth = meta.get_float("lineWidth", 1.0f);
+	builder.shaderId = find_shader(reader.read_string("shader", meta.to_string()));
+	builder.topology = from_string_vk_primitive_topology(reader.read_string("primitiveTopology"));
+	builder.polygonMode = from_string_vk_polygon_mode(reader.read_string("polygonMode"));
+	builder.cullMode = from_string_vk_cull_mode_flag_bits(reader.read_string("cullMode"));
+	builder.frontFace = from_string_vk_front_face(reader.read_string("frontFace"));
+	builder.lineWidth = reader.read_float("lineWidth", 1.0f);
 
 	std::vector<Node> const* nodes;
 	if (nodes = meta.find_all("binding"))
@@ -1627,10 +1636,11 @@ ID minty::RenderEngine::load_shader_pass(Path const& path, String const& name)
 		for (auto const& child : *nodes)
 		{
 			VkVertexInputBindingDescription binding = {};
+			Reader childReader(child);
 
-			binding.binding = child.get_uint("binding", child.to_uint());
-			binding.stride = child.get_uint("stride");
-			binding.inputRate = from_string_vk_vertex_input_rate(child.get_string("inputRate"));
+			binding.binding = childReader.read_uint("binding", child.to_uint());
+			binding.stride = childReader.read_uint("stride");
+			binding.inputRate = from_string_vk_vertex_input_rate(childReader.read_string("inputRate"));
 
 			builder.vertexBindings.push_back(binding);
 		}
@@ -1640,11 +1650,12 @@ ID minty::RenderEngine::load_shader_pass(Path const& path, String const& name)
 		for (auto const& child : *nodes)
 		{
 			VkVertexInputAttributeDescription attribute = {};
+			Reader childReader(child);
 
-			attribute.location = child.get_uint("location", child.to_uint());
-			attribute.binding = child.get_uint("binding");
-			attribute.format = from_string_vk_format(child.get_string("format"));
-			attribute.offset = child.get_uint("offset");
+			attribute.location = childReader.read_uint("location", child.to_uint());
+			attribute.binding = childReader.read_uint("binding");
+			attribute.format = from_string_vk_format(childReader.read_string("format"));
+			attribute.offset = childReader.read_uint("offset");
 
 			builder.vertexAttributes.push_back(attribute);
 		}
@@ -1654,11 +1665,12 @@ ID minty::RenderEngine::load_shader_pass(Path const& path, String const& name)
 		for (auto const& child : *nodes)
 		{
 			ShaderPassBuilder::ShaderStageInfo info;
+			Reader childReader(child);
 
-			info.stage = from_string_vk_shader_stage_flag_bits(child.get_string("stage", child.to_string()));
-			String path = child.get_string("path");
+			info.stage = from_string_vk_shader_stage_flag_bits(childReader.read_string("stage", child.to_string()));
+			String path = childReader.read_string("path");
 			info.code = Asset::load_chars(path);
-			info.entry = child.get_string("entry", "main");
+			info.entry = childReader.read_string("entry", "main");
 
 			builder.stages.push_back(info);
 		}
@@ -1717,11 +1729,12 @@ ID minty::RenderEngine::load_material(Path const& path, String const& name)
 	}
 
 	Node meta = Asset::load_node(path);
+	Reader reader(meta);
 
 	MaterialBuilder builder;
 	builder.name = Path(path).stem().string();
 
-	builder.templateId = find_material_template(meta.get_string("template"));
+	builder.templateId = find_material_template(reader.read_string("template"));
 
 	if (Node const* node = meta.find("values"))
 	{
@@ -2244,12 +2257,7 @@ ID minty::RenderEngine::create_buffer(VkDeviceSize const size, VkBufferUsageFlag
 
 	VK_ASSERT(vkBindBufferMemory(_device, buffer, bufferMemory, 0), "Failed to bind buffer memory.");
 
-	return _buffers.emplace(Buffer
-		{
-			.buffer = buffer,
-			.memory = bufferMemory,
-			.size = size
-		});
+	return _buffers.emplace(Buffer(buffer, bufferMemory, size));
 }
 
 ID minty::RenderEngine::create_buffer_uniform(VkDeviceSize const size)

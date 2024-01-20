@@ -1,22 +1,22 @@
 #pragma once
 
-#include "M_Types.h"
-#include "M_Object.h"
+#include "M_Base.h"
 #include "M_Node.h"
-#include "M_Vector.h"
-#include "M_Quaternion.h"
 #include <map>
+#include <unordered_map>
+#include <set>
+#include <unordered_set>
 #include <vector>
 
 namespace minty
 {
+	class Object;
 	class ISerializable;
 
 	/// <summary>
 	/// Reads data from a serialized Node.
 	/// </summary>
 	class Reader
-		: public Object
 	{
 	private:
 		Node const& _node;
@@ -58,37 +58,307 @@ namespace minty
 
 #pragma region Reading
 
-		void read_object(String const& name, ISerializable* const value) const;
+		void to_serializable(ISerializable* const value) const;
+
+		void read_serializable(String const& name, ISerializable* const value) const;
+
+		String to_string(String const& defaultValue = "") const;
 
 		String read_string(String const& name, String const& defaultValue = "") const;
 
+		int to_int(int const defaultValue = 0) const;
+
 		int read_int(String const& name, int const defaultValue = 0) const;
+
+		unsigned int to_uint(unsigned int const defaultValue = 0) const;
 
 		unsigned int read_uint(String const& name, unsigned int const defaultValue = 0) const;
 
+		ID to_id(ID const defaultValue = ERROR_ID) const;
+
 		ID read_id(String const& name, ID const defaultValue = ERROR_ID) const;
+
+		float to_float(float const defaultValue = 0.0f) const;
 
 		float read_float(String const& name, float const defaultValue = 0.0f) const;
 
+		Byte to_byte(Byte const defaultValue = 0) const;
+
 		Byte read_byte(String const& name, Byte const defaultValue = 0) const;
+
+		size_t to_size(size_t const defaultValue = 0) const;
 
 		size_t read_size(String const& name, size_t const defaultValue = 0) const;
 
-		Vector2 read_vector2(String const& name, Vector2 const& defaultValue = Vector2()) const;
+		bool to_bool(bool const defaultValue = false) const;
 
-		Vector3 read_vector3(String const& name, Vector3 const& defaultValue = Vector3()) const;
+		bool read_bool(String const& name, bool const defaultValue = false) const;
 
-		Vector4 read_vector4(String const& name, Vector4 const& defaultValue = Vector4()) const;
+	public:
+		template<typename T>
+		void to_object(T& value) const
+		{
+			parse_object(_node, value);
+		}
 
-		Vector2Int read_vector2int(String const& name, Vector2Int const& defaultValue = Vector2Int()) const;
+		template<typename T>
+		void to_object(T& value, T const& defaultValue) const
+		{
+			if (!parse_object(_node, value))
+			{
+				value = defaultValue;
+			}
+		}
 
-		Vector3Int read_vector3int(String const& name, Vector3Int const& defaultValue = Vector3Int()) const;
+		template<typename T>
+		void read_object(String const& name, T& value) const
+		{
+			if (Node const* node = _node.find(name))
+			{
+				parse_object(*node, value);
+			}
+		}
 
-		Vector4Int read_vector4int(String const& name, Vector4Int const& defaultValue = Vector4Int()) const;
+		template<typename T>
+		void read_object(String const& name, T& value, T const& defaultValue) const
+		{
+			if (Node const* node = _node.find(name))
+			{
+				if (parse_object(*node, value))
+				{
+					return;
+				}
+			}
 
-		Quaternion read_quaternion(String const& name, Quaternion const& defaultValue = Quaternion()) const;
+			value = defaultValue;
+		}
 
-		std::vector<String> read_vector_string(String const& name, std::vector<String> const& defaultValue = {}) const;
+		template<typename T>
+		void to_vector(std::vector<T>& value) const
+		{
+			parse_vector(*this, value);
+		}
+
+		template<typename T>
+		void read_vector(String const& name, std::vector<T>& value) const
+		{
+			if (auto const* obj = _node.find(name))
+			{
+				parse_vector(*obj, value);
+			}
+			else
+			{
+				value.clear();
+			}
+		}
+
+		template<typename T>
+		void to_set(std::set<T>& value) const
+		{
+			parse_set(*this, value);
+		}
+
+		template<typename T>
+		void read_set(String const& name, std::set<T>& value) const
+		{
+			if (auto const* obj = _node.find(name))
+			{
+				parse_set(obj, value);
+			}
+			else
+			{
+				value.clear();
+			}
+		}
+
+		template<typename T>
+		void to_unordered_set(std::unordered_set<T>& value) const
+		{
+			parse_unordered_set(*this, value);
+		}
+
+		template<typename T>
+		void read_unordered_set(String const& name, std::unordered_set<T>& value) const
+		{
+			if (auto const* obj = _node.find(name))
+			{
+				parse_unordered_set(*obj, value);
+			}
+			else
+			{
+				value.clear();
+			}
+		}
+
+		template<typename T, typename U>
+		void to_map(std::map<T, U>& value) const
+		{
+			parse_map(*this, value);
+		}
+
+		template<typename T, typename U>
+		void read_map(String const& name, std::map<T, U>& value) const
+		{
+			if (auto const* obj = _node.find(name))
+			{
+				parse_map(*obj, value);
+			}
+			else
+			{
+				value.clear();
+			}
+		}
+
+		template<typename T, typename U>
+		void to_unordered_map(std::unordered_map<T, U>& value) const
+		{
+			parse_unordered_map(*this, value);
+		}
+
+		template<typename T, typename U>
+		void read_unordered_map(String const& name, std::unordered_map<T, U>& value) const
+		{
+			if (auto const* obj = _node.find(name))
+			{
+				parse_unordered_map(*obj, value);
+			}
+			else
+			{
+				value.clear();
+			}
+		}
+
+	private:
+		template<typename T>
+		bool parse_object(Node const& node, T& value) const
+		{
+			if (Object* obj = try_cast<T, Object>(&value))
+			{
+				Reader reader(node);
+				obj->deserialize(reader);
+
+				return true;
+			}
+			else if(node.data.size())
+			{
+				std::stringstream stream(node.data);
+				stream >> value;
+
+				return true;
+			}
+
+			return false;
+		}
+
+		template<typename T>
+		void parse_vector(Node const& node, std::vector<T>& value) const
+		{
+			value.clear();
+
+			// read ordered first
+			size_t i = 0;
+			String name = std::to_string(i);
+			Node const* child;
+
+			while (child = node.find(name))
+			{
+				T t;
+				parse_object(*child, t);
+				value.push_back(t);
+
+				i++;
+				name = std::to_string(i);
+			}
+
+			// read unordered, add to end
+			if (auto const* list = node.find_all(BLANK))
+			{
+				value.reserve(value.size() + list->size());
+
+				for (Node const& node : *list)
+				{
+					T t;
+					parse_object(node, t);
+					value.push_back(t);
+				}
+			}
+		}
+
+		template<typename T>
+		void parse_set(Node const& node, std::set<T>& value) const
+		{
+			value.clear();
+
+			if (auto const* list = node.find_all(BLANK))
+			{
+				value.reserve(list->size());
+
+				for (Node const& node : *list)
+				{
+					T t;
+					parse_object(node, t);
+					value.push_back(t);
+				}
+			}
+		}
+
+		template<typename T>
+		void parse_unordered_set(Node const& node, std::unordered_set<T>& value) const
+		{
+			value.clear();
+
+			if (auto const* list = node.find_all(BLANK))
+			{
+				value.reserve(list->size());
+
+				for (Node const& node : *list)
+				{
+					T t;
+					parse_object(node, t);
+					value.push_back(t);
+				}
+			}
+		}
+
+		template<typename T, typename U>
+		void parse_map(Node const& node, std::map<T, U>& value) const
+		{
+			value.clear();
+
+			Reader reader(node, _data);
+
+			for (auto const& child : node->children)
+			{
+				// parse T
+				T t;
+				std::stringstream stream(child.first);
+				stream >> t;
+
+				// parse U
+				U u;
+				reader.read_object(child.first, u);
+			}
+		}
+
+		template<typename T, typename U>
+		void parse_unordered_map(Node const& node, std::unordered_map<T, U>& value) const
+		{
+			value.clear();
+
+			Reader reader(node, _data);
+
+			for (auto const& child : node->children)
+			{
+				// parse T
+				T t;
+				std::stringstream stream(child.first);
+				stream >> t;
+
+				// parse U
+				U u;
+				reader.read_object(child.first, u);
+			}
+		}
 
 #pragma endregion
 

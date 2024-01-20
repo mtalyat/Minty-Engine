@@ -93,97 +93,9 @@ void minty::Writer::write(String const& name, size_t const value)
 	write(name, std::to_string(value));
 }
 
-void minty::Writer::write(String const& name, Vector2 const& value)
+void minty::Writer::write(String const& name, bool const value)
 {
-	Node node;
-
-	Writer writer(node);
-
-	writer.write("x", value.x);
-	writer.write("y", value.y);
-
-	write(name, node);
-}
-
-void minty::Writer::write(String const& name, Vector3 const& value)
-{
-	Node node;
-
-	Writer writer(node);
-
-	writer.write("x", value.x);
-	writer.write("y", value.y);
-	writer.write("z", value.z);
-
-	write(name, node);
-}
-
-void minty::Writer::write(String const& name, Vector4 const& value)
-{
-	Node node;
-
-	Writer writer(node);
-
-	writer.write("x", value.x);
-	writer.write("y", value.y);
-	writer.write("z", value.z);
-	writer.write("w", value.w);
-
-	write(name, node);
-}
-
-void minty::Writer::write(String const& name, Vector2Int const& value)
-{
-	Node node;
-
-	Writer writer(node);
-
-	writer.write("x", value.x);
-	writer.write("y", value.y);
-
-	write(name, node);
-}
-
-void minty::Writer::write(String const& name, Vector3Int const& value)
-{
-	Node node;
-
-	Writer writer(node);
-
-	writer.write("x", value.x);
-	writer.write("y", value.y);
-	writer.write("z", value.z);
-
-	write(name, node);
-}
-
-void minty::Writer::write(String const& name, Vector4Int const& value)
-{
-	Node node;
-
-	Writer writer(node);
-
-	writer.write("x", value.x);
-	writer.write("y", value.y);
-	writer.write("z", value.z);
-	writer.write("w", value.w);
-
-	write(name, node);
-}
-
-void minty::Writer::write(String const& name, Quaternion const& value)
-{
-	Node node;
-
-	Writer writer(node);
-
-	Vector3 angles = glm::eulerAngles(value);
-
-	writer.write("x", angles.x); // pitch
-	writer.write("y", angles.y); // yaw
-	writer.write("z", angles.z); // roll
-
-	write(name, node);
+	write(name, std::to_string(value));
 }
 
 void minty::Writer::write(String const& name, String const& value, String const& defaultValue)
@@ -199,7 +111,7 @@ void minty::Writer::write(String const& name, int const value, int const default
 {
 	if (value != defaultValue)
 	{
-		write(name, std::to_string(value));
+		write(name, value);
 	}
 }
 
@@ -207,7 +119,7 @@ void minty::Writer::write(String const& name, unsigned int const value, unsigned
 {
 	if (value != defaultValue)
 	{
-		write(name, std::to_string(value));
+		write(name, value);
 	}
 }
 
@@ -215,7 +127,7 @@ void minty::Writer::write(String const& name, float const value, float const def
 {
 	if (value != defaultValue)
 	{
-		write(name, std::to_string(value));
+		write(name, value);
 	}
 }
 
@@ -223,7 +135,7 @@ void minty::Writer::write(String const& name, Byte const value, Byte const defau
 {
 	if (value != defaultValue)
 	{
-		write(name, std::to_string(value));
+		write(name, value);
 	}
 }
 
@@ -231,122 +143,15 @@ void minty::Writer::write(String const& name, size_t const value, size_t const d
 {
 	if (value != defaultValue)
 	{
-		write(name, std::to_string(value));
+		write(name, value);
 	}
 }
 
-void minty::Writer::write(String const& name, Vector2 const& value, Vector2 const& defaultValue)
+void minty::Writer::write(String const& name, bool const value, bool const defaultValue)
 {
 	if (value != defaultValue)
 	{
-		Node node;
-
-		Writer writer(node);
-
-		writer.write("x", value.x, defaultValue.x);
-		writer.write("y", value.y, defaultValue.y);
-
-		write(name, node);
-	}
-}
-
-void minty::Writer::write(String const& name, Vector3 const& value, Vector3 const& defaultValue)
-{
-	if (value != defaultValue)
-	{
-		Node node;
-
-		Writer writer(node);
-
-		writer.write("x", value.x, defaultValue.x);
-		writer.write("y", value.y, defaultValue.y);
-		writer.write("z", value.z, defaultValue.z);
-
-		write(name, node);
-	}
-}
-
-void minty::Writer::write(String const& name, Vector4 const& value, Vector4 const& defaultValue)
-{
-	if (value != defaultValue)
-	{
-		Node node;
-
-		Writer writer(node);
-
-		writer.write("x", value.x, defaultValue.x);
-		writer.write("y", value.y, defaultValue.y);
-		writer.write("z", value.z, defaultValue.z);
-		writer.write("w", value.w, defaultValue.w);
-
-		write(name, node);
-	}
-}
-
-void minty::Writer::write(String const& name, Vector2Int const& value, Vector2Int const& defaultValue)
-{
-	if (value != defaultValue)
-	{
-		Node node;
-
-		Writer writer(node);
-
-		writer.write("x", value.x, defaultValue.x);
-		writer.write("y", value.y, defaultValue.y);
-
-		write(name, node);
-	}
-}
-
-void minty::Writer::write(String const& name, Vector3Int const& value, Vector3Int const& defaultValue)
-{
-	if (value != defaultValue)
-	{
-		Node node;
-
-		Writer writer(node);
-
-		writer.write("x", value.x, defaultValue.x);
-		writer.write("y", value.y, defaultValue.y);
-		writer.write("z", value.z, defaultValue.z);
-
-		write(name, node);
-	}
-}
-
-void minty::Writer::write(String const& name, Vector4Int const& value, Vector4Int const& defaultValue)
-{
-	if (value != defaultValue)
-	{
-		Node node;
-
-		Writer writer(node);
-
-		writer.write("x", value.x, defaultValue.x);
-		writer.write("y", value.y, defaultValue.y);
-		writer.write("z", value.z, defaultValue.z);
-		writer.write("w", value.w, defaultValue.w);
-
-		write(name, node);
-	}
-}
-
-void minty::Writer::write(String const& name, Quaternion const& value, Quaternion const& defaultValue)
-{
-	if (value != defaultValue)
-	{
-		Node node;
-
-		Writer writer(node);
-
-		Vector3 angles = glm::eulerAngles(value);
-		Vector3 defaultAngles = glm::eulerAngles(value);
-
-		writer.write("x", angles.x, defaultAngles.x); // pitch
-		writer.write("y", angles.y, defaultAngles.y); // yaw
-		writer.write("z", angles.z, defaultAngles.z); // roll
-
-		write(name, node);
+		write(name, value);
 	}
 }
 

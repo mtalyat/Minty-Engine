@@ -1,5 +1,6 @@
 #pragma once
 #include "M_Object.h"
+#include "M_ISerializable.h"
 
 #include <vector>
 #include <unordered_map>
@@ -202,6 +203,9 @@ namespace minty
 		auto& back();
 		auto const& front() const;
 		auto const &back() const;
+
+		void serialize(Writer& writer) const override;
+		void deserialize(Reader const& reader) override;
 	};
 
 	template <class T>
@@ -473,5 +477,70 @@ namespace minty
 	auto const &Register<T>::back() const
 	{
 		return _data.back();
+	}
+	
+	template<class T>
+	void Register<T>::serialize(Writer& writer) const
+	{
+		writer.write("capacity", _capacity, MAX_ID);
+
+		// write named and unnamed values
+		Node valuesNode;
+		Writer valuesWriter(valuesNode);
+
+		for (auto const& pair : _data)
+		{
+			// if there is a name, use it, otherwise use "_"
+			auto const& found = _names.find(pair.first);
+			if (found == _names.end())
+			{
+				valuesWriter.write_object("_", pair.second);
+			}
+			else
+			{
+				valuesWriter.write_object(found->second, pair.second);
+			}
+		}
+
+		writer.write("data", valuesNode);
+	}
+	
+	template<class T>
+	void Register<T>::deserialize(Reader const& reader)
+	{
+		_next = 0;
+		_data.clear();
+		_names.clear();
+		_lookup.clear();
+
+		_capacity = reader.read_id("capacity");
+
+		Node const& node = reader.get_node();
+		if (Node const* valuesNode = node.find("values"))
+		{
+			T t;
+
+			// get unnamed
+			if (auto const* unnamedList = valuesNode->find_all("_"))
+			{
+				for (auto const& unnamedNode : *unnamedList)
+				{
+					Reader reader(unnamedNode);
+					reader.to_object(t);
+					emplace(t);
+				}
+			}
+
+			// get named
+			for (auto const& pair : valuesNode->children)
+			{
+				if (pair.first == "_") continue; // skip unnamed
+
+				Node const& namedNode = pair.second.front();
+				Reader reader(namedNode);
+				reader.to_object(t);
+				emplace(pair.first, t);
+			}
+		}
 	}
 }

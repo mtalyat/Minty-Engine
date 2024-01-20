@@ -26,6 +26,11 @@ namespace minty
 
 	public:
 		/// <summary>
+		/// Creates an empty Material.
+		/// </summary>
+		Material();
+
+		/// <summary>
 		/// Creates a new Material.
 		/// </summary>
 		/// <param name="builder"></param>

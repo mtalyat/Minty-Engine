@@ -1,6 +1,6 @@
 #pragma once
 
-#include "M_Base.h"
+#include "M_Object.h"
 
 #include <vector>
 
@@ -10,6 +10,7 @@ namespace minty::rendering
 	/// Holds info for a uniform constant.
 	/// </summary>
 	struct UniformConstantInfo
+		: public Object
 	{
 		/// <summary>
 		/// The name of the uniform constant.

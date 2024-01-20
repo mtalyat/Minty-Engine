@@ -14,8 +14,19 @@
 using namespace minty;
 using namespace minty::rendering;
 
+minty::Texture::Texture()
+	: RenderObject::RenderObject()
+	, _width()
+	, _height()
+	, _format()
+	, _image()
+	, _view()
+	, _memory()
+	, _sampler()
+{}
+
 Texture::Texture(rendering::TextureBuilder const& builder, RenderEngine& renderer)
-	: RenderObject::RenderObject(renderer)
+	: RenderObject::RenderObject(&renderer)
 	, _width(builder.width)
 	, _height(builder.height)
 	, _format()
@@ -169,7 +180,9 @@ Texture::Texture(rendering::TextureBuilder const& builder, RenderEngine& rendere
 
 void minty::Texture::destroy()
 {
-	auto device = _renderer.get_device();
+	RenderEngine* renderer = get_renderer();
+
+	auto device = renderer->get_device();
 
 	vkDestroySampler(device, _sampler, nullptr);
 	vkDestroyImageView(device, _view, nullptr);

@@ -10,8 +10,11 @@
 
 namespace minty
 {
+	/// <summary>
+	/// Holds data for a ShaderPass.
+	/// </summary>
 	class ShaderPass
-		: rendering::RenderObject
+		: public rendering::RenderObject
 	{
 	private:
 		ID _shaderId;
@@ -21,6 +24,11 @@ namespace minty
 		rendering::DescriptorSet _descriptorSet;
 
 	public:
+		/// <summary>
+		/// Creates an empty ShaderPass.
+		/// </summary>
+		ShaderPass();
+
 		/// <summary>
 		/// Creates a new ShaderPass.
 		/// </summary>

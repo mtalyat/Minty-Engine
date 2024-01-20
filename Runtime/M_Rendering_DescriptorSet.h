@@ -54,6 +54,11 @@ namespace minty::rendering
 
 	public:
 		/// <summary>
+		/// Creates an empty DescriptorSet.
+		/// </summary>
+		DescriptorSet();
+
+		/// <summary>
 		/// Creates a new DescriptorSet.
 		/// </summary>
 		/// <param name="renderer"></param>

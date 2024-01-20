@@ -1,0 +1,14 @@
+name: death
+frameTime: 0.15
+frames:
+    0: death_0
+    1: death_1
+    2: death_2
+    3: death_3
+    4: death_4
+    5: death_5
+    6: death_6
+    7: death_7
+    8: death_8
+    9: death_9
+    10: death_10

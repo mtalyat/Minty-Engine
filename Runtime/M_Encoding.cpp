@@ -6,12 +6,18 @@
 using namespace minty;
 
 // https://stackoverflow.com/questions/180947/base64-decode-snippet-in-c
-String minty::encoding::encode_base64(String const& in)
+String minty::encoding::encode_base64(Dynamic const& in)
 {
     String out;
 
+    Byte* bytes = static_cast<Byte*>(in.data());
+    size_t count = in.size();
+
     int val = 0, valb = -6;
-    for (Byte c : in) {
+    for (size_t i = 0; i < count; i++)
+    {
+        Byte c = bytes[i];
+
         val = (val << 8) + c;
         valb += 8;
         while (valb >= 0) {
@@ -25,9 +31,9 @@ String minty::encoding::encode_base64(String const& in)
 }
 
 // https://stackoverflow.com/questions/180947/base64-decode-snippet-in-c
-String minty::encoding::decode_base64(String const& in)
+Dynamic minty::encoding::decode_base64(String const& in)
 {
-    String out;
+    std::vector<Byte> bytes;
 
     std::vector<int> T(256, -1);
     for (int i = 0; i < 64; i++) T["ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/"[i]] = i;
@@ -38,9 +44,9 @@ String minty::encoding::decode_base64(String const& in)
         val = (val << 6) + T[c];
         valb += 6;
         if (valb >= 0) {
-            out.push_back(char((val >> valb) & 0xFF));
+            bytes.push_back(char((val >> valb) & 0xFF));
             valb -= 8;
         }
     }
-    return out;
+    return Dynamic(bytes.data(), bytes.size());
 }

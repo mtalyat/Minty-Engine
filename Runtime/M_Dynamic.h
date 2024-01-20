@@ -1,7 +1,6 @@
 #pragma once
 
 #include "M_Object.h"
-#include "M_ISerializable.h"
 
 namespace minty
 {
@@ -9,7 +8,7 @@ namespace minty
 	/// Holds a dynamic set of data, where its type can be unknown at compile and runtime.
 	/// </summary>
 	class Dynamic
-		: public Object, ISerializable
+		: public Object
 	{
 	private:
 		void* _data;
@@ -42,6 +41,10 @@ namespace minty
 
 		~Dynamic();
 
+		friend bool operator==(Dynamic const& left, Dynamic const& right);
+
+		friend bool operator!=(Dynamic const& left, Dynamic const& right);
+
 		/// <summary>
 		/// Sets the data within this Dynamic.
 		/// </summary>
@@ -49,7 +52,10 @@ namespace minty
 		/// <param name="data">The data to set.</param>
 		/// <param name="count">The number of elements of the data.</param>
 		template<typename T>
-		void set(T* const data, size_t const count = 1);
+		void set(T* const data, size_t const count = 1)
+		{
+			set(static_cast<void*>(data), sizeof(T) * count);
+		}
 		
 		/// <summary>
 		/// Sets the data within this Dynamic.
@@ -64,7 +70,10 @@ namespace minty
 		/// <typeparam name="T">The type of data.</typeparam>
 		/// <returns>A pointer to the data within this Dynamic.</returns>
 		template<typename T>
-		T* get() const;
+		T get() const
+		{
+			return *static_cast<T*>(_data);
+		}
 
 		/// <summary>
 		/// Gets the pointer to the data.
@@ -86,14 +95,4 @@ namespace minty
 		void serialize(Writer& writer) const;
 		void deserialize(Reader const& reader);
 	};
-	template<typename T>
-	void Dynamic::set(T* const data, size_t const count)
-	{
-		set(static_cast<void*>(data), sizeof(T) * count);
-	}
-	template<typename T>
-	T* Dynamic::get() const
-	{
-		return static_cast<T>(_data);
-	}
 }

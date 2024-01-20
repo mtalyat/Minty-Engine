@@ -1,6 +1,6 @@
 #pragma once
 
-#include "M_Base.h"
+#include "M_Object.h"
 
 namespace minty::rendering
 {
@@ -8,6 +8,7 @@ namespace minty::rendering
 	/// Holds info for a push constant.
 	/// </summary>
 	struct PushConstantInfo
+		: public Object
 	{
 		/// <summary>
 		/// The name of the push constant.
@@ -17,7 +18,7 @@ namespace minty::rendering
 		/// <summary>
 		/// The shader stage this push constant is in.
 		/// </summary>
-		VkShaderStageFlags stageFlags;
+		VkShaderStageFlagBits stageFlags;
 
 		/// <summary>
 		/// The offset of this push constant in bytes.
@@ -28,5 +29,8 @@ namespace minty::rendering
 		/// The size of this push constant in bytes.
 		/// </summary>
 		uint32_t size;
+
+		void serialize(Writer& writer) const override;
+		void deserialize(Reader const& reader) override;
 	};
 }

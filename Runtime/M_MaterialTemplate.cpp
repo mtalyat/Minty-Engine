@@ -11,8 +11,14 @@
 using namespace minty;
 using namespace minty::rendering;
 
+minty::MaterialTemplate::MaterialTemplate()
+	: RenderObject::RenderObject()
+	, _shaderPassIds()
+	, _defaultValues()
+{}
+
 minty::MaterialTemplate::MaterialTemplate(rendering::MaterialTemplateBuilder const& builder, RenderEngine& renderer)
-	: RenderObject::RenderObject(renderer)
+	: RenderObject::RenderObject(&renderer)
 	, _shaderPassIds(builder.shaderPassIds)
 	, _defaultValues(builder.defaultValues)
 {}

@@ -20,7 +20,7 @@ namespace minty
 		/// <summary>
 		/// Handles controlling animation flow.
 		/// </summary>
-		FSM<ID> fsm;
+		FSM fsm;
 
 		/// <summary>
 		/// The ID of the current animation being ran.

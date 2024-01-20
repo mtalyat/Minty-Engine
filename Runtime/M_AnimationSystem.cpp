@@ -78,7 +78,7 @@ void minty::AnimationSystem::update()
 			// new animation
 
 			// get new animation id
-			animator.current = animator.fsm.get_current_value();
+			animator.current = animator.fsm.get_current_value().get<ID>();
 		} // else, same animation
 
 		// go to first frame
@@ -133,18 +133,20 @@ ID minty::AnimationSystem::load_animation(Path const& path)
 	}
 
 	Node meta = Asset::load_node(path);
+	Reader reader(meta);
 
 	AnimationBuilder builder
 	{
-		.name = meta.get_string("name", meta.to_string()),
-		.frameTime = meta.get_float("frameTime", 0.25f),
+		.name = reader.read_string("name", meta.to_string()),
+		.frameTime = reader.read_float("frameTime", 0.25f),
 	};
 
 	// get renderer
 	RenderEngine& renderer = _engine->get_render_engine();
 
 	// get sprite IDs from loaded names
-	std::vector<String> names = meta.get_vector_string("frames");
+	std::vector<String> names;
+	reader.read_vector("frames", names);
 	builder.frames.resize(names.size());
 	for (size_t i = 0; i < names.size(); i++)
 	{

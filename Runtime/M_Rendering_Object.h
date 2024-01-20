@@ -14,17 +14,23 @@ namespace minty::rendering
 	class RenderObject :
 		public Object
 	{
-	protected:
-		minty::RenderEngine& _renderer;
+	private:
+		minty::RenderEngine* _renderer;
 
 	public:
 		/// <summary>
 		/// Creates a new RenderObject.
 		/// </summary>
 		/// <param name="renderer"></param>
-		RenderObject(minty::RenderEngine& renderer);
+		RenderObject(minty::RenderEngine* renderer = nullptr);
 
 		virtual ~RenderObject();
+
+		void set_renderer(RenderEngine* renderer);
+
+		RenderEngine* get_renderer();
+
+		RenderEngine const* get_renderer() const;
 
 		friend String to_string(RenderObject const& value);
 	};

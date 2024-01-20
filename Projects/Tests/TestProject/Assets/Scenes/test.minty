@@ -2,6 +2,7 @@ Systems
     CameraController
     Move
     Test
+    Animation
 Entities
     Camera
         Transform
@@ -13,6 +14,13 @@ Entities
             far: 100.0
         Move
         AudioListener
+Sprite
+    Renderable
+    Transform
+    Sprite
+    Animator
+        entity: Sprite
+        
 #    Model
 #        Renderable
 #        Transform

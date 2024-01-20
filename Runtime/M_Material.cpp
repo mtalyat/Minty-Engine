@@ -6,13 +6,19 @@
 using namespace minty;
 using namespace minty::rendering;
 
+minty::Material::Material()
+	: rendering::RenderObject()
+	, _templateId(ERROR_ID)
+	, _passDescriptorSets()
+{}
+
 minty::Material::Material(rendering::MaterialBuilder const& builder, RenderEngine& renderer)
-	: rendering::RenderObject(renderer)
+	: rendering::RenderObject(&renderer)
 	, _templateId(builder.templateId)
 	, _passDescriptorSets()
 {
 	// use template to generate descriptor sets
-	auto const& materialTemplate = _renderer.get_material_template(_templateId);
+	auto const& materialTemplate = renderer.get_material_template(_templateId);
 	auto const& passIds = materialTemplate.get_shader_pass_ids();
 
 	auto const& defaultValues = materialTemplate.get_default_values();
@@ -20,11 +26,11 @@ minty::Material::Material(rendering::MaterialBuilder const& builder, RenderEngin
 	for (auto const passId : passIds)
 	{
 		// get the shader pass
-		auto const& shaderPass = _renderer.get_shader_pass(passId);
+		auto const& shaderPass = renderer.get_shader_pass(passId);
 
 		// get the shader that the pass belongs to
 		auto const shaderId = shaderPass.get_shader_id();
-		auto& shader = _renderer.get_shader(shaderId);
+		auto& shader = renderer.get_shader(shaderId);
 
 		// get the descriptor set for the pass
 		DescriptorSet descriptorSet = shader.create_descriptor_set(DESCRIPTOR_SET_MATERIAL, false);

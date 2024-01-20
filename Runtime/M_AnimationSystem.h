@@ -15,6 +15,7 @@ namespace minty
     {
     private:
         Register<Animation> _animations;
+        
 
     public:
         AnimationSystem(minty::Engine* const engine, minty::EntityRegistry* const registry);

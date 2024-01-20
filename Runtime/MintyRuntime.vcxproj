@@ -218,6 +218,8 @@
     <ClInclude Include="M_Animation.h" />
     <ClInclude Include="M_AnimationBuilder.h" />
     <ClInclude Include="M_AnimationSystem.h" />
+    <ClInclude Include="M_Animator.h" />
+    <ClInclude Include="M_AnimatorBuilder.h" />
     <ClInclude Include="M_AnimatorComponent.h" />
     <ClInclude Include="M_Asset.h" />
     <ClInclude Include="M_Audio.h" />
@@ -228,6 +230,7 @@
     <ClInclude Include="M_Builtin.h" />
     <ClInclude Include="M_Compression.h" />
     <ClInclude Include="M_FiniteStateMachine.h" />
+    <ClInclude Include="M_Lookup.h" />
     <ClInclude Include="M_Macros.h" />
     <ClInclude Include="M_PhysicalFile.h" />
     <ClInclude Include="M_CoordinateMode.h" />
@@ -382,8 +385,10 @@
     <ClCompile Include="M_Error.cpp" />
     <ClCompile Include="M_File.cpp" />
     <ClCompile Include="M_Engine.cpp" />
+    <ClCompile Include="M_FiniteStateMachine.cpp" />
     <ClCompile Include="M_PhysicalFile.cpp" />
     <ClCompile Include="M_PixelCoordinateMode.cpp" />
+    <ClCompile Include="M_Rendering_Buffer.cpp" />
     <ClCompile Include="M_Rendering_PixelFormat.cpp" />
     <ClCompile Include="M_Material.cpp" />
     <ClCompile Include="M_RelationshipComponent.cpp" />
@@ -406,6 +411,7 @@
     <ClCompile Include="M_RenderableComponent.cpp" />
     <ClCompile Include="M_Rendering_DescriptorSet.cpp" />
     <ClCompile Include="M_Rendering_Object.cpp" />
+    <ClCompile Include="M_Rendering_PushConstantInfo.cpp" />
     <ClCompile Include="M_Rendering_ShaderBuilder.cpp" />
     <ClCompile Include="M_Scene.cpp" />
     <ClCompile Include="M_SceneManager.cpp" />

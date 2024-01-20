@@ -8,7 +8,7 @@
 
 namespace minty
 {
-	/// <summary>
+	/*/// <summary>
 	/// Holds the data for a template for an Entity.
 	/// </summary>
 	class Template
@@ -42,5 +42,5 @@ namespace minty
 		virtual void serialize(Writer& writer) const;
 		
 		virtual void deserialize(Reader const& reader);
-	};
+	};*/
 }

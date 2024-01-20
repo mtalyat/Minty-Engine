@@ -25,6 +25,11 @@ namespace minty
 		// number of slices that have been made
 		size_t _createdSlices;
 	public:
+		/// <summary>
+		/// Creates an empty TextureAtlas.
+		/// </summary>
+		TextureAtlas();
+
 		TextureAtlas(rendering::TextureAtlasBuilder const& builder, RenderEngine& renderer);
 
 		~TextureAtlas();

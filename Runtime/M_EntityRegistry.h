@@ -14,7 +14,7 @@ namespace minty
 	String to_string(Entity const value);
 
 	class EntityRegistry
-		: public Object, public entt::registry, public ISerializable
+		: public Object, public entt::registry
 	{
 	public:
 		typedef std::function<Component* (EntityRegistry* const, Entity const)> ComponentCreateFunc;

@@ -8,7 +8,7 @@
 namespace minty
 {
 	class Animation
-		: public Object, ISerializable
+		: public Object
 	{
 	private:
 		float _frameTime;

@@ -26,16 +26,16 @@ Vector3 minty::TransformComponent::get_right() const
 
 void minty::TransformComponent::serialize(Writer& writer) const
 {
-	writer.write("position", local.position, Vector3());
-	writer.write("rotation", local.rotation, Quaternion());
-	writer.write("scale", local.scale, Vector3(1.0f, 1.0f, 1.0f));
+	writer.write_object("position", local.position, Vector3());
+	writer.write_object("rotation", local.rotation, Quaternion());
+	writer.write_object("scale", local.scale, Vector3(1.0f, 1.0f, 1.0f));
 }
 
 void minty::TransformComponent::deserialize(Reader const& reader)
 {
-	local.position = reader.read_vector3("position");
-	local.rotation = reader.read_quaternion("rotation");
-	local.scale = reader.read_vector3("scale", Vector3(1.0f, 1.0f, 1.0f));
+	reader.read_object("position", local.position, Vector3());
+	reader.read_object("rotation", local.rotation, Quaternion());
+	reader.read_object("scale", local.scale, Vector3(1.0f, 1.0f, 1.0f));
 }
 
 String minty::to_string(TransformComponent const& value)

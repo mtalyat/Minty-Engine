@@ -3,6 +3,7 @@
 
 #include "M_Console.h"
 #include "M_Parse.h"
+#include "M_Encoding.h"
 
 using namespace minty;
 
@@ -111,16 +112,15 @@ void minty::Dynamic::clear()
 
 void minty::Dynamic::serialize(Writer& writer) const
 {
-	console::todo("Dynamic::serialize");
+	// base64 encode the data, do that
+	writer.write("size", _size);
+	writer.write("data", encoding::encode_base64(*this));
 }
 
 void minty::Dynamic::deserialize(Reader const& reader)
 {
-	// use node directly to have more control since this deserialization is tricky
-	Node const& node = reader.get_node();
-
 	// get size in bytes
-	size_t size = node.get_size("size", node.to_size());
+	size_t size = reader.read_size("size", reader.to_size());
 
 	// if no size, all done
 	if (!size)
@@ -129,15 +129,29 @@ void minty::Dynamic::deserialize(Reader const& reader)
 		return;
 	}
 
+	// use node directly to have more control since this deserialization is tricky
+	Node const& node = reader.get_node();
+
+	// if there is the raw data base64 encoded, just read that and be done
+	if (Node const* dataNode = node.find("data"))
+	{
+		Dynamic data = encoding::decode_base64(dataNode->to_string());
+		set(data.data(), data.size());
+		return;
+	}
+
+	// manual byte entry:
+
 	// go through and get all possible combinations of bytes/bits, pack into data
 	Byte* data = new Byte[size];
 	memset(data, 0, size);
 
-	// assume 'x' is any number:
+	// assume 'x' is any number, and 'y' is another number:
 	// x refers to the byte at x
 	// xi refers to an integer starting at byte x
 	// xui refers to an unsigned integer starting at byte x
 	// xf refers to a float starting at byte f
+	// xsy refers to a string at x of y length
 
 	size_t i;
 	String name;
@@ -202,4 +216,15 @@ void minty::Dynamic::deserialize(Reader const& reader)
 
 	// clean up
 	delete[] data;
+}
+
+bool minty::operator==(Dynamic const& left, Dynamic const& right)
+{
+	// equal if the same address OR size and data are equal
+	return &left == &right || (left._size == right._size && !memcmp(left._data, right._data, left._size));
+}
+
+bool minty::operator!=(Dynamic const& left, Dynamic const& right)
+{
+	return !(left == right);
 }

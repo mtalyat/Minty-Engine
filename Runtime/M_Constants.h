@@ -22,4 +22,6 @@ namespace minty
 	constexpr unsigned int DESCRIPTOR_SET_SHADER = 0;
 	constexpr unsigned int DESCRIPTOR_SET_SHADER_PASS = 1;
 	constexpr unsigned int DESCRIPTOR_SET_MATERIAL = 2;
+
+	constexpr char const* const BLANK = "_";
 }

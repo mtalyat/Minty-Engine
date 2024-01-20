@@ -7,8 +7,17 @@
 using namespace minty;
 using namespace minty::rendering;
 
+minty::Sprite::Sprite()
+	: RenderObject::RenderObject()
+	, _textureId(ERROR_ID)
+	, _materialId(ERROR_ID)
+	, _minCoords()
+	, _maxCoords()
+	, _pivot()
+{}
+
 minty::Sprite::Sprite(rendering::SpriteBuilder const& builder, RenderEngine& renderer)
-	: RenderObject::RenderObject(renderer)
+	: RenderObject::RenderObject(&renderer)
 	, _textureId(builder.textureId)
 	, _materialId(builder.materialId)
 	, _minCoords()
@@ -95,7 +104,7 @@ void minty::Sprite::set_pivot(Vector2 const pivot, CoordinateMode const coordina
 
 Vector2 minty::Sprite::normalize_coords(Vector2 const coords) const
 {
-	Texture const& tex = _renderer.get_texture(_textureId);
+	Texture const& tex = get_renderer()->get_texture(_textureId);
 
 	return Vector2(coords.x / static_cast<float>(tex.get_width()), coords.y / static_cast<float>(tex.get_height()));
 }

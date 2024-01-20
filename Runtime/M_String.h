@@ -58,7 +58,7 @@ namespace minty::string
 	/// <param name="string">The string to split.</param>
 	/// <param name="delimiter">The character to split the string by.</param>
 	/// <returns>A vector of strings, not including the delimiters.</returns>
-	std::vector<String> split(String const& string, char const delimiter = ' ');
+	std::vector<String> split(String const& string, char const delimiter);
 
 	/// <summary>
 	/// Splits the string based on the given delimiter.
@@ -66,5 +66,19 @@ namespace minty::string
 	/// <param name="string">The string to split.</param>
 	/// <param name="delimiter">The string to split the string by.</param>
 	/// <returns>A vector of strings, not including the delimiters.</returns>
-	std::vector<String> split(String const& string, String const& delimiter = " ");
+	std::vector<String> split(String const& string, String const& delimiter);
+
+	// https://stackoverflow.com/questions/216823/how-to-trim-a-stdstring
+	//inline void ltrim(std::string& s) {
+	//	s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {
+	//		return !std::isspace(ch);
+	//		}));
+	//}
+
+	//// trim from end (in place)
+	//inline void rtrim(std::string& s) {
+	//	s.erase(std::find_if(s.rbegin(), s.rend(), [](unsigned char ch) {
+	//		return !std::isspace(ch);
+	//		}).base(), s.end());
+	//}
 }

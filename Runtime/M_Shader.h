@@ -30,6 +30,11 @@ namespace minty
 		rendering::DescriptorSet _descriptorSet;
 	public:
 		/// <summary>
+		/// Creates an empty Shader.
+		/// </summary>
+		Shader();
+
+		/// <summary>
 		/// Creates a new Shader.
 		/// </summary>
 		/// <param name="layout"></param>
