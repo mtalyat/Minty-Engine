@@ -34,7 +34,7 @@ namespace minty
 		/// </summary>
 		/// <param name="builder"></param>
 		/// <param name="renderer"></param>
-		ShaderPass(rendering::ShaderPassBuilder const& builder, RenderEngine& renderer);
+		ShaderPass(rendering::ShaderPassBuilder const& builder, Engine& engine, ID const sceneId);
 
 		/// <summary>
 		/// Destroys all of the resources associated with this ShaderPass.

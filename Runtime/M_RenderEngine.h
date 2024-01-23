@@ -155,8 +155,6 @@ namespace minty
 
 #pragma region Get
 
-		Scene const* get_scene() const;
-
 		/// <summary>
 		/// Gets the device that this RenderEngine is rendering to.
 		/// </summary>

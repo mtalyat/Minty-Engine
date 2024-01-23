@@ -159,6 +159,7 @@ void Engine::run()
 
 	// all done
 	_sceneManager.unload();
+	_sceneManager.destroy();
 
 	// print elapsed time
 	console::log(std::format("Elapsed time: {}s", std::chrono::duration_cast<std::chrono::milliseconds>(get_now() - start).count() / 1000.0f));

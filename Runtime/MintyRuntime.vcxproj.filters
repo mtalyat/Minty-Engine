@@ -507,6 +507,12 @@
     <ClInclude Include="M_SpriteComponent.h">
       <Filter>Header Files\Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="M_SceneObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="M_AudioObject.h">
+      <Filter>Header Files\Audio</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -834,6 +840,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_AnimatorComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_SceneObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_AudioObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

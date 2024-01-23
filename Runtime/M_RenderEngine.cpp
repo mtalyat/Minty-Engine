@@ -227,11 +227,6 @@ bool minty::RenderEngine::is_initialized() const
 	return _initialized;
 }
 
-Scene const* minty::RenderEngine::get_scene() const
-{
-	return _scene;
-}
-
 void RenderEngine::create_instance()
 {
 	// check if we can use validation layers
@@ -1020,6 +1015,12 @@ void minty::RenderEngine::draw_mesh(VkCommandBuffer commandBuffer, Matrix4 const
 
 void minty::RenderEngine::draw_sprite(VkCommandBuffer commandBuffer, TransformComponent const& transformComponent, SpriteComponent const& spriteComponent)
 {
+	// if no sprite, skip and draw nothing
+	if(spriteComponent.spriteId == ERROR_ID)
+	{
+		return;
+	}
+
 	// get the sprite
 	Sprite const& sprite = _renderSystem->get_sprite(spriteComponent.spriteId);
 

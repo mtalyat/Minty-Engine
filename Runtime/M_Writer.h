@@ -2,6 +2,7 @@
 
 #include "M_Base.h"
 #include "M_Node.h"
+#include "M_Register.h"
 #include <map>
 #include <unordered_map>
 #include <set>
@@ -218,6 +219,15 @@ namespace minty
 			}
 
 			write(name, node);
+		}
+
+		template<typename T>
+		void write(String const& name, Register<T> const& value)
+		{
+			for (auto const& pair : value)
+			{
+				write_object(value.get_name(pair.first), pair.second);
+			}
 		}
 
 #pragma endregion

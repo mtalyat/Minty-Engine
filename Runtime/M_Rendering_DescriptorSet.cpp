@@ -15,15 +15,15 @@ minty::rendering::DescriptorSet::DescriptorSet()
 	, _dirties()
 {}
 
-minty::rendering::DescriptorSet::DescriptorSet(RenderEngine& renderer)
-	: RenderObject::RenderObject(renderer)
+minty::rendering::DescriptorSet::DescriptorSet(Engine& engine, ID const sceneId)
+	: RenderObject::RenderObject(engine, sceneId)
 	, _descriptorSets()
 	, _descriptors()
 	, _dirties()
 {}
 
-minty::rendering::DescriptorSet::DescriptorSet(std::array<VkDescriptorSet, MAX_FRAMES_IN_FLIGHT> const& descriptorSets, std::unordered_map<String, std::array<DescriptorData, MAX_FRAMES_IN_FLIGHT>> const& datas, RenderEngine& renderer)
-	: RenderObject::RenderObject(renderer)
+minty::rendering::DescriptorSet::DescriptorSet(std::array<VkDescriptorSet, MAX_FRAMES_IN_FLIGHT> const& descriptorSets, std::unordered_map<String, std::array<DescriptorData, MAX_FRAMES_IN_FLIGHT>> const& datas, Engine& engine, ID const sceneId)
+	: RenderObject::RenderObject(engine, sceneId)
 	, _descriptorSets(descriptorSets)
 	, _descriptors(datas)
 	, _dirties()
@@ -147,7 +147,7 @@ void minty::rendering::DescriptorSet::apply(int const frame)
 	std::vector<std::vector<VkDescriptorImageInfo>> imageInfos;
 
 	RenderEngine& renderer = get_render_engine();
-	RenderSystem* renderSystem = renderer.get_scene()->get_system_registry().find<RenderSystem>();
+	RenderSystem* renderSystem = get_render_system();
 
 	for (auto const& pair : _descriptors)
 	{

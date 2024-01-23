@@ -14,9 +14,8 @@ using namespace minty::rendering;
 using namespace minty::vk;
 using namespace minty::builtin;
 
-minty::RenderSystem::RenderSystem(Scene& scene)
-	: System::System(scene)
-	, _renderEngine(&scene.get_engine().get_render_engine())
+minty::RenderSystem::RenderSystem(Engine& engine, ID const sceneId)
+	: System::System(engine, sceneId)
 {}
 
 minty::RenderSystem::~RenderSystem()
@@ -61,12 +60,14 @@ void minty::RenderSystem::update_camera(CameraComponent const& camera, Transform
 	// TODO: don't use lookat
 	// maybe invert global?
 
+	RenderEngine& renderEngine = get_engine().get_render_engine();
+
 	// get projection
 	Matrix4 proj;
 	switch (camera.perspective)
 	{
 	case CameraComponent::Perspective::Perspective:
-		proj = glm::perspective(glm::radians(camera.fov), _renderEngine->get_aspect_ratio(), camera.nearPlane, camera.farPlane);
+		proj = glm::perspective(glm::radians(camera.fov), renderEngine.get_aspect_ratio(), camera.nearPlane, camera.farPlane);
 		break;
 	default:
 		proj = Matrix4(1.0f);
@@ -85,44 +86,44 @@ void minty::RenderSystem::update_camera(CameraComponent const& camera, Transform
 	// update all shaders
 	for (auto& shader : _shaders)
 	{
-		shader.second.update_global_uniform_constant("camera", _renderEngine->get_frame(), &obj, sizeof(CameraBufferObject), 0);
+		shader.second.update_global_uniform_constant("camera", renderEngine.get_frame(), &obj, sizeof(CameraBufferObject), 0);
 	}
 }
 
 ID minty::RenderSystem::create_texture(rendering::TextureBuilder const& builder)
 {
-	return _textures.emplace(builder.name, Texture(builder, *_renderEngine));
+	return _textures.emplace(builder.name, Texture(builder, get_engine(), get_scene_id()));
 }
 
 ID minty::RenderSystem::create_sprite(rendering::SpriteBuilder const& builder)
 {
-	return _sprites.emplace(builder.name, Sprite(builder, *_renderEngine));
+	return _sprites.emplace(builder.name, Sprite(builder, get_engine(), get_scene_id()));
 }
 
 ID minty::RenderSystem::create_shader(rendering::ShaderBuilder const& builder)
 {
-	return _shaders.emplace(builder.name, Shader(builder, *_renderEngine));
+	return _shaders.emplace(builder.name, Shader(builder, get_engine(), get_scene_id()));
 }
 
 ID minty::RenderSystem::create_shader_pass(rendering::ShaderPassBuilder const& builder)
 {
-	return _shaderPasses.emplace(builder.name, ShaderPass(builder, *_renderEngine));
+	return _shaderPasses.emplace(builder.name, ShaderPass(builder, get_engine(), get_scene_id()));
 }
 
 ID minty::RenderSystem::create_material_template(rendering::MaterialTemplateBuilder const& builder)
 {
-	return _materialTemplates.emplace(builder.name, MaterialTemplate(builder, *_renderEngine));
+	return _materialTemplates.emplace(builder.name, MaterialTemplate(builder, get_engine(), get_scene_id()));
 }
 
 ID minty::RenderSystem::create_material(rendering::MaterialBuilder const& builder)
 {
-	return _materials.emplace(builder.name, Material(builder, *_renderEngine));
+	return _materials.emplace(builder.name, Material(builder, get_engine(), get_scene_id()));
 }
 
 ID minty::RenderSystem::create_mesh()
 {
 	// just create a brand new mesh
-	return _meshes.emplace(Mesh(*_renderEngine));
+	return _meshes.emplace(Mesh(get_engine(), get_scene_id()));
 }
 
 ID minty::RenderSystem::get_or_create_mesh(String const& name)
@@ -134,7 +135,7 @@ ID minty::RenderSystem::get_or_create_mesh(String const& name)
 	}
 
 	// create new
-	return _meshes.emplace(name, Mesh(*_renderEngine));
+	return _meshes.emplace(name, Mesh(get_engine(), get_scene_id()));
 }
 
 ID minty::RenderSystem::get_or_create_mesh(MeshType const type)
@@ -148,7 +149,7 @@ ID minty::RenderSystem::get_or_create_mesh(MeshType const type)
 	}
 
 	// create new
-	ID id = _meshes.emplace(name, Mesh(*_renderEngine));
+	ID id = _meshes.emplace(name, Mesh(get_engine(), get_scene_id()));
 	Mesh& mesh = _meshes.at(id);
 
 	switch (type)
@@ -367,7 +368,7 @@ ID minty::RenderSystem::load_shader(Path const& path, String const& name)
 	Node meta = Asset::load_node(path);
 
 	ShaderBuilder builder;
-	builder.name = path.stem().string();
+	builder.name = name;
 
 	std::vector<Node const*> nodes = meta.find_all("push");
 	for (Node const* child : nodes)
@@ -419,7 +420,7 @@ ID minty::RenderSystem::load_shader_pass(Path const& path, String const& name)
 	Reader reader(meta);
 
 	ShaderPassBuilder builder;
-	builder.name = path.stem().string();
+	builder.name = name;
 	builder.shaderId = find_shader(reader.read_string("shader", meta.to_string()));
 	builder.topology = from_string_vk_primitive_topology(reader.read_string("primitiveTopology"));
 	builder.polygonMode = from_string_vk_polygon_mode(reader.read_string("polygonMode"));
@@ -433,7 +434,7 @@ ID minty::RenderSystem::load_shader_pass(Path const& path, String const& name)
 		VkVertexInputBindingDescription binding = {};
 		Reader childReader(*child);
 
-		binding.binding = childReader.read_uint("binding", reader.to_uint());
+		binding.binding = childReader.read_uint("binding", childReader.to_uint());
 		binding.stride = childReader.read_uint("stride");
 		binding.inputRate = from_string_vk_vertex_input_rate(childReader.read_string("inputRate"));
 
@@ -445,7 +446,7 @@ ID minty::RenderSystem::load_shader_pass(Path const& path, String const& name)
 		VkVertexInputAttributeDescription attribute = {};
 		Reader childReader(*child);
 
-		attribute.location = childReader.read_uint("location", reader.to_uint());
+		attribute.location = childReader.read_uint("location", childReader.to_uint());
 		attribute.binding = childReader.read_uint("binding");
 		attribute.format = from_string_vk_format(childReader.read_string("format"));
 		attribute.offset = childReader.read_uint("offset");
@@ -458,7 +459,7 @@ ID minty::RenderSystem::load_shader_pass(Path const& path, String const& name)
 		ShaderPassBuilder::ShaderStageInfo info;
 		Reader childReader(*child);
 
-		info.stage = from_string_vk_shader_stage_flag_bits(childReader.read_string("stage", reader.to_string()));
+		info.stage = from_string_vk_shader_stage_flag_bits(childReader.read_string("stage", childReader.to_string()));
 		String path = childReader.read_string("path");
 		info.code = Asset::load_chars(path);
 		info.entry = childReader.read_string("entry", "main");
@@ -484,7 +485,7 @@ ID minty::RenderSystem::load_material_template(Path const& path, String const& n
 	Node meta = Asset::load_node(path);
 
 	MaterialTemplateBuilder builder;
-	builder.name = path.stem().string();
+	builder.name = name;
 
 	std::vector<Node const*> nodes = meta.find_all("pass");
 	for (auto const* child : nodes)
@@ -520,7 +521,7 @@ ID minty::RenderSystem::load_material(Path const& path, String const& name)
 	Reader reader(meta);
 
 	MaterialBuilder builder;
-	builder.name = Path(path).stem().string();
+	builder.name = name;
 
 	builder.templateId = find_material_template(reader.read_string("template"));
 
@@ -980,49 +981,59 @@ void minty::RenderSystem::deserialize(Reader const& reader)
 	Node const& node = reader.get_node();
 	if (Node const* atlasesNode = node.find("atlases"))
 	{
-		TextureAtlasBuilder builder;
-		TextureAtlas atlas(builder, *_renderEngine);
-
-		Reader atlasesReader(*atlasesNode, reader.get_data());
-		atlas.deserialize(atlasesReader);
-
-		if (Node const* spritesNode = atlasesNode->find("sprites"))
+		for(Node const& atlasNode : atlasesNode->get_children())
 		{
-			// determine what to do with the sprites
-			if (spritesNode->find("all"))
+			Reader atlasReader(atlasNode, reader.get_data());
+
+			TextureAtlasBuilder builder
 			{
-				// create all sprites
-				atlas.create_all();
-			}
-			else
+				.textureId = find_texture(atlasReader.read_string("texture")),
+				.materialId = find_material(atlasReader.read_string("material")),
+				.coordinateMode = from_string_pixel_coordinate_mode(atlasReader.read_string("coordinateMode")),
+			};
+			atlasReader.read_object("slice", builder.slice, Vector2::zero());
+			atlasReader.read_object("pivot", builder.pivot, Vector2::half());
+
+			TextureAtlas atlas(builder, get_engine(), get_scene_id());
+
+			if (Node const* spritesNode = atlasesNode->find("sprites"))
 			{
-				// create sprites at specific X Y coordinates
-				std::vector<Node const*> nodes = spritesNode->find_all("sprite");
-				for (Node const* n : nodes)
+				// determine what to do with the sprites
+				if (spritesNode->find("all"))
 				{
-					Reader nReader(*n, reader.get_data());
-					int x = nReader.read_int("x");
-					int y = nReader.read_int("y");
-					Vector2 pivot;
-					nReader.read_object("pivot", pivot, Vector2::half());
-					CoordinateMode coordinateMode = from_string_pixel_coordinate_mode(nReader.read_string("coordinateMode"));
-
-					atlas.create_sprite(x, y, pivot, coordinateMode);
+					// create all sprites
+					atlas.create_all();
 				}
-
-				// create slices at specific offsets
-				nodes = spritesNode->find_all("slice");
-				for (Node const* n : nodes)
+				else
 				{
-					Reader nReader(*n, reader.get_data());
-					Vector2 minCoords, maxCoords;
-					nReader.read_object("min", minCoords, Vector2::zero());
-					nReader.read_object("max", maxCoords, Vector2::one());
-					CoordinateMode coordinateMode = from_string_pixel_coordinate_mode(nReader.read_string("coordinateMode"));
+					// create sprites at specific X Y coordinates
+					std::vector<Node const*> nodes = spritesNode->find_all("sprite");
+					for (Node const* n : nodes)
+					{
+						Reader nReader(*n, reader.get_data());
+						int x = nReader.read_int("x");
+						int y = nReader.read_int("y");
+						Vector2 pivot;
+						nReader.read_object("pivot", pivot, Vector2::half());
+						CoordinateMode coordinateMode = from_string_pixel_coordinate_mode(nReader.read_string("coordinateMode"));
 
-					atlas.slice_sprite(minCoords, maxCoords, coordinateMode);
+						atlas.create_sprite(x, y, pivot, coordinateMode);
+					}
+
+					// create slices at specific offsets
+					nodes = spritesNode->find_all("slice");
+					for (Node const* n : nodes)
+					{
+						Reader nReader(*n, reader.get_data());
+						Vector2 minCoords, maxCoords;
+						nReader.read_object("min", minCoords, Vector2::zero());
+						nReader.read_object("max", maxCoords, Vector2::one());
+						CoordinateMode coordinateMode = from_string_pixel_coordinate_mode(nReader.read_string("coordinateMode"));
+
+						atlas.slice_sprite(minCoords, maxCoords, coordinateMode);
+					}
 				}
 			}
-		}
+		}		
 	}
 }

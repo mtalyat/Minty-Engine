@@ -16,8 +16,6 @@ namespace minty
 		: public rendering::RenderObject
 	{
 	private:
-		RenderSystem* _renderSystem;
-
 		// id to texture
 		ID _textureId;
 		// id to the material
@@ -34,7 +32,7 @@ namespace minty
 		/// </summary>
 		TextureAtlas();
 
-		TextureAtlas(rendering::TextureAtlasBuilder const& builder, RenderEngine& renderer);
+		TextureAtlas(rendering::TextureAtlasBuilder const& builder, Engine& engine, ID const sceneId);
 
 		~TextureAtlas();
 

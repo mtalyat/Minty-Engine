@@ -14,11 +14,11 @@ minty::ShaderPass::ShaderPass()
 	, _descriptorSet()
 {}
 
-minty::ShaderPass::ShaderPass(ShaderPassBuilder const& builder, RenderEngine& renderer)
-	: rendering::RenderObject(renderer)
+minty::ShaderPass::ShaderPass(ShaderPassBuilder const& builder, Engine& engine, ID const sceneId)
+	: rendering::RenderObject(engine, sceneId)
 	, _shaderId(builder.shaderId)
 	, _pipeline()
-	, _descriptorSet(renderer)
+	, _descriptorSet(engine, sceneId)
 {
 	create_pipeline(builder);
 

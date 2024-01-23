@@ -227,6 +227,7 @@
     <ClInclude Include="M_AudioClip.h" />
     <ClInclude Include="M_AudioEngine.h" />
     <ClInclude Include="M_AudioListenerComponent.h" />
+    <ClInclude Include="M_AudioObject.h" />
     <ClInclude Include="M_AudioSourceComponent.h" />
     <ClInclude Include="M_AudioSystem.h" />
     <ClInclude Include="M_Builtin.h" />
@@ -243,6 +244,7 @@
     <ClInclude Include="M_Rendering_UIPushData.h" />
     <ClInclude Include="M_RenderSystem.h" />
     <ClInclude Include="M_Resource.h" />
+    <ClInclude Include="M_SceneObject.h" />
     <ClInclude Include="M_SerializationData.h" />
     <ClInclude Include="M_Dynamic.h" />
     <ClInclude Include="framework.h" />
@@ -377,6 +379,7 @@
     <ClCompile Include="M_AudioClip.cpp" />
     <ClCompile Include="M_AudioEngine.cpp" />
     <ClCompile Include="M_AudioListenerComponent.cpp" />
+    <ClCompile Include="M_AudioObject.cpp" />
     <ClCompile Include="M_AudioSourceComponent.cpp" />
     <ClCompile Include="M_AudioSystem.cpp" />
     <ClCompile Include="M_Compression.cpp" />
@@ -424,6 +427,7 @@
     <ClCompile Include="M_Scene.cpp" />
     <ClCompile Include="M_SceneManager.cpp" />
     <ClCompile Include="M_Node.cpp" />
+    <ClCompile Include="M_SceneObject.cpp" />
     <ClCompile Include="M_Shader.cpp" />
     <ClCompile Include="M_ShaderPass.cpp" />
     <ClCompile Include="M_Sprite.cpp" />

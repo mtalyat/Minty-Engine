@@ -103,6 +103,10 @@ int init(Runtime &runtime)
         EntityRegistry& er = scene.get_entity_registry();
         SystemRegistry& sr = scene.get_system_registry();
 
+        // set the camera to one of the cameras in the scene
+        RenderSystem* renderSystem = sr.find<RenderSystem>();
+        renderSystem->set_main_camera(er.find<CameraComponent>());
+
         // load the scene we created, with the camera
         sceneManager.load_scene(sceneId);
 
@@ -113,7 +117,7 @@ int init(Runtime &runtime)
                 .scene = &scene,
                 .entity = NULL_ENTITY};
             Writer writer(node, &data);
-            scene.serialize(writer);
+            writer.write_object("Scene", scene);
             minty::console::print(node);
         }
 
@@ -201,7 +205,8 @@ int init(Runtime &runtime)
     }
     catch (const std::exception &e)
     {
-        std::cerr << "Failed to init: \"" << e.what() << '"' << std::endl;
+        console::error(std::format("Failed to init: \"{}\"", e.what()));
+        // std::cerr << "Failed to init: \"" << e.what() << '"' << std::endl;
     }
 
     console::log("Game start.");

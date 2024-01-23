@@ -4,8 +4,12 @@
 
 using namespace minty;
 
-game::MoveSystem::MoveSystem(minty::Scene& scene)
-    : System::System(scene), right(), up(), forward(), faster()
+game::MoveSystem::MoveSystem(Engine& engine, ID const sceneId)
+    : System::System(engine, sceneId)
+    , right()
+    , up()
+    , forward()
+    , faster()
 {
 }
 

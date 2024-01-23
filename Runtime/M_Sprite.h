@@ -25,7 +25,7 @@ namespace minty
 		/// </summary>
 		Sprite();
 
-		Sprite(rendering::SpriteBuilder const& builder, RenderEngine& renderer);
+		Sprite(rendering::SpriteBuilder const& builder, Engine& engine, ID const sceneId);
 
 		/// <summary>
 		/// Destroys all of the resources associated with this Sprite.

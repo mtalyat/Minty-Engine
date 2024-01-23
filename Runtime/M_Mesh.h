@@ -76,7 +76,7 @@ namespace minty
 		/// Creates a new Mesh.
 		/// </summary>
 		/// <param name="renderer"></param>
-		Mesh(RenderEngine& renderer);
+		Mesh(Engine& engine, ID const sceneId);
 
 		~Mesh();
 

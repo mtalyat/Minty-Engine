@@ -1,7 +1,6 @@
 #pragma once
-#include "M_Object.h"
-#include "M_ISerializable.h"
 
+#include "M_Base.h"
 #include <vector>
 #include <unordered_map>
 #include <stdexcept>
@@ -13,7 +12,7 @@ namespace minty
 	/// </summary>
 	/// <typeparam name="T"></typeparam>
 	template <class T>
-	class Register : public Object
+	class Register
 	{
 	private:
 		// the most amount of elements allowed
@@ -48,7 +47,7 @@ namespace minty
 		/// </summary>
 		/// <param name="obj">The object values.</param>
 		/// <returns>The ID of the new object in this Register, or ERROR_ID if this Register is full.</returns>
-		ID emplace(T const &obj);
+		ID emplace(T const& obj);
 
 		/// <summary>
 		/// Creates a new named object within the Register with an name.
@@ -56,20 +55,26 @@ namespace minty
 		/// <param name="name">The name of the object.</param>
 		/// <param name="obj">The object.</param>
 		/// <returns>The ID of the object in the Register, or ERROR_ID if the Register is full.</returns>
-		ID emplace(String const &name, T const &obj);
+		ID emplace(String const& name, T const& obj);
 
 		/// <summary>
 		/// Sets an name for an ID in this Register.
 		/// </summary>
 		/// <param name="name">The name name.</param>
 		/// <param name="id">The ID of the object.</param>
-		void emplace_name(String const &name, ID const id);
+		void emplace_name(String const& name, ID const id);
+
+		/// <summary>
+		/// Gets the next ID that will be used.
+		/// </summary>
+		/// <returns></returns>
+		ID get_next() const;
 
 		/// <summary>
 		/// Removes an name for an ID in this Register.
 		/// </summary>
 		/// <param name="name">The name name.</param>
-		void erase_name(String const &name);
+		void erase_name(String const& name);
 
 		/// <summary>
 		/// Erases the object with the given ID.
@@ -81,7 +86,7 @@ namespace minty
 		/// Erases the object with the given name.
 		/// </summary>
 		/// <param name="name"></param>
-		void erase(String const &name);
+		void erase(String const& name);
 
 		/// <summary>
 		/// Checks if this Register has an object with the given ID.
@@ -95,7 +100,7 @@ namespace minty
 		/// </summary>
 		/// <param name="name"></param>
 		/// <returns></returns>
-		bool contains(String const &name) const;
+		bool contains(String const& name) const;
 
 		/// <summary>
 		/// Gets the ID for the given name in this Register.
@@ -130,7 +135,7 @@ namespace minty
 		/// </summary>
 		/// <param name="id">The ID of the object in this Register.</param>
 		/// <returns>A pointer to the object, or nullptr if the ID was invalid.</returns>
-		T const &at(ID const id) const;
+		T const& at(ID const id) const;
 
 		/// <summary>
 		/// Gets the object with the given name.
@@ -144,7 +149,7 @@ namespace minty
 		/// </summary>
 		/// <param name="name">The name of the object in this Register.</param>
 		/// <returns>A pointer to the object.</returns>
-		T const &at(String const &name) const;
+		T const& at(String const& name) const;
 
 		/// <summary>
 		/// Gets the number of objects within this Register.
@@ -167,13 +172,13 @@ namespace minty
 		/// Gets the vector containing all of this Register data.
 		/// </summary>
 		/// <returns></returns>
-		auto &data();
+		auto& data();
 
 		/// <summary>
 		/// Gets the vector containing all of this Register data.
 		/// </summary>
 		/// <returns></returns>
-		auto const &data() const;
+		auto const& data() const;
 
 		/// <summary>
 		/// Resizes this Register.
@@ -191,7 +196,7 @@ namespace minty
 		/// Sets the new capacity for this Register. All values are cleared.
 		/// </summary>
 		/// <param name="size">The new capacity.</param>
-		void limit(ID const size);
+		void limit(ID const size = MAX_ID);
 
 		auto begin();
 		auto end();
@@ -202,10 +207,7 @@ namespace minty
 		auto& front();
 		auto& back();
 		auto const& front() const;
-		auto const &back() const;
-
-		void serialize(Writer& writer) const override;
-		void deserialize(Reader const& reader) override;
+		auto const& back() const;
 	};
 
 	template <class T>
@@ -221,13 +223,13 @@ namespace minty
 	}
 
 	template <class T>
-	ID Register<T>::emplace(T const &obj)
+	ID Register<T>::emplace(T const& obj)
 	{
 		return emplace("", obj);
 	}
 
 	template <class T>
-	ID Register<T>::emplace(String const &name, T const &obj)
+	ID Register<T>::emplace(String const& name, T const& obj)
 	{
 		// check if over capacity
 		if (_data.size() >= _capacity)
@@ -253,14 +255,20 @@ namespace minty
 	}
 
 	template <class T>
-	void Register<T>::emplace_name(String const &name, ID const id)
+	void Register<T>::emplace_name(String const& name, ID const id)
 	{
 		_lookup[name] = id;
 		_names[id] = name;
 	}
 
+	template<class T>
+	inline ID Register<T>::get_next() const
+	{
+		return _next;
+	}
+
 	template <class T>
-	void Register<T>::erase_name(String const &name)
+	void Register<T>::erase_name(String const& name)
 	{
 		ID id = _lookup.at(name);
 		_lookup.erase(name);
@@ -281,7 +289,7 @@ namespace minty
 	}
 
 	template <class T>
-	void Register<T>::erase(String const &name)
+	void Register<T>::erase(String const& name)
 	{
 		ID id = _lookup.at(name);
 		_lookup.erase(name);
@@ -290,7 +298,7 @@ namespace minty
 	}
 
 	template <class T>
-	bool Register<T>::contains(String const &name) const
+	bool Register<T>::contains(String const& name) const
 	{
 		return _lookup.contains(name);
 	}
@@ -344,26 +352,26 @@ namespace minty
 	}
 
 	template <class T>
-	T const &Register<T>::at(ID const id) const
+	T const& Register<T>::at(ID const id) const
 	{
 		return _data.at(id);
 	}
 
 	template <class T>
-	T &Register<T>::at(ID const id)
+	T& Register<T>::at(ID const id)
 	{
 		return _data.at(id);
 	}
 
 	template <class T>
-	T const &Register<T>::at(String const &name) const
+	T const& Register<T>::at(String const& name) const
 	{
 		// use lookup to find id, then use that to get object
 		return at(_lookup.at(name));
 	}
 
 	template <class T>
-	T &Register<T>::at(String const &name)
+	T& Register<T>::at(String const& name)
 	{
 		// use lookup to find id, then use that to get object
 		return at(_lookup.at(name));
@@ -384,18 +392,20 @@ namespace minty
 	template <class T>
 	void Register<T>::clear()
 	{
+		_next = 0;
 		_data.clear();
+		_names.clear();
 		_lookup.clear();
 	}
 
 	template <class T>
-	auto &Register<T>::data()
+	auto& Register<T>::data()
 	{
 		return _data;
 	}
 
 	template <class T>
-	auto const &Register<T>::data() const
+	auto const& Register<T>::data() const
 	{
 		return _data;
 	}
@@ -415,7 +425,6 @@ namespace minty
 	template <class T>
 	void Register<T>::limit(ID const size)
 	{
-		clear();
 		_capacity = size;
 	}
 
@@ -456,88 +465,26 @@ namespace minty
 	}
 
 	template <class T>
-	auto &Register<T>::front()
+	auto& Register<T>::front()
 	{
 		return _data.front();
 	}
 
 	template <class T>
-	auto &Register<T>::back()
+	auto& Register<T>::back()
 	{
 		return _data.back();
 	}
 
 	template <class T>
-	auto const &Register<T>::front() const
+	auto const& Register<T>::front() const
 	{
 		return _data.front();
 	}
 
 	template <class T>
-	auto const &Register<T>::back() const
+	auto const& Register<T>::back() const
 	{
 		return _data.back();
-	}
-	
-	template<class T>
-	void Register<T>::serialize(Writer& writer) const
-	{
-		writer.write("capacity", _capacity, MAX_ID);
-
-		// write named and unnamed values
-		Node valuesNode("data");
-		Writer valuesWriter(valuesNode);
-
-		for (auto const& pair : _data)
-		{
-			// if there is a name, use it, otherwise use ""
-			auto const& found = _names.find(pair.first);
-			if (found == _names.end())
-			{
-				valuesWriter.write_object("", pair.second);
-			}
-			else
-			{
-				valuesWriter.write_object(found->second, pair.second);
-			}
-		}
-
-		writer.write(valuesNode);
-	}
-	
-	template<class T>
-	void Register<T>::deserialize(Reader const& reader)
-	{
-		_next = 0;
-		_data.clear();
-		_names.clear();
-		_lookup.clear();
-
-		_capacity = reader.read_id("capacity");
-
-		Node const& node = reader.get_node();
-		if (Node const* valuesNode = node.find("values"))
-		{
-			T t;
-
-			// get unnamed
-			std::vector<Node const*> unnamedList = valuesNode->find_all("");
-			for (auto const& child : unnamedList)
-			{
-				Reader reader(*child);
-				reader.to_object(t);
-				emplace(t);
-			}
-
-			// get named
-			for (auto const& child : valuesNode->get_children())
-			{
-				if (child.get_name() == "") continue; // skip unnamed
-
-				Reader reader(child);
-				reader.to_object(t);
-				emplace(child.get_name(), t);
-			}
-		}
 	}
 }

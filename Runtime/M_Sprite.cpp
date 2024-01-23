@@ -17,8 +17,8 @@ minty::Sprite::Sprite()
 	, _pivot()
 {}
 
-minty::Sprite::Sprite(rendering::SpriteBuilder const& builder, RenderEngine& renderer)
-	: RenderObject::RenderObject(renderer)
+minty::Sprite::Sprite(rendering::SpriteBuilder const& builder, Engine& engine, ID const sceneId)
+	: RenderObject::RenderObject(engine, sceneId)
 	, _textureId(builder.textureId)
 	, _materialId(builder.materialId)
 	, _minCoords()

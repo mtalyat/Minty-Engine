@@ -22,15 +22,13 @@ namespace minty
 			Vector3 velocity;
 		};
 	private:
-		AudioEngine* _audioEngine;
-
 		Register<AudioClip> _clips;
 		std::unordered_map<AudioHandle, Entity> _playing;
 
 		Entity _listener;
 		SoundData _listenerData;
 	public:
-		AudioSystem(Scene& scene);
+		AudioSystem(Engine& engine, ID const sceneId);
 
 		void update() override;
 
@@ -218,6 +216,8 @@ namespace minty
 		void destroy_all_clips();
 
 	private:
+		AudioEngine& get_audio_engine() const;
+
 		// updates the given sound data using the given entity
 		void update_sound_data(SoundData& data, Entity const entity);
 	};

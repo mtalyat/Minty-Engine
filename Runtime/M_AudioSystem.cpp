@@ -10,9 +10,8 @@
 
 using namespace minty;
 
-minty::AudioSystem::AudioSystem(Scene& scene)
-	: System::System(scene)
-	, _audioEngine(&scene.get_engine().get_audio_engine())
+minty::AudioSystem::AudioSystem(Engine& engine, ID const sceneId)
+	: System::System(engine, sceneId)
 {}
 
 void minty::AudioSystem::update()
@@ -20,6 +19,7 @@ void minty::AudioSystem::update()
 	TransformComponent* transComp;
 
 	EntityRegistry& entityRegistry = get_entity_registry();
+	AudioEngine& audioEngine = get_audio_engine();
 
 	bool listenerDirty = entityRegistry.all_of<DirtyComponent>(_listener);
 
@@ -36,7 +36,7 @@ void minty::AudioSystem::update()
 			Vector3 forward = transComp->get_forward();
 
 			// update that data in the audio engine
-			_audioEngine->set_listener_parameters(_listenerData.position, forward, up, _listenerData.velocity);
+			audioEngine.set_listener_parameters(_listenerData.position, forward, up, _listenerData.velocity);
 		}
 	}
 
@@ -51,14 +51,14 @@ void minty::AudioSystem::update()
 	for (auto& pair : _playing)
 	{
 		// check if sound is still playing
-		if (_audioEngine->is_valid_handle(pair.first))
+		if (audioEngine.is_valid_handle(pair.first))
 		{
 			// still playing, update 3d location if needed
 			if (pair.second != NULL_ENTITY && entityRegistry.all_of<DirtyComponent>(pair.second) && (transComp = entityRegistry.try_get<TransformComponent>(pair.second)))
 			{
 				update_sound_data(sourceData, pair.second);
 
-				_audioEngine->set_source_parameters(pair.first, sourceData.position, sourceData.velocity);
+				audioEngine.set_source_parameters(pair.first, sourceData.position, sourceData.velocity);
 			}
 		}
 		else
@@ -75,7 +75,7 @@ void minty::AudioSystem::update()
 	}
 
 	// finalize updates
-	_audioEngine->apply();
+	audioEngine.apply();
 }
 
 
@@ -87,7 +87,7 @@ AudioHandle minty::AudioSystem::play(ID const id, float const volume, float cons
 	AudioClip& clip = at(id);
 
 	// start playing
-	AudioHandle handle = _audioEngine->play(clip, volume, pan, paused);
+	AudioHandle handle = get_audio_engine().play(clip, volume, pan, paused);
 
 	// mark as playing
 	_playing[handle] = NULL_ENTITY;
@@ -122,15 +122,16 @@ AudioHandle minty::AudioSystem::play_spatial(ID const id, Entity const entity, f
 	MINTY_ASSERT(entityRegistry.all_of<AudioSourceComponent>(entity), "The entity for play_spatial must have an AudioSourceComponent component.");
 
 	AudioSourceComponent& source = entityRegistry.get<AudioSourceComponent>(entity);
+	AudioEngine& audioEngine = get_audio_engine();
 
 	// entity tied to sound, so play in 3d space
 	SoundData data{};
 	update_sound_data(data, entity);
-	AudioHandle handle = _audioEngine->play_spatial(_clips.at(id), data.position, data.velocity, volume, paused, bus);
+	AudioHandle handle = audioEngine.play_spatial(_clips.at(id), data.position, data.velocity, volume, paused, bus);
 
-	_audioEngine->set_source_attenuation(handle, SoLoud::AudioSource::LINEAR_DISTANCE, source.attenuation);
-	_audioEngine->set_source_min_max_distance(handle, source.nearDistance, source.farDistance);
-	_audioEngine->apply();
+	audioEngine.set_source_attenuation(handle, SoLoud::AudioSource::LINEAR_DISTANCE, source.attenuation);
+	audioEngine.set_source_min_max_distance(handle, source.nearDistance, source.farDistance);
+	audioEngine.apply();
 
 	_playing[handle] = entity;
 
@@ -150,7 +151,7 @@ AudioHandle minty::AudioSystem::play_background(ID const id, float const volume,
 	AudioClip& clip = at(id);
 
 	// start playing
-	SoLoud::handle handle = _audioEngine->play_background(clip, volume, paused, bus);
+	SoLoud::handle handle = get_audio_engine().play_background(clip, volume, paused, bus);
 
 	// add to playing
 	_playing[handle] = NULL_ENTITY;
@@ -165,17 +166,17 @@ AudioHandle minty::AudioSystem::play_background(String const& name, float const 
 
 bool minty::AudioSystem::is_playing(AudioHandle const handle)
 {
-	return _audioEngine->is_valid_handle(handle);
+	return get_audio_engine().is_valid_handle(handle);
 }
 
 void minty::AudioSystem::set_pause(AudioHandle const handle, bool const paused)
 {
-	_audioEngine->set_pause(handle, paused);
+	get_audio_engine().set_pause(handle, paused);
 }
 
 bool minty::AudioSystem::get_pause(AudioHandle const handle)
 {
-	return _audioEngine->get_pause(handle);
+	return get_audio_engine().get_pause(handle);
 }
 
 void minty::AudioSystem::stop(AudioHandle const handle)
@@ -184,14 +185,14 @@ void minty::AudioSystem::stop(AudioHandle const handle)
 
 	if (found != _playing.end())
 	{
-		_audioEngine->stop(handle);
+		get_audio_engine().stop(handle);
 		_playing.erase(handle);
 	}
 }
 
 void minty::AudioSystem::stop_all()
 {
-	_audioEngine->stop_all();
+	get_audio_engine().stop_all();
 }
 
 ID minty::AudioSystem::load_clip(String const& name, Path const& path)
@@ -268,6 +269,11 @@ void minty::AudioSystem::destroy_all_clips()
 
 	// remove all
 	_clips.clear();
+}
+
+AudioEngine& minty::AudioSystem::get_audio_engine() const
+{
+	return get_engine().get_audio_engine();
 }
 
 void minty::AudioSystem::set_listener(Entity const entity)

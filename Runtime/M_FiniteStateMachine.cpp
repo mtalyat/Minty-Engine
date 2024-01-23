@@ -223,7 +223,7 @@ void minty::FSM::Transition::serialize(Writer& writer) const
 	writer.write("state", fsm->get_state_name(_stateId));
 
 	Node condNode("conditions");
-	Writer condWriter(condNode);
+	Writer condWriter(condNode, writer.get_data());
 
 	for (auto const& condition : _conditions)
 	{
@@ -245,7 +245,7 @@ void minty::FSM::Transition::deserialize(Reader const& reader)
 		std::vector<Node const*> list = conditions->find_all("");
 		for (Node const* node : list)
 		{
-			Reader condReader(*node, this);
+			Reader condReader(*node, reader.get_data());
 			Condition cond;
 			cond.deserialize(condReader);
 			emplace_condition(cond);
@@ -468,7 +468,7 @@ void minty::FSM::serialize(Writer& writer) const
 	Writer fsmWriter(writer.get_node(), this);
 
 	fsmWriter.write_object("scope", _scope);
-	fsmWriter.write_object("states", _states);
+	fsmWriter.write("states", _states);
 	fsmWriter.write("start", _states.get_name(_startingStateId));
 }
 
@@ -477,7 +477,7 @@ void minty::FSM::deserialize(Reader const& reader)
 	Reader fsmReader(reader.get_node(), this);
 
 	fsmReader.read_object("scope", _scope);
-	fsmReader.read_object("states", _states);
+	fsmReader.read_register("states", _states);
 	_startingStateId = _states.find(fsmReader.read_string("start"));
 	_currentStateId = _startingStateId;
 }

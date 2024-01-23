@@ -14,12 +14,12 @@ minty::Material::Material()
 	, _passDescriptorSets()
 {}
 
-minty::Material::Material(rendering::MaterialBuilder const& builder, RenderEngine& renderer)
-	: rendering::RenderObject(renderer)
+minty::Material::Material(rendering::MaterialBuilder const& builder, Engine& engine, ID const sceneId)
+	: rendering::RenderObject(engine, sceneId)
 	, _templateId(builder.templateId)
 	, _passDescriptorSets()
 {
-	RenderSystem* renderSystem = renderer.get_scene()->get_system_registry().find<RenderSystem>();
+	RenderSystem* renderSystem = get_render_system();
 
 	MINTY_ASSERT(renderSystem != nullptr, "Material(): renderSystem cannot be null.");
 

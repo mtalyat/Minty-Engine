@@ -1,10 +1,11 @@
 #pragma once
 
-#include "M_Object.h"
+#include "M_SceneObject.h"
 #include <set>
 
 namespace minty
 {
+	class Engine;
 	class Scene;
 	class EntityRegistry;
 	class SystemRegistry;
@@ -13,28 +14,21 @@ namespace minty
 	/// The base class for systems, which provide functionality and conduct the behavior of the ECS engine.
 	/// </summary>
 	class System
-		: public Object
+		: public SceneObject
 	{
 	private:
 		// is this system enabled?
 		bool _enabled;
 
-		/// <summary>
-		/// The Scene that this System is part of.
-		/// </summary>
-		Scene* _scene;
-
 	public:
 		/// <summary>
 		/// Creates a new System.
 		/// </summary>
-		System(Scene& scene);
+		System(Engine& engine, ID const sceneId);
 
 		virtual ~System();
 
-	protected:
-		Scene& get_scene() const;
-
+	public:
 		EntityRegistry& get_entity_registry() const;
 
 		SystemRegistry& get_system_registry() const;

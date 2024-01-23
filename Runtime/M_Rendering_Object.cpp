@@ -1,37 +1,33 @@
 #include "pch.h"
 #include "M_Rendering_Object.h"
 
+#include "M_Engine.h"
 #include "M_RenderEngine.h"
-#include "M_Scene.h"
 #include "M_RenderSystem.h"
+#include "M_Scene.h"
 
 using namespace minty;
 using namespace minty::rendering;
 
 minty::rendering::RenderObject::RenderObject()
-	: _renderer()
+	: SceneObject()
 {}
 
-RenderObject::RenderObject(RenderEngine& renderer)
-	: _renderer(&renderer)
+RenderObject::RenderObject(Engine& engine, ID const sceneId)
+	: SceneObject(engine, sceneId)
 {}
 
 RenderObject::~RenderObject()
 {}
 
-void minty::rendering::RenderObject::set_render_engine(RenderEngine& renderer)
-{
-	_renderer = &renderer;
-}
-
 RenderEngine& minty::rendering::RenderObject::get_render_engine() const
 {
-	return *_renderer;
+	return get_engine().get_render_engine();
 }
 
 RenderSystem* minty::rendering::RenderObject::get_render_system() const
 {
-	return _renderer->get_scene()->get_system_registry().find<RenderSystem>();
+	return get_scene().get_system_registry().find<RenderSystem>();
 }
 
 String minty::rendering::to_string(RenderObject const& value)

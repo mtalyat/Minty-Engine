@@ -97,9 +97,7 @@ void print_node(Node const& node, int const indent)
 
 void minty::console::print(Node const& node)
 {
-	Node root;
-	root.add_child(node);
-	print_node(root, 0);
+	print_node(node, 0);
 }
 
 void minty::console::print(String const& message, Color const color)

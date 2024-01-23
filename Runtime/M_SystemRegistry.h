@@ -1,6 +1,6 @@
 #pragma once
 
-#include "M_Object.h"
+#include "M_SceneObject.h"
 #include "M_System.h"
 #include "M_Console.h"
 #include "M_ISerializable.h"
@@ -14,14 +14,13 @@ namespace minty
 	/// Holds and managers data relevant to systems.
 	/// </summary>
 	class SystemRegistry
-		: public Object
+		: public SceneObject
 	{
+		friend class Scene;
 	public:
-		typedef std::function<System* (Scene&)> SystemFunc;
+		typedef std::function<System* (Engine&, ID const)> SystemFunc;
 
 	private:
-		Scene* _scene;
-
 		// the systems to manage
 		std::map<int, std::set<System*>> _orderedSystems;
 		std::map<String const, System*> _allSystems;
@@ -31,7 +30,7 @@ namespace minty
 		/// <summary>
 		/// Creates an empty SystemRegistry.
 		/// </summary>
-		SystemRegistry(Scene& scene);
+		SystemRegistry(Engine& engine, ID const sceneId);
 
 		~SystemRegistry();
 
@@ -135,7 +134,7 @@ namespace minty
 	template<class T>
 	T* SystemRegistry::emplace(String const& name, int const priority)
 	{
-		return static_cast<T*>(this->emplace(name, new T(*_scene), priority));
+		return static_cast<T*>(this->emplace(name, new T(get_engine(), get_scene_id()), priority));
 	}
 
 	template<class T>
@@ -173,7 +172,7 @@ namespace minty
 	template<class T>
 	void SystemRegistry::register_system(String const& name)
 	{
-		_systemTypes.emplace(name, [](Scene& scene) { return new T(scene); });
+		_systemTypes.emplace(name, [](Engine& engine, ID const sceneId) { return new T(engine, sceneId); });
 
 		console::info(std::format("Registered system {}", name));
 	}

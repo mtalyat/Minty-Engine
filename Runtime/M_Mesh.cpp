@@ -21,8 +21,8 @@ minty::Mesh::Mesh()
 	, _indexType()
 {}
 
-minty::Mesh::Mesh(RenderEngine& renderer)
-	: rendering::RenderObject::RenderObject(renderer)
+minty::Mesh::Mesh(Engine& engine, ID const sceneId)
+	: rendering::RenderObject::RenderObject(engine, sceneId)
 	, _vertexCount()
 	, _vertexSize()
 	, _vertexBufferId(ERROR_ID)

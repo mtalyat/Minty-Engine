@@ -33,7 +33,7 @@ namespace minty
 		/// </summary>
 		/// <param name="builder"></param>
 		/// <param name="renderer"></param>
-		Texture(rendering::TextureBuilder const& builder, RenderEngine& renderer);
+		Texture(rendering::TextureBuilder const& builder, Engine& engine, ID const sceneId);
 
 		/// <summary>
 		/// Destroys all of the resources associated with this Texture.

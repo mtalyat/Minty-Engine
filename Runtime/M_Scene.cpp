@@ -9,25 +9,26 @@
 
 using namespace minty;
 
-minty::Scene::Scene(Engine& engine)
-	: _engine(&engine)
+minty::Scene::Scene(Engine& engine, ID const sceneId)
+	: _id(sceneId)
+	, _engine(&engine)
 	, _entities(new EntityRegistry())
-	, _systems(new SystemRegistry(*this))
+	, _systems(new SystemRegistry(engine, sceneId))
 {}
 
 minty::Scene::~Scene()
 {
 	delete _entities;
-	_entities = nullptr;
 	delete _systems;
-	_systems = nullptr;
 }
 
 minty::Scene::Scene(Scene&& other) noexcept
-	: _engine(other._engine)
+	: _id(other._id)
+	, _engine(other._engine)
 	, _entities(other._entities)
 	, _systems(other._systems)
 {
+	other._id = ERROR_ID;
 	other._engine = nullptr;
 	other._entities = nullptr;
 	other._systems = nullptr;
@@ -37,10 +38,12 @@ Scene& minty::Scene::operator=(Scene&& other) noexcept
 {
 	if (this != &other)
 	{
+		_id = other._id;
 		_engine = other._engine;
 		_entities = other._entities;
 		_systems = other._systems;
 
+		other._id = ERROR_ID;
 		other._engine = nullptr;
 		other._entities = nullptr;
 		other._systems = nullptr;
@@ -48,6 +51,24 @@ Scene& minty::Scene::operator=(Scene&& other) noexcept
 
 	return *this;
 }
+
+//minty::Scene::Scene(Scene const& other)
+//	: _engine(other._engine)
+//	, _entities(other._entities)
+//	, _systems(other._systems)
+//{}
+//
+//Scene& minty::Scene::operator=(Scene const& other)
+//{
+//	if (&other != this)
+//	{
+//		_engine = other._engine;
+//		_entities = other._entities;
+//		_systems = other._systems;
+//	}
+//
+//	return *this;
+//}
 
 Engine& minty::Scene::get_engine() const
 {

@@ -24,9 +24,6 @@ namespace minty
 		: public System
 	{
 	private:
-		// reference to the render engine
-		RenderEngine* _renderEngine;
-
 		Entity _mainCamera = NULL_ENTITY;
 
 		Register<Texture> _textures;
@@ -38,7 +35,7 @@ namespace minty
 		Register<Mesh> _meshes;
 
 	public:
-		RenderSystem(Scene& scene);
+		RenderSystem(Engine& engine, ID const sceneId);
 
 		~RenderSystem();
 

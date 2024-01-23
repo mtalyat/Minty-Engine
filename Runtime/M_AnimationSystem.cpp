@@ -9,8 +9,8 @@
 
 using namespace minty;
 
-minty::AnimationSystem::AnimationSystem(Scene& scene)
-	: System(scene)
+minty::AnimationSystem::AnimationSystem(Engine& engine, ID const sceneId)
+	: System(engine, sceneId)
 	, _animators()
 	, _animations()
 {}

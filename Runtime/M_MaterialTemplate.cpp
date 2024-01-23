@@ -17,8 +17,8 @@ minty::MaterialTemplate::MaterialTemplate()
 	, _defaultValues()
 {}
 
-minty::MaterialTemplate::MaterialTemplate(rendering::MaterialTemplateBuilder const& builder, RenderEngine& renderer)
-	: RenderObject::RenderObject(renderer)
+minty::MaterialTemplate::MaterialTemplate(rendering::MaterialTemplateBuilder const& builder, Engine& engine, ID const sceneId)
+	: RenderObject::RenderObject(engine, sceneId)
 	, _shaderPassIds(builder.shaderPassIds)
 	, _defaultValues(builder.defaultValues)
 {}

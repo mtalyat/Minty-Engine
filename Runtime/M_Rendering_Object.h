@@ -1,5 +1,5 @@
 #pragma once
-#include "M_Object.h"
+#include "M_SceneObject.h"
 
 namespace minty
 {
@@ -13,10 +13,10 @@ namespace minty::rendering
 	/// Base class for an object that is used with the RenderEngine.
 	/// </summary>
 	class RenderObject :
-		public Object
+		public SceneObject
 	{
-	private:
-		minty::RenderEngine* _renderer;
+		//friend class RenderEngine;
+		//friend class RenderSystem;
 
 	public:
 		RenderObject();
@@ -25,11 +25,9 @@ namespace minty::rendering
 		/// Creates a new RenderObject.
 		/// </summary>
 		/// <param name="renderer"></param>
-		RenderObject(RenderEngine& renderer);
+		RenderObject(Engine& engine, ID const sceneId);
 
 		virtual ~RenderObject();
-
-		void set_render_engine(RenderEngine& renderer);
 
 		RenderEngine& get_render_engine() const;
 

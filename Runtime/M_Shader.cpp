@@ -15,9 +15,9 @@ minty::Shader::Shader()
 	, _descriptorSet()
 {}
 
-minty::Shader::Shader(rendering::ShaderBuilder const& builder, RenderEngine& renderer)
-	: RenderObject::RenderObject(renderer)
-	, _descriptorSet(renderer)
+minty::Shader::Shader(rendering::ShaderBuilder const& builder, Engine& engine, ID const sceneId)
+	: RenderObject::RenderObject(engine, sceneId)
+	, _descriptorSet(engine, sceneId)
 {
 	for (auto const& pair : builder.pushConstantInfos)
 	{
@@ -75,6 +75,9 @@ void minty::Shader::update_push_constant(VkCommandBuffer const commandBuffer, vo
 	// get info of push constant
 	auto const& info = _pushConstantInfos.at(0);
 
+	MINTY_ASSERT(size <= info.size, std::format("Shader::update_push_constant(): The given size must not be larger than the push constant info size. push constant: {}, given size: {}, push constant size: {}", info.name, size, info.size));
+	MINTY_ASSERT(info.offset + offset + size <= info.size, std::format("Shader::update_push_constant(): The given offset and size will exceed the bounds of the push constant info size. push constant: {}, given offset: {}, given size: {}, push constant offset: {}, push constant size: {}", info.name, offset, size, info.offset, info.size));
+
 	// push value
 	vkCmdPushConstants(commandBuffer, _pipelineLayout, info.stageFlags, info.offset + offset, size, value);
 }
@@ -83,6 +86,9 @@ void minty::Shader::update_push_constant(String const& name, VkCommandBuffer con
 {
 	// get info of push constant
 	auto const& info = _pushConstantInfos.at(name);
+
+	MINTY_ASSERT(size <= info.size, std::format("Shader::update_push_constant(): The given size must not be larger than the push constant info size. push constant: {}, given size: {}, push constant size: {}", info.name, size, info.size));
+	MINTY_ASSERT(info.offset + offset + size <= info.size, std::format("Shader::update_push_constant(): The given offset and size will exceed the bounds of the push constant info size. push constant: {}, given offset: {}, given size: {}, push constant offset: {}, push constant size: {}", info.name, offset, size, info.offset, info.size));
 
 	// push value
 	vkCmdPushConstants(commandBuffer, _pipelineLayout, info.stageFlags, info.offset + offset, size, value);
@@ -279,7 +285,7 @@ DescriptorSet minty::Shader::create_descriptor_set(uint32_t const set, bool cons
 	if (set == DESCRIPTOR_SET_INVALID)
 	{
 		// invalid set, so just create an empty descriptor
-		return DescriptorSet(renderer);
+		return DescriptorSet(get_engine(), get_scene_id());
 	}
 
 	// create and allocate sets
@@ -356,7 +362,7 @@ DescriptorSet minty::Shader::create_descriptor_set(uint32_t const set, bool cons
 	}
 
 	// all done, create set
-	DescriptorSet descriptorSet(descriptorSets, datas, renderer);
+	DescriptorSet descriptorSet(descriptorSets, datas, get_engine(), get_scene_id());
 
 	// "initialize" it if told to
 	if (initialize)

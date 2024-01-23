@@ -2,6 +2,7 @@
 
 #include "M_Base.h"
 #include "M_Node.h"
+#include "M_Register.h"
 #include <map>
 #include <unordered_map>
 #include <set>
@@ -234,13 +235,26 @@ namespace minty
 			}
 		}
 
+		template<typename T>
+		void read_register(String const& name, Register<T>& value)
+		{
+			if (auto const* obj = _node.find(name))
+			{
+				parse_register(*obj, value);
+			}
+			else
+			{
+				value.clear();
+			}
+		}
+
 	private:
 		template<typename T>
 		bool parse_object(Node const& node, T& value) const
 		{
 			if (Object* obj = try_cast<T, Object>(&value))
 			{
-				Reader reader(node);
+				Reader reader(node, _data);
 				obj->deserialize(reader);
 
 				return true;
@@ -377,6 +391,44 @@ namespace minty
 				// parse U
 				U u;
 				reader.read_object(child.first, u);
+			}
+		}
+
+		template<typename T>
+		void parse_register(Node const& node, Register<T>& value) const
+		{
+			value.clear();
+
+			Reader reader(node, _data);
+
+			if (reader.exists("capacity"))
+			{
+				// set limit
+				value.limit(reader.read_id("capacity"));
+			}
+			else
+			{
+				// no limit
+				value.limit();
+			}
+
+			// read elements
+			for (Node const& child : node.get_children())
+			{
+				// get object from node
+				Reader childReader(child, _data);
+				T t;
+				childReader.to_object(t);
+
+				// if name is empty, do not emplace with a name
+				if (child.has_name())
+				{
+					value.emplace(child.get_name(), t);
+				}
+				else
+				{
+					value.emplace(t);
+				}
 			}
 		}
 

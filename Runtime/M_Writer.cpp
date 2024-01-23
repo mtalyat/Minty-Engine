@@ -53,7 +53,7 @@ void minty::Writer::write(Node const& node)
 void minty::Writer::write(String const& name, ISerializable const* const value)
 {
 	// add child object for this object to write
-	write(Node());
+	write(Node(name));
 
 	// create a Writer to use
 	Writer Writer(_node.get_children().back(), _data);

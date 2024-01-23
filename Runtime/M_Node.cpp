@@ -330,7 +330,17 @@ Node minty::Node::load_node(Path const& path)
             {
                 // split: implies key: value
                 key = line.substr(0, split);
-                value = line.substr(split + 2, line.size() - split - 2); // ignore ": "
+                // ignore ": "
+                size_t size = line.size() - split - 2;
+                if(split < line.size() - 2)
+                {
+                    // something on other side of ": "
+                    value = line.substr(split + 2, size);
+                } else
+                {
+                    // nothing on other side of the ": "
+                    value = "";
+                }
                 newNode.set_data(value);
             }
         }

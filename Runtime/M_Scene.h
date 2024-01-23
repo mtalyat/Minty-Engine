@@ -16,6 +16,7 @@ namespace minty
 		public Object
 	{
 	private:
+		ID _id;
 		Engine* _engine;
 		EntityRegistry* _entities;
 		SystemRegistry* _systems;
@@ -24,7 +25,7 @@ namespace minty
 		/// <summary>
 		/// Creates an empty Scene.
 		/// </summary>
-		Scene(Engine& engine);
+		Scene(Engine& engine, ID const sceneId);
 
 		~Scene();
 
@@ -33,6 +34,12 @@ namespace minty
 
 		// move
 		Scene& operator=(Scene&& other) noexcept;
+
+		//// copy
+		//Scene(Scene const& other);
+
+		//// copy
+		//Scene& operator=(Scene const& other);
 
 		Engine& get_engine() const;
 
