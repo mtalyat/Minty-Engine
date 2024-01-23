@@ -47,106 +47,64 @@ int init(Runtime &runtime)
         renderer.init(rb);
 
         // create textures
-        renderer.load_texture("Textures/oak_planks.png");
-        renderer.load_texture("Textures/pattern.png");
-        renderer.load_texture("Textures/texture.jpg");
-        renderer.load_texture("Textures/brian.png");
-        renderer.load_texture("Textures/x.png");
-        ID deathId = renderer.load_texture("Textures/death.png");
-        renderer.load_texture("Resources/Models/pumpkin_tex.jpg");
+        // renderer.load_texture("Textures/oak_planks.png");
+        // renderer.load_texture("Textures/pattern.png");
+        // renderer.load_texture("Textures/texture.jpg");
+        // renderer.load_texture("Textures/brian.png");
+        // renderer.load_texture("Textures/x.png");
+        // ID deathId = renderer.load_texture("Textures/death.png");
+        // renderer.load_texture("Resources/Models/pumpkin_tex.jpg");
 
-        // create shaders
-        renderer.load_shader("Shaders/shader.minty");
-        renderer.load_shader("Shaders/spriteShader.minty");
+        // // create shaders
+        // renderer.load_shader("Shaders/shader.minty");
+        // renderer.load_shader("Shaders/spriteShader.minty");
 
-        // create shader passes
-        renderer.load_shader_pass("Shaders/shaderPass.minty");
-        renderer.load_shader_pass("Shaders/spriteShaderPass.minty");
+        // // create shader passes
+        // renderer.load_shader_pass("Shaders/shaderPass.minty");
+        // renderer.load_shader_pass("Shaders/spriteShaderPass.minty");
 
-        // create material templates
-        renderer.load_material_template("Materials/materialTemplate.minty");
-        renderer.load_material_template("Materials/spriteMaterialTemplate.minty");
+        // // create material templates
+        // renderer.load_material_template("Materials/materialTemplate.minty");
+        // renderer.load_material_template("Materials/spriteMaterialTemplate.minty");
 
-        // create materials
-        renderer.load_material("Materials/material1.minty");
-        // renderer.load_material("Materials/material2.minty");
-        // renderer.load_material("Materials/material3.minty");
-        // renderer.load_material("Materials/pumpkinMat.minty");
-        renderer.load_material("Materials/spriteMaterial.minty");
-        renderer.load_material("Materials/xSpriteMaterial.minty");
+        // // create materials
+        // renderer.load_material("Materials/material1.minty");
+        // // renderer.load_material("Materials/material2.minty");
+        // // renderer.load_material("Materials/material3.minty");
+        // // renderer.load_material("Materials/pumpkinMat.minty");
+        // renderer.load_material("Materials/spriteMaterial.minty");
+        // renderer.load_material("Materials/xSpriteMaterial.minty");
 
-        // // create models
-        // renderer.load_mesh("Resources/Models/pumpkin.obj");
+        // // // create models
+        // // renderer.load_mesh("Resources/Models/pumpkin.obj");
 
-        // creat sprites
-        renderer.load_sprite("Sprites/brian.minty");
-        ID xId = renderer.load_sprite("Sprites/x.minty");
+        // // creat sprites
+        // renderer.load_sprite("Sprites/brian.minty");
+        // ID xId = renderer.load_sprite("Sprites/x.minty");
 
-        TextureAtlasBuilder atlasBuilder{
-            .textureId = deathId,
-            .materialId = ERROR_ID,
-            .coordinateMode = CoordinateMode::Pixel,
-            .slice = Vector2(90.0f, 90.0f),
-            .pivot = Vector2(45.0f, 45.0f)};
+        // TextureAtlasBuilder atlasBuilder{
+        //     .textureId = deathId,
+        //     .materialId = ERROR_ID,
+        //     .coordinateMode = CoordinateMode::Pixel,
+        //     .slice = Vector2(90.0f, 90.0f),
+        //     .pivot = Vector2(45.0f, 45.0f)};
 
-        TextureAtlas atlas(atlasBuilder, renderer);
+        // TextureAtlas atlas(atlasBuilder, renderer);
 
-        // create audio
-        audio.load_clip("Audio/blinking-forest.wav");
-        audio.load_clip("Audio/cow-bells.wav");
-        audio.load_clip("Audio/ding.wav");
-        audio.load_clip("Audio/dong.wav");
+        // // create audio
+        // audio.load_clip("Audio/blinking-forest.wav");
+        // audio.load_clip("Audio/cow-bells.wav");
+        // audio.load_clip("Audio/ding.wav");
+        // audio.load_clip("Audio/dong.wav");
 
         // load scene from disk
         ID sceneId = sceneManager.create_scene("Scenes/test.minty");
         Scene &scene = sceneManager.get_scene(sceneId);
-        EntityRegistry *er = scene.get_entity_registry();
-        SystemRegistry *sr = scene.get_system_registry();
+        EntityRegistry& er = scene.get_entity_registry();
+        SystemRegistry& sr = scene.get_system_registry();
 
         // load the scene we created, with the camera
         sceneManager.load_scene(sceneId);
-
-        Vector2Int atlasSize = atlas.get_size_in_slices();
-
-        // create sprites
-        for (int x = 0; x < atlasSize.x; x++)
-        {
-            for (int y = 0; y < atlasSize.y; y++)
-            {
-                // get name
-                String name = std::format("sprite_{}_{}", x, y);
-
-                // create sprite in scene
-                Entity entity = er->create(name);
-                er->emplace<RenderableComponent>(entity);
-                SpriteComponent &spriteComponent = er->emplace<SpriteComponent>(entity);
-                spriteComponent.spriteId = atlas.create_sprite(x, y);
-                TransformComponent &transformComponent = er->emplace<TransformComponent>(entity);
-                Vector3 position(0.0f, 0.0f, 0.0f);
-                // Vector3 position(static_cast<float>(x), static_cast<float>(y), 0.0f);
-                transformComponent.local.position = position;
-            }
-        }
-
-        // // copy the model 5 times
-        // Entity modelEntity = er->find_by_name("Model");
-        // for (int y = 0; y < 5; y++)
-        // {
-        //     for (int x = 0; x < 5; x++)
-        //     {
-        //         // ignore original
-        //         if (x == 0 && y == 0)
-        //             continue;
-
-        //         // clone model, move it to the right 2 * i and down 2 * i
-        //         Entity clone = er->clone(modelEntity);
-        //         TransformComponent &cloneTransformComp = er->get<TransformComponent>(clone);
-        //         cloneTransformComp.local.position.x += static_cast<float>(x) * 4.0f;
-        //         cloneTransformComp.local.position.y += static_cast<float>(y) * 4.0f;
-        //         er->emplace_or_replace<DirtyComponent>(clone);
-        //         er->set_name(clone, std::format("Model {}", y * 5 + x));
-        //     }
-        // }
 
         // debug print scene:
         {
@@ -164,20 +122,21 @@ int init(Runtime &runtime)
         // play audio
         // audio.play_background("blinking-forest", 0.2f);
 
-        AudioEngine *audioPtr = &audio;
+        AudioSystem *audioPtr = sr.find<AudioSystem>();
         Window *windowPtr = &window;
+        EntityRegistry* erPtr = &er;
 
         //          input
-        input.emplace_key_down(Key::E, [audioPtr, er](KeyPressEventArgs const &args)
-                               { audioPtr->play_spatial("ding", er->find_by_name("Model")); });
-        input.emplace_key_up(Key::E, [audioPtr, er](KeyPressEventArgs const &args)
-                             { audioPtr->play_spatial("dong", er->find_by_name("Model")); });
+        input.emplace_key_down(Key::E, [audioPtr, erPtr](KeyPressEventArgs const &args)
+                               { audioPtr->play_spatial("ding", erPtr->find_by_name("Model")); });
+        input.emplace_key_up(Key::E, [audioPtr, erPtr](KeyPressEventArgs const &args)
+                             { audioPtr->play_spatial("dong", erPtr->find_by_name("Model")); });
 
         // quit on key close
         input.emplace_key_down(Key::Escape, [windowPtr](KeyPressEventArgs const &args)
                                { windowPtr->close(); });
 
-        MoveSystem *moveSystem = sr->find_by_type<MoveSystem>();
+        MoveSystem *moveSystem = sr.find<MoveSystem>();
         input.emplace_key_down(Key::W, [moveSystem](KeyPressEventArgs const &args)
                                { moveSystem->forward += 1.0f; });
         input.emplace_key_up(Key::W, [moveSystem](KeyPressEventArgs const &args)
@@ -208,13 +167,13 @@ int init(Runtime &runtime)
         input.emplace_key_up(Key::LeftControl, [moveSystem](KeyPressEventArgs const &args)
                              { moveSystem->faster = false; });
 
-        TestSystem *testSystem = sr->find_by_type<TestSystem>();
+        TestSystem *testSystem = sr.find<TestSystem>();
         input.emplace_key_down(Key::Pause, [testSystem](KeyPressEventArgs const &args)
                                { testSystem->toggle_pause(); });
         input.emplace_key_down(Key::Insert, [testSystem](KeyPressEventArgs const &args)
                                { testSystem->reset(); });
 
-        CameraControllerSystem *cameraControllerSystem = sr->find_by_type<CameraControllerSystem>();
+        CameraControllerSystem *cameraControllerSystem = sr.find<CameraControllerSystem>();
         input.emplace_mouse_down(MouseButton::Left, [cameraControllerSystem, windowPtr](MouseClickEventArgs const &args)
                                  {
                                      if (cameraControllerSystem->mouseDown)

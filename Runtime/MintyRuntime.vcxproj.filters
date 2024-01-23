@@ -237,9 +237,6 @@
     <ClInclude Include="M_Encoding.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="M_SpriteComponent.h">
-      <Filter>Header Files\Components</Filter>
-    </ClInclude>
     <ClInclude Include="M_Sprite.h">
       <Filter>Header Files\Rendering</Filter>
     </ClInclude>
@@ -408,16 +405,7 @@
     <ClInclude Include="miniaudio.h">
       <Filter>Libraries\soloud</Filter>
     </ClInclude>
-    <ClInclude Include="M_AudioSourceComponent.h">
-      <Filter>Header Files\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="M_AudioListenerComponent.h">
-      <Filter>Header Files\Components</Filter>
-    </ClInclude>
     <ClInclude Include="M_DirtyComponent.h">
-      <Filter>Header Files\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="M_RenderableComponent.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
     <ClInclude Include="M_Rendering_PixelFormat.h">
@@ -477,9 +465,6 @@
     <ClInclude Include="M_FiniteStateMachine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="M_AnimatorComponent.h">
-      <Filter>Header Files\Components</Filter>
-    </ClInclude>
     <ClInclude Include="M_Animation.h">
       <Filter>Header Files\Animation</Filter>
     </ClInclude>
@@ -506,6 +491,21 @@
     </ClInclude>
     <ClInclude Include="M_AudioSystem.h">
       <Filter>Header Files\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="M_AnimatorComponent.h">
+      <Filter>Header Files\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="M_AudioListenerComponent.h">
+      <Filter>Header Files\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="M_AudioSourceComponent.h">
+      <Filter>Header Files\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="M_RenderableComponent.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="M_SpriteComponent.h">
+      <Filter>Header Files\Rendering</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -831,6 +831,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_AudioSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_AnimatorComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

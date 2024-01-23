@@ -372,6 +372,7 @@
     <ClCompile Include="M_AnimationObject.cpp" />
     <ClCompile Include="M_AnimationSystem.cpp" />
     <ClCompile Include="M_Animator.cpp" />
+    <ClCompile Include="M_AnimatorComponent.cpp" />
     <ClCompile Include="M_Asset.cpp" />
     <ClCompile Include="M_AudioClip.cpp" />
     <ClCompile Include="M_AudioEngine.cpp" />

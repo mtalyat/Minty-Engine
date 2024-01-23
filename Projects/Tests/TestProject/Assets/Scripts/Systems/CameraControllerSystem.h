@@ -13,7 +13,7 @@ namespace game
     bool mouseDown;
 
     public:
-        CameraControllerSystem(minty::Engine* const engine, minty::EntityRegistry* const registry);
+        CameraControllerSystem(minty::Scene& scene);
 
         void update() override;
     };

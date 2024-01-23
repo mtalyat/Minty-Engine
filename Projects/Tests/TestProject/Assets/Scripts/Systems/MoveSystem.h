@@ -16,7 +16,7 @@ namespace game
         bool faster;
 
     public:
-        MoveSystem(minty::Engine* const engine, minty::EntityRegistry* const registry);
+        MoveSystem(minty::Scene& scene);
 
         void update() override;
     };
