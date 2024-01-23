@@ -13,10 +13,19 @@ access to the entire engine without needing include each file.
 #include "vulkan.h"
 #include "glm.hpp"
 
+// ANIMATION
+#include "M_Animation.h"
+#include "M_AnimationBuilder.h"
+#include "M_AnimationObject.h"
+#include "M_AnimationSystem.h"
+#include "M_Animator.h"
+#include "M_AnimatorBuilder.h"
+
 // AUDIO
 #include "M_Audio.h"
 #include "M_AudioClip.h"
 #include "M_AudioEngine.h"
+#include "M_AudioSystem.h"
 
 // BUILTIN
 #include "M_Builtin.h"
