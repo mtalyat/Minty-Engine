@@ -84,6 +84,7 @@ access to the entire engine without needing include each file.
 #include "M_Rendering_TextureAtlasBuilder.h"
 #include "M_Rendering_TextureBuilder.h"
 #include "M_Rendering_UniformConstantInfo.h"
+#include "M_RenderSystem.h"
 #include "M_Shader.h"
 #include "M_ShaderPass.h"
 #include "M_Sprite.h"
