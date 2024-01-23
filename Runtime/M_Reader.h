@@ -265,16 +265,23 @@ namespace minty
 			std::unordered_set<String> addedKeys;
 			size_t i = 0;
 			String name = std::to_string(i);
-			Node const* child;
+			std::vector<Node>* children;
 
-			while (child = node.find(name))
+			// find all with that id
+			while (children = node.find_all(name))
 			{
+				// add name so we do not re-do it later
 				addedKeys.emplace(name);
 
-				T t;
-				parse_object(*child, t);
-				value.push_back(t);
+				// create each child
+				for (auto const& child : *children)
+				{
+					T t;
+					parse_object(*child, t);
+					value.push_back(t);
+				}
 
+				// move to next number
 				i++;
 				name = std::to_string(i);
 			}
