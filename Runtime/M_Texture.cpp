@@ -26,7 +26,7 @@ minty::Texture::Texture()
 {}
 
 Texture::Texture(rendering::TextureBuilder const& builder, RenderEngine& renderer)
-	: RenderObject::RenderObject(&renderer)
+	: RenderObject::RenderObject(renderer)
 	, _width(builder.width)
 	, _height(builder.height)
 	, _format()
@@ -180,9 +180,9 @@ Texture::Texture(rendering::TextureBuilder const& builder, RenderEngine& rendere
 
 void minty::Texture::destroy()
 {
-	RenderEngine* renderer = get_renderer();
+	RenderEngine& renderer = get_render_engine();
 
-	auto device = renderer->get_device();
+	auto device = renderer.get_device();
 
 	vkDestroySampler(device, _sampler, nullptr);
 	vkDestroyImageView(device, _view, nullptr);

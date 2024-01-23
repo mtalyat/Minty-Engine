@@ -99,6 +99,12 @@ namespace minty
 #pragma endregion
 
 		/// <summary>
+		/// Checks if this node has any data.
+		/// </summary>
+		/// <returns>True if data is not empty.</returns>
+		bool has_data() const;
+
+		/// <summary>
 		/// console::logs this Node tree.
 		/// </summary>
 		/// <param name="indent">The base indent for this Node.</param>

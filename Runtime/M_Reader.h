@@ -20,7 +20,7 @@ namespace minty
 	{
 	private:
 		Node const& _node;
-		void* _data;
+		void const* _data;
 
 	public:
 		/// <summary>
@@ -28,7 +28,7 @@ namespace minty
 		/// </summary>
 		/// <param name="node">The Node to read from.</param>
 		/// <param name="data">The user data that can be referenced while reading.</param>
-		Reader(Node const& node, void* const data = nullptr);
+		Reader(Node const& node, void const* const data = nullptr);
 
 		/// <summary>
 		/// Gets the root node that this Reader is using.
@@ -47,7 +47,13 @@ namespace minty
 		/// Gets the extra data given to this Reader.
 		/// </summary>
 		/// <returns>The extra data as a void pointer.</returns>
-		void* get_data() const;
+		void const* get_data() const;
+
+		/// <summary>
+		/// Sets the extra data given to this Reader.
+		/// </summary>
+		/// <param name="data">The extra data as a void pointer.</param>
+		void set_data(void const* data);
 
 		/// <summary>
 		/// Checks if a child with the given name exists.
@@ -256,12 +262,15 @@ namespace minty
 			value.clear();
 
 			// read ordered first
+			std::unordered_set<String> addedKeys;
 			size_t i = 0;
 			String name = std::to_string(i);
 			Node const* child;
 
 			while (child = node.find(name))
 			{
+				addedKeys.emplace(name);
+
 				T t;
 				parse_object(*child, t);
 				value.push_back(t);
@@ -270,15 +279,20 @@ namespace minty
 				name = std::to_string(i);
 			}
 
-			// read unordered, add to end
-			if (auto const* list = node.find_all(BLANK))
+			// read everything else, add to end
+			for (auto const& pair : _node.children)
 			{
-				value.reserve(value.size() + list->size());
+				if (addedKeys.contains(pair.first))
+				{
+					// already added in ordered code above
+					continue;
+				}
 
-				for (Node const& node : *list)
+				// get the object
+				for (auto const& childNode : pair.second)
 				{
 					T t;
-					parse_object(node, t);
+					parse_object(childNode, t);
 					value.push_back(t);
 				}
 			}

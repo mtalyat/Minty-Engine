@@ -232,7 +232,7 @@ void minty::EntityRegistry::deserialize(Reader const& reader)
 	// read each entity, add name if it has one
 	
 	Node const& node = reader.get_node();
-	SerializationData* data = static_cast<SerializationData*>(reader.get_data());
+	SerializationData data = *static_cast<SerializationData const*>(reader.get_data());
 
 	// for each entity name given
 	for (auto const& pair : node.children)
@@ -242,7 +242,7 @@ void minty::EntityRegistry::deserialize(Reader const& reader)
 		{
 			// create the entity
 			Entity entity = create();
-			data->entity = entity;
+			data.entity = entity;
 
 			// set name
 			set_name(entity, pair.first);
@@ -260,7 +260,7 @@ void minty::EntityRegistry::deserialize(Reader const& reader)
 				Node const& compNode = compPair.second.front();
 
 				Component* comp = emplace_by_name(compPair.first, entity);
-				Reader compReader(compNode, data);
+				Reader compReader(compNode, &data);
 				comp->deserialize(compReader);
 			}
 		}
@@ -274,8 +274,9 @@ bool minty::EntityRegistry::is_name_empty(String const& name)
 
 void minty::EntityRegistry::serialize_entity(Writer& writer, Entity const entity) const
 {
-	SerializationData* data = static_cast<SerializationData*>(writer.get_data());
-	data->entity = entity;
+	SerializationData data = *static_cast<SerializationData const*>(writer.get_data());
+	data.entity = entity;
+	Writer tempWriter(writer.get_node(), &data);
 
 	for (auto&& curr : this->storage())
 	{
@@ -302,7 +303,7 @@ void minty::EntityRegistry::serialize_entity(Writer& writer, Entity const entity
 			}
 
 			// write component with its name and serialized values
-			writer.write(name, this->get_by_name(name, entity));
+			tempWriter.write(name, this->get_by_name(name, entity));
 		}
 	}
 }

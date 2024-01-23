@@ -20,6 +20,14 @@ namespace minty
 
 		friend String to_string(Vector2 const& value);
 		friend Vector2 from_string_vector2(String const& value);
+
+		static Vector2 zero();
+		static Vector2 half();
+		static Vector2 one();
+		static Vector2 right();
+		static Vector2 up();
+		static Vector2 left();
+		static Vector2 down();
 	};
 	struct Vector3
 		: public glm::vec3, public Object
@@ -35,6 +43,16 @@ namespace minty
 
 		friend String to_string(Vector3 const& value);
 		friend Vector3 from_string_vector3(String const& value);
+
+		static Vector3 zero();
+		static Vector3 half();
+		static Vector3 one();
+		static Vector3 right();
+		static Vector3 up();
+		static Vector3 left();
+		static Vector3 down();
+		static Vector3 forward();
+		static Vector3 backward();
 	};
 	struct Vector4
 		: public glm::vec4, public Object

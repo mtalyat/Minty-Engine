@@ -24,7 +24,7 @@ namespace minty
 		/// <summary>
 		/// Creates an empty Scene.
 		/// </summary>
-		Scene(Engine* const engine);
+		Scene(Engine& engine);
 
 		~Scene();
 
@@ -34,19 +34,19 @@ namespace minty
 		// move
 		Scene& operator=(Scene&& other) noexcept;
 
-		Engine* get_engine() const;
+		Engine& get_engine() const;
 
 		/// <summary>
 		/// Gets the EntityRegistry used in the Scene.
 		/// </summary>
 		/// <returns></returns>
-		EntityRegistry* get_entity_registry() const;
+		EntityRegistry& get_entity_registry() const;
 
 		/// <summary>
 		/// Gets the SystemRegistry used in the Scene.
 		/// </summary>
 		/// <returns></returns>
-		SystemRegistry* get_system_registry() const;
+		SystemRegistry& get_system_registry() const;
 
 		/// <summary>
 		/// Loads this Scene.

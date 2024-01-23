@@ -161,6 +161,12 @@ namespace minty
 			Condition();
 
 			/// <summary>
+			/// Parses the given pretty string into a Condition. Must be in the format: variableName conditional value
+			/// </summary>
+			/// <param name="value">Must be in the format: variableName conditional value</param>
+			Condition(String const& value, FSM const& fsm);
+
+			/// <summary>
 			/// Creates a new Condition using the given variable ID, conditional type, and value.
 			/// </summary>
 			/// <param name="variableId">The variable to be referenced when evaluating this Condition.</param>
@@ -174,6 +180,8 @@ namespace minty
 			/// <param name="scope"></param>
 			/// <returns>True when the condition has been met.</returns>
 			bool evaluate(Scope const& scope) const;
+
+			String to_pretty_string(FSM const& fsm) const;
 
 			void serialize(Writer& writer) const override;
 			void deserialize(Reader const& reader) override;
@@ -239,8 +247,6 @@ namespace minty
 			: public Object
 		{
 		private:
-			String _name;
-
 			Dynamic _value;
 
 			std::vector<Transition> _transitions;
@@ -255,13 +261,7 @@ namespace minty
 			/// </summary>
 			/// <param name="name">The name of the State.</param>
 			/// <param name="value">The value this State holds.</param>
-			State(String const& name, Dynamic const& value);
-
-			/// <summary>
-			/// Gets the name of this State.
-			/// </summary>
-			/// <returns></returns>
-			String const& get_name() const;
+			State(Dynamic const& value);
 
 			/// <summary>
 			/// Gets the value of this State.
@@ -333,6 +333,13 @@ namespace minty
 		/// <param name="id"></param>
 		/// <returns></returns>
 		FSM::State const& get_state(ID const id) const;
+
+		/// <summary>
+		/// Gets the name of the State with the given ID.
+		/// </summary>
+		/// <param name="id">The ID of the State.</param>
+		/// <returns>The name of the State.</returns>
+		String const& get_state_name(ID const id) const;
 
 		/// <summary>
 		/// Finds the State with the given name.

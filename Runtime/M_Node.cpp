@@ -138,8 +138,19 @@ std::vector<Node> const* minty::Node::find_all(String const& name) const
 	return nullptr;
 }
 
+bool minty::Node::has_data() const
+{
+	return static_cast<bool>(data.size());
+}
+
 void minty::Node::print(int const indent) const
 {
+	// do nothing if no children
+	if (!children.size()) return;
+
+	// create indent string before the printed line
+	String indentString(indent, '\t');
+
 	// print children
 	// parent takes care of printing this node's data
 	for (auto const& pair : children)
@@ -149,12 +160,12 @@ void minty::Node::print(int const indent) const
 			if (child.data.size())
 			{
 				// print data if there is something
-				console::print(std::format("{}{}: {}", String(indent, '\t'), pair.first, child.data));
+				console::print(std::format("{}{}: {}", indentString, pair.first, child.data));
 			}
 			else
 			{
 				// print normal if no data
-				console::print(std::format("{}{}", String(indent, '\t'), pair.first));
+				console::print(std::format("{}{}", indentString, pair.first));
 			}
 
 			// if child has children, print those, recusrively

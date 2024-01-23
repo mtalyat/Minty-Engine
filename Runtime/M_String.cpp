@@ -133,3 +133,20 @@ std::vector<String> minty::string::split(String const& string, String const& del
 	console::todo("string::split() (string delimiter)");
 	return {};
 }
+
+String minty::string::join(std::vector<String> const& list)
+{
+	return join(list, 0, list.size());
+}
+
+String minty::string::join(std::vector<String> const& list, size_t start, size_t count)
+{
+	String out;
+
+	for (size_t i = start; i < start + count; i++)
+	{
+		out += list.at(i);
+	}
+
+	return out;
+}

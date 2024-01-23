@@ -2,6 +2,7 @@
 #include "M_Animation.h"
 
 #include "M_SerializationData.h"
+#include "M_RenderSystem.h"
 #include "M_RenderEngine.h"
 
 using namespace minty;
@@ -33,8 +34,10 @@ ID minty::Animation::get_frame(size_t const index) const
 
 void minty::Animation::serialize(Writer& writer) const
 {
-	SerializationData* data = static_cast<SerializationData*>(writer.get_data());
-	RenderEngine& renderer = data->scene->get_engine()->get_render_engine();
+	SerializationData const* data = static_cast<SerializationData const*>(writer.get_data());
+	RenderSystem const* renderer = data->scene->get_system_registry().find<RenderSystem>();
+
+	MINTY_ASSERT(renderer != nullptr, "Animation::serialize(): RenderSystem cannot be null.");
 
 	// write basic types
 	writer.write("frameTime", _frameTime);
@@ -43,7 +46,7 @@ void minty::Animation::serialize(Writer& writer) const
 	std::vector<String> names(_frames.size());
 	for (size_t i = 0; i < _frames.size(); i++)
 	{
-		names[i] = renderer.get_sprite_name(_frames.at(i));
+		names[i] = renderer->get_sprite_name(_frames.at(i));
 	}
 
 	writer.write("frames", names);
@@ -51,8 +54,10 @@ void minty::Animation::serialize(Writer& writer) const
 
 void minty::Animation::deserialize(Reader const& reader)
 {
-	SerializationData* data = static_cast<SerializationData*>(reader.get_data());
-	RenderEngine& renderer = data->scene->get_engine()->get_render_engine();
+	SerializationData const* data = static_cast<SerializationData const*>(reader.get_data());
+	RenderSystem const* renderer = data->scene->get_system_registry().find<RenderSystem>();
+
+	MINTY_ASSERT(renderer != nullptr, "Animation::deserialize(): RenderSystem cannot be null.");
 
 	// get basic types
 	_frameTime = reader.read_float("frameTime");
@@ -64,6 +69,6 @@ void minty::Animation::deserialize(Reader const& reader)
 	_frames.resize(names.size());
 	for (size_t i = 0; i < names.size(); i++)
 	{
-		_frames[i] = renderer.find_sprite(names.at(i));
+		_frames[i] = renderer->find_sprite(names.at(i));
 	}
 }

@@ -24,7 +24,7 @@ namespace minty
 		Scene* _loadedScene;
 
 	public:
-		SceneManager(Engine* const engine);
+		SceneManager(Engine& engine);
 
 		/// <summary>
 		/// Creates and loads an empty Scene.

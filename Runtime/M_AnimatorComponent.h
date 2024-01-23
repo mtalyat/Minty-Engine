@@ -20,12 +20,12 @@ namespace minty
 		/// <summary>
 		/// Handles controlling animation flow.
 		/// </summary>
-		FSM fsm;
+		ID animatorId = ERROR_ID;
 
 		/// <summary>
 		/// The ID of the current animation being ran.
 		/// </summary>
-		ID current = ERROR_ID;
+		ID animationId = ERROR_ID;
 
 		/// <summary>
 		/// The amount of time left on the current frame.

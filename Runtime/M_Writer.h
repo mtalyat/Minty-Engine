@@ -20,7 +20,7 @@ namespace minty
 	{
 	private:
 		Node& _node;
-		void* _data;
+		void const* _data;
 
 	public:
 		/// <summary>
@@ -28,12 +28,18 @@ namespace minty
 		/// </summary>
 		/// <param name="node">The Node to write to.</param>
 		/// <param name="data">The user data that can be referenced while writing.</param>
-		Writer(Node& node, void* const data = nullptr);
+		Writer(Node& node, void const* const data = nullptr);
 
 		/// <summary>
 		/// Gets the root node that this Writer is using.
 		/// </summary>
-		/// <returns>A pointer to the root node.</returns>
+		/// <returns>The root node.</returns>
+		Node& get_node();
+
+		/// <summary>
+		/// Gets the root node that this Writer is using.
+		/// </summary>
+		/// <returns>The root node.</returns>
 		Node const& get_node() const;
 
 		/// <summary>
@@ -47,7 +53,13 @@ namespace minty
 		/// Gets the extra data given to this Writer.
 		/// </summary>
 		/// <returns>The extra data as a void pointer.</returns>
-		void* get_data() const;
+		void const* get_data() const;
+
+		/// <summary>
+		/// Sets the extra data given to this Writer.
+		/// </summary>
+		/// <param name="data">The extra data as a void pointer.</param>
+		void set_data(void const* const data);
 
 		/// <summary>
 		/// Checks if a child with the given name exists.

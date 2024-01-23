@@ -4,6 +4,7 @@
 namespace minty
 {
 	class RenderEngine;
+	class RenderSystem;
 }
 
 namespace minty::rendering
@@ -18,19 +19,21 @@ namespace minty::rendering
 		minty::RenderEngine* _renderer;
 
 	public:
+		RenderObject();
+
 		/// <summary>
 		/// Creates a new RenderObject.
 		/// </summary>
 		/// <param name="renderer"></param>
-		RenderObject(minty::RenderEngine* renderer = nullptr);
+		RenderObject(RenderEngine& renderer);
 
 		virtual ~RenderObject();
 
-		void set_renderer(RenderEngine* renderer);
+		void set_render_engine(RenderEngine& renderer);
 
-		RenderEngine* get_renderer();
+		RenderEngine& get_render_engine() const;
 
-		RenderEngine const* get_renderer() const;
+		RenderSystem* get_render_system() const;
 
 		friend String to_string(RenderObject const& value);
 	};

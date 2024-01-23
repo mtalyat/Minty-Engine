@@ -9,10 +9,10 @@
 
 using namespace minty;
 
-minty::Scene::Scene(Engine* const engine)
-	: _engine(engine)
+minty::Scene::Scene(Engine& engine)
+	: _engine(&engine)
 	, _entities(new EntityRegistry())
-	, _systems(new SystemRegistry(engine, _entities))
+	, _systems(new SystemRegistry(*this))
 {}
 
 minty::Scene::~Scene()
@@ -49,19 +49,19 @@ Scene& minty::Scene::operator=(Scene&& other) noexcept
 	return *this;
 }
 
-Engine* minty::Scene::get_engine() const
+Engine& minty::Scene::get_engine() const
 {
-	return _engine;
+	return *_engine;
 }
 
-EntityRegistry* minty::Scene::get_entity_registry() const
+EntityRegistry& minty::Scene::get_entity_registry() const
 {
-	return _entities;
+	return *_entities;
 }
 
-SystemRegistry* minty::Scene::get_system_registry() const
+SystemRegistry& minty::Scene::get_system_registry() const
 {
-	return _systems;
+	return *_systems;
 }
 
 void minty::Scene::load()
@@ -172,14 +172,14 @@ void minty::Scene::finalize()
 
 void minty::Scene::serialize(Writer& writer) const
 {
-	writer.write("Systems", _systems);
-	writer.write("Entities", _entities);
+	writer.write("systems", _systems);
+	writer.write("entities", _entities);
 }
 
 void minty::Scene::deserialize(Reader const& reader)
 {
-	reader.read_serializable("Systems", _systems);
-	reader.read_serializable("Entities", _entities);
+	reader.read_serializable("systems", _systems);
+	reader.read_serializable("entities", _entities);
 }
 
 String minty::to_string(Scene const& value)

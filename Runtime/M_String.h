@@ -68,6 +68,10 @@ namespace minty::string
 	/// <returns>A vector of strings, not including the delimiters.</returns>
 	std::vector<String> split(String const& string, String const& delimiter);
 
+	String join(std::vector<String> const& list);
+
+	String join(std::vector<String> const& list, size_t start, size_t count);
+
 	// https://stackoverflow.com/questions/216823/how-to-trim-a-stdstring
 	//inline void ltrim(std::string& s) {
 	//	s.erase(s.begin(), std::find_if(s.begin(), s.end(), [](unsigned char ch) {

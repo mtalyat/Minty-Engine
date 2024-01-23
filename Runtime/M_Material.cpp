@@ -2,6 +2,8 @@
 #include "M_Material.h"
 
 #include "M_RenderEngine.h"
+#include "M_RenderSystem.h"
+#include "M_Scene.h"
 
 using namespace minty;
 using namespace minty::rendering;
@@ -13,12 +15,16 @@ minty::Material::Material()
 {}
 
 minty::Material::Material(rendering::MaterialBuilder const& builder, RenderEngine& renderer)
-	: rendering::RenderObject(&renderer)
+	: rendering::RenderObject(renderer)
 	, _templateId(builder.templateId)
 	, _passDescriptorSets()
 {
+	RenderSystem* renderSystem = renderer.get_scene()->get_system_registry().find<RenderSystem>();
+
+	MINTY_ASSERT(renderSystem != nullptr, "Material(): renderSystem cannot be null.");
+
 	// use template to generate descriptor sets
-	auto const& materialTemplate = renderer.get_material_template(_templateId);
+	auto const& materialTemplate = renderSystem->get_material_template(_templateId);
 	auto const& passIds = materialTemplate.get_shader_pass_ids();
 
 	auto const& defaultValues = materialTemplate.get_default_values();
@@ -26,11 +32,11 @@ minty::Material::Material(rendering::MaterialBuilder const& builder, RenderEngin
 	for (auto const passId : passIds)
 	{
 		// get the shader pass
-		auto const& shaderPass = renderer.get_shader_pass(passId);
+		auto const& shaderPass = renderSystem->get_shader_pass(passId);
 
 		// get the shader that the pass belongs to
 		auto const shaderId = shaderPass.get_shader_id();
-		auto& shader = renderer.get_shader(shaderId);
+		auto& shader = renderSystem->get_shader(shaderId);
 
 		// get the descriptor set for the pass
 		DescriptorSet descriptorSet = shader.create_descriptor_set(DESCRIPTOR_SET_MATERIAL, false);

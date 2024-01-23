@@ -19,7 +19,7 @@ namespace minty
         InputMap::ClickEvent_t::func _onMouseClick;
 
     public:
-        UISystem(minty::Engine* const engine, minty::EntityRegistry* const registry);
+        UISystem(Scene& scene);
 
         void load() override;
 

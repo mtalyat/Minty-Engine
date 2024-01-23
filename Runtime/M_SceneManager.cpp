@@ -16,8 +16,8 @@
 
 using namespace minty;
 
-minty::SceneManager::SceneManager(Engine* const engine)
-	: _engine(engine)
+minty::SceneManager::SceneManager(Engine& engine)
+	: _engine(&engine)
 	, _loaded()
 	, _scenes()
 	, _loadedScene()
@@ -26,7 +26,7 @@ minty::SceneManager::SceneManager(Engine* const engine)
 ID minty::SceneManager::create_scene()
 {
 	ID id = static_cast<ID>(_scenes.size());
-	_scenes.push_back(Scene(_engine));
+	_scenes.push_back(Scene(*_engine));
 	return id;
 }
 
@@ -71,7 +71,6 @@ void minty::SceneManager::load_scene(ID const id)
 
 	// set renderer to use this new scene
 	_engine->get_render_engine().set_scene(_loadedScene);
-	_engine->get_audio_engine().set_scene(_loadedScene);
 
 	// load event
 	if (_loaded && _loadedScene)

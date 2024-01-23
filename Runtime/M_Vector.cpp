@@ -213,6 +213,41 @@ void minty::Vector2::deserialize(Reader const& reader)
 	y = reader.read_float("y");
 }
 
+Vector2 minty::Vector2::zero()
+{
+	return Vector2(0.0f, 0.0f);
+}
+
+Vector2 minty::Vector2::half()
+{
+	return Vector2(0.5f, 0.5f);
+}
+
+Vector2 minty::Vector2::one()
+{
+	return Vector2(1.0f, 1.0f);
+}
+
+Vector2 minty::Vector2::right()
+{
+	return Vector2(1.0f, 0.0f);
+}
+
+Vector2 minty::Vector2::up()
+{
+	return Vector2(0.0f, -1.0f);
+}
+
+Vector2 minty::Vector2::left()
+{
+	return Vector2(-1.0f, 0.0f);
+}
+
+Vector2 minty::Vector2::down()
+{
+	return Vector2(0.0f, 1.0f);
+}
+
 minty::Vector3::Vector3(glm::vec3 const& vec)
 	: glm::vec3::vec(vec)
 {}
@@ -303,4 +338,49 @@ void minty::Vector4Int::deserialize(Reader const& reader)
 	y = reader.read_int("y");
 	z = reader.read_int("z");
 	w = reader.read_int("w");
+}
+
+Vector3 minty::Vector3::zero()
+{
+	return Vector3(0.0f, 0.0f, 0.0f);
+}
+
+Vector3 minty::Vector3::half()
+{
+	return Vector3(0.5f, 0.5f, 0.5f);
+}
+
+Vector3 minty::Vector3::one()
+{
+	return Vector3(1.0f, 1.0f, 1.0f);
+}
+
+Vector3 minty::Vector3::right()
+{
+	return Vector3(1.0f, 0.0f, 0.0f);
+}
+
+Vector3 minty::Vector3::up()
+{
+	return Vector3(0.0f, -1.0f, 0.0f);
+}
+
+Vector3 minty::Vector3::left()
+{
+	return Vector3(-1.0f, 0.0f, 0.0f);
+}
+
+Vector3 minty::Vector3::down()
+{
+	return Vector3(0.0f, 1.0f, 0.0f);
+}
+
+Vector3 minty::Vector3::forward()
+{
+	return Vector3(0.0f, 0.0f, 1.0f);
+}
+
+Vector3 minty::Vector3::backward()
+{
+	return Vector3(0.0f, 0.0f, -1.0f);
 }

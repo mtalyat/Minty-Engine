@@ -118,6 +118,21 @@ minty::FSM::Condition::Condition()
 	, _value()
 {}
 
+minty::FSM::Condition::Condition(String const& value, FSM const& fsm)
+	: _variableId(ERROR_ID)
+	, _conditional()
+	, _value()
+{
+	// split into parts
+	auto list = string::split(value);
+	size_t size = list.size();
+
+	// get ID of variable from fsm
+	_variableId = fsm.find_variable(string::join(list, 0, size - 2));
+	_conditional = from_string_conditional(list.at(size - 2));
+	_value = parse::to_int(list.at(size - 1));
+}
+
 minty::FSM::Condition::Condition(ID const variableId, Conditional const conditional, int const value)
 	: _variableId(variableId)
 	, _conditional(conditional)
@@ -140,6 +155,11 @@ bool minty::FSM::Condition::evaluate(Scope const& scope) const
 	case Conditional::LessThanOrEqualTo: return value <= _value;
 	default: return false; // conditional DNE
 	}
+}
+
+String minty::FSM::Condition::to_pretty_string(FSM const& fsm) const
+{
+	return std::format("{} {} {}", fsm.get_variable_name(_variableId), to_string(_conditional), _value);
 }
 
 void minty::FSM::Condition::serialize(Writer& writer) const
@@ -200,14 +220,14 @@ void minty::FSM::Transition::serialize(Writer& writer) const
 {
 	FSM const* fsm = static_cast<FSM const*>(writer.get_data());
 
-	writer.write("state", fsm->get_state(_stateId).get_name());
+	writer.write("state", fsm->get_state_name(_stateId));
 
 	Node condNode;
 	Writer condWriter(condNode);
 
 	for (auto const& condition : _conditions)
 	{
-		condWriter.write("_", static_cast<ISerializable const*>(static_cast<void const*>(&condition)));
+		condWriter.write("", condition.to_pretty_string(*fsm));
 	}
 
 	writer.write("conditions", condNode);
@@ -222,7 +242,7 @@ void minty::FSM::Transition::deserialize(Reader const& reader)
 	Node const& node = reader.get_node();
 	if (auto const* conditions = node.find("conditions"))
 	{
-		if (auto const* list = conditions->find_all("_"))
+		if (auto const* list = conditions->find_all(""))
 		{
 			for (Node const& node : *list)
 			{
@@ -236,21 +256,14 @@ void minty::FSM::Transition::deserialize(Reader const& reader)
 }
 
 minty::FSM::State::State()
-	: _name()
-	, _value()
+	: _value()
 	, _transitions()
 {}
 
-minty::FSM::State::State(String const& name, Dynamic const& value)
-	: _name(name)
-	, _value(value)
+minty::FSM::State::State(Dynamic const& value)
+	: _value(value)
 	, _transitions()
 {}
-
-String const& minty::FSM::State::get_name() const
-{
-	return _name;
-}
 
 Dynamic& minty::FSM::State::get_value()
 {
@@ -284,14 +297,12 @@ ID minty::FSM::State::evaluate(Scope const& scope) const
 
 void minty::FSM::State::serialize(Writer& writer) const
 {
-	writer.write("name", _name);
 	writer.write_object("value", _value);
 	writer.write("transitions", _transitions);
 }
 
 void minty::FSM::State::deserialize(Reader const& reader)
 {
-	_name = reader.read_string("name");
 	reader.read_object("value", _value);
 	reader.read_vector("transitions", _transitions);
 }
@@ -308,7 +319,7 @@ minty::FSM::~FSM()
 
 ID minty::FSM::create_state(String const& name, Dynamic const& value)
 {
-	return _states.emplace(name, State(name, value));
+	return _states.emplace(name, State(value));
 }
 
 FSM::State& minty::FSM::get_state(ID const id)
@@ -319,6 +330,11 @@ FSM::State& minty::FSM::get_state(ID const id)
 FSM::State const& minty::FSM::get_state(ID const id) const
 {
 	return _states.at(id);
+}
+
+String const& minty::FSM::get_state_name(ID const id) const
+{
+	return _states.get_name(id);
 }
 
 ID minty::FSM::find_state(String const& name) const
@@ -450,16 +466,21 @@ void minty::FSM::reset()
 
 void minty::FSM::serialize(Writer& writer) const
 {
-	writer.write_object("scope", _scope);
-	writer.write_object("states", _states);
-	writer.write("start", _states.get_name(_startingStateId));
+	// swap data
+	Writer fsmWriter(writer.get_node(), this);
+
+	fsmWriter.write_object("scope", _scope);
+	fsmWriter.write_object("states", _states);
+	fsmWriter.write("start", _states.get_name(_startingStateId));
 }
 
 void minty::FSM::deserialize(Reader const& reader)
 {
-	reader.read_object("scope", _scope);
-	reader.read_object("states", _states);
-	_startingStateId = _states.find(reader.read_string("start"));
+	Reader fsmReader(reader.get_node(), this);
+
+	fsmReader.read_object("scope", _scope);
+	fsmReader.read_object("states", _states);
+	_startingStateId = _states.find(fsmReader.read_string("start"));
 	_currentStateId = _startingStateId;
 }
 

@@ -1,0 +1,4 @@
+name: idle
+frameTime: 1
+frames:
+    0: death_0

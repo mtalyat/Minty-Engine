@@ -206,22 +206,32 @@ Node minty::File::read_node(Path const& path)
             line = line.substr(static_cast<size_t>(spaces), line.size() - spaces);
         }
 
-        // split by colon, if there is one
-        size_t split = line.find_first_of(':');
-
         Node newNode;
 
-        if (split == String::npos)
+        if (line.starts_with("- "))
         {
-            // no split, just key
-            key = line;
+            // bullet point, use "" as key and the whole line as the value
+            key = "";
+            value = line;
+            newNode.data = value;
         }
         else
         {
-            // split: implies key: value
-            key = line.substr(0, split);
-            value = line.substr(split + 2, line.size() - split - 2); // ignore ": "
-            newNode.data = value;
+            // split by colon, if there is one
+            size_t split = line.find_first_of(':');
+
+            if (split == String::npos)
+            {
+                // no split, just key
+                key = line;
+            }
+            else
+            {
+                // split: implies key: value
+                key = line.substr(0, split);
+                value = line.substr(split + 2, line.size() - split - 2); // ignore ": "
+                newNode.data = value;
+            }
         }
 
         // add node to children

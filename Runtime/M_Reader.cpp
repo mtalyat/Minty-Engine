@@ -6,7 +6,7 @@
 
 using namespace minty;
 
-minty::Reader::Reader(Node const& node, void* const data)
+minty::Reader::Reader(Node const& node, void const* const data)
 	: _node(node)
 	, _data(data)
 {}
@@ -21,9 +21,14 @@ Node const* minty::Reader::get_node(String const& name) const
 	return _node.find(name);
 }
 
-void* minty::Reader::get_data() const
+void const* minty::Reader::get_data() const
 {
 	return _data;
+}
+
+void minty::Reader::set_data(void const* data)
+{
+	_data = data;
 }
 
 bool minty::Reader::exists(String const& name) const

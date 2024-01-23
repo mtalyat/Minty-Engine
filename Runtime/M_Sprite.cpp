@@ -2,6 +2,7 @@
 #include "M_Sprite.h"
 
 #include "M_RenderEngine.h"
+#include "M_RenderSystem.h"
 #include "M_Texture.h"
 
 using namespace minty;
@@ -17,7 +18,7 @@ minty::Sprite::Sprite()
 {}
 
 minty::Sprite::Sprite(rendering::SpriteBuilder const& builder, RenderEngine& renderer)
-	: RenderObject::RenderObject(&renderer)
+	: RenderObject::RenderObject(renderer)
 	, _textureId(builder.textureId)
 	, _materialId(builder.materialId)
 	, _minCoords()
@@ -104,7 +105,7 @@ void minty::Sprite::set_pivot(Vector2 const pivot, CoordinateMode const coordina
 
 Vector2 minty::Sprite::normalize_coords(Vector2 const coords) const
 {
-	Texture const& tex = get_renderer()->get_texture(_textureId);
+	Texture const& tex = get_render_system()->get_texture(_textureId);
 
 	return Vector2(coords.x / static_cast<float>(tex.get_width()), coords.y / static_cast<float>(tex.get_height()));
 }

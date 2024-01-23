@@ -11,9 +11,8 @@ namespace minty
 {
 	std::map<String const, SystemRegistry::SystemFunc const> SystemRegistry::_systemTypes = std::map<String const, SystemRegistry::SystemFunc const>();
 
-	SystemRegistry::SystemRegistry(Engine* const engine, EntityRegistry* const registry)
-		: _engine(engine)
-		, _registry(registry)
+	SystemRegistry::SystemRegistry(Scene& scene)
+		: _scene(&scene)
 		, _orderedSystems()
 		, _allSystems()
 	{}
@@ -28,26 +27,21 @@ namespace minty
 	}
 
 	SystemRegistry::SystemRegistry(SystemRegistry&& other) noexcept
-		: _engine(other._engine)
-		, _registry(other._registry)
+		: _scene(other._scene)
 		, _orderedSystems(std::move(other._orderedSystems))
 		, _allSystems(std::move(other._allSystems))
 	{
-		other._engine = nullptr;
-		other._registry = nullptr;
+		other._scene = nullptr;
 	}
 
 	SystemRegistry& SystemRegistry::operator=(SystemRegistry&& other) noexcept
 	{
 		if (this != &other)
 		{
-			_engine = other._engine;
-			_registry = other._registry;
+			_scene = other._scene;
+			other._scene = nullptr;
 			_orderedSystems = std::move(other._orderedSystems);
 			_allSystems = std::move(other._allSystems);
-
-			other._engine = nullptr;
-			other._registry = nullptr;
 		}
 
 		return *this;
@@ -94,25 +88,10 @@ namespace minty
 		else
 		{
 			// name found
-			System* system = found->second(_engine, _registry);
+			System* system = found->second(*_scene);
 			this->emplace(name, system, priority);
 			return system;
 		}
-	}
-
-	System* SystemRegistry::find_by_name(String const& name) const
-	{
-		for (auto const& pair : _allSystems)
-		{
-			if (pair.first.compare(name) == 0)
-			{
-				// found name, return system
-				return pair.second;
-			}
-		}
-
-		// not found
-		return nullptr;
 	}
 
 	void SystemRegistry::erase(System* const system)

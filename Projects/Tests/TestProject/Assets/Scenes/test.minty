@@ -1,9 +1,57 @@
-Systems
+systems
     CameraController
     Move
     Test
     Animation
-Entities
+        animations
+            - Animations/idle.minty
+            - Animations/moving.minty
+        animators
+            - Animations/animator.minty
+    Audio
+        clips
+            - Audio/blinking-forest.wav
+            - Audio/cow-bells.wav
+            - Audio/ding.wav
+            - Audio/dong.wav
+    Render
+        textures
+            - Textures/oak_planks.png
+            - Textures/pattern.png
+            - Textures/texture.jpg
+            - Textures/brian.png
+            - Textures/x.png
+            - Textures/death.png
+            - Resources/Models/pumpkin_tex.jpg
+        shaders
+            - Shaders/shader.minty
+            - Shaders/spriteShader.minty
+        shaderPasses
+            - Shaders/shaderPass.minty
+            - Shaders/spriteShader.minty
+        materialTemplates
+            - Materials/materialTemplate.minty
+            - Materials/spriteMaterialTemplate.minty
+        materials
+            - Materials/material1.minty
+            - Materials/spriteMaterial.minty
+            - Materials/xSpriteMaterial.minty
+        sprites
+            - Sprites/brian.minty
+            - Sprites/x.minty
+        atlases
+            -
+                texture: death
+                coordinateMode: PIXEL
+                slice
+                    x: 90
+                    y: 90
+                pivot
+                    x: 45
+                    y: 45
+                sprites
+                    all
+entities
     Camera
         Transform
             position
@@ -14,13 +62,12 @@ Entities
             far: 100.0
         Move
         AudioListener
-Sprite
-    Renderable
-    Transform
     Sprite
-    Animator
-        entity: Sprite
-        
+        Renderable
+        Transform
+        Sprite
+        Animator
+            entity: Sprite
 #    Model
 #        Renderable
 #        Transform

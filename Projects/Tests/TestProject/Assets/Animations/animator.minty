@@ -1,0 +1,21 @@
+name: animator
+fsm
+    scope
+        move: 0
+    states
+        idle
+            value
+                0i: 0
+            transitions
+                -
+                    state: moving
+                    conditions
+                        - move == 0
+        moving
+            value
+                0i: 1
+            transitions
+                -
+                    state: idle
+                    conditions
+                        - move != 0

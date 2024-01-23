@@ -217,6 +217,7 @@
     <ClInclude Include="miniaudio.h" />
     <ClInclude Include="M_Animation.h" />
     <ClInclude Include="M_AnimationBuilder.h" />
+    <ClInclude Include="M_AnimationObject.h" />
     <ClInclude Include="M_AnimationSystem.h" />
     <ClInclude Include="M_Animator.h" />
     <ClInclude Include="M_AnimatorBuilder.h" />
@@ -227,6 +228,7 @@
     <ClInclude Include="M_AudioEngine.h" />
     <ClInclude Include="M_AudioListenerComponent.h" />
     <ClInclude Include="M_AudioSourceComponent.h" />
+    <ClInclude Include="M_AudioSystem.h" />
     <ClInclude Include="M_Builtin.h" />
     <ClInclude Include="M_Compression.h" />
     <ClInclude Include="M_FiniteStateMachine.h" />
@@ -239,6 +241,7 @@
     <ClInclude Include="M_Rendering_SpriteBuilder.h" />
     <ClInclude Include="M_Rendering_TextureAtlasBuilder.h" />
     <ClInclude Include="M_Rendering_UIPushData.h" />
+    <ClInclude Include="M_RenderSystem.h" />
     <ClInclude Include="M_Resource.h" />
     <ClInclude Include="M_SerializationData.h" />
     <ClInclude Include="M_Dynamic.h" />
@@ -366,12 +369,15 @@
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="dr_impl.cpp" />
     <ClCompile Include="M_Animation.cpp" />
+    <ClCompile Include="M_AnimationObject.cpp" />
     <ClCompile Include="M_AnimationSystem.cpp" />
+    <ClCompile Include="M_Animator.cpp" />
     <ClCompile Include="M_Asset.cpp" />
     <ClCompile Include="M_AudioClip.cpp" />
     <ClCompile Include="M_AudioEngine.cpp" />
     <ClCompile Include="M_AudioListenerComponent.cpp" />
     <ClCompile Include="M_AudioSourceComponent.cpp" />
+    <ClCompile Include="M_AudioSystem.cpp" />
     <ClCompile Include="M_Compression.cpp" />
     <ClCompile Include="M_Dynamic.cpp" />
     <ClCompile Include="M_CameraComponent.cpp" />
@@ -413,6 +419,7 @@
     <ClCompile Include="M_Rendering_Object.cpp" />
     <ClCompile Include="M_Rendering_PushConstantInfo.cpp" />
     <ClCompile Include="M_Rendering_ShaderBuilder.cpp" />
+    <ClCompile Include="M_RenderSystem.cpp" />
     <ClCompile Include="M_Scene.cpp" />
     <ClCompile Include="M_SceneManager.cpp" />
     <ClCompile Include="M_Node.cpp" />

@@ -7,6 +7,8 @@
 
 namespace minty
 {
+	class RenderSystem;
+
 	/// <summary>
 	/// A collection of Sprites that originate from a Texture.
 	/// </summary>
@@ -14,6 +16,8 @@ namespace minty
 		: public rendering::RenderObject
 	{
 	private:
+		RenderSystem* _renderSystem;
+
 		// id to texture
 		ID _textureId;
 		// id to the material

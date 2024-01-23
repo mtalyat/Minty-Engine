@@ -12,6 +12,8 @@
 #include "M_EntityRegistry.h"
 #include "M_Encoding.h"
 
+#include "M_RenderSystem.h"
+
 #include "M_TransformComponent.h"
 #include "M_CameraComponent.h"
 #include "M_MeshComponent.h"
@@ -87,13 +89,6 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
 RenderEngine::RenderEngine(Window* const window)
 	: _builder(nullptr)
 	, _window(window)
-	, _textures()
-	, _materials()
-	, _materialTemplates()
-	, _shaderPasses()
-	, _shaders()
-	, _buffers()
-	, _meshes()
 	, _boundIds()
 	, _view()
 	, _backgroundColor({ 250, 220, 192, 255 }) // light tan color
@@ -230,6 +225,11 @@ bool RenderEngine::is_running() const
 bool minty::RenderEngine::is_initialized() const
 {
 	return _initialized;
+}
+
+Scene const* minty::RenderEngine::get_scene() const
+{
+	return _scene;
 }
 
 void RenderEngine::create_instance()
@@ -371,30 +371,6 @@ void RenderEngine::create_image(uint32_t width, uint32_t height, VkFormat format
 	vkBindImageMemory(_device, image, imageMemory, 0);
 }
 
-void minty::RenderEngine::update()
-{
-	// do nothing if no scene set
-	if (_scene == nullptr)
-	{
-		console::error("There is no Scene to render!");
-		return;
-	}
-
-	// do nothing if no camera
-	if (_mainCamera == NULL_ENTITY)
-	{
-		console::warn("There is no Camera to render to!");
-		return;
-	}
-
-	// get camera transform
-	CameraComponent const& camera = _registry->get<CameraComponent>(_mainCamera);
-	TransformComponent const& transformComponent = _registry->get<TransformComponent>(_mainCamera);
-
-	// update camera in renderer
-	update_camera(camera, transformComponent);
-}
-
 VkDevice minty::RenderEngine::get_device() const
 {
 	return _device;
@@ -415,104 +391,9 @@ uint32_t minty::RenderEngine::get_frame() const
 	return _frame;
 }
 
-Texture& minty::RenderEngine::get_texture(ID const id)
+float minty::RenderEngine::get_aspect_ratio() const
 {
-	return _textures.at(id);
-}
-
-Texture const& minty::RenderEngine::get_texture(ID const id) const
-{
-	return _textures.at(id);
-}
-
-Sprite& minty::RenderEngine::get_sprite(ID const id)
-{
-	return _sprites.at(id);
-}
-
-Sprite const& minty::RenderEngine::get_sprite(ID const id) const
-{
-	return _sprites.at(id);
-}
-
-Shader& minty::RenderEngine::get_shader(ID const id)
-{
-	return _shaders.at(id);
-}
-
-Shader const& minty::RenderEngine::get_shader(ID const id) const
-{
-	return _shaders.at(id);
-}
-
-Shader& minty::RenderEngine::get_shader_from_material_id(ID const id)
-{
-	return get_shader(get_shader_pass(get_material_template(get_material(id).get_template_id()).get_shader_pass_ids().front()).get_shader_id());
-}
-
-Shader const& minty::RenderEngine::get_shader_from_material_id(ID const id) const
-{
-	return get_shader(get_shader_pass(get_material_template(get_material(id).get_template_id()).get_shader_pass_ids().front()).get_shader_id());
-}
-
-ShaderPass& minty::RenderEngine::get_shader_pass(ID const id)
-{
-	return _shaderPasses.at(id);
-}
-
-ShaderPass const& minty::RenderEngine::get_shader_pass(ID const id) const
-{
-	return _shaderPasses.at(id);
-}
-
-ShaderPass& minty::RenderEngine::get_shader_pass_from_material_id(ID const id)
-{
-	return get_shader_pass(get_material_template(get_material(id).get_template_id()).get_shader_pass_ids().front());
-}
-
-ShaderPass const& minty::RenderEngine::get_shader_pass_from_material_id(ID const id) const
-{
-	return get_shader_pass(get_material_template(get_material(id).get_template_id()).get_shader_pass_ids().front());
-}
-
-MaterialTemplate& minty::RenderEngine::get_material_template(ID const id)
-{
-	return _materialTemplates.at(id);
-}
-
-MaterialTemplate const& minty::RenderEngine::get_material_template(ID const id) const
-{
-	return _materialTemplates.at(id);
-}
-
-MaterialTemplate& minty::RenderEngine::get_material_template_from_material_id(ID const id)
-{
-	return get_material_template(get_material(id).get_template_id());
-}
-
-MaterialTemplate const& minty::RenderEngine::get_material_template_from_material_id(ID const id) const
-{
-	return get_material_template(get_material(id).get_template_id());
-}
-
-Material& minty::RenderEngine::get_material(ID const id)
-{
-	return _materials.at(id);
-}
-
-Material const& minty::RenderEngine::get_material(ID const id) const
-{
-	return _materials.at(id);
-}
-
-Mesh& minty::RenderEngine::get_mesh(ID const id)
-{
-	return _meshes.at(id);
-}
-
-Mesh const& minty::RenderEngine::get_mesh(ID const id) const
-{
-	return _meshes.at(id);
+	return static_cast<float>(_swapChainExtent.width) / static_cast<float>(_swapChainExtent.height);
 }
 
 VkImageView RenderEngine::create_image_view(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags) {
@@ -1106,7 +987,7 @@ void minty::RenderEngine::draw_mesh(VkCommandBuffer commandBuffer, Matrix4 const
 		return;
 	}
 
-	Mesh& mesh = get_mesh(meshComponent.meshId);
+	Mesh& mesh = _renderSystem->get_mesh(meshComponent.meshId);
 
 	// do nothing if empty mesh
 	if (mesh.empty())
@@ -1130,7 +1011,7 @@ void minty::RenderEngine::draw_mesh(VkCommandBuffer commandBuffer, Matrix4 const
 	{
 		.transform = tmatrix,
 	};
-	Shader& shader = get_shader_from_material_id(meshComponent.materialId);
+	Shader& shader = _renderSystem->get_shader_from_material_id(meshComponent.materialId);
 	shader.update_push_constant(commandBuffer, &info, sizeof(DrawCallObject3D));
 
 	// draw
@@ -1140,7 +1021,7 @@ void minty::RenderEngine::draw_mesh(VkCommandBuffer commandBuffer, Matrix4 const
 void minty::RenderEngine::draw_sprite(VkCommandBuffer commandBuffer, TransformComponent const& transformComponent, SpriteComponent const& spriteComponent)
 {
 	// get the sprite
-	Sprite const& sprite = get_sprite(spriteComponent.spriteId);
+	Sprite const& sprite = _renderSystem->get_sprite(spriteComponent.spriteId);
 
 	// bind the material the sprite is using
 	bind(commandBuffer, sprite.get_material_id());
@@ -1156,7 +1037,7 @@ void minty::RenderEngine::draw_sprite(VkCommandBuffer commandBuffer, TransformCo
 	};
 
 	// push data to shader
-	Shader& shader = get_shader_from_material_id(sprite.get_material_id());
+	Shader& shader = _renderSystem->get_shader_from_material_id(sprite.get_material_id());
 	shader.update_push_constant(commandBuffer, &pushData, sizeof(SpritePushData));
 
 	// draw
@@ -1287,778 +1168,6 @@ void RenderEngine::populate_debug_messenger_create_info(VkDebugUtilsMessengerCre
 	};
 }
 
-ID minty::RenderEngine::create_texture(rendering::TextureBuilder const& builder)
-{
-	return _textures.emplace(builder.name, Texture(builder, *this));
-}
-
-ID minty::RenderEngine::create_sprite(rendering::SpriteBuilder const& builder)
-{
-	return _sprites.emplace(builder.name, Sprite(builder, *this));
-}
-
-ID minty::RenderEngine::create_shader(rendering::ShaderBuilder const& builder)
-{
-	return _shaders.emplace(builder.name, Shader(builder, *this));
-}
-
-ID minty::RenderEngine::create_shader_pass(rendering::ShaderPassBuilder const& builder)
-{
-	return _shaderPasses.emplace(builder.name, ShaderPass(builder, *this));
-}
-
-ID minty::RenderEngine::create_material_template(rendering::MaterialTemplateBuilder const& builder)
-{
-	return _materialTemplates.emplace(builder.name, MaterialTemplate(builder, *this));
-}
-
-ID minty::RenderEngine::create_material(rendering::MaterialBuilder const& builder)
-{
-	return _materials.emplace(builder.name, Material(builder, *this));
-}
-
-ID minty::RenderEngine::create_mesh()
-{
-	// just create a brand new mesh
-	return _meshes.emplace(Mesh(*this));
-}
-
-ID minty::RenderEngine::get_or_create_mesh(String const& name)
-{
-	// if contains name, return it
-	if (_meshes.contains(name))
-	{
-		return _meshes.get_id(name);
-	}
-
-	// create new
-	return _meshes.emplace(name, Mesh(*this));
-}
-
-ID minty::RenderEngine::get_or_create_mesh(MeshType const type)
-{
-	String name = to_string(type);
-
-	// if contains type, return that
-	if (_meshes.contains(name))
-	{
-		return _meshes.get_id(name);
-	}
-
-	// create new
-	ID id = _meshes.emplace(name, Mesh(*this));
-	Mesh& mesh = _meshes.at(id);
-
-	switch (type)
-	{
-	case MeshType::Custom:
-		// do nothing for now
-		console::todo("MeshType::Custom");
-		break;
-	case MeshType::Quad:
-		Mesh::create_primitive_quad(mesh);
-		break;
-	case MeshType::Cube:
-		Mesh::create_primitive_cube(mesh);
-		break;
-	case MeshType::Pyramid:
-		Mesh::create_primitive_pyramid(mesh);
-		break;
-	case MeshType::Sphere:
-		Mesh::create_primitive_sphere(mesh);
-		break;
-	case MeshType::Cylinder:
-		Mesh::create_primitive_cylinder(mesh);
-		break;
-	default:
-		// empty mesh
-		mesh.clear();
-		break;
-	}
-
-	return id;
-}
-
-ID minty::RenderEngine::find_texture(String const& name) const
-{
-	if (!_textures.contains(name))
-	{
-		return ERROR_ID;
-	}
-
-	return _textures.get_id(name);
-}
-
-ID minty::RenderEngine::find_sprite(String const& name) const
-{
-	if (!_sprites.contains(name))
-	{
-		return ERROR_ID;
-	}
-
-	return _sprites.get_id(name);
-}
-
-ID minty::RenderEngine::find_shader(String const& name) const
-{
-	if (!_shaders.contains(name))
-	{
-		return ERROR_ID;
-	}
-
-	return _shaders.get_id(name);
-}
-
-ID minty::RenderEngine::find_shader_pass(String const& name) const
-{
-	if (!_shaderPasses.contains(name))
-	{
-		return ERROR_ID;
-	}
-
-	return _shaderPasses.get_id(name);
-}
-
-ID minty::RenderEngine::find_material_template(String const& name) const
-{
-	if (!_materialTemplates.contains(name))
-	{
-		return ERROR_ID;
-	}
-
-	return _materialTemplates.get_id(name);
-}
-
-ID minty::RenderEngine::find_material(String const& name) const
-{
-	if (!_materials.contains(name))
-	{
-		return ERROR_ID;
-	}
-
-	return _materials.get_id(name);
-}
-
-ID minty::RenderEngine::find_mesh(String const& name) const
-{
-	if (!_meshes.contains(name))
-	{
-		return ERROR_ID;
-	}
-
-	return _meshes.get_id(name);
-}
-
-String minty::RenderEngine::get_texture_name(ID const id) const
-{
-	return _textures.get_name(id);
-}
-
-String minty::RenderEngine::get_sprite_name(ID const id) const
-{
-	return _sprites.get_name(id);
-}
-
-String minty::RenderEngine::get_shader_name(ID const id) const
-{
-	return _shaders.get_name(id);
-}
-
-String minty::RenderEngine::get_shader_pass_name(ID const id) const
-{
-	return _shaderPasses.get_name(id);
-}
-
-String minty::RenderEngine::get_material_template_name(ID const id) const
-{
-	return _materialTemplates.get_name(id);
-}
-
-String minty::RenderEngine::get_material_name(ID const id) const
-{
-	return _materials.get_name(id);
-}
-
-String minty::RenderEngine::get_mesh_name(ID const id) const
-{
-	return _meshes.get_name(id);
-}
-
-ID minty::RenderEngine::load_texture(Path const& path)
-{
-	return load_texture(path, path.stem().string());
-}
-
-ID minty::RenderEngine::load_texture(Path const& path, String const& name)
-{
-	if (Asset::check(path, false))
-	{
-		return ERROR_ID;
-	}
-
-	Node meta = Asset::load_meta(path);
-	Reader reader(meta);
-
-	// create texture builder from path and meta file
-	TextureBuilder builder
-	{
-		.name = name,
-		.path = path,
-		.pixelData = nullptr,
-		.width = 0,
-		.height = 0,
-		.pixelFormat = from_string_texture_builder_pixel_format(reader.read_string("pixelFormat", "RGBA")),
-		.filter = from_string_vk_filter(reader.read_string("filter", "NEAREST")),
-		.format = from_string_vk_format(reader.read_string("format", "R8G8B8A8_SRGB")),
-		.addressMode = from_string_vk_sampler_address_mode(reader.read_string("samplerAddressMode", "REPEAT")),
-		.mipmapMode = from_string_vk_sampler_mipmap_mode(reader.read_string("samplerMipmapMode", "NEAREST")),
-	};
-
-	return create_texture(builder);
-}
-
-ID minty::RenderEngine::load_sprite(Path const& path)
-{
-	return load_sprite(path, path.stem().string());
-}
-
-ID minty::RenderEngine::load_sprite(Path const& path, String const& name)
-{
-	if (Asset::check(path, false))
-	{
-		return ERROR_ID;
-	}
-
-	Node meta = Asset::load_node(path);
-	Reader reader(meta);
-
-	SpriteBuilder builder
-	{
-		.name = name,
-		.textureId = find_texture(reader.read_string("texture")),
-		.materialId = find_material(reader.read_string("material")),
-		.coordinateMode = from_string_pixel_coordinate_mode(reader.read_string("coordinateMode")),
-		.minCoords = Vector2(0.0f, 0.0f),
-		.maxCoords = Vector2(1.0f, 1.0f),
-		.pivot = Vector2(0.5f, 0.5f),
-	};
-
-	reader.read_object("min", builder.minCoords);
-	reader.read_object("max", builder.maxCoords);
-	reader.read_object("pivot", builder.pivot);
-
-	return create_sprite(builder);
-}
-
-ID minty::RenderEngine::load_shader(Path const& path)
-{
-	return load_shader(path, path.stem().string());
-}
-
-ID minty::RenderEngine::load_shader(Path const& path, String const& name)
-{
-	if (Asset::check(path, false))
-	{
-		return ERROR_ID;
-	}
-
-	Node meta = Asset::load_node(path);
-
-	ShaderBuilder builder;
-	builder.name = path.stem().string();
-
-	std::vector<Node> const* nodes;
-	if (nodes = meta.find_all("push"))
-	{
-		for (Node const& child : *nodes)
-		{
-			PushConstantInfo pushConstantInfo;
-			Reader reader(child);
-
-			pushConstantInfo.name = reader.read_string("name", child.to_string());
-			pushConstantInfo.stageFlags = from_string_vk_shader_stage_flag_bits(reader.read_string("stageFlags"));
-			pushConstantInfo.offset = reader.read_uint("offset");
-			pushConstantInfo.size = reader.read_uint("size");
-
-			builder.pushConstantInfos.emplace(pushConstantInfo.name, pushConstantInfo);
-		}
-	}
-
-	if (nodes = meta.find_all("uniform"))
-	{
-		for (Node const& child : *nodes)
-		{
-			UniformConstantInfo uniformConstantInfo;
-			Reader reader(child);
-
-			uniformConstantInfo.name = reader.read_string("name", child.to_string());
-			uniformConstantInfo.type = from_string_vk_descriptor_type(reader.read_string("type"));
-			uniformConstantInfo.set = reader.read_uint("set");
-			uniformConstantInfo.binding = reader.read_uint("binding");
-			uniformConstantInfo.count = reader.read_uint("count", 1u);
-			uniformConstantInfo.size = static_cast<VkDeviceSize>(reader.read_size("size"));
-			uniformConstantInfo.stageFlags = from_string_vk_shader_stage_flag_bits(reader.read_string("stageFlags"));
-
-			builder.uniformConstantInfos.emplace(uniformConstantInfo.name, uniformConstantInfo);
-		}
-	}
-
-	return create_shader(builder);
-}
-
-ID minty::RenderEngine::load_shader_pass(Path const& path)
-{
-	return load_shader_pass(path, path.stem().string());
-}
-
-ID minty::RenderEngine::load_shader_pass(Path const& path, String const& name)
-{
-	if (Asset::check(path, false))
-	{
-		return ERROR_ID;
-	}
-
-	Node meta = Asset::load_node(path);
-	Reader reader(meta);
-
-	ShaderPassBuilder builder;
-	builder.name = path.stem().string();
-	builder.shaderId = find_shader(reader.read_string("shader", meta.to_string()));
-	builder.topology = from_string_vk_primitive_topology(reader.read_string("primitiveTopology"));
-	builder.polygonMode = from_string_vk_polygon_mode(reader.read_string("polygonMode"));
-	builder.cullMode = from_string_vk_cull_mode_flag_bits(reader.read_string("cullMode"));
-	builder.frontFace = from_string_vk_front_face(reader.read_string("frontFace"));
-	builder.lineWidth = reader.read_float("lineWidth", 1.0f);
-
-	std::vector<Node> const* nodes;
-	if (nodes = meta.find_all("binding"))
-	{
-		for (auto const& child : *nodes)
-		{
-			VkVertexInputBindingDescription binding = {};
-			Reader childReader(child);
-
-			binding.binding = childReader.read_uint("binding", child.to_uint());
-			binding.stride = childReader.read_uint("stride");
-			binding.inputRate = from_string_vk_vertex_input_rate(childReader.read_string("inputRate"));
-
-			builder.vertexBindings.push_back(binding);
-		}
-	}
-	if (nodes = meta.find_all("attribute"))
-	{
-		for (auto const& child : *nodes)
-		{
-			VkVertexInputAttributeDescription attribute = {};
-			Reader childReader(child);
-
-			attribute.location = childReader.read_uint("location", child.to_uint());
-			attribute.binding = childReader.read_uint("binding");
-			attribute.format = from_string_vk_format(childReader.read_string("format"));
-			attribute.offset = childReader.read_uint("offset");
-
-			builder.vertexAttributes.push_back(attribute);
-		}
-	}
-	if (nodes = meta.find_all("stage"))
-	{
-		for (auto const& child : *nodes)
-		{
-			ShaderPassBuilder::ShaderStageInfo info;
-			Reader childReader(child);
-
-			info.stage = from_string_vk_shader_stage_flag_bits(childReader.read_string("stage", child.to_string()));
-			String path = childReader.read_string("path");
-			info.code = Asset::load_chars(path);
-			info.entry = childReader.read_string("entry", "main");
-
-			builder.stages.push_back(info);
-		}
-	}
-
-	return create_shader_pass(builder);
-}
-
-ID minty::RenderEngine::load_material_template(Path const& path)
-{
-	return load_material_template(path, path.stem().string());
-}
-
-ID minty::RenderEngine::load_material_template(Path const& path, String const& name)
-{
-	if (Asset::check(path, false))
-	{
-		return ERROR_ID;
-	}
-
-	Node meta = Asset::load_node(path);
-
-	MaterialTemplateBuilder builder;
-	builder.name = path.stem().string();
-
-	std::vector<Node> const* nodes;
-	if (nodes = meta.find_all("pass"))
-	{
-		for (auto const& child : *nodes)
-		{
-			builder.shaderPassIds.push_back(find_shader_pass(child.to_string()));
-		}
-	}
-	if (Node const* node = meta.find("defaults"))
-	{
-		// get shader uniform constant values so we know how to interpret the values in the materials
-		ShaderPass const& shaderPass = get_shader_pass(builder.shaderPassIds.front());
-		Shader const& shader = get_shader(shaderPass.get_shader_id());
-
-		load_descriptor_values(builder.defaultValues, *node, shader.get_uniform_constant_infos(DESCRIPTOR_SET_MATERIAL));
-	}
-
-	return create_material_template(builder);
-}
-
-ID minty::RenderEngine::load_material(Path const& path)
-{
-	return load_material(path, path.stem().string());
-}
-
-ID minty::RenderEngine::load_material(Path const& path, String const& name)
-{
-	if (Asset::check(path, false))
-	{
-		return ERROR_ID;
-	}
-
-	Node meta = Asset::load_node(path);
-	Reader reader(meta);
-
-	MaterialBuilder builder;
-	builder.name = Path(path).stem().string();
-
-	builder.templateId = find_material_template(reader.read_string("template"));
-
-	if (Node const* node = meta.find("values"))
-	{
-		// get shader uniform constant values so we know how to interpret the values in the materials
-		MaterialTemplate const& materialTemplate = get_material_template(builder.templateId);
-		ShaderPass const& shaderPass = get_shader_pass(materialTemplate.get_shader_pass_ids().front());
-		Shader const& shader = get_shader(shaderPass.get_shader_id());
-
-		load_descriptor_values(builder.values, *node, shader.get_uniform_constant_infos(DESCRIPTOR_SET_MATERIAL));
-	}
-
-	return create_material(builder);
-}
-
-ID minty::RenderEngine::load_mesh(Path const& path)
-{
-	return load_mesh(path, path.stem().string());
-}
-
-ID minty::RenderEngine::load_mesh(Path const& path, String const& name)
-{
-	if (Asset::check(path, false))
-	{
-		return ERROR_ID;
-	}
-
-	String extension = path.extension().string();
-
-	if (extension != ".obj")
-	{
-		console::error(std::format("Cannot load_animation mesh from file type \"{}\".", extension));
-		return ERROR_ID;
-	}
-
-	// override existing mesh with same name
-	ID id = get_or_create_mesh(name);
-
-	// determine how to load the file
-	if (extension == ".obj")
-	{
-		load_mesh_obj(path, id);
-	}
-
-	return id;
-}
-
-void minty::RenderEngine::destroy_texture(ID const id)
-{
-	if (_textures.contains(id))
-	{
-		auto& value = _textures.at(id);
-		value.destroy();
-		_textures.erase(id);
-	}
-}
-
-void minty::RenderEngine::destroy_sprite(ID const id)
-{
-	if (_sprites.contains(id))
-	{
-		auto& value = _sprites.at(id);
-		value.destroy();
-		_sprites.erase(id);
-	}
-}
-
-void minty::RenderEngine::destroy_shader(ID const id)
-{
-	if (_shaders.contains(id))
-	{
-		auto& value = _shaders.at(id);
-		value.destroy();
-		_shaders.erase(id);
-	}
-}
-
-void minty::RenderEngine::destroy_shader_pass(ID const id)
-{
-	if (_shaderPasses.contains(id))
-	{
-		auto& value = _shaderPasses.at(id);
-		value.destroy();
-		_shaderPasses.erase(id);
-	}
-}
-
-void minty::RenderEngine::destroy_material_template(ID const id)
-{
-	if (_materialTemplates.contains(id))
-	{
-		MaterialTemplate& materialTemplate = _materialTemplates.at(id);
-		materialTemplate.destroy();
-		_materialTemplates.erase(id);
-	}
-}
-
-void minty::RenderEngine::destroy_material(ID const id)
-{
-	if (_materials.contains(id))
-	{
-		Material& material = _materials.at(id);
-		material.destroy();
-		_materials.erase(id);
-	}
-}
-
-void minty::RenderEngine::destroy_mesh(ID const id)
-{
-	if (_meshes.contains(id))
-	{
-		Mesh& mesh = _meshes.at(id);
-		mesh.clear();
-		_meshes.erase(id);
-	}
-}
-
-void minty::RenderEngine::destroy_assets()
-{
-	for (auto& tex : _textures)
-	{
-		tex.second.destroy();
-	}
-	_textures.clear();
-	for (auto& sprite : _sprites)
-	{
-		sprite.second.destroy();
-	}
-	_sprites.clear();
-	for (auto& material : _materials)
-	{
-		material.second.destroy();
-	}
-	_materials.clear();
-	for (auto& materialTemplate : _materialTemplates)
-	{
-		materialTemplate.second.destroy();
-	}
-	_materialTemplates.clear();
-	for (auto& shaderPass : _shaderPasses)
-	{
-		shaderPass.second.destroy();
-	}
-	_shaderPasses.clear();
-	for (auto& shader : _shaders)
-	{
-		shader.second.destroy();
-	}
-	_shaders.clear();
-	for (auto& mesh : _meshes)
-	{
-		mesh.second.clear();
-	}
-	_meshes.clear();
-}
-
-void minty::RenderEngine::load_descriptor_values(std::unordered_map<String, Dynamic>& values, Node const& node, std::vector<rendering::UniformConstantInfo> const& infos) const
-{
-	// go through all the constant values
-	for (auto const& info : infos)
-	{
-		// if the name exists in the node, interpret the values from the node
-		auto const& found = node.children.find(info.name);
-		if (found == node.children.end())
-		{
-			// not found in values, so skip it
-			continue;
-		}
-#ifdef MINTY_DEBUG
-		if (found->second.size() > 1)
-		{
-			console::warn(std::format("Duplicate descriptors named \"{}\" found. Only the first one is being used.", info.name));
-		}
-#endif
-		Node const& child = found->second.front();
-
-		switch (info.type)
-		{
-		case VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER:
-		{
-			// create list of ids from given texture names
-			size_t size = child.children.size();
-			ID* ids = new ID[size];
-			for (size_t i = 0; i < size; i++)
-			{
-				// if child with the index name exists, use that
-				if (Node const* c = child.find(std::to_string(i)))
-				{
-					// should be a texture name, so load that into ids
-					ids[i] = find_texture(c->to_string());
-				}
-				else
-				{
-					// if index name does not exist, show warning and set to ERROR_ID
-					console::warn(std::format("Failed to load_animation texture with index {} into descriptor named \"{}\".", i, info.name));
-					ids[i] = ERROR_ID;
-				}
-			}
-
-			// add to values
-			values.emplace(found->first, Dynamic(ids, sizeof(ID) * size));
-			// done with original ids array
-			delete[] ids;
-
-			break;
-		}
-		case VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER:
-		{
-			// read raw data from files directly into the dynamic, for now
-			Dynamic d;
-			Reader reader(child);
-			d.deserialize(reader);
-			values.emplace(found->first, d);
-			break;
-		}
-		}
-	}
-}
-
-void minty::RenderEngine::load_mesh_obj(Path const& path, ID const id)
-{
-	Node meta = Asset::load_meta(path);
-
-	Mesh& mesh = get_mesh(id);
-
-	std::vector<String> lines = Asset::load_lines(path);
-
-	std::vector<Vector3> positions;
-	std::vector<Vector2> coords;
-	std::vector<Vector3> normals;
-
-	std::unordered_map<Vector3Int, uint16_t> faces;
-	std::vector<Vertex3D> vertices;
-	std::vector<uint16_t> indices;
-
-	std::istringstream ss;
-	String token;
-
-	for (auto const& line : lines)
-	{
-		ss = std::istringstream(line);
-		ss >> token;
-		if (token == "v")
-		{
-			// position
-			Vector3 position;
-			ss >> position.x >> position.y >> position.z;
-			position.y = -position.y; // flip Y
-			positions.push_back(position);
-		}
-		else if(token == "vt")
-		{
-			// coord
-			Vector2 coord;
-			ss >> coord.x >> coord.y;
-			coord.y = -coord.y; // flip y
-			coords.push_back(coord);
-		}
-		else if (token == "vn")
-		{
-			// normal
-			Vector3 normal;
-			ss >> normal.x >> normal.y >> normal.z;
-			normals.push_back(normal);
-		}
-		else if (token == "f")
-		{
-			// face
-			// get pairs
-			for (size_t i = 0; i < 3; i++)
-			{
-				String set;
-				ss >> set;
-
-				std::istringstream setss(set);
-				Vector3Int faceIndices = Vector3Int();
-
-				// subtract 1, since all indices are 1 indexed apparently
-				if (std::getline(setss, token, '/'))
-				{
-					faceIndices.x = parse::to_int(token) - 1;
-
-					if (std::getline(setss, token, '/'))
-					{
-						faceIndices.y = parse::to_int(token) - 1;
-
-						if (std::getline(setss, token, '/'))
-						{
-							faceIndices.z = parse::to_int(token) - 1;
-						}
-					}
-				}
-
-				// if combo exists, add that index
-				auto const& found = faces.find(faceIndices);
-				if (found == faces.end())
-				{
-					// vertex does not exist yet
-
-					uint16_t index = static_cast<uint16_t>(vertices.size());
-					vertices.push_back(Vertex3D
-						{
-							.pos = positions[faceIndices.x],
-							.normal = normals[faceIndices.z],
-							.coord = coords[faceIndices.y]
-						});
-					indices.push_back(index);
-					faces.emplace(faceIndices, index);
-				}
-				else
-				{
-					// vertex already exists
-
-					uint16_t index = found->second;
-					indices.push_back(index);
-				}
-			}
-		}
-	}
-
-	// all vertices and indices populated
-	mesh.set_vertices(vertices);
-	mesh.set_indices(indices);
-}
-
 void RenderEngine::setup_debug_messenger() {
 	if (!enableValidationLayers) return;
 
@@ -2186,49 +1295,6 @@ void RenderEngine::create_framebuffers()
 		if (vkCreateFramebuffer(_device, &framebufferInfo, nullptr, &_swapChainFramebuffers[i]) != VK_SUCCESS) {
 			error::abort("Failed to create framebuffer.");
 		}
-	}
-}
-
-void RenderEngine::update_camera(CameraComponent const& camera, TransformComponent const& transform)
-{
-	Vector4 matPos = transform.global[3];
-	Vector3 globalPos = Vector3(matPos.x, matPos.y, matPos.z);
-
-	Matrix4 view = glm::lookAt(globalPos, globalPos + transform.local.rotation.forward(), Vector3(0.0f, 1.0f, 0.0f));
-
-	// TODO: don't use lookat
-	// maybe invert global?
-
-	// get projection
-	Matrix4 proj;
-	switch (camera.perspective)
-	{
-	case CameraComponent::Perspective::Perspective:
-		proj = glm::perspective(glm::radians(camera.fov), _swapChainExtent.width / static_cast<float>(_swapChainExtent.height), camera.nearPlane, camera.farPlane);
-		break;
-	default:
-		proj = Matrix4(1.0f);
-		break;
-	}
-	// flip y and x so that we have a left handed coordinate system
-	//proj[0][0] *= -1.0f;	// x
-	//proj[1][1] *= -1.0f;	// y
-	//proj[2][2] *= -1.0f;	// z
-
-	// multiply together
-	Matrix4 transformMatrix = proj * view;
-
-	// update buffer object
-	CameraBufferObject obj =
-	{
-		.transform = transformMatrix,
-	};
-
-	// update all shaders
-	for (auto& shader : _shaders)
-	{
-		shader.second.update_global_uniform_constant("camera", _frame, &obj, sizeof(CameraBufferObject), 0);
-		//shader.update_uniform_constant_frame("camera", &obj, sizeof(CameraBufferObject));
 	}
 }
 
@@ -2423,11 +1489,6 @@ void RenderEngine::create_command_buffers()
 	}
 }
 
-void minty::RenderEngine::set_main_camera(Entity const entity)
-{
-	_mainCamera = entity;
-}
-
 void minty::RenderEngine::set_scene(Scene const* const scene, Entity const camera)
 {
 	// update scene that is being rendered
@@ -2437,24 +1498,12 @@ void minty::RenderEngine::set_scene(Scene const* const scene, Entity const camer
 	if (!_scene)
 	{
 		_registry = nullptr;
-		_mainCamera = NULL_ENTITY;
 		return;
 	}
 
 	// set registry to scene registry
-	_registry = _scene->get_entity_registry();
-
-	// update camera we are rendering from
-	if (camera == NULL_ENTITY)
-	{
-		// no camera provided, attempt to find first one in scene
-		_mainCamera = _scene->get_entity_registry()->find_by_type<CameraComponent>();
-	}
-	else
-	{
-		// camera provided, use that
-		_mainCamera = camera;
-	}
+	_registry = &_scene->get_entity_registry();
+	_renderSystem = _scene->get_system_registry().find<RenderSystem>();
 }
 
 void RenderEngine::record_command_buffer(VkCommandBuffer commandBuffer, uint32_t imageIndex)
@@ -2560,8 +1609,6 @@ void RenderEngine::destroy()
 	// clean up vulkan
 	cleanup_swap_chain();
 
-	// destroy assets
-	destroy_assets();
 	for (auto& buffer : _buffers)
 	{
 		destroy_buffer(buffer.second);
@@ -2595,9 +1642,9 @@ void minty::RenderEngine::bind(VkCommandBuffer const commandBuffer)
 	}
 
 	// get references to grab descriptor sets from
-	Shader const& shader = get_shader(_boundIds.at(BIND_SHADER));
-	ShaderPass const& shaderPass = get_shader_pass(_boundIds.at(BIND_SHADER_PASS));
-	Material const& material = get_material(_boundIds.at(BIND_MATERIAL));
+	Shader const& shader = _renderSystem->get_shader(_boundIds.at(BIND_SHADER));
+	ShaderPass const& shaderPass = _renderSystem->get_shader_pass(_boundIds.at(BIND_SHADER_PASS));
+	Material const& material = _renderSystem->get_material(_boundIds.at(BIND_MATERIAL));
 
 	// set descriptor sets we actually care about
 	std::array<VkDescriptorSet, DESCRIPTOR_SET_COUNT> descriptorSets;
@@ -2632,7 +1679,7 @@ void minty::RenderEngine::bind(VkCommandBuffer const commandBuffer, ID const mat
 
 	_boundIds[BIND_MATERIAL] = materialId;
 
-	Material const& material = get_material(materialId);
+	Material const& material = _renderSystem->get_material(materialId);
 	ID const materialTemplateId = material.get_template_id();
 
 	if (_boundIds.at(BIND_MATERIAL_TEMPLATE) == materialTemplateId)
@@ -2643,7 +1690,7 @@ void minty::RenderEngine::bind(VkCommandBuffer const commandBuffer, ID const mat
 	}
 
 	_boundIds[BIND_MATERIAL_TEMPLATE] = materialTemplateId;
-	MaterialTemplate const& materialTemplate = get_material_template(materialTemplateId);
+	MaterialTemplate const& materialTemplate = _renderSystem->get_material_template(materialTemplateId);
 	ID const shaderPassId = materialTemplate.get_shader_pass_ids().front();
 
 	if (_boundIds.at(BIND_SHADER_PASS) == shaderPassId)
@@ -2654,7 +1701,7 @@ void minty::RenderEngine::bind(VkCommandBuffer const commandBuffer, ID const mat
 	}
 
 	_boundIds[BIND_SHADER_PASS] = shaderPassId;
-	ShaderPass const& shaderPass = get_shader_pass(shaderPassId);
+	ShaderPass const& shaderPass = _renderSystem->get_shader_pass(shaderPassId);
 	ID const shaderId = shaderPass.get_shader_id();
 
 	if (_boundIds.at(BIND_SHADER) == shaderId)

@@ -14,15 +14,15 @@ void minty::RelationshipComponent::serialize(Writer& writer) const
 		return;
 	}
 
-	SerializationData* data = static_cast<SerializationData*>(writer.get_data());
+	SerializationData const* data = static_cast<SerializationData const*>(writer.get_data());
 
-	EntityRegistry const* er = data->scene->get_entity_registry();
+	EntityRegistry const& er = data->scene->get_entity_registry();
 
 	writer.write("children", children, 0ull);
-	writer.write("first", er->get_name(first), "");
-	writer.write("prev", er->get_name(prev), "");
-	writer.write("next", er->get_name(next), "");
-	writer.write("parent", er->get_name(parent), "");
+	writer.write("first", er.get_name(first), "");
+	writer.write("prev", er.get_name(prev), "");
+	writer.write("next", er.get_name(next), "");
+	writer.write("parent", er.get_name(parent), "");
 }
 
 void minty::RelationshipComponent::deserialize(Reader const& reader)
@@ -33,15 +33,15 @@ void minty::RelationshipComponent::deserialize(Reader const& reader)
 		return;
 	}
 
-	SerializationData* data = static_cast<SerializationData*>(reader.get_data());
+	SerializationData const* data = static_cast<SerializationData const*>(reader.get_data());
 
-	EntityRegistry const* er = data->scene->get_entity_registry();
+	EntityRegistry const& er = data->scene->get_entity_registry();
 
 	children = reader.read_size("children");
-	first = er->find_by_name(reader.read_string("first"));
-	prev = er->find_by_name(reader.read_string("prev"));
-	next = er->find_by_name(reader.read_string("next"));
-	parent = er->find_by_name(reader.read_string("parent"));
+	first = er.find_by_name(reader.read_string("first"));
+	prev = er.find_by_name(reader.read_string("prev"));
+	next = er.find_by_name(reader.read_string("next"));
+	parent = er.find_by_name(reader.read_string("parent"));
 }
 
 String minty::to_string(RelationshipComponent const& value)

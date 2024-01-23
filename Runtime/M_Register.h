@@ -490,11 +490,11 @@ namespace minty
 
 		for (auto const& pair : _data)
 		{
-			// if there is a name, use it, otherwise use "_"
+			// if there is a name, use it, otherwise use ""
 			auto const& found = _names.find(pair.first);
 			if (found == _names.end())
 			{
-				valuesWriter.write_object("_", pair.second);
+				valuesWriter.write_object("", pair.second);
 			}
 			else
 			{
@@ -521,7 +521,7 @@ namespace minty
 			T t;
 
 			// get unnamed
-			if (auto const* unnamedList = valuesNode->find_all("_"))
+			if (auto const* unnamedList = valuesNode->find_all(""))
 			{
 				for (auto const& unnamedNode : *unnamedList)
 				{
@@ -534,7 +534,7 @@ namespace minty
 			// get named
 			for (auto const& pair : valuesNode->children)
 			{
-				if (pair.first == "_") continue; // skip unnamed
+				if (pair.first == "") continue; // skip unnamed
 
 				Node const& namedNode = pair.second.front();
 				Reader reader(namedNode);

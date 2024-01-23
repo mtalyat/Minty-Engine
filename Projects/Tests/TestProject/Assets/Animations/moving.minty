@@ -1,4 +1,4 @@
-name: death
+name: moving
 frameTime: 0.15
 frames:
     0: death_0

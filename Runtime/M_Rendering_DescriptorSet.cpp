@@ -2,6 +2,8 @@
 #include "M_Rendering_DescriptorSet.h"
 
 #include "M_RenderEngine.h"
+#include "M_Scene.h"
+#include "M_RenderSystem.h"
 
 using namespace minty;
 using namespace minty::rendering;
@@ -14,14 +16,14 @@ minty::rendering::DescriptorSet::DescriptorSet()
 {}
 
 minty::rendering::DescriptorSet::DescriptorSet(RenderEngine& renderer)
-	: RenderObject::RenderObject(&renderer)
+	: RenderObject::RenderObject(renderer)
 	, _descriptorSets()
 	, _descriptors()
 	, _dirties()
 {}
 
 minty::rendering::DescriptorSet::DescriptorSet(std::array<VkDescriptorSet, MAX_FRAMES_IN_FLIGHT> const& descriptorSets, std::unordered_map<String, std::array<DescriptorData, MAX_FRAMES_IN_FLIGHT>> const& datas, RenderEngine& renderer)
-	: RenderObject::RenderObject(&renderer)
+	: RenderObject::RenderObject(renderer)
 	, _descriptorSets(descriptorSets)
 	, _descriptors(datas)
 	, _dirties()
@@ -46,7 +48,7 @@ DescriptorSet& minty::rendering::DescriptorSet::operator=(DescriptorSet const& o
 
 void minty::rendering::DescriptorSet::destroy()
 {
-	RenderEngine* renderer = get_renderer();
+	RenderEngine& renderer = get_render_engine();
 
 	// remove references to all VK descriptor sets, since they not need be destroyed
 	for (size_t i = 0; i < _descriptorSets.size(); i++)
@@ -60,7 +62,7 @@ void minty::rendering::DescriptorSet::destroy()
 		{
 			for (auto const id : data.second.at(i).ids)
 			{
-				renderer->destroy_buffer(id);
+				renderer.destroy_buffer(id);
 			}
 		}
 	}
@@ -144,7 +146,8 @@ void minty::rendering::DescriptorSet::apply(int const frame)
 	std::vector<VkDescriptorBufferInfo> bufferInfos;
 	std::vector<std::vector<VkDescriptorImageInfo>> imageInfos;
 
-	RenderEngine* renderer = get_renderer();
+	RenderEngine& renderer = get_render_engine();
+	RenderSystem* renderSystem = renderer.get_scene()->get_system_registry().find<RenderSystem>();
 
 	for (auto const& pair : _descriptors)
 	{
@@ -185,9 +188,9 @@ void minty::rendering::DescriptorSet::apply(int const frame)
 
 			// set buffer info
 			VkDescriptorBufferInfo& bufferInfo = bufferInfos.back();
-			bufferInfo.buffer = renderer->get_buffer(bufferId);
+			bufferInfo.buffer = renderer.get_buffer(bufferId);
 			bufferInfo.offset = 0;
-			bufferInfo.range = renderer->get_buffer_size(bufferId);
+			bufferInfo.range = renderer.get_buffer_size(bufferId);
 
 			// add buffer info to write
 			write.pBufferInfo = &bufferInfo;
@@ -205,7 +208,7 @@ void minty::rendering::DescriptorSet::apply(int const frame)
 			{
 				ID textureId = data.ids.at(i);
 
-				Texture const& texture = renderer->get_texture(textureId);
+				Texture const& texture = renderSystem->get_texture(textureId);
 
 				VkDescriptorImageInfo& info = infos.at(i);
 
@@ -225,7 +228,7 @@ void minty::rendering::DescriptorSet::apply(int const frame)
 	// apply all changes, if there were some
 	if (uint32_t count = static_cast<uint32_t>(writes.size()))
 	{
-		vkUpdateDescriptorSets(renderer->get_device(), count, writes.data(), 0, nullptr);
+		vkUpdateDescriptorSets(renderer.get_device(), count, writes.data(), 0, nullptr);
 	}
 }
 
@@ -270,7 +273,8 @@ void minty::rendering::DescriptorSet::set_descriptor(DescriptorData& data, int c
 		ID bufferId = data.ids.front();
 
 		// set buffer
-		get_renderer()->set_buffer(bufferId, value, size, offset);
+		RenderEngine& renderer = get_render_engine();
+		renderer.set_buffer(bufferId, value, size, offset);
 
 		break;
 	}
@@ -315,7 +319,8 @@ bool minty::rendering::DescriptorSet::get(String const& name, int const frame, v
 		ID bufferId = found->second.at(frame).ids.front();
 
 		// set the data
-		get_renderer()->get_buffer_data(bufferId, out);
+		RenderEngine& renderer = get_render_engine();
+		renderer.get_buffer_data(bufferId, out);
 
 		return true;
 	}
