@@ -157,15 +157,15 @@ void Engine::run()
 		}
 	}
 
-	// all done
+	// wait for render engine to finish before cleaning up
+	_renderEngine.sync();
+
+	// clean up
 	_sceneManager.unload();
 	_sceneManager.destroy();
 
-	// print elapsed time
+	// print elapsed time of program
 	console::log(std::format("Elapsed time: {}s", std::chrono::duration_cast<std::chrono::milliseconds>(get_now() - start).count() / 1000.0f));
-
-	// wait for device to be safe
-	_renderEngine.sync();
 }
 
 time_point_t minty::Engine::get_now() const

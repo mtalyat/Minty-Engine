@@ -3,6 +3,8 @@
 
 #include "M_Console.h"
 
+#include <typeinfo>
+
 using namespace minty;
 
 std::ostream& minty::operator<<(std::ostream& stream, Object const& object)
@@ -17,7 +19,7 @@ std::istream& minty::operator>>(std::istream& stream, Object const& object)
 
 String minty::to_string(Object const& value)
 {
-	return std::format("Object()");
+	return std::format("Object({})", typeid(value).name());
 }
 
 void minty::Object::serialize(Writer& writer) const
