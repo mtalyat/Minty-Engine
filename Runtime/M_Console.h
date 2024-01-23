@@ -1,6 +1,7 @@
 #pragma once
 
 #include "M_Base.h"
+#include "M_Node.h"
 
 namespace minty::console
 {
@@ -31,10 +32,16 @@ namespace minty::console
 	String to_string(Color const value);
 
 	/// <summary>
-	/// Prints the string to the console.
+	/// Prints the String to the console.
 	/// </summary>
-	/// <param name="message">The string to print.</param>
+	/// <param name="message">The String to print.</param>
 	void print(String const& message);
+
+	/// <summary>
+	/// Prints the Node to the console.
+	/// </summary>
+	/// <param name="node">The Node to print.</param>
+	void print(Node const& node);
 
 	/// <summary>
 	/// Prints the string to the console in the given color.

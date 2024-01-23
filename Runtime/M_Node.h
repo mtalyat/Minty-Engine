@@ -3,27 +3,72 @@
 #include "M_Types.h"
 #include <string>
 #include <vector>
-#include <map>
+#include <unordered_map>
 
 namespace minty
 {
 	/// <summary>
 	/// Holds a bit of serialized data.
 	/// </summary>
-	struct Node
+	class Node
 	{
+	private:
+		/// <summary>
+		/// The name of this Node.
+		/// </summary>
+		String _name;
+
 		/// <summary>
 		/// The data stored within this Node.
 		/// </summary>
-		String data;
+		String _data;
 
 		/// <summary>
-		/// The child nodes. Organized by name and a list of each node with that name.
+		/// A list of all child nodes on this Node.
 		/// </summary>
-		std::map<String, std::vector<Node>> children;
+		std::vector<Node> _children;
+
+		/// <summary>
+		/// A map of all names to child nodes for quick lookup.
+		/// </summary>
+		std::unordered_map<String, std::vector<size_t>> _lookup;
+
+	public:
+		Node();
+
+		Node(String const& name, String const& data = "");
+
+		String const& get_name() const;
+
+		void set_name(String const& name);
+
+		String const& get_data() const;
+
+		void set_data(String const& data);
+
+		std::vector<Node>& get_children();
+
+		std::vector<Node> const& get_children() const;
+
+		bool has_name() const;
+
+		/// <summary>
+		/// Checks if this Node has any data.
+		/// </summary>
+		/// <returns>True if data is not empty.</returns>
+		bool has_data() const;
+
+		/// <summary>
+		/// Checks if this Node has any children.
+		/// </summary>
+		/// <returns>True if children is not empty.</returns>
+		bool has_children() const;
+
+		void add_child(Node const& node);
 
 #pragma region To
 
+	public:
 		/// <summary>
 		/// Converts this Node's data to a string.
 		/// </summary>
@@ -68,6 +113,7 @@ namespace minty
 
 #pragma region Find
 
+	public:
 		/// <summary>
 		/// Searches for a child node with the given name.
 		/// </summary>
@@ -87,28 +133,12 @@ namespace minty
 		/// </summary>
 		/// <param name="name">The name of the children nodes.</param>
 		/// <returns>A pointer to the vector of child nodes with the given name, or nullptr if none found.</returns>
-		std::vector<Node>* find_all(String const& name);
-
-		/// <summary>
-		/// Finds a list of all the nodes with the given name.
-		/// </summary>
-		/// <param name="name">The name of the children nodes.</param>
-		/// <returns>A pointer to the vector of child nodes with the given name, or nullptr if none found.</returns>
-		std::vector<Node> const* find_all(String const& name) const;
+		std::vector<Node const*> find_all(String const& name) const;
 
 #pragma endregion
 
-		/// <summary>
-		/// Checks if this node has any data.
-		/// </summary>
-		/// <returns>True if data is not empty.</returns>
-		bool has_data() const;
-
-		/// <summary>
-		/// console::logs this Node tree.
-		/// </summary>
-		/// <param name="indent">The base indent for this Node.</param>
-		void print(int const indent = 0) const;
+	public:
+		static Node load_node(Path const& path);
 
 	public:
 		friend String to_string(Node const& value);

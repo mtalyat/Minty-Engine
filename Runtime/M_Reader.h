@@ -245,9 +245,9 @@ namespace minty
 
 				return true;
 			}
-			else if(node.data.size())
+			else if(node.has_data())
 			{
-				std::stringstream stream(node.data);
+				std::stringstream stream(node.get_data());
 				stream >> value;
 
 				return true;
@@ -265,16 +265,17 @@ namespace minty
 			std::unordered_set<String> addedKeys;
 			size_t i = 0;
 			String name = std::to_string(i);
-			std::vector<Node>* children;
+			std::vector<Node const*> children = node.find_all(name);
 
 			// find all with that id
-			while (children = node.find_all(name))
+
+			while (children.size())
 			{
 				// add name so we do not re-do it later
 				addedKeys.emplace(name);
 
 				// create each child
-				for (auto const& child : *children)
+				for (Node const* child : children)
 				{
 					T t;
 					parse_object(*child, t);
@@ -284,24 +285,22 @@ namespace minty
 				// move to next number
 				i++;
 				name = std::to_string(i);
+				children = node.find_all(name);
 			}
 
 			// read everything else, add to end
-			for (auto const& pair : _node.children)
+			for (auto const& child : node.get_children())
 			{
-				if (addedKeys.contains(pair.first))
+				if (addedKeys.contains(child.get_name()))
 				{
 					// already added in ordered code above
 					continue;
 				}
 
 				// get the object
-				for (auto const& childNode : pair.second)
-				{
-					T t;
-					parse_object(childNode, t);
-					value.push_back(t);
-				}
+				T t;
+				parse_object(child, t);
+				value.push_back(t);
 			}
 		}
 

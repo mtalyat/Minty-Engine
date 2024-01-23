@@ -8,15 +8,96 @@
 
 using namespace minty;
 
+minty::Node::Node()
+    : _name()
+    , _data()
+    , _children()
+    , _lookup()
+{}
+
+minty::Node::Node(String const& name, String const& data)
+    : _name(name)
+    , _data(data)
+    , _children()
+    , _lookup()
+{}
+
+String const& minty::Node::get_name() const
+{
+	return _name;
+}
+
+void minty::Node::set_name(String const& name)
+{
+	_name = name;
+}
+
+String const& minty::Node::get_data() const
+{
+	return _data;
+}
+
+void minty::Node::set_data(String const& data)
+{
+	_data = data;
+}
+
+std::vector<Node>& minty::Node::get_children()
+{
+	return _children;
+}
+
+std::vector<Node> const& minty::Node::get_children() const
+{
+	return _children;
+}
+
+bool minty::Node::has_name() const
+{
+    return static_cast<bool>(_name.size());
+}
+
+bool minty::Node::has_data() const
+{
+	return static_cast<bool>(_data.size());
+}
+
+bool minty::Node::has_children() const
+{
+	return static_cast<bool>(_children.size());
+}
+
+void minty::Node::add_child(Node const& node)
+{
+    // get new child node index
+    size_t index = _children.size();
+
+    // add to children
+    _children.push_back(node);
+
+    // add to lookup
+    auto const& found = _lookup.find(node.get_name());
+    if (found == _lookup.end())
+    {
+        // new name
+        _lookup.emplace(node.get_name(), std::vector<size_t> { index });
+    }
+    else
+    {
+        // old name
+        found->second.push_back(index);
+    }
+}
+
 String const& minty::Node::to_string() const
 {
-	return data;
+	return _data;
 }
 
 Byte minty::Node::to_byte(Byte const defaultValue) const
 {
 	Byte out;
-	if (parse::try_byte(data, out))
+	if (parse::try_byte(_data, out))
 	{
 		return out;
 	}
@@ -27,7 +108,7 @@ Byte minty::Node::to_byte(Byte const defaultValue) const
 int minty::Node::to_int(int const defaultValue) const
 {
 	int out;
-	if (parse::try_int(data, out))
+	if (parse::try_int(_data, out))
 	{
 		return out;
 	}
@@ -38,7 +119,7 @@ int minty::Node::to_int(int const defaultValue) const
 ID minty::Node::to_id(ID const defaultValue) const
 {
 	ID out;
-	if (parse::try_id(data, out))
+	if (parse::try_id(_data, out))
 	{
 		return out;
 	}
@@ -49,7 +130,7 @@ ID minty::Node::to_id(ID const defaultValue) const
 unsigned int minty::Node::to_uint(unsigned int const defaultValue) const
 {
 	unsigned int out;
-	if (parse::try_uint(data, out))
+	if (parse::try_uint(_data, out))
 	{
 		return out;
 	}
@@ -60,7 +141,7 @@ unsigned int minty::Node::to_uint(unsigned int const defaultValue) const
 size_t minty::Node::to_size(size_t const defaultValue) const
 {
 	size_t out;
-	if (parse::try_size(data, out))
+	if (parse::try_size(_data, out))
 	{
 		return out;
 	}
@@ -71,7 +152,7 @@ size_t minty::Node::to_size(size_t const defaultValue) const
 float minty::Node::to_float(float const defaultValue) const
 {
 	float out;
-	if (parse::try_float(data, out))
+	if (parse::try_float(_data, out))
 	{
 		return out;
 	}
@@ -82,7 +163,7 @@ float minty::Node::to_float(float const defaultValue) const
 bool minty::Node::to_bool(bool const defaultValue) const
 {
 	bool out;
-	if (parse::try_bool(data, out))
+	if (parse::try_bool(_data, out))
 	{
 		return out;
 	}
@@ -92,11 +173,11 @@ bool minty::Node::to_bool(bool const defaultValue) const
 
 Node* minty::Node::find(String const& name)
 {
-	auto const& found = children.find(name);
+	auto const& found = _lookup.find(name);
 
-	if (found != children.end())
+	if (found != _lookup.end())
 	{
-		return &found->second.front();
+		return &_children.at(found->second.front());
 	}
 
 	return nullptr;
@@ -104,77 +185,185 @@ Node* minty::Node::find(String const& name)
 
 Node const* minty::Node::find(String const& name) const
 {
-	auto const& found = children.find(name);
+	auto const& found = _lookup.find(name);
 
-	if (found != children.end())
+	if (found != _lookup.end())
 	{
-		return &found->second.front();
+		return &_children.at(found->second.front());
 	}
 
 	return nullptr;
 }
 
-std::vector<Node>* minty::Node::find_all(String const& name)
+std::vector<Node const*> minty::Node::find_all(String const& name) const
 {
-	auto const& found = children.find(name);
+	std::vector<Node const*> list;
 
-	if (found != children.end())
+	auto const& found = _lookup.find(name);
+
+	if (found != _lookup.end())
 	{
-		return &found->second;
-	}
+		list.reserve(found->second.size());
 
-	return nullptr;
-}
-
-std::vector<Node> const* minty::Node::find_all(String const& name) const
-{
-	auto const& found = children.find(name);
-
-	if (found != children.end())
-	{
-		return &found->second;
-	}
-
-	return nullptr;
-}
-
-bool minty::Node::has_data() const
-{
-	return static_cast<bool>(data.size());
-}
-
-void minty::Node::print(int const indent) const
-{
-	// do nothing if no children
-	if (!children.size()) return;
-
-	// create indent string before the printed line
-	String indentString(indent, '\t');
-
-	// print children
-	// parent takes care of printing this node's data
-	for (auto const& pair : children)
-	{
-		for (auto const& child : pair.second)
+		for (size_t const index : found->second)
 		{
-			if (child.data.size())
-			{
-				// print data if there is something
-				console::print(std::format("{}{}: {}", indentString, pair.first, child.data));
-			}
-			else
-			{
-				// print normal if no data
-				console::print(std::format("{}{}", indentString, pair.first));
-			}
-
-			// if child has children, print those, recusrively
-			child.print(indent + 1);
+			list.push_back(&_children.at(index));
 		}
 	}
+
+	return list;
+}
+
+Node minty::Node::load_node(Path const& path)
+{
+    std::vector<String> lines = File::read_all_lines(path);
+
+    int indent = 0;
+    String key;
+    String value;
+
+    Node root;
+
+    // if no lines, node is empty
+    if (!lines.size())
+    {
+        return root;
+    }
+
+    // if first line starts with a ": ", then that is the data for the root node
+    if (lines.front().starts_with(": "))
+    {
+        root._data = lines.front().substr(2, lines.front().size() - 2);
+    }
+
+    std::vector<Node*> nodeStack;
+    nodeStack.push_back(&root);
+    Node* node = nodeStack.back();
+
+    int const SPACES_PER_TAB = 4;
+
+    for (String line : lines)
+    {
+        // skip empty/whitespace/comment lines
+        if (line.size() == 0 || line.find_first_not_of(" \t\n\v\f\r") == String::npos || line.front() == '#' || line.front() == ':')
+        {
+            continue;
+        }
+
+        // count number of tabs (indents)
+        int spaces = 0;
+        for (char const c : line)
+        {
+            if (c == ' ' || c == '\t')
+            {
+                spaces++;
+            }
+            else
+            {
+                break;
+            }
+        }
+        int i = spaces / SPACES_PER_TAB;
+
+        int indentChange = i - indent;
+
+        // if new indent is too deep, ignore
+        if (indentChange > 1)
+        {
+            console::warn(std::format("Discarding line, invalid indent change of {}: {}", indentChange, line));
+            continue;
+        }
+
+        // check change in index
+        if (indentChange > 0)
+        {
+            // add last child to node stack
+            nodeStack.push_back(&node->_children.back());
+
+            // start using that as active node
+            node = nodeStack.back();
+
+            // update indent
+            indent = i;
+        }
+        else if (indentChange < 0)
+        {
+            // going down, so pop down X nodes, where X is the difference between indents
+            for (; indentChange < 0; indentChange++)
+            {
+                nodeStack.pop_back();
+            }
+
+            // update node reference
+            node = nodeStack.back();
+
+            // update indent
+            indent = i;
+        }
+
+        // remove indents for parsing
+        if (spaces > 0)
+        {
+            line = line.substr(static_cast<size_t>(spaces), line.size() - spaces);
+        }
+
+        Node newNode;
+
+        if (line.starts_with("- "))
+        {
+            // bullet point, use "" as key and the whole line as the value
+            key = "";
+            value = line.substr(2, line.size() - 2);
+            newNode.set_data(value);
+        }
+        else
+        {
+            // split by colon, if there is one
+            size_t split = line.find_first_of(':');
+
+            if (split == String::npos)
+            {
+                // no split, just key
+                key = line;
+            }
+            else
+            {
+                // split: implies key: value
+                key = line.substr(0, split);
+                value = line.substr(split + 2, line.size() - split - 2); // ignore ": "
+                newNode.set_data(value);
+            }
+        }
+
+        // set newNode name to key
+        newNode.set_name(key);
+
+        // get index of newNode
+        size_t index = node->_children.size();
+
+        // add node to children
+        node->_children.push_back(newNode);
+
+        // add node to lookup
+        // if key name exists, add there, otherwise create new
+        auto found = node->_lookup.find(key);
+        if (found != node->_lookup.end())
+        {
+            // name exists
+            found->second.push_back(index);
+        }
+        else
+        {
+            // name does not exist
+            node->_lookup.emplace(key, std::vector<size_t>{ index });
+        }
+    }
+
+    // root node should contain everything
+    return root;
 }
 
 String minty::to_string(Node const& value)
 {
-	return std::format("Node(data = {}, children size = {})", value.data, value.children.size());
+	return std::format("Node(data = {}, children size = {})", value._data, value._children.size());
 }

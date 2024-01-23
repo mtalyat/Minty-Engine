@@ -45,29 +45,18 @@ void minty::Writer::write(String const& name)
 	write(name, "");
 }
 
-void minty::Writer::write(String const& name, Node const& node)
+void minty::Writer::write(Node const& node)
 {
-	auto const& found = _node.children.find(name);
-
-	if (found != _node.children.end())
-	{
-		// existing key/children list
-		found->second.push_back(node);
-	}
-	else
-	{
-		// new key and children list
-		_node.children.emplace(name, std::vector{ node });
-	}
+	_node.add_child(node);
 }
 
 void minty::Writer::write(String const& name, ISerializable const* const value)
 {
 	// add child object for this object to write
-	write(name, Node());
+	write(Node());
 
 	// create a Writer to use
-	Writer Writer(_node.children.at(name).back(), _data);
+	Writer Writer(_node.get_children().back(), _data);
 
 	// serialize the object into that node
 	value->serialize(Writer);
@@ -75,7 +64,7 @@ void minty::Writer::write(String const& name, ISerializable const* const value)
 
 void minty::Writer::write(String const& name, String const& value)
 {
-	write(name, Node{.data = value });
+	write(Node(name, value));
 }
 
 void minty::Writer::write(String const& name, int const value)

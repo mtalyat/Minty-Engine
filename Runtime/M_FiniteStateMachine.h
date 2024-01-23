@@ -339,7 +339,7 @@ namespace minty
 		/// </summary>
 		/// <param name="id">The ID of the State.</param>
 		/// <returns>The name of the State.</returns>
-		String const& get_state_name(ID const id) const;
+		String get_state_name(ID const id) const;
 
 		/// <summary>
 		/// Finds the State with the given name.

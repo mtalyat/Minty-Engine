@@ -74,8 +74,8 @@ void minty::Runtime::register_builtin()
 {
 	// systems
 	SystemRegistry::register_system<AnimationSystem>("Animation");
-	SystemRegistry::register_system<AnimationSystem>("Audio");
-	SystemRegistry::register_system<AnimationSystem>("Render");
+	SystemRegistry::register_system<AudioSystem>("Audio");
+	SystemRegistry::register_system<RenderSystem>("Render");
 	SystemRegistry::register_system<UISystem>("UI");
 
 	// components

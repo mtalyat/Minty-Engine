@@ -154,10 +154,9 @@ void minty::Dynamic::deserialize(Reader const& reader)
 	// xsy refers to a string at x of y length
 
 	size_t i;
-	String name;
-	for (auto const& childPair : node.children)
+	for (auto const& child : node.get_children())
 	{
-		name = childPair.first;
+		String const& name = child.get_name();
 		if (name.empty() || !std::isdigit(name.front()))
 		{
 			// does not start with byte location, so, ignore
@@ -172,14 +171,14 @@ void minty::Dynamic::deserialize(Reader const& reader)
 			{
 				// byte
 				i = parse::to_size(name);
-				Byte temp = childPair.second.front().to_byte();
+				Byte temp = child.to_byte();
 				memcpy(&data[i], &temp, sizeof(Byte));
 			}
 			else
 			{
 				// string
 				size_t stringSize = parse::to_size(name.substr(sIndex + 1, name.length() - 1 - sIndex));
-				String temp = childPair.second.front().to_string();
+				String temp = child.to_string();
 				memcpy(&data[i], temp.data(), sizeof(char) * stringSize);
 				data[i + stringSize - 1] = '\0';
 			}
@@ -188,26 +187,26 @@ void minty::Dynamic::deserialize(Reader const& reader)
 		{
 			// unsigned int
 			i = parse::to_size(name.substr(0, name.size() - 2));
-			unsigned int temp = childPair.second.front().to_uint();
+			unsigned int temp = child.to_uint();
 			memcpy(&data[i], &temp, sizeof(unsigned int));
 		}
 		else if (name.ends_with("i"))
 		{
 			// int
 			i = parse::to_size(name.substr(0, name.size() - 1));
-			int temp = childPair.second.front().to_int();
+			int temp = child.to_int();
 			memcpy(&data[i], &temp, sizeof(int));
 		}
 		else if (name.ends_with("f"))
 		{
 			// float
 			i = parse::to_size(name.substr(0, name.size() - 1));
-			float temp = childPair.second.front().to_float();
+			float temp = child.to_float();
 			memcpy(&data[i], &temp, sizeof(float));
 		}
 		else
 		{
-
+			console::todo(std::format("Dynamic::deserialize(): unknown token: {}.", name));
 		}
 	}
 

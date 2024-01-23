@@ -199,14 +199,17 @@ namespace minty
 	void SystemRegistry::deserialize(Reader const& reader)
 	{
 		// read each one and set as we go, by name
-		Node const& node = reader.get_node();
-
-		for (auto const& pair : node.children)
+		for (auto const& child : reader.get_node().get_children())
 		{
-			for (auto const& child : pair.second)
-			{
-				emplace_by_name(pair.first, child.to_int());
-			}			
+			console::test(std::format("Loading {} from node:", child.get_name()));
+			console::print(child);
+
+			// create the system
+			System* system = emplace_by_name(child.get_name(), child.to_int());
+
+			// deserialize the system
+			Reader systemReader(child, reader.get_data());
+			system->deserialize(systemReader);
 		}
 	}
 

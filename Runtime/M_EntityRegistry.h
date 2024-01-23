@@ -60,7 +60,7 @@ namespace minty
 		/// </summary>
 		/// <param name="string"></param>
 		/// <returns>The Entity, if found, otherwise NULL_ENTITY.</returns>
-		Entity find_by_name(String const& string) const;
+		Entity find(String const& string) const;
 
 		/// <summary>
 		/// Finds the first Entity with the given Component type.
@@ -68,7 +68,7 @@ namespace minty
 		/// <typeparam name="T">The type of component.</typeparam>
 		/// <returns>The Entity, if found, otherwise NULL_ENTITY.</returns>
 		template<class T>
-		Entity find_by_type() const;
+		Entity find() const;
 
 		/// <summary>
 		/// Gets the name of the Entity, or an empty string if no name exists.
@@ -145,7 +145,7 @@ namespace minty
 	};
 
 	template<class T>
-	inline Entity EntityRegistry::find_by_type() const
+	inline Entity EntityRegistry::find() const
 	{
 		// iterate through view
 		for (auto [entity, t] : this->view<T const>().each())

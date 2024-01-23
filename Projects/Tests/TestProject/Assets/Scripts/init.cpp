@@ -114,7 +114,7 @@ int init(Runtime &runtime)
                 .entity = NULL_ENTITY};
             Writer writer(node, &data);
             scene.serialize(writer);
-            node.print();
+            minty::console::print(node);
         }
 
         //          audio
@@ -128,9 +128,9 @@ int init(Runtime &runtime)
 
         //          input
         input.emplace_key_down(Key::E, [audioPtr, erPtr](KeyPressEventArgs const &args)
-                               { audioPtr->play_spatial("ding", erPtr->find_by_name("Model")); });
+                               { audioPtr->play_spatial("ding", erPtr->find("Model")); });
         input.emplace_key_up(Key::E, [audioPtr, erPtr](KeyPressEventArgs const &args)
-                             { audioPtr->play_spatial("dong", erPtr->find_by_name("Model")); });
+                             { audioPtr->play_spatial("dong", erPtr->find("Model")); });
 
         // quit on key close
         input.emplace_key_down(Key::Escape, [windowPtr](KeyPressEventArgs const &args)

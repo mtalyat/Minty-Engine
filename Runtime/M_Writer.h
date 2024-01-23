@@ -72,7 +72,7 @@ namespace minty
 
 		void write(String const& name);
 
-		void write(String const& name, Node const& node);
+		void write(Node const& node);
 
 		void write(String const& name, ISerializable const* const value);
 
@@ -115,7 +115,7 @@ namespace minty
 				return;
 			}
 
-			Node node;
+			Node node(name);
 			Writer writer(node);
 
 			if (ordered)
@@ -137,7 +137,7 @@ namespace minty
 				}
 			}
 
-			write(name, node);
+			write(node);
 		}
 
 		template<typename T>

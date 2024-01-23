@@ -369,40 +369,35 @@ ID minty::RenderSystem::load_shader(Path const& path, String const& name)
 	ShaderBuilder builder;
 	builder.name = path.stem().string();
 
-	std::vector<Node> const* nodes;
-	if (nodes = meta.find_all("push"))
+	std::vector<Node const*> nodes = meta.find_all("push");
+	for (Node const* child : nodes)
 	{
-		for (Node const& child : *nodes)
-		{
-			PushConstantInfo pushConstantInfo;
-			Reader reader(child);
+		PushConstantInfo pushConstantInfo;
+		Reader reader(*child);
 
-			pushConstantInfo.name = reader.read_string("name", child.to_string());
-			pushConstantInfo.stageFlags = from_string_vk_shader_stage_flag_bits(reader.read_string("stageFlags"));
-			pushConstantInfo.offset = reader.read_uint("offset");
-			pushConstantInfo.size = reader.read_uint("size");
+		pushConstantInfo.name = reader.read_string("name", reader.to_string());
+		pushConstantInfo.stageFlags = from_string_vk_shader_stage_flag_bits(reader.read_string("stageFlags"));
+		pushConstantInfo.offset = reader.read_uint("offset");
+		pushConstantInfo.size = reader.read_uint("size");
 
-			builder.pushConstantInfos.emplace(pushConstantInfo.name, pushConstantInfo);
-		}
+		builder.pushConstantInfos.emplace(pushConstantInfo.name, pushConstantInfo);
 	}
 
-	if (nodes = meta.find_all("uniform"))
+	nodes = meta.find_all("uniform");
+	for (Node const* child : nodes)
 	{
-		for (Node const& child : *nodes)
-		{
-			UniformConstantInfo uniformConstantInfo;
-			Reader reader(child);
+		UniformConstantInfo uniformConstantInfo;
+		Reader reader(*child);
 
-			uniformConstantInfo.name = reader.read_string("name", child.to_string());
-			uniformConstantInfo.type = from_string_vk_descriptor_type(reader.read_string("type"));
-			uniformConstantInfo.set = reader.read_uint("set");
-			uniformConstantInfo.binding = reader.read_uint("binding");
-			uniformConstantInfo.count = reader.read_uint("count", 1u);
-			uniformConstantInfo.size = static_cast<VkDeviceSize>(reader.read_size("size"));
-			uniformConstantInfo.stageFlags = from_string_vk_shader_stage_flag_bits(reader.read_string("stageFlags"));
+		uniformConstantInfo.name = reader.read_string("name", reader.to_string());
+		uniformConstantInfo.type = from_string_vk_descriptor_type(reader.read_string("type"));
+		uniformConstantInfo.set = reader.read_uint("set");
+		uniformConstantInfo.binding = reader.read_uint("binding");
+		uniformConstantInfo.count = reader.read_uint("count", 1u);
+		uniformConstantInfo.size = static_cast<VkDeviceSize>(reader.read_size("size"));
+		uniformConstantInfo.stageFlags = from_string_vk_shader_stage_flag_bits(reader.read_string("stageFlags"));
 
-			builder.uniformConstantInfos.emplace(uniformConstantInfo.name, uniformConstantInfo);
-		}
+		builder.uniformConstantInfos.emplace(uniformConstantInfo.name, uniformConstantInfo);
 	}
 
 	return create_shader(builder);
@@ -432,50 +427,43 @@ ID minty::RenderSystem::load_shader_pass(Path const& path, String const& name)
 	builder.frontFace = from_string_vk_front_face(reader.read_string("frontFace"));
 	builder.lineWidth = reader.read_float("lineWidth", 1.0f);
 
-	std::vector<Node> const* nodes;
-	if (nodes = meta.find_all("binding"))
+	std::vector<Node const*> nodes = meta.find_all("binding");
+	for (auto const* child : nodes)
 	{
-		for (auto const& child : *nodes)
-		{
-			VkVertexInputBindingDescription binding = {};
-			Reader childReader(child);
+		VkVertexInputBindingDescription binding = {};
+		Reader childReader(*child);
 
-			binding.binding = childReader.read_uint("binding", child.to_uint());
-			binding.stride = childReader.read_uint("stride");
-			binding.inputRate = from_string_vk_vertex_input_rate(childReader.read_string("inputRate"));
+		binding.binding = childReader.read_uint("binding", reader.to_uint());
+		binding.stride = childReader.read_uint("stride");
+		binding.inputRate = from_string_vk_vertex_input_rate(childReader.read_string("inputRate"));
 
-			builder.vertexBindings.push_back(binding);
-		}
+		builder.vertexBindings.push_back(binding);
 	}
-	if (nodes = meta.find_all("attribute"))
+	nodes = meta.find_all("attribute");
+	for (auto const* child : nodes)
 	{
-		for (auto const& child : *nodes)
-		{
-			VkVertexInputAttributeDescription attribute = {};
-			Reader childReader(child);
+		VkVertexInputAttributeDescription attribute = {};
+		Reader childReader(*child);
 
-			attribute.location = childReader.read_uint("location", child.to_uint());
-			attribute.binding = childReader.read_uint("binding");
-			attribute.format = from_string_vk_format(childReader.read_string("format"));
-			attribute.offset = childReader.read_uint("offset");
+		attribute.location = childReader.read_uint("location", reader.to_uint());
+		attribute.binding = childReader.read_uint("binding");
+		attribute.format = from_string_vk_format(childReader.read_string("format"));
+		attribute.offset = childReader.read_uint("offset");
 
-			builder.vertexAttributes.push_back(attribute);
-		}
+		builder.vertexAttributes.push_back(attribute);
 	}
-	if (nodes = meta.find_all("stage"))
+	nodes = meta.find_all("stage");
+	for (auto const* child : nodes)
 	{
-		for (auto const& child : *nodes)
-		{
-			ShaderPassBuilder::ShaderStageInfo info;
-			Reader childReader(child);
+		ShaderPassBuilder::ShaderStageInfo info;
+		Reader childReader(*child);
 
-			info.stage = from_string_vk_shader_stage_flag_bits(childReader.read_string("stage", child.to_string()));
-			String path = childReader.read_string("path");
-			info.code = Asset::load_chars(path);
-			info.entry = childReader.read_string("entry", "main");
+		info.stage = from_string_vk_shader_stage_flag_bits(childReader.read_string("stage", reader.to_string()));
+		String path = childReader.read_string("path");
+		info.code = Asset::load_chars(path);
+		info.entry = childReader.read_string("entry", "main");
 
-			builder.stages.push_back(info);
-		}
+		builder.stages.push_back(info);
 	}
 
 	return create_shader_pass(builder);
@@ -498,14 +486,12 @@ ID minty::RenderSystem::load_material_template(Path const& path, String const& n
 	MaterialTemplateBuilder builder;
 	builder.name = path.stem().string();
 
-	std::vector<Node> const* nodes;
-	if (nodes = meta.find_all("pass"))
+	std::vector<Node const*> nodes = meta.find_all("pass");
+	for (auto const* child : nodes)
 	{
-		for (auto const& child : *nodes)
-		{
-			builder.shaderPassIds.push_back(find_shader_pass(child.to_string()));
-		}
+		builder.shaderPassIds.push_back(find_shader_pass(child->to_string()));
 	}
+
 	if (Node const* node = meta.find("defaults"))
 	{
 		// get shader uniform constant values so we know how to interpret the values in the materials
@@ -804,31 +790,24 @@ void minty::RenderSystem::load_descriptor_values(std::unordered_map<String, Dyna
 	for (auto const& info : infos)
 	{
 		// if the name exists in the node, interpret the values from the node
-		auto const& found = node.children.find(info.name);
-		if (found == node.children.end())
+		auto const* child = node.find(info.name);
+		if (!child)
 		{
 			// not found in values, so skip it
 			continue;
 		}
-#ifdef MINTY_DEBUG
-		if (found->second.size() > 1)
-		{
-			console::warn(std::format("Duplicate descriptors named \"{}\" found. Only the first one is being used.", info.name));
-		}
-#endif
-		Node const& child = found->second.front();
 
 		switch (info.type)
 		{
 		case VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER:
 		{
 			// create list of ids from given texture names
-			size_t size = child.children.size();
+			size_t size = child->get_children().size();
 			ID* ids = new ID[size];
 			for (size_t i = 0; i < size; i++)
 			{
 				// if child with the index name exists, use that
-				if (Node const* c = child.find(std::to_string(i)))
+				if (Node const* c = child->find(std::to_string(i)))
 				{
 					// should be a texture name, so load that into ids
 					ids[i] = find_texture(c->to_string());
@@ -842,7 +821,7 @@ void minty::RenderSystem::load_descriptor_values(std::unordered_map<String, Dyna
 			}
 
 			// add to values
-			values.emplace(found->first, Dynamic(ids, sizeof(ID) * size));
+			values.emplace(child->get_name(), Dynamic(ids, sizeof(ID) * size));
 			// done with original ids array
 			delete[] ids;
 
@@ -852,9 +831,9 @@ void minty::RenderSystem::load_descriptor_values(std::unordered_map<String, Dyna
 		{
 			// read raw data from files directly into the dynamic, for now
 			Dynamic d;
-			Reader reader(child);
+			Reader reader(*child);
 			d.deserialize(reader);
-			values.emplace(found->first, d);
+			values.emplace(child->get_name(), d);
 			break;
 		}
 		}
@@ -1017,35 +996,31 @@ void minty::RenderSystem::deserialize(Reader const& reader)
 			}
 			else
 			{
-				// create specific sprites
-				if (auto const* sprites = spritesNode->find_all("sprite"))
+				// create sprites at specific X Y coordinates
+				std::vector<Node const*> nodes = spritesNode->find_all("sprite");
+				for (Node const* n : nodes)
 				{
-					// create sprites at specific X Y coordinates
-					for (Node const& n : *sprites)
-					{
-						Reader nReader(n, reader.get_data());
-						int x = nReader.read_int("x");
-						int y = nReader.read_int("y");
-						Vector2 pivot;
-						nReader.read_object("pivot", pivot, Vector2::half());
-						CoordinateMode coordinateMode = from_string_pixel_coordinate_mode(nReader.read_string("coordinateMode"));
+					Reader nReader(*n, reader.get_data());
+					int x = nReader.read_int("x");
+					int y = nReader.read_int("y");
+					Vector2 pivot;
+					nReader.read_object("pivot", pivot, Vector2::half());
+					CoordinateMode coordinateMode = from_string_pixel_coordinate_mode(nReader.read_string("coordinateMode"));
 
-						atlas.create_sprite(x, y, pivot, coordinateMode);
-					}
+					atlas.create_sprite(x, y, pivot, coordinateMode);
 				}
-				if (auto const* slices = spritesNode->find_all("slice"))
-				{
-					// create slices at specific locations
-					for (Node const& n : *slices)
-					{
-						Reader nReader(n, reader.get_data());
-						Vector2 minCoords, maxCoords;
-						nReader.read_object("min", minCoords, Vector2::zero());
-						nReader.read_object("max", maxCoords, Vector2::one());
-						CoordinateMode coordinateMode = from_string_pixel_coordinate_mode(nReader.read_string("coordinateMode"));
 
-						atlas.slice_sprite(minCoords, maxCoords, coordinateMode);
-					}
+				// create slices at specific offsets
+				nodes = spritesNode->find_all("slice");
+				for (Node const* n : nodes)
+				{
+					Reader nReader(*n, reader.get_data());
+					Vector2 minCoords, maxCoords;
+					nReader.read_object("min", minCoords, Vector2::zero());
+					nReader.read_object("max", maxCoords, Vector2::one());
+					CoordinateMode coordinateMode = from_string_pixel_coordinate_mode(nReader.read_string("coordinateMode"));
+
+					atlas.slice_sprite(minCoords, maxCoords, coordinateMode);
 				}
 			}
 		}

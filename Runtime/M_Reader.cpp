@@ -52,7 +52,7 @@ void minty::Reader::read_serializable(String const& name, ISerializable* const v
 
 String minty::Reader::to_string(String const& defaultValue) const
 {
-	return _node.data;
+	return _node.to_string();
 }
 
 String minty::Reader::read_string(String const& name, String const& defaultValue) const

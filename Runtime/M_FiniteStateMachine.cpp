@@ -106,9 +106,9 @@ void minty::FSM::Scope::deserialize(Reader const& reader)
 
 	// read all parts of the node as the variables
 	Node const& node = reader.get_node();
-	for (auto const& pair : node.children)
+	for (auto const& child : node.get_children())
 	{
-		emplace(pair.first, pair.second.front().to_int());
+		emplace(child.get_name(), child.to_int());
 	}
 }
 
@@ -222,7 +222,7 @@ void minty::FSM::Transition::serialize(Writer& writer) const
 
 	writer.write("state", fsm->get_state_name(_stateId));
 
-	Node condNode;
+	Node condNode("conditions");
 	Writer condWriter(condNode);
 
 	for (auto const& condition : _conditions)
@@ -230,7 +230,7 @@ void minty::FSM::Transition::serialize(Writer& writer) const
 		condWriter.write("", condition.to_pretty_string(*fsm));
 	}
 
-	writer.write("conditions", condNode);
+	writer.write(condNode);
 }
 
 void minty::FSM::Transition::deserialize(Reader const& reader)
@@ -242,15 +242,13 @@ void minty::FSM::Transition::deserialize(Reader const& reader)
 	Node const& node = reader.get_node();
 	if (auto const* conditions = node.find("conditions"))
 	{
-		if (auto const* list = conditions->find_all(""))
+		std::vector<Node const*> list = conditions->find_all("");
+		for (Node const* node : list)
 		{
-			for (Node const& node : *list)
-			{
-				Reader condReader(node);
-				Condition cond;
-				cond.deserialize(condReader);
-				emplace_condition(cond);
-			}
+			Reader condReader(*node, this);
+			Condition cond;
+			cond.deserialize(condReader);
+			emplace_condition(cond);
 		}
 	}
 }
@@ -332,7 +330,7 @@ FSM::State const& minty::FSM::get_state(ID const id) const
 	return _states.at(id);
 }
 
-String const& minty::FSM::get_state_name(ID const id) const
+String minty::FSM::get_state_name(ID const id) const
 {
 	return _states.get_name(id);
 }

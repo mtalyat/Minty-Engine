@@ -1,19 +1,4 @@
 systems
-    CameraController
-    Move
-    Test
-    Animation
-        animations
-            - Animations/idle.minty
-            - Animations/moving.minty
-        animators
-            - Animations/animator.minty
-    Audio
-        clips
-            - Audio/blinking-forest.wav
-            - Audio/cow-bells.wav
-            - Audio/ding.wav
-            - Audio/dong.wav
     Render
         textures
             - Textures/oak_planks.png
@@ -51,6 +36,21 @@ systems
                     y: 45
                 sprites
                     all
+    Audio
+        clips
+            - Audio/blinking-forest.wav
+            - Audio/cow-bells.wav
+            - Audio/ding.wav
+            - Audio/dong.wav
+    Animation
+        animations
+            - Animations/idle.minty
+            - Animations/moving.minty
+        animators
+            - Animations/animator.minty
+    CameraController
+    Move
+    Test
 entities
     Camera
         Transform

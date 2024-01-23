@@ -485,7 +485,7 @@ namespace minty
 		writer.write("capacity", _capacity, MAX_ID);
 
 		// write named and unnamed values
-		Node valuesNode;
+		Node valuesNode("data");
 		Writer valuesWriter(valuesNode);
 
 		for (auto const& pair : _data)
@@ -502,7 +502,7 @@ namespace minty
 			}
 		}
 
-		writer.write("data", valuesNode);
+		writer.write(valuesNode);
 	}
 	
 	template<class T>
@@ -521,25 +521,22 @@ namespace minty
 			T t;
 
 			// get unnamed
-			if (auto const* unnamedList = valuesNode->find_all(""))
+			std::vector<Node const*> unnamedList = valuesNode->find_all("");
+			for (auto const& child : unnamedList)
 			{
-				for (auto const& unnamedNode : *unnamedList)
-				{
-					Reader reader(unnamedNode);
-					reader.to_object(t);
-					emplace(t);
-				}
+				Reader reader(*child);
+				reader.to_object(t);
+				emplace(t);
 			}
 
 			// get named
-			for (auto const& pair : valuesNode->children)
+			for (auto const& child : valuesNode->get_children())
 			{
-				if (pair.first == "") continue; // skip unnamed
+				if (child.get_name() == "") continue; // skip unnamed
 
-				Node const& namedNode = pair.second.front();
-				Reader reader(namedNode);
+				Reader reader(child);
 				reader.to_object(t);
-				emplace(pair.first, t);
+				emplace(child.get_name(), t);
 			}
 		}
 	}
