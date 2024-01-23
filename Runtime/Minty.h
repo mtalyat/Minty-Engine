@@ -20,11 +20,14 @@ access to the entire engine without needing include each file.
 #include "M_AnimationSystem.h"
 #include "M_Animator.h"
 #include "M_AnimatorBuilder.h"
+#include "M_AnimatorComponent.h"
 
 // AUDIO
 #include "M_Audio.h"
 #include "M_AudioClip.h"
 #include "M_AudioEngine.h"
+#include "M_AudioListenerComponent.h"
+#include "M_AudioSourceComponent.h"
 #include "M_AudioSystem.h"
 
 // BUILTIN
@@ -33,15 +36,11 @@ access to the entire engine without needing include each file.
 // COMPONENTS
 #include "M_Component.h"
 
-#include "M_AudioListenerComponent.h"
-#include "M_AudioSourceComponent.h"
 #include "M_CameraComponent.h"
 #include "M_DirtyComponent.h"
 #include "M_MeshComponent.h"
 #include "M_NameComponent.h"
 #include "M_RelationshipComponent.h"
-#include "M_RenderableComponent.h"
-#include "M_SpriteComponent.h"
 #include "M_TransformComponent.h"
 #include "M_UITransformComponent.h"
 
@@ -69,6 +68,7 @@ access to the entire engine without needing include each file.
 #include "M_Material.h"
 #include "M_MaterialTemplate.h"
 #include "M_Mesh.h"
+#include "M_RenderableComponent.h"
 #include "M_RenderEngine.h"
 #include "M_Rendering_Buffer.h"
 #include "M_Rendering_DescriptorSet.h"
@@ -88,6 +88,7 @@ access to the entire engine without needing include each file.
 #include "M_Shader.h"
 #include "M_ShaderPass.h"
 #include "M_Sprite.h"
+#include "M_SpriteComponent.h"
 #include "M_Texture.h"
 #include "M_TextureAtlas.h"
 
