@@ -50,8 +50,7 @@ systems
 entities
     Camera
         Transform
-            position
-                z: -4
+            position: (0, 0, -4)
         Camera
             perspective: 1
             near: 0.1
@@ -61,18 +60,20 @@ entities
     Sprite
         Renderable
         Transform
+            position: (0, 0, -2)
         Sprite
-            sprite: x
+            sprite: brian
 #        Animator
 #            entity: Sprite
-#    Model
-#        Renderable
-#        Transform
-#        Mesh
-#            material: material1
-#            type: cube
-#        AudioSource
-#            clip: cow-bells
+    Model
+        Renderable
+        Transform
+            position: (0, 0, 0)
+        Mesh
+            material: material1
+            type: cube
+        AudioSource
+            clip: cow-bells
 #    Sprite
 #        Renderable
 #        Transform

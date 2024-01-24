@@ -12,7 +12,7 @@ void minty::SpriteComponent::serialize(Writer& writer) const
 	RenderSystem const* renderSystem = data->scene->get_system_registry().find<RenderSystem>();
 
 	writer.write("sprite", renderSystem->get_sprite_name(spriteId));
-	writer.write_object("size", size, Vector2(1.0f, 1.0f));
+	writer.write("size", size, Vector2(1.0f, 1.0f));
 	writer.write("order", order, 0);
 }
 

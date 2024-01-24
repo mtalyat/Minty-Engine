@@ -207,9 +207,6 @@ namespace minty
 		// read each one and set as we go, by name
 		for (auto const& child : reader.get_node().get_children())
 		{
-			console::test(std::format("Loading {} from node:", child.get_name()));
-			console::print(child);
-
 			// create the system
 			System* system = emplace_by_name(child.get_name(), child.to_int());
 

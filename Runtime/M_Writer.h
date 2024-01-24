@@ -75,36 +75,42 @@ namespace minty
 
 		void write(Node const& node);
 
-		void write(String const& name, ISerializable const* const value);
-
-		void write(String const& name, String const& value);
-
-		void write(String const& name, int const value);
-
-		void write(String const& name, unsigned int const value);
-
-		void write(String const& name, float const value);
-
-		void write(String const& name, Byte const value);
-
-		void write(String const& name, size_t const value);
-
-		void write(String const& name, bool const value);
+		void write(String const& name, ISerializable const& value);
 
 		template<typename T>
-		void write_object(String const& name, T const& value)
+		void write(String const& name, T const* value)
 		{
-			if (Object const* obj = try_cast<T, Object>(&value))
+			// write nothing if null
+			if (!value)
 			{
-				// write as a serializable
-				write(name, obj);
+				write(Node(name));
+			}
+			else if (ISerializable const* serializable = try_cast<T, ISerializable const>(value))
+			{
+				write(name, *serializable);
 			}
 			else
 			{
-				// write as direct value
+				// regular
+				std::ostringstream stream;
+				stream << *value;
+				write(Node(name, stream.str()));
+			}
+		}
+
+		template<typename T>
+		void write(String const& name, T const& value)
+		{
+			if (ISerializable const* serializable = try_cast<T, ISerializable const>(&value))
+			{
+				write(name, *serializable);
+			}
+			else
+			{
+				// regular
 				std::ostringstream stream;
 				stream << value;
-				write(name, stream.str());
+				write(Node(name, stream.str()));
 			}
 		}
 
@@ -125,7 +131,7 @@ namespace minty
 				size_t i = 0;
 				for (auto const& v : value)
 				{
-					writer.write_object(std::to_string(i), v);
+					writer.write(std::to_string(i), v);
 					i++;
 				}
 			}
@@ -134,7 +140,7 @@ namespace minty
 				// unordered
 				for (auto const& v : value)
 				{
-					writer.write_object(BLANK, v);
+					writer.write(BLANK, v);
 				}
 			}
 
@@ -154,7 +160,7 @@ namespace minty
 
 			for (auto const& v : value)
 			{
-				writer.write_object(BLANK, v);
+				writer.write(BLANK, v);
 			}
 
 			write(name, node);
@@ -173,7 +179,7 @@ namespace minty
 
 			for (auto const& v : value)
 			{
-				writer.write_object(BLANK, v);
+				writer.write(BLANK, v);
 			}
 
 			write(name, node);
@@ -194,7 +200,7 @@ namespace minty
 			{
 				std::stringstream stream;
 				stream << pair.first;
-				writer.write_object(stream.str(), pair.second);
+				writer.write(stream.str(), pair.second);
 			}
 
 			write(name, node);
@@ -215,7 +221,7 @@ namespace minty
 			{
 				std::stringstream stream;
 				stream << pair.first;
-				writer.write_object(stream.str(), pair.second);
+				writer.write(stream.str(), pair.second);
 			}
 
 			write(name, node);
@@ -226,7 +232,7 @@ namespace minty
 		{
 			for (auto const& pair : value)
 			{
-				write_object(value.get_name(pair.first), pair.second);
+				write(value.get_name(pair.first), pair.second);
 			}
 		}
 
@@ -234,26 +240,21 @@ namespace minty
 
 #pragma region Default Writing
 
-		void write(String const& name, String const& value, String const& defaultValue);
-
-		void write(String const& name, int const value, int const defaultValue);
-
-		void write(String const& name, unsigned int const value, unsigned int const defaultValue);
-
-		void write(String const& name, float const value, float const defaultValue);
-
-		void write(String const& name, Byte const value, Byte const defaultValue);
-
-		void write(String const& name, size_t const value, size_t const defaultValue);
-
-		void write(String const& name, bool const value, bool const defaultValue);
-
 		template<typename T>
-		void write_object(String const& name, T const& value, T const& defaultValue)
+		void write(String const& name, T const& value, T const& defaultValue)
 		{
 			if (value != defaultValue)
 			{
-				write_object(name, value);
+				write(name, value);
+			}
+		}
+
+		template<typename T, typename U>
+		void write(String const& name, T const& value, U const& defaultValue)
+		{
+			if (value != defaultValue)
+			{
+				write(name, value);
 			}
 		}
 

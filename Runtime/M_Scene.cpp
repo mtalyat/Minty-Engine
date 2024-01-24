@@ -193,8 +193,8 @@ void minty::Scene::finalize()
 
 void minty::Scene::serialize(Writer& writer) const
 {
-	writer.write("systems", _systems);
-	writer.write("entities", _entities);
+	writer.write("systems", *_systems);
+	writer.write("entities", *_entities);
 }
 
 void minty::Scene::deserialize(Reader const& reader)

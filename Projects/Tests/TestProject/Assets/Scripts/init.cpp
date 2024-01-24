@@ -117,7 +117,7 @@ int init(Runtime &runtime)
                 .scene = &scene,
                 .entity = NULL_ENTITY};
             Writer writer(node, &data);
-            writer.write_object("Scene", scene);
+            writer.write("Scene", scene);
             minty::console::print(node);
         }
 

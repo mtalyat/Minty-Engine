@@ -40,7 +40,7 @@ namespace minty
 	template<typename DerivedClass, typename BaseClass>
 	bool is_type()
 	{
-		return static_cast<bool>(std::is_base_of<BaseClass, DerivedClass>::value);
+		return std::is_base_of<BaseClass, DerivedClass>::value;
 	}
 
 	template<typename Old, typename New>

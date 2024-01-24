@@ -19,8 +19,8 @@ namespace minty
 	public:
 		enum class Perspective : Byte
 		{
-			Orthographic,
 			Perspective,
+			Orthographic,
 		};
 
 		/// <summary>

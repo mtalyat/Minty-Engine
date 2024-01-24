@@ -245,8 +245,6 @@ void minty::EntityRegistry::deserialize(Reader const& reader)
 		// cycle through each component on entity
 		for (auto const& compNode : entityNode.get_children())
 		{
-			console::test(std::format("{}: {}", entityNode.get_name(), compNode.get_name()));
-
 			// cannot have multiple of same component
 			if (get_by_name(compNode.get_name(), entity))
 			{

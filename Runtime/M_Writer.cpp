@@ -42,7 +42,7 @@ bool minty::Writer::exists(String const& name) const
 
 void minty::Writer::write(String const& name)
 {
-	write(name, "");
+	write(Node(name));
 }
 
 void minty::Writer::write(Node const& node)
@@ -50,7 +50,7 @@ void minty::Writer::write(Node const& node)
 	_node.add_child(node);
 }
 
-void minty::Writer::write(String const& name, ISerializable const* const value)
+void minty::Writer::write(String const& name, ISerializable const& value)
 {
 	// add child object for this object to write
 	write(Node(name));
@@ -59,99 +59,7 @@ void minty::Writer::write(String const& name, ISerializable const* const value)
 	Writer Writer(_node.get_children().back(), _data);
 
 	// serialize the object into that node
-	value->serialize(Writer);
-}
-
-void minty::Writer::write(String const& name, String const& value)
-{
-	write(Node(name, value));
-}
-
-void minty::Writer::write(String const& name, int const value)
-{
-	write(name, std::to_string(value));
-}
-
-void minty::Writer::write(String const& name, unsigned int const value)
-{
-	write(name, std::to_string(value));
-}
-
-void minty::Writer::write(String const& name, float const value)
-{
-	write(name, std::to_string(value));
-}
-
-void minty::Writer::write(String const& name, Byte const value)
-{
-	write(name, std::to_string(value));
-}
-
-void minty::Writer::write(String const& name, size_t const value)
-{
-	write(name, std::to_string(value));
-}
-
-void minty::Writer::write(String const& name, bool const value)
-{
-	write(name, std::to_string(value));
-}
-
-void minty::Writer::write(String const& name, String const& value, String const& defaultValue)
-{
-	if (value.compare(defaultValue))
-	{
-		// not default value
-		write(name, value);
-	}
-}
-
-void minty::Writer::write(String const& name, int const value, int const defaultValue)
-{
-	if (value != defaultValue)
-	{
-		write(name, value);
-	}
-}
-
-void minty::Writer::write(String const& name, unsigned int const value, unsigned int const defaultValue)
-{
-	if (value != defaultValue)
-	{
-		write(name, value);
-	}
-}
-
-void minty::Writer::write(String const& name, float const value, float const defaultValue)
-{
-	if (value != defaultValue)
-	{
-		write(name, value);
-	}
-}
-
-void minty::Writer::write(String const& name, Byte const value, Byte const defaultValue)
-{
-	if (value != defaultValue)
-	{
-		write(name, value);
-	}
-}
-
-void minty::Writer::write(String const& name, size_t const value, size_t const defaultValue)
-{
-	if (value != defaultValue)
-	{
-		write(name, value);
-	}
-}
-
-void minty::Writer::write(String const& name, bool const value, bool const defaultValue)
-{
-	if (value != defaultValue)
-	{
-		write(name, value);
-	}
+	value.serialize(Writer);
 }
 
 String minty::to_string(Writer const& value)

@@ -295,7 +295,7 @@ ID minty::FSM::State::evaluate(Scope const& scope) const
 
 void minty::FSM::State::serialize(Writer& writer) const
 {
-	writer.write_object("value", _value);
+	writer.write("value", _value);
 	writer.write("transitions", _transitions);
 }
 
@@ -467,7 +467,7 @@ void minty::FSM::serialize(Writer& writer) const
 	// swap data
 	Writer fsmWriter(writer.get_node(), this);
 
-	fsmWriter.write_object("scope", _scope);
+	fsmWriter.write("scope", _scope);
 	fsmWriter.write("states", _states);
 	fsmWriter.write("start", _states.get_name(_startingStateId));
 }
