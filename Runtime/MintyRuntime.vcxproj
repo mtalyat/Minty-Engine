@@ -217,7 +217,6 @@
     <ClInclude Include="miniaudio.h" />
     <ClInclude Include="M_Animation.h" />
     <ClInclude Include="M_AnimationBuilder.h" />
-    <ClInclude Include="M_AnimationObject.h" />
     <ClInclude Include="M_AnimationSystem.h" />
     <ClInclude Include="M_Animator.h" />
     <ClInclude Include="M_AnimatorBuilder.h" />
@@ -371,7 +370,6 @@
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="dr_impl.cpp" />
     <ClCompile Include="M_Animation.cpp" />
-    <ClCompile Include="M_AnimationObject.cpp" />
     <ClCompile Include="M_AnimationSystem.cpp" />
     <ClCompile Include="M_Animator.cpp" />
     <ClCompile Include="M_AnimatorComponent.cpp" />
