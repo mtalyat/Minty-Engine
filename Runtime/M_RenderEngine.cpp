@@ -1037,6 +1037,8 @@ void minty::RenderEngine::draw_sprite(VkCommandBuffer commandBuffer, TransformCo
 		.size = spriteComponent.size,
 	};
 
+	console::test(std::format("{}", sizeof(minty::Matrix4) + sizeof(minty::Vector2) * 4));
+
 	// push data to shader
 	Shader& shader = _renderSystem->get_shader_from_material_id(sprite.get_material_id());
 	shader.update_push_constant(commandBuffer, &pushData, sizeof(SpritePushData));

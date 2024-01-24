@@ -1,120 +1,45 @@
 #pragma once
 
-#include "M_Object.h"
-#include "M_Types.h"
+#include "M_Base.h"
 #include "glm.hpp"
 
 namespace minty
 {
-	struct Vector2
-		: public glm::vec2, public Object
-	{
-		using glm::vec2::vec;
-		Vector2(glm::vec2 const& vec);
+	typedef glm::vec2 Vector2;
+	String to_string(Vector2 const& value);
+	Vector2 from_string_vector2(String const& value);
+	std::istream& operator>>(std::istream& stream, Vector2& vector);
+	std::ostream& operator<<(std::ostream& stream, const Vector2& vector);
 
-		void serialize(Writer& writer) const override;
-		void deserialize(Reader const& reader) override;
+	typedef glm::vec3 Vector3;
+	std::istream& operator>>(std::istream& stream, Vector3& vector);
+	std::ostream& operator<<(std::ostream& stream, const Vector3& vector);
+	String to_string(Vector3 const& value);
+	Vector3 from_string_vector3(String const& value);
 
-		friend std::istream& operator>>(std::istream& stream, Vector2& vector);
-		friend std::ostream& operator<<(std::ostream& stream, const Vector2& vector);
+	typedef glm::vec4 Vector4;
+	std::istream& operator>>(std::istream& stream, Vector4& vector);
+	std::ostream& operator<<(std::ostream& stream, const Vector4& vector);
+	String to_string(Vector4 const& value);
+	Vector4 from_string_vector4(String const& value);
 
-		friend String to_string(Vector2 const& value);
-		friend Vector2 from_string_vector2(String const& value);
+	typedef glm::ivec2 Vector2Int;
+	std::istream& operator>>(std::istream& stream, Vector2Int& vector);
+	std::ostream& operator<<(std::ostream& stream, const Vector2Int& vector);
+	String to_string(Vector2Int const& value);
+	Vector2Int from_string_vector2int(String const& value);
 
-		static Vector2 zero();
-		static Vector2 half();
-		static Vector2 one();
-		static Vector2 right();
-		static Vector2 up();
-		static Vector2 left();
-		static Vector2 down();
-	};
-	struct Vector3
-		: public glm::vec3, public Object
-	{
-		using glm::vec3::vec;
-		Vector3(glm::vec3 const& vec);
+	typedef glm::ivec3 Vector3Int;
+	std::istream& operator>>(std::istream& stream, Vector3Int& vector);
+	std::ostream& operator<<(std::ostream& stream, const Vector3Int& vector);
+	String to_string(Vector3Int const& value);
+	Vector3Int from_string_vector3int(String const& value);
 
-		void serialize(Writer& writer) const override;
-		void deserialize(Reader const& reader) override;
-
-		friend std::istream& operator>>(std::istream& stream, Vector3& vector);
-		friend std::ostream& operator<<(std::ostream& stream, const Vector3& vector);
-
-		friend String to_string(Vector3 const& value);
-		friend Vector3 from_string_vector3(String const& value);
-
-		static Vector3 zero();
-		static Vector3 half();
-		static Vector3 one();
-		static Vector3 right();
-		static Vector3 up();
-		static Vector3 left();
-		static Vector3 down();
-		static Vector3 forward();
-		static Vector3 backward();
-	};
-	struct Vector4
-		: public glm::vec4, public Object
-	{
-		using glm::vec4::vec;
-		Vector4(glm::vec4 const& vec);
-
-		void serialize(Writer& writer) const override;
-		void deserialize(Reader const& reader) override;
-
-		friend std::istream& operator>>(std::istream& stream, Vector4& vector);
-		friend std::ostream& operator<<(std::ostream& stream, const Vector4& vector);
-
-		friend String to_string(Vector4 const& value);
-		friend Vector4 from_string_vector4(String const& value);
-	};
-
-	struct Vector2Int
-		: public glm::ivec2, public Object
-	{
-		using glm::ivec2::vec;
-		Vector2Int(glm::ivec2 const& vec);
-
-		void serialize(Writer& writer) const override;
-		void deserialize(Reader const& reader) override;
-
-		friend std::istream& operator>>(std::istream& stream, Vector2Int& vector);
-		friend std::ostream& operator<<(std::ostream& stream, const Vector2Int& vector);
-
-		friend String to_string(Vector2Int const& value);
-		friend Vector2Int from_string_vector2int(String const& value);
-	};
-	struct Vector3Int
-		: public glm::ivec3, public Object
-	{
-		using glm::ivec3::vec;
-		Vector3Int(glm::ivec3 const& vec);
-
-		void serialize(Writer& writer) const override;
-		void deserialize(Reader const& reader) override;
-
-		friend std::istream& operator>>(std::istream& stream, Vector3Int& vector);
-		friend std::ostream& operator<<(std::ostream& stream, const Vector3Int& vector);
-
-		friend String to_string(Vector3Int const& value);
-		friend Vector3Int from_string_vector3int(String const& value);
-	};
-	struct Vector4Int
-		: public glm::ivec4, public Object
-	{
-		using glm::ivec4::vec;
-		Vector4Int(glm::ivec4 const& vec);
-
-		void serialize(Writer& writer) const override;
-		void deserialize(Reader const& reader) override;
-
-		friend std::istream& operator>>(std::istream& stream, Vector4Int& vector);
-		friend std::ostream& operator<<(std::ostream& stream, const Vector4Int& vector);
-
-		friend String to_string(Vector4Int const& value);
-		friend Vector4Int from_string_vector4int(String const& value);
-	};
+	typedef glm::ivec4 Vector4Int;
+	std::istream& operator>>(std::istream& stream, Vector4Int& vector);
+	std::ostream& operator<<(std::ostream& stream, const Vector4Int& vector);
+	String to_string(Vector4Int const& value);
+	Vector4Int from_string_vector4int(String const& value);
 }
 
 //template<>

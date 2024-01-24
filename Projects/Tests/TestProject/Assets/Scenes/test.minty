@@ -28,12 +28,8 @@ systems
             -
                 texture: death
                 coordinateMode: PIXEL
-                slice
-                    x: 90
-                    y: 90
-                pivot
-                    x: 45
-                    y: 45
+                slice: (90, 90)
+                pivot: (45, 45)
                 sprites
                     all
     Audio
@@ -66,9 +62,9 @@ entities
         Renderable
         Transform
         Sprite
-            sprite: brian
-        Animator
-            entity: Sprite
+            sprite: x
+#        Animator
+#            entity: Sprite
 #    Model
 #        Renderable
 #        Transform

@@ -18,5 +18,5 @@ namespace minty
 	};
 
 	std::string to_string(CoordinateMode const value);
-	CoordinateMode from_string_pixel_coordinate_mode(std::string const& value);
+	CoordinateMode from_string_coordinate_mode(std::string const& value);
 }
