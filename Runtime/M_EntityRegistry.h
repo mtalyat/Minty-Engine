@@ -17,14 +17,16 @@ namespace minty
 		: public Object, public entt::registry
 	{
 	public:
-		typedef std::function<Component* (EntityRegistry&, Entity const)> ComponentCreateFunc;
+		typedef std::function<Component* (EntityRegistry&, Entity const)> ComponentEmplaceFunc;
 		typedef std::function<Component const* (EntityRegistry const&, Entity const)> ComponentGetFunc;
+		typedef std::function<void(EntityRegistry&, Entity const)> ComponentEraseFunc;
 
 	private:
 		struct ComponentFuncs
 		{
-			ComponentCreateFunc create;
+			ComponentEmplaceFunc emplace;
 			ComponentGetFunc get;
+			ComponentEraseFunc erase;
 		};
 
 		static std::map<String const, ComponentFuncs const> _components; // name -> creation/get funcs
@@ -117,6 +119,13 @@ namespace minty
 		std::vector<Component const*> get_all(Entity const entity) const;
 
 		/// <summary>
+		/// Erases the Component, by name.
+		/// </summary>
+		/// <param name="name">The name of the component.</param>
+		/// <param name="entity">The Entity that has the Component.</param>
+		void erase_by_name(String const& name, Entity const entity);
+
+		/// <summary>
 		/// Clones the given Entity and its components, and returns the new Entity.
 		/// </summary>
 		/// <param name="entity">The Entity to clone.</param>
@@ -171,8 +180,9 @@ namespace minty
 	{
 		// funcs
 		ComponentFuncs funcs = {
-			.create = [](EntityRegistry& registry, Entity const entity) { return &registry.emplace<T>(entity); },
-				.get = [](EntityRegistry const& registry, Entity const entity) { return registry.try_get<T>(entity); }
+			.emplace = [](EntityRegistry& registry, Entity const entity) { return &registry.emplace<T>(entity); },
+			.get = [](EntityRegistry const& registry, Entity const entity) { return registry.try_get<T>(entity); },
+			.erase = [](EntityRegistry& registry, Entity const entity) { registry.erase<T>(entity); },
 		};
 		_components.emplace(name, funcs);
 

@@ -682,11 +682,15 @@ Texture& minty::RenderSystem::get_texture(ID const id)
 
 Texture const& minty::RenderSystem::get_texture(ID const id) const
 {
+	MINTY_ASSERT(_textures.contains(id), std::format("RenderSystem::get_texture(): Textures does not contain the ID {}.", id));
+
 	return _textures.at(id);
 }
 
 Sprite& minty::RenderSystem::get_sprite(ID const id)
 {
+	MINTY_ASSERT(_sprites.contains(id), std::format("RenderSystem::get_sprite(): Sprites does not contain the ID {}.", id));
+
 	return _sprites.at(id);
 }
 

@@ -1,9 +1,9 @@
 template: materialTemplate
 values
     material
-        - i 3
-        - e 12
-        - f 1
-        - f 1
-        - f 1
-        - f 1
+        i 3
+        e 12
+        f 1
+        f 1
+        f 1
+        f 1

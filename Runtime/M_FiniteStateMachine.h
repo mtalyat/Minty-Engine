@@ -373,6 +373,12 @@ namespace minty
 		void set_current_state(String const& name);
 
 		/// <summary>
+		/// Checks if there is a current state selected.
+		/// </summary>
+		/// <returns></returns>
+		bool has_current_state() const;
+
+		/// <summary>
 		/// Gets the current State.
 		/// </summary>
 		/// <returns></returns>

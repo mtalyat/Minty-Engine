@@ -1,21 +1,20 @@
 name: animator
 fsm
+    start: flicker
     scope
         move: 0
     states
-        idle
-            value
-                0i: 0
-            transitions
-                -
-                    state: moving
-                    conditions
-                        - move == 0
-        moving
-            value
-                0i: 1
-            transitions
-                -
-                    state: idle
-                    conditions
-                        - move != 0
+#        idle
+#            value: i 0
+#            transitions
+#                -
+#                    state: moving
+#                    conditions
+#                        - move != 0
+        flicker
+            value: i 2
+#            transitions
+#                -
+#                    state: idle
+#                    conditions
+#                        - move == 0

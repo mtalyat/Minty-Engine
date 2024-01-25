@@ -132,16 +132,15 @@ void minty::Dynamic::deserialize(Reader const& reader)
 {
 	Node const& node = reader.get_node();
 
-	Dynamic data;
-
 	// just decode the raw data
 	if (node.has_data())
 	{
-		std::stringstream stream;
-		stream >> data;
-		set(data.data(), data.size());
+		std::stringstream stream(node.get_data());
+		stream >> *this;
 		return;
 	}
+
+	Dynamic data;
 
 	// no raw data given, so go through the values and set directly
 	std::vector<Dynamic> values;
@@ -152,7 +151,7 @@ void minty::Dynamic::deserialize(Reader const& reader)
 
 	for (Node const& child : node.get_children())
 	{
-		std::stringstream stream(child.get_data());
+		std::stringstream stream(child.get_name());
 		stream >> data;
 		size += data.size();
 		values.push_back(data);

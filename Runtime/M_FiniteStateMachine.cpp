@@ -166,18 +166,18 @@ void minty::FSM::Condition::serialize(Writer& writer) const
 {
 	FSM const* fsm = static_cast<FSM const*>(writer.get_data());
 
-	writer.write("variable", fsm->get_variable_name(_variableId));
-	writer.write("conditional", to_string(_conditional));
-	writer.write("value", _value);
+	writer.get_node().set_data(to_pretty_string(*fsm));
 }
 
 void minty::FSM::Condition::deserialize(Reader const& reader)
 {
 	FSM const* fsm = static_cast<FSM const*>(reader.get_data());
 
-	_variableId = fsm->find_variable(reader.read_string("variable"));
-	_conditional = from_string_conditional(reader.read_string("conditional"));
-	_value = reader.read_int("value");
+	std::vector<String> parts = string::split(reader.get_node().get_data());
+
+	_variableId = fsm->find_variable(parts.at(0));
+	_conditional = from_string_conditional(parts.at(1));
+	_value = parse::to_int(parts.at(2));
 }
 
 minty::FSM::Transition::Transition()
@@ -358,6 +358,11 @@ void minty::FSM::set_current_state(ID const id)
 void minty::FSM::set_current_state(String const& name)
 {
 	_currentStateId = _states.get_id(name);
+}
+
+bool minty::FSM::has_current_state() const
+{
+	return _currentStateId != ERROR_ID;
 }
 
 FSM::State& minty::FSM::get_current_state()

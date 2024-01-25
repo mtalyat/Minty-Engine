@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "M_AnimationSystem.h"
 
+#include "M_AnimationBuilder.h"
 #include "M_SpriteComponent.h"
 #include "M_Asset.h"
 #include "M_RenderEngine.h"
@@ -19,54 +20,52 @@ void minty::AnimationSystem::update()
 {
 	float deltaTime = get_scene().get_engine().get_delta_time();
 
-	for (auto&& [entity, animatorComponent] : get_entity_registry().view<AnimatorComponent>().each())
+	EntityRegistry& registry = get_entity_registry();
+
+	for (auto&& [entity, animatorComponent] : registry.view<AnimatorComponent>().each())
 	{
-		//// skip if no animation
-		//if (animatorComponent.animationId == ERROR_ID)
-		//{
-		//	continue;
-		//}
+		// skip if no animation
+		if (animatorComponent.animationId == ERROR_ID)
+		{
+			continue;
+		}
 
-		//// update the animator, get the current animation ID
-		//Animator& animator = get_animator(animatorComponent.animatorId);
+		// update the animator, get the current animation ID
+		ID newId = animatorComponent.animator.update();
 
-		//ID newId = animator.update();
+		// if the ID has changed, reset with new animation data
+		if (animatorComponent.animationId != newId)
+		{
+			animatorComponent.animationId = newId;
+			animatorComponent.reset();
+		}
 
-		//// if the animation has not changed
+		// if the animator time is below zero, then the animator has paused, so do nothing
+		// OR if the animation ID is ERROR_ID, do nothing
+		if (animatorComponent.time < 0.0f || animatorComponent.animationId == ERROR_ID)
+		{
+			continue;
+		}
 
-		//// elapse time
-		//animatorComponent.time -= deltaTime;
+		// get the animation so it can be used
+		Animation const& animation = _animations.at(animatorComponent.animationId);
 
-		//// if time is over, move to next animation stage
-		//if (animatorComponent.time > 0.0f)
-		//{
-		//	// do nothing, keep rendering current frame
-		//	continue;
-		//}
+		// animate with it
+		if (animation.animate(animatorComponent.time, deltaTime, animatorComponent.index, entity, registry))
+		{
+			// animation has completed, loop if supposed to
+			if (animation.loops())
+			{
+				animatorComponent.reset();
+			}
+			else
+			{
+				// not looping
 
-		//// frame over: move to the next frame
-		//animatorComponent.index++;
-
-		//Animation const& animation = _animations.at(animatorComponent.animationId);
-
-		//// if still on animation, reset frame time and move on
-		//if (animatorComponent.index < animation.get_frame_count())
-		//{
-		//	update_animation(animatorComponent, animation);
-
-		//	continue;
-		//}
-
-		//// animation over: move to the next animation
-
-		//// evaluate the animator, get the new animation ID, if any change at all
-		//animatorComponent.animationId = animator.update();
-
-		//// go to first frame
-		//animatorComponent.index = 0;
-
-		//// set sprite id and time
-		//update_animation(animatorComponent, animation);
+				// set time to -1 to indicate that it has stopped, until a new animation ID is given
+				animatorComponent.time = -1.0f;
+			}
+		}
 	}
 }
 
@@ -74,17 +73,6 @@ void minty::AnimationSystem::reset()
 {
 	_animations.clear();
 	_animators.clear();
-}
-
-void minty::AnimationSystem::update_animation(AnimatorComponent& animatorComponent, Animation const& animation) const
-{
-	//// set time
-	//float frameTime = animation.get_frame_time();
-	//animatorComponent.time = math::mod(animatorComponent.time, frameTime) + frameTime;
-
-	//// set frame
-	//SpriteComponent& spriteComponent = get_entity_registry().get<SpriteComponent>(animatorComponent.entity);
-	//spriteComponent.spriteId = animation.get_frame(animatorComponent.index);
 }
 
 ID minty::AnimationSystem::create_animation(AnimationBuilder const& builder)
@@ -147,29 +135,50 @@ ID minty::AnimationSystem::load_animation(Path const& path)
 	Node meta = Asset::load_node(path);
 	Reader reader(meta);
 
+	// read basic values
 	AnimationBuilder builder
 	{
 		.name = reader.read_string("name", meta.to_string()),
 		.length = reader.read_float("length"),
+		.loops = reader.read_bool("loops"),
 	};
+	
+	// read data vectors
 	reader.read_vector("entities", builder.entities);
 	reader.read_vector("components", builder.components);
 	reader.read_vector("sizes", builder.sizes);
 	reader.read_vector("values", builder.values);
 
-	// get renderer
-	RenderSystem* renderer = get_scene().get_system_registry().find<RenderSystem>();
+	// read the steps, but split them up by '/'
+	if (Node const* stepsNode = reader.get_node().find("steps"))
+	{
+		// for each child, that is a time stamp
+		// each child of each time stamp are the actual steps
+		// all are the node names
+		for (Node const& timeStampNode : stepsNode->get_children())
+		{
+			float time = parse::to_float(timeStampNode.get_name());
 
-	MINTY_ASSERT(renderer != nullptr, "AnimationSystem::load_animation(): renderer must not be null.");
-
-	//// get sprite IDs from loaded names
-	//std::vector<String> names;
-	//reader.read_vector("frames", names);
-	//builder.frames.resize(names.size());
-	//for (size_t i = 0; i < names.size(); i++)
-	//{
-	//	builder.frames[i] = renderer->find_sprite(names.at(i));
-	//}
+			// get actual step values
+			for (Node const& stepNode : timeStampNode.get_children())
+			{
+				// split the line by /s
+				std::vector<String> split = string::split(stepNode.get_name(), '/');
+				// create the step
+				Animation::Step step
+				{
+					.type = (split.size() >= 1 && split.at(0).size()) ? static_cast<Animation::StepType>(parse::to_size(split.at(0))) : Animation::StepType::Ignore,
+					.entityIndex = (split.size() >= 2 && split.at(1).size()) ? parse::to_size(split.at(1)) : Animation::MAX_INDEX,
+					.componentIndex = (split.size() >= 3 && split.at(2).size()) ? parse::to_size(split.at(2)) : Animation::MAX_INDEX,
+					.offsetIndex = (split.size() >= 4 && split.at(3).size()) ? parse::to_size(split.at(3)) : Animation::MAX_INDEX,
+					.sizeIndex = (split.size() >= 5 && split.at(4).size()) ? parse::to_size(split.at(4)) : Animation::MAX_INDEX,
+					.valueIndex = (split.size() >= 6 && split.at(5).size()) ? parse::to_size(split.at(5)) : Animation::MAX_VALUE_INDEX,
+				};
+				// add to builder
+				builder.steps.push_back({ time, step });
+			}
+		}
+	}
 
 	return create_animation(builder);
 }

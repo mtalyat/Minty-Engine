@@ -468,7 +468,7 @@ namespace minty
 				// get object from node
 				Reader childReader(child, _data);
 				T t;
-				childReader.to_object(t);
+				childReader.to_object_ref(t);
 
 				// if name is empty, do not emplace with a name
 				if (child.has_name())

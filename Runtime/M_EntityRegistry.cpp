@@ -125,7 +125,7 @@ Component* minty::EntityRegistry::emplace_by_name(String const& name, Entity con
 	else
 	{
 		// name found
-		return found->second.create(*this, entity);
+		return found->second.emplace(*this, entity);
 	}
 }
 
@@ -135,7 +135,7 @@ Component* minty::EntityRegistry::get_by_name(String const& name, Entity const e
 	if (found == _components.end())
 	{
 		// name not found
-		console::error(std::format("Cannot at Component \"{}\". It has not been registered with the EntityRegistry.", name));
+		console::error(std::format("Cannot get Component \"{}\". It has not been registered with the EntityRegistry.", name));
 		return nullptr;
 	}
 	else
@@ -151,7 +151,7 @@ Component const* minty::EntityRegistry::get_by_name(String const& name, Entity c
 	if (found == _components.end())
 	{
 		// name not found
-		console::error(std::format("Cannot at Component \"{}\". It has not been registered with the EntityRegistry.", name));
+		console::error(std::format("Cannot get Component \"{}\". It has not been registered with the EntityRegistry.", name));
 		return nullptr;
 	}
 	else
@@ -188,6 +188,21 @@ std::vector<Component const*> minty::EntityRegistry::get_all(Entity const entity
 	}
 
 	return components;
+}
+
+void minty::EntityRegistry::erase_by_name(String const& name, Entity const entity)
+{
+	auto const& found = _components.find(name);
+	if (found == _components.end())
+	{
+		// name not found
+		console::error(std::format("Cannot erase Component \"{}\". It has not been registered with the EntityRegistry.", name));
+	}
+	else
+	{
+		// name found
+		found->second.erase(*this, entity);
+	}
 }
 
 Entity minty::EntityRegistry::clone(Entity const entity)

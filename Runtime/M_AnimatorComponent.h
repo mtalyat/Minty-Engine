@@ -1,6 +1,7 @@
 #pragma once
 
 #include "M_Component.h"
+#include "M_Animator.h"
 #include "M_FiniteStateMachine.h"
 #include "M_EntityRegistry.h"
 
@@ -13,14 +14,9 @@ namespace minty
 		: public Component
 	{
 		/// <summary>
-		/// The Entity with the SpriteComponent.
-		/// </summary>
-		Entity entity = NULL_ENTITY;
-
-		/// <summary>
 		/// Handles controlling animation flow.
 		/// </summary>
-		ID animatorId = ERROR_ID;
+		Animator animator;
 
 		/// <summary>
 		/// The ID of the current animation being ran.
@@ -28,14 +24,16 @@ namespace minty
 		ID animationId = ERROR_ID;
 
 		/// <summary>
-		/// The amount of time left on the current frame.
+		/// The amount of time elapsed on the animation.
 		/// </summary>
 		float time = 0.0f;
 
 		/// <summary>
-		/// The frame index of the current animation.
+		/// The step index of the current animation.
 		/// </summary>
 		size_t index = 0;
+
+		void reset();
 
 		void serialize(Writer& writer) const override;
 		void deserialize(Reader const& reader) override;

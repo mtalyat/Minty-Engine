@@ -2,6 +2,7 @@
 
 #include "M_Base.h"
 #include "M_Dynamic.h"
+#include "M_Animation.h"
 
 namespace minty
 {
@@ -18,7 +19,12 @@ namespace minty
 		/// <summary>
 		/// The amount of time this Animation runs for, in seconds.
 		/// </summary>
-		float const length;
+		float length;
+
+		/// <summary>
+		/// The animation will loop when it ends.
+		/// </summary>
+		bool loops;
 
 		/// <summary>
 		/// A list of all Entities being affected by this Animation.
@@ -46,6 +52,6 @@ namespace minty
 		/// The compilation of steps within this Animation.
 		/// [Entity index: 8 bits][Component index: 8 bits][offset index: 8 bits][size index: 8 bits][value index: 32 bits]
 		/// </summary>
-		std::vector<std::pair<float, uint64_t>> steps;
+		std::vector<std::pair<float, Animation::Step>> steps;
 	};
 }

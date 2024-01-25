@@ -2,13 +2,14 @@
 
 #include "M_Object.h"
 #include "M_ISerializable.h"
-#include "M_AnimationBuilder.h"
 #include "M_Dynamic.h"
 #include "M_EntityRegistry.h"
 #include <vector>
 
 namespace minty
 {
+	struct AnimationBuilder;
+
 	/*
 	
 	Animations can be ran. They can edit values of other components.
@@ -28,24 +29,54 @@ namespace minty
 	class Animation
 		: public Object
 	{
-	private:
+	public:
+		constexpr static size_t const MAX_STEP = 0b11;
+		constexpr static size_t const MAX_INDEX = 0xff;
+		constexpr static size_t const MAX_VALUE_INDEX = 0x3fffffff;
+
+		enum class StepType
+		{
+			/// <summary>
+			/// Perform a step as normal.
+			/// </summary>
+			Normal = 0b00,
+			/// <summary>
+			/// Add the Component to the Entity, if it does not exist.
+			/// </summary>
+			Add = 0b01,
+			/// <summary>
+			/// Remove the Component from the Entity, if it exists.
+			/// </summary>
+			Remove = 0b10,
+			/// <summary>
+			/// Ignore this step.
+			/// </summary>
+			Ignore = 0b11,
+		};
+
 		/// <summary>
 		/// Holds all of the indices required for a step, to different component values.
 		/// </summary>
 		struct Step
 		{
-			size_t entityIndex;
-			size_t componentIndex;
-			size_t offsetIndex;
-			size_t sizeIndex;
-			size_t valueIndex;
+			StepType type = StepType::Ignore;
+			size_t entityIndex = MAX_INDEX;
+			size_t componentIndex = MAX_INDEX;
+			size_t offsetIndex = MAX_INDEX;
+			size_t sizeIndex = MAX_INDEX;
+			size_t valueIndex = MAX_VALUE_INDEX;
 		};
 
 	private:
 		/// <summary>
 		/// The amount of time this Animation runs for, in seconds.
 		/// </summary>
-		float const _length;
+		float _length;
+
+		/// <summary>
+		/// The animation loops.
+		/// </summary>
+		bool _loops;
 
 		/// <summary>
 		/// A list of all Entities being affected by this Animation.
@@ -71,7 +102,7 @@ namespace minty
 
 		/// <summary>
 		/// The compilation of steps within this Animation.
-		/// [Entity index: 8 bits][Component index: 8 bits][offset index: 8 bits][size index: 8 bits][value index: 32 bits]
+		/// [Step type: 2 bits][Entity index: 8 bits][Component index: 8 bits][offset index: 8 bits][size index: 8 bits][value index: 30 bits]
 		/// </summary>
 		std::vector<std::pair<float, uint64_t>> _steps;
 
@@ -87,6 +118,12 @@ namespace minty
 		/// <param name="frames">A list of Sprite IDs.</param>
 		/// <param name="frameTime">The time to elapse per frame.</param>
 		Animation(AnimationBuilder const& builder);
+
+		/// <summary>
+		/// Checks if this Animation loops.
+		/// </summary>
+		/// <returns></returns>
+		bool loops() const;
 
 		/// <summary>
 		/// Performs an animation on an Entity.

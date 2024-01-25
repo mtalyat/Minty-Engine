@@ -10,5 +10,5 @@ void game::TestComponent::serialize(Writer &writer) const
 
 void game::TestComponent::deserialize(Reader const &reader)
 {
-    reader.read_object("rotationSpeed", rotationSpeed, Vector3());
+    rotationSpeed = reader.read_object<Vector3>("rotationSpeed");
 }

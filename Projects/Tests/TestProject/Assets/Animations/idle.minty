@@ -1,4 +1,14 @@
 name: idle
-frameTime: 1
-frames:
-    0: death_0
+length: 0.25
+loops: false
+entities
+components
+    - Sprite
+sizes
+    - 0
+    - 4
+values
+    - i 0
+steps
+    0.0
+        0//0/0/1/0

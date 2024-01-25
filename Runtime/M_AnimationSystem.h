@@ -25,9 +25,6 @@ namespace minty
 
         void reset() override;
 
-    private:
-        void update_animation(AnimatorComponent& animator, Animation const& animation) const;
-
     public:
         ID create_animation(AnimationBuilder const& builder);
 

@@ -1,11 +1,11 @@
 pass: shaderPass
 defaults
     material
-        - e 16
-        - f 1
-        - f 1
-        - f 1
-        - f 1
+        e 16
+        f 1
+        f 1
+        f 1
+        f 1
     textures
         0: oak_planks
         1: pattern

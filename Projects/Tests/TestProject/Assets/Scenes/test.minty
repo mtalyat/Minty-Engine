@@ -22,8 +22,8 @@ systems
             - Materials/spriteMaterial.minty
             - Materials/xSpriteMaterial.minty
         sprites
-            - Sprites/brian.minty
             - Sprites/x.minty
+            - Sprites/brian.minty
         atlases
             -
                 texture: death
@@ -42,6 +42,7 @@ systems
         animations
             - Animations/idle.minty
             - Animations/moving.minty
+            - Animations/flicker.minty
         animators
             - Animations/animator.minty
     CameraController
@@ -62,9 +63,9 @@ entities
         Transform
             position: (0, 0, -2)
         Sprite
-            sprite: brian
-#        Animator
-#            entity: Sprite
+            sprite: x
+        Animator
+            animator: animator
     Model
         Renderable
         Transform
