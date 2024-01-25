@@ -50,9 +50,20 @@ namespace minty
 		/// </summary>
 		/// <typeparam name="T">The type of data to set.</typeparam>
 		/// <param name="data">The data to set.</param>
+		template<typename T>
+		void set(T* const data)
+		{
+			set(static_cast<void*>(data), sizeof(T));
+		}
+
+		/// <summary>
+		/// Sets the data within this Dynamic.
+		/// </summary>
+		/// <typeparam name="T">The type of data to set.</typeparam>
+		/// <param name="data">The data to set.</param>
 		/// <param name="count">The number of elements of the data.</param>
 		template<typename T>
-		void set(T* const data, size_t const count = 1)
+		void set_array(T* const data, size_t const count)
 		{
 			set(static_cast<void*>(data), sizeof(T) * count);
 		}
@@ -94,5 +105,8 @@ namespace minty
 
 		void serialize(Writer& writer) const;
 		void deserialize(Reader const& reader);
+
+		friend std::ostream& operator<<(std::ostream& stream, Dynamic const& object);
+		friend std::istream& operator>>(std::istream& stream, Dynamic& object);
 	};
 }

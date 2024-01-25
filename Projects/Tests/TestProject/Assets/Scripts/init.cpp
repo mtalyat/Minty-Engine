@@ -45,58 +45,7 @@ int init(Runtime &runtime)
 
         // basic::create_basic_renderer_builder(rb);
         renderer.init(rb);
-
-        // create textures
-        // renderer.load_texture("Textures/oak_planks.png");
-        // renderer.load_texture("Textures/pattern.png");
-        // renderer.load_texture("Textures/texture.jpg");
-        // renderer.load_texture("Textures/brian.png");
-        // renderer.load_texture("Textures/x.png");
-        // ID deathId = renderer.load_texture("Textures/death.png");
-        // renderer.load_texture("Resources/Models/pumpkin_tex.jpg");
-
-        // // create shaders
-        // renderer.load_shader("Shaders/shader.minty");
-        // renderer.load_shader("Shaders/spriteShader.minty");
-
-        // // create shader passes
-        // renderer.load_shader_pass("Shaders/shaderPass.minty");
-        // renderer.load_shader_pass("Shaders/spriteShaderPass.minty");
-
-        // // create material templates
-        // renderer.load_material_template("Materials/materialTemplate.minty");
-        // renderer.load_material_template("Materials/spriteMaterialTemplate.minty");
-
-        // // create materials
-        // renderer.load_material("Materials/material1.minty");
-        // // renderer.load_material("Materials/material2.minty");
-        // // renderer.load_material("Materials/material3.minty");
-        // // renderer.load_material("Materials/pumpkinMat.minty");
-        // renderer.load_material("Materials/spriteMaterial.minty");
-        // renderer.load_material("Materials/xSpriteMaterial.minty");
-
-        // // // create models
-        // // renderer.load_mesh("Resources/Models/pumpkin.obj");
-
-        // // creat sprites
-        // renderer.load_sprite("Sprites/brian.minty");
-        // ID xId = renderer.load_sprite("Sprites/x.minty");
-
-        // TextureAtlasBuilder atlasBuilder{
-        //     .textureId = deathId,
-        //     .materialId = ERROR_ID,
-        //     .coordinateMode = CoordinateMode::Pixel,
-        //     .slice = Vector2(90.0f, 90.0f),
-        //     .pivot = Vector2(45.0f, 45.0f)};
-
-        // TextureAtlas atlas(atlasBuilder, renderer);
-
-        // // create audio
-        // audio.load_clip("Audio/blinking-forest.wav");
-        // audio.load_clip("Audio/cow-bells.wav");
-        // audio.load_clip("Audio/ding.wav");
-        // audio.load_clip("Audio/dong.wav");
-
+        
         // load scene from disk
         ID sceneId = sceneManager.create_scene("Scenes/test.minty");
         Scene &scene = sceneManager.get_scene(sceneId);

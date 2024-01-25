@@ -16,7 +16,6 @@ access to the entire engine without needing include each file.
 // ANIMATION
 #include "M_Animation.h"
 #include "M_AnimationBuilder.h"
-#include "M_AnimationObject.h"
 #include "M_AnimationSystem.h"
 #include "M_Animator.h"
 #include "M_AnimatorBuilder.h"

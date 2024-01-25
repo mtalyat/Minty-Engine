@@ -17,8 +17,8 @@ namespace minty
 		: public Object, public entt::registry
 	{
 	public:
-		typedef std::function<Component* (EntityRegistry* const, Entity const)> ComponentCreateFunc;
-		typedef std::function<Component const* (EntityRegistry const* const, Entity const)> ComponentGetFunc;
+		typedef std::function<Component* (EntityRegistry&, Entity const)> ComponentCreateFunc;
+		typedef std::function<Component const* (EntityRegistry const&, Entity const)> ComponentGetFunc;
 
 	private:
 		struct ComponentFuncs
@@ -99,6 +99,14 @@ namespace minty
 		/// <param name="name">The name of the Component.</param>
 		/// <param name="entity">The Entity that has the Component.</param>
 		/// <returns>The Component, or null if it does not exist.</returns>
+		Component* get_by_name(String const& name, Entity const entity);
+
+		/// <summary>
+		/// Gets the Component, by name.
+		/// </summary>
+		/// <param name="name">The name of the Component.</param>
+		/// <param name="entity">The Entity that has the Component.</param>
+		/// <returns>The Component, or null if it does not exist.</returns>
 		Component const* get_by_name(String const& name, Entity const entity) const;
 
 		/// <summary>
@@ -145,7 +153,7 @@ namespace minty
 	};
 
 	template<class T>
-	inline Entity EntityRegistry::find() const
+	Entity EntityRegistry::find() const
 	{
 		// iterate through view
 		for (auto [entity, t] : this->view<T const>().each())
@@ -163,8 +171,8 @@ namespace minty
 	{
 		// funcs
 		ComponentFuncs funcs = {
-			.create = [](EntityRegistry* const registry, Entity const entity) { return &registry->emplace<T>(entity); },
-				.get = [](EntityRegistry const* const registry, Entity const entity) { return registry->try_get<T>(entity); }
+			.create = [](EntityRegistry& registry, Entity const entity) { return &registry.emplace<T>(entity); },
+				.get = [](EntityRegistry const& registry, Entity const entity) { return registry.try_get<T>(entity); }
 		};
 		_components.emplace(name, funcs);
 

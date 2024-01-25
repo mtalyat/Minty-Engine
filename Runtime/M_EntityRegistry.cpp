@@ -125,7 +125,23 @@ Component* minty::EntityRegistry::emplace_by_name(String const& name, Entity con
 	else
 	{
 		// name found
-		return found->second.create(this, entity);
+		return found->second.create(*this, entity);
+	}
+}
+
+Component* minty::EntityRegistry::get_by_name(String const& name, Entity const entity)
+{
+	auto found = _components.find(name);
+	if (found == _components.end())
+	{
+		// name not found
+		console::error(std::format("Cannot at Component \"{}\". It has not been registered with the EntityRegistry.", name));
+		return nullptr;
+	}
+	else
+	{
+		// name found
+		return const_cast<Component*>(static_cast<Component const*>(found->second.get(*this, entity)));
 	}
 }
 
@@ -141,7 +157,7 @@ Component const* minty::EntityRegistry::get_by_name(String const& name, Entity c
 	else
 	{
 		// name found
-		return found->second.get(this, entity);
+		return found->second.get(*this, entity);
 	}
 }
 

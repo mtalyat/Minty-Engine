@@ -67,8 +67,8 @@ void minty::Dynamic::set(void* const data, size_t const size)
 {
 	clear();
 
-	// if no data given, do nothing
-	if (!data || !size)
+	// if no size, do nothing
+	if (!size)
 	{
 		return;
 	}
@@ -83,8 +83,18 @@ void minty::Dynamic::set(void* const data, size_t const size)
 		return;
 	}
 
-	// copy data over
-	memcpy(_data, data, size);
+	// if no data to copy, set to zeros, otherwise copy
+	if (data)
+	{
+		// copy data over
+		memcpy(_data, data, size);
+	}
+	else
+	{
+		// set to zeros
+		memset(_data, 0, size);
+	}
+	
 	_size = size;
 }
 
@@ -112,109 +122,61 @@ void minty::Dynamic::clear()
 
 void minty::Dynamic::serialize(Writer& writer) const
 {
-	// base64 encode the data, do that
-	writer.write("size", _size);
-	writer.write("data", encoding::encode_base64(*this));
+	// write this data as a string
+	std::stringstream stream;
+	stream << *this;
+	writer.get_node().set_data(stream.str());
 }
 
 void minty::Dynamic::deserialize(Reader const& reader)
 {
-	// get size in bytes
-	size_t size = reader.read_size("size", reader.to_size());
-
-	// if no size, all done
-	if (!size)
-	{
-		clear();
-		return;
-	}
-
-	// use node directly to have more control since this deserialization is tricky
 	Node const& node = reader.get_node();
 
-	// if there is the raw data base64 encoded, just read that and be done
-	if (Node const* dataNode = node.find("data"))
+	Dynamic data;
+
+	// just decode the raw data
+	if (node.has_data())
 	{
-		Dynamic data = encoding::decode_base64(dataNode->to_string());
+		std::stringstream stream;
+		stream >> data;
 		set(data.data(), data.size());
 		return;
 	}
 
-	// manual byte entry:
+	// no raw data given, so go through the values and set directly
+	std::vector<Dynamic> values;
+	values.reserve(node.get_children().size());
 
-	// go through and get all possible combinations of bytes/bits, pack into data
-	Byte* data = new Byte[size];
-	memset(data, 0, size);
+	// total size of all the read values
+	size_t size = 0;
 
-	// assume 'x' is any number, and 'y' is another number:
-	// x refers to the byte at x
-	// xi refers to an integer starting at byte x
-	// xui refers to an unsigned integer starting at byte x
-	// xf refers to a float starting at byte f
-	// xsy refers to a string at x of y length
-
-	size_t i;
-	for (auto const& child : node.get_children())
+	for (Node const& child : node.get_children())
 	{
-		String const& name = child.get_name();
-		if (name.empty() || !std::isdigit(name.front()))
-		{
-			// does not start with byte location, so, ignore
-			continue;
-		}
-
-		// get type
-		if (std::isdigit(name.back()))
-		{
-			size_t sIndex = name.rfind('s');
-			if (sIndex == std::string::npos)
-			{
-				// byte
-				i = parse::to_size(name);
-				Byte temp = child.to_byte();
-				memcpy(&data[i], &temp, sizeof(Byte));
-			}
-			else
-			{
-				// string
-				size_t stringSize = parse::to_size(name.substr(sIndex + 1, name.length() - 1 - sIndex));
-				String temp = child.to_string();
-				memcpy(&data[i], temp.data(), sizeof(char) * stringSize);
-				data[i + stringSize - 1] = '\0';
-			}
-		}
-		else if (name.ends_with("ui"))
-		{
-			// unsigned int
-			i = parse::to_size(name.substr(0, name.size() - 2));
-			unsigned int temp = child.to_uint();
-			memcpy(&data[i], &temp, sizeof(unsigned int));
-		}
-		else if (name.ends_with("i"))
-		{
-			// int
-			i = parse::to_size(name.substr(0, name.size() - 1));
-			int temp = child.to_int();
-			memcpy(&data[i], &temp, sizeof(int));
-		}
-		else if (name.ends_with("f"))
-		{
-			// float
-			i = parse::to_size(name.substr(0, name.size() - 1));
-			float temp = child.to_float();
-			memcpy(&data[i], &temp, sizeof(float));
-		}
-		else
-		{
-			console::todo(std::format("Dynamic::deserialize(): unknown token: {}.", name));
-		}
+		std::stringstream stream(child.get_data());
+		stream >> data;
+		size += data.size();
+		values.push_back(data);
 	}
 
-	// set new data
-	set(data, size);
+	// now compile them all into one big array
+	Byte* bytes = new Byte[size];
 
-	// clean up
-	delete[] data;
+	// keep track of the offset
+	size_t offset = 0;
+
+	// copy each value over in order
+	for (Dynamic const& value : values)
+	{
+		memcpy(bytes + offset, value.data(), value.size());
+
+		offset += value.size();
+	}
+
+	// lastly, set all to this data
+	set(bytes, size);
+
+	// done with this byte array, delete it
+	delete[] bytes;
 }
 
 bool minty::operator==(Dynamic const& left, Dynamic const& right)
@@ -226,4 +188,122 @@ bool minty::operator==(Dynamic const& left, Dynamic const& right)
 bool minty::operator!=(Dynamic const& left, Dynamic const& right)
 {
 	return !(left == right);
+}
+
+std::ostream& minty::operator<<(std::ostream& stream, Dynamic const& object)
+{
+	// output as base 64
+	stream << "64 " << encoding::encode_base64(object);
+
+	return stream;
+}
+
+std::istream& minty::operator>>(std::istream& stream, Dynamic& object)
+{
+	// input as a variety of types:
+	/*
+		b/ub: byte
+		sb: signed byte
+		c: char
+		str: string
+		s: short
+		us: unsigned short
+		i: int
+		ui: unsigned int
+		l: long
+		ul: unsigned long
+		e: empty bytes of size
+		(no type given): base 64 encoded string
+	*/
+
+	// read in the type
+	String type;
+	stream >> type;
+
+	// decide what to do based on that
+	if (type == "str") // string
+	{
+		String temp;
+		stream >> temp;
+		object.set(temp.data(), (temp.size() + 1) * sizeof(char));
+	}
+	else if (type == "i") // int
+	{
+		int temp;
+		stream >> temp;
+		object.set(&temp, sizeof(int));
+	}
+	else if (type == "ui") // unsigned int
+	{
+		unsigned int temp;
+		stream >> temp;
+		object.set(&temp, sizeof(unsigned int));
+	}
+	else if (type == "f") // float
+	{
+		float temp;
+		stream >> temp;
+		object.set(&temp, sizeof(float));
+	}
+	else if (type == "d") // double
+	{
+		double temp;
+		stream >> temp;
+		object.set(&temp, sizeof(double));
+	}
+	else if (type == "b" || type == "ub") // (unsigned) byte
+	{
+		unsigned char temp;
+		stream >> temp;
+		object.set(&temp, sizeof(unsigned char));
+	}
+	else if (type == "sb") // signed byte
+	{
+		signed char temp;
+		stream >> temp;
+		object.set(&temp, sizeof(signed char));
+	}
+	else if (type == "c") // char
+	{
+		char temp;
+		stream >> temp;
+		object.set(&temp, sizeof(char));
+	}
+	else if (type == "s") // short
+	{
+		short temp;
+		stream >> temp;
+		object.set(&temp, sizeof(short));
+	}
+	else if (type == "us") // unsigned short
+	{
+		unsigned short temp;
+		stream >> temp;
+		object.set(&temp, sizeof(unsigned short));
+	}
+	else if (type == "l") // long
+	{
+		long temp;
+		stream >> temp;
+		object.set(&temp, sizeof(long));
+	}
+	else if (type == "ul") // unsigned long
+	{
+		unsigned long temp;
+		stream >> temp;
+		object.set(&temp, sizeof(unsigned long));
+	}
+	else if (type == "e")
+	{
+		size_t temp;
+		stream >> temp;
+		object.set(nullptr, temp);
+	}
+	else
+	{
+		// assume base64 encoding, but inside of type
+		object = encoding::decode_base64(type);
+	}
+
+	return stream;
 }

@@ -21,52 +21,52 @@ void minty::AnimationSystem::update()
 
 	for (auto&& [entity, animatorComponent] : get_entity_registry().view<AnimatorComponent>().each())
 	{
-		// skip if no animation
-		if (animatorComponent.animationId == ERROR_ID)
-		{
-			continue;
-		}
+		//// skip if no animation
+		//if (animatorComponent.animationId == ERROR_ID)
+		//{
+		//	continue;
+		//}
 
-		// update the animator, get the current animation ID
-		Animator& animator = get_animator(animatorComponent.animatorId);
+		//// update the animator, get the current animation ID
+		//Animator& animator = get_animator(animatorComponent.animatorId);
 
-		ID newId = animator.update();
+		//ID newId = animator.update();
 
-		// if the animation has not changed
+		//// if the animation has not changed
 
-		// elapse time
-		animatorComponent.time -= deltaTime;
+		//// elapse time
+		//animatorComponent.time -= deltaTime;
 
-		// if time is over, move to next animation stage
-		if (animatorComponent.time > 0.0f)
-		{
-			// do nothing, keep rendering current frame
-			continue;
-		}
+		//// if time is over, move to next animation stage
+		//if (animatorComponent.time > 0.0f)
+		//{
+		//	// do nothing, keep rendering current frame
+		//	continue;
+		//}
 
-		// frame over: move to the next frame
-		animatorComponent.index++;
+		//// frame over: move to the next frame
+		//animatorComponent.index++;
 
-		Animation const& animation = _animations.at(animatorComponent.animationId);
+		//Animation const& animation = _animations.at(animatorComponent.animationId);
 
-		// if still on animation, reset frame time and move on
-		if (animatorComponent.index < animation.get_frame_count())
-		{
-			update_animation(animatorComponent, animation);
+		//// if still on animation, reset frame time and move on
+		//if (animatorComponent.index < animation.get_frame_count())
+		//{
+		//	update_animation(animatorComponent, animation);
 
-			continue;
-		}
+		//	continue;
+		//}
 
-		// animation over: move to the next animation
+		//// animation over: move to the next animation
 
-		// evaluate the animator, get the new animation ID, if any change at all
-		animatorComponent.animationId = animator.update();
+		//// evaluate the animator, get the new animation ID, if any change at all
+		//animatorComponent.animationId = animator.update();
 
-		// go to first frame
-		animatorComponent.index = 0;
+		//// go to first frame
+		//animatorComponent.index = 0;
 
-		// set sprite id and time
-		update_animation(animatorComponent, animation);
+		//// set sprite id and time
+		//update_animation(animatorComponent, animation);
 	}
 }
 
@@ -78,13 +78,13 @@ void minty::AnimationSystem::reset()
 
 void minty::AnimationSystem::update_animation(AnimatorComponent& animatorComponent, Animation const& animation) const
 {
-	// set time
-	float frameTime = animation.get_frame_time();
-	animatorComponent.time = math::mod(animatorComponent.time, frameTime) + frameTime;
+	//// set time
+	//float frameTime = animation.get_frame_time();
+	//animatorComponent.time = math::mod(animatorComponent.time, frameTime) + frameTime;
 
-	// set frame
-	SpriteComponent& spriteComponent = get_entity_registry().get<SpriteComponent>(animatorComponent.entity);
-	spriteComponent.spriteId = animation.get_frame(animatorComponent.index);
+	//// set frame
+	//SpriteComponent& spriteComponent = get_entity_registry().get<SpriteComponent>(animatorComponent.entity);
+	//spriteComponent.spriteId = animation.get_frame(animatorComponent.index);
 }
 
 ID minty::AnimationSystem::create_animation(AnimationBuilder const& builder)
@@ -150,22 +150,26 @@ ID minty::AnimationSystem::load_animation(Path const& path)
 	AnimationBuilder builder
 	{
 		.name = reader.read_string("name", meta.to_string()),
-		.frameTime = reader.read_float("frameTime", 0.25f),
+		.length = reader.read_float("length"),
 	};
+	reader.read_vector("entities", builder.entities);
+	reader.read_vector("components", builder.components);
+	reader.read_vector("sizes", builder.sizes);
+	reader.read_vector("values", builder.values);
 
 	// get renderer
 	RenderSystem* renderer = get_scene().get_system_registry().find<RenderSystem>();
 
 	MINTY_ASSERT(renderer != nullptr, "AnimationSystem::load_animation(): renderer must not be null.");
 
-	// get sprite IDs from loaded names
-	std::vector<String> names;
-	reader.read_vector("frames", names);
-	builder.frames.resize(names.size());
-	for (size_t i = 0; i < names.size(); i++)
-	{
-		builder.frames[i] = renderer->find_sprite(names.at(i));
-	}
+	//// get sprite IDs from loaded names
+	//std::vector<String> names;
+	//reader.read_vector("frames", names);
+	//builder.frames.resize(names.size());
+	//for (size_t i = 0; i < names.size(); i++)
+	//{
+	//	builder.frames[i] = renderer->find_sprite(names.at(i));
+	//}
 
 	return create_animation(builder);
 }

@@ -12,7 +12,7 @@ std::ostream& minty::operator<<(std::ostream& stream, Object const& object)
 	return stream;
 }
 
-std::istream& minty::operator>>(std::istream& stream, Object const& object)
+std::istream& minty::operator>>(std::istream& stream, Object& object)
 {
 	return stream;
 }

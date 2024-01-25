@@ -1,6 +1,7 @@
 #pragma once
 
 #include "M_Base.h"
+#include "M_Dynamic.h"
 
 namespace minty
 {
@@ -15,13 +16,36 @@ namespace minty
 		String name;
 
 		/// <summary>
-		/// The time each frame takes to elapse in seconds.
+		/// The amount of time this Animation runs for, in seconds.
 		/// </summary>
-		float frameTime;
+		float const length;
 
 		/// <summary>
-		/// A list of Sprite IDs for each frame in the animation.
+		/// A list of all Entities being affected by this Animation.
 		/// </summary>
-		std::vector<ID> frames;
+		std::vector<String> entities;
+
+		/// <summary>
+		/// A list of all Components being edited by this Animation.
+		/// </summary>
+		std::vector<String> components;
+
+		/// <summary>
+		/// A list of all offset/sizes being set by this Animation.
+		/// 
+		/// Each offset/size corresponds to somewhere within one of the components being edited.
+		/// </summary>
+		std::vector<size_t> sizes;
+
+		/// <summary>
+		/// A list of all values being set by this Animation.
+		/// </summary>
+		std::vector<Dynamic> values;
+
+		/// <summary>
+		/// The compilation of steps within this Animation.
+		/// [Entity index: 8 bits][Component index: 8 bits][offset index: 8 bits][size index: 8 bits][value index: 32 bits]
+		/// </summary>
+		std::vector<std::pair<float, uint64_t>> steps;
 	};
 }

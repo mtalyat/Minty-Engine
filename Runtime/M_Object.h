@@ -18,7 +18,7 @@ namespace minty
 		virtual void deserialize(Reader const& reader) override;
 
 		friend std::ostream& operator<<(std::ostream& stream, Object const& object);
-		friend std::istream& operator>>(std::istream& stream, Object const& object);
+		friend std::istream& operator>>(std::istream& stream, Object& object);
 	public:
 		friend String to_string(Object const& value);
 	};

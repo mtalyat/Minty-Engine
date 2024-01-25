@@ -8,28 +8,94 @@
 using namespace minty;
 
 minty::Animation::Animation()
-	: _frameTime(0.25f)
-	, _frames()
+	: _length()
+	, _entities()
+	, _components()
+	, _sizes()
+	, _values()
+	, _steps()
 {}
 
 minty::Animation::Animation(AnimationBuilder const& builder)
-	: _frameTime(builder.frameTime)
-	, _frames(builder.frames)
+	: _length(builder.length)
+	, _entities(builder.entities)
+	, _components(builder.components)
+	, _sizes(builder.sizes)
+	, _values(builder.values)
+	, _steps(builder.steps)
 {}
 
-float minty::Animation::get_frame_time() const
+bool minty::Animation::animate(float& time, float const elapsedTime, size_t& index, Entity const thisEntity, EntityRegistry& registry) const
 {
-	return _frameTime;
+	if (time >= _length)
+	{
+		// already done
+		return true;
+	}
+
+	time += elapsedTime;
+
+	// perform all steps that are <= the time
+	while (_steps.at(index).first <= time)
+	{
+		// get the compiled step value
+		size_t compiledStep = _steps.at(index).second;
+
+		// get the indices for each part of the step
+		Step step;
+		uncompile_step(compiledStep, step);
+
+		// get the entity
+		// if entity index is 0xff (max ID), then it is referring to the argument Entity (this Entity, if you will)
+		Entity entity = step.entityIndex == 0xff ? thisEntity : registry.find(_entities.at(step.entityIndex));
+		if (entity == NULL_ENTITY) continue; // no entity, do not continue
+
+		// get the component from the entity
+		Component* component = registry.get_by_name(_components.at(step.componentIndex), entity);
+		if (!component) continue; // no component, do not continue
+
+		// get the value to set
+		Dynamic const& value = _values.at(step.valueIndex);
+
+		// set the value using the offset and size
+		size_t offset = _sizes.at(step.offsetIndex);
+		size_t size = _sizes.at(step.sizeIndex);
+
+		memcpy(static_cast<char*>(static_cast<void*>(component)) + offset, value.data(), size);
+
+		// move to the next step
+		index++;
+	}
+
+	if (time >= _length)
+	{
+		// now its done
+		return true;
+	}
+
+	// not done yet
+	return false;
 }
 
-size_t minty::Animation::get_frame_count() const
+uint64_t minty::Animation::compile_step(Step const& step)
 {
-	return _frames.size();
+	// [Entity index: 8 bits][Component index: 8 bits][offset index: 8 bits][size index: 8 bits][value index: 32 bits]
+	return
+		((step.entityIndex & 0xff) << 56) |
+		((step.componentIndex & 0xff) << 48) |
+		((step.offsetIndex & 0xff) << 40) |
+		((step.sizeIndex & 0xff) << 32) |
+		((step.valueIndex & 0xffffffff));
 }
 
-ID minty::Animation::get_frame(size_t const index) const
+void minty::Animation::uncompile_step(size_t const value, Step& step)
 {
-	return _frames.at(index);
+	// [Entity index: 8 bits][Component index: 8 bits][offset index: 8 bits][size index: 8 bits][value index: 32 bits]
+	step.entityIndex = (value >> 56) & 0xff;
+	step.componentIndex = (value >> 48) & 0xff;
+	step.offsetIndex = (value >> 40) & 0xff;
+	step.sizeIndex = (value >> 32) & 0xff;
+	step.valueIndex = value & 0xffffffff;
 }
 
 void minty::Animation::serialize(Writer& writer) const
@@ -39,17 +105,7 @@ void minty::Animation::serialize(Writer& writer) const
 
 	MINTY_ASSERT(renderer != nullptr, "Animation::serialize(): RenderSystem cannot be null.");
 
-	// write basic types
-	writer.write("frameTime", _frameTime);
 	
-	// convert all sprite IDs to names, then write the names
-	std::vector<String> names(_frames.size());
-	for (size_t i = 0; i < _frames.size(); i++)
-	{
-		names[i] = renderer->get_sprite_name(_frames.at(i));
-	}
-
-	writer.write("frames", names);
 }
 
 void minty::Animation::deserialize(Reader const& reader)
@@ -59,16 +115,5 @@ void minty::Animation::deserialize(Reader const& reader)
 
 	MINTY_ASSERT(renderer != nullptr, "Animation::deserialize(): RenderSystem cannot be null.");
 
-	// get basic types
-	_frameTime = reader.read_float("frameTime");
-
-	// convert all names to IDs
-	std::vector<String> names;
-	reader.read_vector("frames", names);
-	_frames.clear();
-	_frames.resize(names.size());
-	for (size_t i = 0; i < names.size(); i++)
-	{
-		_frames[i] = renderer->find_sprite(names.at(i));
-	}
+	
 }
