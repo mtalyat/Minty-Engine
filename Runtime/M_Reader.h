@@ -54,7 +54,7 @@ namespace minty
 		/// Sets the extra data given to this Reader.
 		/// </summary>
 		/// <param name="data">The extra data as a void pointer.</param>
-		void set_data(void const* data);
+		void set_data(void const* const data);
 
 		/// <summary>
 		/// Checks if a child with the given name exists.
@@ -65,9 +65,9 @@ namespace minty
 
 #pragma region Reading
 
-		void to_serializable(ISerializable* const value) const;
+		void to_serializable(ISerializable& value) const;
 
-		void read_serializable(String const& name, ISerializable* const value) const;
+		void read_serializable(String const& name, ISerializable& value) const;
 
 		String to_string(String const& defaultValue = "") const;
 
@@ -103,13 +103,13 @@ namespace minty
 
 	public:
 		template<typename T>
-		void to_object(T& value) const
+		void to_object_ref(T& value) const
 		{
 			parse_object(_node, value);
 		}
 
 		template<typename T>
-		void to_object(T& value, T const& defaultValue) const
+		void to_object_ref(T& value, T const& defaultValue) const
 		{
 			if (!parse_object(_node, value))
 			{
@@ -118,7 +118,28 @@ namespace minty
 		}
 
 		template<typename T>
-		void read_object(String const& name, T& value) const
+		T to_object() const
+		{
+			T t{};
+			parse_object(_node, t);
+			return t;
+		}
+
+		template<typename T>
+		T to_object(T const& defaultValue) const
+		{
+			T t{};
+
+			if (parse_object(_node, t))
+			{
+				return t;
+			}
+
+			return defaultValue;
+		}
+
+		template<typename T>
+		void read_object_ref(String const& name, T& value) const
 		{
 			if (Node const* node = _node.find(name))
 			{
@@ -127,7 +148,7 @@ namespace minty
 		}
 
 		template<typename T>
-		void read_object(String const& name, T& value, T const& defaultValue) const
+		void read_object_ref(String const& name, T& value, T const& defaultValue) const
 		{
 			if (Node const* node = _node.find(name))
 			{
@@ -138,6 +159,35 @@ namespace minty
 			}
 
 			value = defaultValue;
+		}
+
+		template<typename T>
+		T read_object(String const& name) const
+		{
+			T t{};
+			
+			if (Node const* node = _node.find(name))
+			{
+				parse_object(*node, t);
+			}
+
+			return t;
+		}
+
+		template<typename T>
+		T read_object(String const& name, T const& defaultValue) const
+		{
+			T t{};
+			
+			if (Node const* node = _node.find(name))
+			{
+				if (parse_object(*node, t))
+				{
+					return t;
+				}
+			}
+
+			return defaultValue;
 		}
 
 		template<typename T>
@@ -252,7 +302,7 @@ namespace minty
 		template<typename T>
 		bool parse_object(Node const& node, T& value) const
 		{
-			if (Object* obj = try_cast<T, Object>(&value))
+			if (ISerializable* obj = try_cast<T, ISerializable>(&value))
 			{
 				Reader reader(node, _data);
 				obj->deserialize(reader);
@@ -364,13 +414,13 @@ namespace minty
 			for (auto const& child : node->children)
 			{
 				// parse T
-				T t;
+				T t{};
 				std::stringstream stream(child.first);
 				stream >> t;
 
 				// parse U
-				U u;
-				reader.read_object(child.first, u);
+				U u{};
+				reader.read_object_ref(child.first, u);
 			}
 		}
 
@@ -384,13 +434,13 @@ namespace minty
 			for (auto const& child : node->children)
 			{
 				// parse T
-				T t;
+				T t{};
 				std::stringstream stream(child.first);
 				stream >> t;
 
 				// parse U
-				U u;
-				reader.read_object(child.first, u);
+				U u{};
+				reader.read_object_ref(child.first, u);
 			}
 		}
 

@@ -341,14 +341,10 @@ ID minty::RenderSystem::load_sprite(Path const& path, String const& name)
 		.textureId = find_texture(reader.read_string("texture")),
 		.materialId = find_material(reader.read_string("material")),
 		.coordinateMode = from_string_coordinate_mode(reader.read_string("coordinateMode")),
-		.minCoords = Vector2(0.0f, 0.0f),
-		.maxCoords = Vector2(1.0f, 1.0f),
-		.pivot = Vector2(0.5f, 0.5f),
+		.minCoords = reader.read_object("min", Vector2(0.0f, 0.0f)),
+		.maxCoords = reader.read_object("max", Vector2(1.0f, 1.0f)),
+		.pivot = reader.read_object("pivot", Vector2(0.5f, 0.5f)),
 	};
-
-	reader.read_object("min", builder.minCoords);
-	reader.read_object("max", builder.maxCoords);
-	reader.read_object("pivot", builder.pivot);
 
 	return create_sprite(builder);
 }
@@ -991,8 +987,8 @@ void minty::RenderSystem::deserialize(Reader const& reader)
 				.materialId = find_material(atlasReader.read_string("material")),
 				.coordinateMode = from_string_coordinate_mode(atlasReader.read_string("coordinateMode")),
 			};
-			atlasReader.read_object("slice", builder.slice, Vector2(0.0f, 0.0f));
-			atlasReader.read_object("pivot", builder.pivot, Vector2(0.5f, 0.5f));
+			builder.slice = atlasReader.read_object("slice", Vector2(0.0f, 0.0f));
+			builder.pivot = atlasReader.read_object("pivot", Vector2(0.5f, 0.5f));
 
 			TextureAtlas atlas(builder, get_engine(), get_scene_id());
 
@@ -1014,7 +1010,7 @@ void minty::RenderSystem::deserialize(Reader const& reader)
 						int x = nReader.read_int("x");
 						int y = nReader.read_int("y");
 						Vector2 pivot;
-						nReader.read_object("pivot", pivot, Vector2(0.5f, 0.5f));
+						nReader.read_object_ref("pivot", pivot, Vector2(0.5f, 0.5f));
 						CoordinateMode coordinateMode = from_string_coordinate_mode(nReader.read_string("coordinateMode"));
 
 						atlas.create_sprite(x, y, pivot, coordinateMode);
@@ -1025,9 +1021,8 @@ void minty::RenderSystem::deserialize(Reader const& reader)
 					for (Node const* n : nodes)
 					{
 						Reader nReader(*n, reader.get_data());
-						Vector2 minCoords, maxCoords;
-						nReader.read_object("min", minCoords, Vector2(0.0f, 0.0f));
-						nReader.read_object("max", maxCoords, Vector2(1.0f, 1.0f));
+						Vector2 minCoords = nReader.read_object("min", Vector2(0.0f, 0.0f));
+						Vector2 maxCoords = nReader.read_object("max", Vector2(1.0f, 1.0f));
 						CoordinateMode coordinateMode = from_string_coordinate_mode(nReader.read_string("coordinateMode"));
 
 						atlas.slice_sprite(minCoords, maxCoords, coordinateMode);

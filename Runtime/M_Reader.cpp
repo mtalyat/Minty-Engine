@@ -26,7 +26,7 @@ void const* minty::Reader::get_data() const
 	return _data;
 }
 
-void minty::Reader::set_data(void const* data)
+void minty::Reader::set_data(void const* const data)
 {
 	_data = data;
 }
@@ -36,17 +36,17 @@ bool minty::Reader::exists(String const& name) const
 	return static_cast<bool>(_node.find(name));
 }
 
-void minty::Reader::to_serializable(ISerializable* const value) const
+void minty::Reader::to_serializable(ISerializable& value) const
 {
-	value->deserialize(*this);
+	value.deserialize(*this);
 }
 
-void minty::Reader::read_serializable(String const& name, ISerializable* const value) const
+void minty::Reader::read_serializable(String const& name, ISerializable& value) const
 {
 	if (Node const* found = _node.find(name))
 	{
 		Reader reader(*found, _data);
-		value->deserialize(reader);
+		value.deserialize(reader);
 	}
 }
 

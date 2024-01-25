@@ -188,7 +188,7 @@ ID minty::AnimationSystem::load_animator(Path const& path)
 	{
 		.name = reader.read_string("name", meta.to_string()),
 	};
-	reader.read_object("fsm", builder.fsm);
+	reader.read_object_ref("fsm", builder.fsm);
 
 	return create_animator(builder);
 }

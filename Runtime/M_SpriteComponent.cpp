@@ -22,7 +22,7 @@ void minty::SpriteComponent::deserialize(Reader const& reader)
 	RenderSystem const* renderSystem = data->scene->get_system_registry().find<RenderSystem>();
 
 	spriteId = renderSystem->find_sprite(reader.read_string("sprite"));
-	reader.read_object("size", size, Vector2(1.0f, 1.0f));
+	size = reader.read_object<Vector2>("size", Vector2(1.0f, 1.0f));
 	order = reader.read_int("order");
 }
 

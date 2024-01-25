@@ -301,7 +301,7 @@ void minty::FSM::State::serialize(Writer& writer) const
 
 void minty::FSM::State::deserialize(Reader const& reader)
 {
-	reader.read_object("value", _value);
+	reader.read_object_ref("value", _value);
 	reader.read_vector("transitions", _transitions);
 }
 
@@ -476,7 +476,7 @@ void minty::FSM::deserialize(Reader const& reader)
 {
 	Reader fsmReader(reader.get_node(), this);
 
-	fsmReader.read_object("scope", _scope);
+	fsmReader.read_object_ref("scope", _scope);
 	fsmReader.read_register("states", _states);
 	_startingStateId = _states.find(fsmReader.read_string("start"));
 	_currentStateId = _startingStateId;
