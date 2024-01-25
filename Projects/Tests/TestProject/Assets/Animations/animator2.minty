@@ -1,8 +1,8 @@
-name: animator
+name: animator2
 fsm
     start: idle
     scope
-        move: 0
+        rotate: 0
         flicker: 0
     states
         idle

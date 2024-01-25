@@ -24,12 +24,6 @@ void minty::AnimationSystem::update()
 
 	for (auto&& [entity, animatorComponent] : registry.view<AnimatorComponent>().each())
 	{
-		// skip if no animation
-		if (animatorComponent.animationId == ERROR_ID)
-		{
-			continue;
-		}
-
 		// update the animator, get the current animation ID
 		ID newId = animatorComponent.animator.update();
 
@@ -38,6 +32,12 @@ void minty::AnimationSystem::update()
 		{
 			animatorComponent.animationId = newId;
 			animatorComponent.reset();
+		}
+
+		// skip if no animation
+		if (animatorComponent.animationId == ERROR_ID)
+		{
+			continue;
 		}
 
 		// if the animator time is below zero, then the animator has paused, so do nothing
@@ -148,6 +148,27 @@ ID minty::AnimationSystem::load_animation(Path const& path)
 	reader.read_vector("components", builder.components);
 	reader.read_vector("sizes", builder.sizes);
 	reader.read_vector("values", builder.values);
+
+	RenderSystem* renderSystem = get_system_registry().find<RenderSystem>();
+
+	// if the values are strings, parse them
+	for (Dynamic& value : builder.values)
+	{
+		String valueString = value.get_string();
+
+		if (valueString.starts_with("Sprite: "))
+		{
+			ID id = renderSystem->find_sprite(valueString.substr(8, valueString.size() - 8));
+			value.set(&id);
+		}
+		else if (valueString.starts_with("Texture: "))
+		{
+			ID id = renderSystem->find_texture(valueString.substr(8, valueString.size() - 8));
+			value.set(&id);
+		}
+
+		// else, leave be
+	}
 
 	// read the steps, but split them up by '/'
 	if (Node const* stepsNode = reader.get_node().find("steps"))

@@ -15,7 +15,12 @@ minty::Animator::Animator(AnimatorBuilder const& builder)
 
 void minty::Animator::set_variable(String const& name, int const value)
 {
-	_fsm.set_variable("name", value);
+	_fsm.set_variable(name, value);
+}
+
+int minty::Animator::get_variable(String const& name) const
+{
+	return _fsm.get_variable(name);
 }
 
 ID minty::Animator::update()
@@ -27,8 +32,10 @@ ID minty::Animator::update()
 	{
 	case -1: // did not transition, same state
 	case 0: // transitioned, new state
+		break;
 	case 1: // did nothing, no state
-		break; // ok result
+		console::warn(std::format("Animator::update(): No current state set."));
+		return ERROR_ID;
 	case 2:
 		// infinite loop
 		console::warn(std::format("Animator::update(): Infinite loop indicated."));
@@ -38,19 +45,15 @@ ID minty::Animator::update()
 		return ERROR_ID;
 	}
 
-	// if current state, and state has a value...
-	if (_fsm.has_current_state())
-	{
-		Dynamic const& value = _fsm.get_current_value();
+	Dynamic const& value = _fsm.get_current_value();
 
-		if (value.size() == sizeof(ID))
-		{
-			return value.get<ID>();
-		}
-		else
-		{
-			console::error(std::format("Animator::update(): FSM value was not the size of an ID. sizeof(ID): {}, size: {}", sizeof(ID), value.size()));
-		}
+	if (value.size() == sizeof(ID))
+	{
+		return value.get<ID>();
+	}
+	else
+	{
+		console::error(std::format("Animator::update(): FSM value was not the size of an ID. sizeof(ID): {}, size: {}", sizeof(ID), value.size()));
 	}
 
 	// no state or value

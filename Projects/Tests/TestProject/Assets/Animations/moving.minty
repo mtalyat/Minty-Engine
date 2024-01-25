@@ -1,35 +1,44 @@
 name: moving
-length: 2.0
+length: 1.1
 loops: true
 entities
 components
-    - Sprite
+    0: Sprite
 sizes
-    - 8
-    - 4
+    0: 8
+    1: 4
 values
-    - i 0
-    - i 1
-    - i 2
-    - i 3
-    - i 4
-    - i 5
-    - i 6
-    - i 7
+    0: S Sprite: death_0
+    1: S Sprite: death_1
+    2: S Sprite: death_2
+    3: S Sprite: death_3
+    4: S Sprite: death_4
+    5: S Sprite: death_5
+    6: S Sprite: death_6
+    7: S Sprite: death_7
+    8: S Sprite: death_8
+    9: S Sprite: death_9
+    10: S Sprite: death_10
 steps
     0.0
         0//0/0/1/0
-    0.25
+    0.1
         0//0/0/1/1
-    0.5
+    0.2
         0//0/0/1/2
-    0.75
+    0.3
         0//0/0/1/3
-    1.0
+    0.4
         0//0/0/1/4
-    1.25
+    0.5
         0//0/0/1/5
-    1.5
+    0.6
         0//0/0/1/6
-    1.75
+    0.7
         0//0/0/1/7
+    0.8
+        0//0/0/1/8
+    0.9
+        0//0/0/1/9
+    1.0
+        0//0/0/1/10

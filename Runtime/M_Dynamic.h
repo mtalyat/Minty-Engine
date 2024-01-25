@@ -88,6 +88,8 @@ namespace minty
 			return *static_cast<T*>(_data);
 		}
 
+		String get_string() const;
+
 		/// <summary>
 		/// Gets the pointer to the data.
 		/// </summary>

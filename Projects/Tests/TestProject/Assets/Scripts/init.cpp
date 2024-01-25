@@ -79,7 +79,6 @@ int init(Runtime &runtime)
         Window *windowPtr = &window;
         EntityRegistry* erPtr = &er;
 
-        //          input
         input.emplace_key_down(Key::E, [audioPtr, erPtr](KeyPressEventArgs const &args)
                                { audioPtr->play_spatial("ding", erPtr->find("Model")); });
         input.emplace_key_up(Key::E, [audioPtr, erPtr](KeyPressEventArgs const &args)
@@ -88,6 +87,26 @@ int init(Runtime &runtime)
         // quit on key close
         input.emplace_key_down(Key::Escape, [windowPtr](KeyPressEventArgs const &args)
                                { windowPtr->close(); });
+
+        // animator
+        input.emplace_key_down(Key::D1, [erPtr](KeyPressEventArgs const& args)
+        {
+            console::log("D1");
+            Entity spriteEntity = erPtr->find("Sprite");
+            AnimatorComponent& animatorComp = erPtr->get<AnimatorComponent>(spriteEntity);
+            animatorComp.animator.set_variable("move", (animatorComp.animator.get_variable("move") + 1) & 1);
+
+            console::log(std::to_string(animatorComp.animator.get_variable("move")));
+        });
+        input.emplace_key_down(Key::D2, [erPtr](KeyPressEventArgs const& args)
+        {
+            console::log("D2");
+            Entity spriteEntity = erPtr->find("Sprite");
+            AnimatorComponent& animatorComp = erPtr->get<AnimatorComponent>(spriteEntity);
+            animatorComp.animator.set_variable("flicker", (animatorComp.animator.get_variable("flicker") + 1) & 1);
+
+            console::log(std::to_string(animatorComp.animator.get_variable("flicker")));
+        });
 
         MoveSystem *moveSystem = sr.find<MoveSystem>();
         input.emplace_key_down(Key::W, [moveSystem](KeyPressEventArgs const &args)

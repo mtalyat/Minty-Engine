@@ -19,6 +19,8 @@ namespace minty
 
 		void set_variable(String const& name, int const value);
 
+		int get_variable(String const& name) const;
+
 		ID update();
 
 		FSM& get_fsm();

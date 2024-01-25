@@ -482,7 +482,23 @@ void minty::FSM::deserialize(Reader const& reader)
 	Reader fsmReader(reader.get_node(), this);
 
 	fsmReader.read_object_ref("scope", _scope);
-	fsmReader.read_register("states", _states);
+
+	// read all state names first so that the transitions can reference them
+	if (Node const* statesNode = fsmReader.get_node().find("states"))
+	{
+		_states.clear();
+
+		for (Node const& stateNode : statesNode->get_children())
+		{
+			_states.emplace(stateNode.get_name(), State());
+		}
+
+		// read into temp register so the temp states still exist
+		Register<State> temp;
+		fsmReader.read_register("states", temp);
+		_states = temp; // copy over
+	}
+
 	_startingStateId = _states.find(fsmReader.read_string("start"));
 	_currentStateId = _startingStateId;
 }

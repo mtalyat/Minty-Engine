@@ -990,13 +990,13 @@ void minty::RenderSystem::deserialize(Reader const& reader)
 				.textureId = find_texture(atlasReader.read_string("texture")),
 				.materialId = find_material(atlasReader.read_string("material")),
 				.coordinateMode = from_string_coordinate_mode(atlasReader.read_string("coordinateMode")),
+				.slice = atlasReader.read_object("slice", Vector2(0.0f, 0.0f)),
+				.pivot = atlasReader.read_object("pivot", Vector2(0.5f, 0.5f))
 			};
-			builder.slice = atlasReader.read_object("slice", Vector2(0.0f, 0.0f));
-			builder.pivot = atlasReader.read_object("pivot", Vector2(0.5f, 0.5f));
 
 			TextureAtlas atlas(builder, get_engine(), get_scene_id());
 
-			if (Node const* spritesNode = atlasesNode->find("sprites"))
+			if (Node const* spritesNode = atlasNode.find("sprites"))
 			{
 				// determine what to do with the sprites
 				if (spritesNode->find("all"))

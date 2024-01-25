@@ -98,6 +98,26 @@ void minty::Dynamic::set(void* const data, size_t const size)
 	_size = size;
 }
 
+String minty::Dynamic::get_string() const
+{
+	// make appropriate char array
+	char* temp = new char[_size + 1];
+
+	// copy data over
+	memcpy(temp, _data, _size);
+
+	// set last char to '\0'
+	temp[_size] = '\0';
+
+	// turn that into a string
+	String out(temp);
+
+	// clean up
+	delete[] temp;
+
+	return out;
+}
+
 void* minty::Dynamic::data() const
 {
 	return _data;
@@ -192,7 +212,7 @@ bool minty::operator!=(Dynamic const& left, Dynamic const& right)
 std::ostream& minty::operator<<(std::ostream& stream, Dynamic const& object)
 {
 	// output as base 64
-	stream << "64 " << encoding::encode_base64(object);
+	stream << encoding::encode_base64(object);
 
 	return stream;
 }
@@ -212,6 +232,7 @@ std::istream& minty::operator>>(std::istream& stream, Dynamic& object)
 		l: long
 		ul: unsigned long
 		e: empty bytes of size
+		S: String
 		(no type given): base 64 encoded string
 	*/
 
@@ -220,11 +241,29 @@ std::istream& minty::operator>>(std::istream& stream, Dynamic& object)
 	stream >> type;
 
 	// decide what to do based on that
-	if (type == "str") // string
+	if (type.starts_with("S")) // string
 	{
+		// skip one char (should be a space)
+		stream.get();
+
+		// get value
 		String temp;
-		stream >> temp;
-		object.set(temp.data(), (temp.size() + 1) * sizeof(char));
+		//stream >> temp;
+		std::getline(stream, temp);
+		size_t size = temp.size();
+
+		// get size from type, if applicable
+		if (type.size() > 1)
+		{
+			// get new size from type after the 'S'
+			size = parse::to_size(type.substr(1, type.size() - 1));
+
+			// resize string
+			temp.resize(size);
+		}
+
+		// set data to string
+		object.set(temp.data(), size * sizeof(char));
 	}
 	else if (type == "i") // int
 	{
