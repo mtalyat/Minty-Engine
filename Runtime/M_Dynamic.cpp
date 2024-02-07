@@ -4,6 +4,8 @@
 #include "M_Console.h"
 #include "M_Parse.h"
 #include "M_Encoding.h"
+#include "M_Vector.h"
+#include "M_Quaternion.h"
 
 using namespace minty;
 
@@ -233,6 +235,13 @@ std::istream& minty::operator>>(std::istream& stream, Dynamic& object)
 		ul: unsigned long
 		e: empty bytes of size
 		S: String
+		V2: Vector2
+		V3: Vector3
+		V4: Vector4
+		V2I: Vector2Int
+		V3I: Vector3Int
+		V4I: Vector4Int
+		Q: Quaternion
 		(no type given): base 64 encoded string
 	*/
 
@@ -269,73 +278,115 @@ std::istream& minty::operator>>(std::istream& stream, Dynamic& object)
 	{
 		int temp;
 		stream >> temp;
-		object.set(&temp, sizeof(int));
+		object.set(&temp);
 	}
 	else if (type == "ui") // unsigned int
 	{
 		unsigned int temp;
 		stream >> temp;
-		object.set(&temp, sizeof(unsigned int));
+		object.set(&temp);
 	}
 	else if (type == "f") // float
 	{
 		float temp;
 		stream >> temp;
-		object.set(&temp, sizeof(float));
+		object.set(&temp);
 	}
 	else if (type == "d") // double
 	{
 		double temp;
 		stream >> temp;
-		object.set(&temp, sizeof(double));
+		object.set(&temp);
 	}
 	else if (type == "b" || type == "ub") // (unsigned) byte
 	{
 		unsigned char temp;
 		stream >> temp;
-		object.set(&temp, sizeof(unsigned char));
+		object.set(&temp);
 	}
 	else if (type == "sb") // signed byte
 	{
 		signed char temp;
 		stream >> temp;
-		object.set(&temp, sizeof(signed char));
+		object.set(&temp);
 	}
 	else if (type == "c") // char
 	{
 		char temp;
 		stream >> temp;
-		object.set(&temp, sizeof(char));
+		object.set(&temp);
 	}
 	else if (type == "s") // short
 	{
 		short temp;
 		stream >> temp;
-		object.set(&temp, sizeof(short));
+		object.set(&temp);
 	}
 	else if (type == "us") // unsigned short
 	{
 		unsigned short temp;
 		stream >> temp;
-		object.set(&temp, sizeof(unsigned short));
+		object.set(&temp);
 	}
 	else if (type == "l") // long
 	{
 		long temp;
 		stream >> temp;
-		object.set(&temp, sizeof(long));
+		object.set(&temp);
 	}
 	else if (type == "ul") // unsigned long
 	{
 		unsigned long temp;
 		stream >> temp;
-		object.set(&temp, sizeof(unsigned long));
+		object.set(&temp);
 	}
 	else if (type == "e")
 	{
 		size_t temp;
 		stream >> temp;
 		object.set(nullptr, temp);
+	}
+	else if (type == "V2")
+	{
+		Vector2 temp;
+		stream >> temp;
+		object.set(&temp);
+	}
+	else if (type == "V3")
+	{
+		Vector3 temp;
+		stream >> temp;
+		object.set(&temp);
+	}
+	else if (type == "V4")
+	{
+		Vector4 temp;
+		stream >> temp;
+		object.set(&temp);
+	}
+	else if (type == "V2I")
+	{
+		Vector2Int temp;
+		stream >> temp;
+		object.set(&temp);
+	}
+	else if (type == "V3I")
+	{
+		Vector3Int temp;
+		stream >> temp;
+		object.set(&temp);
+	}
+	else if (type == "V4I")
+	{
+		Vector4Int temp;
+		stream >> temp;
+		object.set(&temp);
+	}
+	else if (type == "Q")
+	{
+		Quaternion temp;
+		stream >> temp;
+		object.set(&temp);
 	}
 	else
 	{

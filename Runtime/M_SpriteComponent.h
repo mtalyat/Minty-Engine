@@ -1,7 +1,7 @@
 #pragma once
 
 #include "M_Component.h"
-#include "M_Transform.h"
+#include "M_Vector.h"
 
 namespace minty
 {

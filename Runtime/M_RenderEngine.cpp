@@ -945,7 +945,7 @@ void minty::RenderEngine::draw_scene(VkCommandBuffer commandBuffer)
 		if (transformComponent)
 		{
 			// render the entity's mesh at the position
-			draw_mesh(commandBuffer, transformComponent->global, mesh);
+			draw_mesh(commandBuffer, transformComponent->globalMatrix, mesh);
 		}
 		else
 		{
@@ -1030,7 +1030,7 @@ void minty::RenderEngine::draw_sprite(VkCommandBuffer commandBuffer, TransformCo
 	// get the data
 	SpritePushData pushData
 	{
-		.transform = transformComponent.global,
+		.transform = transformComponent.globalMatrix,
 		.minCoords = sprite.get_min_coords(),
 		.maxCoords = sprite.get_max_coords(),
 		.pivot = sprite.get_pivot(),

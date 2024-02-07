@@ -91,21 +91,27 @@ int init(Runtime &runtime)
         // animator
         input.emplace_key_down(Key::D1, [erPtr](KeyPressEventArgs const& args)
         {
-            console::log("D1");
             Entity spriteEntity = erPtr->find("Sprite");
             AnimatorComponent& animatorComp = erPtr->get<AnimatorComponent>(spriteEntity);
             animatorComp.animator.set_variable("move", (animatorComp.animator.get_variable("move") + 1) & 1);
-
-            console::log(std::to_string(animatorComp.animator.get_variable("move")));
         });
         input.emplace_key_down(Key::D2, [erPtr](KeyPressEventArgs const& args)
         {
-            console::log("D2");
             Entity spriteEntity = erPtr->find("Sprite");
             AnimatorComponent& animatorComp = erPtr->get<AnimatorComponent>(spriteEntity);
             animatorComp.animator.set_variable("flicker", (animatorComp.animator.get_variable("flicker") + 1) & 1);
-
-            console::log(std::to_string(animatorComp.animator.get_variable("flicker")));
+        });
+        input.emplace_key_down(Key::D3, [erPtr](KeyPressEventArgs const& args)
+        {
+            Entity spriteEntity = erPtr->find("Model");
+            AnimatorComponent& animatorComp = erPtr->get<AnimatorComponent>(spriteEntity);
+            animatorComp.animator.set_variable("move", (animatorComp.animator.get_variable("move") + 1) & 1);
+        });
+        input.emplace_key_down(Key::D4, [erPtr](KeyPressEventArgs const& args)
+        {
+            Entity spriteEntity = erPtr->find("Model");
+            AnimatorComponent& animatorComp = erPtr->get<AnimatorComponent>(spriteEntity);
+            animatorComp.animator.set_variable("flicker", (animatorComp.animator.get_variable("flicker") + 1) & 1);
         });
 
         MoveSystem *moveSystem = sr.find<MoveSystem>();

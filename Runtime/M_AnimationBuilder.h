@@ -37,21 +37,23 @@ namespace minty
 		std::vector<String> components;
 
 		/// <summary>
-		/// A list of all offset/sizes being set by this Animation.
-		/// 
-		/// Each offset/size corresponds to somewhere within one of the components being edited.
+		/// A list of all variable names being set by this Animation.
 		/// </summary>
-		std::vector<size_t> sizes;
+		std::vector<String> variables;
 
 		/// <summary>
 		/// A list of all values being set by this Animation.
 		/// </summary>
-		std::vector<Dynamic> values;
+		std::vector<String> values;
 
 		/// <summary>
-		/// The compilation of steps within this Animation.
-		/// [Entity index: 8 bits][Component index: 8 bits][offset index: 8 bits][size index: 8 bits][value index: 32 bits]
+		/// The steps within this Animation.
 		/// </summary>
 		std::vector<std::pair<float, Animation::Step>> steps;
+
+		/// <summary>
+		/// The steps taken when resetting this Animation.
+		/// </summary>
+		std::vector<Animation::Step> resetSteps;
 	};
 }

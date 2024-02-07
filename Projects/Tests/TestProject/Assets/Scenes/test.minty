@@ -43,8 +43,10 @@ systems
             - Animations/idle.minty
             - Animations/moving.minty
             - Animations/flicker.minty
+            - Animations/slide.minty
         animators
             - Animations/animator.minty
+            - Animations/animator2.minty
     CameraController
     Move
     Test
@@ -75,6 +77,8 @@ entities
             type: cube
         AudioSource
             clip: cow-bells
+        Animator
+            animator: animator2
 #    Sprite
 #        Renderable
 #        Transform

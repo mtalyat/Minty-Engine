@@ -2,22 +2,22 @@ name: animator2
 fsm
     start: idle
     scope
-        rotate: 0
+        move: 0
         flicker: 0
     states
         idle
             value: i 0
             transitions
                 -
-                    state: moving
+                    state: slide
                     conditions
                         - move != 0
                 -
                     state: flicker
                     conditions
                         - flicker != 0
-        moving
-            value: i 1
+        slide
+            value: i 3
             transitions
                 -
                     state: idle

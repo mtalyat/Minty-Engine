@@ -1,44 +1,51 @@
 #include "pch.h"
 #include "M_TransformComponent.h"
 
+#include "glm.hpp"
+
 using namespace minty;
+
+Matrix4 minty::TransformComponent::get_local_matrix() const
+{
+	return glm::translate(Matrix4(1.0f), localPosition) * glm::mat4_cast(localRotation) * glm::scale(Matrix4(1.0f), localScale);
+}
 
 Vector3 minty::TransformComponent::get_global_position() const
 {
 	// last column of the matrix is the position
-	return Vector3(global[3]);
+	return Vector3(globalMatrix[3]);
 }
 
 Vector3 minty::TransformComponent::get_forward() const
 {
-	return Vector3(global * Vector4(0.0f, 0.0f, 1.0f, 1.0f));
+	return Vector3(globalMatrix * Vector4(0.0f, 0.0f, 1.0f, 1.0f));
 }
 
 Vector3 minty::TransformComponent::get_up() const
 {
-	return Vector3(global * Vector4(0.0f, 1.0f, 0.0f, 1.0f));
+	return Vector3(globalMatrix * Vector4(0.0f, 1.0f, 0.0f, 1.0f));
 }
 
 Vector3 minty::TransformComponent::get_right() const
 {
-	return Vector3(global * Vector4(1.0f, 0.0f, 0.0f, 1.0f));
+	return Vector3(globalMatrix * Vector4(1.0f, 0.0f, 0.0f, 1.0f));
 }
 
 void minty::TransformComponent::serialize(Writer& writer) const
 {
-	writer.write("position", local.position, Vector3());
-	writer.write("rotation", local.rotation, Quaternion());
-	writer.write("scale", local.scale, Vector3(1.0f, 1.0f, 1.0f));
+	writer.write("position", localPosition, Vector3());
+	writer.write("rotation", localRotation, Quaternion());
+	writer.write("scale", localScale, Vector3(1.0f, 1.0f, 1.0f));
 }
 
 void minty::TransformComponent::deserialize(Reader const& reader)
 {
-	local.position = reader.read_object<Vector3>("position");
-	local.rotation = reader.read_object<Quaternion>("rotation");
-	local.scale = reader.read_object<Vector3>("scale", Vector3(1.0f, 1.0f, 1.0f));
+	localPosition = reader.read_object<Vector3>("position");
+	localRotation = reader.read_object<Quaternion>("rotation");
+	localScale = reader.read_object<Vector3>("scale", Vector3(1.0f, 1.0f, 1.0f));
 }
 
 String minty::to_string(TransformComponent const& value)
 {
-	return std::format("TransformComponent(local = {})", to_string(value.local));
+	return std::format("TransformComponent(position = {}, rotation = {}, scale = {})", to_string(value.localPosition), to_string(value.localRotation), to_string(value.localScale));
 }

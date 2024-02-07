@@ -4,6 +4,7 @@
 #include "M_Animator.h"
 #include "M_FiniteStateMachine.h"
 #include "M_EntityRegistry.h"
+#include "M_Animation.h"
 
 namespace minty
 {
@@ -31,7 +32,7 @@ namespace minty
 		/// <summary>
 		/// The step index of the current animation.
 		/// </summary>
-		size_t index = 0;
+		Animation::Index index = 0;
 
 		void reset();
 

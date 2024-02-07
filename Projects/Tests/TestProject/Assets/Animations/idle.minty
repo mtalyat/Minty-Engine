@@ -3,12 +3,7 @@ length: 0.1
 loops: false
 entities
 components
-    0: Sprite
-sizes
-    0: 8
-    1: 4
+variables
 values
-    0: S Sprite: brian
 steps
-    0.0
-        0//0/0/1/0
+reset

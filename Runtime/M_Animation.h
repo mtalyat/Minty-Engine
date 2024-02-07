@@ -1,17 +1,17 @@
 #pragma once
 
 #include "M_Object.h"
-#include "M_ISerializable.h"
 #include "M_Dynamic.h"
 #include "M_EntityRegistry.h"
 #include <vector>
+#include <unordered_map>
 
 namespace minty
 {
 	struct AnimationBuilder;
 
 	/*
-	
+
 	Animations can be ran. They can edit values of other components.
 
 	Name of animation
@@ -20,7 +20,7 @@ namespace minty
 			Name of component to edit
 			Name of value to edit (use offsetof to edit data directly)
 			Value to set (Dynamic?)
-	
+
 	*/
 
 	/// <summary>
@@ -29,29 +29,38 @@ namespace minty
 	class Animation
 		: public Object
 	{
-	public:
-		constexpr static size_t const MAX_STEP = 0b11;
-		constexpr static size_t const MAX_INDEX = 0xff;
-		constexpr static size_t const MAX_VALUE_INDEX = 0x3fffffff;
-
-		enum class StepType
+	private:
+		enum Flags : int
 		{
-			/// <summary>
-			/// Perform a step as normal.
-			/// </summary>
-			Normal = 0b00,
-			/// <summary>
-			/// Add the Component to the Entity, if it does not exist.
-			/// </summary>
-			Add = 0b01,
-			/// <summary>
-			/// Remove the Component from the Entity, if it exists.
-			/// </summary>
-			Remove = 0b10,
-			/// <summary>
-			/// Ignore this step.
-			/// </summary>
-			Ignore = 0b11,
+			ANIMATION_FLAGS_NONE = 0,
+			ANIMATION_FLAGS_LOOPS = 0b00000001,
+			ANIMATION_FLAGS_ALL = 0b00000001,
+		};
+
+	private:
+		constexpr static int const ENTITY_OFFSET = 16;
+		constexpr static int const COMPONENT_OFFSET = 8;
+		constexpr static int const VARIABLE_OFFSET = 0;
+		constexpr static int const TIME_OFFSET = 0;
+		constexpr static int const VALUE_OFFSET = 4;
+		constexpr static int const FLAGS_OFFSET = 0;
+		constexpr static size_t const MAX_ENTITY_INDEX = 0xff;
+		constexpr static size_t const MAX_COMPONENT_INDEX = 0xff;
+		constexpr static size_t const MAX_VARIABLE_INDEX = 0xff;
+		constexpr static size_t const MAX_TIME_INDEX = 0xffffffff;
+		constexpr static size_t const MAX_VALUE_INDEX = 0xfffffff;
+		constexpr static size_t const MAX_FLAGS_INDEX = 0xf;
+		typedef uint32_t step_key_t;
+		typedef uint32_t step_time_t;
+		typedef uint32_t step_value_t;
+
+	public:
+		enum StepFlags
+		{
+			ANIMATION_STEP_FLAGS_NONE = 0b0000,
+			ANIMATION_STEP_FLAGS_ADD_REMOVE = 0b0001,
+			ANIMATION_STEP_FLAGS_HARD_SOFT = 0b0010,
+			ANIMATION_STEP_FLAGS_ALL = 0b0011,
 		};
 
 		/// <summary>
@@ -59,24 +68,22 @@ namespace minty
 		/// </summary>
 		struct Step
 		{
-			StepType type = StepType::Ignore;
-			size_t entityIndex = MAX_INDEX;
-			size_t componentIndex = MAX_INDEX;
-			size_t offsetIndex = MAX_INDEX;
-			size_t sizeIndex = MAX_INDEX;
+			size_t entityIndex = MAX_ENTITY_INDEX;
+			size_t componentIndex = MAX_COMPONENT_INDEX;
+			size_t variableIndex = MAX_VARIABLE_INDEX;
+			size_t timeIndex = MAX_TIME_INDEX;
 			size_t valueIndex = MAX_VALUE_INDEX;
+			StepFlags flags;
 		};
 
+		typedef uint32_t Index;
 	private:
 		/// <summary>
 		/// The amount of time this Animation runs for, in seconds.
 		/// </summary>
 		float _length;
 
-		/// <summary>
-		/// The animation loops.
-		/// </summary>
-		bool _loops;
+		Flags _flags;
 
 		/// <summary>
 		/// A list of all Entities being affected by this Animation.
@@ -89,22 +96,34 @@ namespace minty
 		std::vector<String> _components;
 
 		/// <summary>
-		/// A list of all offset/sizes being set by this Animation.
-		/// 
-		/// Each offset/size corresponds to somewhere within one of the components being edited.
+		/// A list of all variable names being used by this Animation.
 		/// </summary>
-		std::vector<size_t> _sizes;
+		std::vector<String> _variables;
+
+		/// <summary>
+		/// List of all time intervals in this Animation.
+		/// </summary>
+		std::vector<float> _times;
 
 		/// <summary>
 		/// A list of all values being set by this Animation.
 		/// </summary>
-		std::vector<Dynamic> _values;
+		std::vector<String> _values;
 
 		/// <summary>
 		/// The compilation of steps within this Animation.
-		/// [Step type: 2 bits][Entity index: 8 bits][Component index: 8 bits][offset index: 8 bits][size index: 8 bits][value index: 30 bits]
+		/// [Entity index: 8 bits][Component index: 8 bits][Offset index: 8 bits][Time index: 18 bits][Value index: 18 bits][Flags: 4 bits]
+		/// 
+		/// Key: The combined IDs of Entity, Component, Variable
+		/// Value Key: Time ID
+		/// Value Value: Value and Flags
 		/// </summary>
-		std::vector<std::pair<float, uint64_t>> _steps;
+		std::unordered_map<step_key_t, std::unordered_map<step_time_t, step_value_t>> _steps;
+
+		/// <summary>
+		/// The steps taken when the animation is reset.
+		/// </summary>
+		std::unordered_map<step_key_t, std::vector<step_value_t>> _reset;
 
 	public:
 		/// <summary>
@@ -132,15 +151,28 @@ namespace minty
 		/// <param name="elapsedTime">The time that has elapsed over the last frame.</param>
 		/// <param name="index">The index of the next step to perform.</param>
 		/// <param name="thisEntity">The entity in which this Animation is being acted upon.</param>
-		/// <param name="registry">The EntityRegistry in which this Animation is acting in.</param>
+		/// <param name="registry">The EntityRegistry in which thisEntity is in.</param>
 		/// <returns>True when the animation has completed, otherwise false.</returns>
-		bool animate(float& time, float const elapsedTime, size_t& index, Entity const thisEntity, EntityRegistry& registry) const;
+		bool animate(float& time, float const elapsedTime, Index& index, Entity const thisEntity, EntityRegistry& registry) const;
+
+		/// <summary>
+		/// Performs a reset on an Entity.
+		/// </summary>
+		/// <param name="thisEntity">The Entity to reset.</param>
+		/// <param name="registry">The EntityRegistry in which thisEntity is in.</param>
+		void reset(Entity const thisEntity, EntityRegistry& registry) const;
+
+	public:
+		static Step parse_step(String const& string);
 
 	private:
-		static uint64_t compile_step(Step const& step);
+		step_key_t compile_key(size_t const entityIndex, size_t const componentIndex, size_t const variableIndex) const;
 
-		static void uncompile_step(size_t const value, Step& step);
+		step_value_t compile_value(size_t const valueIndex, StepFlags const flags) const;
 
+		void perform_step(step_key_t const key, step_time_t const time, step_value_t const value, Entity const thisEntity, EntityRegistry& registry) const;
+
+		void perform_step(Step const& step, Entity const thisEntity, EntityRegistry& registry) const;
 	public:
 		void serialize(Writer& writer) const override;
 		void deserialize(Reader const& reader) override;

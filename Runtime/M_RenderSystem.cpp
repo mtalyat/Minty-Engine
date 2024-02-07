@@ -52,10 +52,10 @@ void minty::RenderSystem::unload()
 
 void minty::RenderSystem::update_camera(CameraComponent const& camera, TransformComponent const& transform)
 {
-	Vector4 matPos = transform.global[3];
+	Vector4 matPos = transform.globalMatrix[3];
 	Vector3 globalPos = Vector3(matPos.x, matPos.y, matPos.z);
 
-	Matrix4 view = glm::lookAt(globalPos, globalPos + transform.local.rotation.forward(), Vector3(0.0f, 1.0f, 0.0f));
+	Matrix4 view = glm::lookAt(globalPos, globalPos + transform.localRotation.forward(), Vector3(0.0f, 1.0f, 0.0f));
 
 	// TODO: don't use lookat
 	// maybe invert global?

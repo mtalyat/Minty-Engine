@@ -46,6 +46,12 @@ namespace minty
 
 		void set_data(String const& data);
 
+		/// <summary>
+		/// Gets the Node string as it were serialized.
+		/// </summary>
+		/// <returns></returns>
+		String get_node_string() const;
+
 		std::vector<Node>& get_children();
 
 		std::vector<Node> const& get_children() const;

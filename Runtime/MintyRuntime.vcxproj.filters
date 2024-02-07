@@ -55,6 +55,9 @@
     <Filter Include="Header Files\Animation">
       <UniqueIdentifier>{63fb4a8f-724c-450f-852f-d1a3410792cd}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Transform">
+      <UniqueIdentifier>{30483a13-5871-4e8e-9c19-a93c57aff238}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -227,12 +230,6 @@
     </ClInclude>
     <ClInclude Include="M_RelationshipComponent.h">
       <Filter>Header Files\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="M_TransformComponent.h">
-      <Filter>Header Files\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="M_Transform.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="M_Encoding.h">
       <Filter>Header Files</Filter>
@@ -483,9 +480,6 @@
     <ClInclude Include="M_Lookup.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="M_AnimationObject.h">
-      <Filter>Header Files\Animation</Filter>
-    </ClInclude>
     <ClInclude Include="M_RenderSystem.h">
       <Filter>Header Files\Rendering</Filter>
     </ClInclude>
@@ -512,6 +506,9 @@
     </ClInclude>
     <ClInclude Include="M_AudioObject.h">
       <Filter>Header Files\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="M_TransformComponent.h">
+      <Filter>Header Files\Transform</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -651,9 +648,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_TransformComponent.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="M_Transform.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_DirtyComponent.cpp">
@@ -825,9 +819,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_Rendering_Buffer.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="M_AnimationObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_Animator.cpp">

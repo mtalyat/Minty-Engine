@@ -159,7 +159,7 @@ void minty::Scene::update()
 
 			if (parentTransform)
 			{
-				transform.global = parentTransform->global * transform.local.get_matrix();
+				transform.globalMatrix = parentTransform->globalMatrix * transform.get_local_matrix();
 
 				continue;
 			}
@@ -168,7 +168,7 @@ void minty::Scene::update()
 		}
 
 		// no parent
-		transform.global = transform.local.get_matrix();
+		transform.globalMatrix = transform.get_local_matrix();
 	}
 }
 

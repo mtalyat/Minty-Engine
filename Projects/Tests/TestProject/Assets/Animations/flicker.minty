@@ -1,17 +1,15 @@
 name: flicker
-length: 1.0
+length: 0.5
 loops: true
 entities
 components
-    0: Sprite
-sizes
-    0: 8
-    1: 4
+    0: Renderable
+variables
 values
-    0: S Sprite: brian
-    1: S Sprite: x
 steps
     0.0
-        0//0/0/1/0
-    0.5
-        0//0/0/1/1
+        1//0///
+    0.25
+        2//0///
+reset
+    1//0///

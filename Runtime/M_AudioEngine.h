@@ -2,6 +2,7 @@
 
 #include "M_Object.h"
 #include "M_Register.h"
+#include "M_Vector.h"
 
 #include "M_AudioClip.h"
 #include "M_Audio.h"

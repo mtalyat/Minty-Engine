@@ -9,37 +9,104 @@
 
 using namespace minty;
 
+// READ ME
+/*
+
+
+
+
+
+Create an interface (or add to Component) that has a Set function for the name of each variable using a string.
+Then use that to set variables for animators.
+
+Make that function virtual, but have it throw a runtime error by default so it only has to be
+overridden when needed.
+
+
+
+
+
+
+*/
+
 minty::Animation::Animation()
 	: _length()
+	, _flags()
 	, _entities()
 	, _components()
-	, _sizes()
+	, _variables()
 	, _values()
+	, _times()
 	, _steps()
+	, _reset()
 {}
 
 minty::Animation::Animation(AnimationBuilder const& builder)
 	: _length(builder.length)
+	, _flags(
+		builder.loops ? ANIMATION_FLAGS_LOOPS : ANIMATION_FLAGS_NONE
+	)
 	, _entities(builder.entities)
 	, _components(builder.components)
-	, _sizes(builder.sizes)
+	, _variables(builder.variables)
 	, _values(builder.values)
+	, _times()
 	, _steps()
+	, _reset()
 {
 	// take steps and compile them all
 	_steps.reserve(builder.steps.size());
 	for (auto const& pair : builder.steps)
 	{
-		_steps.push_back({ pair.first, compile_step(pair.second) });
+		// if this is the first time, or a new time, add to times
+		if (!_times.size() || _times.back() != pair.first)
+		{
+			_times.push_back(pair.first);
+		}
+
+		// get that time id
+		step_time_t timeIndex = static_cast<step_time_t>(_times.size());
+
+		// add to steps
+		step_key_t key = compile_key(pair.second.entityIndex, pair.second.componentIndex, pair.second.variableIndex);
+		
+		auto const& found = _steps.find(key);
+		if (found == _steps.end())
+		{
+			// create new map
+			_steps.emplace(key, std::unordered_map<step_time_t, step_value_t>());
+		}
+
+		step_value_t value = compile_value(pair.second.valueIndex, pair.second.flags);
+
+		// add to map
+		_steps.at(key).emplace(timeIndex, value);
+	}
+	_reset.reserve(builder.resetSteps.size());
+	for (auto const& step : builder.resetSteps)
+	{
+		// get the key and value
+		step_key_t key = compile_key(step.entityIndex, step.componentIndex, step.variableIndex);
+		step_value_t value = compile_value(step.valueIndex, step.flags);
+
+		// add list if it dne for this key
+		auto const& found = _reset.find(key);
+		if (found == _reset.end())
+		{
+			_reset.emplace(key, std::vector<step_value_t>());
+		}
+
+		// add to that list
+		_reset.at(key).push_back(value);
 	}
 }
 
 bool minty::Animation::loops() const
 {
-	return _loops;
+	return _flags & ANIMATION_FLAGS_LOOPS;
 }
 
-bool minty::Animation::animate(float& time, float const elapsedTime, size_t& index, Entity const thisEntity, EntityRegistry& registry) const
+bool minty::Animation::animate(float& time, float const elapsedTime, Index& index, Entity const thisEntity, EntityRegistry& registry) const
 {
 	if (time >= _length)
 	{
@@ -49,104 +116,154 @@ bool minty::Animation::animate(float& time, float const elapsedTime, size_t& ind
 
 	time += elapsedTime;
 
-	// perform all steps that are <= the time
-	while (index < _steps.size() && _steps.at(index).first <= time)
+	// if no more times in the times list, nothing will happen
+	if (index >= _times.size()) return false;
+
+	// if current time < the next time in the times list, then nothing will happen
+	if (time < _times.at(index)) return false;
+	
+	// find the ending index
+	Index endIndex = index;
+	while (endIndex < _times.size() && time <= _times[endIndex + 1])
 	{
-		// get the compiled step value
-		size_t compiledStep = _steps.at(index).second;
+		endIndex++;
+	}
 
-		// get the indices for each part of the step
-		Step step;
-		uncompile_step(compiledStep, step);
-
-		// get the entity
-		// if entity index is 0xff (max ID), then it is referring to the argument Entity (this Entity, if you will)
-		Entity entity = step.entityIndex == MAX_INDEX ? thisEntity : registry.find(_entities.at(step.entityIndex));
-		if (entity == NULL_ENTITY) continue; // no entity, do not continue
-
-		// get the component from the entity
-		Component* component = registry.get_by_name(_components.at(step.componentIndex), entity);
-
-		// determine what to do based on the type
-		switch (step.type)
+	// go through each step list
+	for (auto const& pair : _steps)
+	{
+		// start at end, apply first value that shows up, if any
+		for (int64_t i = endIndex; i >= index; i--)
 		{
-			case StepType::Normal:
+			auto const& found = pair.second.find(static_cast<Index>(i));
+			if (found != pair.second.end())
 			{
-				if (!component) continue; // no component, do nothing else
+				// step found, so perform it and stop looking for steps since this is the last one linearly
+				perform_step(pair.first, found->first, found->second, thisEntity, registry);
 				break;
 			}
-			case StepType::Add:
-			{
-				// add the component to the entity if it does not contain it
-				if (!component)
-				{
-					registry.emplace_by_name(_components.at(step.componentIndex), entity);
-				}
-				break;
-			}
-			case StepType::Remove:
-			{
-				// remove the component from the entity if it does contain it
-				if (component)
-				{
-					registry.erase_by_name(_components.at(step.componentIndex), entity);
-				}
-				// skip the rest: cannot set component value if it was just erased
-				continue;
-				break;
-			}
-			default:
-				console::error(std::format("Animation::animate(): unrecognized StepType: {}", static_cast<int>(step.type)));
-				continue;
 		}
-
-		// if the value index is max value, there is no value to set
-		if (step.valueIndex == MAX_INDEX) continue;
-
-		// get the value to set
-		Dynamic const& value = _values.at(step.valueIndex);
-
-		// set the value using the offset and size
-		size_t offset = _sizes.at(step.offsetIndex);
-		size_t size = _sizes.at(step.sizeIndex);
-
-		memcpy(static_cast<char*>(static_cast<void*>(component)) + offset, value.data(), size);
-
-		// move to the next step
-		index++;
 	}
 
-	if (time >= _length)
+	// update index, so it will start after the last step performed
+	index = endIndex + 1;
+
+	// check again if animation completed
+	return time >= _length;
+}
+
+void minty::Animation::reset(Entity const thisEntity, EntityRegistry& registry) const
+{
+	// perform each step within _reset
+	for (auto const& pair : _reset)
 	{
-		// now its done
-		return true;
+		for (auto const value : pair.second)
+		{
+			perform_step(pair.first, 0u, value, thisEntity, registry);
+		}
+	}
+}
+
+size_t get_split(size_t const index, std::vector<String> const& split, size_t const defaultValue)
+{
+	return (index < split.size() && split.at(index).size()) ? parse::to_size(split.at(index)) : defaultValue;
+}
+
+Animation::Step minty::Animation::parse_step(String const& string)
+{
+	// split the line by /'s
+	std::vector<String> split = string::split(string, '/');
+
+	// parse into the step's values
+	return Step
+	{
+		.entityIndex = get_split(1, split, Animation::MAX_ENTITY_INDEX),
+		.componentIndex = get_split(2, split, Animation::MAX_COMPONENT_INDEX),
+		.variableIndex = get_split(3, split, Animation::MAX_VARIABLE_INDEX),
+		.timeIndex = Animation::MAX_TIME_INDEX, // time set outside of this function
+		.valueIndex = get_split(4, split, Animation::MAX_VALUE_INDEX),
+		.flags = static_cast<Animation::StepFlags>(get_split(0, split, Animation::StepFlags::ANIMATION_STEP_FLAGS_NONE)),
+	};
+}
+
+Animation::step_key_t minty::Animation::compile_key(size_t const entityIndex, size_t const componentIndex, size_t const variableIndex) const
+{
+	return
+		((entityIndex & MAX_ENTITY_INDEX) << ENTITY_OFFSET) |
+		((componentIndex & MAX_COMPONENT_INDEX) << COMPONENT_OFFSET) |
+		((variableIndex & MAX_VARIABLE_INDEX) << VARIABLE_OFFSET);
+}
+
+Animation::step_value_t minty::Animation::compile_value(size_t const valueIndex, StepFlags const flags) const
+{
+	return
+		((valueIndex & MAX_VALUE_INDEX) << VALUE_OFFSET) |
+		((flags & MAX_FLAGS_INDEX) << FLAGS_OFFSET);
+}
+
+void minty::Animation::perform_step(step_key_t const key, step_time_t const time, step_value_t const value, Entity const thisEntity, EntityRegistry& registry) const
+{
+	// build the step
+	Step step = Step
+	{
+		.entityIndex = key >> ENTITY_OFFSET,
+		.componentIndex = key >> COMPONENT_OFFSET,
+		.variableIndex = key >> VARIABLE_OFFSET,
+		.timeIndex = time >> TIME_OFFSET,
+		.valueIndex = value >> VALUE_OFFSET,
+		.flags = static_cast<StepFlags>(value >> FLAGS_OFFSET),
+	};
+
+	// perform the step using that
+	return perform_step(step, thisEntity, registry);
+}
+
+void minty::Animation::perform_step(Step const& step, Entity const thisEntity, EntityRegistry& registry) const
+{
+	// get the entity
+	// if entity index is 0xff (max ID), then it is referring to the argument Entity (this Entity, if you will)
+	Entity entity = step.entityIndex == MAX_ENTITY_INDEX ? thisEntity : registry.find(_entities.at(step.entityIndex));
+	if (entity == NULL_ENTITY) return; // no entity, do not continue
+
+	// get the component from the entity
+	Component* component = registry.get_by_name(_components.at(step.componentIndex), entity);
+
+	// determine what to do based on the flags
+	if (step.flags & ANIMATION_STEP_FLAGS_ADD_REMOVE)
+	{
+		// remove the component from the entity if it does contain it
+		if (component)
+		{
+			registry.erase_by_name(_components.at(step.componentIndex), entity);
+		}
+	}
+	else
+	{
+		// add the component to the entity if it does not contain it
+		if (!component)
+		{
+			registry.emplace_by_name(_components.at(step.componentIndex), entity);
+		}
 	}
 
-	// not done yet
-	return false;
-}
+	// ignore if no variable name or value
+	if (step.variableIndex == MAX_VARIABLE_INDEX || step.valueIndex == MAX_VALUE_INDEX) return;
 
-uint64_t minty::Animation::compile_step(Step const& step)
-{
-	// [Step type: 2 bits][Entity index: 8 bits][Component index: 8 bits][offset index: 8 bits][size index: 8 bits][value index: 30 bits]
-	return
-		((static_cast<size_t>(step.type) & MAX_STEP) << 62) |
-		((step.entityIndex & MAX_INDEX) << 54) |
-		((step.componentIndex & MAX_INDEX) << 46) |
-		((step.offsetIndex & MAX_INDEX) << 38) |
-		((step.sizeIndex & MAX_INDEX) << 30) |
-		((step.valueIndex & MAX_VALUE_INDEX));
-}
+	// get the variable name that will be set
+	String const& name = _variables.at(step.variableIndex);
 
-void minty::Animation::uncompile_step(size_t const value, Step& step)
-{
-	// [Step type: 2 bits][Entity index: 8 bits][Component index: 8 bits][offset index: 8 bits][size index: 8 bits][value index: 30 bits]
-	step.type = static_cast<StepType>((value >> 62) & MAX_STEP);
-	step.entityIndex = (value >> 54) & MAX_INDEX;
-	step.componentIndex = (value >> 46) & MAX_INDEX;
-	step.offsetIndex = (value >> 38) & MAX_INDEX;
-	step.sizeIndex = (value >> 30) & MAX_INDEX;
-	step.valueIndex = value & MAX_VALUE_INDEX;
+	// get the value to set
+	String const& value = _values.at(step.valueIndex);
+
+	if (step.flags & ANIMATION_STEP_FLAGS_HARD_SOFT)
+	{
+		// lerp between frames
+		console::todo("Animation::animate() soft animation. Defaulting to hard.");
+	}
+
+	// create a reader and deserialize using that one value
+	Reader reader(Node(name, value));
+	component->deserialize(reader);
 }
 
 void minty::Animation::serialize(Writer& writer) const
@@ -156,7 +273,11 @@ void minty::Animation::serialize(Writer& writer) const
 
 	MINTY_ASSERT(renderer != nullptr, "Animation::serialize(): RenderSystem cannot be null.");
 
+	//writer.write("name", )
+	writer.write("length", _length);
+	writer.write("loops", static_cast<bool>(_flags & ANIMATION_FLAGS_LOOPS));
 	
+	console::todo("Finish Animation::serialize()");
 }
 
 void minty::Animation::deserialize(Reader const& reader)
@@ -166,5 +287,5 @@ void minty::Animation::deserialize(Reader const& reader)
 
 	MINTY_ASSERT(renderer != nullptr, "Animation::deserialize(): RenderSystem cannot be null.");
 
-	
+	console::todo("Animation::deserialize()");
 }

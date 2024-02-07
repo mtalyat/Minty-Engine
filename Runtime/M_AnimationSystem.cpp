@@ -30,14 +30,18 @@ void minty::AnimationSystem::update()
 		// if the ID has changed, reset with new animation data
 		if (animatorComponent.animationId != newId)
 		{
+			// reset animation state data
+			
+			// get the animation so it can be used
+			if (animatorComponent.animationId != ERROR_ID)
+			{
+				Animation const& oldAnimation = _animations.at(animatorComponent.animationId);
+				oldAnimation.reset(entity, registry);
+			}
+
+			// reset animator for new animation
 			animatorComponent.animationId = newId;
 			animatorComponent.reset();
-		}
-
-		// skip if no animation
-		if (animatorComponent.animationId == ERROR_ID)
-		{
-			continue;
 		}
 
 		// if the animator time is below zero, then the animator has paused, so do nothing
@@ -146,29 +150,10 @@ ID minty::AnimationSystem::load_animation(Path const& path)
 	// read data vectors
 	reader.read_vector("entities", builder.entities);
 	reader.read_vector("components", builder.components);
-	reader.read_vector("sizes", builder.sizes);
+	reader.read_vector("variables", builder.variables);
 	reader.read_vector("values", builder.values);
 
 	RenderSystem* renderSystem = get_system_registry().find<RenderSystem>();
-
-	// if the values are strings, parse them
-	for (Dynamic& value : builder.values)
-	{
-		String valueString = value.get_string();
-
-		if (valueString.starts_with("Sprite: "))
-		{
-			ID id = renderSystem->find_sprite(valueString.substr(8, valueString.size() - 8));
-			value.set(&id);
-		}
-		else if (valueString.starts_with("Texture: "))
-		{
-			ID id = renderSystem->find_texture(valueString.substr(8, valueString.size() - 8));
-			value.set(&id);
-		}
-
-		// else, leave be
-	}
 
 	// read the steps, but split them up by '/'
 	if (Node const* stepsNode = reader.get_node().find("steps"))
@@ -183,21 +168,17 @@ ID minty::AnimationSystem::load_animation(Path const& path)
 			// get actual step values
 			for (Node const& stepNode : timeStampNode.get_children())
 			{
-				// split the line by /s
-				std::vector<String> split = string::split(stepNode.get_name(), '/');
-				// create the step
-				Animation::Step step
-				{
-					.type = (split.size() >= 1 && split.at(0).size()) ? static_cast<Animation::StepType>(parse::to_size(split.at(0))) : Animation::StepType::Ignore,
-					.entityIndex = (split.size() >= 2 && split.at(1).size()) ? parse::to_size(split.at(1)) : Animation::MAX_INDEX,
-					.componentIndex = (split.size() >= 3 && split.at(2).size()) ? parse::to_size(split.at(2)) : Animation::MAX_INDEX,
-					.offsetIndex = (split.size() >= 4 && split.at(3).size()) ? parse::to_size(split.at(3)) : Animation::MAX_INDEX,
-					.sizeIndex = (split.size() >= 5 && split.at(4).size()) ? parse::to_size(split.at(4)) : Animation::MAX_INDEX,
-					.valueIndex = (split.size() >= 6 && split.at(5).size()) ? parse::to_size(split.at(5)) : Animation::MAX_VALUE_INDEX,
-				};
-				// add to builder
-				builder.steps.push_back({ time, step });
+				builder.steps.push_back({ time, Animation::Step() });
+				Animation::parse_step(stepNode.get_node_string());
 			}
+		}
+	}
+	if (Node const* resetsNode = reader.get_node().find("reset"))
+	{
+		for (Node const& resetNode : resetsNode->get_children())
+		{
+			builder.resetSteps.push_back(Animation::Step());
+			Animation::parse_step(resetNode.get_node_string());
 		}
 	}
 

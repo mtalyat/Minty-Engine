@@ -4,21 +4,21 @@ loops: true
 entities
 components
     0: Sprite
-sizes
-    0: 8
-    1: 4
+variables
+    0: spriteId
 values
-    0: S Sprite: death_0
-    1: S Sprite: death_1
-    2: S Sprite: death_2
-    3: S Sprite: death_3
-    4: S Sprite: death_4
-    5: S Sprite: death_5
-    6: S Sprite: death_6
-    7: S Sprite: death_7
-    8: S Sprite: death_8
-    9: S Sprite: death_9
-    10: S Sprite: death_10
+    0: S death_0
+    1: S death_1
+    2: S death_2
+    3: S death_3
+    4: S death_4
+    5: S death_5
+    6: S death_6
+    7: S death_7
+    8: S death_8
+    9: S death_9
+    10: S death_10
+    11: S brian
 steps
     0.0
         0//0/0/1/0
@@ -42,3 +42,5 @@ steps
         0//0/0/1/9
     1.0
         0//0/0/1/10
+reset
+    0//0/0/1/11

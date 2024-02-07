@@ -42,6 +42,36 @@ void minty::Node::set_data(String const& data)
 	_data = data;
 }
 
+String minty::Node::get_node_string() const
+{
+    if (has_name())
+    {
+        if (has_data())
+        {
+            // both name and data
+            return std::format("{}: {}", get_name(), get_data());
+        }
+        else
+        {
+            // only name
+            return get_name();
+        }
+    }
+    else
+    {
+        if (has_data())
+        {
+            // only data
+            return get_data();
+        }
+        else
+        {
+            // neither
+            return "";
+        }
+    }
+}
+
 std::vector<Node>& minty::Node::get_children()
 {
 	return _children;
@@ -375,5 +405,5 @@ Node minty::Node::load_node(Path const& path)
 
 String minty::to_string(Node const& value)
 {
-	return std::format("Node(data = {}, children size = {})", value._data, value._children.size());
+    return value.get_node_string();
 }
