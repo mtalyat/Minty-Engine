@@ -21,9 +21,9 @@ void game::CameraControllerSystem::update()
     for (auto &&[entity, camera, transform] : registry.view<CameraComponent const, TransformComponent>().each())
     {
         Quaternion quat = Quaternion::from_euler_angles(math::deg2rad(pitch), math::deg2rad(yaw), 0.0f);
-        if (transform.local.rotation != quat)
+        if (transform.localRotation != quat)
         {
-            transform.local.rotation = quat;
+            transform.localRotation = quat;
             registry.emplace_or_replace<DirtyComponent>(entity);
         }
     }

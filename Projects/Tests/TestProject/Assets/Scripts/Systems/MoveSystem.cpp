@@ -33,17 +33,17 @@ void game::MoveSystem::update()
         bool moved = false;
         if (right != 0.0f)
         {
-            transform.local.position += transform.local.rotation.right() * movement * right;
+            transform.localPosition += transform.localRotation.right() * movement * right;
             moved = true;
         }
         if (up != 0.0f)
         {
-            transform.local.position += transform.local.rotation.up() * movement * up;
+            transform.localPosition += transform.localRotation.up() * movement * up;
             moved = true;
         }
         if (forward != 0.0f)
         {
-            transform.local.position += transform.local.rotation.forward() * movement * forward;
+            transform.localPosition += transform.localRotation.forward() * movement * forward;
             moved = true;
         }
         if (moved)

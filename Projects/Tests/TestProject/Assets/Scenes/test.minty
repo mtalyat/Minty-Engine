@@ -66,8 +66,8 @@ entities
             position: (0, 0, -2)
         Sprite
             sprite: x
-        Animator
-            animator: animator
+#        Animator
+#            animator: animator
     Model
         Renderable
         Transform

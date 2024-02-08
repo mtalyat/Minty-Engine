@@ -40,9 +40,9 @@ void minty::TransformComponent::serialize(Writer& writer) const
 
 void minty::TransformComponent::deserialize(Reader const& reader)
 {
-	localPosition = reader.read_object<Vector3>("position");
-	localRotation = reader.read_object<Quaternion>("rotation");
-	localScale = reader.read_object<Vector3>("scale", Vector3(1.0f, 1.0f, 1.0f));
+	reader.try_read_object("position", localPosition);
+	reader.try_read_object("rotation", localRotation);
+	reader.try_read_object("scale", localScale);
 }
 
 String minty::to_string(TransformComponent const& value)

@@ -182,71 +182,71 @@ ID minty::RenderSystem::get_or_create_mesh(MeshType const type)
 	return id;
 }
 
-ID minty::RenderSystem::find_texture(String const& name) const
+ID minty::RenderSystem::find_texture(String const& name, ID const defaultId) const
 {
 	if (!_textures.contains(name))
 	{
-		return ERROR_ID;
+		return defaultId;
 	}
 
 	return _textures.get_id(name);
 }
 
-ID minty::RenderSystem::find_sprite(String const& name) const
+ID minty::RenderSystem::find_sprite(String const& name, ID const defaultId) const
 {
 	if (!_sprites.contains(name))
 	{
-		return ERROR_ID;
+		return defaultId;
 	}
 
 	return _sprites.get_id(name);
 }
 
-ID minty::RenderSystem::find_shader(String const& name) const
+ID minty::RenderSystem::find_shader(String const& name, ID const defaultId) const
 {
 	if (!_shaders.contains(name))
 	{
-		return ERROR_ID;
+		return defaultId;
 	}
 
 	return _shaders.get_id(name);
 }
 
-ID minty::RenderSystem::find_shader_pass(String const& name) const
+ID minty::RenderSystem::find_shader_pass(String const& name, ID const defaultId) const
 {
 	if (!_shaderPasses.contains(name))
 	{
-		return ERROR_ID;
+		return defaultId;
 	}
 
 	return _shaderPasses.get_id(name);
 }
 
-ID minty::RenderSystem::find_material_template(String const& name) const
+ID minty::RenderSystem::find_material_template(String const& name, ID const defaultId) const
 {
 	if (!_materialTemplates.contains(name))
 	{
-		return ERROR_ID;
+		return defaultId;
 	}
 
 	return _materialTemplates.get_id(name);
 }
 
-ID minty::RenderSystem::find_material(String const& name) const
+ID minty::RenderSystem::find_material(String const& name, ID const defaultId) const
 {
 	if (!_materials.contains(name))
 	{
-		return ERROR_ID;
+		return defaultId;
 	}
 
 	return _materials.get_id(name);
 }
 
-ID minty::RenderSystem::find_mesh(String const& name) const
+ID minty::RenderSystem::find_mesh(String const& name, ID const defaultId) const
 {
 	if (!_meshes.contains(name))
 	{
-		return ERROR_ID;
+		return defaultId;
 	}
 
 	return _meshes.get_id(name);

@@ -21,9 +21,10 @@ void minty::SpriteComponent::deserialize(Reader const& reader)
 	SerializationData const* data = static_cast<SerializationData const*>(reader.get_data());
 	RenderSystem const* renderSystem = data->scene->get_system_registry().find<RenderSystem>();
 
-	spriteId = renderSystem->find_sprite(reader.read_string("sprite"));
-	size = reader.read_object<Vector2>("size", Vector2(1.0f, 1.0f));
-	order = reader.read_int("order");
+	String spriteName;
+	if (reader.try_read_string("sprite", spriteName))spriteId = renderSystem->find_sprite(spriteName);
+	reader.try_read_object("size", size);
+	reader.try_read_int("order", order);
 }
 
 String minty::to_string(SpriteComponent const& value)

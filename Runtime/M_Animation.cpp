@@ -6,28 +6,9 @@
 #include "M_SerializationData.h"
 #include "M_RenderSystem.h"
 #include "M_RenderEngine.h"
+#include "M_Scene.h"
 
 using namespace minty;
-
-// READ ME
-/*
-
-
-
-
-
-Create an interface (or add to Component) that has a Set function for the name of each variable using a string.
-Then use that to set variables for animators.
-
-Make that function virtual, but have it throw a runtime error by default so it only has to be
-overridden when needed.
-
-
-
-
-
-
-*/
 
 minty::Animation::Animation()
 	: _length()
@@ -65,7 +46,7 @@ minty::Animation::Animation(AnimationBuilder const& builder)
 		}
 
 		// get that time id
-		step_time_t timeIndex = static_cast<step_time_t>(_times.size());
+		step_time_t timeIndex = static_cast<step_time_t>(_times.size() - 1);
 
 		// add to steps
 		step_key_t key = compile_key(pair.second.entityIndex, pair.second.componentIndex, pair.second.variableIndex);
@@ -106,7 +87,7 @@ bool minty::Animation::loops() const
 	return _flags & ANIMATION_FLAGS_LOOPS;
 }
 
-bool minty::Animation::animate(float& time, float const elapsedTime, Index& index, Entity const thisEntity, EntityRegistry& registry) const
+bool minty::Animation::animate(float& time, float const elapsedTime, Index& index, Entity const thisEntity, Scene& scene) const
 {
 	if (time >= _length)
 	{
@@ -124,8 +105,10 @@ bool minty::Animation::animate(float& time, float const elapsedTime, Index& inde
 	
 	// find the ending index
 	Index endIndex = index;
-	while (endIndex < _times.size() && time <= _times[endIndex + 1])
+	Index nextIndex = endIndex + 1;
+	while (nextIndex < _times.size() && time >= _times[nextIndex])
 	{
+		nextIndex++;
 		endIndex++;
 	}
 
@@ -139,7 +122,7 @@ bool minty::Animation::animate(float& time, float const elapsedTime, Index& inde
 			if (found != pair.second.end())
 			{
 				// step found, so perform it and stop looking for steps since this is the last one linearly
-				perform_step(pair.first, found->first, found->second, thisEntity, registry);
+				perform_step(pair.first, found->first, found->second, thisEntity, scene);
 				break;
 			}
 		}
@@ -152,14 +135,14 @@ bool minty::Animation::animate(float& time, float const elapsedTime, Index& inde
 	return time >= _length;
 }
 
-void minty::Animation::reset(Entity const thisEntity, EntityRegistry& registry) const
+void minty::Animation::reset(Entity const thisEntity, Scene& scene) const
 {
 	// perform each step within _reset
 	for (auto const& pair : _reset)
 	{
 		for (auto const value : pair.second)
 		{
-			perform_step(pair.first, 0u, value, thisEntity, registry);
+			perform_step(pair.first, 0u, value, thisEntity, scene);
 		}
 	}
 }
@@ -201,31 +184,34 @@ Animation::step_value_t minty::Animation::compile_value(size_t const valueIndex,
 		((flags & MAX_FLAGS_INDEX) << FLAGS_OFFSET);
 }
 
-void minty::Animation::perform_step(step_key_t const key, step_time_t const time, step_value_t const value, Entity const thisEntity, EntityRegistry& registry) const
+void minty::Animation::perform_step(step_key_t const key, step_time_t const time, step_value_t const value, Entity const thisEntity, Scene& scene) const
 {
 	// build the step
 	Step step = Step
 	{
-		.entityIndex = key >> ENTITY_OFFSET,
-		.componentIndex = key >> COMPONENT_OFFSET,
-		.variableIndex = key >> VARIABLE_OFFSET,
-		.timeIndex = time >> TIME_OFFSET,
-		.valueIndex = value >> VALUE_OFFSET,
-		.flags = static_cast<StepFlags>(value >> FLAGS_OFFSET),
+		.entityIndex = (key >> ENTITY_OFFSET) & MAX_ENTITY_INDEX,
+		.componentIndex = (key >> COMPONENT_OFFSET) & MAX_COMPONENT_INDEX,
+		.variableIndex = (key >> VARIABLE_OFFSET) & MAX_VARIABLE_INDEX,
+		.timeIndex = (time >> TIME_OFFSET) & MAX_TIME_INDEX,
+		.valueIndex = (value >> VALUE_OFFSET) & MAX_VALUE_INDEX,
+		.flags = static_cast<StepFlags>((value >> FLAGS_OFFSET) & MAX_FLAGS_INDEX),
 	};
 
 	// perform the step using that
-	return perform_step(step, thisEntity, registry);
+	return perform_step(step, thisEntity, scene);
 }
 
-void minty::Animation::perform_step(Step const& step, Entity const thisEntity, EntityRegistry& registry) const
+void minty::Animation::perform_step(Step const& step, Entity const thisEntity, Scene& scene) const
 {
+	EntityRegistry& registry = scene.get_entity_registry();
+
 	// get the entity
 	// if entity index is 0xff (max ID), then it is referring to the argument Entity (this Entity, if you will)
 	Entity entity = step.entityIndex == MAX_ENTITY_INDEX ? thisEntity : registry.find(_entities.at(step.entityIndex));
 	if (entity == NULL_ENTITY) return; // no entity, do not continue
 
-	// get the component from the entity
+	// get the component from the entity, if one was given
+	if(step.componentIndex == MAX_COMPONENT_INDEX) return;
 	Component* component = registry.get_by_name(_components.at(step.componentIndex), entity);
 
 	// determine what to do based on the flags
@@ -253,7 +239,8 @@ void minty::Animation::perform_step(Step const& step, Entity const thisEntity, E
 	String const& name = _variables.at(step.variableIndex);
 
 	// get the value to set
-	String const& value = _values.at(step.valueIndex);
+	Node value = _values.at(step.valueIndex);
+	value.set_name(name);
 
 	if (step.flags & ANIMATION_STEP_FLAGS_HARD_SOFT)
 	{
@@ -262,7 +249,13 @@ void minty::Animation::perform_step(Step const& step, Entity const thisEntity, E
 	}
 
 	// create a reader and deserialize using that one value
-	Reader reader(Node(name, value));
+	SerializationData data = SerializationData{
+		.scene = &scene,
+		.entity = thisEntity,
+	};
+	Node root;
+	root.add_child(value);
+	Reader reader(root, &data);
 	component->deserialize(reader);
 }
 

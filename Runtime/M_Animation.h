@@ -9,19 +9,7 @@
 namespace minty
 {
 	struct AnimationBuilder;
-
-	/*
-
-	Animations can be ran. They can edit values of other components.
-
-	Name of animation
-	Data: (animation states)
-		Time:
-			Name of component to edit
-			Name of value to edit (use offsetof to edit data directly)
-			Value to set (Dynamic?)
-
-	*/
+	class Scene;
 
 	/// <summary>
 	/// Holds data for an animation that can be ran.
@@ -108,7 +96,7 @@ namespace minty
 		/// <summary>
 		/// A list of all values being set by this Animation.
 		/// </summary>
-		std::vector<String> _values;
+		std::vector<Node> _values;
 
 		/// <summary>
 		/// The compilation of steps within this Animation.
@@ -153,14 +141,14 @@ namespace minty
 		/// <param name="thisEntity">The entity in which this Animation is being acted upon.</param>
 		/// <param name="registry">The EntityRegistry in which thisEntity is in.</param>
 		/// <returns>True when the animation has completed, otherwise false.</returns>
-		bool animate(float& time, float const elapsedTime, Index& index, Entity const thisEntity, EntityRegistry& registry) const;
+		bool animate(float& time, float const elapsedTime, Index& index, Entity const thisEntity, Scene& scene) const;
 
 		/// <summary>
 		/// Performs a reset on an Entity.
 		/// </summary>
 		/// <param name="thisEntity">The Entity to reset.</param>
 		/// <param name="registry">The EntityRegistry in which thisEntity is in.</param>
-		void reset(Entity const thisEntity, EntityRegistry& registry) const;
+		void reset(Entity const thisEntity, Scene& scene) const;
 
 	public:
 		static Step parse_step(String const& string);
@@ -170,9 +158,9 @@ namespace minty
 
 		step_value_t compile_value(size_t const valueIndex, StepFlags const flags) const;
 
-		void perform_step(step_key_t const key, step_time_t const time, step_value_t const value, Entity const thisEntity, EntityRegistry& registry) const;
+		void perform_step(step_key_t const key, step_time_t const time, step_value_t const value, Entity const thisEntity, Scene& scene) const;
 
-		void perform_step(Step const& step, Entity const thisEntity, EntityRegistry& registry) const;
+		void perform_step(Step const& step, Entity const thisEntity, Scene& scene) const;
 	public:
 		void serialize(Writer& writer) const override;
 		void deserialize(Reader const& reader) override;

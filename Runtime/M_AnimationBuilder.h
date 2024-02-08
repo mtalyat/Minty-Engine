@@ -44,7 +44,7 @@ namespace minty
 		/// <summary>
 		/// A list of all values being set by this Animation.
 		/// </summary>
-		std::vector<String> values;
+		std::vector<Node> values;
 
 		/// <summary>
 		/// The steps within this Animation.

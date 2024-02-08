@@ -20,7 +20,7 @@ namespace minty
 	class Reader
 	{
 	private:
-		Node const& _node;
+		Node const* _node;
 		void const* _data;
 
 	public:
@@ -69,43 +69,60 @@ namespace minty
 
 		void read_serializable(String const& name, ISerializable& value) const;
 
+		bool try_read_serializable(String const& name, ISerializable& value) const;
+
 		String to_string(String const& defaultValue = "") const;
 
 		String read_string(String const& name, String const& defaultValue = "") const;
+
+		bool try_read_string(String const& name, String& value) const;
 
 		int to_int(int const defaultValue = 0) const;
 
 		int read_int(String const& name, int const defaultValue = 0) const;
 
+		bool try_read_int(String const& name, int& value) const;
+
 		unsigned int to_uint(unsigned int const defaultValue = 0) const;
 
 		unsigned int read_uint(String const& name, unsigned int const defaultValue = 0) const;
+
+		bool try_read_uint(String const& name, unsigned int& value) const;
 
 		ID to_id(ID const defaultValue = ERROR_ID) const;
 
 		ID read_id(String const& name, ID const defaultValue = ERROR_ID) const;
 
+		bool try_read_id(String const& name, ID& value) const;
+
 		float to_float(float const defaultValue = 0.0f) const;
 
 		float read_float(String const& name, float const defaultValue = 0.0f) const;
+
+		bool try_read_float(String const& name, float& value) const;
 
 		Byte to_byte(Byte const defaultValue = 0) const;
 
 		Byte read_byte(String const& name, Byte const defaultValue = 0) const;
 
+		bool try_read_byte(String const& name, Byte& value) const;
+
 		size_t to_size(size_t const defaultValue = 0) const;
 
 		size_t read_size(String const& name, size_t const defaultValue = 0) const;
+
+		bool try_read_size(String const& name, size_t& value) const;
 
 		bool to_bool(bool const defaultValue = false) const;
 
 		bool read_bool(String const& name, bool const defaultValue = false) const;
 
+		bool try_read_bool(String const& name, bool& value) const;
 	public:
 		template<typename T>
 		void to_object_ref(T& value) const
 		{
-			parse_object(_node, value);
+			parse_object(*_node, value);
 		}
 
 		template<typename T>
@@ -121,7 +138,7 @@ namespace minty
 		T to_object() const
 		{
 			T t{};
-			parse_object(_node, t);
+			parse_object(*_node, t);
 			return t;
 		}
 
@@ -130,7 +147,7 @@ namespace minty
 		{
 			T t{};
 
-			if (parse_object(_node, t))
+			if (parse_object(*_node, t))
 			{
 				return t;
 			}
@@ -141,7 +158,7 @@ namespace minty
 		template<typename T>
 		void read_object_ref(String const& name, T& value) const
 		{
-			if (Node const* node = _node.find(name))
+			if (Node const* node = _node->find(name))
 			{
 				parse_object(*node, value);
 			}
@@ -150,7 +167,7 @@ namespace minty
 		template<typename T>
 		void read_object_ref(String const& name, T& value, T const& defaultValue) const
 		{
-			if (Node const* node = _node.find(name))
+			if (Node const* node = _node->find(name))
 			{
 				if (parse_object(*node, value))
 				{
@@ -166,7 +183,7 @@ namespace minty
 		{
 			T t{};
 			
-			if (Node const* node = _node.find(name))
+			if (Node const* node = _node->find(name))
 			{
 				parse_object(*node, t);
 			}
@@ -179,7 +196,7 @@ namespace minty
 		{
 			T t{};
 			
-			if (Node const* node = _node.find(name))
+			if (Node const* node = _node->find(name))
 			{
 				if (parse_object(*node, t))
 				{
@@ -191,6 +208,18 @@ namespace minty
 		}
 
 		template<typename T>
+		bool try_read_object(String const& name, T& value) const
+		{
+			if (Node const* node = _node->find(name))
+			{
+				parse_object(*node, value);
+				return true;
+			}
+
+			return false;
+		}
+
+		template<typename T>
 		void to_vector(std::vector<T>& value) const
 		{
 			parse_vector(*this, value);
@@ -199,7 +228,7 @@ namespace minty
 		template<typename T>
 		void read_vector(String const& name, std::vector<T>& value) const
 		{
-			if (auto const* obj = _node.find(name))
+			if (auto const* obj = _node->find(name))
 			{
 				parse_vector(*obj, value);
 			}
@@ -207,6 +236,17 @@ namespace minty
 			{
 				value.clear();
 			}
+		}
+
+		template<typename T>
+		bool try_read_vector(String const& name, std::vector<T>& value) const
+		{
+			if (auto const* obj = _node->find(name))
+			{
+				parse_vector(*obj, value);
+				return true;
+			}
+			return false;
 		}
 
 		template<typename T>
@@ -218,7 +258,7 @@ namespace minty
 		template<typename T>
 		void read_set(String const& name, std::set<T>& value) const
 		{
-			if (auto const* obj = _node.find(name))
+			if (auto const* obj = _node->find(name))
 			{
 				parse_set(obj, value);
 			}
@@ -226,6 +266,17 @@ namespace minty
 			{
 				value.clear();
 			}
+		}
+
+		template<typename T>
+		bool try_read_set(String const& name, std::set<T>& value) const
+		{
+			if (auto const* obj = _node->find(name))
+			{
+				parse_set(*obj, value);
+				return true;
+			}
+			return false;
 		}
 
 		template<typename T>
@@ -237,7 +288,7 @@ namespace minty
 		template<typename T>
 		void read_unordered_set(String const& name, std::unordered_set<T>& value) const
 		{
-			if (auto const* obj = _node.find(name))
+			if (auto const* obj = _node->find(name))
 			{
 				parse_unordered_set(*obj, value);
 			}
@@ -245,6 +296,17 @@ namespace minty
 			{
 				value.clear();
 			}
+		}
+
+		template<typename T>
+		bool try_read_unordered_set(String const& name, std::unordered_set<T>& value) const
+		{
+			if (auto const* obj = _node->find(name))
+			{
+				parse_unordered_set(*obj, value);
+				return true;
+			}
+			return false;
 		}
 
 		template<typename T, typename U>
@@ -256,7 +318,7 @@ namespace minty
 		template<typename T, typename U>
 		void read_map(String const& name, std::map<T, U>& value) const
 		{
-			if (auto const* obj = _node.find(name))
+			if (auto const* obj = _node->find(name))
 			{
 				parse_map(*obj, value);
 			}
@@ -264,6 +326,17 @@ namespace minty
 			{
 				value.clear();
 			}
+		}
+
+		template<typename T, typename U>
+		bool try_read_map(String const& name, std::map<T, U>& value) const
+		{
+			if (auto const* obj = _node->find(name))
+			{
+				parse_map(*obj, value);
+				return true;
+			}
+			return false;
 		}
 
 		template<typename T, typename U>
@@ -275,7 +348,7 @@ namespace minty
 		template<typename T, typename U>
 		void read_unordered_map(String const& name, std::unordered_map<T, U>& value) const
 		{
-			if (auto const* obj = _node.find(name))
+			if (auto const* obj = _node->find(name))
 			{
 				parse_unordered_map(*obj, value);
 			}
@@ -285,10 +358,21 @@ namespace minty
 			}
 		}
 
+		template<typename T, typename U>
+		bool try_read_unordered_map(String const& name, std::unordered_map<T, U>& value) const
+		{
+			if (auto const* obj = _node->find(name))
+			{
+				parse_unordered_map(*obj, value);
+				return true;
+			}
+			return false;
+		}
+
 		template<typename T>
 		void read_register(String const& name, Register<T>& value)
 		{
-			if (auto const* obj = _node.find(name))
+			if (auto const* obj = _node->find(name))
 			{
 				parse_register(*obj, value);
 			}
@@ -296,6 +380,17 @@ namespace minty
 			{
 				value.clear();
 			}
+		}
+
+		template<typename T>
+		bool try_read_register(String const& name, Register<T>& value) const
+		{
+			if (auto const* obj = _node->find(name))
+			{
+				parse_register(*obj, value);
+				return true;
+			}
+			return false;
 		}
 
 	private:

@@ -24,7 +24,7 @@ void game::TestSystem::update()
     for(auto&& [entity, test, transform] : registry.view<TestComponent, TransformComponent>().each())
     {
         test.rotation += test.rotationSpeed * deltaTime;
-        transform.local.position = Quaternion(test.rotation) * Vector3(0.0f, 0.0f, 10.0f);
+        transform.localPosition = Quaternion(test.rotation) * Vector3(0.0f, 0.0f, 10.0f);
         registry.emplace_or_replace<DirtyComponent>(entity);
     }
 }
@@ -46,6 +46,6 @@ void game::TestSystem::reset()
     for(auto&& [entity, test, transform] : registry.view<TestComponent, TransformComponent>().each())
     {
         test.rotation = Vector3();
-        transform.local.rotation = Quaternion(test.rotation);
+        transform.localRotation = Quaternion(test.rotation);
     }
 }

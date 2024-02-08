@@ -25,7 +25,7 @@ namespace minty
 		/// <summary>
 		/// The scale.
 		/// </summary>
-		Vector3 localScale;
+		Vector3 localScale = Vector3(1.0f, 1.0f, 1.0f);
 
 		Matrix4 get_local_matrix() const;
 

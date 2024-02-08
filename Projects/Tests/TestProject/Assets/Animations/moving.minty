@@ -5,42 +5,42 @@ entities
 components
     0: Sprite
 variables
-    0: spriteId
+    0: sprite
 values
-    0: S death_0
-    1: S death_1
-    2: S death_2
-    3: S death_3
-    4: S death_4
-    5: S death_5
-    6: S death_6
-    7: S death_7
-    8: S death_8
-    9: S death_9
-    10: S death_10
-    11: S brian
+    0: death_0
+    1: death_1
+    2: death_2
+    3: death_3
+    4: death_4
+    5: death_5
+    6: death_6
+    7: death_7
+    8: death_8
+    9: death_9
+    10: death_10
+    11: brian
 steps
     0.0
-        0//0/0/1/0
+        0//0/0/0
     0.1
-        0//0/0/1/1
+        0//0/0/1
     0.2
-        0//0/0/1/2
+        0//0/0/2
     0.3
-        0//0/0/1/3
+        0//0/0/3
     0.4
-        0//0/0/1/4
+        0//0/0/4
     0.5
-        0//0/0/1/5
+        0//0/0/5
     0.6
-        0//0/0/1/6
+        0//0/0/6
     0.7
-        0//0/0/1/7
+        0//0/0/7
     0.8
-        0//0/0/1/8
+        0//0/0/8
     0.9
-        0//0/0/1/9
+        0//0/0/9
     1.0
-        0//0/0/1/10
+        0//0/0/10
 reset
-    0//0/0/1/11
+    0//0/0/11

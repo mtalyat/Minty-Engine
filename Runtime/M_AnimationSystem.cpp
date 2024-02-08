@@ -36,7 +36,7 @@ void minty::AnimationSystem::update()
 			if (animatorComponent.animationId != ERROR_ID)
 			{
 				Animation const& oldAnimation = _animations.at(animatorComponent.animationId);
-				oldAnimation.reset(entity, registry);
+				oldAnimation.reset(entity, get_scene());
 			}
 
 			// reset animator for new animation
@@ -55,7 +55,7 @@ void minty::AnimationSystem::update()
 		Animation const& animation = _animations.at(animatorComponent.animationId);
 
 		// animate with it
-		if (animation.animate(animatorComponent.time, deltaTime, animatorComponent.index, entity, registry))
+		if (animation.animate(animatorComponent.time, deltaTime, animatorComponent.index, entity, get_scene()))
 		{
 			// animation has completed, loop if supposed to
 			if (animation.loops())
@@ -151,7 +151,10 @@ ID minty::AnimationSystem::load_animation(Path const& path)
 	reader.read_vector("entities", builder.entities);
 	reader.read_vector("components", builder.components);
 	reader.read_vector("variables", builder.variables);
-	reader.read_vector("values", builder.values);
+	if (Node const* valuesNode = reader.get_node().find("values"))
+	{
+		builder.values = valuesNode->get_children();
+	}
 
 	RenderSystem* renderSystem = get_system_registry().find<RenderSystem>();
 
@@ -168,8 +171,11 @@ ID minty::AnimationSystem::load_animation(Path const& path)
 			// get actual step values
 			for (Node const& stepNode : timeStampNode.get_children())
 			{
-				builder.steps.push_back({ time, Animation::Step() });
-				Animation::parse_step(stepNode.get_node_string());
+				builder.steps.push_back(
+					{ 
+						time,
+						Animation::parse_step(stepNode.get_node_string())
+					});
 			}
 		}
 	}
@@ -177,8 +183,7 @@ ID minty::AnimationSystem::load_animation(Path const& path)
 	{
 		for (Node const& resetNode : resetsNode->get_children())
 		{
-			builder.resetSteps.push_back(Animation::Step());
-			Animation::parse_step(resetNode.get_node_string());
+			builder.resetSteps.push_back(Animation::parse_step(resetNode.get_node_string()));
 		}
 	}
 

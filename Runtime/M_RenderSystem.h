@@ -126,49 +126,49 @@ namespace minty
 		/// </summary>
 		/// <param name="name">The name of the asset to find.</param>
 		/// <returns>The ID of the asset, or ERROR_ID if none was found with the given name.</returns>
-		ID find_texture(String const& name) const;
+		ID find_texture(String const& name, ID const defaultId = ERROR_ID) const;
 
 		/// <summary>
 		/// Finds the ID of the loaded Sprite with the given name.
 		/// </summary>
 		/// <param name="name">The name of the asset to find.</param>
 		/// <returns>The ID of the asset, or ERROR_ID if none was found with the given name.</returns>
-		ID find_sprite(String const& name) const;
+		ID find_sprite(String const& name, ID const defaultId = ERROR_ID) const;
 
 		/// <summary>
 		/// Finds the ID of the loaded Shader with the given name.
 		/// </summary>
 		/// <param name="name">The name of the asset to find.</param>
 		/// <returns>The ID of the asset, or ERROR_ID if none was found with the given name.</returns>
-		ID find_shader(String const& name) const;
+		ID find_shader(String const& name, ID const defaultId = ERROR_ID) const;
 
 		/// <summary>
 		/// Finds the ID of the loaded ShaderPass with the given name.
 		/// </summary>
 		/// <param name="name">The name of the asset to find.</param>
 		/// <returns>The ID of the asset, or ERROR_ID if none was found with the given name.</returns>
-		ID find_shader_pass(String const& name) const;
+		ID find_shader_pass(String const& name, ID const defaultId = ERROR_ID) const;
 
 		/// <summary>
 		/// Finds the ID of the loaded MaterialTemplate with the given name.
 		/// </summary>
 		/// <param name="name">The name of the asset to find.</param>
 		/// <returns>The ID of the asset, or ERROR_ID if none was found with the given name.</returns>
-		ID find_material_template(String const& name) const;
+		ID find_material_template(String const& name, ID const defaultId = ERROR_ID) const;
 
 		/// <summary>
 		/// Finds the ID of the loaded Material with the given name.
 		/// </summary>
 		/// <param name="name">The name of the asset to find.</param>
 		/// <returns>The ID of the asset, or ERROR_ID if none was found with the given name.</returns>
-		ID find_material(String const& name) const;
+		ID find_material(String const& name, ID const defaultId = ERROR_ID) const;
 
 		/// <summary>
 		/// Finds the ID of the loaded Mesh with the given name.
 		/// </summary>
 		/// <param name="name">The name of the asset to find.</param>
 		/// <returns>The ID of the asset, or ERROR_ID if none was found with the given name.</returns>
-		ID find_mesh(String const& name) const;
+		ID find_mesh(String const& name, ID const defaultId = ERROR_ID) const;
 
 #pragma endregion
 

@@ -20,7 +20,7 @@ namespace minty
 	class Writer
 	{
 	private:
-		Node& _node;
+		Node* _node;
 		void const* _data;
 
 	public:
