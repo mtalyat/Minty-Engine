@@ -25,39 +25,47 @@ void minty::MeshComponent::deserialize(Reader const& reader)
 	if (!renderSystem) return;
 
 	// load meta data
-	materialId = renderSystem->find_material(reader.read_string("material"));
+	String materialName;
+	if (reader.try_read_string("material", materialName))
+	{
+		materialId = renderSystem->find_material(materialName);
+	}
 
 	// load mesh data
-	MeshType meshType = from_string_mesh_type(reader.read_string("type"));
-
-	switch (meshType)
+	String meshTypeName;
+	if (reader.try_read_string("type", meshTypeName))
 	{
-	case MeshType::Empty:
-	case MeshType::Custom:
-	{
-		// use the asset path to get the mesh ( or use the name if no path given )
-		String path = reader.read_string("path", reader.read_string("name"));
+		MeshType meshType = from_string_mesh_type(meshTypeName);
 
-		// check if mesh with name is loaded
-		String name = Path(path).stem().string();
-		meshId = renderSystem->find_mesh(name);
-
-		if (meshId == ERROR_ID)
+		switch (meshType)
 		{
-			// mesh is not loaded, so load it using the path
-			meshId = renderSystem->load_mesh(path);
-		}
-
-		if (meshId == ERROR_ID)
+		case MeshType::Empty:
+		case MeshType::Custom:
 		{
-			console::error(std::format("Could not load_animation mesh with path \"{}\" and name \"{}\".", path, name));
+			// use the asset path to get the mesh ( or use the name if no path given )
+			String path = reader.read_string("path", reader.read_string("name"));
+
+			// check if mesh with name is loaded
+			String name = Path(path).stem().string();
+			meshId = renderSystem->find_mesh(name);
+
+			if (meshId == ERROR_ID)
+			{
+				// mesh is not loaded, so load it using the path
+				meshId = renderSystem->load_mesh(path);
+			}
+
+			if (meshId == ERROR_ID)
+			{
+				console::error(std::format("Could not load_animation mesh with path \"{}\" and name \"{}\".", path, name));
+			}
+			break;
 		}
-		break;
-	}
-	default:
-		// if there was a type given, then use that type
-		meshId = renderSystem->get_or_create_mesh(meshType);
-		break;
+		default:
+			// if there was a type given, then use that type
+			meshId = renderSystem->get_or_create_mesh(meshType);
+			break;
+		}
 	}
 }
 

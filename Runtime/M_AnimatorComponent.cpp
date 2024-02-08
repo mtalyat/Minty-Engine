@@ -35,13 +35,12 @@ void minty::AnimatorComponent::deserialize(Reader const& reader)
 	if (!animationSystem) return;
 
 	// make copy of animator for this animatorComponent, since we want our own values and stuff
-	animator = animationSystem->get_animator(animationSystem->find_animator(reader.read_string("animator")));
-	animationId = animator.get_fsm().get_current_value().get<ID>();
-	//String animationName = reader.read_string("animation");
-	//animationId = animationSystem->find_animation(animationName);
-	//animator.get_fsm().set_current_state(animationName);
-
-	// don't care about stuff (sorry not sorry)
+	String animatorName;
+	if (reader.try_read_string("animator", animatorName))
+	{
+		animator = animationSystem->get_animator(animationSystem->find_animator(animatorName));
+		animationId = animator.get_fsm().get_current_value().get<ID>();
+	}
 }
 
 String minty::to_string(AnimatorComponent const& value)

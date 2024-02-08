@@ -15,10 +15,14 @@ void minty::CameraComponent::serialize(Writer& writer) const
 
 void minty::CameraComponent::deserialize(Reader const& reader)
 {
-	perspective = from_string_camera_component_perspective(reader.read_string("perspective"));
-	fov = reader.read_float("fov", DEFAULT_FOV);
-	nearPlane = reader.read_float("near", DEFAULT_NEAR);
-	farPlane = reader.read_float("far", DEFAULT_FAR);
+	String perspectiveName;
+	if (reader.try_read_string("perspective", perspectiveName))
+	{
+		perspective = from_string_camera_component_perspective(perspectiveName);
+	}
+	reader.try_read_float("fov", fov);
+	reader.try_read_float("near", nearPlane);
+	reader.try_read_float("far", farPlane);
 }
 
 String minty::to_string(CameraComponent const& value)

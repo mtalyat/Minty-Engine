@@ -15,12 +15,12 @@ namespace minty
 		/// <summary>
 		/// The ID of the Mesh to draw.
 		/// </summary>
-		ID meshId;
+		ID meshId = ERROR_ID;
 
 		/// <summary>
 		/// The ID of the Material to use to draw the Mesh.
 		/// </summary>
-		ID materialId;
+		ID materialId = ERROR_ID;
 
 		void serialize(Writer& writer) const override;
 		void deserialize(Reader const& reader) override;

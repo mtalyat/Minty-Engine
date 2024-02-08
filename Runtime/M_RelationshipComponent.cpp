@@ -37,11 +37,12 @@ void minty::RelationshipComponent::deserialize(Reader const& reader)
 
 	EntityRegistry const& er = data->scene->get_entity_registry();
 
-	children = reader.read_size("children");
-	first = er.find(reader.read_string("first"));
-	prev = er.find(reader.read_string("prev"));
-	next = er.find(reader.read_string("next"));
-	parent = er.find(reader.read_string("parent"));
+	reader.try_read_size("children", children);
+	String name;
+	if (reader.try_read_string("first", name)) first = er.find(name);
+	if (reader.try_read_string("prev", name)) prev = er.find(name);
+	if (reader.try_read_string("next", name)) next = er.find(name);
+	if (reader.try_read_string("parent", name)) parent = er.find(name);
 }
 
 String minty::to_string(RelationshipComponent const& value)
