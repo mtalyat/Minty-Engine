@@ -81,7 +81,7 @@ void minty::Dynamic::set(void* const data, size_t const size)
 	// ensure properly allocated
 	if (!_data)
 	{
-		console::error("Failed to malloc in Dynamic set().");
+		Console::error("Failed to malloc in Dynamic set().");
 		return;
 	}
 
@@ -214,7 +214,7 @@ bool minty::operator!=(Dynamic const& left, Dynamic const& right)
 std::ostream& minty::operator<<(std::ostream& stream, Dynamic const& object)
 {
 	// output as base 64
-	stream << encoding::encode_base64(object);
+	stream << Encoding::encode_base64(object);
 
 	return stream;
 }
@@ -265,7 +265,7 @@ std::istream& minty::operator>>(std::istream& stream, Dynamic& object)
 		if (type.size() > 1)
 		{
 			// get new size from type after the 'S'
-			size = parse::to_size(type.substr(1, type.size() - 1));
+			size = Parse::to_size(type.substr(1, type.size() - 1));
 
 			// resize string
 			temp.resize(size);
@@ -391,7 +391,7 @@ std::istream& minty::operator>>(std::istream& stream, Dynamic& object)
 	else
 	{
 		// assume base64 encoding, but inside of type
-		object = encoding::decode_base64(type);
+		object = Encoding::decode_base64(type);
 	}
 
 	return stream;

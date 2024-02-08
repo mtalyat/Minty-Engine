@@ -34,14 +34,14 @@ ID minty::Animator::update()
 	case 0: // transitioned, new state
 		break;
 	case 1: // did nothing, no state
-		console::warn(std::format("Animator::update(): No current state set."));
+		Console::warn(std::format("Animator::update(): No current state set."));
 		return ERROR_ID;
 	case 2:
 		// infinite loop
-		console::warn(std::format("Animator::update(): Infinite loop indicated."));
+		Console::warn(std::format("Animator::update(): Infinite loop indicated."));
 		return ERROR_ID;
 	default:
-		console::error(std::format("Animator::update(): Unrecognized FSM fsmResult code {}", result));
+		Console::error(std::format("Animator::update(): Unrecognized FSM fsmResult code {}", result));
 		return ERROR_ID;
 	}
 
@@ -53,7 +53,7 @@ ID minty::Animator::update()
 	}
 	else
 	{
-		console::error(std::format("Animator::update(): FSM value was not the size of an ID. sizeof(ID): {}, size: {}", sizeof(ID), value.size()));
+		Console::error(std::format("Animator::update(): FSM value was not the size of an ID. sizeof(ID): {}, size: {}", sizeof(ID), value.size()));
 	}
 
 	// no state or value

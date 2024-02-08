@@ -7,7 +7,7 @@
 #include "M_Console.h"
 
 using namespace minty;
-using namespace minty::rendering;
+using namespace minty;
 
 std::vector<VkDescriptorSetLayoutBinding> ShaderBuilder::get_descriptor_set_layout_bindings(uint32_t const set) const
 {
@@ -33,7 +33,7 @@ std::vector<VkDescriptorSetLayoutBinding> ShaderBuilder::get_descriptor_set_layo
 	return result;
 }
 
-uint32_t minty::rendering::ShaderBuilder::get_uniform_constant_count(uint32_t const set) const
+uint32_t minty::ShaderBuilder::get_uniform_constant_count(uint32_t const set) const
 {
 	uint32_t count = 0;
 

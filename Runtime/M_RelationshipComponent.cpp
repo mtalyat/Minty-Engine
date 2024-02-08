@@ -10,7 +10,7 @@ void minty::RelationshipComponent::serialize(Writer& writer) const
 {
 	if (!writer.get_data())
 	{
-		console::error("Cannot serialize RelationshipComponent. Writer data must be a Scene.");
+		Console::error("Cannot serialize RelationshipComponent. Writer data must be a Scene.");
 		return;
 	}
 
@@ -29,7 +29,7 @@ void minty::RelationshipComponent::deserialize(Reader const& reader)
 {
 	if (!reader.get_data())
 	{
-		console::error("Cannot deserialize RelationshipComponent. Reader data must be a Scene.");
+		Console::error("Cannot deserialize RelationshipComponent. Reader data must be a Scene.");
 		return;
 	}
 

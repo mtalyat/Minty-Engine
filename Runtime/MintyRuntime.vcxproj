@@ -232,7 +232,6 @@
     <ClInclude Include="M_Builtin.h" />
     <ClInclude Include="M_Compression.h" />
     <ClInclude Include="M_FiniteStateMachine.h" />
-    <ClInclude Include="M_Lookup.h" />
     <ClInclude Include="M_Macros.h" />
     <ClInclude Include="M_PhysicalFile.h" />
     <ClInclude Include="M_CoordinateMode.h" />

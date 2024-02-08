@@ -40,7 +40,6 @@ access to the entire engine without needing include each file.
 #include "M_MeshComponent.h"
 #include "M_NameComponent.h"
 #include "M_RelationshipComponent.h"
-#include "M_TransformComponent.h"
 #include "M_UITransformComponent.h"
 
 // ENTITIES
@@ -56,6 +55,7 @@ access to the entire engine without needing include each file.
 #include "M_Wrapper.h"
 
 // INPUT
+#include "M_CursorMode.h"
 #include "M_InputMap.h"
 #include "M_Key.h"
 #include "M_KeyAction.h"
@@ -107,6 +107,8 @@ access to the entire engine without needing include each file.
 #include "M_SystemRegistry.h"
 #include "M_UISystem.h"
 
+// TRANSFORM
+#include "M_TransformComponent.h"
 
 // GENERAL
 #include "M_Base.h"

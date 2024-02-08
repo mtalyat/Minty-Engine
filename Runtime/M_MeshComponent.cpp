@@ -12,7 +12,7 @@ using namespace minty;
 
 void minty::MeshComponent::serialize(Writer& writer) const
 {
-	console::todo("MeshComponent::serialize");
+	Console::todo("MeshComponent::serialize");
 }
 
 void minty::MeshComponent::deserialize(Reader const& reader)
@@ -57,7 +57,7 @@ void minty::MeshComponent::deserialize(Reader const& reader)
 
 			if (meshId == ERROR_ID)
 			{
-				console::error(std::format("Could not load_animation mesh with path \"{}\" and name \"{}\".", path, name));
+				Console::error(std::format("Could not load_animation mesh with path \"{}\" and name \"{}\".", path, name));
 			}
 			break;
 		}

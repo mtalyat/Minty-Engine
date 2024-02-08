@@ -16,10 +16,7 @@
 namespace minty
 {
 	class RenderEngine;
-}
 
-namespace minty::rendering
-{
 	/// <summary>
 	/// Holds data to create a new RenderEngine.
 	/// </summary>

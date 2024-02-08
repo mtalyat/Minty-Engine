@@ -7,11 +7,11 @@
 #include "glm.hpp"
 
 using namespace minty;
-using namespace minty::builtin;
-using namespace minty::rendering;
+using namespace minty::Builtin;
+using namespace minty;
 
 minty::Mesh::Mesh()
-	: rendering::RenderObject::RenderObject()
+	: RenderObject::RenderObject()
 	, _vertexCount()
 	, _vertexSize()
 	, _vertexBufferId(ERROR_ID)
@@ -22,7 +22,7 @@ minty::Mesh::Mesh()
 {}
 
 minty::Mesh::Mesh(Engine& engine, ID const sceneId)
-	: rendering::RenderObject::RenderObject(engine, sceneId)
+	: RenderObject::RenderObject(engine, sceneId)
 	, _vertexCount()
 	, _vertexSize()
 	, _vertexBufferId(ERROR_ID)
@@ -276,16 +276,16 @@ void minty::Mesh::create_primitive_sphere(Mesh& mesh)
 		{
 			stackAngle = PI / 2.0f - i * STACK_STEP;
 
-			float xy = RADIUS * math::cos(stackAngle);
-			float z = RADIUS * math::sin(stackAngle);
+			float xy = RADIUS * Math::cos(stackAngle);
+			float z = RADIUS * Math::sin(stackAngle);
 
 			for (int j = 0; j <= SECTORS; j++)
 			{
 				sectorAngle = j * SECTOR_STEP;
 
-				float x = xy * math::cos(sectorAngle);
+				float x = xy * Math::cos(sectorAngle);
 
-				float y = xy * math::sin(sectorAngle);
+				float y = xy * Math::sin(sectorAngle);
 
 				float texCoordX = (x / (RADIUS * 2.0f)) + 0.5f;
 				float texCoordY = (y / (RADIUS * 2.0f)) + 0.5f;
@@ -353,8 +353,8 @@ void minty::Mesh::create_primitive_cylinder(Mesh& mesh)
 		{
 			angle = i * STEP + PI2;
 
-			points[i].x = RADIUS * math::cos(angle);
-			points[i].y = RADIUS * math::sin(angle);
+			points[i].x = RADIUS * Math::cos(angle);
+			points[i].y = RADIUS * Math::sin(angle);
 		}
 
 		// add top center
@@ -573,13 +573,13 @@ String minty::to_string(MeshType const value)
 	case MeshType::Cylinder:
 		return "CYLINDER";
 	default:
-		return error::ERROR_TEXT;
+		return Error::ERROR_TEXT;
 	}
 }
 
 MeshType minty::from_string_mesh_type(String const& value)
 {
-	String value2 = string::to_upper(value);
+	String value2 = Text::to_upper(value);
 	if (value2 == "CUSTOM")
 	{
 		return MeshType::Custom;

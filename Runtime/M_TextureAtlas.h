@@ -13,7 +13,7 @@ namespace minty
 	/// A collection of Sprites that originate from a Texture.
 	/// </summary>
 	class TextureAtlas
-		: public rendering::RenderObject
+		: public RenderObject
 	{
 	private:
 		// id to texture
@@ -32,7 +32,7 @@ namespace minty
 		/// </summary>
 		TextureAtlas();
 
-		TextureAtlas(rendering::TextureAtlasBuilder const& builder, Engine& engine, ID const sceneId);
+		TextureAtlas(TextureAtlasBuilder const& builder, Engine& engine, ID const sceneId);
 
 		~TextureAtlas();
 

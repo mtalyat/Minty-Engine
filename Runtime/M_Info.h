@@ -4,10 +4,6 @@
 #include "M_ISerializable.h"
 #include <vulkan/vulkan.h>
 
-//#define MINTY_NAME "Minty Engine"
-//#define MINTY_VERSION VK_MAKE_VERSION(1, 0, 0)
-//#define MINTY_API_VERSION VK_API_VERSION_1_2
-
 namespace minty
 {
 	constexpr char const* MINTY_NAME = "Minty Engine";

@@ -10,9 +10,9 @@
 #include "M_Rendering_DrawCallObjectInfo.h"
 
 using namespace minty;
-using namespace minty::rendering;
+using namespace minty;
 using namespace minty::vk;
-using namespace minty::builtin;
+using namespace minty::Builtin;
 
 minty::RenderSystem::RenderSystem(Engine& engine, ID const sceneId)
 	: System::System(engine, sceneId)
@@ -31,7 +31,7 @@ void minty::RenderSystem::update()
 	// do nothing if no camera
 	if (_mainCamera == NULL_ENTITY)
 	{
-		console::warn("There is no Camera to render to!");
+		Console::warn("There is no Camera to render to!");
 		return;
 	}
 
@@ -90,32 +90,32 @@ void minty::RenderSystem::update_camera(CameraComponent const& camera, Transform
 	}
 }
 
-ID minty::RenderSystem::create_texture(rendering::TextureBuilder const& builder)
+ID minty::RenderSystem::create_texture(TextureBuilder const& builder)
 {
 	return _textures.emplace(builder.name, Texture(builder, get_engine(), get_scene_id()));
 }
 
-ID minty::RenderSystem::create_sprite(rendering::SpriteBuilder const& builder)
+ID minty::RenderSystem::create_sprite(SpriteBuilder const& builder)
 {
 	return _sprites.emplace(builder.name, Sprite(builder, get_engine(), get_scene_id()));
 }
 
-ID minty::RenderSystem::create_shader(rendering::ShaderBuilder const& builder)
+ID minty::RenderSystem::create_shader(ShaderBuilder const& builder)
 {
 	return _shaders.emplace(builder.name, Shader(builder, get_engine(), get_scene_id()));
 }
 
-ID minty::RenderSystem::create_shader_pass(rendering::ShaderPassBuilder const& builder)
+ID minty::RenderSystem::create_shader_pass(ShaderPassBuilder const& builder)
 {
 	return _shaderPasses.emplace(builder.name, ShaderPass(builder, get_engine(), get_scene_id()));
 }
 
-ID minty::RenderSystem::create_material_template(rendering::MaterialTemplateBuilder const& builder)
+ID minty::RenderSystem::create_material_template(MaterialTemplateBuilder const& builder)
 {
 	return _materialTemplates.emplace(builder.name, MaterialTemplate(builder, get_engine(), get_scene_id()));
 }
 
-ID minty::RenderSystem::create_material(rendering::MaterialBuilder const& builder)
+ID minty::RenderSystem::create_material(MaterialBuilder const& builder)
 {
 	return _materials.emplace(builder.name, Material(builder, get_engine(), get_scene_id()));
 }
@@ -156,7 +156,7 @@ ID minty::RenderSystem::get_or_create_mesh(MeshType const type)
 	{
 	case MeshType::Custom:
 		// do nothing for now
-		console::todo("MeshType::Custom");
+		Console::todo("MeshType::Custom");
 		break;
 	case MeshType::Quad:
 		Mesh::create_primitive_quad(mesh);
@@ -550,7 +550,7 @@ ID minty::RenderSystem::load_mesh(Path const& path, String const& name)
 
 	if (extension != ".obj")
 	{
-		console::error(std::format("Cannot load_animation mesh from file type \"{}\".", extension));
+		Console::error(std::format("Cannot load_animation mesh from file type \"{}\".", extension));
 		return ERROR_ID;
 	}
 
@@ -785,7 +785,7 @@ void minty::RenderSystem::set_main_camera(Entity const entity)
 	_mainCamera = entity;
 }
 
-void minty::RenderSystem::load_descriptor_values(std::unordered_map<String, Dynamic>& values, Node const& node, std::vector<rendering::UniformConstantInfo> const& infos) const
+void minty::RenderSystem::load_descriptor_values(std::unordered_map<String, Dynamic>& values, Node const& node, std::vector<UniformConstantInfo> const& infos) const
 {
 	// go through all the constant values
 	for (auto const& info : infos)
@@ -816,7 +816,7 @@ void minty::RenderSystem::load_descriptor_values(std::unordered_map<String, Dyna
 				else
 				{
 					// if index name does not exist, show warning and set to ERROR_ID
-					console::warn(std::format("Failed to load_animation texture with index {} into descriptor named \"{}\".", i, info.name));
+					Console::warn(std::format("Failed to load_animation texture with index {} into descriptor named \"{}\".", i, info.name));
 					ids[i] = ERROR_ID;
 				}
 			}
@@ -902,15 +902,15 @@ void minty::RenderSystem::load_mesh_obj(Path const& path, ID const id)
 				// subtract 1, since all indices are 1 indexed apparently
 				if (std::getline(setss, token, '/'))
 				{
-					faceIndices.x = parse::to_int(token) - 1;
+					faceIndices.x = Parse::to_int(token) - 1;
 
 					if (std::getline(setss, token, '/'))
 					{
-						faceIndices.y = parse::to_int(token) - 1;
+						faceIndices.y = Parse::to_int(token) - 1;
 
 						if (std::getline(setss, token, '/'))
 						{
-							faceIndices.z = parse::to_int(token) - 1;
+							faceIndices.z = Parse::to_int(token) - 1;
 						}
 					}
 				}
@@ -949,7 +949,7 @@ void minty::RenderSystem::load_mesh_obj(Path const& path, ID const id)
 
 void minty::RenderSystem::serialize(Writer& writer) const
 {
-	console::todo("RenderSystem::serialize()");
+	Console::todo("RenderSystem::serialize()");
 }
 
 void minty::RenderSystem::deserialize(Reader const& reader)

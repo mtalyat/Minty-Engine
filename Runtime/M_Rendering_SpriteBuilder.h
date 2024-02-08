@@ -7,7 +7,7 @@
 #include "M_Vector.h"
 #include "vulkan.h"
 
-namespace minty::rendering
+namespace minty
 {
 	/// <summary>
 	/// Holds data to create a new Sprite.

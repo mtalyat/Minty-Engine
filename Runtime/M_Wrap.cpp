@@ -66,19 +66,19 @@ void minty::Wrap::load()
     if (!std::filesystem::exists(_path))
     {
         // file does not exist
-        console::error(std::format("Cannot load_animation \"{}\" Wrap file: file does not exist.", _path.string()));
+        Console::error(std::format("Cannot load_animation \"{}\" Wrap file: file does not exist.", _path.string()));
         return;
     }
     else if (!std::filesystem::is_regular_file(_path))
     {
         // not a file
-        console::error(std::format("Cannot load_animation \"{}\" Wrap file: not a regular file.", _path.string()));
+        Console::error(std::format("Cannot load_animation \"{}\" Wrap file: not a regular file.", _path.string()));
         return;
     }
     else if (_path.extension() != WRAP_EXTENSION)
     {
         // not a .wrap file
-        console::error(std::format("Cannot load_animation \"{}\" Wrap file: missing .wrap file extension.", _path.string()));
+        Console::error(std::format("Cannot load_animation \"{}\" Wrap file: missing .wrap file extension.", _path.string()));
         return;
     }
 
@@ -92,7 +92,7 @@ void minty::Wrap::load()
     if (memcmp(_header.id, WRAP_MAGIC, WRAP_MAGIC_SIZE))
     {
         // does not have the correct "WRAP" id magic
-        console::error(std::format("Cannot emplace \"{}\" into Wrap file: invalid data.", _path.string()));
+        Console::error(std::format("Cannot emplace \"{}\" into Wrap file: invalid data.", _path.string()));
         _header = Header();
         return;
     }
@@ -195,7 +195,7 @@ uint32_t minty::Wrap::emplace_entry(Entry& newEntry)
     }
 
     // cannot fit
-    console::error("Cannot emplace entry to Wrap file. Entry count surpassed.");
+    Console::error("Cannot emplace entry to Wrap file. Entry count surpassed.");
 
     return -1;
 }
@@ -254,13 +254,13 @@ void minty::Wrap::emplace(Path const& physicalPath, Path const& virtualPath, Com
     if (!std::filesystem::exists(physicalPath))
     {
         // file does not exist
-        console::error(std::format("Cannot emplace \"{}\" into Wrap file: file does not exist.", physicalPath.string()));
+        Console::error(std::format("Cannot emplace \"{}\" into Wrap file: file does not exist.", physicalPath.string()));
         return;
     }
     else if (!std::filesystem::is_regular_file(physicalPath))
     {
         // not a file
-        console::error(std::format("Cannot emplace \"{}\" into Wrap file: not a regular file.", physicalPath.string()));
+        Console::error(std::format("Cannot emplace \"{}\" into Wrap file: not a regular file.", physicalPath.string()));
         return;
     }
 
@@ -298,7 +298,7 @@ void minty::Wrap::emplace(Path const& physicalPath, Path const& virtualPath, Com
         // compress it
         if (compress(compressedData, destSize, fileData, sourceSize, compressionLevel))
         {
-            console::error(std::format("Cannot emplace \"{}\" into Wrap file: failed to compress file with compression level {}.", physicalPath.string(), static_cast<int>(compressionLevel)));
+            Console::error(std::format("Cannot emplace \"{}\" into Wrap file: failed to compress file with compression level {}.", physicalPath.string(), static_cast<int>(compressionLevel)));
             return;
         }
 
@@ -307,7 +307,7 @@ void minty::Wrap::emplace(Path const& physicalPath, Path const& virtualPath, Com
         fileData = compressedData;
         fileSize = static_cast<File::Size>(destSize);
 
-        console::log(std::format("Compressed {} from {} bytes to {} bytes.", physicalPath.string(), std::to_string(sourceSize), std::to_string(destSize)));
+        Console::log(std::format("Compressed {} from {} bytes to {} bytes.", physicalPath.string(), std::to_string(sourceSize), std::to_string(destSize)));
     }
 
     // set size and offset
@@ -383,7 +383,7 @@ std::vector<char> minty::Wrap::read(Path const& path) const
     Byte* data = new Byte[size];
     if (uncompress(data, size, fileData, sourceSize))
     {
-        console::error(std::format("Failed to uncompress file \"{}\" in Wrap file.", path.string()));
+        Console::error(std::format("Failed to uncompress file \"{}\" in Wrap file.", path.string()));
         return std::vector<char>();
     }
 

@@ -174,6 +174,6 @@ namespace minty
 	{
 		_systemTypes.emplace(name, [](Engine& engine, ID const sceneId) { return new T(engine, sceneId); });
 
-		console::info(std::format("Registered system {}", name));
+		Console::info(std::format("Registered system {}", name));
 	}
 }

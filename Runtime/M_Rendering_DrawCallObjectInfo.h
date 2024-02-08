@@ -3,7 +3,7 @@
 #include "M_Matrix.h"
 #include "M_Vector.h"
 
-namespace minty::rendering
+namespace minty
 {
 	struct DrawCallObject3D
 	{

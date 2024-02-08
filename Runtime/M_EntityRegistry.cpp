@@ -119,7 +119,7 @@ Component* minty::EntityRegistry::emplace_by_name(String const& name, Entity con
 	if (found == _components.end())
 	{
 		// name not found
-		console::error(std::format("Cannot emplace Component \"{}\". It has not been registered with the EntityRegistry.", name));
+		Console::error(std::format("Cannot emplace Component \"{}\". It has not been registered with the EntityRegistry.", name));
 		return nullptr;
 	}
 	else
@@ -135,7 +135,7 @@ Component* minty::EntityRegistry::get_by_name(String const& name, Entity const e
 	if (found == _components.end())
 	{
 		// name not found
-		console::error(std::format("Cannot get Component \"{}\". It has not been registered with the EntityRegistry.", name));
+		Console::error(std::format("Cannot get Component \"{}\". It has not been registered with the EntityRegistry.", name));
 		return nullptr;
 	}
 	else
@@ -151,7 +151,7 @@ Component const* minty::EntityRegistry::get_by_name(String const& name, Entity c
 	if (found == _components.end())
 	{
 		// name not found
-		console::error(std::format("Cannot get Component \"{}\". It has not been registered with the EntityRegistry.", name));
+		Console::error(std::format("Cannot get Component \"{}\". It has not been registered with the EntityRegistry.", name));
 		return nullptr;
 	}
 	else
@@ -177,7 +177,7 @@ std::vector<Component const*> minty::EntityRegistry::get_all(Entity const entity
 			auto found = _componentTypes.find(ctype.index());
 			if (found == _componentTypes.end())
 			{
-				console::error(std::format("Cannot find_animation component type with id: {}, name: {}", ctype.index(), ctype.name().data()));
+				Console::error(std::format("Cannot find_animation component type with id: {}, name: {}", ctype.index(), ctype.name().data()));
 				continue;
 			}
 
@@ -196,7 +196,7 @@ void minty::EntityRegistry::erase_by_name(String const& name, Entity const entit
 	if (found == _components.end())
 	{
 		// name not found
-		console::error(std::format("Cannot erase Component \"{}\". It has not been registered with the EntityRegistry.", name));
+		Console::error(std::format("Cannot erase Component \"{}\". It has not been registered with the EntityRegistry.", name));
 	}
 	else
 	{
@@ -224,7 +224,7 @@ Entity minty::EntityRegistry::clone(Entity const entity)
 void minty::EntityRegistry::print(Entity const entity) const
 {
 	// serialize entity, add it to parent, print that
-	console::print(serialize_entity(entity));
+	Console::print(serialize_entity(entity));
 }
 
 size_t minty::EntityRegistry::size() const
@@ -279,7 +279,7 @@ void minty::EntityRegistry::deserialize(Reader const& reader)
 			// cannot have multiple of same component
 			if (get_by_name(compNode.get_name(), entity))
 			{
-				console::error(std::format("Attempting to deserialize entity \"{}\" with multiple instances of the \"{}\" component.", entityNode.get_name(), compNode.get_name()));
+				Console::error(std::format("Attempting to deserialize entity \"{}\" with multiple instances of the \"{}\" component.", entityNode.get_name(), compNode.get_name()));
 				return;
 			}
 
@@ -314,7 +314,7 @@ void minty::EntityRegistry::serialize_entity(Writer& writer, Entity const entity
 			auto found = _componentTypes.find(ctype.index());
 			if (found == _componentTypes.end())
 			{
-				console::error(std::format("Cannot find_animation component type with id: {}, name: {}", ctype.index(), ctype.name().data()));
+				Console::error(std::format("Cannot find_animation component type with id: {}, name: {}", ctype.index(), ctype.name().data()));
 				continue;
 			}
 

@@ -3,10 +3,10 @@
 #include "M_Base.h"
 #include "M_Node.h"
 
-namespace minty::console
+namespace minty::Console
 {
 	/// <summary>
-	/// Defines a color that can be printed to the console.
+	/// Defines a color that can be printed to the Console.
 	/// </summary>
 	enum Color
 	{
@@ -32,19 +32,19 @@ namespace minty::console
 	String to_string(Color const value);
 
 	/// <summary>
-	/// Prints the String to the console.
+	/// Prints the String to the Console.
 	/// </summary>
 	/// <param name="message">The String to print.</param>
 	void print(String const& message);
 
 	/// <summary>
-	/// Prints the Node to the console.
+	/// Prints the Node to the Console.
 	/// </summary>
 	/// <param name="node">The Node to print.</param>
 	void print(Node const& node);
 
 	/// <summary>
-	/// Prints the string to the console in the given color.
+	/// Prints the string to the Console in the given color.
 	/// </summary>
 	/// <param name="message">The string to print.</param>
 	/// <param name="color">The color to print the message.</param>

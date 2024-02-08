@@ -5,17 +5,17 @@
 #include "M_RenderSystem.h"
 
 using namespace minty;
-using namespace minty::rendering;
+using namespace minty;
 
 minty::ShaderPass::ShaderPass()
-	: rendering::RenderObject()
+	: RenderObject()
 	, _shaderId(ERROR_ID)
 	, _pipeline()
 	, _descriptorSet()
 {}
 
 minty::ShaderPass::ShaderPass(ShaderPassBuilder const& builder, Engine& engine, ID const sceneId)
-	: rendering::RenderObject(engine, sceneId)
+	: RenderObject(engine, sceneId)
 	, _shaderId(builder.shaderId)
 	, _pipeline()
 	, _descriptorSet(engine, sceneId)
@@ -222,7 +222,7 @@ void minty::ShaderPass::create_pipeline(ShaderPassBuilder const& builder)
 
 	// create the pipeline
 	if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &_pipeline) != VK_SUCCESS) {
-		error::abort("Failed to create graphics pipeline.");
+		Error::abort("Failed to create graphics pipeline.");
 	}
 
 	// cleanup

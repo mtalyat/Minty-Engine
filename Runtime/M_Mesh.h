@@ -55,7 +55,7 @@ namespace minty
 	/// Holds data for a model to be rendered to the screen.
 	/// </summary>
 	class Mesh :
-		public rendering::RenderObject
+		public RenderObject
 	{
 	private:
 		uint32_t _vertexCount;

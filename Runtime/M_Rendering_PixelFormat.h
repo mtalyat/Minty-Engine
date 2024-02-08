@@ -2,7 +2,7 @@
 
 #include "M_Types.h"
 
-namespace minty::rendering
+namespace minty
 {
 	/// <summary>
 	/// The format for how pixels are read.

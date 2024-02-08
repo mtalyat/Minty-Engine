@@ -52,7 +52,7 @@ String minty::FSM::Scope::get_name(ID const key) const
 		}
 	}
 
-	return string::EMPTY;
+	return Text::EMPTY;
 }
 
 ID minty::FSM::Scope::find(String const& key) const
@@ -124,13 +124,13 @@ minty::FSM::Condition::Condition(String const& value, FSM const& fsm)
 	, _value()
 {
 	// split into parts
-	auto list = string::split(value);
+	auto list = Text::split(value);
 	size_t size = list.size();
 
 	// get ID of variable from fsm
-	_variableId = fsm.find_variable(string::join(list, 0, size - 2));
+	_variableId = fsm.find_variable(Text::join(list, 0, size - 2));
 	_conditional = from_string_conditional(list.at(size - 2));
-	_value = parse::to_int(list.at(size - 1));
+	_value = Parse::to_int(list.at(size - 1));
 }
 
 minty::FSM::Condition::Condition(ID const variableId, Conditional const conditional, int const value)
@@ -173,11 +173,11 @@ void minty::FSM::Condition::deserialize(Reader const& reader)
 {
 	FSM const* fsm = static_cast<FSM const*>(reader.get_data());
 
-	std::vector<String> parts = string::split(reader.get_node().get_data());
+	std::vector<String> parts = Text::split(reader.get_node().get_data());
 
 	_variableId = fsm->find_variable(parts.at(0));
 	_conditional = from_string_conditional(parts.at(1));
-	_value = parse::to_int(parts.at(2));
+	_value = Parse::to_int(parts.at(2));
 }
 
 minty::FSM::Transition::Transition()

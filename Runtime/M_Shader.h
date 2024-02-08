@@ -18,16 +18,16 @@ namespace minty
 	/// Holds data for a Shader.
 	/// </summary>
 	class Shader :
-		public rendering::RenderObject
+		public RenderObject
 	{
 	private:
 		VkPipelineLayout _pipelineLayout;
 		std::array<VkDescriptorSetLayout, DESCRIPTOR_SET_COUNT> _descriptorSetLayouts;
 		std::unordered_map<uint32_t, std::vector<std::pair<VkDescriptorPool, uint32_t>>> _descriptorPools;
 
-		Register<rendering::PushConstantInfo> _pushConstantInfos;
-		Register<rendering::UniformConstantInfo> _uniformConstantInfos;
-		rendering::DescriptorSet _descriptorSet;
+		Register<PushConstantInfo> _pushConstantInfos;
+		Register<UniformConstantInfo> _uniformConstantInfos;
+		DescriptorSet _descriptorSet;
 	public:
 		/// <summary>
 		/// Creates an empty Shader.
@@ -39,7 +39,7 @@ namespace minty
 		/// </summary>
 		/// <param name="layout"></param>
 		/// <param name="pipeline"></param>
-		Shader(rendering::ShaderBuilder const& builder, Engine& engine, ID const sceneId);
+		Shader(ShaderBuilder const& builder, Engine& engine, ID const sceneId);
 
 		/// <summary>
 		/// Destroys all of the resources associated with this Shader.
@@ -56,7 +56,7 @@ namespace minty
 		/// Gets the global descriptor set for this Shader.
 		/// </summary>
 		/// <returns></returns>
-		rendering::DescriptorSet const& get_global_descriptor_set() const;
+		DescriptorSet const& get_global_descriptor_set() const;
 
 		/// <summary>
 		/// Updates the push constant.
@@ -101,18 +101,18 @@ namespace minty
 		/// </summary>
 		/// <param name="set"></param>
 		/// <returns></returns>
-		rendering::DescriptorSet create_descriptor_set(uint32_t const set, bool const initialize);
+		DescriptorSet create_descriptor_set(uint32_t const set, bool const initialize);
 
 		/// <summary>
 		/// Gets the uniform constant infos for the given set index.
 		/// </summary>
 		/// <param name="set"></param>
 		/// <returns></returns>
-		std::vector<rendering::UniformConstantInfo> get_uniform_constant_infos(uint32_t const set) const;
+		std::vector<UniformConstantInfo> get_uniform_constant_infos(uint32_t const set) const;
 	private:
-		void create_descriptor_set_layouts(rendering::ShaderBuilder const& builder);
+		void create_descriptor_set_layouts(ShaderBuilder const& builder);
 
-		void create_pipeline_layout(rendering::ShaderBuilder const& builder);
+		void create_pipeline_layout(ShaderBuilder const& builder);
 
 		VkDescriptorPool create_pool(uint32_t const set);
 

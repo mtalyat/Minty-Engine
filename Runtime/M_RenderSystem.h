@@ -59,42 +59,42 @@ namespace minty
 		/// </summary>
 		/// <param name="builder">The rendering builder to use.</param>
 		/// <returns>The ID of the newly created asset.</returns>
-		ID create_texture(rendering::TextureBuilder const& builder);
+		ID create_texture(TextureBuilder const& builder);
 
 		/// <summary>
 		/// Creates a new Sprite using the given builder, then returns its ID.
 		/// </summary>
 		/// <param name="builder">The rendering builder to use.</param>
 		/// <returns>The ID of the newly created asset.</returns>
-		ID create_sprite(rendering::SpriteBuilder const& builder);
+		ID create_sprite(SpriteBuilder const& builder);
 
 		/// <summary>
 		/// Creates a new Shader using the given builder, then returns its ID.
 		/// </summary>
 		/// <param name="builder">The rendering builder to use.</param>
 		/// <returns>The ID of the newly created asset.</returns>
-		ID create_shader(rendering::ShaderBuilder const& builder);
+		ID create_shader(ShaderBuilder const& builder);
 
 		/// <summary>
 		/// Creates a new ShaderPass using the given builder, then returns its ID.
 		/// </summary>
 		/// <param name="builder">The rendering builder to use.</param>
 		/// <returns>The ID of the newly created asset.</returns>
-		ID create_shader_pass(rendering::ShaderPassBuilder const& builder);
+		ID create_shader_pass(ShaderPassBuilder const& builder);
 
 		/// <summary>
 		/// Creates a new MaterialTemplate using the given builder, then returns its ID.
 		/// </summary>
 		/// <param name="builder">The rendering builder to use.</param>
 		/// <returns>The ID of the newly created asset.</returns>
-		ID create_material_template(rendering::MaterialTemplateBuilder const& builder);
+		ID create_material_template(MaterialTemplateBuilder const& builder);
 
 		/// <summary>
 		/// Creates a new Material using the given builder, then returns its ID.
 		/// </summary>
 		/// <param name="builder">The rendering builder to use.</param>
 		/// <returns>The ID of the newly created asset.</returns>
-		ID create_material(rendering::MaterialBuilder const& builder);
+		ID create_material(MaterialBuilder const& builder);
 
 		/// <summary>
 		/// Creates a new Mesh using the given builder, then returns its ID.
@@ -542,7 +542,7 @@ namespace minty
 
 
 	private:
-		void load_descriptor_values(std::unordered_map<String, Dynamic>& values, Node const& node, std::vector<rendering::UniformConstantInfo> const& infos) const;
+		void load_descriptor_values(std::unordered_map<String, Dynamic>& values, Node const& node, std::vector<UniformConstantInfo> const& infos) const;
 
 		// loads a .obj file
 		void load_mesh_obj(Path const& path, ID const meshId);

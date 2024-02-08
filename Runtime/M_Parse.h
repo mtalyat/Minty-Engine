@@ -3,7 +3,7 @@
 #include "M_Types.h"
 #include <string>
 
-namespace minty::parse
+namespace minty::Parse
 {
 	/// <summary>
 	/// Parses the given string into a bool.

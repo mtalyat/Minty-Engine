@@ -17,14 +17,14 @@ int minty::Asset::check(Path const& path, bool const requiresMeta)
 	// can load if assets exists, and if no meta is required, or if a meta is required, it exists
 	if (path.empty() || !Asset::exists(path))
 	{
-		//console::error(std::format("Cannot find_animation asset at path \"{}\".", path.string()));
+		//Console::error(std::format("Cannot find_animation asset at path \"{}\".", path.string()));
 		// cannot find asset itself
 		return 1;
 	}
 
 	if (requiresMeta && !Asset::exists_meta(path))
 	{
-		//console::error(std::format("Cannot find_animation meta file for asset at path \"{}\".", path.string()));
+		//Console::error(std::format("Cannot find_animation meta file for asset at path \"{}\".", path.string()));
 		// cannot find asset meta file
 		return 2;
 	}
@@ -51,7 +51,7 @@ Path minty::Asset::absolute(Path const& path)
 Node minty::Asset::load_node(Path const& path)
 {
 #if N_DEBUG
-	console::error("Asset loading not implemented for release builds.");
+	Console::error("Asset loading not implemented for release builds.");
 	return String();
 #else
 	return File::read_node(get_assets_path(path));
@@ -76,7 +76,7 @@ Node minty::Asset::load_meta(Path const& path)
 std::vector<char> minty::Asset::load_chars(Path const& path)
 {
 #if N_DEBUG
-	console::error("Asset loading not implemented for release builds.");
+	Console::error("Asset loading not implemented for release builds.");
 	return String();
 #else
 	return File::read_all_chars(get_assets_path(path));
@@ -86,7 +86,7 @@ std::vector<char> minty::Asset::load_chars(Path const& path)
 String minty::Asset::load_text(Path const& path)
 {
 #if N_DEBUG
-	console::error("Asset loading not implemented for release builds.");
+	Console::error("Asset loading not implemented for release builds.");
 	return String();
 #else
 	return File::read_all_text(get_assets_path(path));
@@ -96,7 +96,7 @@ String minty::Asset::load_text(Path const& path)
 std::vector<String> minty::Asset::load_lines(Path const& path)
 {
 #if N_DEBUG
-	console::error("Asset loading not implemented for release builds.");
+	Console::error("Asset loading not implemented for release builds.");
 	return std::vector<String>();
 #else
 	return File::read_all_lines(get_assets_path(path));

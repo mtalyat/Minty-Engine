@@ -8,14 +8,14 @@
 #include <fstream>
 
 using namespace minty;
-using namespace minty::rendering;
+using namespace minty;
 
 minty::Shader::Shader()
 	: RenderObject::RenderObject()
 	, _descriptorSet()
 {}
 
-minty::Shader::Shader(rendering::ShaderBuilder const& builder, Engine& engine, ID const sceneId)
+minty::Shader::Shader(ShaderBuilder const& builder, Engine& engine, ID const sceneId)
 	: RenderObject::RenderObject(engine, sceneId)
 	, _descriptorSet(engine, sceneId)
 {
@@ -65,7 +65,7 @@ VkPipelineLayout minty::Shader::get_pipeline_layout() const
 	return _pipelineLayout;
 }
 
-rendering::DescriptorSet const& minty::Shader::get_global_descriptor_set() const
+DescriptorSet const& minty::Shader::get_global_descriptor_set() const
 {
 	return _descriptorSet;
 }
@@ -106,7 +106,7 @@ void minty::Shader::update_global_uniform_constant(String const& name, int const
 	_descriptorSet.apply(frame);
 }
 
-void minty::Shader::create_descriptor_set_layouts(rendering::ShaderBuilder const& builder)
+void minty::Shader::create_descriptor_set_layouts(ShaderBuilder const& builder)
 {
 	RenderEngine& renderer = get_render_engine();
 
@@ -124,12 +124,12 @@ void minty::Shader::create_descriptor_set_layouts(rendering::ShaderBuilder const
 		};
 
 		if (vkCreateDescriptorSetLayout(device, &layoutInfo, nullptr, &_descriptorSetLayouts.at(i)) != VK_SUCCESS) {
-			error::abort("Failed to create descriptor set layout.");
+			Error::abort("Failed to create descriptor set layout.");
 		}
 	}
 }
 
-void minty::Shader::create_pipeline_layout(rendering::ShaderBuilder const& builder)
+void minty::Shader::create_pipeline_layout(ShaderBuilder const& builder)
 {
 	// get push constant infos
 	auto const& pushConstantInfos = builder.pushConstantInfos;
@@ -161,7 +161,7 @@ void minty::Shader::create_pipeline_layout(rendering::ShaderBuilder const& build
 
 	// create the pipeline layout
 	if (vkCreatePipelineLayout(renderer.get_device(), &pipelineLayoutInfo, nullptr, &_pipelineLayout) != VK_SUCCESS) {
-		error::abort("Failed to create pipeline layout.");
+		Error::abort("Failed to create pipeline layout.");
 	}
 }
 
@@ -196,7 +196,7 @@ VkDescriptorPool minty::Shader::create_pool(uint32_t const set)
 
 	if (vkCreateDescriptorPool(get_render_engine().get_device(), &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS)
 	{
-		error::abort("Failed to create descriptor pool.");
+		Error::abort("Failed to create descriptor pool.");
 	}
 
 	return descriptorPool;
@@ -373,9 +373,9 @@ DescriptorSet minty::Shader::create_descriptor_set(uint32_t const set, bool cons
 	return descriptorSet;
 }
 
-std::vector<rendering::UniformConstantInfo> minty::Shader::get_uniform_constant_infos(uint32_t const set) const
+std::vector<UniformConstantInfo> minty::Shader::get_uniform_constant_infos(uint32_t const set) const
 {
-	std::vector<rendering::UniformConstantInfo> infos;
+	std::vector<UniformConstantInfo> infos;
 
 	for (auto const& pair : _uniformConstantInfos)
 	{

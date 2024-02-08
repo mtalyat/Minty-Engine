@@ -50,11 +50,11 @@ bool Rect::overlaps(Rect const& other) const
 
 Rect Rect::overlap(Rect const& other) const
 {
-	int xMin = math::clamp(other.x - x, 0, width);
-	int yMin = math::clamp(other.y - y, 0, height);
+	int xMin = Math::clamp(other.x - x, 0, width);
+	int yMin = Math::clamp(other.y - y, 0, height);
 
-	int xMax = math::clamp(other.x + other.width - x, 0, width);
-	int yMax = math::clamp(other.y + other.height - y, 0, height);
+	int xMax = Math::clamp(other.x + other.width - x, 0, width);
+	int yMax = Math::clamp(other.y + other.height - y, 0, height);
 
 	return Rect(xMin, yMin, xMax - xMin, yMax - yMin);
 }
@@ -76,7 +76,7 @@ Rect Rect::bounds(int const left, int const right, int const top, int const bott
 
 Rect Rect::round(RectF const& rect)
 {
-	return Rect(math::round_to_int(rect.x), math::round_to_int(rect.y), math::round_to_int(rect.width), math::round_to_int(rect.height));
+	return Rect(Math::round_to_int(rect.x), Math::round_to_int(rect.y), Math::round_to_int(rect.width), Math::round_to_int(rect.height));
 }
 
 String minty::to_string(Rect const& rect)

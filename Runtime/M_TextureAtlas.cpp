@@ -9,7 +9,7 @@
 using namespace minty;
 
 minty::TextureAtlas::TextureAtlas()
-	: rendering::RenderObject()
+	: RenderObject()
 	, _textureId(ERROR_ID)
 	, _materialId(ERROR_ID)
 	, _slice()
@@ -17,8 +17,8 @@ minty::TextureAtlas::TextureAtlas()
 	, _createdSlices()
 {}
 
-minty::TextureAtlas::TextureAtlas(rendering::TextureAtlasBuilder const& builder, Engine& engine, ID const sceneId)
-	: rendering::RenderObject(engine, sceneId)
+minty::TextureAtlas::TextureAtlas(TextureAtlasBuilder const& builder, Engine& engine, ID const sceneId)
+	: RenderObject(engine, sceneId)
 	, _textureId(builder.textureId)
 	, _materialId(builder.materialId)
 	, _slice()
@@ -39,7 +39,7 @@ minty::TextureAtlas::TextureAtlas(rendering::TextureAtlasBuilder const& builder,
 		MINTY_ASSERT(renderSystem != nullptr, "TextureAtlas::TextureAtlas(): renderSystem cannot be null.");
 
 		// create a material based on this texture
-		rendering::MaterialBuilder materialBuilder;
+		MaterialBuilder materialBuilder;
 		materialBuilder.name = std::format("{}_atlas", renderSystem->get_texture_name(_textureId));
 		materialBuilder.templateId = renderSystem->find_material_template("spriteMaterialTemplate"); // TODO: hard coded name
 
@@ -96,7 +96,7 @@ Vector2Int minty::TextureAtlas::get_size_in_slices() const
 {
 	Texture const& texture = get_render_system()->get_texture(_textureId);
 
-	return Vector2Int(math::floor_to_int(static_cast<float>(texture.get_width()) / _slice.x), math::floor_to_int(static_cast<float>(texture.get_height()) / _slice.y));
+	return Vector2Int(Math::floor_to_int(static_cast<float>(texture.get_width()) / _slice.x), Math::floor_to_int(static_cast<float>(texture.get_height()) / _slice.y));
 }
 
 Vector2Int minty::TextureAtlas::get_size() const
@@ -119,7 +119,7 @@ ID minty::TextureAtlas::slice_sprite(Vector2 const minCoords, Vector2 const maxC
 ID minty::TextureAtlas::slice_sprite(Vector2 const minCoords, Vector2 const maxCoords, Vector2 const pivot, String const& name, CoordinateMode const coordinateMode)
 {
 	// create builder
-	rendering::SpriteBuilder builder
+	SpriteBuilder builder
 	{
 		.name = name,
 		.textureId = _textureId,

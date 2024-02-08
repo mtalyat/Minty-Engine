@@ -4,7 +4,7 @@
 #include "M_CoordinateMode.h"
 #include "M_Vector.h"
 
-namespace minty::rendering
+namespace minty
 {
 	/// <summary>
 	/// Holds data to create a new TextureAtlas.

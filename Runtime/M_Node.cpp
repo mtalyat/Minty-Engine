@@ -127,7 +127,7 @@ String const& minty::Node::to_string() const
 Byte minty::Node::to_byte(Byte const defaultValue) const
 {
 	Byte out;
-	if (parse::try_byte(_data, out))
+	if (Parse::try_byte(_data, out))
 	{
 		return out;
 	}
@@ -138,7 +138,7 @@ Byte minty::Node::to_byte(Byte const defaultValue) const
 int minty::Node::to_int(int const defaultValue) const
 {
 	int out;
-	if (parse::try_int(_data, out))
+	if (Parse::try_int(_data, out))
 	{
 		return out;
 	}
@@ -149,7 +149,7 @@ int minty::Node::to_int(int const defaultValue) const
 ID minty::Node::to_id(ID const defaultValue) const
 {
 	ID out;
-	if (parse::try_id(_data, out))
+	if (Parse::try_id(_data, out))
 	{
 		return out;
 	}
@@ -160,7 +160,7 @@ ID minty::Node::to_id(ID const defaultValue) const
 unsigned int minty::Node::to_uint(unsigned int const defaultValue) const
 {
 	unsigned int out;
-	if (parse::try_uint(_data, out))
+	if (Parse::try_uint(_data, out))
 	{
 		return out;
 	}
@@ -171,7 +171,7 @@ unsigned int minty::Node::to_uint(unsigned int const defaultValue) const
 size_t minty::Node::to_size(size_t const defaultValue) const
 {
 	size_t out;
-	if (parse::try_size(_data, out))
+	if (Parse::try_size(_data, out))
 	{
 		return out;
 	}
@@ -182,7 +182,7 @@ size_t minty::Node::to_size(size_t const defaultValue) const
 float minty::Node::to_float(float const defaultValue) const
 {
 	float out;
-	if (parse::try_float(_data, out))
+	if (Parse::try_float(_data, out))
 	{
 		return out;
 	}
@@ -193,7 +193,7 @@ float minty::Node::to_float(float const defaultValue) const
 bool minty::Node::to_bool(bool const defaultValue) const
 {
 	bool out;
-	if (parse::try_bool(_data, out))
+	if (Parse::try_bool(_data, out))
 	{
 		return out;
 	}
@@ -300,7 +300,7 @@ Node minty::Node::load_node(Path const& path)
         // if new indent is too deep, ignore
         if (indentChange > 1)
         {
-            console::warn(std::format("Discarding line, invalid indent change of {}: {}", indentChange, line));
+            Console::warn(std::format("Discarding line, invalid indent change of {}: {}", indentChange, line));
             continue;
         }
 

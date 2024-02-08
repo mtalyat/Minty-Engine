@@ -3,7 +3,7 @@
 #include <vulkan/vulkan.h>
 #include "M_String.h"
 
-#define VK_ASSERT(expression, message) { VkResult result = expression; if(result != VkResult::VK_SUCCESS) { minty::error::abort(std::format("[{}] {}", minty::vk::to_string(result), message)); } }
+#define VK_ASSERT(expression, message) { VkResult result = expression; if(result != VkResult::VK_SUCCESS) { minty::Error::abort(std::format("[{}] {}", minty::vk::to_string(result), message)); } }
 
 namespace minty::vk
 {

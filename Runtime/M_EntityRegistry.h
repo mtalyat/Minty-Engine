@@ -190,6 +190,6 @@ namespace minty
 		// type names
 		_componentTypes.emplace(info.index(), name);
 
-		console::info(std::format("Registered component {}", name));
+		Console::info(std::format("Registered component {}", name));
 	}
 }

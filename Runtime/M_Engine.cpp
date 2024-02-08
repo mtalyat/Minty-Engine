@@ -8,7 +8,7 @@
 #include <GLFW/glfw3.h>
 
 using namespace minty;
-using namespace minty::rendering;
+using namespace minty;
 
 uint32_t const WIDTH = 800;
 uint32_t const HEIGHT = 600;
@@ -85,7 +85,7 @@ void Engine::run()
 	// if no scenes at all, abort
 	if (!_sceneManager.size())
 	{
-		error::abort("Aborting game. No Scenes loaded.");
+		Error::abort("Aborting game. No Scenes loaded.");
 	}
 
 	// if no scene loaded, just load the first scene
@@ -150,7 +150,7 @@ void Engine::run()
 		// if fps time >= 1 second (in nanoseconds)
 		if (fpsTime >= 1000000000ll)
 		{
-			console::log(std::format("{}\r", fpsCount));
+			Console::log(std::format("{}\r", fpsCount));
 
 			fpsCount = 0u;
 			fpsTime = 0ll;
@@ -165,7 +165,7 @@ void Engine::run()
 	_sceneManager.destroy();
 
 	// print elapsed time of program
-	console::log(std::format("Elapsed time: {}s", std::chrono::duration_cast<std::chrono::milliseconds>(get_now() - start).count() / 1000.0f));
+	Console::log(std::format("Elapsed time: {}s", std::chrono::duration_cast<std::chrono::milliseconds>(get_now() - start).count() / 1000.0f));
 }
 
 time_point_t minty::Engine::get_now() const

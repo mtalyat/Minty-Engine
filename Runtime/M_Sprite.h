@@ -10,7 +10,7 @@ namespace minty
 	/// Holds the data for a slice of a texture.
 	/// </summary>
 	class Sprite
-		: public rendering::RenderObject
+		: public RenderObject
 	{
 	private:
 		ID _textureId;
@@ -25,7 +25,7 @@ namespace minty
 		/// </summary>
 		Sprite();
 
-		Sprite(rendering::SpriteBuilder const& builder, Engine& engine, ID const sceneId);
+		Sprite(SpriteBuilder const& builder, Engine& engine, ID const sceneId);
 
 		/// <summary>
 		/// Destroys all of the resources associated with this Sprite.

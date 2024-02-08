@@ -11,7 +11,7 @@ std::vector<char> minty::File::read_all_chars(Path const& path)
 {
     if (!std::filesystem::exists(path))
     {
-        console::error(std::format("File not found at: {}", path.string()));
+        Console::error(std::format("File not found at: {}", path.string()));
         return {};
     }
 
@@ -19,7 +19,7 @@ std::vector<char> minty::File::read_all_chars(Path const& path)
 
     if (!file.is_open())
     {
-        console::error(std::format("Failed to open file at: {}", path.string()));
+        Console::error(std::format("Failed to open file at: {}", path.string()));
         return {};
     }
 
@@ -38,7 +38,7 @@ String minty::File::read_all_text(Path const& path)
 {
     if (!std::filesystem::exists(path))
     {
-        console::error(std::format("File not found at: {}", path.string()));
+        Console::error(std::format("File not found at: {}", path.string()));
         return String();
     }
 
@@ -47,7 +47,7 @@ String minty::File::read_all_text(Path const& path)
 
     if (!file.is_open())
     {
-        console::error(std::format("Failed to open file at: {}", path.string()));
+        Console::error(std::format("Failed to open file at: {}", path.string()));
         return String();
     }
 
@@ -69,7 +69,7 @@ String minty::File::read_all_text(Path const& path)
     }
     else
     {
-        console::error(std::format("File not opened at: ", path.string()));
+        Console::error(std::format("File not opened at: ", path.string()));
         return String();
     }
 
@@ -81,7 +81,7 @@ std::vector<String> minty::File::read_all_lines(Path const& path)
 {
     if (!std::filesystem::exists(path))
     {
-        console::error(std::format("File not found at: {}", path.string()));
+        Console::error(std::format("File not found at: {}", path.string()));
         return std::vector<String>();
     }
 
@@ -105,7 +105,7 @@ std::vector<String> minty::File::read_all_lines(Path const& path)
     }
     else
     {
-        console::error(std::format("File not opened at: ", path.string()));
+        Console::error(std::format("File not opened at: ", path.string()));
         return std::vector<String>();
     }
 
@@ -124,7 +124,7 @@ bool minty::File::write_all_text(Path const& path, String const& text)
 
     if (!file.is_open())
     {
-        console::error(std::format("File not created at: {}", path.string()));
+        Console::error(std::format("File not created at: {}", path.string()));
         return false;
     }
 
@@ -143,7 +143,7 @@ bool minty::File::write_all_lines(Path const& path, std::vector<String> const& l
 
     if (!file.is_open())
     {
-        console::error(std::format("File not created at: {}", path.string()));
+        Console::error(std::format("File not created at: {}", path.string()));
         return false;
     }
 

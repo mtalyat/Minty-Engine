@@ -2,7 +2,7 @@
 
 #include "M_Types.h"
 
-namespace minty::math
+namespace minty::Math
 {
 	float const PI = 3.14159265359f;
 

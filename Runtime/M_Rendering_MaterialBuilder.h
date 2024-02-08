@@ -4,7 +4,7 @@
 #include "M_Dynamic.h"
 #include <unordered_map>
 
-namespace minty::rendering
+namespace minty
 {
 	/// <summary>
 	/// Holds data to create a new Material.

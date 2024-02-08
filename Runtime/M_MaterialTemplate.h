@@ -17,7 +17,7 @@ namespace minty
 	/// Holds the graphics information template data for a Material.
 	/// </summary>
 	class MaterialTemplate
-		: public rendering::RenderObject
+		: public RenderObject
 	{
 	private:
 		// the shader pass IDs for the material
@@ -36,7 +36,7 @@ namespace minty
 		/// </summary>
 		/// <param name="builder"></param>
 		/// <param name="renderer"></param>
-		MaterialTemplate(rendering::MaterialTemplateBuilder const& builder, Engine& engine, ID const sceneId);
+		MaterialTemplate(MaterialTemplateBuilder const& builder, Engine& engine, ID const sceneId);
 
 		/// <summary>
 		/// Destroys all of the resources associated with this MaterialTemplate.

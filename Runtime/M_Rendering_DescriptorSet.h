@@ -7,7 +7,7 @@
 #include <unordered_map>
 #include <unordered_set>
 
-namespace minty::rendering
+namespace minty
 {
 	/// <summary>
 	/// Holds data for a descriptor set within a shader.

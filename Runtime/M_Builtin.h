@@ -4,7 +4,7 @@
 #include "M_Matrix.h"
 #include "M_Vector.h"
 
-namespace minty::builtin
+namespace minty::Builtin
 {
 	// global uniform buffer object
 	struct GlobalUBO

@@ -5,10 +5,7 @@ namespace minty
 {
 	class RenderEngine;
 	class RenderSystem;
-}
 
-namespace minty::rendering
-{
 	/// <summary>
 	/// Base class for an object that is used with the RenderEngine.
 	/// </summary>

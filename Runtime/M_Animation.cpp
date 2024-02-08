@@ -158,13 +158,13 @@ void minty::Animation::reset(Entity const thisEntity, Scene& scene) const
 
 size_t get_split(size_t const index, std::vector<String> const& split, size_t const defaultValue)
 {
-	return (index < split.size() && split.at(index).size()) ? parse::to_size(split.at(index)) : defaultValue;
+	return (index < split.size() && split.at(index).size()) ? Parse::to_size(split.at(index)) : defaultValue;
 }
 
 Animation::Step minty::Animation::parse_step(String const& string)
 {
 	// split the line by /'s
-	std::vector<String> split = string::split(string, '/');
+	std::vector<String> split = Text::split(string, '/');
 
 	// parse into the step's values
 	return Step
@@ -273,7 +273,7 @@ void minty::Animation::serialize(Writer& writer) const
 	writer.write("length", _length);
 	writer.write("loops", static_cast<bool>(_flags & ANIMATION_FLAGS_LOOPS));
 	
-	console::todo("Finish Animation::serialize()");
+	Console::todo("Finish Animation::serialize()");
 }
 
 void minty::Animation::deserialize(Reader const& reader)
@@ -283,5 +283,5 @@ void minty::Animation::deserialize(Reader const& reader)
 
 	MINTY_ASSERT(renderer != nullptr, "Animation::deserialize(): RenderSystem cannot be null.");
 
-	console::todo("Animation::deserialize()");
+	Console::todo("Animation::deserialize()");
 }

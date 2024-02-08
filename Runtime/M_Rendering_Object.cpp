@@ -7,9 +7,9 @@
 #include "M_Scene.h"
 
 using namespace minty;
-using namespace minty::rendering;
+using namespace minty;
 
-minty::rendering::RenderObject::RenderObject()
+minty::RenderObject::RenderObject()
 	: SceneObject()
 {}
 
@@ -20,17 +20,17 @@ RenderObject::RenderObject(Engine& engine, ID const sceneId)
 RenderObject::~RenderObject()
 {}
 
-RenderEngine& minty::rendering::RenderObject::get_render_engine() const
+RenderEngine& minty::RenderObject::get_render_engine() const
 {
 	return get_engine().get_render_engine();
 }
 
-RenderSystem* minty::rendering::RenderObject::get_render_system() const
+RenderSystem* minty::RenderObject::get_render_system() const
 {
 	return get_scene().get_system_registry().find<RenderSystem>();
 }
 
-String minty::rendering::to_string(RenderObject const& value)
+String minty::to_string(RenderObject const& value)
 {
 	return std::format("RenderObject()");
 }

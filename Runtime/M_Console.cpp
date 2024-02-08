@@ -6,9 +6,9 @@
 
 using namespace minty;
 
-void print_raw(std::ostream& stream, String const& message, minty::console::Color const color)
+void print_raw(std::ostream& stream, String const& message, minty::Console::Color const color)
 {
-	if (color < minty::console::Color::Gray)
+	if (color < minty::Console::Color::Gray)
 	{
 		// basic color
 		stream << "\033[" << static_cast<int>(color) + 30 << ";40m" << message << "\033[0m" << std::endl;
@@ -20,7 +20,7 @@ void print_raw(std::ostream& stream, String const& message, minty::console::Colo
 	}
 }
 
-String minty::console::to_string(Color const value)
+String minty::Console::to_string(Color const value)
 {
 	switch (value) {
 	case Color::Black: return "Black";
@@ -39,11 +39,11 @@ String minty::console::to_string(Color const value)
 	case Color::BrightMagenta: return "Bright Magenta";
 	case Color::BrightCyan: return "Bright Cyan";
 	case Color::BrightWhite: return "Bright White";
-	default: return minty::error::ERROR_TEXT;
+	default: return minty::Error::ERROR_TEXT;
 	}
 }
 
-void minty::console::print(String const& message)
+void minty::Console::print(String const& message)
 {
 	std::cout << message << std::endl;
 }
@@ -67,12 +67,12 @@ void print_node(Node const& node, int const indent)
 			if (child.has_data())
 			{
 				// print data if there is something
-				console::print(std::format("{}{}: {}", indentString, child.get_name(), child.get_data()));
+				Console::print(std::format("{}{}: {}", indentString, child.get_name(), child.get_data()));
 			}
 			else
 			{
 				// print, but no data
-				console::print(std::format("{}{}", indentString, child.get_name()));
+				Console::print(std::format("{}{}", indentString, child.get_name()));
 			}
 		}
 		else
@@ -81,12 +81,12 @@ void print_node(Node const& node, int const indent)
 			if (child.has_data())
 			{
 				// print data if there is something
-				console::print(std::format("{}- {}", indentString, child.get_data()));
+				Console::print(std::format("{}- {}", indentString, child.get_data()));
 			}
 			else
 			{
 				// print, but no data or name
-				console::print(std::format("{}- ", indentString));
+				Console::print(std::format("{}- ", indentString));
 			}
 		}
 
@@ -95,71 +95,71 @@ void print_node(Node const& node, int const indent)
 	}
 }
 
-void minty::console::print(Node const& node)
+void minty::Console::print(Node const& node)
 {
 	print_node(node, 0);
 }
 
-void minty::console::print(String const& message, Color const color)
+void minty::Console::print(String const& message, Color const color)
 {
 	print_raw(std::cout, message, color);
 }
 
-void minty::console::wait()
+void minty::Console::wait()
 {
 	print("\nPress enter to continue...");
 	String temp;
 	std::getline(std::cin, temp);
 }
 
-void minty::console::log(String const& message, Color const color)
+void minty::Console::log(String const& message, Color const color)
 {
 #ifndef NDEBUG
 	print_raw(std::cout, message, color);
 #endif
 }
 
-void minty::console::todo(String const& message)
+void minty::Console::todo(String const& message)
 {
 #ifndef NDEBUG
 	print_raw(std::cout, "[todo]: " + message, Color::Magenta);
 #endif
 }
 
-void minty::console::test(String const& message, Color const color)
+void minty::Console::test(String const& message, Color const color)
 {
 #ifndef NDEBUG
 	print_raw(std::cout, "[test]: " + message, color);
 #endif
 }
 
-void minty::console::info(String const& message)
+void minty::Console::info(String const& message)
 {
 #ifndef NDEBUG
 	print_raw(std::cout, "[info]: " + message, Color::Gray);
 #endif
 }
 
-void minty::console::warn(String const& message)
+void minty::Console::warn(String const& message)
 {
 #ifndef NDEBUG
 	print_raw(std::cout, "[warn]: " + message, Color::Yellow);
 #endif
 }
 
-void minty::console::error(String const& message)
+void minty::Console::error(String const& message)
 {
 #ifndef NDEBUG
 	print_raw(std::cout, "[errr]: " + message, Color::Red);
 #endif
 }
 
-bool minty::console::ass(bool const value, String const& errorMessage)
+bool minty::Console::ass(bool const value, String const& errorMessage)
 {
 #ifndef NDEBUG
 	if (!value)
 	{
-		console::error(errorMessage);
+		Console::error(errorMessage);
 	}
 	return value;
 #else

@@ -49,7 +49,7 @@ namespace minty
 		// if exists in all, do not add a duplicate
 		if (_allSystems.contains(name))
 		{
-			console::error(std::format("SystemRegistry already contains a System with the name \"{}\". Returning NULL.", name));
+			Console::error(std::format("SystemRegistry already contains a System with the name \"{}\". Returning NULL.", name));
 			return nullptr;
 		}
 
@@ -79,7 +79,7 @@ namespace minty
 		if (found == _systemTypes.end())
 		{
 			// name not found
-			console::error(std::format("Cannot emplace System \"{}\". It has not been registered with the SystemRegistry.", name));
+			Console::error(std::format("Cannot emplace System \"{}\". It has not been registered with the SystemRegistry.", name));
 			return nullptr;
 		}
 		else

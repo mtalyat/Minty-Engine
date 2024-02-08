@@ -7,7 +7,7 @@
 
 using namespace minty;
 
-String minty::string::to_lower(String const& string)
+String minty::Text::to_lower(String const& string)
 {
 	std::vector<char> data(string.size());
 
@@ -21,7 +21,7 @@ String minty::string::to_lower(String const& string)
 	return String(data.data());
 }
 
-String minty::string::to_upper(String const& string)
+String minty::Text::to_upper(String const& string)
 {
 	std::vector<char> data(string.size());
 
@@ -35,7 +35,7 @@ String minty::string::to_upper(String const& string)
 	return String(data.data());
 }
 
-String minty::string::to_bytes(void const* const data, size_t const size)
+String minty::Text::to_bytes(void const* const data, size_t const size)
 {
 	String result = "";
 
@@ -54,7 +54,7 @@ String minty::string::to_bytes(void const* const data, size_t const size)
 	return result;
 }
 
-String minty::string::to_bits(void const* const data, size_t const size)
+String minty::Text::to_bits(void const* const data, size_t const size)
 {
 	String result = "";
 
@@ -76,7 +76,7 @@ String minty::string::to_bits(void const* const data, size_t const size)
 	return result;
 }
 
-bool minty::string::equal_insensitive(String const& left, String const& right)
+bool minty::Text::equal_insensitive(String const& left, String const& right)
 {
 	// check if not equal lengths
 	if (left.size() != right.size())
@@ -98,7 +98,7 @@ bool minty::string::equal_insensitive(String const& left, String const& right)
 	return true;
 }
 
-std::vector<String> minty::string::split(String const& string)
+std::vector<String> minty::Text::split(String const& string)
 {
 	std::stringstream ss(string);
 
@@ -113,7 +113,7 @@ std::vector<String> minty::string::split(String const& string)
 	return results;
 }
 
-std::vector<String> minty::string::split(String const& string, char const delimiter)
+std::vector<String> minty::Text::split(String const& string, char const delimiter)
 {
 	std::stringstream ss(string);
 
@@ -128,18 +128,18 @@ std::vector<String> minty::string::split(String const& string, char const delimi
 	return results;
 }
 
-std::vector<String> minty::string::split(String const& string, String const& delimiter)
+std::vector<String> minty::Text::split(String const& string, String const& delimiter)
 {
-	console::todo("string::split() (string delimiter)");
+	Console::todo("string::split() (string delimiter)");
 	return {};
 }
 
-String minty::string::join(std::vector<String> const& list)
+String minty::Text::join(std::vector<String> const& list)
 {
 	return join(list, 0, list.size());
 }
 
-String minty::string::join(std::vector<String> const& list, size_t start, size_t count)
+String minty::Text::join(std::vector<String> const& list, size_t start, size_t count)
 {
 	String out;
 

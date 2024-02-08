@@ -4,7 +4,7 @@
 
 #include <vector>
 
-namespace minty::rendering
+namespace minty
 {
 	/// <summary>
 	/// Holds info for a uniform constant.

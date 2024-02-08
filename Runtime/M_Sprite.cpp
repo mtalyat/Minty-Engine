@@ -6,7 +6,7 @@
 #include "M_Texture.h"
 
 using namespace minty;
-using namespace minty::rendering;
+using namespace minty;
 
 minty::Sprite::Sprite()
 	: RenderObject::RenderObject()
@@ -17,7 +17,7 @@ minty::Sprite::Sprite()
 	, _pivot()
 {}
 
-minty::Sprite::Sprite(rendering::SpriteBuilder const& builder, Engine& engine, ID const sceneId)
+minty::Sprite::Sprite(SpriteBuilder const& builder, Engine& engine, ID const sceneId)
 	: RenderObject::RenderObject(engine, sceneId)
 	, _textureId(builder.textureId)
 	, _materialId(builder.materialId)
@@ -69,7 +69,7 @@ void minty::Sprite::set_min_coords(Vector2 const coords, CoordinateMode const co
 		_minCoords = normalize_coords(coords);
 		break;
 	default:
-		console::error("set_min_coords invalid CoordinateMode.");
+		Console::error("set_min_coords invalid CoordinateMode.");
 	}
 }
 
@@ -84,7 +84,7 @@ void minty::Sprite::set_max_coords(Vector2 const coords, CoordinateMode const co
 		_maxCoords = normalize_coords(coords);
 		break;
 	default:
-		console::error("set_max_coords invalid CoordinateMode.");
+		Console::error("set_max_coords invalid CoordinateMode.");
 	}
 }
 
@@ -99,7 +99,7 @@ void minty::Sprite::set_pivot(Vector2 const pivot, CoordinateMode const coordina
 		_pivot = normalize_coords(pivot);
 		break;
 	default:
-		console::error("set_pivot invalid CoordinateMode.");
+		Console::error("set_pivot invalid CoordinateMode.");
 	}
 }
 

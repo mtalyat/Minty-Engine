@@ -3,7 +3,7 @@
 #include "M_Types.h"
 #include <vector>
 
-namespace minty::string
+namespace minty::Text
 {
 	constexpr char const* const EMPTY = "";
 

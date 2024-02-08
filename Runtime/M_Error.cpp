@@ -5,9 +5,9 @@
 #include <stdexcept>
 
 using namespace minty;
-using namespace minty::error;
+using namespace minty::Error;
 
-void minty::error::abort(String const& message)
+void minty::Error::abort(String const& message)
 {
 	// abort program
 	throw std::runtime_error(message);

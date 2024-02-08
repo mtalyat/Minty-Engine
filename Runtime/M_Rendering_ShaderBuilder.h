@@ -9,7 +9,7 @@
 #include <vector>
 #include <unordered_map>
 
-namespace minty::rendering
+namespace minty
 {
 	/// <summary>
 	/// Holds data to create a new Shader.

@@ -12,7 +12,7 @@
 #include <stb_image.h>
 
 using namespace minty;
-using namespace minty::rendering;
+using namespace minty;
 
 minty::Texture::Texture()
 	: RenderObject::RenderObject()
@@ -25,7 +25,7 @@ minty::Texture::Texture()
 	, _sampler()
 {}
 
-Texture::Texture(rendering::TextureBuilder const& builder, Engine& engine, ID const sceneId)
+Texture::Texture(TextureBuilder const& builder, Engine& engine, ID const sceneId)
 	: RenderObject::RenderObject(engine, sceneId)
 	, _width(builder.width)
 	, _height(builder.height)
@@ -46,13 +46,13 @@ Texture::Texture(rendering::TextureBuilder const& builder, Engine& engine, ID co
 	{
 		if (!Asset::exists(path))
 		{
-			console::error(std::format("Cannot load_animation texture. File not found at: {}", path.string()));
+			Console::error(std::format("Cannot load_animation texture. File not found at: {}", path.string()));
 			return;
 		}
 
 		if (builder.pixelFormat == PixelFormat::None)
 		{
-			console::error("Attempting to load_animation texture with a pixelFormat of None.");
+			Console::error("Attempting to load_animation texture with a pixelFormat of None.");
 			return;
 		}
 
@@ -65,7 +65,7 @@ Texture::Texture(rendering::TextureBuilder const& builder, Engine& engine, ID co
 		// if no pixels, error
 		if (!pixels)
 		{
-			console::error(std::format("Failed to load_animation texture: {}", path.string()));
+			Console::error(std::format("Failed to load_animation texture: {}", path.string()));
 			return;
 		}
 	}
@@ -88,12 +88,12 @@ Texture::Texture(rendering::TextureBuilder const& builder, Engine& engine, ID co
 
 	if (!pixels)
 	{
-		console::error("Failed to create texture. Pixels are null.");
+		Console::error("Failed to create texture. Pixels are null.");
 		return;
 	}
 
 	// get size needed to store the texture
-	VkDeviceSize imageSize = _width * _height * sizeof(color_t);
+	VkDeviceSize imageSize = _width * _height * sizeof(Color::color_t);
 
 	RenderEngine& renderEngine = get_render_engine();
 
@@ -176,7 +176,7 @@ Texture::Texture(rendering::TextureBuilder const& builder, Engine& engine, ID co
 	samplerInfo.maxLod = 0.0f;
 
 	if (vkCreateSampler(device, &samplerInfo, nullptr, &_sampler) != VK_SUCCESS) {
-		error::abort(std::format("Failed to load_animation texture: {}", path.string()));
+		Error::abort(std::format("Failed to load_animation texture: {}", path.string()));
 	}
 }
 

@@ -24,10 +24,10 @@ String minty::to_string(Object const& value)
 
 void minty::Object::serialize(Writer& writer) const
 {
-	console::todo(std::format("serialize() for {}.", to_string(*this)));
+	Console::todo(std::format("serialize() for {}.", to_string(*this)));
 }
 
 void minty::Object::deserialize(Reader const& reader)
 {
-	console::todo(std::format("deserialize() for {}.", to_string(*this)));
+	Console::todo(std::format("deserialize() for {}.", to_string(*this)));
 }

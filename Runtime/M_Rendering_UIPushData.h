@@ -4,7 +4,7 @@
 #include "M_Vector.h"
 #include "M_Matrix.h"
 
-namespace minty::rendering
+namespace minty
 {
 	struct UIPushData
 	{

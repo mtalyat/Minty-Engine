@@ -6,10 +6,10 @@
 #ifdef MINTY_RELEASE
 #define MINTY_ASSERT(expression, message)
 #else
-#define MINTY_ASSERT(expression, message) if(!(expression)) minty::error::abort(message);
+#define MINTY_ASSERT(expression, message) if(!(expression)) minty::Error::abort(message);
 #endif
 
-namespace minty::error
+namespace minty::Error
 {
 	/// <summary>
 	/// The default error text.

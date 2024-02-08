@@ -116,7 +116,7 @@ String minty::vk::to_string(VkFilter const value)
 
 VkFilter minty::vk::from_string_vk_filter(String const& value)
 {
-	String value2 = minty::string::to_upper(value);
+	String value2 = minty::Text::to_upper(value);
 	if (value2 == "NEAREST") return VkFilter::VK_FILTER_NEAREST;
 	if (value2 == "LINEAR") return VkFilter::VK_FILTER_LINEAR;
 	if (value2 == "CUBIC_IMG") return VkFilter::VK_FILTER_CUBIC_IMG;
@@ -319,7 +319,7 @@ String minty::vk::to_string(VkFormat const value)
 
 VkFormat minty::vk::from_string_vk_format(String const& value)
 {
-	String value2 = minty::string::to_upper(value);
+	String value2 = minty::Text::to_upper(value);
 	if (value2 == "UNDEFINED") return VkFormat::VK_FORMAT_UNDEFINED;
 	if (value2 == "R4G4_UNORM_PACK8") return VkFormat::VK_FORMAT_R4G4_UNORM_PACK8;
 	if (value2 == "R4G4B4A4_UNORM_PACK16") return VkFormat::VK_FORMAT_R4G4B4A4_UNORM_PACK16;
@@ -524,7 +524,7 @@ String minty::vk::to_string(VkSamplerAddressMode const value)
 
 VkSamplerAddressMode minty::vk::from_string_vk_sampler_address_mode(String const& value)
 {
-	String value2 = minty::string::to_upper(value);
+	String value2 = minty::Text::to_upper(value);
 	if (value2 == "REPEAT") return VkSamplerAddressMode::VK_SAMPLER_ADDRESS_MODE_REPEAT;
 	if (value2 == "MIRRORED_REPEAT") return VkSamplerAddressMode::VK_SAMPLER_ADDRESS_MODE_MIRRORED_REPEAT;
 	if (value2 == "CLAMP_TO_EDGE") return VkSamplerAddressMode::VK_SAMPLER_ADDRESS_MODE_CLAMP_TO_EDGE;
@@ -546,7 +546,7 @@ String minty::vk::to_string(VkSamplerMipmapMode const value)
 
 VkSamplerMipmapMode minty::vk::from_string_vk_sampler_mipmap_mode(String const& value)
 {
-	String value2 = minty::string::to_upper(value);
+	String value2 = minty::Text::to_upper(value);
 	if (value2 == "NEAREST") return VkSamplerMipmapMode::VK_SAMPLER_MIPMAP_MODE_NEAREST;
 	if (value2 == "LINEAR") return VkSamplerMipmapMode::VK_SAMPLER_MIPMAP_MODE_LINEAR;
 
@@ -570,7 +570,7 @@ String minty::vk::to_string(VkShaderStageFlagBits const value)
 
 VkShaderStageFlagBits minty::vk::from_string_vk_shader_stage_flag_bits(String const& value)
 {
-	String value2 = minty::string::to_upper(value);
+	String value2 = minty::Text::to_upper(value);
 	if (value2 == "VERTEX_BIT") return VkShaderStageFlagBits::VK_SHADER_STAGE_VERTEX_BIT;
 	if (value2 == "TESSELLATION_CONTROL_BIT") return VkShaderStageFlagBits::VK_SHADER_STAGE_TESSELLATION_CONTROL_BIT;
 	if (value2 == "TESSELLATION_EVALUATION_BIT") return VkShaderStageFlagBits::VK_SHADER_STAGE_TESSELLATION_EVALUATION_BIT;
@@ -603,7 +603,7 @@ String minty::vk::to_string(VkDescriptorType const value)
 
 VkDescriptorType minty::vk::from_string_vk_descriptor_type(String const& value)
 {
-	String value2 = minty::string::to_upper(value);
+	String value2 = minty::Text::to_upper(value);
 	if (value2 == "SAMPLER") return VkDescriptorType::VK_DESCRIPTOR_TYPE_SAMPLER;
 	if (value2 == "COMBINED_IMAGE_SAMPLER") return VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;
 	if (value2 == "SAMPLED_IMAGE") return VkDescriptorType::VK_DESCRIPTOR_TYPE_SAMPLED_IMAGE;
@@ -640,7 +640,7 @@ String minty::vk::to_string(VkPrimitiveTopology const value)
 
 VkPrimitiveTopology minty::vk::from_string_vk_primitive_topology(String const& value)
 {
-	String value2 = minty::string::to_upper(value);
+	String value2 = minty::Text::to_upper(value);
 	if (value2 == "POINT_LIST") return VkPrimitiveTopology::VK_PRIMITIVE_TOPOLOGY_POINT_LIST;
 	if (value2 == "LINE_LIST") return VkPrimitiveTopology::VK_PRIMITIVE_TOPOLOGY_LINE_LIST;
 	if (value2 == "LINE_STRIP") return VkPrimitiveTopology::VK_PRIMITIVE_TOPOLOGY_LINE_STRIP;
@@ -669,7 +669,7 @@ String minty::vk::to_string(VkPolygonMode const value)
 
 VkPolygonMode minty::vk::from_string_vk_polygon_mode(String const& value)
 {
-	String value2 = minty::string::to_upper(value);
+	String value2 = minty::Text::to_upper(value);
 	if (value2 == "FILL") return VkPolygonMode::VK_POLYGON_MODE_FILL;
 	if (value2 == "LINE") return VkPolygonMode::VK_POLYGON_MODE_LINE;
 	if (value2 == "POINT") return VkPolygonMode::VK_POLYGON_MODE_POINT;
@@ -691,7 +691,7 @@ String minty::vk::to_string(VkCullModeFlagBits const value)
 
 VkCullModeFlagBits minty::vk::from_string_vk_cull_mode_flag_bits(String const& value)
 {
-	String value2 = minty::string::to_upper(value);
+	String value2 = minty::Text::to_upper(value);
 	if (value2 == "NONE") return VkCullModeFlagBits::VK_CULL_MODE_NONE;
 	if (value2 == "FRONT_BIT") return VkCullModeFlagBits::VK_CULL_MODE_FRONT_BIT;
 	if (value2 == "BACK_BIT") return VkCullModeFlagBits::VK_CULL_MODE_BACK_BIT;
@@ -712,7 +712,7 @@ String minty::vk::to_string(VkFrontFace const value)
 
 VkFrontFace minty::vk::from_string_vk_front_face(String const& value)
 {
-	String value2 = minty::string::to_upper(value);
+	String value2 = minty::Text::to_upper(value);
 	if (value2 == "COUNTER_CLOCKWISE") return VkFrontFace::VK_FRONT_FACE_COUNTER_CLOCKWISE;
 	if (value2 == "CLOCKWISE") return VkFrontFace::VK_FRONT_FACE_CLOCKWISE;
 
@@ -731,7 +731,7 @@ String minty::vk::to_string(VkVertexInputRate const value)
 
 VkVertexInputRate minty::vk::from_string_vk_vertex_input_rate(String const& value)
 {
-	String value2 = minty::string::to_upper(value);
+	String value2 = minty::Text::to_upper(value);
 	if (value2 == "VERTEX") return VkVertexInputRate::VK_VERTEX_INPUT_RATE_VERTEX;
 	if (value2 == "INSTANCE") return VkVertexInputRate::VK_VERTEX_INPUT_RATE_INSTANCE;
 

@@ -17,12 +17,12 @@ namespace minty
 	/// Holds graphics information.
 	/// </summary>
 	class Material
-		: public rendering::RenderObject
+		: public RenderObject
 	{
 	private:
 		// the material template id
 		ID _templateId;
-		std::vector<rendering::DescriptorSet> _passDescriptorSets;
+		std::vector<DescriptorSet> _passDescriptorSets;
 
 	public:
 		/// <summary>
@@ -35,7 +35,7 @@ namespace minty
 		/// </summary>
 		/// <param name="builder"></param>
 		/// <param name="renderer"></param>
-		Material(rendering::MaterialBuilder const& builder, Engine& engine, ID const sceneId);
+		Material(MaterialBuilder const& builder, Engine& engine, ID const sceneId);
 
 		/// <summary>
 		/// Destroys all of the resources associated with this Material.
@@ -53,7 +53,7 @@ namespace minty
 		/// </summary>
 		/// <param name="pass"></param>
 		/// <returns></returns>
-		rendering::DescriptorSet const& get_descriptor_set(uint32_t const pass) const;
+		DescriptorSet const& get_descriptor_set(uint32_t const pass) const;
 
 	public:
 		friend String to_string(Material const& value);

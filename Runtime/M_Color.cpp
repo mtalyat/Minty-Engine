@@ -117,19 +117,19 @@ inline Color Color::lighten(float const percent) const
 Color Color::lerp(Color const left, Color const right, float const t)
 {
 	return Color(
-		static_cast<Byte>(math::lerp(left.r, right.r, t)),
-		static_cast<Byte>(math::lerp(left.g, right.g, t)),
-		static_cast<Byte>(math::lerp(left.b, right.b, t)),
+		static_cast<Byte>(Math::lerp(left.r, right.r, t)),
+		static_cast<Byte>(Math::lerp(left.g, right.g, t)),
+		static_cast<Byte>(Math::lerp(left.b, right.b, t)),
 		left.a);
 }
 
 Color Color::lerpa(Color const left, Color const right, float const t)
 {
 	return Color(
-		static_cast<Byte>(math::lerp(left.r, right.r, t)),
-		static_cast<Byte>(math::lerp(left.g, right.g, t)),
-		static_cast<Byte>(math::lerp(left.b, right.b, t)),
-		static_cast<Byte>(math::lerp(left.a, right.a, t)));
+		static_cast<Byte>(Math::lerp(left.r, right.r, t)),
+		static_cast<Byte>(Math::lerp(left.g, right.g, t)),
+		static_cast<Byte>(Math::lerp(left.b, right.b, t)),
+		static_cast<Byte>(Math::lerp(left.a, right.a, t)));
 }
 
 String minty::to_string(Color const color)

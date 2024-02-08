@@ -33,8 +33,8 @@ Vector2 minty::from_string_vector2(String const& value)
 
 	// split by ", ", grab inner values
 	String raw = value.substr(1, value.size() - 2);
-	std::vector<String> parts = string::split(raw, ", ");
-	return Vector2(parse::to_float(parts.at(0)), parse::to_float(parts.at(1)));
+	std::vector<String> parts = Text::split(raw, ", ");
+	return Vector2(Parse::to_float(parts.at(0)), Parse::to_float(parts.at(1)));
 }
 
 std::istream& minty::operator>>(std::istream& stream, Vector3& vector)
@@ -65,8 +65,8 @@ Vector3 minty::from_string_vector3(String const& value)
 
 	// split by ", ", grab inner values
 	String raw = value.substr(1, value.size() - 2);
-	std::vector<String> parts = string::split(raw, ", ");
-	return Vector3(parse::to_float(parts.at(0)), parse::to_float(parts.at(1)), parse::to_float(parts.at(2)));
+	std::vector<String> parts = Text::split(raw, ", ");
+	return Vector3(Parse::to_float(parts.at(0)), Parse::to_float(parts.at(1)), Parse::to_float(parts.at(2)));
 }
 
 std::istream& minty::operator>>(std::istream& stream, Vector4& vector)
@@ -97,8 +97,8 @@ Vector4 minty::from_string_vector4(String const& value)
 
 	// split by ", ", grab inner values
 	String raw = value.substr(1, value.size() - 2);
-	std::vector<String> parts = string::split(raw, ", ");
-	return Vector4(parse::to_float(parts.at(0)), parse::to_float(parts.at(1)), parse::to_float(parts.at(2)), parse::to_float(parts.at(3)));
+	std::vector<String> parts = Text::split(raw, ", ");
+	return Vector4(Parse::to_float(parts.at(0)), Parse::to_float(parts.at(1)), Parse::to_float(parts.at(2)), Parse::to_float(parts.at(3)));
 }
 
 std::istream& minty::operator>>(std::istream& stream, Vector2Int& vector)
@@ -129,8 +129,8 @@ Vector2Int minty::from_string_vector2int(String const& value)
 
 	// split by ", ", grab inner values
 	String raw = value.substr(1, value.size() - 2);
-	std::vector<String> parts = string::split(raw, ", ");
-	return Vector2Int(parse::to_int(parts.at(0)), parse::to_int(parts.at(1)));
+	std::vector<String> parts = Text::split(raw, ", ");
+	return Vector2Int(Parse::to_int(parts.at(0)), Parse::to_int(parts.at(1)));
 }
 
 std::istream& minty::operator>>(std::istream& stream, Vector3Int& vector)
@@ -161,8 +161,8 @@ Vector3Int minty::from_string_vector3int(String const& value)
 
 	// split by ", ", grab inner values
 	String raw = value.substr(1, value.size() - 2);
-	std::vector<String> parts = string::split(raw, ", ");
-	return Vector3Int(parse::to_int(parts.at(0)), parse::to_int(parts.at(1)), parse::to_int(parts.at(2)));
+	std::vector<String> parts = Text::split(raw, ", ");
+	return Vector3Int(Parse::to_int(parts.at(0)), Parse::to_int(parts.at(1)), Parse::to_int(parts.at(2)));
 }
 
 std::istream& minty::operator>>(std::istream& stream, Vector4Int& vector)
@@ -193,6 +193,6 @@ Vector4Int minty::from_string_vector4int(String const& value)
 
 	// split by ", ", grab inner values
 	String raw = value.substr(1, value.size() - 2);
-	std::vector<String> parts = string::split(raw, ", ");
-	return Vector4Int(parse::to_int(parts.at(0)), parse::to_int(parts.at(1)), parse::to_int(parts.at(2)), parse::to_int(parts.at(3)));
+	std::vector<String> parts = Text::split(raw, ", ");
+	return Vector4Int(Parse::to_int(parts.at(0)), Parse::to_int(parts.at(1)), Parse::to_int(parts.at(2)), Parse::to_int(parts.at(3)));
 }

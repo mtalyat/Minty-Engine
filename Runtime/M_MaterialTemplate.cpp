@@ -9,7 +9,7 @@
 #include "M_Error.h"
 
 using namespace minty;
-using namespace minty::rendering;
+using namespace minty;
 
 minty::MaterialTemplate::MaterialTemplate()
 	: RenderObject::RenderObject()
@@ -17,7 +17,7 @@ minty::MaterialTemplate::MaterialTemplate()
 	, _defaultValues()
 {}
 
-minty::MaterialTemplate::MaterialTemplate(rendering::MaterialTemplateBuilder const& builder, Engine& engine, ID const sceneId)
+minty::MaterialTemplate::MaterialTemplate(MaterialTemplateBuilder const& builder, Engine& engine, ID const sceneId)
 	: RenderObject::RenderObject(engine, sceneId)
 	, _shaderPassIds(builder.shaderPassIds)
 	, _defaultValues(builder.defaultValues)

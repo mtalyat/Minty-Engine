@@ -6,7 +6,7 @@
 using namespace minty;
 
 // https://stackoverflow.com/questions/180947/base64-decode-snippet-in-c
-String minty::encoding::encode_base64(Dynamic const& in)
+String minty::Encoding::encode_base64(Dynamic const& in)
 {
     String out;
 
@@ -31,7 +31,7 @@ String minty::encoding::encode_base64(Dynamic const& in)
 }
 
 // https://stackoverflow.com/questions/180947/base64-decode-snippet-in-c
-Dynamic minty::encoding::decode_base64(String const& in)
+Dynamic minty::Encoding::decode_base64(String const& in)
 {
     std::vector<Byte> bytes;
 

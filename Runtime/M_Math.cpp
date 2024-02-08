@@ -16,152 +16,152 @@
 
 using namespace minty;
 
-float minty::math::clamp(float const value, float const minimum, float const maximum)
+float minty::Math::clamp(float const value, float const minimum, float const maximum)
 {
 	return std::max(minimum, std::min(maximum, value));
 }
 
-int minty::math::clamp(int const value, int const minimum, int const maximum)
+int minty::Math::clamp(int const value, int const minimum, int const maximum)
 {
 	return std::max(minimum, std::min(maximum, value));
 }
 
-float minty::math::lerp(float const left, float const right, float const t)
+float minty::Math::lerp(float const left, float const right, float const t)
 {
 	return (right - left) * t + left;
 }
 
-int minty::math::lerp(int const left, int const right, float const t)
+int minty::Math::lerp(int const left, int const right, float const t)
 {
 	return static_cast<int>(roundf((right - left) * t + left));
 }
 
-float minty::math::lerp_clamped(float const left, float const right, float const t)
+float minty::Math::lerp_clamped(float const left, float const right, float const t)
 {
 	return ((right - left) * clamp(t, 0.0f, 1.0f) + left);
 }
 
-float minty::math::round(float const value)
+float minty::Math::round(float const value)
 {
 	return roundf(value);
 }
 
-float minty::math::round(float const value, float const precision)
+float minty::Math::round(float const value, float const precision)
 {
 	return roundf(value / precision) * precision;
 }
 
-int minty::math::round_to_int(float const value)
+int minty::Math::round_to_int(float const value)
 {
 	return static_cast<int>(roundf(value));
 }
 
-int minty::math::round_to_int(float const value, float const precision)
+int minty::Math::round_to_int(float const value, float const precision)
 {
 	return static_cast<int>(roundf(value / precision) * precision);
 }
 
-float minty::math::floor(float const value)
+float minty::Math::floor(float const value)
 {
 	return floorf(value);
 }
 
-int minty::math::floor_to_int(float const value)
+int minty::Math::floor_to_int(float const value)
 {
 	return static_cast<int>(floorf(value));
 }
 
-float minty::math::ceil(float const value)
+float minty::Math::ceil(float const value)
 {
 	return ceilf(value);
 }
 
-int minty::math::ceil_to_int(float const value)
+int minty::Math::ceil_to_int(float const value)
 {
 	return static_cast<int>(ceilf(value));
 }
 
-float minty::math::abs(float const value)
+float minty::Math::abs(float const value)
 {
 	return fabsf(value);
 }
 
-float minty::math::mod(float const value, float const mod)
+float minty::Math::mod(float const value, float const mod)
 {
 	return value - floorf(value / mod) * mod;
 }
 
-float minty::math::deg2rad(float const degree)
+float minty::Math::deg2rad(float const degree)
 {
 	return degree * PI / 180.0f;
 }
 
-float minty::math::rad2deg(float const rad)
+float minty::Math::rad2deg(float const rad)
 {
 	return rad * 180.0f / PI;
 }
 
-float minty::math::sin(float const rad)
+float minty::Math::sin(float const rad)
 {
 	return sinf(rad);
 }
 
-float minty::math::cos(float const rad)
+float minty::Math::cos(float const rad)
 {
 	return cosf(rad);
 }
 
-float minty::math::tan(float const rad)
+float minty::Math::tan(float const rad)
 {
 	return tanf(rad);
 }
 
-float minty::math::asin(float const rad)
+float minty::Math::asin(float const rad)
 {
 	return asinf(rad);
 }
 
-float minty::math::acos(float const rad)
+float minty::Math::acos(float const rad)
 {
 	return acosf(rad);
 }
 
-float minty::math::atan(float const rad)
+float minty::Math::atan(float const rad)
 {
 	return atanf(rad);
 }
 
-float minty::math::atan2(float const dy, float const dx)
+float minty::Math::atan2(float const dy, float const dx)
 {
 	return atan2f(dy, dx);
 }
 
-float minty::math::angle(float const dx, float const dy)
+float minty::Math::angle(float const dx, float const dy)
 {
 	return atan2f(dy, dx);
 }
 
-float minty::math::sqrt(float const value)
+float minty::Math::sqrt(float const value)
 {
 	return sqrtf(value);
 }
 
-float minty::math::pow(float const value, float const power)
+float minty::Math::pow(float const value, float const power)
 {
 	return powf(value, power);
 }
 
-float minty::math::magnitude(float const x, float const y)
+float minty::Math::magnitude(float const x, float const y)
 {
 	return sqrtf(x * x + y * y);
 }
 
-float minty::math::sign(float const value)
+float minty::Math::sign(float const value)
 {
 	return value < 0.0f ? -1.0f : 1.0f;
 }
 
-float minty::math::signz(float const value)
+float minty::Math::signz(float const value)
 {
 	return value < 0.0f ? -1.0f : (value > 0.0f ? 1.0f : 0.0f);
 }
@@ -186,7 +186,7 @@ bool try_get_constant(String const& str, float& value)
 {
 	static std::unordered_map<String, float> const constants =
 	{
-		{"PI", minty::math::PI},
+		{"PI", minty::Math::PI},
 		{"FLOAT", static_cast<float>(sizeof(float))},
 		{"DOUBLE", static_cast<float>(sizeof(double))},
 		{"INT", static_cast<float>(sizeof(int))},
@@ -208,7 +208,7 @@ bool try_get_constant(String const& str, float& value)
 		//{"", sizeof()},
 	};
 
-	auto found = constants.find(minty::string::to_upper(str));
+	auto found = constants.find(minty::Text::to_upper(str));
 	if (found == constants.end())
 	{
 		return false;
@@ -339,7 +339,7 @@ void sort_infix_to_postfix(std::vector<String>& tokens)
 		}
 		else
 		{
-			minty::error::abort(std::format("Invalid token: {}", token));
+			minty::Error::abort(std::format("Invalid token: {}", token));
 		}
 	}
 
@@ -352,7 +352,7 @@ void sort_infix_to_postfix(std::vector<String>& tokens)
 	}
 }
 
-float minty::math::evaluate(String const& expression)
+float minty::Math::evaluate(String const& expression)
 {
 	// get tokens
 	std::vector<String> tokens = split_into_tokens(expression);
@@ -366,7 +366,7 @@ float minty::math::evaluate(String const& expression)
 	float left, right;
 	for (String const& token : tokens)
 	{
-		if (parse::try_float(token, left) || try_get_constant(token, left))
+		if (Parse::try_float(token, left) || try_get_constant(token, left))
 		{
 			// operand, push value onto stack
 			stack.push_back(left);
@@ -403,7 +403,7 @@ float minty::math::evaluate(String const& expression)
 			}
 			else
 			{
-				minty::error::abort(std::format("Invalid operator: {}", token));
+				minty::Error::abort(std::format("Invalid operator: {}", token));
 			}
 		}
 		else if (is_function(token))
@@ -413,7 +413,7 @@ float minty::math::evaluate(String const& expression)
 		else
 		{
 			// something else
-			minty::error::abort(std::format("Invalid token: {}", token));
+			minty::Error::abort(std::format("Invalid token: {}", token));
 		}
 	}
 

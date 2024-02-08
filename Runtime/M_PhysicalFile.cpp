@@ -37,7 +37,7 @@ void minty::PhysicalFile::open(Path const& path, Flags const flags)
     // check if open
     if (!_stream.is_open())
     {
-        console::error(std::format("Cannot open File at path: \"{}\"", path.string()));
+        Console::error(std::format("Cannot open File at path: \"{}\"", path.string()));
         return;
     }
 }
@@ -84,7 +84,7 @@ bool minty::PhysicalFile::end_of_file()
 
 File::Position minty::PhysicalFile::tell()
 {
-    error::abort("PhysicalFile::tell() not supported. Use tell_read() or tell_write().");
+    Error::abort("PhysicalFile::tell() not supported. Use tell_read() or tell_write().");
     return Position();
 }
 

@@ -6,23 +6,23 @@
 #include "M_RenderSystem.h"
 
 using namespace minty;
-using namespace minty::rendering;
+using namespace minty;
 
-minty::rendering::DescriptorSet::DescriptorSet()
+minty::DescriptorSet::DescriptorSet()
 	: RenderObject::RenderObject()
 	, _descriptorSets()
 	, _descriptors()
 	, _dirties()
 {}
 
-minty::rendering::DescriptorSet::DescriptorSet(Engine& engine, ID const sceneId)
+minty::DescriptorSet::DescriptorSet(Engine& engine, ID const sceneId)
 	: RenderObject::RenderObject(engine, sceneId)
 	, _descriptorSets()
 	, _descriptors()
 	, _dirties()
 {}
 
-minty::rendering::DescriptorSet::DescriptorSet(std::array<VkDescriptorSet, MAX_FRAMES_IN_FLIGHT> const& descriptorSets, std::unordered_map<String, std::array<DescriptorData, MAX_FRAMES_IN_FLIGHT>> const& datas, Engine& engine, ID const sceneId)
+minty::DescriptorSet::DescriptorSet(std::array<VkDescriptorSet, MAX_FRAMES_IN_FLIGHT> const& descriptorSets, std::unordered_map<String, std::array<DescriptorData, MAX_FRAMES_IN_FLIGHT>> const& datas, Engine& engine, ID const sceneId)
 	: RenderObject::RenderObject(engine, sceneId)
 	, _descriptorSets(descriptorSets)
 	, _descriptors(datas)
@@ -35,7 +35,7 @@ minty::rendering::DescriptorSet::DescriptorSet(std::array<VkDescriptorSet, MAX_F
 	}
 }
 
-DescriptorSet& minty::rendering::DescriptorSet::operator=(DescriptorSet const& other)
+DescriptorSet& minty::DescriptorSet::operator=(DescriptorSet const& other)
 {
 	if (&other != this)
 	{
@@ -46,7 +46,7 @@ DescriptorSet& minty::rendering::DescriptorSet::operator=(DescriptorSet const& o
 	return *this;
 }
 
-void minty::rendering::DescriptorSet::destroy()
+void minty::DescriptorSet::destroy()
 {
 	RenderEngine& renderer = get_render_engine();
 
@@ -69,7 +69,7 @@ void minty::rendering::DescriptorSet::destroy()
 	_descriptors.clear();
 }
 
-void minty::rendering::DescriptorSet::set(String const& name, void const* const value)
+void minty::DescriptorSet::set(String const& name, void const* const value)
 {
 	if (auto* datas = find_descriptors(name))
 	{
@@ -81,7 +81,7 @@ void minty::rendering::DescriptorSet::set(String const& name, void const* const 
 	}
 }
 
-void minty::rendering::DescriptorSet::set(String const& name, int const frame, void const* const value)
+void minty::DescriptorSet::set(String const& name, int const frame, void const* const value)
 {
 	if (DescriptorData* data = find_descriptor(name, frame))
 	{
@@ -90,7 +90,7 @@ void minty::rendering::DescriptorSet::set(String const& name, int const frame, v
 	}
 }
 
-void minty::rendering::DescriptorSet::set(String const& name, void const* const value, VkDeviceSize const size, VkDeviceSize const offset)
+void minty::DescriptorSet::set(String const& name, void const* const value, VkDeviceSize const size, VkDeviceSize const offset)
 {
 	if (auto* datas = find_descriptors(name))
 	{
@@ -101,7 +101,7 @@ void minty::rendering::DescriptorSet::set(String const& name, void const* const 
 	}
 }
 
-void minty::rendering::DescriptorSet::set(String const& name, int const frame, void const* const value, VkDeviceSize const size, VkDeviceSize const offset)
+void minty::DescriptorSet::set(String const& name, int const frame, void const* const value, VkDeviceSize const size, VkDeviceSize const offset)
 {
 	if (DescriptorData* data = find_descriptor(name, frame))
 	{
@@ -109,7 +109,7 @@ void minty::rendering::DescriptorSet::set(String const& name, int const frame, v
 	}
 }
 
-void minty::rendering::DescriptorSet::set(String const& name, Dynamic const& value, VkDeviceSize const offset)
+void minty::DescriptorSet::set(String const& name, Dynamic const& value, VkDeviceSize const offset)
 {
 	if (auto* datas = find_descriptors(name))
 	{
@@ -120,7 +120,7 @@ void minty::rendering::DescriptorSet::set(String const& name, Dynamic const& val
 	}
 }
 
-void minty::rendering::DescriptorSet::set(String const& name, int const frame, Dynamic const& value, VkDeviceSize const offset)
+void minty::DescriptorSet::set(String const& name, int const frame, Dynamic const& value, VkDeviceSize const offset)
 {
 	if (DescriptorData* data = find_descriptor(name, frame))
 	{
@@ -128,7 +128,7 @@ void minty::rendering::DescriptorSet::set(String const& name, int const frame, D
 	}
 }
 
-void minty::rendering::DescriptorSet::apply(int const frame)
+void minty::DescriptorSet::apply(int const frame)
 {
 	if (!_dirties.contains(frame))
 	{
@@ -232,7 +232,7 @@ void minty::rendering::DescriptorSet::apply(int const frame)
 	}
 }
 
-void minty::rendering::DescriptorSet::apply()
+void minty::DescriptorSet::apply()
 {
 	for (int i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
 	{
@@ -240,7 +240,7 @@ void minty::rendering::DescriptorSet::apply()
 	}
 }
 
-std::array<DescriptorSet::DescriptorData, MAX_FRAMES_IN_FLIGHT>* minty::rendering::DescriptorSet::find_descriptors(String const& name)
+std::array<DescriptorSet::DescriptorData, MAX_FRAMES_IN_FLIGHT>* minty::DescriptorSet::find_descriptors(String const& name)
 {
 	auto found = _descriptors.find(name);
 
@@ -252,7 +252,7 @@ std::array<DescriptorSet::DescriptorData, MAX_FRAMES_IN_FLIGHT>* minty::renderin
 	return &found->second;
 }
 
-DescriptorSet::DescriptorData* minty::rendering::DescriptorSet::find_descriptor(String const& name, int const frame)
+DescriptorSet::DescriptorData* minty::DescriptorSet::find_descriptor(String const& name, int const frame)
 {
 	if (auto* descriptors = find_descriptors(name))
 	{
@@ -262,7 +262,7 @@ DescriptorSet::DescriptorData* minty::rendering::DescriptorSet::find_descriptor(
 	return nullptr;
 }
 
-void minty::rendering::DescriptorSet::set_descriptor(DescriptorData& data, int const frame, void const* const value, VkDeviceSize const size, VkDeviceSize const offset)
+void minty::DescriptorSet::set_descriptor(DescriptorData& data, int const frame, void const* const value, VkDeviceSize const size, VkDeviceSize const offset)
 {
 	// do something based on type
 	switch (data.type)
@@ -302,7 +302,7 @@ void minty::rendering::DescriptorSet::set_descriptor(DescriptorData& data, int c
 	data.empty = false;
 }
 
-bool minty::rendering::DescriptorSet::get(String const& name, int const frame, void* const out) const
+bool minty::DescriptorSet::get(String const& name, int const frame, void* const out) const
 {
 	auto found = _descriptors.find(name);
 
@@ -335,32 +335,32 @@ bool minty::rendering::DescriptorSet::get(String const& name, int const frame, v
 	return false;
 }
 
-VkDescriptorSet minty::rendering::DescriptorSet::at(uint32_t const index) const
+VkDescriptorSet minty::DescriptorSet::at(uint32_t const index) const
 {
 	return _descriptorSets.at(index);
 }
 
-std::array<VkDescriptorSet, MAX_FRAMES_IN_FLIGHT> const& minty::rendering::DescriptorSet::data() const
+std::array<VkDescriptorSet, MAX_FRAMES_IN_FLIGHT> const& minty::DescriptorSet::data() const
 {
 	return _descriptorSets;
 }
 
-auto minty::rendering::DescriptorSet::begin()
+auto minty::DescriptorSet::begin()
 {
 	return _descriptorSets.begin();
 }
 
-auto minty::rendering::DescriptorSet::begin() const
+auto minty::DescriptorSet::begin() const
 {
 	return _descriptorSets.begin();
 }
 
-auto minty::rendering::DescriptorSet::end()
+auto minty::DescriptorSet::end()
 {
 	return _descriptorSets.end();
 }
 
-auto minty::rendering::DescriptorSet::end() const
+auto minty::DescriptorSet::end() const
 {
 	return _descriptorSets.end();
 }

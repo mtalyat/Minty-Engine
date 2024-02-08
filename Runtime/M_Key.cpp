@@ -125,6 +125,6 @@ String minty::to_string(Key const value)
 	case Key::RightAlt: return "RightAlt";
 	case Key::RightSuper: return "RightSuper";
 	case Key::Menu: return "Menu";
-	default: return minty::error::ERROR_TEXT;
+	default: return minty::Error::ERROR_TEXT;
 	}
 }

@@ -166,7 +166,7 @@ ID minty::AnimationSystem::load_animation(Path const& path)
 		// all are the node names
 		for (Node const& timeStampNode : stepsNode->get_children())
 		{
-			float time = parse::to_float(timeStampNode.get_name());
+			float time = Parse::to_float(timeStampNode.get_name());
 
 			// get actual step values
 			for (Node const& stepNode : timeStampNode.get_children())
@@ -227,7 +227,7 @@ void minty::AnimationSystem::destroy_animator(ID const id)
 
 void minty::AnimationSystem::serialize(Writer& writer) const
 {
-	console::todo("AnimationSystem::serialize()");
+	Console::todo("AnimationSystem::serialize()");
 }
 
 void minty::AnimationSystem::deserialize(Reader const& reader)

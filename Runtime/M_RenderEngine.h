@@ -71,11 +71,8 @@ namespace minty
 	class Scene;
 	class RenderSystem;
 
-	namespace rendering
-	{
-		struct RenderEngineBuilder;
-		struct TextureBuilder;
-	}
+	struct RenderEngineBuilder;
+	struct TextureBuilder;
 
 	/// <summary>
 	/// Handles rendering for the game engine.
@@ -84,11 +81,11 @@ namespace minty
 		: public Object
 	{
 	private:
-		rendering::RenderEngineBuilder const* _builder;
+		RenderEngineBuilder const* _builder;
 		Window* _window;
 
 		// assets
-		Register<rendering::Buffer> _buffers;
+		Register<Buffer> _buffers;
 
 		std::array<ID, BIND_COUNT> _boundIds;
 
@@ -193,7 +190,7 @@ namespace minty
 		/// <summary>
 		/// Initializes the RenderEngine.
 		/// </summary>
-		void init(rendering::RenderEngineBuilder const& builder);
+		void init(RenderEngineBuilder const& builder);
 
 	private:
 		/// <summary>
@@ -405,7 +402,7 @@ namespace minty
 
 	private:
 		// destroys the buffer data directly
-		void destroy_buffer(rendering::Buffer const& buffer);
+		void destroy_buffer(Buffer const& buffer);
 
 #pragma endregion
 

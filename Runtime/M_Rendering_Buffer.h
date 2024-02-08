@@ -2,7 +2,7 @@
 
 #include "M_Object.h"
 
-namespace minty::rendering
+namespace minty
 {
 	/// <summary>
 	/// Holds data for a buffer on the GPU.

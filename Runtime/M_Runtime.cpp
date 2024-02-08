@@ -59,12 +59,12 @@ int Runtime::run()
 	}
 	catch (std::exception const& e)
 	{
-		console::error(std::format("Program aborted: \"{}\"", e.what()));
+		Console::error(std::format("Program aborted: \"{}\"", e.what()));
 		return EXIT_FAILURE;
 	}
 	catch (...)
 	{
-		console::error("An uncaught exception occured.");
+		Console::error("An uncaught exception occured.");
 	}
 
 	return EXIT_SUCCESS;

@@ -40,7 +40,7 @@ Window::Window(String const& title, int const width, int const height, InputMap 
 
 	if (!_window)
 	{
-		error::abort("Failed to create GLFW window \"" + title + "\".");
+		Error::abort("Failed to create GLFW window \"" + title + "\".");
 	}
 
 	// set user pointer, so this class can be referenced for callbacks
@@ -263,7 +263,7 @@ void minty::Window::trigger_cursor(float x, float y)
 void Window::resize_callback(GLFWwindow* const window, int const width, int const height)
 {
 	auto w = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
-	console::ass(w != nullptr, "Window is null on resize callback.");
+	Console::ass(w != nullptr, "Window is null on resize callback.");
 	if (w)
 	{
 		w->_resized = true;
@@ -273,7 +273,7 @@ void Window::resize_callback(GLFWwindow* const window, int const width, int cons
 void Window::key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
 	auto w = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
-	console::ass(w != nullptr, "Window is null on key callback.");
+	Console::ass(w != nullptr, "Window is null on key callback.");
 	if (w)
 	{
 		w->trigger_key(static_cast<Key>(key), static_cast<KeyAction>(action), static_cast<KeyModifiers>(mods));
@@ -283,7 +283,7 @@ void Window::key_callback(GLFWwindow* window, int key, int scancode, int action,
 void minty::Window::button_ballback(GLFWwindow* window, int button, int action, int mods)
 {
 	auto w = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
-	console::ass(w != nullptr, "Window is null on button callback.");
+	Console::ass(w != nullptr, "Window is null on button callback.");
 	if (w)
 	{
 		w->trigger_button(static_cast<MouseButton>(button), static_cast<KeyAction>(action), static_cast<KeyModifiers>(mods));
@@ -293,7 +293,7 @@ void minty::Window::button_ballback(GLFWwindow* window, int button, int action, 
 void minty::Window::cursor_callback(GLFWwindow* window, double xpos, double ypos)
 {
 	auto w = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
-	console::ass(w != nullptr, "Window is null on cursor callback.");
+	Console::ass(w != nullptr, "Window is null on cursor callback.");
 	if (w)
 	{
 		w->trigger_cursor(static_cast<float>(xpos), static_cast<float>(ypos));
@@ -303,7 +303,7 @@ void minty::Window::cursor_callback(GLFWwindow* window, double xpos, double ypos
 void minty::Window::scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
 	auto w = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
-	console::ass(w != nullptr, "Window is null on scroll callback.");
+	Console::ass(w != nullptr, "Window is null on scroll callback.");
 	if (w)
 	{
 		w->trigger_scroll(static_cast<float>(xoffset), static_cast<float>(yoffset));

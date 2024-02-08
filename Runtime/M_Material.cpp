@@ -6,16 +6,16 @@
 #include "M_Scene.h"
 
 using namespace minty;
-using namespace minty::rendering;
+using namespace minty;
 
 minty::Material::Material()
-	: rendering::RenderObject()
+	: RenderObject()
 	, _templateId(ERROR_ID)
 	, _passDescriptorSets()
 {}
 
-minty::Material::Material(rendering::MaterialBuilder const& builder, Engine& engine, ID const sceneId)
-	: rendering::RenderObject(engine, sceneId)
+minty::Material::Material(MaterialBuilder const& builder, Engine& engine, ID const sceneId)
+	: RenderObject(engine, sceneId)
 	, _templateId(builder.templateId)
 	, _passDescriptorSets()
 {

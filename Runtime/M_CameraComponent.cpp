@@ -42,7 +42,7 @@ String minty::to_string(CameraComponent::Perspective const value)
 
 CameraComponent::Perspective minty::from_string_camera_component_perspective(String const& value)
 {
-	String value2 = minty::string::to_upper(value);
+	String value2 = minty::Text::to_upper(value);
 	if (value2 == "ORTHOGRAPHIC") return CameraComponent::Perspective::Orthographic;
 	if (value2 == "PERSPECTIVE") return CameraComponent::Perspective::Perspective;
 
