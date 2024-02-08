@@ -181,7 +181,7 @@ bool minty::AudioSystem::get_pause(AudioHandle const handle)
 
 void minty::AudioSystem::stop(AudioHandle const handle)
 {
-	auto const& found = _playing.find(handle);
+	auto found = _playing.find(handle);
 
 	if (found != _playing.end())
 	{

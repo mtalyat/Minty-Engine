@@ -44,7 +44,7 @@ minty::Material::Material(rendering::MaterialBuilder const& builder, Engine& eng
 		// set all values
 		for (auto const& defaultValue : defaultValues)
 		{
-			auto const& found = builder.values.find(defaultValue.first);
+			auto found = builder.values.find(defaultValue.first);
 			if (found == builder.values.end())
 			{
 				// if no value exists, use a default value

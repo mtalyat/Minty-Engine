@@ -115,7 +115,7 @@ void minty::EntityRegistry::set_name(Entity const entity, String const& name)
 
 Component* minty::EntityRegistry::emplace_by_name(String const& name, Entity const entity)
 {
-	auto const& found = _components.find(name);
+	auto found = _components.find(name);
 	if (found == _components.end())
 	{
 		// name not found
@@ -147,7 +147,7 @@ Component* minty::EntityRegistry::get_by_name(String const& name, Entity const e
 
 Component const* minty::EntityRegistry::get_by_name(String const& name, Entity const entity) const
 {
-	auto const& found = _components.find(name);
+	auto found = _components.find(name);
 	if (found == _components.end())
 	{
 		// name not found
@@ -174,7 +174,7 @@ std::vector<Component const*> minty::EntityRegistry::get_all(Entity const entity
 		if (storage.contains(entity))
 		{
 			// this entity has this component type, so get the "pretty" name
-			auto const& found = _componentTypes.find(ctype.index());
+			auto found = _componentTypes.find(ctype.index());
 			if (found == _componentTypes.end())
 			{
 				console::error(std::format("Cannot find_animation component type with id: {}, name: {}", ctype.index(), ctype.name().data()));
@@ -192,7 +192,7 @@ std::vector<Component const*> minty::EntityRegistry::get_all(Entity const entity
 
 void minty::EntityRegistry::erase_by_name(String const& name, Entity const entity)
 {
-	auto const& found = _components.find(name);
+	auto found = _components.find(name);
 	if (found == _components.end())
 	{
 		// name not found
@@ -311,7 +311,7 @@ void minty::EntityRegistry::serialize_entity(Writer& writer, Entity const entity
 		if (storage.contains(entity))
 		{
 			// this entity has this component type, so get the "pretty" name
-			auto const& found = _componentTypes.find(ctype.index());
+			auto found = _componentTypes.find(ctype.index());
 			if (found == _componentTypes.end())
 			{
 				console::error(std::format("Cannot find_animation component type with id: {}, name: {}", ctype.index(), ctype.name().data()));

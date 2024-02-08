@@ -916,7 +916,7 @@ void minty::RenderSystem::load_mesh_obj(Path const& path, ID const id)
 				}
 
 				// if combo exists, add that index
-				auto const& found = faces.find(faceIndices);
+				auto found = faces.find(faceIndices);
 				if (found == faces.end())
 				{
 					// vertex does not exist yet

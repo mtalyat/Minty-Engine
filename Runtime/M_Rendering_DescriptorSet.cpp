@@ -242,7 +242,7 @@ void minty::rendering::DescriptorSet::apply()
 
 std::array<DescriptorSet::DescriptorData, MAX_FRAMES_IN_FLIGHT>* minty::rendering::DescriptorSet::find_descriptors(String const& name)
 {
-	auto const& found = _descriptors.find(name);
+	auto found = _descriptors.find(name);
 
 	if (found == _descriptors.end())
 	{
@@ -304,7 +304,7 @@ void minty::rendering::DescriptorSet::set_descriptor(DescriptorData& data, int c
 
 bool minty::rendering::DescriptorSet::get(String const& name, int const frame, void* const out) const
 {
-	auto const& found = _descriptors.find(name);
+	auto found = _descriptors.find(name);
 
 	if (found == _descriptors.end())
 	{

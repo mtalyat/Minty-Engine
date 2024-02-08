@@ -57,7 +57,7 @@ String minty::FSM::Scope::get_name(ID const key) const
 
 ID minty::FSM::Scope::find(String const& key) const
 {
-	auto const& found = _ids.find(key);
+	auto found = _ids.find(key);
 
 	if (found != _ids.end())
 	{

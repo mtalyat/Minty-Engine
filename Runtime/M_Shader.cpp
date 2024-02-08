@@ -309,7 +309,7 @@ DescriptorSet minty::Shader::create_descriptor_set(uint32_t const set, bool cons
 			auto const type = info.type;
 
 			// create a new data for this constant, if needed
-			auto const& found = datas.find(info.name);
+			auto found = datas.find(info.name);
 			if (found == datas.end())
 			{
 				// add new array

@@ -106,7 +106,7 @@ void minty::Node::add_child(Node const& node)
     _children.push_back(node);
 
     // add to lookup
-    auto const& found = _lookup.find(node.get_name());
+    auto found = _lookup.find(node.get_name());
     if (found == _lookup.end())
     {
         // new name
@@ -203,7 +203,7 @@ bool minty::Node::to_bool(bool const defaultValue) const
 
 Node* minty::Node::find(String const& name)
 {
-	auto const& found = _lookup.find(name);
+	auto found = _lookup.find(name);
 
 	if (found != _lookup.end())
 	{
@@ -215,7 +215,7 @@ Node* minty::Node::find(String const& name)
 
 Node const* minty::Node::find(String const& name) const
 {
-	auto const& found = _lookup.find(name);
+	auto found = _lookup.find(name);
 
 	if (found != _lookup.end())
 	{
@@ -229,7 +229,7 @@ std::vector<Node const*> minty::Node::find_all(String const& name) const
 {
 	std::vector<Node const*> list;
 
-	auto const& found = _lookup.find(name);
+	auto found = _lookup.find(name);
 
 	if (found != _lookup.end())
 	{

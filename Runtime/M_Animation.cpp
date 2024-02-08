@@ -51,7 +51,7 @@ minty::Animation::Animation(AnimationBuilder const& builder)
 		// add to steps
 		step_key_t key = compile_key(pair.second.entityIndex, pair.second.componentIndex, pair.second.variableIndex);
 		
-		auto const& found = _steps.find(key);
+		auto found = _steps.find(key);
 		if (found == _steps.end())
 		{
 			// create new map
@@ -71,7 +71,7 @@ minty::Animation::Animation(AnimationBuilder const& builder)
 		step_value_t value = compile_value(step.valueIndex, step.flags);
 
 		// add list if it dne for this key
-		auto const& found = _reset.find(key);
+		auto found = _reset.find(key);
 		if (found == _reset.end())
 		{
 			_reset.emplace(key, std::vector<step_value_t>());
@@ -118,11 +118,20 @@ bool minty::Animation::animate(float& time, float const elapsedTime, Index& inde
 		// start at end, apply first value that shows up, if any
 		for (int64_t i = endIndex; i >= index; i--)
 		{
-			auto const& found = pair.second.find(static_cast<Index>(i));
+			auto found = pair.second.find(static_cast<Index>(i));
 			if (found != pair.second.end())
 			{
+				step_value_t previousValue = INVALID_STEP_VALUE;
+
+				if (found != pair.second.begin())
+				{
+					// get the previous value as long as there is one
+					auto prevFound = std::prev(found);
+					previousValue = prevFound->second;
+				}
+
 				// step found, so perform it and stop looking for steps since this is the last one linearly
-				perform_step(pair.first, found->first, found->second, thisEntity, scene);
+				perform_step(pair.first, found->first, found->second, previousValue, thisEntity, scene);
 				break;
 			}
 		}
@@ -142,7 +151,7 @@ void minty::Animation::reset(Entity const thisEntity, Scene& scene) const
 	{
 		for (auto const value : pair.second)
 		{
-			perform_step(pair.first, 0u, value, thisEntity, scene);
+			perform_step(pair.first, INVALID_STEP_VALUE, 0u, value, thisEntity, scene);
 		}
 	}
 }
@@ -184,7 +193,7 @@ Animation::step_value_t minty::Animation::compile_value(size_t const valueIndex,
 		((flags & MAX_FLAGS_INDEX) << FLAGS_OFFSET);
 }
 
-void minty::Animation::perform_step(step_key_t const key, step_time_t const time, step_value_t const value, Entity const thisEntity, Scene& scene) const
+void minty::Animation::perform_step(step_key_t const key, step_time_t const time, step_value_t const value, step_value_t const previousValue, Entity const thisEntity, Scene& scene) const
 {
 	// build the step
 	Step step = Step
@@ -198,10 +207,10 @@ void minty::Animation::perform_step(step_key_t const key, step_time_t const time
 	};
 
 	// perform the step using that
-	return perform_step(step, thisEntity, scene);
+	return perform_step(step, previousValue, thisEntity, scene);
 }
 
-void minty::Animation::perform_step(Step const& step, Entity const thisEntity, Scene& scene) const
+void minty::Animation::perform_step(Step const& step, step_value_t const previousValue, Entity const thisEntity, Scene& scene) const
 {
 	EntityRegistry& registry = scene.get_entity_registry();
 
@@ -241,12 +250,6 @@ void minty::Animation::perform_step(Step const& step, Entity const thisEntity, S
 	// get the value to set
 	Node value = _values.at(step.valueIndex);
 	value.set_name(name);
-
-	if (step.flags & ANIMATION_STEP_FLAGS_HARD_SOFT)
-	{
-		// lerp between frames
-		console::todo("Animation::animate() soft animation. Defaulting to hard.");
-	}
 
 	// create a reader and deserialize using that one value
 	SerializationData data = SerializationData{

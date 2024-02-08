@@ -75,7 +75,7 @@ namespace minty
 
 	System* SystemRegistry::emplace_by_name(String const& name, int const priority)
 	{
-		auto const& found = _systemTypes.find(name);
+		auto found = _systemTypes.find(name);
 		if (found == _systemTypes.end())
 		{
 			// name not found

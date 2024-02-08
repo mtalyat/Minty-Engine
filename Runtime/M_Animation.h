@@ -26,29 +26,31 @@ namespace minty
 		};
 
 	private:
-		constexpr static int const ENTITY_OFFSET = 16;
-		constexpr static int const COMPONENT_OFFSET = 8;
-		constexpr static int const VARIABLE_OFFSET = 0;
-		constexpr static int const TIME_OFFSET = 0;
-		constexpr static int const VALUE_OFFSET = 4;
-		constexpr static int const FLAGS_OFFSET = 0;
-		constexpr static size_t const MAX_ENTITY_INDEX = 0xff;
-		constexpr static size_t const MAX_COMPONENT_INDEX = 0xff;
-		constexpr static size_t const MAX_VARIABLE_INDEX = 0xff;
-		constexpr static size_t const MAX_TIME_INDEX = 0xffffffff;
-		constexpr static size_t const MAX_VALUE_INDEX = 0xfffffff;
-		constexpr static size_t const MAX_FLAGS_INDEX = 0xf;
+		constexpr static int ENTITY_OFFSET = 16;
+		constexpr static int COMPONENT_OFFSET = 8;
+		constexpr static int VARIABLE_OFFSET = 0;
+		constexpr static int TIME_OFFSET = 0;
+		constexpr static int VALUE_OFFSET = 4;
+		constexpr static int FLAGS_OFFSET = 0;
+		constexpr static size_t MAX_ENTITY_INDEX = 0xff;
+		constexpr static size_t MAX_COMPONENT_INDEX = 0xff;
+		constexpr static size_t MAX_VARIABLE_INDEX = 0xff;
+		constexpr static size_t MAX_TIME_INDEX = 0xffffffff;
+		constexpr static size_t MAX_VALUE_INDEX = 0xfffffff;
+		constexpr static size_t MAX_FLAGS_INDEX = 0xf;
 		typedef uint32_t step_key_t;
 		typedef uint32_t step_time_t;
 		typedef uint32_t step_value_t;
+		constexpr static step_key_t INVALID_STEP_KEY = (MAX_ENTITY_INDEX << ENTITY_OFFSET) | (MAX_COMPONENT_INDEX << COMPONENT_OFFSET) | (MAX_VARIABLE_INDEX | VARIABLE_OFFSET);
+		constexpr static step_time_t INVALID_STEP_TIME = (MAX_TIME_INDEX << TIME_OFFSET);
+		constexpr static step_value_t INVALID_STEP_VALUE = (MAX_VALUE_INDEX << VALUE_OFFSET) | (MAX_FLAGS_INDEX << FLAGS_OFFSET);
 
 	public:
 		enum StepFlags
 		{
 			ANIMATION_STEP_FLAGS_NONE = 0b0000,
 			ANIMATION_STEP_FLAGS_ADD_REMOVE = 0b0001,
-			ANIMATION_STEP_FLAGS_HARD_SOFT = 0b0010,
-			ANIMATION_STEP_FLAGS_ALL = 0b0011,
+			ANIMATION_STEP_FLAGS_ALL = 0b0001,
 		};
 
 		/// <summary>
@@ -158,9 +160,9 @@ namespace minty
 
 		step_value_t compile_value(size_t const valueIndex, StepFlags const flags) const;
 
-		void perform_step(step_key_t const key, step_time_t const time, step_value_t const value, Entity const thisEntity, Scene& scene) const;
+		void perform_step(step_key_t const key, step_time_t const time, step_value_t const value, step_value_t const previousValue, Entity const thisEntity, Scene& scene) const;
 
-		void perform_step(Step const& step, Entity const thisEntity, Scene& scene) const;
+		void perform_step(Step const& step, step_value_t const previousValue, Entity const thisEntity, Scene& scene) const;
 	public:
 		void serialize(Writer& writer) const override;
 		void deserialize(Reader const& reader) override;

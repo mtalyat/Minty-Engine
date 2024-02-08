@@ -312,7 +312,7 @@ namespace minty
 	template <class T>
 	ID Register<T>::get_id(String const& name) const
 	{
-		auto const& found = _lookup.find(name);
+		auto found = _lookup.find(name);
 
 		if (found == _lookup.end())
 		{
@@ -327,7 +327,7 @@ namespace minty
 	template <class T>
 	String Register<T>::get_name(ID const id) const
 	{
-		auto const& found = _names.find(id);
+		auto found = _names.find(id);
 
 		if (found == _names.end())
 		{
@@ -342,7 +342,7 @@ namespace minty
 	template<class T>
 	ID Register<T>::find(String const& name) const
 	{
-		auto const& found = _lookup.find(name);
+		auto found = _lookup.find(name);
 		if (found != _lookup.end())
 		{
 			return found->second;
