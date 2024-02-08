@@ -6,6 +6,7 @@
 #include "M_Asset.h"
 #include "M_File.h"
 #include "M_Error.h"
+#include "M_Console.h"
 #include <format>
 
 #define STB_IMAGE_IMPLEMENTATION

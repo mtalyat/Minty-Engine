@@ -1,9 +1,11 @@
 #include "pch.h"
 #include "M_Sprite.h"
 
+#include "M_SpriteBuilder.h"
 #include "M_RenderEngine.h"
 #include "M_RenderSystem.h"
 #include "M_Texture.h"
+#include "M_Console.h"
 
 using namespace minty;
 using namespace minty;

@@ -4,7 +4,7 @@
 using namespace minty;
 using namespace minty;
 
-#include "M_String.h"
+#include "M_Text.h"
 
 using namespace minty;
 

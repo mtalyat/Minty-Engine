@@ -5,7 +5,7 @@
 #include "M_KeyModifiers.h"
 #include "M_MouseButton.h"
 #include "M_Event.h"
-#include <map>
+#include <unordered_map>
 #include <unordered_set>
 
 namespace minty
@@ -97,14 +97,14 @@ namespace minty
 
 	private:
 		// key press
-		std::map<Key, KeyEvent_t>* _keyDownEvents;
-		std::map<Key, KeyEvent_t>* _keyUpEvents;
-		std::map<Key, KeyEvent_t>* _keyEvents;
+		std::unordered_map<Key, KeyEvent_t>* _keyDownEvents;
+		std::unordered_map<Key, KeyEvent_t>* _keyUpEvents;
+		std::unordered_map<Key, KeyEvent_t>* _keyEvents;
 		std::unordered_set<Key>* _keys;
 		// mouse click
-		std::map<MouseButton, ClickEvent_t>* _mouseDownEvents;
-		std::map<MouseButton, ClickEvent_t>* _mouseUpEvents;
-		std::map<MouseButton, ClickEvent_t>* _mouseEvents;
+		std::unordered_map<MouseButton, ClickEvent_t>* _mouseDownEvents;
+		std::unordered_map<MouseButton, ClickEvent_t>* _mouseUpEvents;
+		std::unordered_map<MouseButton, ClickEvent_t>* _mouseEvents;
 		std::unordered_set<MouseButton>* _buttons;
 		// mouse move
 		MoveEvent_t* _mouseMoveEvent;

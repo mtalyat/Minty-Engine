@@ -1,7 +1,5 @@
 #pragma once
-
 #include "M_SceneObject.h"
-#include <set>
 
 namespace minty
 {

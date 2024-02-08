@@ -7,7 +7,18 @@
 #include "M_Vector.h"
 #include "glm.hpp"
 
+#include "M_EntityRegistry.h"
+#include "M_CameraComponent.h"
+#include "M_TransformComponent.h"
 #include "M_DrawCallObjectInfo.h"
+
+#include "M_TextureBuilder.h"
+#include "M_TextureAtlasBuilder.h"
+#include "M_SpriteBuilder.h"
+#include "M_MaterialBuilder.h"
+#include "M_MaterialTemplateBuilder.h"
+#include "M_ShaderPassBuilder.h"
+#include "M_ShaderBuilder.h"
 
 using namespace minty;
 using namespace minty;

@@ -1,8 +1,8 @@
 #pragma once
 
 #include "M_Base.h"
-#include "M_Dynamic.h"
 #include "M_Animation.h"
+#include "M_Node.h"
 
 namespace minty
 {

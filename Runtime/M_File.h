@@ -3,7 +3,7 @@
 #include "M_Object.h"
 #include "M_Node.h"
 #include <fstream>
-#include <unordered_map>
+#include <vector>
 
 namespace minty
 {
@@ -50,19 +50,13 @@ namespace minty
 		/// <summary>
 		/// Creates an empty File object.
 		/// </summary>
-		File()
-			: _path()
-			, _flags()
-		{}
+		File();
 
 		/// <summary>
 		/// Creates a File object and saves the given path and open flags.
 		/// </summary>
 		/// <param name="path">The path to the file.</param>
-		File(Path const& path, Flags const flags)
-			: _path(path)
-			, _flags(_flags)
-		{}
+		File(Path const& path, Flags const flags);
 
 		virtual ~File() {}
 

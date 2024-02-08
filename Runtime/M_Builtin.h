@@ -1,6 +1,5 @@
 #pragma once
 
-#include "M_Base.h"
 #include "M_Matrix.h"
 #include "M_Vector.h"
 

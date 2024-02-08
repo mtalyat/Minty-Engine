@@ -1,25 +1,27 @@
 #pragma once
 
-#include "M_Register.h"
+#include "M_System.h"
 
+#include "M_Register.h"
 #include "M_Texture.h"
 #include "M_TextureAtlas.h"
 #include "M_Sprite.h"
-#include "M_Shader.h"
-#include "M_ShaderPass.h"
-#include "M_MaterialTemplate.h"
 #include "M_Material.h"
+#include "M_MaterialTemplate.h"
+#include "M_ShaderPass.h"
+#include "M_Shader.h"
 #include "M_Mesh.h"
 
-#include "M_CameraComponent.h"
-#include "M_TransformComponent.h"
+#include "M_Entity.h"
 
-#include "M_EntityRegistry.h"
-
-#include "M_System.h"
+#include <unordered_map>
+#include <vector>
 
 namespace minty
 {
+	struct CameraComponent;
+	struct TransformComponent;
+
 	class RenderSystem
 		: public System
 	{
@@ -49,8 +51,6 @@ namespace minty
 		/// Updates the Camera uniform buffer with the Camera info.
 		/// </summary>
 		void update_camera(CameraComponent const& camera, TransformComponent const& transform);
-
-
 
 #pragma region Create
 

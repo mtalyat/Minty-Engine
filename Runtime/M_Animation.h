@@ -1,8 +1,7 @@
 #pragma once
 
 #include "M_Object.h"
-#include "M_Dynamic.h"
-#include "M_EntityRegistry.h"
+#include "M_Entity.h"
 #include <vector>
 #include <unordered_map>
 

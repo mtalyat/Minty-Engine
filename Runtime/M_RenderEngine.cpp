@@ -10,11 +10,14 @@
 #include "M_File.h"
 #include "M_Scene.h"
 #include "M_EntityRegistry.h"
+#include "M_SystemRegistry.h"
 #include "M_Encoding.h"
 
 #include "M_RenderSystem.h"
 
 #include "M_TransformComponent.h"
+#include "M_UITransformComponent.h"
+#include "M_SpriteComponent.h"
 #include "M_CameraComponent.h"
 #include "M_MeshComponent.h"
 #include "M_RenderableComponent.h"
@@ -22,7 +25,7 @@
 
 #include "M_Asset.h"
 #include "M_Parse.h"
-#include "M_String.h"
+#include "M_Text.h"
 
 #include "M_Vector.h"
 #include "M_Matrix.h"

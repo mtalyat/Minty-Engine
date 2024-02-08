@@ -9,6 +9,18 @@
 #define MINTY_ASSERT(expression, message) if(!(expression)) minty::Error::abort(message);
 #endif
 
+#ifdef MINTY_RELEASE
+#define MINTY_ERROR(expression, message)
+#else
+#define MINTY_ERROR(expression, message) if(!(expression)) minty::Console::error(message);
+#endif
+
+#ifdef MINTY_RELEASE
+#define MINTY_WARN(expression, message)
+#else
+#define MINTY_WARN(expression, message) if(!(expression)) minty::Console::warn(message);
+#endif
+
 namespace minty::Error
 {
 	/// <summary>

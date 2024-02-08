@@ -1,12 +1,11 @@
 #pragma once
 
 #include "M_Engine.h"
-#include "M_Info.h"
-#include <functional>
-#include <map>
 
 namespace minty
 {
+	class Info;
+
 	/// <summary>
 	/// Runs a game using the Minty Engine.
 	/// </summary>

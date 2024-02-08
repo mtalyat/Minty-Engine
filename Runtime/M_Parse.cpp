@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "M_Parse.h"
 
-#include "M_String.h"
+#include "M_Text.h"
 
 using namespace minty;
 using namespace minty::Parse;

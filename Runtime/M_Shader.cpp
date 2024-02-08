@@ -2,6 +2,7 @@
 #include "M_Shader.h"
 
 #include "M_RenderEngine.h"
+#include "M_ShaderBuilder.h"
 
 #include "M_Math.h"
 #include "M_File.h"

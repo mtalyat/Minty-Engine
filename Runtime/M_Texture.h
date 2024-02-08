@@ -1,12 +1,13 @@
 #pragma once
 #include "M_RenderObject.h"
 
-#include "M_TextureBuilder.h"
 #include "M_PixelFormat.h"
-#include <vulkan/vulkan.h>
+#include "vulkan.h"
 
 namespace minty
 {
+	struct TextureBuilder;
+
 	/// <summary>
 	/// Holds data for an image on the GPU.
 	/// </summary>

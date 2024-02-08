@@ -17,9 +17,10 @@ namespace minty
 		Button6 = 5,
 		Button7 = 6,
 		Button8 = 7,
-		Left = 0,
-		Right = 1,
-		Middle = 2
+
+		Left = Button1,
+		Right = Button2,
+		Middle = Button3,
 	};
 
 	String to_string(MouseButton const value);

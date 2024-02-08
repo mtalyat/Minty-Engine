@@ -2,10 +2,11 @@
 
 #include "M_Object.h"
 #include "M_FiniteStateMachine.h"
-#include "M_AnimatorBuilder.h"
 
 namespace minty
 {
+	struct AnimatorBuilder;
+
 	class Animator
 		: public Object
 	{

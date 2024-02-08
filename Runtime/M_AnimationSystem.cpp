@@ -1,12 +1,17 @@
 #include "pch.h"
 #include "M_AnimationSystem.h"
 
+#include "M_AnimatorComponent.h"
+#include "M_AnimatorBuilder.h"
 #include "M_AnimationBuilder.h"
 #include "M_SpriteComponent.h"
 #include "M_Asset.h"
 #include "M_RenderEngine.h"
 #include "M_RenderSystem.h"
 #include "M_Engine.h"
+#include "M_EntityRegistry.h"
+#include "M_SystemRegistry.h"
+#include "M_Scene.h"
 
 using namespace minty;
 

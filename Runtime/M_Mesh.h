@@ -1,8 +1,7 @@
 #pragma once
 #include "M_RenderObject.h"
 
-#include "M_Material.h"
-#include <vulkan/vulkan.h>
+#include "vulkan.h"
 #include <vector>
 
 namespace minty

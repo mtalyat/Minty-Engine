@@ -1,12 +1,14 @@
 #include "pch.h"
 #include "M_MeshComponent.h"
 
+#include "M_Mesh.h"
 #include "M_Console.h"
 #include "M_SerializationData.h"
 #include "M_Scene.h"
 #include "M_RenderEngine.h"
 #include "M_RenderSystem.h"
 #include "M_File.h"
+#include "M_SystemRegistry.h"
 
 using namespace minty;
 

@@ -1,11 +1,11 @@
 #include "pch.h"
 #include "M_MaterialTemplate.h"
 
+#include "M_MaterialTemplateBuilder.h"
 #include "M_Shader.h"
 
 #include "M_RenderEngine.h"
 #include "M_Console.h"
-#include "M_Color.h"
 #include "M_Error.h"
 
 using namespace minty;

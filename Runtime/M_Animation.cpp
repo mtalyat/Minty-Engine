@@ -7,6 +7,10 @@
 #include "M_RenderSystem.h"
 #include "M_RenderEngine.h"
 #include "M_Scene.h"
+#include "M_EntityRegistry.h"
+#include "M_SystemRegistry.h"
+#include "M_Dynamic.h"
+#include "M_Component.h"
 
 using namespace minty;
 

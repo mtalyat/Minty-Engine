@@ -1,14 +1,16 @@
 #pragma once
-
 #include "M_RenderObject.h"
-#include "M_Dynamic.h"
 
+#include "vulkan.h"
 #include <array>
 #include <unordered_map>
 #include <unordered_set>
+#include <vector>
 
 namespace minty
 {
+	class Dynamic;
+
 	/// <summary>
 	/// Holds data for a descriptor set within a shader.
 	/// </summary>

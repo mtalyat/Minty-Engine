@@ -2,13 +2,16 @@
 
 #include "M_Object.h"
 #include "M_Register.h"
-#include "M_VirtualFile.h"
 #include "M_Compression.h"
 #include <unordered_set>
 #include <unordered_map>
+#include <vector>
 
 namespace minty
 {
+	class VirtualFile;
+	class PhysicalFile;
+
 	constexpr char const* const WRAP_MAGIC = "WRAP";
 	constexpr int const WRAP_MAGIC_SIZE = 4;
 	constexpr char const* const WRAP_EXTENSION = ".wrap";

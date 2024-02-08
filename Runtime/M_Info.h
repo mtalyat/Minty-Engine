@@ -1,8 +1,7 @@
 #pragma once
 
 #include "M_Object.h"
-#include "M_ISerializable.h"
-#include <vulkan/vulkan.h>
+#include "vulkan.h"
 
 namespace minty
 {

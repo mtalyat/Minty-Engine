@@ -2,6 +2,7 @@
 #include "M_AudioSourceComponent.h"
 
 #include "M_AudioSystem.h"
+#include "M_SystemRegistry.h"
 
 #include "M_SerializationData.h"
 #include "M_Scene.h"

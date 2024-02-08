@@ -1,13 +1,11 @@
 #pragma once
 #include "M_Object.h"
 
-#include "M_EntityRegistry.h"
-#include "M_SystemRegistry.h"
-#include "M_ISerializable.h"
-
 namespace minty
 {
 	class Engine;
+	class EntityRegistry;
+	class SystemRegistry;
 
 	/// <summary>
 	/// Holds a collection of systems and entities that can interact with one another.

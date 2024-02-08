@@ -2,6 +2,7 @@
 #include "M_Window.h"
 #include "M_Console.h"
 #include "M_Error.h"
+#include "M_InputMap.h"
 #include "glfw.hpp"
 #include <format>
 #include <string>

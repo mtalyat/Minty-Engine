@@ -3,7 +3,7 @@
 
 #include "M_Builtin.h"
 #include "M_RenderEngine.h"
-#include "M_String.h"
+#include "M_Text.h"
 #include "glm.hpp"
 
 using namespace minty;

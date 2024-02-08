@@ -1,15 +1,15 @@
 #pragma once
-
 #include "M_SceneObject.h"
-#include "M_System.h"
+
 #include "M_Console.h"
-#include "M_ISerializable.h"
 #include <map>
 #include <set>
 #include <functional>
 
 namespace minty
 {
+	class System;
+
 	/// <summary>
 	/// Holds and managers data relevant to systems.
 	/// </summary>

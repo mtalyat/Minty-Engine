@@ -1,8 +1,10 @@
 #pragma once
-
 #include "M_Object.h"
-#include "M_Event.h"
-#include "M_InputMap.h"
+
+#include "M_Key.h"
+#include "M_KeyAction.h"
+#include "M_KeyModifiers.h"
+#include "M_MouseButton.h"
 #include "M_CursorMode.h"
 #include <map>
 
@@ -10,6 +12,8 @@ struct GLFWwindow;
 
 namespace minty
 {
+	class InputMap;
+
 	/// <summary>
 	/// A window on the screen.
 	/// </summary>

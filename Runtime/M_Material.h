@@ -1,18 +1,13 @@
 #pragma once
 #include "M_Object.h"
 
-#include "M_Buffer.h"
-#include "M_MaterialBuilder.h"
 #include "M_DescriptorSet.h"
-
-#include "M_Color.h"
-#include <vulkan/vulkan.h>
-#include <string>
-#include <unordered_map>
 #include <vector>
 
 namespace minty
 {
+	struct MaterialBuilder;
+
 	/// <summary>
 	/// Holds graphics information.
 	/// </summary>

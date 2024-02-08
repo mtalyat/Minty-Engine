@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "M_Wrap.h"
 
+#include "M_VirtualFile.h"
+#include "M_PhysicalFile.h"
 #include "M_File.h"
 #include "M_Console.h"
 #include "M_Asset.h"

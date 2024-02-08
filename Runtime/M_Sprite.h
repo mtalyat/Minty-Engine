@@ -1,11 +1,13 @@
 #pragma once
 #include "M_RenderObject.h"
 
-#include "M_SpriteBuilder.h"
+#include "M_CoordinateMode.h"
 #include "M_Vector.h"
 
 namespace minty
 {
+	struct SpriteBuilder;
+
 	/// <summary>
 	/// Holds the data for a slice of a texture.
 	/// </summary>
@@ -53,6 +55,7 @@ namespace minty
 		void set_max_coords(Vector2 const coords, CoordinateMode const coordinateMode = CoordinateMode::Normalized);
 
 		void set_pivot(Vector2 const pivot, CoordinateMode const coordinateMode = CoordinateMode::Normalized);
+
 	private:
 		Vector2 normalize_coords(Vector2 const coords) const;
 

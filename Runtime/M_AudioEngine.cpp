@@ -4,6 +4,7 @@
 #include "M_Audio.h"
 #include "M_AudioSourceComponent.h"
 #include "M_AudioListenerComponent.h"
+#include "M_AudioClip.h"
 
 #include "M_TransformComponent.h"
 #include "M_DirtyComponent.h"

@@ -231,6 +231,7 @@
     <ClInclude Include="M_AudioSystem.h" />
     <ClInclude Include="M_Builtin.h" />
     <ClInclude Include="M_Compression.h" />
+    <ClInclude Include="M_Entity.h" />
     <ClInclude Include="M_FiniteStateMachine.h" />
     <ClInclude Include="M_Macros.h" />
     <ClInclude Include="M_PhysicalFile.h" />
@@ -241,7 +242,6 @@
     <ClInclude Include="M_TextureAtlasBuilder.h" />
     <ClInclude Include="M_UIPushData.h" />
     <ClInclude Include="M_RenderSystem.h" />
-    <ClInclude Include="M_Resource.h" />
     <ClInclude Include="M_SceneObject.h" />
     <ClInclude Include="M_SerializationData.h" />
     <ClInclude Include="M_Dynamic.h" />
@@ -300,10 +300,9 @@
     <ClInclude Include="M_Shader.h" />
     <ClInclude Include="M_ShaderPass.h" />
     <ClInclude Include="M_Sprite.h" />
-    <ClInclude Include="M_String.h" />
+    <ClInclude Include="M_Text.h" />
     <ClInclude Include="M_System.h" />
     <ClInclude Include="M_SystemRegistry.h" />
-    <ClInclude Include="M_Template.h" />
     <ClInclude Include="M_Texture.h" />
     <ClInclude Include="M_Rect.h" />
     <ClInclude Include="M_RectF.h" />
@@ -430,7 +429,6 @@
     <ClCompile Include="M_String.cpp" />
     <ClCompile Include="M_System.cpp" />
     <ClCompile Include="M_SystemRegistry.cpp" />
-    <ClCompile Include="M_Template.cpp" />
     <ClCompile Include="M_Texture.cpp" />
     <ClCompile Include="M_Rect.cpp" />
     <ClCompile Include="M_RectF.cpp" />

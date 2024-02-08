@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "M_Animator.h"
 
+#include "M_AnimatorBuilder.h"
 #include "M_Console.h"
 
 using namespace minty;

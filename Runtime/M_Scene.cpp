@@ -2,6 +2,8 @@
 #include "M_Scene.h"
 
 #include "M_Engine.h"
+#include "M_EntityRegistry.h"
+#include "M_SystemRegistry.h"
 
 #include "M_TransformComponent.h"
 #include "M_RelationshipComponent.h"

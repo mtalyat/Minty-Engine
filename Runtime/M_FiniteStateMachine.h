@@ -1,7 +1,6 @@
 #pragma once
 
 #include "M_Object.h"
-#include "M_ISerializable.h"
 #include "M_Dynamic.h"
 #include "M_Register.h"
 #include <vector>

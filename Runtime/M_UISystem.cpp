@@ -1,7 +1,9 @@
 #include "pch.h"
 #include "M_UISystem.h"
 
+#include "M_Engine.h"
 #include "M_UITransformComponent.h"
+#include "M_Scene.h"
 
 using namespace minty;
 

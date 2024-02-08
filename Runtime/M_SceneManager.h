@@ -1,14 +1,12 @@
 #pragma once
-
 #include "M_Object.h"
-#include "M_Scene.h"
+
 #include "M_Register.h"
-#include <vector>
-#include <unordered_set>
 
 namespace minty
 {
 	class Engine;
+	class Scene;
 
 	class SceneManager
 		: public Object

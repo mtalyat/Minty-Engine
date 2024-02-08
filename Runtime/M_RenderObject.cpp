@@ -5,6 +5,7 @@
 #include "M_RenderEngine.h"
 #include "M_RenderSystem.h"
 #include "M_Scene.h"
+#include "M_SystemRegistry.h"
 
 using namespace minty;
 using namespace minty;

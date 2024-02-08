@@ -158,3 +158,13 @@ bool minty::File::write_all_lines(Path const& path, std::vector<String> const& l
 
     return true;
 }
+
+minty::File::File()
+    : _path()
+    , _flags()
+{}
+
+minty::File::File(Path const& path, Flags const flags)
+    : _path(path)
+    , _flags(_flags)
+{}

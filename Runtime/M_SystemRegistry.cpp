@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "M_SystemRegistry.h"
 
+#include "M_System.h"
 #include "M_Console.h"
 #include "M_Engine.h"
 #include "M_Parse.h"

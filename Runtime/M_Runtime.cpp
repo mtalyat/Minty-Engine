@@ -23,6 +23,7 @@
 
 #include "M_CommandLineParser.h"
 #include "M_Console.h"
+#include "M_Info.h"
 #include <filesystem>
 #include <iostream>
 #include <exception>

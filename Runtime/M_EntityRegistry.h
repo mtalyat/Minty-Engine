@@ -1,16 +1,13 @@
 #pragma once
 
-#include "libraries/entt/entt.hpp"
-#include "M_Component.h"
+#include "M_Entity.h"
+#include "M_Object.h"
 #include "M_Console.h"
-#include "M_ISerializable.h"
+#include <map>
 
 namespace minty
 {
-	typedef entt::entity Entity;
-	constexpr Entity NULL_ENTITY = entt::null;
-
-	String to_string(Entity const value);
+	struct Component;
 
 	class EntityRegistry
 		: public Object, public entt::registry

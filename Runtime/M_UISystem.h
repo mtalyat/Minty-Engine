@@ -1,11 +1,14 @@
 #pragma once
-
 #include "M_System.h"
-#include "M_Engine.h"
+
+#include "M_Entity.h"
+#include "M_InputMap.h"
 #include <unordered_set>
 
 namespace minty
 {
+    class Engine;
+
     /// <summary>
     /// Handles User Interface (UI) inputs.
     /// </summary>

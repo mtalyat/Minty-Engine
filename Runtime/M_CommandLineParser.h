@@ -2,7 +2,7 @@
 
 #include "M_Base.h"
 #include <vector>
-#include <map>
+#include <unordered_map>
 
 namespace minty
 {
@@ -77,9 +77,9 @@ namespace minty
 		};
 
 	private:
-		std::map<int, Parameter> _positionalParams;
-		std::map<String, Parameter> _flagParams;
-		std::map<String, Argument> _args;
+		std::unordered_map<int, Parameter> _positionalParams;
+		std::unordered_map<String, Parameter> _flagParams;
+		std::unordered_map<String, Argument> _args;
 
 	public:
 		/// <summary>

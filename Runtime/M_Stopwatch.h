@@ -1,6 +1,6 @@
 #pragma once
-
 #include "M_Object.h"
+
 #include <chrono>
 
 namespace minty

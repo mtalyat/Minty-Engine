@@ -1,17 +1,14 @@
 #pragma once
 #include "M_RenderObject.h"
 
-#include "M_MaterialTemplateBuilder.h"
-
 #include "M_Dynamic.h"
-
-#include <vulkan/vulkan.h>
 #include <unordered_map>
 #include <vector>
 
 namespace minty
 {
 	class Shader;
+	struct MaterialTemplateBuilder;
 
 	/// <summary>
 	/// Holds the graphics information template data for a Material.

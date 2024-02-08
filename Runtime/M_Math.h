@@ -1,5 +1,4 @@
 #pragma once
-
 #include "M_Types.h"
 
 namespace minty::Math

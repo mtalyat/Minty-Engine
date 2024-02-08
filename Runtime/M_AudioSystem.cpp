@@ -3,9 +3,11 @@
 
 #include "M_Scene.h"
 #include "M_Engine.h"
+#include "M_EntityRegistry.h"
 
 #include "M_AudioListenerComponent.h"
 #include "M_AudioSourceComponent.h"
+#include "M_TransformComponent.h"
 #include "M_DirtyComponent.h"
 
 using namespace minty;

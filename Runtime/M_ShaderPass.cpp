@@ -3,6 +3,7 @@
 
 #include "M_RenderEngine.h"
 #include "M_RenderSystem.h"
+#include "M_ShaderPassBuilder.h"
 
 using namespace minty;
 using namespace minty;

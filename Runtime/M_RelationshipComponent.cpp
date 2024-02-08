@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "M_RelationshipComponent.h"
 
+#include "M_EntityRegistry.h"
 #include "M_SerializationData.h"
 #include "M_Scene.h"
 

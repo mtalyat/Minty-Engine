@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "M_Vector.h"
 
+#include "M_Text.h"
+#include "M_Parse.h"
 #include <format>
 
 using namespace minty;

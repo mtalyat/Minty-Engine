@@ -20,6 +20,9 @@ int minty::Asset::check(Path const& path, char const* const extension, bool cons
 	{
 		//Console::error(std::format("Cannot find_animation asset at path \"{}\".", path.string()));
 		// cannot find asset itself
+		MINTY_ASSERT(!path.empty(), "Asset::check(): Path is empty.");
+		MINTY_ASSERT(Asset::exists(path), std::format("Asset::check(): Path does not exist: {}", path.string()));
+		MINTY_ASSERT(!extension || path.extension() == extension, std::format("Asset::check(): Path does not have the correct extension. Path: {}, extension: {}", path.string(), extension));
 		return 1;
 	}
 
@@ -27,6 +30,7 @@ int minty::Asset::check(Path const& path, char const* const extension, bool cons
 	{
 		//Console::error(std::format("Cannot find_animation meta file for asset at path \"{}\".", path.string()));
 		// cannot find asset meta file
+		MINTY_ASSERT(!requiresMeta || Asset::exists_meta(path), std::format("Asset::check(): Missing appropriate meta path for path: {}, missing meta path: {}", path.string(), path.string() + META_EXTENSION));
 		return 2;
 	}
 

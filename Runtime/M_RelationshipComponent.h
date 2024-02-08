@@ -1,8 +1,7 @@
 #pragma once
 
 #include "M_Component.h"
-#include "M_EntityRegistry.h"
-#include <unordered_set>
+#include "M_Entity.h"
 
 namespace minty
 {

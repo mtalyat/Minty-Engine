@@ -1,15 +1,14 @@
 #pragma once
 #include "M_RenderObject.h"
 
-#include "M_ShaderPassBuilder.h"
 #include "M_DescriptorSet.h"
-#include "M_Constants.h"
-#include "M_Register.h"
 
-#include <vulkan/vulkan.h>
+#include "vulkan.h"
 
 namespace minty
 {
+	struct ShaderPassBuilder;
+	
 	/// <summary>
 	/// Holds data for a ShaderPass.
 	/// </summary>

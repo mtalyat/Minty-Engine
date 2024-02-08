@@ -3,6 +3,8 @@
 
 #include "M_SerializationData.h"
 #include "M_AnimationSystem.h"
+#include "M_SystemRegistry.h"
+#include "M_Scene.h"
 
 using namespace minty;
 

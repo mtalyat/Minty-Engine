@@ -1,40 +1,17 @@
 #pragma once
 #include "M_Object.h"
 
-#include "M_Constants.h"
 #include "M_Register.h"
 #include "M_Color.h"
 #include "M_Info.h"
 #include "M_Window.h"
 #include "M_Viewport.h"
-
-#include "M_EntityRegistry.h"
-#include "M_CameraComponent.h"
-#include "M_MeshComponent.h"
-#include "M_TransformComponent.h"
-#include "M_UITransformComponent.h"
-#include "M_SpriteComponent.h"
-
-#include "M_Texture.h"
-#include "M_Sprite.h"
-#include "M_Shader.h"
-#include "M_ShaderPass.h"
-#include "M_MaterialTemplate.h"
-#include "M_Material.h"
-#include "M_Mesh.h"
-
 #include "M_Buffer.h"
-#include "M_TextureBuilder.h"
-#include "M_SpriteBuilder.h"
-#include "M_ShaderBuilder.h"
-#include "M_ShaderPassBuilder.h"
-#include "M_MaterialTemplateBuilder.h"
-#include "M_MaterialBuilder.h"
-#include "M_DescriptorSet.h"
-
-#include "M_Error.h"
+#include "M_Entity.h"
+#include "M_Matrix.h"
 
 #include "glm.hpp"
+#include "vulkan.h"
 
 #include <array>
 #include <vector>
@@ -70,6 +47,12 @@ namespace minty
 
 	class Scene;
 	class RenderSystem;
+	class EntityRegistry;
+
+	struct MeshComponent;
+	struct TransformComponent;
+	struct UITransformComponent;
+	struct SpriteComponent;
 
 	struct RenderEngineBuilder;
 	struct TextureBuilder;

@@ -1,7 +1,6 @@
 #pragma once
 
 #include "M_Object.h"
-#include "M_ISerializable.h"
 
 namespace minty
 {

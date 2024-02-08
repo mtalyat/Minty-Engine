@@ -1,13 +1,13 @@
 #pragma once
+#include "M_RenderObject.h"
 
-#include "M_Texture.h"
-#include "M_TextureAtlasBuilder.h"
 #include "M_CoordinateMode.h"
 #include "M_Vector.h"
 
 namespace minty
 {
 	class RenderSystem;
+	struct TextureAtlasBuilder;
 
 	/// <summary>
 	/// A collection of Sprites that originate from a Texture.

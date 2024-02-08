@@ -9,8 +9,6 @@
 
 namespace minty::Asset
 {
-	constexpr char const* META_EXTENSION = ".meta";
-
 #ifdef N_DEBUG
 	Path const BASE_PATH = Path("");
 #else

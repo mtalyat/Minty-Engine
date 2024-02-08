@@ -2,6 +2,7 @@
 #include "vulkan.h"
 
 #include "M_Error.h"
+#include "M_Text.h"
 
 using namespace minty;
 using namespace minty::vk;

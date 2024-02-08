@@ -4,9 +4,10 @@
 #include "M_Console.h"
 #include "M_Error.h"
 #include "M_Parse.h"
-#include "M_String.h"
+#include "M_Text.h"
 #include "M_Vector.h"
 #include "M_Matrix.h"
+#include "M_Quaternion.h"
 #include <cmath>
 #include <vector>
 #include <regex>
@@ -205,7 +206,8 @@ bool try_get_constant(String const& str, float& value)
 		{"MATRIX2", static_cast<float>(sizeof(minty::Matrix2))},
 		{"MATRIX3", static_cast<float>(sizeof(minty::Matrix3))},
 		{"MATRIX4", static_cast<float>(sizeof(minty::Matrix4))},
-		//{"", sizeof()},
+		{"QUATERNION", static_cast<float>(sizeof(minty::Quaternion))},
+		//{"", static_cast<float>(sizeof())},
 	};
 
 	auto found = constants.find(minty::Text::to_upper(str));
