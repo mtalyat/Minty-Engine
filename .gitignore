@@ -401,6 +401,6 @@ FodyWeavers.xsd
 Management/
 
 # cmake
-Engine/cmake/doc
-Engine/cmake/share
-Engine/cmake/man
+Engine/cmake/doc/
+Engine/cmake/share/
+Engine/cmake/man/
