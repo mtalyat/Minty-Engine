@@ -12,7 +12,6 @@
 #include <iostream>
 
 using namespace minty;
-using namespace minty::rendering;
 using namespace game;
 
 InputMap input;
@@ -67,7 +66,7 @@ int init(Runtime &runtime)
                 .entity = NULL_ENTITY};
             Writer writer(node, &data);
             writer.write("Scene", scene);
-            minty::console::print(node);
+            Console::print(node);
         }
 
         //          audio
@@ -179,11 +178,11 @@ int init(Runtime &runtime)
     }
     catch (const std::exception &e)
     {
-        console::error(std::format("Failed to init: \"{}\"", e.what()));
+        Console::error(std::format("Failed to init: \"{}\"", e.what()));
         // std::cerr << "Failed to init: \"" << e.what() << '"' << std::endl;
     }
 
-    console::log("Game start.");
+    Console::log("Game start.");
 
     return 0;
 }
@@ -191,7 +190,7 @@ int init(Runtime &runtime)
 // called when the engine is destroyed
 int destroy(Runtime &runtime)
 {
-    console::log("Game over.");
+    Console::log("Game over.");
 
     // wait for input to close
     // console::wait();

@@ -684,7 +684,7 @@ void Application::generate_cmake()
 	// if not open, error
 	if (!file.is_open())
 	{
-		minty::console::error(std::string("Could not open cmake file: ") + path);
+		minty::Console::error(std::string("Could not open cmake file: ") + path);
 		return;
 	}
 
@@ -747,7 +747,7 @@ void Application::generate_main()
 	// if not open, error
 	if (!file.is_open())
 	{
-		minty::console::error(std::string("Could not open main file: ") + path);
+		minty::Console::error(std::string("Could not open main file: ") + path);
 		return;
 	}
 
@@ -764,12 +764,12 @@ void Application::generate_main()
 		"#include \"../Assets/Scripts/init.h\"" << std::endl <<
 		"int main(int argc, char const* argv[]) {" << std::endl <<
 		"	std::filesystem::current_path(\"" << _info.project->get_base_path().generic_string() << "\");" << std::endl << // move out of Build/Debug or Build/Release folder, into base folder
-		"	minty::console::log(std::filesystem::current_path().string());" << std::endl <<
+		"	minty::Console::log(std::filesystem::current_path().string());" << std::endl <<
 		"	minty::Info info(\"TestProject - HARD CODED NAME\", 0, 0, 0);" << std::endl <<
 		"	minty::Runtime rt(info);" << std::endl <<
-		"	if(int code = init(rt)) { minty::console::error(std::format(\"Failed to init program with error code {}.\", code)); return code; }" << std::endl <<
+		"	if(int code = init(rt)) { minty::Console::error(std::format(\"Failed to init program with error code {}.\", code)); return code; }" << std::endl <<
 		"	int result = rt.run();" << std::endl <<
-		"	if(int code = destroy(rt)) { minty::console::error(std::format(\"Failed to destroy program with error code {}.\", code)); return code; }" << std::endl <<
+		"	if(int code = destroy(rt)) { minty::Console::error(std::format(\"Failed to destroy program with error code {}.\", code)); return code; }" << std::endl <<
 		"	return result;" << std::endl <<
 		"}";
 

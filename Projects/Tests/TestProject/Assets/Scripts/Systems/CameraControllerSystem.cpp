@@ -13,14 +13,14 @@ game::CameraControllerSystem::CameraControllerSystem(Engine& engine, ID const sc
 void game::CameraControllerSystem::update()
 {
     // cap pitch
-    pitch = math::clamp(pitch, -89.0f, 89.0f);
+    pitch = Math::clamp(pitch, -89.0f, 89.0f);
 
     EntityRegistry& registry = get_entity_registry();
 
     // rotate cameras
     for (auto &&[entity, camera, transform] : registry.view<CameraComponent const, TransformComponent>().each())
     {
-        Quaternion quat = Quaternion::from_euler_angles(math::deg2rad(pitch), math::deg2rad(yaw), 0.0f);
+        Quaternion quat = Quaternion::from_euler_angles(Math::deg2rad(pitch), Math::deg2rad(yaw), 0.0f);
         if (transform.localRotation != quat)
         {
             transform.localRotation = quat;

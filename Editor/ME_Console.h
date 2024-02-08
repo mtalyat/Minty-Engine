@@ -12,13 +12,16 @@ namespace mintye
 {
 	class Console
 	{
+	public:
+		typedef minty::Console::Color Color;
+
 	private:
 		struct Line
 		{
 			std::string text;
-			minty::console::Color color;
+			Color color;
 
-			Line(std::string const& text, minty::console::Color color);
+			Line(std::string const& text, Color color);
 		};
 
 		bool _scrollToBottom;
@@ -51,7 +54,7 @@ namespace mintye
 		/// <returns>True if there is a command being executed, otherwise false.</returns>
 		bool is_command_running() const;
 
-		void log(std::string const& text, minty::console::Color const color = minty::console::Color::White);
+		void log(std::string const& text, Color const color = Color::White);
 
 		void log_important(std::string const& text);
 

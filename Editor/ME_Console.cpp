@@ -17,19 +17,19 @@ mintye::Console::Console()
 	//_lines.reserve(_maxLines);
 }
 
-ImVec4 ColorToImVec4(console::Color const color)
+ImVec4 ColorToImVec4(Console::Color const color)
 {
 	switch (color)
 	{
-	case console::Color::Black: return ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
-	case console::Color::Red: return ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
-	case console::Color::Green: return ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
-	case console::Color::Yellow: return ImVec4(1.0f, 1.0f, 0.0f, 1.0f);
-	case console::Color::Blue: return ImVec4(0.0f, 0.0f, 1.0f, 1.0f);
-	case console::Color::Magenta: return ImVec4(1.0f, 0.0f, 1.0f, 1.0f);
-	case console::Color::Cyan: return ImVec4(0.0f, 1.0f, 1.0f, 1.0f);
-	case console::Color::White: return ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
-	case console::Color::Gray: return ImVec4(0.5f, 0.5f, 0.5f, 1.0f);
+	case Console::Color::Black: return ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
+	case Console::Color::Red: return ImVec4(1.0f, 0.0f, 0.0f, 1.0f);
+	case Console::Color::Green: return ImVec4(0.0f, 1.0f, 0.0f, 1.0f);
+	case Console::Color::Yellow: return ImVec4(1.0f, 1.0f, 0.0f, 1.0f);
+	case Console::Color::Blue: return ImVec4(0.0f, 0.0f, 1.0f, 1.0f);
+	case Console::Color::Magenta: return ImVec4(1.0f, 0.0f, 1.0f, 1.0f);
+	case Console::Color::Cyan: return ImVec4(0.0f, 1.0f, 1.0f, 1.0f);
+	case Console::Color::White: return ImVec4(1.0f, 1.0f, 1.0f, 1.0f);
+	case Console::Color::Gray: return ImVec4(0.5f, 0.5f, 0.5f, 1.0f);
 	default: return ImVec4(0.0f, 0.0f, 0.0f, 1.0f);
 	}
 }
@@ -67,7 +67,7 @@ void mintye::Console::draw(char const* title)
 			}
 
 			// pick color
-			bool hasColor = line.color != console::Color::White;
+			bool hasColor = line.color != Color::White;
 			if (hasColor)
 			{
 				ImGui::PushStyleColor(ImGuiCol_Text, ColorToImVec4(line.color));
@@ -152,7 +152,7 @@ bool mintye::Console::is_command_running() const
 	return _commandsThreadRunning;
 }
 
-void mintye::Console::log(std::string const& text, minty::console::Color const color)
+void mintye::Console::log(std::string const& text, minty::Console::Color const color)
 {
 	_linesLock.lock();
 
@@ -169,22 +169,22 @@ void mintye::Console::log(std::string const& text, minty::console::Color const c
 
 void mintye::Console::log_important(std::string const& text)
 {
-	log(text, console::Color::Cyan);
+	log(text, Color::Cyan);
 }
 
 void mintye::Console::log_info(std::string const& text)
 {
-	log(text, console::Color::Gray);
+	log(text, Color::Gray);
 }
 
 void mintye::Console::log_warning(std::string const& text)
 {
-	log(text, console::Color::Yellow);
+	log(text, Color::Yellow);
 }
 
 void mintye::Console::log_error(std::string const& text)
 {
-	log(text, console::Color::Red);
+	log(text, Color::Red);
 }
 
 void mintye::Console::set_max_lines(int const count)
@@ -203,7 +203,7 @@ size_t mintye::Console::execute_command(std::string const& command)
 	std::regex regex("(\033\\[)[0-?]*[ -\\/]*[@-~]"); // regex to remove escape codes
 	std::string result;
 	bool changeColor = true;
-	console::Color color = console::Color::White;
+	Color color = Color::White;
 	while (fgets(buffer.data(), static_cast<int>(buffer.size()), pipe.get()) != nullptr) {
 
 		// get text
@@ -217,29 +217,29 @@ size_t mintye::Console::execute_command(std::string const& command)
 			// check for [type]
 			if (/*result.starts_with("[errr]") || */result.find("err") != std::string::npos)
 			{
-				color = console::Color::Red;
+				color = Color::Red;
 				errorCount++;
 			}
 			else if (/*result.starts_with("[warn]") || */result.find("warn") != std::string::npos)
 			{
-				color = console::Color::Yellow;
+				color = Color::Yellow;
 			}
 			else if (/*result.starts_with("[info]") || */result.find("info") != std::string::npos)
 			{
-				color = console::Color::Gray;
+				color = Color::Gray;
 			}
 			else if (result.starts_with("[test]"))
 			{
-				color = console::Color::Blue;
+				color = Color::Blue;
 			}
 			else if (result.starts_with("[todo]"))
 			{
-				color = console::Color::Magenta;
+				color = Color::Magenta;
 			}
 			else
 			{
 				// normal
-				color = console::Color::White;
+				color = Color::White;
 			}
 		}
 
@@ -293,7 +293,7 @@ void mintye::Console::execute_commands()
 	_commandsLock.unlock();
 }
 
-mintye::Console::Line::Line(std::string const& text, minty::console::Color color)
+mintye::Console::Line::Line(std::string const& text, Color color)
 	: text(text)
 	, color(color)
 {}
