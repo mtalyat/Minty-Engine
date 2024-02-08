@@ -1,15 +1,33 @@
 #pragma once
 
 #include "M_Component.h"
-#include "M_Transform.h"
+#include "M_Matrix.h"
+#include "M_Vector.h"
+#include "M_Quaternion.h"
 
 namespace minty
 {
 	struct TransformComponent
 		: public Component
 	{
-		Matrix4 global;
-		Transform local;
+		Matrix4 globalMatrix;
+
+		/// <summary>
+		/// The position.
+		/// </summary>
+		Vector3 localPosition;
+
+		/// <summary>
+		/// The rotation.
+		/// </summary>
+		Quaternion localRotation;
+
+		/// <summary>
+		/// The scale.
+		/// </summary>
+		Vector3 localScale = Vector3(1.0f, 1.0f, 1.0f);
+
+		Matrix4 get_local_matrix() const;
 
 		Vector3 get_global_position() const;
 

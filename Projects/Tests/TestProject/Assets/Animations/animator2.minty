@@ -1,0 +1,36 @@
+name: animator2
+fsm
+    start: idle
+    scope
+        move: 0
+        flicker: 0
+    states
+        idle
+            value: i 0
+            transitions
+                -
+                    state: slide
+                    conditions
+                        - move != 0
+                -
+                    state: flicker
+                    conditions
+                        - flicker != 0
+        slide
+            value: i 3
+            transitions
+                -
+                    state: idle
+                    conditions
+                        - move == 0
+                -
+                    state: flicker
+                    conditions
+                        - flicker != 0
+        flicker
+            value: i 2
+            transitions
+                -
+                    state: idle
+                    conditions
+                        - flicker == 0

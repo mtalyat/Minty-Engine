@@ -4,8 +4,8 @@
 
 using namespace minty;
 
-game::TestSystem::TestSystem(minty::Engine *const engine, minty::EntityRegistry *const registry)
-    : System::System(engine, registry)
+game::TestSystem::TestSystem(Engine& engine, ID const sceneId)
+    : System::System(engine, sceneId)
 {}
 
 void game::TestSystem::update()
@@ -16,14 +16,16 @@ void game::TestSystem::update()
         return;
     }
 
-    float deltaTime = _engine->get_delta_time();
+    float deltaTime = get_scene().get_engine().get_delta_time();
+
+    EntityRegistry& registry = get_entity_registry();
 
     // move all with test component
-    for(auto&& [entity, test, transform] : _registry->view<TestComponent, TransformComponent>().each())
+    for(auto&& [entity, test, transform] : registry.view<TestComponent, TransformComponent>().each())
     {
         test.rotation += test.rotationSpeed * deltaTime;
-        transform.local.position = Quaternion(test.rotation) * Vector3(0.0f, 0.0f, 10.0f);
-        _registry->emplace_or_replace<DirtyComponent>(entity);
+        transform.localPosition = Quaternion(test.rotation) * Vector3(0.0f, 0.0f, 10.0f);
+        registry.emplace_or_replace<DirtyComponent>(entity);
     }
 }
 
@@ -39,9 +41,11 @@ void game::TestSystem::toggle_pause()
 
 void game::TestSystem::reset()
 {
-    for(auto&& [entity, test, transform] : _registry->view<TestComponent, TransformComponent>().each())
+    EntityRegistry& registry = get_entity_registry();
+
+    for(auto&& [entity, test, transform] : registry.view<TestComponent, TransformComponent>().each())
     {
         test.rotation = Vector3();
-        transform.local.rotation = Quaternion(test.rotation);
+        transform.localRotation = Quaternion(test.rotation);
     }
 }

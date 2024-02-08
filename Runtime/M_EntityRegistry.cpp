@@ -52,7 +52,7 @@ Entity minty::EntityRegistry::create(String const& name)
 	return e;
 }
 
-Entity minty::EntityRegistry::find_by_name(String const& string) const
+Entity minty::EntityRegistry::find(String const& string) const
 {
 	if (is_name_empty(string))
 	{
@@ -115,7 +115,7 @@ void minty::EntityRegistry::set_name(Entity const entity, String const& name)
 
 Component* minty::EntityRegistry::emplace_by_name(String const& name, Entity const entity)
 {
-	auto const& found = _components.find(name);
+	auto found = _components.find(name);
 	if (found == _components.end())
 	{
 		// name not found
@@ -125,23 +125,39 @@ Component* minty::EntityRegistry::emplace_by_name(String const& name, Entity con
 	else
 	{
 		// name found
-		return found->second.create(this, entity);
+		return found->second.emplace(*this, entity);
 	}
 }
 
-Component const* minty::EntityRegistry::get_by_name(String const& name, Entity const entity) const
+Component* minty::EntityRegistry::get_by_name(String const& name, Entity const entity)
 {
-	auto const& found = _components.find(name);
+	auto found = _components.find(name);
 	if (found == _components.end())
 	{
 		// name not found
-		console::error(std::format("Cannot at Component \"{}\". It has not been registered with the EntityRegistry.", name));
+		console::error(std::format("Cannot get Component \"{}\". It has not been registered with the EntityRegistry.", name));
 		return nullptr;
 	}
 	else
 	{
 		// name found
-		return found->second.get(this, entity);
+		return const_cast<Component*>(static_cast<Component const*>(found->second.get(*this, entity)));
+	}
+}
+
+Component const* minty::EntityRegistry::get_by_name(String const& name, Entity const entity) const
+{
+	auto found = _components.find(name);
+	if (found == _components.end())
+	{
+		// name not found
+		console::error(std::format("Cannot get Component \"{}\". It has not been registered with the EntityRegistry.", name));
+		return nullptr;
+	}
+	else
+	{
+		// name found
+		return found->second.get(*this, entity);
 	}
 }
 
@@ -158,10 +174,10 @@ std::vector<Component const*> minty::EntityRegistry::get_all(Entity const entity
 		if (storage.contains(entity))
 		{
 			// this entity has this component type, so get the "pretty" name
-			auto const& found = _componentTypes.find(ctype.index());
+			auto found = _componentTypes.find(ctype.index());
 			if (found == _componentTypes.end())
 			{
-				console::error(std::format("Cannot find component type with id: {}, name: {}", ctype.index(), ctype.name().data()));
+				console::error(std::format("Cannot find_animation component type with id: {}, name: {}", ctype.index(), ctype.name().data()));
 				continue;
 			}
 
@@ -172,6 +188,21 @@ std::vector<Component const*> minty::EntityRegistry::get_all(Entity const entity
 	}
 
 	return components;
+}
+
+void minty::EntityRegistry::erase_by_name(String const& name, Entity const entity)
+{
+	auto found = _components.find(name);
+	if (found == _components.end())
+	{
+		// name not found
+		console::error(std::format("Cannot erase Component \"{}\". It has not been registered with the EntityRegistry.", name));
+	}
+	else
+	{
+		// name found
+		found->second.erase(*this, entity);
+	}
 }
 
 Entity minty::EntityRegistry::clone(Entity const entity)
@@ -193,9 +224,7 @@ Entity minty::EntityRegistry::clone(Entity const entity)
 void minty::EntityRegistry::print(Entity const entity) const
 {
 	// serialize entity, add it to parent, print that
-	Node root;
-	root.children.emplace(this->get_name(entity), std::vector<Node>{ serialize_entity(entity) });
-	root.print();
+	console::print(serialize_entity(entity));
 }
 
 size_t minty::EntityRegistry::size() const
@@ -210,20 +239,20 @@ void minty::EntityRegistry::serialize(Writer& writer) const
 
 	for (auto [entity] : this->storage<Entity>()->each())
 	{
+		// get name
+		entityName = this->get_name(entity);
+
+		// use "-" instead of ""
+		if (entityName.empty()) entityName = "-";
+
 		// serialize entity
-		Node entityNode;
+		Node entityNode(entityName);
 		Writer entityWriter(entityNode, writer.get_data());
 
 		serialize_entity(entityWriter, entity);
 
-		// get entity name
-		entityName = this->get_name(entity);
-
-		// use "_" instead of ""
-		if (entityName.empty()) entityName = "_";
-
 		// write entity node
-		writer.write(entityName, entityNode);
+		writer.write(entityNode);
 	}
 }
 
@@ -232,37 +261,32 @@ void minty::EntityRegistry::deserialize(Reader const& reader)
 	// read each entity, add name if it has one
 	
 	Node const& node = reader.get_node();
-	SerializationData* data = static_cast<SerializationData*>(reader.get_data());
+	SerializationData data = *static_cast<SerializationData const*>(reader.get_data());
 
 	// for each entity name given
-	for (auto const& pair : node.children)
+	for (auto const& entityNode : node.get_children())
 	{
-		// for each entity to be created with that name
-		for (auto const& entityNode : pair.second)
+		// create the entity
+		Entity entity = create();
+		data.entity = entity;
+
+		// set name
+		set_name(entity, entityNode.get_name());
+
+		// cycle through each component on entity
+		for (auto const& compNode : entityNode.get_children())
 		{
-			// create the entity
-			Entity entity = create();
-			data->entity = entity;
-
-			// set name
-			set_name(entity, pair.first);
-
-			// cycle through each component on entity
-			for (auto const& compPair : entityNode.children)
+			// cannot have multiple of same component
+			if (get_by_name(compNode.get_name(), entity))
 			{
-				// cannot have multiple of same component
-				if (compPair.second.size() > 1)
-				{
-					console::error(std::format("Attempting to deserialize entity \"{}\" with multiple instances of the \"{}\" component.", pair.first, compPair.first));
-				}
-
-				// get node to use to get data
-				Node const& compNode = compPair.second.front();
-
-				Component* comp = emplace_by_name(compPair.first, entity);
-				Reader compReader(compNode, data);
-				comp->deserialize(compReader);
+				console::error(std::format("Attempting to deserialize entity \"{}\" with multiple instances of the \"{}\" component.", entityNode.get_name(), compNode.get_name()));
+				return;
 			}
+
+			// add component
+			Component* comp = emplace_by_name(compNode.get_name(), entity);
+			Reader compReader(compNode, &data);
+			comp->deserialize(compReader);
 		}
 	}
 }
@@ -274,8 +298,9 @@ bool minty::EntityRegistry::is_name_empty(String const& name)
 
 void minty::EntityRegistry::serialize_entity(Writer& writer, Entity const entity) const
 {
-	SerializationData* data = static_cast<SerializationData*>(writer.get_data());
-	data->entity = entity;
+	SerializationData data = *static_cast<SerializationData const*>(writer.get_data());
+	data.entity = entity;
+	Writer tempWriter(writer.get_node(), &data);
 
 	for (auto&& curr : this->storage())
 	{
@@ -286,10 +311,10 @@ void minty::EntityRegistry::serialize_entity(Writer& writer, Entity const entity
 		if (storage.contains(entity))
 		{
 			// this entity has this component type, so get the "pretty" name
-			auto const& found = _componentTypes.find(ctype.index());
+			auto found = _componentTypes.find(ctype.index());
 			if (found == _componentTypes.end())
 			{
-				console::error(std::format("Cannot find component type with id: {}, name: {}", ctype.index(), ctype.name().data()));
+				console::error(std::format("Cannot find_animation component type with id: {}, name: {}", ctype.index(), ctype.name().data()));
 				continue;
 			}
 
@@ -302,7 +327,7 @@ void minty::EntityRegistry::serialize_entity(Writer& writer, Entity const entity
 			}
 
 			// write component with its name and serialized values
-			writer.write(name, this->get_by_name(name, entity));
+			tempWriter.write(name, this->get_by_name(name, entity));
 		}
 	}
 }

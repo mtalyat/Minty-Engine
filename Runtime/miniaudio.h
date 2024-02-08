@@ -4920,7 +4920,7 @@ ma_handle ma_dlopen(ma_context* pContext, const char* filename)
 #if MA_LOG_LEVEL >= MA_LOG_LEVEL_INFO
     if (handle == NULL) {
         char message[256];
-        ma_strappend(message, sizeof(message), "Failed to load library: ", filename);
+        ma_strappend(message, sizeof(message), "Failed to load_animation library: ", filename);
         ma_log(pContext, NULL, MA_LOG_LEVEL_INFO, message);
     }
 #endif
@@ -4968,7 +4968,7 @@ ma_proc ma_dlsym(ma_context* pContext, ma_handle handle, const char* symbol)
 #if MA_LOG_LEVEL >= MA_LOG_LEVEL_WARNING
     if (handle == NULL) {
         char message[256];
-        ma_strappend(message, sizeof(message), "Failed to load symbol: ", symbol);
+        ma_strappend(message, sizeof(message), "Failed to load_animation symbol: ", symbol);
         ma_log(pContext, NULL, MA_LOG_LEVEL_WARNING, message);
     }
 #endif
@@ -8022,7 +8022,7 @@ ma_result ma_context_get_device_info_from_IAudioClient__wasapi(ma_context* pCont
 
                     if (!found) {
                         ma_IPropertyStore_Release(pProperties);
-                        return ma_context_post_error(pContext, NULL, MA_LOG_LEVEL_ERROR, "[WASAPI] Failed to find suitable device format for device info retrieval.", MA_FAILED_TO_OPEN_BACKEND_DEVICE);
+                        return ma_context_post_error(pContext, NULL, MA_LOG_LEVEL_ERROR, "[WASAPI] Failed to find_animation suitable device format for device info retrieval.", MA_FAILED_TO_OPEN_BACKEND_DEVICE);
                     }
                 }
             } else {
@@ -8574,7 +8574,7 @@ ma_result ma_device_init_internal__wasapi(ma_context* pContext, ma_device_type d
 
     /* Return an error if we still haven't found a format. */
     if (result != MA_SUCCESS) {
-        errorMsg = "[WASAPI] Failed to find best device mix format.";
+        errorMsg = "[WASAPI] Failed to find_animation best device mix format.";
         goto done;
     }
 
@@ -12156,7 +12156,7 @@ ma_result ma_device_init__winmm(ma_context* pContext, const ma_device_config* pC
 
         result = ma_formats_flags_to_WAVEFORMATEX__winmm(caps.dwFormats, caps.wChannels, &wf);
         if (result != MA_SUCCESS) {
-            errorMsg = "[WinMM] Could not find appropriate format for internal device.", errorCode = result;
+            errorMsg = "[WinMM] Could not find_animation appropriate format for internal device.", errorCode = result;
             goto on_error;
         }
 
@@ -12194,7 +12194,7 @@ ma_result ma_device_init__winmm(ma_context* pContext, const ma_device_config* pC
 
         result = ma_formats_flags_to_WAVEFORMATEX__winmm(caps.dwFormats, caps.wChannels, &wf);
         if (result != MA_SUCCESS) {
-            errorMsg = "[WinMM] Could not find appropriate format for internal device.", errorCode = result;
+            errorMsg = "[WinMM] Could not find_animation appropriate format for internal device.", errorCode = result;
             goto on_error;
         }
 

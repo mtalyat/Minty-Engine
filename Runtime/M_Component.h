@@ -9,7 +9,7 @@ namespace minty
 	/// The base class for all Components.
 	/// </summary>
 	struct Component
-		: public Object, public ISerializable
+		: public Object
 	{
 		virtual ~Component() {}
 

@@ -68,10 +68,15 @@ namespace minty
 		VkIndexType _indexType;
 	public:
 		/// <summary>
-		/// Creates a new, empty Mesh.
+		/// Creates an empty Mesh.
+		/// </summary>
+		Mesh();
+
+		/// <summary>
+		/// Creates a new Mesh.
 		/// </summary>
 		/// <param name="renderer"></param>
-		Mesh(RenderEngine& renderer);
+		Mesh(Engine& engine, ID const sceneId);
 
 		~Mesh();
 

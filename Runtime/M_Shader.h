@@ -30,11 +30,16 @@ namespace minty
 		rendering::DescriptorSet _descriptorSet;
 	public:
 		/// <summary>
+		/// Creates an empty Shader.
+		/// </summary>
+		Shader();
+
+		/// <summary>
 		/// Creates a new Shader.
 		/// </summary>
 		/// <param name="layout"></param>
 		/// <param name="pipeline"></param>
-		Shader(rendering::ShaderBuilder const& builder, RenderEngine& renderer);
+		Shader(rendering::ShaderBuilder const& builder, Engine& engine, ID const sceneId);
 
 		/// <summary>
 		/// Destroys all of the resources associated with this Shader.

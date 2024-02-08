@@ -1,184 +1,263 @@
 #include "pch.h"
 #include "M_Reader.h"
 
+#include "M_Node.h"
 #include "M_ISerializable.h"
 
 using namespace minty;
 
-minty::Reader::Reader(Node const& node, void* const data)
-	: _node(node)
+minty::Reader::Reader(Node const& node, void const* const data)
+	: _node(&node)
 	, _data(data)
 {}
 
 Node const& minty::Reader::get_node() const
 {
-	return _node;
+	return *_node;
 }
 
 Node const* minty::Reader::get_node(String const& name) const
 {
-	return _node.find(name);
+	return _node->find(name);
 }
 
-void* minty::Reader::get_data() const
+void const* minty::Reader::get_data() const
 {
 	return _data;
 }
 
-bool minty::Reader::exists(String const& name) const
+void minty::Reader::set_data(void const* const data)
 {
-	return static_cast<bool>(_node.find(name));
+	_data = data;
 }
 
-void minty::Reader::read_object(String const& name, ISerializable* const value) const
+bool minty::Reader::exists(String const& name) const
 {
-	auto const* found = _node.find(name);
-	if (found)
-	{
-		// create Reader to use
-		Reader reader(*found, _data);
+	return static_cast<bool>(_node->find(name));
+}
 
-		// deserialize the values into the given object
-		value->deserialize(reader);
-	}
-	else
+void minty::Reader::to_serializable(ISerializable& value) const
+{
+	value.deserialize(*this);
+}
+
+void minty::Reader::read_serializable(String const& name, ISerializable& value) const
+{
+	try_read_serializable(name, value);
+}
+
+bool minty::Reader::try_read_serializable(String const& name, ISerializable& value) const
+{
+	if (Node const* found = _node->find(name))
 	{
-		// deserialize with an empty node so it is initialized to defaults
-		Node empty;
-		Reader reader(empty, _data);
-		value->deserialize(reader);
+		Reader reader(*found, _data);
+		value.deserialize(reader);
+		return true;
 	}
+	return false;
+}
+
+String minty::Reader::to_string(String const& defaultValue) const
+{
+	return _node->to_string();
 }
 
 String minty::Reader::read_string(String const& name, String const& defaultValue) const
 {
-	return _node.get_string(name, defaultValue);
+	if (Node const* child = _node->find(name))
+	{
+		return child->to_string();
+	}
+
+	return defaultValue;
+}
+
+bool minty::Reader::try_read_string(String const& name, String& value) const
+{
+	if (Node const* child = _node->find(name))
+	{
+		value = child->to_string();
+		return true;
+	}
+	return false;
+}
+
+int minty::Reader::to_int(int const defaultValue) const
+{
+	return _node->to_int(defaultValue);
 }
 
 int minty::Reader::read_int(String const& name, int const defaultValue) const
 {
-	return _node.get_int(name, defaultValue);
+	if (Node const* child = _node->find(name))
+	{
+		return child->to_int(defaultValue);
+	}
+
+	return defaultValue;
+}
+
+bool minty::Reader::try_read_int(String const& name, int& value) const
+{
+	if (Node const* child = _node->find(name))
+	{
+		value = child->to_int();
+		return true;
+	}
+	return false;
+}
+
+unsigned int minty::Reader::to_uint(unsigned int const defaultValue) const
+{
+	return _node->to_uint(defaultValue);
 }
 
 unsigned int minty::Reader::read_uint(String const& name, unsigned int const defaultValue) const
 {
-	return _node.get_uint(name, defaultValue);
+	if (Node const* child = _node->find(name))
+	{
+		return child->to_uint(defaultValue);
+	}
+
+	return defaultValue;
+}
+
+bool minty::Reader::try_read_uint(String const& name, unsigned int& value) const
+{
+	if (Node const* child = _node->find(name))
+	{
+		value = child->to_uint();
+		return true;
+	}
+	return false;
+}
+
+ID minty::Reader::to_id(ID const defaultValue) const
+{
+	return _node->to_id(defaultValue);
 }
 
 ID minty::Reader::read_id(String const& name, ID const defaultValue) const
 {
-	return _node.get_id(name, defaultValue);
+	if (Node const* child = _node->find(name))
+	{
+		return child->to_id(defaultValue);
+	}
+
+	return defaultValue;
+}
+
+bool minty::Reader::try_read_id(String const& name, ID& value) const
+{
+	if (Node const* child = _node->find(name))
+	{
+		value = child->to_id();
+		return true;
+	}
+	return false;
+}
+
+float minty::Reader::to_float(float const defaultValue) const
+{
+	return _node->to_float(defaultValue);
 }
 
 float minty::Reader::read_float(String const& name, float const defaultValue) const
 {
-	return _node.get_float(name, defaultValue);
+	if (Node const* child = _node->find(name))
+	{
+		return child->to_float(defaultValue);
+	}
+
+	return defaultValue;
+}
+
+bool minty::Reader::try_read_float(String const& name, float& value) const
+{
+	if (Node const* child = _node->find(name))
+	{
+		value = child->to_float();
+		return true;
+	}
+	return false;
+}
+
+Byte minty::Reader::to_byte(Byte const defaultValue) const
+{
+	return _node->to_byte(defaultValue);
 }
 
 Byte minty::Reader::read_byte(String const& name, Byte const defaultValue) const
 {
-	return _node.get_byte(name, defaultValue);
+	if (Node const* child = _node->find(name))
+	{
+		return child->to_byte(defaultValue);
+	}
+
+	return defaultValue;
+}
+
+bool minty::Reader::try_read_byte(String const& name, Byte& value) const
+{
+	if (Node const* child = _node->find(name))
+	{
+		value = child->to_byte();
+		return true;
+	}
+	return false;
+}
+
+size_t minty::Reader::to_size(size_t const defaultValue) const
+{
+	return _node->to_size(defaultValue);
 }
 
 size_t minty::Reader::read_size(String const& name, size_t const defaultValue) const
 {
-	return _node.get_size(name, defaultValue);
-}
-
-Vector2 minty::Reader::read_vector2(String const& name, Vector2 const& defaultValue) const
-{
-	auto const* found = _node.find(name);
-	if (found)
+	if (Node const* child = _node->find(name))
 	{
-		Reader r(*found);
-
-		return Vector2(r.read_float("x", defaultValue.x), r.read_float("y", defaultValue.y));
+		return child->to_size(defaultValue);
 	}
 
 	return defaultValue;
 }
 
-Vector3 minty::Reader::read_vector3(String const& name, Vector3 const& defaultValue) const
+bool minty::Reader::try_read_size(String const& name, size_t& value) const
 {
-	auto const* found = _node.find(name);
-	if (found)
+	if (Node const* child = _node->find(name))
 	{
-		Reader r(*found);
+		value = child->to_size();
+		return true;
+	}
+	return false;
+}
 
-		return Vector3(r.read_float("x", defaultValue.x), r.read_float("y", defaultValue.y), r.read_float("z", defaultValue.z));
+bool minty::Reader::to_bool(bool const defaultValue) const
+{
+	return _node->to_bool(defaultValue);
+}
+
+bool minty::Reader::read_bool(String const& name, bool const defaultValue) const
+{
+	if (Node const* child = _node->find(name))
+	{
+		return child->to_bool(defaultValue);
 	}
 
 	return defaultValue;
 }
 
-Vector4 minty::Reader::read_vector4(String const& name, Vector4 const& defaultValue) const
+bool minty::Reader::try_read_bool(String const& name, bool& value) const
 {
-	auto const* found = _node.find(name);
-	if (found)
+	if (Node const* child = _node->find(name))
 	{
-		Reader r(*found);
-
-		return Vector4(r.read_float("x", defaultValue.x), r.read_float("y", defaultValue.y), r.read_float("z", defaultValue.z), r.read_float("w", defaultValue.w));
+		value = child->to_bool();
+		return true;
 	}
-
-	return defaultValue;
-}
-
-Vector2Int minty::Reader::read_vector2int(String const& name, Vector2Int const& defaultValue) const
-{
-	auto const* found = _node.find(name);
-	if (found)
-	{
-		Reader r(*found);
-
-		return Vector2Int(r.read_int("x", defaultValue.x), r.read_int("y", defaultValue.y));
-	}
-
-	return defaultValue;
-}
-
-Vector3Int minty::Reader::read_vector3int(String const& name, Vector3Int const& defaultValue) const
-{
-	auto const* found = _node.find(name);
-	if (found)
-	{
-		Reader r(*found);
-
-		return Vector3Int(r.read_int("x", defaultValue.x), r.read_int("y", defaultValue.y), r.read_int("z", defaultValue.z));
-	}
-
-	return defaultValue;
-}
-
-Vector4Int minty::Reader::read_vector4int(String const& name, Vector4Int const& defaultValue) const
-{
-	auto const* found = _node.find(name);
-	if (found)
-	{
-		Reader r(*found);
-
-		return Vector4Int(r.read_int("x", defaultValue.x), r.read_int("y", defaultValue.y), r.read_int("z", defaultValue.z), r.read_int("w", defaultValue.w));
-	}
-
-	return defaultValue;
-}
-
-Quaternion minty::Reader::read_quaternion(String const& name, Quaternion const& defaultValue) const
-{
-	auto const* found = _node.find(name);
-	if (found)
-	{
-		Reader r(*found);
-
-		Vector3 defaultValueEuler = defaultValue.to_euler_angles();
-
-		return Quaternion::from_euler_angles(r.read_float("x", defaultValueEuler.x), r.read_float("y", defaultValueEuler.y), r.read_float("z", defaultValueEuler.z));
-	}
-
-	return defaultValue;
+	return false;
 }
 
 String minty::to_string(Reader const& value)
 {
-	return std::format("Reader(node = {})", to_string(value._node));
+	return std::format("Reader(node = {})", to_string(*value._node));
 }

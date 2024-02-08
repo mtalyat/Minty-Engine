@@ -2,18 +2,30 @@
 #include "M_TextureAtlas.h"
 
 #include "M_RenderEngine.h"
+#include "M_Scene.h"
 #include "M_Sprite.h"
+#include "M_RenderSystem.h"
 
 using namespace minty;
 
-minty::TextureAtlas::TextureAtlas(rendering::TextureAtlasBuilder const& builder, RenderEngine& renderer)
-	: rendering::RenderObject(renderer)
+minty::TextureAtlas::TextureAtlas()
+	: rendering::RenderObject()
+	, _textureId(ERROR_ID)
+	, _materialId(ERROR_ID)
+	, _slice()
+	, _pivot()
+	, _createdSlices()
+{}
+
+minty::TextureAtlas::TextureAtlas(rendering::TextureAtlasBuilder const& builder, Engine& engine, ID const sceneId)
+	: rendering::RenderObject(engine, sceneId)
 	, _textureId(builder.textureId)
 	, _materialId(builder.materialId)
 	, _slice()
 	, _pivot()
+	, _createdSlices(0)
 {
-	MINTY_ASSERT(_textureId != ERROR_ID, "Cannot create a TextureAtlas with a Texture ID of ERROR_ID.");
+	MINTY_ASSERT(_textureId != ERROR_ID, "TextureAtlas::TextureAtlas(): Cannot create a TextureAtlas with a Texture ID of ERROR_ID.");
 
 	// set sizes
 	set_slice(builder.slice, builder.coordinateMode);
@@ -22,18 +34,20 @@ minty::TextureAtlas::TextureAtlas(rendering::TextureAtlasBuilder const& builder,
 	// if no material given, create a new one
 	if (_materialId == ERROR_ID)
 	{
+		RenderSystem* renderSystem = get_render_system();
+
+		MINTY_ASSERT(renderSystem != nullptr, "TextureAtlas::TextureAtlas(): renderSystem cannot be null.");
+
 		// create a material based on this texture
-		rendering::MaterialBuilder materialBuilder
-		{
-			.name = std::format("{}_atlas", _renderer.get_texture_name(_textureId)),
-			.templateId = _renderer.find_material_template("spriteMaterialTemplate"), // TODO: hard coded name
-		};
+		rendering::MaterialBuilder materialBuilder;
+		materialBuilder.name = std::format("{}_atlas", renderSystem->get_texture_name(_textureId));
+		materialBuilder.templateId = renderSystem->find_material_template("spriteMaterialTemplate"); // TODO: hard coded name
 
 		// add texture to values
 		materialBuilder.values.emplace("texture", Dynamic(&_textureId, sizeof(ID)));
 
 		// create material
-		_materialId = _renderer.create_material(materialBuilder);
+		_materialId = renderSystem->create_material(materialBuilder);
 	}	
 }
 
@@ -47,7 +61,7 @@ void minty::TextureAtlas::set_slice(Vector2 const size, CoordinateMode const coo
 	case CoordinateMode::Normalized:
 	{
 		// convert from normalized to pixel
-		Texture const& texture = _renderer.get_texture(_textureId);
+		Texture const& texture = get_render_system()->get_texture(_textureId);
 		_slice = Vector2(size.x * static_cast<float>(texture.get_width()), size.y * static_cast<float>(texture.get_height()));
 		break;
 	}
@@ -66,7 +80,7 @@ void minty::TextureAtlas::set_pivot(Vector2 const pivot, CoordinateMode const co
 	case CoordinateMode::Normalized:
 	{
 		// convert from normalized to pixel
-		Texture const& texture = _renderer.get_texture(_textureId);
+		Texture const& texture = get_render_system()->get_texture(_textureId);
 		_pivot = Vector2(pivot.x * static_cast<float>(texture.get_width()), pivot.y * static_cast<float>(texture.get_height()));
 		break;
 	}
@@ -80,24 +94,29 @@ void minty::TextureAtlas::set_pivot(Vector2 const pivot, CoordinateMode const co
 
 Vector2Int minty::TextureAtlas::get_size_in_slices() const
 {
-	Texture const& texture = _renderer.get_texture(_textureId);
+	Texture const& texture = get_render_system()->get_texture(_textureId);
 
 	return Vector2Int(math::floor_to_int(static_cast<float>(texture.get_width()) / _slice.x), math::floor_to_int(static_cast<float>(texture.get_height()) / _slice.y));
 }
 
 Vector2Int minty::TextureAtlas::get_size() const
 {
-	Texture const& texture = _renderer.get_texture(_textureId);
+	Texture const& texture = get_render_system()->get_texture(_textureId);
 
 	return Vector2Int(texture.get_width(), texture.get_height());
 }
 
-ID minty::TextureAtlas::slice_sprite(Vector2 const minCoords, Vector2 const maxCoords, String const& name, CoordinateMode const coordinateMode) const
+ID minty::TextureAtlas::slice_sprite(Vector2 const minCoords, Vector2 const maxCoords, CoordinateMode const coordinateMode)
+{
+	return slice_sprite(minCoords, maxCoords, get_next_slice_name(), coordinateMode);
+}
+
+ID minty::TextureAtlas::slice_sprite(Vector2 const minCoords, Vector2 const maxCoords, String const& name, CoordinateMode const coordinateMode)
 {
 	return slice_sprite(minCoords, maxCoords, Vector2(0.5f, 0.5f), name, coordinateMode);
 }
 
-ID minty::TextureAtlas::slice_sprite(Vector2 const minCoords, Vector2 const maxCoords, Vector2 const pivot, String const& name, CoordinateMode const coordinateMode) const
+ID minty::TextureAtlas::slice_sprite(Vector2 const minCoords, Vector2 const maxCoords, Vector2 const pivot, String const& name, CoordinateMode const coordinateMode)
 {
 	// create builder
 	rendering::SpriteBuilder builder
@@ -111,20 +130,23 @@ ID minty::TextureAtlas::slice_sprite(Vector2 const minCoords, Vector2 const maxC
 		.pivot = pivot,
 	};
 
+	// increment total slices created
+	_createdSlices++;
+
 	// create the sprite
-	return _renderer.create_sprite(builder);
+	return get_render_system()->create_sprite(builder);
 }
 
-ID minty::TextureAtlas::create_sprite(int const x, int const y, Vector2 const pivot, CoordinateMode const coordinateMode) const
+ID minty::TextureAtlas::create_sprite(int const x, int const y, Vector2 const pivot, CoordinateMode const coordinateMode)
 {
 	// create name from the texture name and the x/y position
-	return create_sprite(x, y, pivot, std::format("{}_{}_{}", _renderer.get_texture_name(_textureId), x, y), coordinateMode);
+	return create_sprite(x, y, pivot, get_next_slice_name(), coordinateMode);
 }
 
-ID minty::TextureAtlas::create_sprite(int const x, int const y, Vector2 const pivot, String const& name, CoordinateMode const coordinateMode) const
+ID minty::TextureAtlas::create_sprite(int const x, int const y, Vector2 const pivot, String const& name, CoordinateMode const coordinateMode)
 {
 	// get texture
-	Texture const& texture = _renderer.get_texture(_textureId);
+	Texture const& texture = get_render_system()->get_texture(_textureId);
 	float width = static_cast<float>(texture.get_width());
 	float height = static_cast<float>(texture.get_height());
 
@@ -145,4 +167,28 @@ ID minty::TextureAtlas::create_sprite(int const x, int const y, Vector2 const pi
 	}
 
 	return slice_sprite(minCoords, maxCoords, pivot, name, coordinateMode);
+}
+
+std::vector<ID> minty::TextureAtlas::create_all(Vector2 const pivot, CoordinateMode const coordinateMode)
+{
+	// get size in slices
+	Vector2Int size = get_size_in_slices();
+
+	// create all the sprites
+	std::vector<ID> ids(size.x * size.y);
+
+	for (int y = 0; y < size.y; y++)
+	{
+		for (int x = 0; x < size.x; x++)
+		{
+			ids[y * size.x + x] = create_sprite(x, y, pivot, coordinateMode);
+		}
+	}
+
+	return ids;
+}
+
+String minty::TextureAtlas::get_next_slice_name() const
+{
+	return std::format("{}_{}", get_render_system()->get_texture_name(_textureId), _createdSlices);
 }

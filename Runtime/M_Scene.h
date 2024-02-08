@@ -13,9 +13,10 @@ namespace minty
 	/// Holds a collection of systems and entities that can interact with one another.
 	/// </summary>
 	class Scene :
-		public Object, public ISerializable
+		public Object
 	{
 	private:
+		ID _id;
 		Engine* _engine;
 		EntityRegistry* _entities;
 		SystemRegistry* _systems;
@@ -24,7 +25,7 @@ namespace minty
 		/// <summary>
 		/// Creates an empty Scene.
 		/// </summary>
-		Scene(Engine* const engine);
+		Scene(Engine& engine, ID const sceneId);
 
 		~Scene();
 
@@ -34,19 +35,25 @@ namespace minty
 		// move
 		Scene& operator=(Scene&& other) noexcept;
 
-		Engine* get_engine() const;
+		//// copy
+		//Scene(Scene const& other);
+
+		//// copy
+		//Scene& operator=(Scene const& other);
+
+		Engine& get_engine() const;
 
 		/// <summary>
 		/// Gets the EntityRegistry used in the Scene.
 		/// </summary>
 		/// <returns></returns>
-		EntityRegistry* get_entity_registry() const;
+		EntityRegistry& get_entity_registry() const;
 
 		/// <summary>
 		/// Gets the SystemRegistry used in the Scene.
 		/// </summary>
 		/// <returns></returns>
-		SystemRegistry* get_system_registry() const;
+		SystemRegistry& get_system_registry() const;
 
 		/// <summary>
 		/// Loads this Scene.

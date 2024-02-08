@@ -10,8 +10,11 @@
 
 namespace minty
 {
+	/// <summary>
+	/// Holds data for a ShaderPass.
+	/// </summary>
 	class ShaderPass
-		: rendering::RenderObject
+		: public rendering::RenderObject
 	{
 	private:
 		ID _shaderId;
@@ -22,11 +25,16 @@ namespace minty
 
 	public:
 		/// <summary>
+		/// Creates an empty ShaderPass.
+		/// </summary>
+		ShaderPass();
+
+		/// <summary>
 		/// Creates a new ShaderPass.
 		/// </summary>
 		/// <param name="builder"></param>
 		/// <param name="renderer"></param>
-		ShaderPass(rendering::ShaderPassBuilder const& builder, RenderEngine& renderer);
+		ShaderPass(rendering::ShaderPassBuilder const& builder, Engine& engine, ID const sceneId);
 
 		/// <summary>
 		/// Destroys all of the resources associated with this ShaderPass.

@@ -15,7 +15,7 @@ namespace minty
 	constexpr uint32_t const MINTY_API_VERSION = VK_API_VERSION_1_2;
 
 	class Info
-		: public Object, public ISerializable
+		: public Object
 	{
 	private:
 		String _applicationName;

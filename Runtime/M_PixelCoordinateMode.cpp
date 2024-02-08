@@ -13,7 +13,7 @@ std::string minty::to_string(CoordinateMode const value)
 	}
 }
 
-CoordinateMode minty::from_string_pixel_coordinate_mode(std::string const& value)
+CoordinateMode minty::from_string_coordinate_mode(std::string const& value)
 {
 	std::string value2 = minty::string::to_upper(value);
 	if (value2 == "NORMALIZED") return CoordinateMode::Normalized;

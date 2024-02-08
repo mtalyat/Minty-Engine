@@ -1,6 +1,6 @@
 #pragma once
 
-#include "M_Base.h"
+#include "M_Object.h"
 
 #include "M_Audio.h"
 #include <filesystem>
@@ -8,6 +8,7 @@
 namespace minty
 {
 	class AudioClip
+		: public Object
 	{
 		friend class AudioEngine;
 	private:

@@ -14,8 +14,19 @@
 using namespace minty;
 using namespace minty::rendering;
 
-Texture::Texture(rendering::TextureBuilder const& builder, RenderEngine& renderer)
-	: RenderObject::RenderObject(renderer)
+minty::Texture::Texture()
+	: RenderObject::RenderObject()
+	, _width()
+	, _height()
+	, _format()
+	, _image()
+	, _view()
+	, _memory()
+	, _sampler()
+{}
+
+Texture::Texture(rendering::TextureBuilder const& builder, Engine& engine, ID const sceneId)
+	: RenderObject::RenderObject(engine, sceneId)
 	, _width(builder.width)
 	, _height(builder.height)
 	, _format()
@@ -35,13 +46,13 @@ Texture::Texture(rendering::TextureBuilder const& builder, RenderEngine& rendere
 	{
 		if (!Asset::exists(path))
 		{
-			console::error(std::format("Cannot load texture. File not found at: {}", path.string()));
+			console::error(std::format("Cannot load_animation texture. File not found at: {}", path.string()));
 			return;
 		}
 
 		if (builder.pixelFormat == PixelFormat::None)
 		{
-			console::error("Attempting to load texture with a pixelFormat of None.");
+			console::error("Attempting to load_animation texture with a pixelFormat of None.");
 			return;
 		}
 
@@ -54,7 +65,7 @@ Texture::Texture(rendering::TextureBuilder const& builder, RenderEngine& rendere
 		// if no pixels, error
 		if (!pixels)
 		{
-			console::error(std::format("Failed to load texture: {}", path.string()));
+			console::error(std::format("Failed to load_animation texture: {}", path.string()));
 			return;
 		}
 	}
@@ -84,19 +95,21 @@ Texture::Texture(rendering::TextureBuilder const& builder, RenderEngine& rendere
 	// get size needed to store the texture
 	VkDeviceSize imageSize = _width * _height * sizeof(color_t);
 
+	RenderEngine& renderEngine = get_render_engine();
+
 	// copy to device via a staging buffer
 
 	// create a buffer that can be used as the source of a transfer command
 	// the memory can be mapped, and specify that flush is not needed (we do not need to flush to make writes)
-	ID stagingBufferId = renderer.create_buffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+	ID stagingBufferId = renderEngine.create_buffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
-	VkDevice device = renderer.get_device();
+	VkDevice device = renderEngine.get_device();
 
 	// map memory and copy it to buffer memory
 
-	void* mappedData = renderer.map_buffer(stagingBufferId);
+	void* mappedData = renderEngine.map_buffer(stagingBufferId);
 	memcpy(mappedData, pixels, static_cast<size_t>(imageSize));
-	renderer.unmap_buffer(stagingBufferId);
+	renderEngine.unmap_buffer(stagingBufferId);
 
 	// done with the pixels from file
 	if (fromFilePathSize)
@@ -112,22 +125,22 @@ Texture::Texture(rendering::TextureBuilder const& builder, RenderEngine& rendere
 	_format = static_cast<VkFormat>(builder.format);
 
 	// create the image on gpu
-	renderer.create_image(_width, _height, _format, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, _image, _memory);
+	renderEngine.create_image(_width, _height, _format, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT | VK_IMAGE_USAGE_SAMPLED_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, _image, _memory);
 
 	// prep texture for copying
-	renderer.change_image_layout(_image, _format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
+	renderEngine.change_image_layout(_image, _format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
 	// copy pixel data to image
-	renderer.copy_buffer_to_image(renderer.get_buffer(stagingBufferId), _image, _width, _height);
+	renderEngine.copy_buffer_to_image(renderEngine.get_buffer(stagingBufferId), _image, _width, _height);
 
 	// prep texture for rendering
-	renderer.change_image_layout(_image, _format, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
+	renderEngine.change_image_layout(_image, _format, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
 	// cleanup staging buffer, no longer needed
-	renderer.destroy_buffer(stagingBufferId);
+	renderEngine.destroy_buffer(stagingBufferId);
 
 	// create view, so the shaders can access the image data
-	_view = renderer.create_image_view(_image, _format, VK_IMAGE_ASPECT_COLOR_BIT);
+	_view = renderEngine.create_image_view(_image, _format, VK_IMAGE_ASPECT_COLOR_BIT);
 
 	// create sampler
 	// create the sampler in constructor for now
@@ -142,7 +155,7 @@ Texture::Texture(rendering::TextureBuilder const& builder, RenderEngine& rendere
 	samplerInfo.addressModeW = static_cast<VkSamplerAddressMode>(builder.addressMode);
 
 	VkPhysicalDeviceProperties properties{};
-	vkGetPhysicalDeviceProperties(renderer.get_physical_device(), &properties);
+	vkGetPhysicalDeviceProperties(renderEngine.get_physical_device(), &properties);
 
 	// how sharp the sampling can get
 	samplerInfo.maxAnisotropy = properties.limits.maxSamplerAnisotropy;
@@ -163,13 +176,15 @@ Texture::Texture(rendering::TextureBuilder const& builder, RenderEngine& rendere
 	samplerInfo.maxLod = 0.0f;
 
 	if (vkCreateSampler(device, &samplerInfo, nullptr, &_sampler) != VK_SUCCESS) {
-		error::abort(std::format("Failed to load texture: {}", path.string()));
+		error::abort(std::format("Failed to load_animation texture: {}", path.string()));
 	}
 }
 
 void minty::Texture::destroy()
 {
-	auto device = _renderer.get_device();
+	RenderEngine& renderer = get_render_engine();
+
+	auto device = renderer.get_device();
 
 	vkDestroySampler(device, _sampler, nullptr);
 	vkDestroyImageView(device, _view, nullptr);

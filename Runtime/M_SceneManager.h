@@ -2,6 +2,7 @@
 
 #include "M_Object.h"
 #include "M_Scene.h"
+#include "M_Register.h"
 #include <vector>
 #include <unordered_set>
 
@@ -19,25 +20,33 @@ namespace minty
 		// if not, no scenes will receive events
 		bool _loaded;
 		// all scenes stored in memory
-		std::vector<Scene> _scenes;
+		Register<Scene*> _scenes;
 		// scene that is active, eg. receiving update, etc. events
 		Scene* _loadedScene;
 
 	public:
-		SceneManager(Engine* const engine);
+		SceneManager(Engine& engine);
 
 		/// <summary>
 		/// Creates and loads an empty Scene.
 		/// </summary>
+		/// <param name="path">The path to the .scene file.</param>
 		/// <returns>The ID of the new Scene.</returns>
-		ID create_scene();
+		ID create_scene(Path const& path);
 
 		/// <summary>
 		/// Loads a new Scene using the file data at the given path.
 		/// </summary>
+		/// <param name="name">The name to the new Scene.</param>
 		/// <param name="path">The path to the .scene file.</param>
 		/// <returns>The ID of the new Scene.</returns>
-		ID create_scene(String const& path);
+		ID create_scene(String const& name, Path const& path);
+
+		/// <summary>
+		/// Destroys the Scene with the given ID.
+		/// </summary>
+		/// <param name="id">The ID of the Scene.</param>
+		void destroy_scene(ID const id);
 
 		/// <summary>
 		/// Loads the Scene with the given ID. Unloads the current Scene first.
@@ -90,6 +99,10 @@ namespace minty
 		/// </summary>
 		void finalize();
 
+		/// <summary>
+		/// Destroys the SceneManager and all Scenes.
+		/// </summary>
+		void destroy();
 	public:
 		friend String to_string(SceneManager const& value);
 	};

@@ -54,10 +54,15 @@ namespace minty::rendering
 
 	public:
 		/// <summary>
+		/// Creates an empty DescriptorSet.
+		/// </summary>
+		DescriptorSet();
+
+		/// <summary>
 		/// Creates a new DescriptorSet.
 		/// </summary>
 		/// <param name="renderer"></param>
-		DescriptorSet(RenderEngine& renderer);
+		DescriptorSet(Engine& engine, ID const sceneId);
 
 		/// <summary>
 		/// Creates a new DescriptorSet.
@@ -65,7 +70,7 @@ namespace minty::rendering
 		/// <param name="descriptorSets">The descriptor sets for one flight.</param>
 		/// <param name="buffers">The buffers associated with this DescriptorSet.</param>
 		/// <param name="renderer"></param>
-		DescriptorSet(std::array<VkDescriptorSet, MAX_FRAMES_IN_FLIGHT> const& descriptorSets, std::unordered_map<String, std::array<DescriptorData, MAX_FRAMES_IN_FLIGHT>> const& datas, RenderEngine& renderer);
+		DescriptorSet(std::array<VkDescriptorSet, MAX_FRAMES_IN_FLIGHT> const& descriptorSets, std::unordered_map<String, std::array<DescriptorData, MAX_FRAMES_IN_FLIGHT>> const& datas, Engine& engine, ID const sceneId);
 
 		// copy
 		DescriptorSet& operator=(DescriptorSet const& other);

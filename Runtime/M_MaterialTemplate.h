@@ -27,11 +27,16 @@ namespace minty
 
 	public:
 		/// <summary>
+		/// Creates an empty MaterialTemplate.
+		/// </summary>
+		MaterialTemplate();
+
+		/// <summary>
 		/// Creates a new MaterialTemplate.
 		/// </summary>
 		/// <param name="builder"></param>
 		/// <param name="renderer"></param>
-		MaterialTemplate(rendering::MaterialTemplateBuilder const& builder, RenderEngine& renderer);
+		MaterialTemplate(rendering::MaterialTemplateBuilder const& builder, Engine& engine, ID const sceneId);
 
 		/// <summary>
 		/// Destroys all of the resources associated with this MaterialTemplate.

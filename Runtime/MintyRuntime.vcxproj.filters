@@ -52,6 +52,12 @@
     <Filter Include="Header Files\Files">
       <UniqueIdentifier>{25b3dd32-a0eb-4c13-9cc9-efa7bee0e2f1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Animation">
+      <UniqueIdentifier>{63fb4a8f-724c-450f-852f-d1a3410792cd}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Transform">
+      <UniqueIdentifier>{30483a13-5871-4e8e-9c19-a93c57aff238}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -225,17 +231,8 @@
     <ClInclude Include="M_RelationshipComponent.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
-    <ClInclude Include="M_TransformComponent.h">
-      <Filter>Header Files\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="M_Transform.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="M_Encoding.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="M_SpriteComponent.h">
-      <Filter>Header Files\Components</Filter>
     </ClInclude>
     <ClInclude Include="M_Sprite.h">
       <Filter>Header Files\Rendering</Filter>
@@ -405,16 +402,7 @@
     <ClInclude Include="miniaudio.h">
       <Filter>Libraries\soloud</Filter>
     </ClInclude>
-    <ClInclude Include="M_AudioSourceComponent.h">
-      <Filter>Header Files\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="M_AudioListenerComponent.h">
-      <Filter>Header Files\Components</Filter>
-    </ClInclude>
     <ClInclude Include="M_DirtyComponent.h">
-      <Filter>Header Files\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="M_RenderableComponent.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
     <ClInclude Include="M_Rendering_PixelFormat.h">
@@ -470,6 +458,57 @@
     </ClInclude>
     <ClInclude Include="M_Rendering_TextureAtlasBuilder.h">
       <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="M_FiniteStateMachine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Animation.h">
+      <Filter>Header Files\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="M_AnimationSystem.h">
+      <Filter>Header Files\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="M_AnimationBuilder.h">
+      <Filter>Header Files\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Animator.h">
+      <Filter>Header Files\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="M_AnimatorBuilder.h">
+      <Filter>Header Files\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Lookup.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="M_RenderSystem.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="M_AudioSystem.h">
+      <Filter>Header Files\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="M_AnimatorComponent.h">
+      <Filter>Header Files\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="M_AudioListenerComponent.h">
+      <Filter>Header Files\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="M_AudioSourceComponent.h">
+      <Filter>Header Files\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="M_RenderableComponent.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="M_SpriteComponent.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="M_SceneObject.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="M_AudioObject.h">
+      <Filter>Header Files\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="M_TransformComponent.h">
+      <Filter>Header Files\Transform</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -609,9 +648,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_TransformComponent.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="M_Transform.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_DirtyComponent.cpp">
@@ -768,6 +804,39 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_TextureAtlas.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_AnimationSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_Animation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_FiniteStateMachine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_Rendering_PushConstantInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_Rendering_Buffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_Animator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_RenderSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_AudioSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_AnimatorComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_SceneObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_AudioObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -10,7 +10,7 @@ void minty::NameComponent::serialize(Writer& writer) const
 
 void minty::NameComponent::deserialize(Reader const& reader)
 {
-	name = reader.read_string("name");
+	reader.try_read_string("name", name);
 }
 
 String minty::to_string(NameComponent const& value)

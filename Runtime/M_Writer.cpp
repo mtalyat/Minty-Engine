@@ -5,352 +5,64 @@
 
 using namespace minty;
 
-minty::Writer::Writer(Node& node, void* const data)
-	: _node(node)
+minty::Writer::Writer(Node& node, void const* const data)
+	: _node(&node)
 	, _data(data)
 {}
 
+Node& minty::Writer::get_node()
+{
+	return *_node;
+}
+
 Node const& minty::Writer::get_node() const
 {
-	return _node;
+	return *_node;
 }
 
 Node const* minty::Writer::get_node(String const& name) const
 {
-	return _node.find(name);
+	return _node->find(name);
 }
 
-void* minty::Writer::get_data() const
+void const* minty::Writer::get_data() const
 {
 	return _data;
 }
 
+void minty::Writer::set_data(void const* const data)
+{
+	_data = data;
+}
+
 bool minty::Writer::exists(String const& name) const
 {
-	return static_cast<bool>(_node.find(name));
+	return static_cast<bool>(_node->find(name));
 }
 
 void minty::Writer::write(String const& name)
 {
-	write(name, "");
+	write(Node(name));
 }
 
-void minty::Writer::write(String const& name, Node const& node)
+void minty::Writer::write(Node const& node)
 {
-	auto const& found = _node.children.find(name);
-
-	if (found != _node.children.end())
-	{
-		// existing key/children list
-		found->second.push_back(node);
-	}
-	else
-	{
-		// new key and children list
-		_node.children.emplace(name, std::vector{ node });
-	}
+	_node->add_child(node);
 }
 
-void minty::Writer::write(String const& name, ISerializable const* const value)
+void minty::Writer::write(String const& name, ISerializable const& value)
 {
 	// add child object for this object to write
-	write(name, Node());
+	write(Node(name));
 
 	// create a Writer to use
-	Writer Writer(_node.children.at(name).back(), _data);
+	Writer Writer(_node->get_children().back(), _data);
 
 	// serialize the object into that node
-	value->serialize(Writer);
-}
-
-void minty::Writer::write(String const& name, String const& value)
-{
-	write(name, Node{.data = value });
-}
-
-void minty::Writer::write(String const& name, int const value)
-{
-	write(name, std::to_string(value));
-}
-
-void minty::Writer::write(String const& name, unsigned int const value)
-{
-	write(name, std::to_string(value));
-}
-
-void minty::Writer::write(String const& name, float const value)
-{
-	write(name, std::to_string(value));
-}
-
-void minty::Writer::write(String const& name, Byte const value)
-{
-	write(name, std::to_string(value));
-}
-
-void minty::Writer::write(String const& name, size_t const value)
-{
-	write(name, std::to_string(value));
-}
-
-void minty::Writer::write(String const& name, Vector2 const& value)
-{
-	Node node;
-
-	Writer writer(node);
-
-	writer.write("x", value.x);
-	writer.write("y", value.y);
-
-	write(name, node);
-}
-
-void minty::Writer::write(String const& name, Vector3 const& value)
-{
-	Node node;
-
-	Writer writer(node);
-
-	writer.write("x", value.x);
-	writer.write("y", value.y);
-	writer.write("z", value.z);
-
-	write(name, node);
-}
-
-void minty::Writer::write(String const& name, Vector4 const& value)
-{
-	Node node;
-
-	Writer writer(node);
-
-	writer.write("x", value.x);
-	writer.write("y", value.y);
-	writer.write("z", value.z);
-	writer.write("w", value.w);
-
-	write(name, node);
-}
-
-void minty::Writer::write(String const& name, Vector2Int const& value)
-{
-	Node node;
-
-	Writer writer(node);
-
-	writer.write("x", value.x);
-	writer.write("y", value.y);
-
-	write(name, node);
-}
-
-void minty::Writer::write(String const& name, Vector3Int const& value)
-{
-	Node node;
-
-	Writer writer(node);
-
-	writer.write("x", value.x);
-	writer.write("y", value.y);
-	writer.write("z", value.z);
-
-	write(name, node);
-}
-
-void minty::Writer::write(String const& name, Vector4Int const& value)
-{
-	Node node;
-
-	Writer writer(node);
-
-	writer.write("x", value.x);
-	writer.write("y", value.y);
-	writer.write("z", value.z);
-	writer.write("w", value.w);
-
-	write(name, node);
-}
-
-void minty::Writer::write(String const& name, Quaternion const& value)
-{
-	Node node;
-
-	Writer writer(node);
-
-	Vector3 angles = glm::eulerAngles(value);
-
-	writer.write("x", angles.x); // pitch
-	writer.write("y", angles.y); // yaw
-	writer.write("z", angles.z); // roll
-
-	write(name, node);
-}
-
-void minty::Writer::write(String const& name, String const& value, String const& defaultValue)
-{
-	if (value.compare(defaultValue))
-	{
-		// not default value
-		write(name, value);
-	}
-}
-
-void minty::Writer::write(String const& name, int const value, int const defaultValue)
-{
-	if (value != defaultValue)
-	{
-		write(name, std::to_string(value));
-	}
-}
-
-void minty::Writer::write(String const& name, unsigned int const value, unsigned int const defaultValue)
-{
-	if (value != defaultValue)
-	{
-		write(name, std::to_string(value));
-	}
-}
-
-void minty::Writer::write(String const& name, float const value, float const defaultValue)
-{
-	if (value != defaultValue)
-	{
-		write(name, std::to_string(value));
-	}
-}
-
-void minty::Writer::write(String const& name, Byte const value, Byte const defaultValue)
-{
-	if (value != defaultValue)
-	{
-		write(name, std::to_string(value));
-	}
-}
-
-void minty::Writer::write(String const& name, size_t const value, size_t const defaultValue)
-{
-	if (value != defaultValue)
-	{
-		write(name, std::to_string(value));
-	}
-}
-
-void minty::Writer::write(String const& name, Vector2 const& value, Vector2 const& defaultValue)
-{
-	if (value != defaultValue)
-	{
-		Node node;
-
-		Writer writer(node);
-
-		writer.write("x", value.x, defaultValue.x);
-		writer.write("y", value.y, defaultValue.y);
-
-		write(name, node);
-	}
-}
-
-void minty::Writer::write(String const& name, Vector3 const& value, Vector3 const& defaultValue)
-{
-	if (value != defaultValue)
-	{
-		Node node;
-
-		Writer writer(node);
-
-		writer.write("x", value.x, defaultValue.x);
-		writer.write("y", value.y, defaultValue.y);
-		writer.write("z", value.z, defaultValue.z);
-
-		write(name, node);
-	}
-}
-
-void minty::Writer::write(String const& name, Vector4 const& value, Vector4 const& defaultValue)
-{
-	if (value != defaultValue)
-	{
-		Node node;
-
-		Writer writer(node);
-
-		writer.write("x", value.x, defaultValue.x);
-		writer.write("y", value.y, defaultValue.y);
-		writer.write("z", value.z, defaultValue.z);
-		writer.write("w", value.w, defaultValue.w);
-
-		write(name, node);
-	}
-}
-
-void minty::Writer::write(String const& name, Vector2Int const& value, Vector2Int const& defaultValue)
-{
-	if (value != defaultValue)
-	{
-		Node node;
-
-		Writer writer(node);
-
-		writer.write("x", value.x, defaultValue.x);
-		writer.write("y", value.y, defaultValue.y);
-
-		write(name, node);
-	}
-}
-
-void minty::Writer::write(String const& name, Vector3Int const& value, Vector3Int const& defaultValue)
-{
-	if (value != defaultValue)
-	{
-		Node node;
-
-		Writer writer(node);
-
-		writer.write("x", value.x, defaultValue.x);
-		writer.write("y", value.y, defaultValue.y);
-		writer.write("z", value.z, defaultValue.z);
-
-		write(name, node);
-	}
-}
-
-void minty::Writer::write(String const& name, Vector4Int const& value, Vector4Int const& defaultValue)
-{
-	if (value != defaultValue)
-	{
-		Node node;
-
-		Writer writer(node);
-
-		writer.write("x", value.x, defaultValue.x);
-		writer.write("y", value.y, defaultValue.y);
-		writer.write("z", value.z, defaultValue.z);
-		writer.write("w", value.w, defaultValue.w);
-
-		write(name, node);
-	}
-}
-
-void minty::Writer::write(String const& name, Quaternion const& value, Quaternion const& defaultValue)
-{
-	if (value != defaultValue)
-	{
-		Node node;
-
-		Writer writer(node);
-
-		Vector3 angles = glm::eulerAngles(value);
-		Vector3 defaultAngles = glm::eulerAngles(value);
-
-		writer.write("x", angles.x, defaultAngles.x); // pitch
-		writer.write("y", angles.y, defaultAngles.y); // yaw
-		writer.write("z", angles.z, defaultAngles.z); // roll
-
-		write(name, node);
-	}
+	value.serialize(Writer);
 }
 
 String minty::to_string(Writer const& value)
 {
-	return std::format("Writer(node = {})", to_string(value._node));
+	return std::format("Writer(node = {})", to_string(*value._node));
 }

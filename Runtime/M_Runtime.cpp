@@ -2,9 +2,13 @@
 #include "M_Runtime.h"
 
 #include "M_SystemRegistry.h"
+#include "M_AnimationSystem.h"
+#include "M_AudioSystem.h"
+#include "M_RenderSystem.h"
 #include "M_UISystem.h"
 
 #include "M_EntityRegistry.h"
+#include "M_AnimatorComponent.h"
 #include "M_AudioListenerComponent.h"
 #include "M_AudioSourceComponent.h"
 #include "M_CameraComponent.h"
@@ -35,9 +39,7 @@ minty::Runtime::Runtime(Info const& appInfo)
 }
 
 Runtime::~Runtime()
-{
-	
-}
+{}
 
 Engine& minty::Runtime::get_engine()
 {
@@ -71,9 +73,13 @@ int Runtime::run()
 void minty::Runtime::register_builtin()
 {
 	// systems
+	SystemRegistry::register_system<AnimationSystem>("Animation");
+	SystemRegistry::register_system<AudioSystem>("Audio");
+	SystemRegistry::register_system<RenderSystem>("Render");
 	SystemRegistry::register_system<UISystem>("UI");
 
 	// components
+	EntityRegistry::register_component<AnimatorComponent>("Animator");
 	EntityRegistry::register_component<AudioListenerComponent>("AudioListener");
 	EntityRegistry::register_component<AudioSourceComponent>("AudioSource");
 	EntityRegistry::register_component<CameraComponent>("Camera");

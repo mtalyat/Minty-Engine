@@ -18,6 +18,13 @@ namespace minty::Asset
 #endif
 
 	/// <summary>
+	/// Checks the given asset path, and ensures it exists.
+	/// </summary>
+	/// <param name="path">The path</param>
+	/// <returns>0 on success, 1 when the asset at the path does not exist, 2 when requiresMeta is true and the meta file does not exist.</returns>
+	int check(Path const& path, bool const requiresMeta);
+
+	/// <summary>
 	/// Checks if the asset at the given path exists.
 	/// </summary>
 	/// <param name="path"></param>

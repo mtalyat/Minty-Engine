@@ -18,7 +18,7 @@ Engine::Engine(Info const& info)
 	, _window(info.get_application_name(), WIDTH, HEIGHT, &_globalInput)
 	, _renderEngine(&_window)
 	, _audioEngine()
-	, _sceneManager(this)
+	, _sceneManager(*this)
 	, _deltaTime(0.02f)
 {}
 
@@ -118,10 +118,10 @@ void Engine::run()
 		_sceneManager.update();
 
 		// update audio engine
-		_audioEngine.update();
+		//_audioEngine.update();
 
 		// update renderer
-		_renderEngine.update();
+		//_renderEngine.update();
 
 		// cleanup scene
 		_sceneManager.finalize();
@@ -157,14 +157,15 @@ void Engine::run()
 		}
 	}
 
-	// all done
-	_sceneManager.unload();
-
-	// print elapsed time
-	console::log(std::format("Elapsed time: {}s", std::chrono::duration_cast<std::chrono::milliseconds>(get_now() - start).count() / 1000.0f));
-
-	// wait for device to be safe
+	// wait for render engine to finish before cleaning up
 	_renderEngine.sync();
+
+	// clean up
+	_sceneManager.unload();
+	_sceneManager.destroy();
+
+	// print elapsed time of program
+	console::log(std::format("Elapsed time: {}s", std::chrono::duration_cast<std::chrono::milliseconds>(get_now() - start).count() / 1000.0f));
 }
 
 time_point_t minty::Engine::get_now() const

@@ -2,17 +2,29 @@
 #include "M_Material.h"
 
 #include "M_RenderEngine.h"
+#include "M_RenderSystem.h"
+#include "M_Scene.h"
 
 using namespace minty;
 using namespace minty::rendering;
 
-minty::Material::Material(rendering::MaterialBuilder const& builder, RenderEngine& renderer)
-	: rendering::RenderObject(renderer)
+minty::Material::Material()
+	: rendering::RenderObject()
+	, _templateId(ERROR_ID)
+	, _passDescriptorSets()
+{}
+
+minty::Material::Material(rendering::MaterialBuilder const& builder, Engine& engine, ID const sceneId)
+	: rendering::RenderObject(engine, sceneId)
 	, _templateId(builder.templateId)
 	, _passDescriptorSets()
 {
+	RenderSystem* renderSystem = get_render_system();
+
+	MINTY_ASSERT(renderSystem != nullptr, "Material(): renderSystem cannot be null.");
+
 	// use template to generate descriptor sets
-	auto const& materialTemplate = _renderer.get_material_template(_templateId);
+	auto const& materialTemplate = renderSystem->get_material_template(_templateId);
 	auto const& passIds = materialTemplate.get_shader_pass_ids();
 
 	auto const& defaultValues = materialTemplate.get_default_values();
@@ -20,11 +32,11 @@ minty::Material::Material(rendering::MaterialBuilder const& builder, RenderEngin
 	for (auto const passId : passIds)
 	{
 		// get the shader pass
-		auto const& shaderPass = _renderer.get_shader_pass(passId);
+		auto const& shaderPass = renderSystem->get_shader_pass(passId);
 
 		// get the shader that the pass belongs to
 		auto const shaderId = shaderPass.get_shader_id();
-		auto& shader = _renderer.get_shader(shaderId);
+		auto& shader = renderSystem->get_shader(shaderId);
 
 		// get the descriptor set for the pass
 		DescriptorSet descriptorSet = shader.create_descriptor_set(DESCRIPTOR_SET_MATERIAL, false);
@@ -32,7 +44,7 @@ minty::Material::Material(rendering::MaterialBuilder const& builder, RenderEngin
 		// set all values
 		for (auto const& defaultValue : defaultValues)
 		{
-			auto const& found = builder.values.find(defaultValue.first);
+			auto found = builder.values.find(defaultValue.first);
 			if (found == builder.values.end())
 			{
 				// if no value exists, use a default value

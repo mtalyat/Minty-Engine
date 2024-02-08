@@ -215,14 +215,24 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="miniaudio.h" />
+    <ClInclude Include="M_Animation.h" />
+    <ClInclude Include="M_AnimationBuilder.h" />
+    <ClInclude Include="M_AnimationSystem.h" />
+    <ClInclude Include="M_Animator.h" />
+    <ClInclude Include="M_AnimatorBuilder.h" />
+    <ClInclude Include="M_AnimatorComponent.h" />
     <ClInclude Include="M_Asset.h" />
     <ClInclude Include="M_Audio.h" />
     <ClInclude Include="M_AudioClip.h" />
     <ClInclude Include="M_AudioEngine.h" />
     <ClInclude Include="M_AudioListenerComponent.h" />
+    <ClInclude Include="M_AudioObject.h" />
     <ClInclude Include="M_AudioSourceComponent.h" />
+    <ClInclude Include="M_AudioSystem.h" />
     <ClInclude Include="M_Builtin.h" />
     <ClInclude Include="M_Compression.h" />
+    <ClInclude Include="M_FiniteStateMachine.h" />
+    <ClInclude Include="M_Lookup.h" />
     <ClInclude Include="M_Macros.h" />
     <ClInclude Include="M_PhysicalFile.h" />
     <ClInclude Include="M_CoordinateMode.h" />
@@ -231,7 +241,9 @@
     <ClInclude Include="M_Rendering_SpriteBuilder.h" />
     <ClInclude Include="M_Rendering_TextureAtlasBuilder.h" />
     <ClInclude Include="M_Rendering_UIPushData.h" />
+    <ClInclude Include="M_RenderSystem.h" />
     <ClInclude Include="M_Resource.h" />
+    <ClInclude Include="M_SceneObject.h" />
     <ClInclude Include="M_SerializationData.h" />
     <ClInclude Include="M_Dynamic.h" />
     <ClInclude Include="framework.h" />
@@ -300,7 +312,6 @@
     <ClInclude Include="M_Runtime.h" />
     <ClInclude Include="M_Stopwatch.h" />
     <ClInclude Include="M_TextureAtlas.h" />
-    <ClInclude Include="M_Transform.h" />
     <ClInclude Include="M_TransformComponent.h" />
     <ClInclude Include="M_Types.h" />
     <ClInclude Include="M_SpriteComponent.h" />
@@ -357,11 +368,17 @@
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="dr_impl.cpp" />
+    <ClCompile Include="M_Animation.cpp" />
+    <ClCompile Include="M_AnimationSystem.cpp" />
+    <ClCompile Include="M_Animator.cpp" />
+    <ClCompile Include="M_AnimatorComponent.cpp" />
     <ClCompile Include="M_Asset.cpp" />
     <ClCompile Include="M_AudioClip.cpp" />
     <ClCompile Include="M_AudioEngine.cpp" />
     <ClCompile Include="M_AudioListenerComponent.cpp" />
+    <ClCompile Include="M_AudioObject.cpp" />
     <ClCompile Include="M_AudioSourceComponent.cpp" />
+    <ClCompile Include="M_AudioSystem.cpp" />
     <ClCompile Include="M_Compression.cpp" />
     <ClCompile Include="M_Dynamic.cpp" />
     <ClCompile Include="M_CameraComponent.cpp" />
@@ -375,8 +392,10 @@
     <ClCompile Include="M_Error.cpp" />
     <ClCompile Include="M_File.cpp" />
     <ClCompile Include="M_Engine.cpp" />
+    <ClCompile Include="M_FiniteStateMachine.cpp" />
     <ClCompile Include="M_PhysicalFile.cpp" />
     <ClCompile Include="M_PixelCoordinateMode.cpp" />
+    <ClCompile Include="M_Rendering_Buffer.cpp" />
     <ClCompile Include="M_Rendering_PixelFormat.cpp" />
     <ClCompile Include="M_Material.cpp" />
     <ClCompile Include="M_RelationshipComponent.cpp" />
@@ -399,10 +418,13 @@
     <ClCompile Include="M_RenderableComponent.cpp" />
     <ClCompile Include="M_Rendering_DescriptorSet.cpp" />
     <ClCompile Include="M_Rendering_Object.cpp" />
+    <ClCompile Include="M_Rendering_PushConstantInfo.cpp" />
     <ClCompile Include="M_Rendering_ShaderBuilder.cpp" />
+    <ClCompile Include="M_RenderSystem.cpp" />
     <ClCompile Include="M_Scene.cpp" />
     <ClCompile Include="M_SceneManager.cpp" />
     <ClCompile Include="M_Node.cpp" />
+    <ClCompile Include="M_SceneObject.cpp" />
     <ClCompile Include="M_Shader.cpp" />
     <ClCompile Include="M_ShaderPass.cpp" />
     <ClCompile Include="M_Sprite.cpp" />
@@ -417,7 +439,6 @@
     <ClCompile Include="M_Runtime.cpp" />
     <ClCompile Include="M_Stopwatch.cpp" />
     <ClCompile Include="M_TextureAtlas.cpp" />
-    <ClCompile Include="M_Transform.cpp" />
     <ClCompile Include="M_TransformComponent.cpp" />
     <ClCompile Include="M_SpriteComponent.cpp" />
     <ClCompile Include="M_UITransformComponent.cpp" />

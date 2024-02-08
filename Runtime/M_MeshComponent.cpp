@@ -5,6 +5,7 @@
 #include "M_SerializationData.h"
 #include "M_Scene.h"
 #include "M_RenderEngine.h"
+#include "M_RenderSystem.h"
 #include "M_File.h"
 
 using namespace minty;
@@ -16,44 +17,55 @@ void minty::MeshComponent::serialize(Writer& writer) const
 
 void minty::MeshComponent::deserialize(Reader const& reader)
 {
-	SerializationData* data = static_cast<SerializationData*>(reader.get_data());
+	SerializationData data = *static_cast<SerializationData const*>(reader.get_data());
 
-	RenderEngine& renderer = data->scene->get_engine()->get_render_engine();
+	RenderSystem* renderSystem = data.scene->get_system_registry().find<RenderSystem>();
+
+	MINTY_ASSERT(renderSystem != nullptr, "MeshComponent::deserialize(): renderSystem cannot be null.");
+	if (!renderSystem) return;
 
 	// load meta data
-	materialId = renderer.find_material(reader.read_string("material"));
+	String materialName;
+	if (reader.try_read_string("material", materialName))
+	{
+		materialId = renderSystem->find_material(materialName);
+	}
 
 	// load mesh data
-	MeshType meshType = from_string_mesh_type(reader.read_string("type"));
-
-	switch (meshType)
+	String meshTypeName;
+	if (reader.try_read_string("type", meshTypeName))
 	{
-	case MeshType::Empty:
-	case MeshType::Custom:
-	{
-		// use the asset path to get the mesh ( or use the name if no path given )
-		String path = reader.read_string("path", reader.read_string("name"));
+		MeshType meshType = from_string_mesh_type(meshTypeName);
 
-		// check if mesh with name is loaded
-		String name = Path(path).stem().string();
-		meshId = renderer.find_mesh(name);
-
-		if (meshId == ERROR_ID)
+		switch (meshType)
 		{
-			// mesh is not loaded, so load it using the path
-			meshId = renderer.load_mesh(path);
-		}
-
-		if (meshId == ERROR_ID)
+		case MeshType::Empty:
+		case MeshType::Custom:
 		{
-			console::error(std::format("Could not load mesh with path \"{}\" and name \"{}\".", path, name));
+			// use the asset path to get the mesh ( or use the name if no path given )
+			String path = reader.read_string("path", reader.read_string("name"));
+
+			// check if mesh with name is loaded
+			String name = Path(path).stem().string();
+			meshId = renderSystem->find_mesh(name);
+
+			if (meshId == ERROR_ID)
+			{
+				// mesh is not loaded, so load it using the path
+				meshId = renderSystem->load_mesh(path);
+			}
+
+			if (meshId == ERROR_ID)
+			{
+				console::error(std::format("Could not load_animation mesh with path \"{}\" and name \"{}\".", path, name));
+			}
+			break;
 		}
-		break;
-	}
-	default:
-		// if there was a type given, then use that type
-		meshId = renderer.get_or_create_mesh(meshType);
-		break;
+		default:
+			// if there was a type given, then use that type
+			meshId = renderSystem->get_or_create_mesh(meshType);
+			break;
+		}
 	}
 }
 

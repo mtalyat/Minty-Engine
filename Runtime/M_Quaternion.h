@@ -1,6 +1,6 @@
 #pragma once
 
-#include "M_Base.h"
+#include "M_Object.h"
 #include "M_Vector.h"
 #include "glm.hpp"
 
@@ -10,11 +10,9 @@ namespace minty
 	/// A Quaternion.
 	/// </summary>
 	struct Quaternion
-		: public glm::quat
+		: public glm::quat, public Object
 	{
 		using glm::quat::qua;
-
-		// copy
 		Quaternion(glm::quat const& other);
 
 		/// <summary>
@@ -59,6 +57,12 @@ namespace minty
 		/// <returns></returns>
 		Vector3 to_euler_angles() const;
 
+		void serialize(Writer& writer) const override;
+		void deserialize(Reader const& reader) override;
+
+		friend std::istream& operator>>(std::istream& stream, Quaternion& vector);
+		friend std::ostream& operator<<(std::ostream& stream, const Quaternion& vector);
+
 		/// <summary>
 		/// Creates a Quaternion from the given euler angles.
 		/// </summary>
@@ -77,6 +81,4 @@ namespace minty
 
 		friend String to_string(Quaternion const& value);
 	};
-
-	String to_string(glm::quat const& value);
 }

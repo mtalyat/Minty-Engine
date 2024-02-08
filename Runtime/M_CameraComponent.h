@@ -12,15 +12,15 @@ namespace minty
 		: public Component
 	{
 	private:
-		float const DEFAULT_FOV = 45.0f;
-		float const DEFAULT_NEAR = 0.1f;
-		float const DEFAULT_FAR = 100.0f;
+		constexpr static float const DEFAULT_FOV = 45.0f;
+		constexpr static float const DEFAULT_NEAR = 0.1f;
+		constexpr static float const DEFAULT_FAR = 100.0f;
 
 	public:
 		enum class Perspective : Byte
 		{
-			Orthographic,
 			Perspective,
+			Orthographic,
 		};
 
 		/// <summary>

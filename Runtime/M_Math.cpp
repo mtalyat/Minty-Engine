@@ -208,7 +208,7 @@ bool try_get_constant(String const& str, float& value)
 		//{"", sizeof()},
 	};
 
-	auto const& found = constants.find(minty::string::to_upper(str));
+	auto found = constants.find(minty::string::to_upper(str));
 	if (found == constants.end())
 	{
 		return false;
@@ -225,7 +225,7 @@ int is_function(String const& str)
 
 	};
 
-	auto const& found = functionNames.find(str);
+	auto found = functionNames.find(str);
 	if (found == functionNames.end())
 	{
 		return 0;
@@ -246,7 +246,7 @@ int operator_precedence(String const& str)
 		{"-", 2}
 	};
 
-	auto const& found = precedence.find(str);
+	auto found = precedence.find(str);
 
 	if (found == precedence.end())
 	{

@@ -1,7 +1,7 @@
 shader: spriteShader
 primitiveTopology: TRIANGLE_LIST
 polygonMode: FILL
-cullMode: BACK_BIT
+cullMode: NONE
 frontFace: CLOCKWISE
 lineWidth: 1
 stage: VERTEX_BIT

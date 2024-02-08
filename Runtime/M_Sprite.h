@@ -20,14 +20,21 @@ namespace minty
 		Vector2 _maxCoords;
 		Vector2 _pivot;
 	public:
-#pragma region Get
-		Sprite(rendering::SpriteBuilder const& builder, RenderEngine& renderer);
+		/// <summary>
+		/// Creates an empty Sprite.
+		/// </summary>
+		Sprite();
+
+		Sprite(rendering::SpriteBuilder const& builder, Engine& engine, ID const sceneId);
 
 		/// <summary>
 		/// Destroys all of the resources associated with this Sprite.
 		/// </summary>
 		void destroy();
 
+#pragma region Get
+
+	public:
 		ID get_material_id() const;
 
 		Vector2 get_min_coords() const;
@@ -35,6 +42,7 @@ namespace minty
 		Vector2 get_max_coords() const;
 
 		Vector2 get_pivot() const;
+
 #pragma endregion
 
 #pragma region Set

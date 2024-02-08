@@ -9,25 +9,26 @@
 
 using namespace minty;
 
-minty::Scene::Scene(Engine* const engine)
-	: _engine(engine)
+minty::Scene::Scene(Engine& engine, ID const sceneId)
+	: _id(sceneId)
+	, _engine(&engine)
 	, _entities(new EntityRegistry())
-	, _systems(new SystemRegistry(engine, _entities))
+	, _systems(new SystemRegistry(engine, sceneId))
 {}
 
 minty::Scene::~Scene()
 {
 	delete _entities;
-	_entities = nullptr;
 	delete _systems;
-	_systems = nullptr;
 }
 
 minty::Scene::Scene(Scene&& other) noexcept
-	: _engine(other._engine)
+	: _id(other._id)
+	, _engine(other._engine)
 	, _entities(other._entities)
 	, _systems(other._systems)
 {
+	other._id = ERROR_ID;
 	other._engine = nullptr;
 	other._entities = nullptr;
 	other._systems = nullptr;
@@ -37,10 +38,12 @@ Scene& minty::Scene::operator=(Scene&& other) noexcept
 {
 	if (this != &other)
 	{
+		_id = other._id;
 		_engine = other._engine;
 		_entities = other._entities;
 		_systems = other._systems;
 
+		other._id = ERROR_ID;
 		other._engine = nullptr;
 		other._entities = nullptr;
 		other._systems = nullptr;
@@ -49,19 +52,37 @@ Scene& minty::Scene::operator=(Scene&& other) noexcept
 	return *this;
 }
 
-Engine* minty::Scene::get_engine() const
+//minty::Scene::Scene(Scene const& other)
+//	: _engine(other._engine)
+//	, _entities(other._entities)
+//	, _systems(other._systems)
+//{}
+//
+//Scene& minty::Scene::operator=(Scene const& other)
+//{
+//	if (&other != this)
+//	{
+//		_engine = other._engine;
+//		_entities = other._entities;
+//		_systems = other._systems;
+//	}
+//
+//	return *this;
+//}
+
+Engine& minty::Scene::get_engine() const
 {
-	return _engine;
+	return *_engine;
 }
 
-EntityRegistry* minty::Scene::get_entity_registry() const
+EntityRegistry& minty::Scene::get_entity_registry() const
 {
-	return _entities;
+	return *_entities;
 }
 
-SystemRegistry* minty::Scene::get_system_registry() const
+SystemRegistry& minty::Scene::get_system_registry() const
 {
-	return _systems;
+	return *_systems;
 }
 
 void minty::Scene::load()
@@ -138,7 +159,7 @@ void minty::Scene::update()
 
 			if (parentTransform)
 			{
-				transform.global = parentTransform->global * transform.local.get_matrix();
+				transform.globalMatrix = parentTransform->globalMatrix * transform.get_local_matrix();
 
 				continue;
 			}
@@ -147,7 +168,7 @@ void minty::Scene::update()
 		}
 
 		// no parent
-		transform.global = transform.local.get_matrix();
+		transform.globalMatrix = transform.get_local_matrix();
 	}
 }
 
@@ -172,14 +193,14 @@ void minty::Scene::finalize()
 
 void minty::Scene::serialize(Writer& writer) const
 {
-	writer.write("Systems", _systems);
-	writer.write("Entities", _entities);
+	writer.write("systems", *_systems);
+	writer.write("entities", *_entities);
 }
 
 void minty::Scene::deserialize(Reader const& reader)
 {
-	reader.read_object("Systems", _systems);
-	reader.read_object("Entities", _entities);
+	reader.read_serializable("systems", *_systems);
+	reader.read_serializable("entities", *_entities);
 }
 
 String minty::to_string(Scene const& value)

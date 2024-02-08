@@ -2,7 +2,6 @@
 
 #include "libraries/entt/entt.hpp"
 #include "M_Component.h"
-#include "M_Transform.h"
 #include "M_Console.h"
 #include "M_ISerializable.h"
 
@@ -14,17 +13,19 @@ namespace minty
 	String to_string(Entity const value);
 
 	class EntityRegistry
-		: public Object, public entt::registry, public ISerializable
+		: public Object, public entt::registry
 	{
 	public:
-		typedef std::function<Component* (EntityRegistry* const, Entity const)> ComponentCreateFunc;
-		typedef std::function<Component const* (EntityRegistry const* const, Entity const)> ComponentGetFunc;
+		typedef std::function<Component* (EntityRegistry&, Entity const)> ComponentEmplaceFunc;
+		typedef std::function<Component const* (EntityRegistry const&, Entity const)> ComponentGetFunc;
+		typedef std::function<void(EntityRegistry&, Entity const)> ComponentEraseFunc;
 
 	private:
 		struct ComponentFuncs
 		{
-			ComponentCreateFunc create;
+			ComponentEmplaceFunc emplace;
 			ComponentGetFunc get;
+			ComponentEraseFunc erase;
 		};
 
 		static std::map<String const, ComponentFuncs const> _components; // name -> creation/get funcs
@@ -60,7 +61,7 @@ namespace minty
 		/// </summary>
 		/// <param name="string"></param>
 		/// <returns>The Entity, if found, otherwise NULL_ENTITY.</returns>
-		Entity find_by_name(String const& string) const;
+		Entity find(String const& string) const;
 
 		/// <summary>
 		/// Finds the first Entity with the given Component type.
@@ -68,7 +69,7 @@ namespace minty
 		/// <typeparam name="T">The type of component.</typeparam>
 		/// <returns>The Entity, if found, otherwise NULL_ENTITY.</returns>
 		template<class T>
-		Entity find_by_type() const;
+		Entity find() const;
 
 		/// <summary>
 		/// Gets the name of the Entity, or an empty string if no name exists.
@@ -99,6 +100,14 @@ namespace minty
 		/// <param name="name">The name of the Component.</param>
 		/// <param name="entity">The Entity that has the Component.</param>
 		/// <returns>The Component, or null if it does not exist.</returns>
+		Component* get_by_name(String const& name, Entity const entity);
+
+		/// <summary>
+		/// Gets the Component, by name.
+		/// </summary>
+		/// <param name="name">The name of the Component.</param>
+		/// <param name="entity">The Entity that has the Component.</param>
+		/// <returns>The Component, or null if it does not exist.</returns>
 		Component const* get_by_name(String const& name, Entity const entity) const;
 
 		/// <summary>
@@ -107,6 +116,13 @@ namespace minty
 		/// <param name="entity">The Entity with the components.</param>
 		/// <returns>A vector of components.</returns>
 		std::vector<Component const*> get_all(Entity const entity) const;
+
+		/// <summary>
+		/// Erases the Component, by name.
+		/// </summary>
+		/// <param name="name">The name of the component.</param>
+		/// <param name="entity">The Entity that has the Component.</param>
+		void erase_by_name(String const& name, Entity const entity);
 
 		/// <summary>
 		/// Clones the given Entity and its components, and returns the new Entity.
@@ -145,7 +161,7 @@ namespace minty
 	};
 
 	template<class T>
-	inline Entity EntityRegistry::find_by_type() const
+	Entity EntityRegistry::find() const
 	{
 		// iterate through view
 		for (auto [entity, t] : this->view<T const>().each())
@@ -163,8 +179,9 @@ namespace minty
 	{
 		// funcs
 		ComponentFuncs funcs = {
-			.create = [](EntityRegistry* const registry, Entity const entity) { return &registry->emplace<T>(entity); },
-				.get = [](EntityRegistry const* const registry, Entity const entity) { return registry->try_get<T>(entity); }
+			.emplace = [](EntityRegistry& registry, Entity const entity) { return &registry.emplace<T>(entity); },
+			.get = [](EntityRegistry const& registry, Entity const entity) { return registry.try_get<T>(entity); },
+			.erase = [](EntityRegistry& registry, Entity const entity) { registry.erase<T>(entity); },
 		};
 		_components.emplace(name, funcs);
 

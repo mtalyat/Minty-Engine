@@ -1,11 +1,12 @@
 #pragma once
 
-#include "M_Object.h"
+#include "M_SceneObject.h"
 #include "M_System.h"
 #include "M_Console.h"
 #include "M_ISerializable.h"
 #include <map>
 #include <set>
+#include <functional>
 
 namespace minty
 {
@@ -13,16 +14,13 @@ namespace minty
 	/// Holds and managers data relevant to systems.
 	/// </summary>
 	class SystemRegistry
-		: public Object, public ISerializable
+		: public SceneObject
 	{
+		friend class Scene;
 	public:
-		typedef std::function<System* (Engine* const, EntityRegistry* const)> SystemFunc;
+		typedef std::function<System* (Engine&, ID const)> SystemFunc;
 
 	private:
-		Engine* _engine;
-
-		EntityRegistry* _registry;
-
 		// the systems to manage
 		std::map<int, std::set<System*>> _orderedSystems;
 		std::map<String const, System*> _allSystems;
@@ -32,7 +30,7 @@ namespace minty
 		/// <summary>
 		/// Creates an empty SystemRegistry.
 		/// </summary>
-		SystemRegistry(Engine* const engine, EntityRegistry* const registry);
+		SystemRegistry(Engine& engine, ID const sceneId);
 
 		~SystemRegistry();
 
@@ -71,7 +69,8 @@ namespace minty
 		/// </summary>
 		/// <param name="name">The name to search by.</param>
 		/// <returns>The System if found, otherwise null.</returns>
-		System* find_by_name(String const& name) const;
+		template<class T>
+		T* find(String const& name) const;
 
 		/// <summary>
 		/// Finds the first System of the given type.
@@ -79,7 +78,7 @@ namespace minty
 		/// <typeparam name="T">The type of System to return.</typeparam>
 		/// <returns>The first System found, or null if none found.</returns>
 		template<class T>
-		T* find_by_type() const;
+		T* find() const;
 
 		/// <summary>
 		/// Removes the given System from the SystemRegistry.
@@ -135,11 +134,27 @@ namespace minty
 	template<class T>
 	T* SystemRegistry::emplace(String const& name, int const priority)
 	{
-		return static_cast<T*>(this->emplace(name, new T(_engine, _registry), priority));
+		return static_cast<T*>(this->emplace(name, new T(get_engine(), get_scene_id()), priority));
 	}
 
 	template<class T>
-	inline T* SystemRegistry::find_by_type() const
+	T* SystemRegistry::find(String const& name) const
+	{
+		for (auto const& pair : _allSystems)
+		{
+			if (pair.first.compare(name) == 0)
+			{
+				// found name, return system
+				return static_cast<T*>(pair.second);
+			}
+		}
+
+		// not found
+		return nullptr;
+	}
+
+	template<class T>
+	T* SystemRegistry::find() const
 	{
 		for (auto const& pair : _allSystems)
 		{
@@ -157,7 +172,7 @@ namespace minty
 	template<class T>
 	void SystemRegistry::register_system(String const& name)
 	{
-		_systemTypes.emplace(name, [](Engine* const engine, EntityRegistry* const registry) { return new T(engine, registry); });
+		_systemTypes.emplace(name, [](Engine& engine, ID const sceneId) { return new T(engine, sceneId); });
 
 		console::info(std::format("Registered system {}", name));
 	}

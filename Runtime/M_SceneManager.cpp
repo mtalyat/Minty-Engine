@@ -16,43 +16,55 @@
 
 using namespace minty;
 
-minty::SceneManager::SceneManager(Engine* const engine)
-	: _engine(engine)
+minty::SceneManager::SceneManager(Engine& engine)
+	: _engine(&engine)
 	, _loaded()
 	, _scenes()
 	, _loadedScene()
 {}
 
-ID minty::SceneManager::create_scene()
+ID minty::SceneManager::create_scene(Path const& path)
 {
-	ID id = static_cast<ID>(_scenes.size());
-	_scenes.push_back(Scene(_engine));
-	return id;
+	return create_scene(path.stem().string(), path);
 }
 
-ID minty::SceneManager::create_scene(String const& path)
+ID minty::SceneManager::create_scene(String const& name, Path const& path)
 {
 	// create the scene
-	ID id = create_scene();
-	Scene& scene = _scenes.at(id);
+	ID id = _scenes.get_next();
+	Scene* scene = new Scene(*_engine, id); // deleted in a destroy function
+	ID actualId = _scenes.emplace(name, scene);
+
+	MINTY_ASSERT(id == actualId, "SceneManager::create_scene(): next ID does not match actual ID.");
 
 	// load the data from the disk into the scene
 	Node node = Asset::load_node(path);
 	SerializationData data =
 	{
-		.scene = &scene,
+		.scene = scene,
 		.entity = NULL_ENTITY
 	};
 	Reader reader(node, &data);
-	scene.deserialize(reader);
+	scene->deserialize(reader);
 
 	// all done
 	return id;
 }
 
+void minty::SceneManager::destroy_scene(ID const id)
+{
+	if (_scenes.contains(id))
+	{
+		// delete
+		delete _scenes.at(id);
+		// erase
+		_scenes.erase(id);
+	}
+}
+
 void minty::SceneManager::load_scene(ID const id)
 {
-	Scene* scene = &_scenes.at(id);
+	Scene* scene = _scenes.at(id);
 
 	// do nothing if already loaded
 	if (scene == _loadedScene)
@@ -71,7 +83,6 @@ void minty::SceneManager::load_scene(ID const id)
 
 	// set renderer to use this new scene
 	_engine->get_render_engine().set_scene(_loadedScene);
-	_engine->get_audio_engine().set_scene(_loadedScene);
 
 	// load event
 	if (_loaded && _loadedScene)
@@ -87,7 +98,7 @@ Scene* minty::SceneManager::get_loaded_scene()
 
 Scene& minty::SceneManager::get_scene(ID const id)
 {
-	return _scenes.at(id);
+	return *_scenes.at(id);
 }
 
 size_t minty::SceneManager::size() const
@@ -155,6 +166,15 @@ void minty::SceneManager::finalize()
 	{
 		_loadedScene->finalize();
 	}
+}
+
+void minty::SceneManager::destroy()
+{
+	for (auto const& pair : _scenes)
+	{
+		delete pair.second;
+	}
+	_scenes.clear();
 }
 
 String minty::to_string(SceneManager const& value)

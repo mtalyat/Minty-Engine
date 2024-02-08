@@ -11,8 +11,14 @@
 using namespace minty;
 using namespace minty::rendering;
 
-minty::MaterialTemplate::MaterialTemplate(rendering::MaterialTemplateBuilder const& builder, RenderEngine& renderer)
-	: RenderObject::RenderObject(renderer)
+minty::MaterialTemplate::MaterialTemplate()
+	: RenderObject::RenderObject()
+	, _shaderPassIds()
+	, _defaultValues()
+{}
+
+minty::MaterialTemplate::MaterialTemplate(rendering::MaterialTemplateBuilder const& builder, Engine& engine, ID const sceneId)
+	: RenderObject::RenderObject(engine, sceneId)
 	, _shaderPassIds(builder.shaderPassIds)
 	, _defaultValues(builder.defaultValues)
 {}
@@ -30,7 +36,7 @@ std::vector<ID> const& minty::MaterialTemplate::get_shader_pass_ids() const
 
 Dynamic minty::MaterialTemplate::get_defalt_value(String const& name) const
 {
-	auto const& found = _defaultValues.find(name);
+	auto found = _defaultValues.find(name);
 
 	if (found != _defaultValues.end())
 	{

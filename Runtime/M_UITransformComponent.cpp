@@ -91,13 +91,14 @@ void minty::UITransformComponent::serialize(Writer& writer) const
 
 void minty::UITransformComponent::deserialize(Reader const& reader)
 {
-	anchorMode = from_string_anchor_mode(reader.read_string("anchor"));
-	x = reader.read_float("x");
-	if (x == 0.0f) x = reader.read_float("left");
-	y = reader.read_float("y");
-	if (y == 0.0f) y = reader.read_float("top");
-	width = reader.read_float("width");
-	if (width == 0.0f) width = reader.read_float("right");
-	height = reader.read_float("height");
-	if (height == 0.0f) height = reader.read_float("bottom");
+	String name;
+	if (reader.try_read_string("anchor", name))anchorMode = from_string_anchor_mode(name);
+	reader.try_read_float("x", x);
+	reader.try_read_float("left", left);
+	reader.try_read_float("y", y);
+	reader.try_read_float("top", top);
+	reader.try_read_float("width", width);
+	reader.try_read_float("right", right);
+	reader.try_read_float("height", height);
+	reader.try_read_float("bottom", bottom);
 }

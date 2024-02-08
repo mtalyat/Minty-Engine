@@ -1,8 +1,9 @@
 template: materialTemplate
 values
-    material: 32
-        0i: 3
-        16f: 1
-        20f: 1
-        24f: 1
-        28f: 1
+    material
+        i 3
+        e 12
+        f 1
+        f 1
+        f 1
+        f 1

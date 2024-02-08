@@ -1,26 +1,27 @@
 #pragma once
 
-#include "M_Types.h"
-#include "M_Object.h"
+#include "M_Base.h"
 #include "M_Node.h"
-#include "M_Vector.h"
+#include "M_Register.h"
 #include <map>
+#include <unordered_map>
+#include <set>
+#include <unordered_set>
 #include <vector>
-#include "M_Quaternion.h"
 
 namespace minty
 {
+	class Object;
 	class ISerializable;
 
 	/// <summary>
 	/// Writes data to a serialized Node.
 	/// </summary>
 	class Writer
-		: public Object
 	{
 	private:
-		Node& _node;
-		void* _data;
+		Node* _node;
+		void const* _data;
 
 	public:
 		/// <summary>
@@ -28,12 +29,18 @@ namespace minty
 		/// </summary>
 		/// <param name="node">The Node to write to.</param>
 		/// <param name="data">The user data that can be referenced while writing.</param>
-		Writer(Node& node, void* const data = nullptr);
+		Writer(Node& node, void const* const data = nullptr);
 
 		/// <summary>
 		/// Gets the root node that this Writer is using.
 		/// </summary>
-		/// <returns>A pointer to the root node.</returns>
+		/// <returns>The root node.</returns>
+		Node& get_node();
+
+		/// <summary>
+		/// Gets the root node that this Writer is using.
+		/// </summary>
+		/// <returns>The root node.</returns>
 		Node const& get_node() const;
 
 		/// <summary>
@@ -47,7 +54,13 @@ namespace minty
 		/// Gets the extra data given to this Writer.
 		/// </summary>
 		/// <returns>The extra data as a void pointer.</returns>
-		void* get_data() const;
+		void const* get_data() const;
+
+		/// <summary>
+		/// Sets the extra data given to this Writer.
+		/// </summary>
+		/// <param name="data">The extra data as a void pointer.</param>
+		void set_data(void const* const data);
 
 		/// <summary>
 		/// Checks if a child with the given name exists.
@@ -60,65 +73,190 @@ namespace minty
 
 		void write(String const& name);
 
-		void write(String const& name, Node const& node);
+		void write(Node const& node);
 
-		void write(String const& name, ISerializable const* const value);
+		void write(String const& name, ISerializable const& value);
 
-		void write(String const& name, String const& value);
+		template<typename T>
+		void write(String const& name, T const* value)
+		{
+			// write nothing if null
+			if (!value)
+			{
+				write(Node(name));
+			}
+			else if (ISerializable const* serializable = try_cast<T, ISerializable const>(value))
+			{
+				write(name, *serializable);
+			}
+			else
+			{
+				// regular
+				std::ostringstream stream;
+				stream << *value;
+				write(Node(name, stream.str()));
+			}
+		}
 
-		void write(String const& name, int const value);
+		template<typename T>
+		void write(String const& name, T const& value)
+		{
+			if (ISerializable const* serializable = try_cast<T, ISerializable const>(&value))
+			{
+				write(name, *serializable);
+			}
+			else
+			{
+				// regular
+				std::ostringstream stream;
+				stream << value;
+				write(Node(name, stream.str()));
+			}
+		}
 
-		void write(String const& name, unsigned int const value);
+		template<typename T>
+		void write(String const& name, std::vector<T> const& value, bool ordered = false)
+		{
+			if (!value.size())
+			{
+				return;
+			}
 
-		void write(String const& name, float const value);
+			Node node(name);
+			Writer writer(node);
 
-		void write(String const& name, Byte const value);
+			if (ordered)
+			{
+				// ordered
+				size_t i = 0;
+				for (auto const& v : value)
+				{
+					writer.write(std::to_string(i), v);
+					i++;
+				}
+			}
+			else
+			{
+				// unordered
+				for (auto const& v : value)
+				{
+					writer.write(BLANK, v);
+				}
+			}
 
-		void write(String const& name, size_t const value);
+			write(node);
+		}
 
-		void write(String const& name, Vector2 const& value);
+		template<typename T>
+		void write(String const& name, std::set<T> const& value)
+		{
+			if (!value.size())
+			{
+				return;
+			}
 
-		void write(String const& name, Vector3 const& value);
+			Node node;
+			Writer writer(node);
 
-		void write(String const& name, Vector4 const& value);
+			for (auto const& v : value)
+			{
+				writer.write(BLANK, v);
+			}
 
-		void write(String const& name, Vector2Int const& value);
+			write(name, node);
+		}
 
-		void write(String const& name, Vector3Int const& value);
+		template<typename T>
+		void write(String const& name, std::unordered_set<T> const& value)
+		{
+			if (!value.size())
+			{
+				return;
+			}
 
-		void write(String const& name, Vector4Int const& value);
+			Node node;
+			Writer writer(node);
 
-		void write(String const& name, Quaternion const& value);
+			for (auto const& v : value)
+			{
+				writer.write(BLANK, v);
+			}
+
+			write(name, node);
+		}
+
+		template<typename T, typename U>
+		void write(String const& name, std::map<T, U> const& value)
+		{
+			if (!value.size())
+			{
+				return;
+			}
+
+			Node node;
+			Writer writer(node);
+
+			for (auto const& pair : value)
+			{
+				std::stringstream stream;
+				stream << pair.first;
+				writer.write(stream.str(), pair.second);
+			}
+
+			write(name, node);
+		}
+
+		template<typename T, typename U>
+		void write(String const& name, std::unordered_map<T, U> const& value)
+		{
+			if (!value.size())
+			{
+				return;
+			}
+
+			Node node;
+			Writer writer(node);
+
+			for (auto const& pair : value)
+			{
+				std::stringstream stream;
+				stream << pair.first;
+				writer.write(stream.str(), pair.second);
+			}
+
+			write(name, node);
+		}
+
+		template<typename T>
+		void write(String const& name, Register<T> const& value)
+		{
+			for (auto const& pair : value)
+			{
+				write(value.get_name(pair.first), pair.second);
+			}
+		}
 
 #pragma endregion
 
 #pragma region Default Writing
 
-		void write(String const& name, String const& value, String const& defaultValue);
+		template<typename T>
+		void write(String const& name, T const& value, T const& defaultValue)
+		{
+			if (value != defaultValue)
+			{
+				write(name, value);
+			}
+		}
 
-		void write(String const& name, int const value, int const defaultValue);
-
-		void write(String const& name, unsigned int const value, unsigned int const defaultValue);
-
-		void write(String const& name, float const value, float const defaultValue);
-
-		void write(String const& name, Byte const value, Byte const defaultValue);
-
-		void write(String const& name, size_t const value, size_t const defaultValue);
-
-		void write(String const& name, Vector2 const& value, Vector2 const& defaultValue);
-
-		void write(String const& name, Vector3 const& value, Vector3 const& defaultValue);
-
-		void write(String const& name, Vector4 const& value, Vector4 const& defaultValue);
-
-		void write(String const& name, Vector2Int const& value, Vector2Int const& defaultValue);
-
-		void write(String const& name, Vector3Int const& value, Vector3Int const& defaultValue);
-
-		void write(String const& name, Vector4Int const& value, Vector4Int const& defaultValue);
-
-		void write(String const& name, Quaternion const& value, Quaternion const& defaultValue);
+		template<typename T, typename U>
+		void write(String const& name, T const& value, U const& defaultValue)
+		{
+			if (value != defaultValue)
+			{
+				write(name, value);
+			}
+		}
 
 #pragma endregion
 
