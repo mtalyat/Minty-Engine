@@ -1,7 +1,7 @@
 #pragma once
 
 #include "M_Texture.h"
-#include "M_Rendering_TextureAtlasBuilder.h"
+#include "M_TextureAtlasBuilder.h"
 #include "M_CoordinateMode.h"
 #include "M_Vector.h"
 

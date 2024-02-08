@@ -1,7 +1,7 @@
 #pragma once
-#include "M_Rendering_Object.h"
+#include "M_RenderObject.h"
 
-#include "M_Rendering_SpriteBuilder.h"
+#include "M_SpriteBuilder.h"
 #include "M_Vector.h"
 
 namespace minty

@@ -7,7 +7,7 @@
 #include "M_Vector.h"
 #include "glm.hpp"
 
-#include "M_Rendering_DrawCallObjectInfo.h"
+#include "M_DrawCallObjectInfo.h"
 
 using namespace minty;
 using namespace minty;

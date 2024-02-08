@@ -1,8 +1,8 @@
 #pragma once
-#include "M_Rendering_Object.h"
+#include "M_RenderObject.h"
 
-#include "M_Rendering_ShaderPassBuilder.h"
-#include "M_Rendering_DescriptorSet.h"
+#include "M_ShaderPassBuilder.h"
+#include "M_DescriptorSet.h"
 #include "M_Constants.h"
 #include "M_Register.h"
 

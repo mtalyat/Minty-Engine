@@ -1,8 +1,8 @@
 #pragma once
-#include "M_Rendering_Object.h"
+#include "M_RenderObject.h"
 
-#include "M_Rendering_TextureBuilder.h"
-#include "M_Rendering_PixelFormat.h"
+#include "M_TextureBuilder.h"
+#include "M_PixelFormat.h"
 #include <vulkan/vulkan.h>
 
 namespace minty

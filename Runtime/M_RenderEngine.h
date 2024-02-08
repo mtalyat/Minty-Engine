@@ -23,14 +23,14 @@
 #include "M_Material.h"
 #include "M_Mesh.h"
 
-#include "M_Rendering_Buffer.h"
-#include "M_Rendering_TextureBuilder.h"
-#include "M_Rendering_SpriteBuilder.h"
-#include "M_Rendering_ShaderBuilder.h"
-#include "M_Rendering_ShaderPassBuilder.h"
-#include "M_Rendering_MaterialTemplateBuilder.h"
-#include "M_Rendering_MaterialBuilder.h"
-#include "M_Rendering_DescriptorSet.h"
+#include "M_Buffer.h"
+#include "M_TextureBuilder.h"
+#include "M_SpriteBuilder.h"
+#include "M_ShaderBuilder.h"
+#include "M_ShaderPassBuilder.h"
+#include "M_MaterialTemplateBuilder.h"
+#include "M_MaterialBuilder.h"
+#include "M_DescriptorSet.h"
 
 #include "M_Error.h"
 

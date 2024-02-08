@@ -5,11 +5,11 @@
 #include "M_Window.h"
 #include "M_Register.h"
 
-#include "M_Rendering_TextureBuilder.h"
-#include "M_Rendering_ShaderBuilder.h"
-#include "M_Rendering_ShaderPassBuilder.h"
-#include "M_Rendering_MaterialTemplateBuilder.h"
-#include "M_Rendering_MaterialBuilder.h"
+#include "M_TextureBuilder.h"
+#include "M_ShaderBuilder.h"
+#include "M_ShaderPassBuilder.h"
+#include "M_MaterialTemplateBuilder.h"
+#include "M_MaterialBuilder.h"
 
 #include "vulkan.h"
 

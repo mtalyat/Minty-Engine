@@ -1,7 +1,7 @@
 #pragma once
-#include "M_Rendering_Object.h"
+#include "M_RenderObject.h"
 
-#include "M_Rendering_MaterialTemplateBuilder.h"
+#include "M_MaterialTemplateBuilder.h"
 
 #include "M_Dynamic.h"
 

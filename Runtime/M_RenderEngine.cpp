@@ -1,9 +1,9 @@
 #include "pch.h"
 #include "M_RenderEngine.h"
 
-#include "M_Rendering_RendererBuilder.h"
-#include "M_Rendering_DrawCallObjectInfo.h"
-#include "M_Rendering_SpritePushData.h"
+#include "M_RendererBuilder.h"
+#include "M_DrawCallObjectInfo.h"
+#include "M_SpritePushData.h"
 
 #include "M_Console.h"
 #include "M_Engine.h"

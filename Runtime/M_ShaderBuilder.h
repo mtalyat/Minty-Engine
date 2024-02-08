@@ -2,8 +2,8 @@
 #include "M_Base.h"
 
 #include "M_Register.h"
-#include "M_Rendering_PushConstantInfo.h"
-#include "M_Rendering_UniformConstantInfo.h"
+#include "M_PushConstantInfo.h"
+#include "M_UniformConstantInfo.h"
 
 #include "vulkan.h"
 #include <vector>

@@ -1,12 +1,12 @@
 #pragma once
-#include "M_Rendering_Object.h"
+#include "M_RenderObject.h"
 
 #include "M_Constants.h"
 #include "M_Register.h"
-#include "M_Rendering_PushConstantInfo.h"
-#include "M_Rendering_UniformConstantInfo.h"
-#include "M_Rendering_DescriptorSet.h"
-#include "M_Rendering_ShaderBuilder.h"
+#include "M_PushConstantInfo.h"
+#include "M_UniformConstantInfo.h"
+#include "M_DescriptorSet.h"
+#include "M_ShaderBuilder.h"
 
 #include <vulkan/vulkan.h>
 #include <vector>

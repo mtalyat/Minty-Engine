@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "M_Rendering_Buffer.h"
+#include "M_Buffer.h"
 
 minty::Buffer::Buffer()
 	: buffer()

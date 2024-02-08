@@ -1,9 +1,9 @@
 #pragma once
-#include "M_Rendering_Object.h"
+#include "M_Object.h"
 
-#include "M_Rendering_Buffer.h"
-#include "M_Rendering_MaterialBuilder.h"
-#include "M_Rendering_DescriptorSet.h"
+#include "M_Buffer.h"
+#include "M_MaterialBuilder.h"
+#include "M_DescriptorSet.h"
 
 #include "M_Color.h"
 #include <vulkan/vulkan.h>
