@@ -401,4 +401,4 @@ FodyWeavers.xsd
 Management/
 
 # cmake
-Engine/cmake/
+Editor/cmake/
