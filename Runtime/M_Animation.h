@@ -160,9 +160,9 @@ namespace minty
 
 		step_value_t compile_value(size_t const valueIndex, StepFlags const flags) const;
 
-		void perform_step(step_key_t const key, step_time_t const time, step_value_t const value, step_value_t const previousValue, Entity const thisEntity, Scene& scene) const;
+		void perform_step(step_key_t const key, step_time_t const time, step_value_t const value, Entity const thisEntity, Scene& scene) const;
 
-		void perform_step(Step const& step, step_value_t const previousValue, Entity const thisEntity, Scene& scene) const;
+		void perform_step(Step const& step, Entity const thisEntity, Scene& scene) const;
 	public:
 		void serialize(Writer& writer) const override;
 		void deserialize(Reader const& reader) override;

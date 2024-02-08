@@ -12,10 +12,11 @@ Path get_assets_path(Path const& path)
 	return BASE_PATH / path;
 }
 
-int minty::Asset::check(Path const& path, bool const requiresMeta)
+int minty::Asset::check(Path const& path, char const* const extension, bool const requiresMeta)
 {
 	// can load if assets exists, and if no meta is required, or if a meta is required, it exists
-	if (path.empty() || !Asset::exists(path))
+	// also needs to have the correct extension, if one was provided
+	if (path.empty() || !Asset::exists(path) || (extension && path.extension() != extension))
 	{
 		//Console::error(std::format("Cannot find_animation asset at path \"{}\".", path.string()));
 		// cannot find asset itself
@@ -60,7 +61,7 @@ Node minty::Asset::load_node(Path const& path)
 
 Node minty::Asset::load_meta(Path const& path)
 {
-	Path metaPath = Path(path).replace_extension(".meta");
+	Path metaPath = Path(path).replace_extension(META_EXTENSION);
 
 	if (std::filesystem::exists(metaPath))
 	{

@@ -101,21 +101,29 @@ ID minty::AnimationSystem::find_animator(String const& name) const
 
 Animation& minty::AnimationSystem::get_animation(ID const id)
 {
+	MINTY_ASSERT(_animations.contains(id), std::format("AnimationSystem::get_animation(): does not contain the ID {}.", id));
+
 	return _animations.at(id);
 }
 
 Animation const& minty::AnimationSystem::get_animation(ID const id) const
 {
+	MINTY_ASSERT(_animations.contains(id), std::format("AnimationSystem::get_animation(): does not contain the ID {}.", id));
+
 	return _animations.at(id);
 }
 
 Animator& minty::AnimationSystem::get_animator(ID const id)
 {
+	MINTY_ASSERT(_animators.contains(id), std::format("AnimationSystem::get_animator(): does not contain the ID {}.", id));
+
 	return _animators.at(id);
 }
 
 Animator const& minty::AnimationSystem::get_animator(ID const id) const
 {
+	MINTY_ASSERT(_animators.contains(id), std::format("AnimationSystem::get_animator(): does not contain the ID {}.", id));
+
 	return _animators.at(id);
 }
 
@@ -131,7 +139,7 @@ String minty::AnimationSystem::get_animator_name(ID const id) const
 
 ID minty::AnimationSystem::load_animation(Path const& path)
 {
-	if (Asset::check(path, false))
+	if (Asset::check(path, ANIMATION_EXTENSION, false))
 	{
 		return ERROR_ID;
 	}
@@ -192,7 +200,7 @@ ID minty::AnimationSystem::load_animation(Path const& path)
 
 ID minty::AnimationSystem::load_animator(Path const& path)
 {
-	if (Asset::check(path, false))
+	if (Asset::check(path, ANIMATOR_EXTENSION, false))
 	{
 		return ERROR_ID;
 	}

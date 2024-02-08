@@ -121,17 +121,8 @@ bool minty::Animation::animate(float& time, float const elapsedTime, Index& inde
 			auto found = pair.second.find(static_cast<Index>(i));
 			if (found != pair.second.end())
 			{
-				step_value_t previousValue = INVALID_STEP_VALUE;
-
-				if (found != pair.second.begin())
-				{
-					// get the previous value as long as there is one
-					auto prevFound = std::prev(found);
-					previousValue = prevFound->second;
-				}
-
 				// step found, so perform it and stop looking for steps since this is the last one linearly
-				perform_step(pair.first, found->first, found->second, previousValue, thisEntity, scene);
+				perform_step(pair.first, found->first, found->second, thisEntity, scene);
 				break;
 			}
 		}
@@ -151,7 +142,7 @@ void minty::Animation::reset(Entity const thisEntity, Scene& scene) const
 	{
 		for (auto const value : pair.second)
 		{
-			perform_step(pair.first, INVALID_STEP_VALUE, 0u, value, thisEntity, scene);
+			perform_step(pair.first, INVALID_STEP_VALUE, value, thisEntity, scene);
 		}
 	}
 }
@@ -193,7 +184,7 @@ Animation::step_value_t minty::Animation::compile_value(size_t const valueIndex,
 		((flags & MAX_FLAGS_INDEX) << FLAGS_OFFSET);
 }
 
-void minty::Animation::perform_step(step_key_t const key, step_time_t const time, step_value_t const value, step_value_t const previousValue, Entity const thisEntity, Scene& scene) const
+void minty::Animation::perform_step(step_key_t const key, step_time_t const time, step_value_t const value, Entity const thisEntity, Scene& scene) const
 {
 	// build the step
 	Step step = Step
@@ -207,10 +198,10 @@ void minty::Animation::perform_step(step_key_t const key, step_time_t const time
 	};
 
 	// perform the step using that
-	return perform_step(step, previousValue, thisEntity, scene);
+	return perform_step(step, thisEntity, scene);
 }
 
-void minty::Animation::perform_step(Step const& step, step_value_t const previousValue, Entity const thisEntity, Scene& scene) const
+void minty::Animation::perform_step(Step const& step, Entity const thisEntity, Scene& scene) const
 {
 	EntityRegistry& registry = scene.get_entity_registry();
 

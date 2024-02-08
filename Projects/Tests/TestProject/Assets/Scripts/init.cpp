@@ -46,7 +46,7 @@ int init(Runtime &runtime)
         renderer.init(rb);
         
         // load scene from disk
-        ID sceneId = sceneManager.create_scene("Scenes/test.minty");
+        ID sceneId = sceneManager.create_scene("Scenes/test.mscene");
         Scene &scene = sceneManager.get_scene(sceneId);
         EntityRegistry& er = scene.get_entity_registry();
         SystemRegistry& sr = scene.get_system_registry();

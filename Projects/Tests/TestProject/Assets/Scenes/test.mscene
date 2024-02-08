@@ -9,21 +9,21 @@ systems
             - Textures/death.png
             - Resources/Models/pumpkin_tex.jpg
         shaders
-            - Shaders/shader.minty
-            - Shaders/spriteShader.minty
+            - Shaders/shader.mshader
+            - Shaders/spriteShader.mshader
         shaderPasses
-            - Shaders/shaderPass.minty
-            - Shaders/spriteShaderPass.minty
+            - Shaders/shaderPass.mshaderpass
+            - Shaders/spriteShaderPass.mshaderpass
         materialTemplates
-            - Materials/materialTemplate.minty
-            - Materials/spriteMaterialTemplate.minty
+            - Materials/materialTemplate.mmaterialtemplate
+            - Materials/spriteMaterialTemplate.mmaterialtemplate
         materials
-            - Materials/material1.minty
-            - Materials/spriteMaterial.minty
-            - Materials/xSpriteMaterial.minty
+            - Materials/material1.mmaterial
+            - Materials/spriteMaterial.mmaterial
+            - Materials/xSpriteMaterial.mmaterial
         sprites
-            - Sprites/x.minty
-            - Sprites/brian.minty
+            - Sprites/x.msprite
+            - Sprites/brian.msprite
         atlases
             -
                 texture: death
@@ -40,13 +40,13 @@ systems
             - Audio/dong.wav
     Animation
         animations
-            - Animations/idle.minty
-            - Animations/moving.minty
-            - Animations/flicker.minty
-            - Animations/slide.minty
+            - Animations/idle.manimation
+            - Animations/moving.manimation
+            - Animations/flicker.manimation
+            - Animations/slide.manimation
         animators
-            - Animations/animator.minty
-            - Animations/animator2.minty
+            - Animations/animator.manimator
+            - Animations/animator2.manimator
     CameraController
     Move
     Test

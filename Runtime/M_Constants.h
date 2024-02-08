@@ -23,5 +23,15 @@ namespace minty
 	constexpr unsigned int DESCRIPTOR_SET_SHADER_PASS = 1;
 	constexpr unsigned int DESCRIPTOR_SET_MATERIAL = 2;
 
-	constexpr char const* const BLANK = "_";
+	constexpr char const* BLANK = "_";
+
+	constexpr char const* META_EXTENSION = ".mmeta";
+	constexpr char const* ANIMATION_EXTENSION = ".manimation";
+	constexpr char const* ANIMATOR_EXTENSION = ".manimator";
+	constexpr char const* SCENE_EXTENSION = ".mscene";
+	constexpr char const* SPRITE_EXTENSION = ".msprite";
+	constexpr char const* MATERIAL_EXTENSION = ".mmaterial";
+	constexpr char const* MATERIAL_TEMPLATE_EXTENSION = ".mmaterialtemplate";
+	constexpr char const* SHADER_PASS_EXTENSION = ".mshaderpass";
+	constexpr char const* SHADER_EXTENSION = ".mshader";
 }
