@@ -1,5 +1,0 @@
-This is a test file. Hopefully it works!
-
-New line here.
-
-Good day.
