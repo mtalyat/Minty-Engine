@@ -27,6 +27,7 @@ namespace minty
 		GLFWwindow* _window;
 		int _frameWidth, _frameHeight;
 		int _width, _height;
+		int _restoreX, _restoreY;
 		bool _resized;
 		InputMap const* _activeInputMap;
 		InputMap const* _globalInputMap;
@@ -41,6 +42,15 @@ namespace minty
 		/// <param name="width">The width of the Window in pixels.</param>
 		/// <param name="height">The height of the Window in pixels.</param>
 		Window(String const& title, int const width, int const height, InputMap const* const globalInputMap = nullptr);
+
+		/// <summary>
+		/// Creates a new Window.
+		/// </summary>
+		/// <param name="title"></param>
+		/// <param name="width"></param>
+		/// <param name="height"></param>
+		/// <param name="globalInputMap"></param>
+		Window(String const& title, int const x, int const y, int const width, int const height, InputMap const* const globalInputMap = nullptr);
 
 		~Window();
 
@@ -59,6 +69,21 @@ namespace minty
 		/// </summary>
 		/// <param name="mode"></param>
 		void set_cursor_mode(CursorMode const mode);
+
+		/// <summary>
+		/// Maximizes the Window.
+		/// </summary>
+		void maximize();
+
+		/// <summary>
+		/// Minimizes the Window.
+		/// </summary>
+		void minimize();
+
+		/// <summary>
+		/// Restores the maximized or minimized window to its normal state.
+		/// </summary>
+		void restore();
 
 		/// <summary>
 		/// Checks if the Window has resized since the last time this method was called.
@@ -123,7 +148,14 @@ namespace minty
 		/// </summary>
 		/// <returns></returns>
 		InputMap const* get_input() const;
+
+		/// <summary>
+		/// Processes all pending Window events.
+		/// </summary>
+		static void poll_events();
 	private:
+		void save_restore_info();
+
 		// triggers a key in the input map
 		void trigger_key(Key const key, KeyAction const action, KeyModifiers const mods);
 

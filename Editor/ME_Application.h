@@ -1,33 +1,47 @@
 #pragma once
 
-#include "ME_Console.h"
-#include "ME_Project.h"
 #include <Minty.h>
+#include <unordered_map>
 
 namespace mintye
 {
+	struct BuildInfo;
+	class Project;
+	class EditorWindow;
+
 	/// <summary>
 	/// Holds data and runs the game engine application.
 	/// </summary>
 	class Application
 	{
 	private:
-		struct BuildInfo
+		enum class NewProjectSetupType
 		{
-			Project* project;
-			bool debug;
+			/// <summary>
+			/// Do nothing special.
+			/// </summary>
+			Default,
 
-			BuildInfo(Project* const project, bool const debug);
-
-			std::string const get_config() const;
+			/// <summary>
+			/// Add .vscode folder, set up for debugging.
+			/// </summary>
+			VSCode,
 		};
 
-		Project _project;
-		BuildInfo _info;
+	private:
+		// info needed for a loaded project:
+		Project* _project;
+		minty::Engine* _engine;
+
+		// window being drawn to:
 		minty::Window _window;
-		Console _console;
+
+		// editor windows to be drawn
+		std::unordered_map<minty::String, EditorWindow*> _editorWindows;
 	public:
 		Application();
+
+		~Application();
 
 		/// <summary>
 		/// Runs the game engine application.
@@ -36,30 +50,54 @@ namespace mintye
 		/// <param name="argv">The command line arguments.</param>
 		int run(int argc, char const* argv[]);
 	private:
-		void draw_commands();
-		void draw_console();
-		void draw_hierarchy();
-		void draw_inspector();
-		void draw_game();
-		void draw_scene();
 
-		/// <summary>
-		/// Generates all necessary files for the target project.
-		/// </summary>
-		/// <param name="info"></param>
-		void generate();
+		void cleanup();
 
-		/// <summary>
-		/// Generates and updates the cmake file for the target project.
-		/// </summary>
-		/// <param name="info">The target info.</param>
-		void generate_cmake();
+		void set_window_title(minty::String const& subTitle);
 
-		/// <summary>
-		/// Generates the main file for the target project.
-		/// </summary>
-		/// <param name="info"></param>
-		void generate_main();
+#pragma region Windows
+
+		void draw_application(BuildInfo& buildInfo);
+		void draw_menu_bar();
+		void draw_commands(BuildInfo& buildInfo);
+		void draw_editor_windows();
+		void reset_editor_windows();
+
+		template<typename T>
+		T* find_editor_window(minty::String const& name);
+
+#pragma endregion
+
+#pragma region Project
+
+		void new_project();
+
+		void open_project();
+
+		void save_project();
+
+		void save_as_project();
+
+		void close_project();
+
+		void load_project(minty::Path const& path);
+
+		void unload_project();
+
+		void create_new_project(minty::String const& name, minty::Path const& path, NewProjectSetupType initType = NewProjectSetupType::Default);
+
+#pragma endregion
+
+#pragma region Scene
+
+		void load_scene(minty::String const& name);
+
+		void unload_scene();
+
+#pragma endregion
+
+
+#pragma region Building and Running
 
 		/// <summary>
 		/// Cleans the target project.
@@ -71,12 +109,60 @@ namespace mintye
 		/// Builds the target project.
 		/// </summary>
 		/// <param name="info">The target info.</param>
-		void build();
+		void build(BuildInfo const& buildInfo);
 
 		/// <summary>
 		/// Runs the target project.
 		/// </summary>
 		/// <param name="info">The target info.</param>
-		void run();
+		void run(BuildInfo const& buildInfo);
+
+#pragma region File Generation
+
+		/// <summary>
+		/// Generates all necessary files for the target project.
+		/// </summary>
+		/// <param name="info"></param>
+		void generate(BuildInfo const& buildInfo);
+
+		/// <summary>
+		/// Generates and updates the cmake file for the target project.
+		/// </summary>
+		/// <param name="info">The target info.</param>
+		void generate_cmake(BuildInfo const& buildInfo);
+
+		/// <summary>
+		/// Generates the main file for the target project.
+		/// </summary>
+		/// <param name="info"></param>
+		void generate_main();
+
+		/// <summary>
+		/// Generates all of the files for a vscode project setup.
+		/// </summary>
+		void generate_vscode();
+
+		/// <summary>
+		/// Generates all of the init.h and init.cpp files for a project.
+		/// </summary>
+		void generate_init(minty::Path const& path);
+
+#pragma endregion
+
+#pragma endregion
 	};
+	template<typename T>
+	inline T* Application::find_editor_window(minty::String const& name)
+	{
+		auto found = _editorWindows.find(name);
+
+		if (found == _editorWindows.end())
+		{
+			// none with that name
+			minty::Console::error(std::format("No editor window with the name \"{}\" exists.", name));
+			return nullptr;
+		}
+
+		return static_cast<T*>(found->second);
+	}
 }

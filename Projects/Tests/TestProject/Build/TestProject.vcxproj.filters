@@ -16,7 +16,7 @@
     <ClCompile Include="C:\Users\mitch\source\repos\Minty-Engine\Projects\Tests\TestProject\Assets\Scripts\Systems\TestSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\mitch\source\repos\Minty-Engine\Projects\Tests\TestProject\Assets\Scripts\init.cpp">
+    <ClCompile Include="C:\Users\mitch\source\repos\Minty-Engine\Projects\Tests\TestProject\Assets\init.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

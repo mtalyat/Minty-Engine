@@ -1,16 +1,15 @@
 #pragma once
+#include "ME_EditorWindow.h"
 
-#include "libraries/imgui/imgui.h"
-#include "libraries/imgui/imgui_impl_glfw.h"
-#include "libraries/imgui/imgui_impl_vulkan.h"
+#include <imgui.h>
 
-#include <Minty.h>
 #include <vector>
 #include <queue>
 
 namespace mintye
 {
-	class Console
+	class ConsoleWindow
+		: public EditorWindow
 	{
 	public:
 		typedef minty::Console::Color Color;
@@ -40,9 +39,11 @@ namespace mintye
 		std::mutex _commandsLock;
 		bool _commandsThreadRunning;
 	public:
-		Console();
+		ConsoleWindow(Application& application);
 
-		void draw(char const* title);
+		virtual void draw() override;
+
+		virtual void reset() override;
 
 		void run_command(std::string const& command);
 
@@ -72,4 +73,3 @@ namespace mintye
 		void execute_commands();
 	};
 }
-

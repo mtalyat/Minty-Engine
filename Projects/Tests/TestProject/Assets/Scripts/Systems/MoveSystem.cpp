@@ -17,7 +17,7 @@ void game::MoveSystem::update()
 {
     // calculate move speed
     float const MOVE_SPEED = 1.0f;
-    float movement = MOVE_SPEED * get_scene().get_engine().get_delta_time();
+    float movement = MOVE_SPEED * get_scene().get_engine().get_time().elapsed;
 
     // sprint multiplier
     if (faster)

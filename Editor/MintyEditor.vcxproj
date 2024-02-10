@@ -125,7 +125,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Libraries\VulkanSDK\1.3.261.1\Include;C:\Libraries\GLFW\glfw-3.3.8.bin.WIN64\include;C:\Users\mitch\source\repos\Minty-Engine\Runtime;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Libraries\VulkanSDK\1.3.261.1\Include;C:\Libraries\GLFW\glfw-3.3.8.bin.WIN64\include;C:\Users\mitch\source\repos\Minty-Engine\Runtime;C:\Users\mitch\source\repos\Minty-Engine\Editor\libraries\imgui;C:\Users\mitch\source\repos\Minty-Engine\Editor\libraries\imguifiledialog\ImGuiFileDialog;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
@@ -149,7 +149,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Libraries\VulkanSDK\1.3.261.1\Include;C:\Libraries\GLFW\glfw-3.3.8.bin.WIN64\include;C:\Users\mitch\source\repos\Minty-Engine\Runtime;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Libraries\VulkanSDK\1.3.261.1\Include;C:\Libraries\GLFW\glfw-3.3.8.bin.WIN64\include;C:\Users\mitch\source\repos\Minty-Engine\Runtime;C:\Users\mitch\source\repos\Minty-Engine\Editor\libraries\imgui;C:\Users\mitch\source\repos\Minty-Engine\Editor\libraries\imguifiledialog\ImGuiFileDialog;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BufferSecurityCheck>true</BufferSecurityCheck>
@@ -170,6 +170,7 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="libraries\imguifiledialog\ImGuiFileDialog\ImGuiFileDialog.cpp" />
     <ClCompile Include="libraries\imgui\imgui.cpp" />
     <ClCompile Include="libraries\imgui\imgui_demo.cpp" />
     <ClCompile Include="libraries\imgui\imgui_draw.cpp" />
@@ -179,14 +180,24 @@
     <ClCompile Include="libraries\imgui\imgui_tables.cpp" />
     <ClCompile Include="libraries\imgui\imgui_widgets.cpp" />
     <ClCompile Include="ME_Application.cpp" />
-    <ClCompile Include="ME_Console.cpp" />
+    <ClCompile Include="ME_BuildInfo.cpp" />
+    <ClCompile Include="ME_ConsoleWindow.cpp" />
+    <ClCompile Include="ME_EditorWindow.cpp" />
+    <ClCompile Include="ME_HierarchyWindow.cpp" />
     <ClCompile Include="ME_Project.cpp" />
     <ClCompile Include="Program.cpp" />
+    <ClCompile Include="ProjectConfig.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="libraries\imguifiledialog\ImGuiFileDialog\ImGuiFileDialog.h" />
     <ClInclude Include="ME_Application.h" />
-    <ClInclude Include="ME_Console.h" />
+    <ClInclude Include="ME_BuildInfo.h" />
+    <ClInclude Include="ME_ConsoleWindow.h" />
+    <ClInclude Include="ME_Constants.h" />
+    <ClInclude Include="ME_EditorWindow.h" />
+    <ClInclude Include="ME_HierarchyWindow.h" />
     <ClInclude Include="ME_Project.h" />
+    <ClInclude Include="ProjectConfig.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

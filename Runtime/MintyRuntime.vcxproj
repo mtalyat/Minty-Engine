@@ -240,6 +240,7 @@
     <ClInclude Include="M_SpritePushData.h" />
     <ClInclude Include="M_SpriteBuilder.h" />
     <ClInclude Include="M_TextureAtlasBuilder.h" />
+    <ClInclude Include="M_Time.h" />
     <ClInclude Include="M_UIPushData.h" />
     <ClInclude Include="M_RenderSystem.h" />
     <ClInclude Include="M_SceneObject.h" />
@@ -307,7 +308,6 @@
     <ClInclude Include="M_Rect.h" />
     <ClInclude Include="M_RectF.h" />
     <ClInclude Include="M_RenderEngine.h" />
-    <ClInclude Include="M_Runtime.h" />
     <ClInclude Include="M_Stopwatch.h" />
     <ClInclude Include="M_TextureAtlas.h" />
     <ClInclude Include="M_TransformComponent.h" />
@@ -433,9 +433,9 @@
     <ClCompile Include="M_Rect.cpp" />
     <ClCompile Include="M_RectF.cpp" />
     <ClCompile Include="M_RenderEngine.cpp" />
-    <ClCompile Include="M_Runtime.cpp" />
     <ClCompile Include="M_Stopwatch.cpp" />
     <ClCompile Include="M_TextureAtlas.cpp" />
+    <ClCompile Include="M_Time.cpp" />
     <ClCompile Include="M_TransformComponent.cpp" />
     <ClCompile Include="M_SpriteComponent.cpp" />
     <ClCompile Include="M_UITransformComponent.cpp" />

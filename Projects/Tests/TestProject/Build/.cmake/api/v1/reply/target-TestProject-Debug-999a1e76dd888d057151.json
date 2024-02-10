@@ -2,10 +2,10 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "Release/TestProject.exe"
+			"path" : "Debug/TestProject.exe"
 		},
 		{
-			"path" : "Release/TestProject.pdb"
+			"path" : "Debug/TestProject.pdb"
 		}
 	],
 	"backtrace" : 1,
@@ -65,7 +65,7 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : "/DWIN32 /D_WINDOWS /GR /EHsc /O2 /Ob2 /DNDEBUG -std:c++20 -MT /GL"
+					"fragment" : "/DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -std:c++20 -MTd"
 				}
 			],
 			"includes" : 
@@ -111,15 +111,11 @@
 		"commandFragments" : 
 		[
 			{
-				"fragment" : "/DWIN32 /D_WINDOWS /GR /EHsc /O2 /Ob2 /DNDEBUG -MT /GL",
+				"fragment" : "/DWIN32 /D_WINDOWS /GR /EHsc /Zi /Ob0 /Od /RTC1 -MTd",
 				"role" : "flags"
 			},
 			{
-				"fragment" : "/NODEFAULTLIB:\"LIBCMT\" /INCREMENTAL:NO /subsystem:console",
-				"role" : "flags"
-			},
-			{
-				"fragment" : "/INCREMENTAL:NO /LTCG",
+				"fragment" : "/NODEFAULTLIB:\"LIBCMT\" /debug /INCREMENTAL /subsystem:console",
 				"role" : "flags"
 			},
 			{
@@ -137,8 +133,7 @@
 				"role" : "libraries"
 			}
 		],
-		"language" : "CXX",
-		"lto" : true
+		"language" : "CXX"
 	},
 	"name" : "TestProject",
 	"nameOnDisk" : "TestProject.exe",
@@ -197,7 +192,7 @@
 		{
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
-			"path" : "C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Assets/Scripts/init.cpp",
+			"path" : "C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Assets/init.cpp",
 			"sourceGroupIndex" : 0
 		}
 	],

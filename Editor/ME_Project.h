@@ -5,6 +5,7 @@
 #include <filesystem>
 #include <unordered_map>
 #include <vector>
+#include <unordered_set>
 #include <set>
 
 namespace mintye
@@ -15,60 +16,83 @@ namespace mintye
 	class Project
 	{
 	public:
-		enum class CommonFileTypes
+		enum class CommonFileType
 		{
-			Header,			// .h
-			Source,			// .cpp .c
-			Scene,			// .scene
-			Shader,			// .spv
-			Texture,		// .png, .jpg, .jpeg, .bmp
-			Text,			// .txt
-			CSV,			// .csv
+			Header,				// .h
+			Source,				// .cpp .c
+			Scene,				// minty::SCENE_EXTENSION
+			Text,				// .txt
+			CSV,				// .csv
+			Texture,			// .png, .jpg, .jpeg, .bmp
+			Sprite,				// minty::SPRITE_EXTENSION
+			Material,			// minty::MATERIAL_EXTENSION
+			MaterialTemplate,	// minty::MATERIAL_TEMPLATE_EXTENSION
+			ShaderPass,			// minty::SHADER_PASS_EXTENSION
+			Shader,				// minty::SHADER_EXTENSION
+			ShaderModule,		// .spv
+			Audio,				// .wav, .mp3
+			Animator,			// minty::ANIMATOR_EXTENSION
+			Animation,			// minty::ANIMATION_EXTENSION
+			Model,				// .obj
+			Wrap,				// minty::WRAP_EXTENSION
 		};
 
 	private:
 		// the base minty::Path of the project
 		minty::Path _base;
 
-		std::unordered_map<std::string, std::set<minty::Path>> _files;
+		std::unordered_map<minty::Path, std::vector<minty::Path>> _files;
 	public:
 		/// <summary>
 		/// Creates a new interface into a project at the given path.
 		/// </summary>
 		/// <param name="path"></param>
-		Project(std::string const& path);
+		Project(minty::Path const& path);
+
+		/// <summary>
+		/// Gets the name of the project.
+		/// </summary>
+		/// <returns></returns>
+		minty::String get_name() const;
 
 		/// <summary>
 		/// Gets the base file path for this project.
 		/// </summary>
 		/// <returns></returns>
-		minty::Path const get_base_path() const;
+		minty::Path get_base_path() const;
+
+		/// <summary>
+		/// Gets the full path to the sub path location from the base path.
+		/// </summary>
+		/// <param name="subPath"></param>
+		/// <returns></returns>
+		minty::Path get_sub_path(minty::Path const& subPath) const;
 
 		/// <summary>
 		/// Gets the Assets folder path for this project.
 		/// </summary>
 		/// <returns></returns>
-		minty::Path const get_assets_path() const;
+		minty::Path get_assets_path() const;
 
 		/// <summary>
 		/// Gets the Build folder path for this project.
 		/// </summary>
 		/// <returns></returns>
-		minty::Path const get_build_path() const;
+		minty::Path get_build_path() const;
 
 		/// <summary>
 		/// Finds all assets within this Project that have the extensions.
 		/// </summary>
 		/// <param name="extensions">The extensions for the asset type.</param>
 		/// <returns>The filepaths to the assets with one of the given extensions.</returns>
-		std::set<minty::Path> find_assets(std::set<std::string> const& extensions) const;
+		std::set<minty::Path> find_assets(std::unordered_set<minty::Path> const& extensions) const;
 
 		/// <summary>
 		/// Finds all assets within the Project that have the common file type extensions.
 		/// </summary>
 		/// <param name="commonFileTypes">The common file types.</param>
 		/// <returns>The filepaths to the assets with one of the given extensions.</returns>
-		std::set<minty::Path> find_assets(CommonFileTypes const commonFileTypes) const;
+		std::set<minty::Path> find_assets(CommonFileType const commonFileTypes) const;
 
 		/// <summary>
 		/// Finds the first asset that has the given name and file extension.
@@ -78,8 +102,33 @@ namespace mintye
 		minty::Path find_asset(std::string name) const;
 
 		/// <summary>
+		/// Finds the first asset that has the given common file type extension.
+		/// </summary>
+		/// <param name="commonFileTypes"></param>
+		/// <returns></returns>
+		minty::Path find_asset(CommonFileType const commonFileTypes) const;
+
+		/// <summary>
+		/// Finds the first asset that has any of the given file extensions.
+		/// </summary>
+		/// <param name="extensions"></param>
+		/// <returns></returns>
+		minty::Path find_asset(std::unordered_set<minty::Path> const& extensions) const;
+
+		/// <summary>
+		/// Finds the asset with the given name and given file type.
+		/// </summary>
+		/// <param name="name"></param>
+		/// <param name="commonFileType"></param>
+		/// <returns></returns>
+		minty::Path find_asset(minty::String const& name, CommonFileType const commonFileType) const;
+
+		/// <summary>
 		/// Searches the disk for all files and updates their internal states. Use this to "refresh" the project.
 		/// </summary>
 		void collect_assets();
+
+	private:
+		std::unordered_set<minty::Path> get_extensions(CommonFileType const commonFileTypes) const;
 	};
 }

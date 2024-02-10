@@ -34,12 +34,6 @@ namespace minty
 		/// </summary>
 		/// <returns></returns>
 		Engine const& get_engine() const;
-
-		/// <summary>
-		/// Runs the Runtime.
-		/// </summary>
-		/// <returns>The program result code for this Runtime upon completion.</returns>
-		int run();
 	private:
 		// registers all built in systems and components
 		void register_builtin();

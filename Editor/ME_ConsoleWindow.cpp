@@ -1,11 +1,12 @@
-#include "ME_Console.h"
+#include "ME_ConsoleWindow.h"
 
 #include <regex>
 
 using namespace minty;
 
-mintye::Console::Console()
-	: _scrollToBottom(true)
+mintye::ConsoleWindow::ConsoleWindow(Application& application)
+	: EditorWindow(application)
+	, _scrollToBottom(true)
 	, _autoScroll(true)
 	, showNormal(true)
 	, showWarnings(true)
@@ -13,9 +14,7 @@ mintye::Console::Console()
 	, _filter()
 	, _maxLines(16384)
 	, _lines()
-{
-	//_lines.reserve(_maxLines);
-}
+{}
 
 ImVec4 ColorToImVec4(Console::Color const color)
 {
@@ -34,12 +33,11 @@ ImVec4 ColorToImVec4(Console::Color const color)
 	}
 }
 
-void mintye::Console::draw(char const* title)
+void mintye::ConsoleWindow::draw()
 {
 	ImGui::SetNextWindowSize(ImVec2(520, 600), ImGuiCond_FirstUseEver);
 	if (!ImGui::Begin("Console"))
 	{
-		ImGui::End();
 		return;
 	}
 
@@ -121,12 +119,17 @@ void mintye::Console::draw(char const* title)
 	ImGui::End();
 }
 
-void mintye::Console::run_command(std::string const& command)
+void mintye::ConsoleWindow::reset()
+{
+	_lines.clear();
+}
+
+void mintye::ConsoleWindow::run_command(std::string const& command)
 {
 	run_commands({ command });
 }
 
-void mintye::Console::run_commands(std::vector<std::string> const& commands)
+void mintye::ConsoleWindow::run_commands(std::vector<std::string> const& commands)
 {
 	// lock and add to queue
 	_commandsLock.lock();
@@ -136,7 +139,7 @@ void mintye::Console::run_commands(std::vector<std::string> const& commands)
 	if (!_commandsThreadRunning)
 	{
 		_commandsThreadRunning = true;
-		std::thread thread(&Console::execute_commands, this);
+		std::thread thread(&ConsoleWindow::execute_commands, this);
 		_commandsLock.unlock();
 		//thread.join();
 		thread.detach();
@@ -147,12 +150,12 @@ void mintye::Console::run_commands(std::vector<std::string> const& commands)
 	}
 }
 
-bool mintye::Console::is_command_running() const
+bool mintye::ConsoleWindow::is_command_running() const
 {
 	return _commandsThreadRunning;
 }
 
-void mintye::Console::log(std::string const& text, minty::Console::Color const color)
+void mintye::ConsoleWindow::log(std::string const& text, minty::Console::Color const color)
 {
 	_linesLock.lock();
 
@@ -167,32 +170,32 @@ void mintye::Console::log(std::string const& text, minty::Console::Color const c
 	_linesLock.unlock();
 }
 
-void mintye::Console::log_important(std::string const& text)
+void mintye::ConsoleWindow::log_important(std::string const& text)
 {
 	log(text, Color::Cyan);
 }
 
-void mintye::Console::log_info(std::string const& text)
+void mintye::ConsoleWindow::log_info(std::string const& text)
 {
 	log(text, Color::Gray);
 }
 
-void mintye::Console::log_warning(std::string const& text)
+void mintye::ConsoleWindow::log_warning(std::string const& text)
 {
 	log(text, Color::Yellow);
 }
 
-void mintye::Console::log_error(std::string const& text)
+void mintye::ConsoleWindow::log_error(std::string const& text)
 {
 	log(text, Color::Red);
 }
 
-void mintye::Console::set_max_lines(int const count)
+void mintye::ConsoleWindow::set_max_lines(int const count)
 {
 	_maxLines = count;
 }
 
-size_t mintye::Console::execute_command(std::string const& command)
+size_t mintye::ConsoleWindow::execute_command(std::string const& command)
 {
 	size_t errorCount = 0;
 	std::array<char, 4096> buffer;
@@ -252,7 +255,7 @@ size_t mintye::Console::execute_command(std::string const& command)
 	return errorCount;
 }
 
-void mintye::Console::execute_commands()
+void mintye::ConsoleWindow::execute_commands()
 {
 	size_t queueSize = 0;
 
@@ -293,7 +296,7 @@ void mintye::Console::execute_commands()
 	_commandsLock.unlock();
 }
 
-mintye::Console::Line::Line(std::string const& text, Color color)
+mintye::ConsoleWindow::Line::Line(std::string const& text, Color color)
 	: text(text)
 	, color(color)
 {}

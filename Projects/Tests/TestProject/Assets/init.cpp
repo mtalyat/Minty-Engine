@@ -1,13 +1,15 @@
 #include "init.h"
 
+#include "Scripts/types.h"
+
 // components
-#include "Components/TestComponent.h"
-#include "Components/MoveComponent.h"
+#include "Scripts/Components/TestComponent.h"
+#include "Scripts/Components/MoveComponent.h"
 
 // system
-#include "Systems/TestSystem.h"
-#include "Systems/CameraControllerSystem.h"
-#include "Systems/MoveSystem.h"
+#include "Scripts/Systems/TestSystem.h"
+#include "Scripts/Systems/CameraControllerSystem.h"
+#include "Scripts/Systems/MoveSystem.h"
 
 #include <iostream>
 
@@ -17,7 +19,7 @@ using namespace game;
 InputMap input;
 
 // called when the engine is initialized
-int init(Runtime &runtime)
+int init(Engine& engine)
 {
     try
     {
@@ -30,20 +32,17 @@ int init(Runtime &runtime)
         SystemRegistry::register_system<game::CameraControllerSystem>("CameraController");
         SystemRegistry::register_system<game::MoveSystem>("Move");
 
-        Engine &engine = runtime.get_engine();
         Window &window = engine.get_window();
+        // window.maximize();
         RenderEngine &renderer = engine.get_render_engine();
         AudioEngine &audio = engine.get_audio_engine();
         SceneManager &sceneManager = engine.get_scene_manager();
 
-        // create renderer
-        Info info("TestProject", 0, 0, 0);
-
-        // use defaults for most things
-        RenderEngineBuilder rb(&info);
-
-        // basic::create_basic_renderer_builder(rb);
-        renderer.init(rb);
+        // initialize renderer for this project
+        {
+            RenderEngineBuilder rb(&engine.get_info());
+            renderer.init(rb);
+        }
         
         // load scene from disk
         ID sceneId = sceneManager.create_scene("Scenes/test.mscene");
@@ -188,7 +187,7 @@ int init(Runtime &runtime)
 }
 
 // called when the engine is destroyed
-int destroy(Runtime &runtime)
+int destroy(Engine& engine)
 {
     Console::log("Game over.");
 

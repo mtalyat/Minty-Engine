@@ -16,7 +16,7 @@ void game::TestSystem::update()
         return;
     }
 
-    float deltaTime = get_scene().get_engine().get_delta_time();
+    float deltaTime = get_scene().get_engine().get_time().elapsed;
 
     EntityRegistry& registry = get_entity_registry();
 

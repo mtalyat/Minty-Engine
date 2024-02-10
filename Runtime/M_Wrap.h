@@ -14,7 +14,7 @@ namespace minty
 
 	constexpr char const* const WRAP_MAGIC = "WRAP";
 	constexpr int const WRAP_MAGIC_SIZE = 4;
-	constexpr char const* const WRAP_EXTENSION = ".wrap";
+
 	constexpr int const WRAP_HEADER_PATH_SIZE = 100;
 	constexpr int const WRAP_HEADER_NAME_SIZE = 50;
 	constexpr int const WRAP_ENTRY_PATH_SIZE = 255;

@@ -131,7 +131,6 @@ access to the entire engine without needing include each file.
 #include "M_Rect.h"
 #include "M_RectF.h"
 #include "M_Register.h"
-#include "M_Runtime.h"
 #include "M_Stopwatch.h"
 #include "M_Text.h"
 #include "M_Types.h"

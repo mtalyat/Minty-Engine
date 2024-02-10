@@ -64,7 +64,6 @@ namespace minty
 		: public Object
 	{
 	private:
-		RenderEngineBuilder const* _builder;
 		Window* _window;
 
 		// assets
@@ -122,12 +121,6 @@ namespace minty
 		void render_frame();
 
 		/// <summary>
-		/// Checks if the render engine is still running.
-		/// </summary>
-		/// <returns>True if the engine is still running.</returns>
-		bool is_running() const;
-
-		/// <summary>
 		/// Checks if this RenderEngine has been initialized.
 		/// </summary>
 		/// <returns>True if the engine is initialized.</returns>
@@ -179,7 +172,7 @@ namespace minty
 		/// <summary>
 		/// Creates a Vulkan instance.
 		/// </summary>
-		void create_instance();
+		void create_instance(RenderEngineBuilder const& builder);
 
 		/// <summary>
 		/// Initializes the debug messenger.

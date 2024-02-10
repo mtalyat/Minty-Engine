@@ -12,10 +12,16 @@ using namespace minty;
 int Window::_windowCount = 0;
 
 Window::Window(String const& title, int const width, int const height, InputMap const* const globalInputMap)
+	: Window(title, -1, -1, width, height, globalInputMap)
+{}
+
+minty::Window::Window(String const& title, int const x, int const y, int const width, int const height, InputMap const* const globalInputMap)
 	: _title(title)
 	, _window()
 	, _width(width)
 	, _height(height)
+	, _restoreX(x)
+	, _restoreY(y)
 	, _resized(true) // start as "resized" so render engine regenerates data on start
 	, _activeInputMap()
 	, _globalInputMap(globalInputMap)
@@ -42,6 +48,17 @@ Window::Window(String const& title, int const width, int const height, InputMap 
 	if (!_window)
 	{
 		Error::abort("Failed to create GLFW window \"" + title + "\".");
+	}
+
+	if (x >= 0 && y >= 0)
+	{
+		// if x and y given, set there
+		restore();
+	}
+	else
+	{
+		// set x and y
+		save_restore_info();
 	}
 
 	// set user pointer, so this class can be referenced for callbacks
@@ -98,6 +115,24 @@ void minty::Window::set_cursor_mode(CursorMode const mode)
 		glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 		break;
 	}
+}
+
+void minty::Window::maximize()
+{
+	save_restore_info();
+	glfwMaximizeWindow(_window);
+}
+
+void minty::Window::minimize()
+{
+	save_restore_info();
+	glfwIconifyWindow(_window);
+}
+
+void minty::Window::restore()
+{
+	glfwSetWindowPos(_window, _restoreX, _restoreY);
+	glfwSetWindowSize(_window, _width, _height);
 }
 
 bool minty::Window::is_resized()
@@ -162,6 +197,17 @@ void minty::Window::set_input(InputMap const* const inputMap)
 InputMap const* minty::Window::get_input() const
 {
 	return _activeInputMap;
+}
+
+void minty::Window::poll_events()
+{
+	glfwPollEvents();
+}
+
+void minty::Window::save_restore_info()
+{
+	glfwGetWindowPos(_window, &_restoreX, &_restoreY);
+	glfwGetWindowSize(_window, &_width, &_height);
 }
 
 void minty::Window::trigger_key(Key const key, KeyAction const action, KeyModifiers const mods)

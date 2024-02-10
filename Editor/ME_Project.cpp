@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "ME_Project.h"
 
+#include "ME_Constants.h"
 #include "M_Console.h"
 #include "M_File.h"
 #include <vector>
@@ -8,37 +9,45 @@
 using namespace minty;
 using namespace mintye;
 
-Project::Project(std::string const& path)
+Project::Project(minty::Path const& path)
 	: _base(std::filesystem::absolute(path))
 	, _files()
+{}
+
+minty::String mintye::Project::get_name() const
 {
-	collect_assets();
+	return _base.stem().string();
 }
 
-Path const Project::get_base_path() const
+Path Project::get_base_path() const
 {
 	return _base;
 }
 
-Path const Project::get_assets_path() const
+minty::Path mintye::Project::get_sub_path(minty::Path const& subPath) const
 {
-	return (_base / "Assets");
+	return (_base / subPath);
 }
 
-Path const Project::get_build_path() const
+Path Project::get_assets_path() const
 {
-	return (_base / "Build");
+	return (_base / ASSETS_DIRECTORY_NAME);
 }
 
-std::set<Path> mintye::Project::find_assets(std::set<std::string> const& extensions) const
+Path Project::get_build_path() const
+{
+	return (_base / BUILD_DIRECTORY_NAME);
+}
+
+std::set<Path> mintye::Project::find_assets(std::unordered_set<minty::Path> const& extensions) const
 {
 	// output files
 	std::set<Path> result;
 
 	// find all files with headers and add to result
-	for (std::string const& extension : extensions)
+	for (Path const& extension : extensions)
 	{
-		auto const& found = _files.find(extension);
+		auto found = _files.find(extension);
 		if (found != _files.end())
 		{
 			// add all to result
@@ -49,20 +58,9 @@ std::set<Path> mintye::Project::find_assets(std::set<std::string> const& extensi
 	return result;
 }
 
-std::set<Path> mintye::Project::find_assets(CommonFileTypes const commonFileTypes) const
+std::set<Path> mintye::Project::find_assets(CommonFileType const commonFileTypes) const
 {
-	// switch based on common file types
-	switch (commonFileTypes)
-	{
-	case CommonFileTypes::Header: return find_assets({ ".h" });
-	case CommonFileTypes::Source: return find_assets({ ".cpp", ".c" });
-	case CommonFileTypes::Scene: return find_assets({ ".scene" });
-	case CommonFileTypes::Shader: return find_assets({ ".spv" });
-	case CommonFileTypes::Texture: return find_assets({ ".png", ".jpg", ".jpeg", ".bmp" });
-	case CommonFileTypes::Text: return find_assets({ ".txt" });
-	case CommonFileTypes::CSV: return find_assets({ ".csv" });
-	default: return {}; // not a valid common file type
-	}
+	return find_assets(get_extensions(commonFileTypes));
 }
 
 Path mintye::Project::find_asset(std::string name) const
@@ -77,7 +75,7 @@ Path mintye::Project::find_asset(std::string name) const
 	Path stem = path.stem();
 
 	// check files with extension
-	auto const& found = _files.find(extension);
+	auto found = _files.find(extension);
 	
 	if (found != _files.end())
 	{
@@ -95,10 +93,61 @@ Path mintye::Project::find_asset(std::string name) const
 	return Path();
 }
 
+minty::Path mintye::Project::find_asset(CommonFileType const commonFileType) const
+{
+	return find_asset(get_extensions(commonFileType));
+}
+
+minty::Path mintye::Project::find_asset(std::unordered_set<minty::Path> const& extensions) const
+{
+	// check each extension, if it exists
+	for (auto const& extension : extensions)
+	{
+		auto found = _files.find(extension);
+
+		if (found != _files.end())
+		{
+			if (found->second.size())
+			{
+				return found->second.front();
+			}
+		}
+	}
+
+	// none found
+	return Path();
+}
+
+minty::Path mintye::Project::find_asset(minty::String const& name, CommonFileType const commonFileType) const
+{
+	for (auto const& extension : get_extensions(commonFileType))
+	{
+		Path path = find_asset(std::format("{}{}", name, extension.string()));
+
+		// asset found with name and type, return path to it
+		if (!path.empty())
+		{
+			return path;
+		}
+	}
+
+	// none found
+	return Path();
+}
+
 void Project::collect_assets()
 {
 	if (!std::filesystem::exists(_base.string()))
 	{
+		Console::error(std::format("Project missing project directory at path: {}", _base.string()));
+		return;
+	}
+
+	Path assetsPath = get_assets_path();
+
+	if (!std::filesystem::exists(assetsPath))
+	{
+		Console::error(std::format("Project missing assets directory at path: {}", _base.string()));
 		return;
 	}
 
@@ -106,7 +155,7 @@ void Project::collect_assets()
 	std::vector<Path> directoriesToCollect;
 
 	// add base directory to get started
-	directoriesToCollect.push_back(get_assets_path());
+	directoriesToCollect.push_back(assetsPath);
 
 	Path directory;
 
@@ -134,35 +183,51 @@ void Project::collect_assets()
 			else
 			{
 				// if a file, check the file type and add where necessary
-				std::string extension = path.extension().string();
+				minty::Path extension = path.extension();
 
 				// if header exists in files, add to that list
 				// otherwise add to new list
-				auto const& found = _files.find(extension);
+				auto found = _files.find(extension);
 				if (found == _files.end())
 				{
 					// new list
-					_files.emplace(extension, std::set<Path>());
-					_files.at(extension).emplace(path);
+					_files.emplace(extension, std::vector<Path>());
+					_files.at(extension).push_back(path);
 				}
 				else
 				{
 					// existing list
-					found->second.emplace(path);
+					found->second.push_back(path);
 				}
 
 				count++;
 			}
 		}
 	}
+}
 
-	//console::log(std::format("Found {} assets:", count));
-	//for (auto const& pair : _files)
-	//{
-	//	console::log(std::format("\t{}:", pair.first));
-	//	for (auto const& path : pair.second)
-	//	{
-	//		console::log(std::format("\t\t{}", path.string()));
-	//	}
-	//}
+std::unordered_set<minty::Path> mintye::Project::get_extensions(CommonFileType const commonFileType) const
+{
+	// switch based on common file types
+	switch (commonFileType)
+	{
+	case CommonFileType::Header: return { ".h" };
+	case CommonFileType::Source: return { ".cpp", ".c" };
+	case CommonFileType::Scene: return { minty::SCENE_EXTENSION };
+	case CommonFileType::Text: return { ".txt" };
+	case CommonFileType::CSV: return { ".csv" };
+	case CommonFileType::Texture: return { ".png", ".jpg", ".jpeg", ".bmp" };
+	case CommonFileType::Sprite: return { minty::SPRITE_EXTENSION };
+	case CommonFileType::Material: return { minty::MATERIAL_EXTENSION };
+	case CommonFileType::MaterialTemplate: return { minty::MATERIAL_TEMPLATE_EXTENSION };
+	case CommonFileType::ShaderPass: return { minty::SHADER_PASS_EXTENSION };
+	case CommonFileType::Shader: return { minty::SHADER_EXTENSION };
+	case CommonFileType::ShaderModule: return { ".spv" };
+	case CommonFileType::Audio: return { ".wav", ".mp3" };
+	case CommonFileType::Animator: return { minty::ANIMATOR_EXTENSION };
+	case CommonFileType::Animation: return { minty::ANIMATION_EXTENSION };
+	case CommonFileType::Model: return { ".obj" };
+	case CommonFileType::Wrap: return { minty::WRAP_EXTENSION };
+	default: return {}; // not a valid common file type
+	}
 }

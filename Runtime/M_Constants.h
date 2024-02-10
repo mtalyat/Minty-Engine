@@ -34,4 +34,5 @@ namespace minty
 	constexpr char const* MATERIAL_TEMPLATE_EXTENSION = ".mmaterialtemplate";
 	constexpr char const* SHADER_PASS_EXTENSION = ".mshaderpass";
 	constexpr char const* SHADER_EXTENSION = ".mshader";
+	constexpr char const* WRAP_EXTENSION = ".wrap";
 }

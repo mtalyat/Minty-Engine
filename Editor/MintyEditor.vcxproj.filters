@@ -13,8 +13,14 @@
       <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
       <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
     </Filter>
-    <Filter Include="Source Files\imgui">
+    <Filter Include="Libraries">
+      <UniqueIdentifier>{c0f650f8-da6b-48af-b7a0-12d7a3ea03a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Libraries\imgui">
       <UniqueIdentifier>{88f785d1-ab77-4e53-9116-af5a7eb4b67e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Libraries\imguifiledialog">
+      <UniqueIdentifier>{5b7b77c6-47f5-456e-994d-b19c5c45bdaa}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -25,33 +31,48 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="libraries\imgui\imgui_stdlib.cpp">
-      <Filter>Source Files\imgui</Filter>
+      <Filter>Libraries\imgui</Filter>
     </ClCompile>
     <ClCompile Include="libraries\imgui\imgui_tables.cpp">
-      <Filter>Source Files\imgui</Filter>
+      <Filter>Libraries\imgui</Filter>
     </ClCompile>
     <ClCompile Include="libraries\imgui\imgui_widgets.cpp">
-      <Filter>Source Files\imgui</Filter>
+      <Filter>Libraries\imgui</Filter>
     </ClCompile>
     <ClCompile Include="libraries\imgui\imgui.cpp">
-      <Filter>Source Files\imgui</Filter>
+      <Filter>Libraries\imgui</Filter>
     </ClCompile>
     <ClCompile Include="libraries\imgui\imgui_demo.cpp">
-      <Filter>Source Files\imgui</Filter>
+      <Filter>Libraries\imgui</Filter>
     </ClCompile>
     <ClCompile Include="libraries\imgui\imgui_draw.cpp">
-      <Filter>Source Files\imgui</Filter>
+      <Filter>Libraries\imgui</Filter>
     </ClCompile>
     <ClCompile Include="libraries\imgui\imgui_impl_vulkan.cpp">
-      <Filter>Source Files\imgui</Filter>
+      <Filter>Libraries\imgui</Filter>
     </ClCompile>
     <ClCompile Include="libraries\imgui\imgui_impl_glfw.cpp">
-      <Filter>Source Files\imgui</Filter>
+      <Filter>Libraries\imgui</Filter>
     </ClCompile>
-    <ClCompile Include="ME_Console.cpp">
+    <ClCompile Include="ME_ConsoleWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ME_Project.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ProjectConfig.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ME_BuildInfo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\imguifiledialog\ImGuiFileDialog\ImGuiFileDialog.cpp">
+      <Filter>Libraries\imguifiledialog</Filter>
+    </ClCompile>
+    <ClCompile Include="ME_EditorWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ME_HierarchyWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -59,10 +80,28 @@
     <ClInclude Include="ME_Application.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ME_Console.h">
+    <ClInclude Include="ME_ConsoleWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ME_Project.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ProjectConfig.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ME_BuildInfo.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\imguifiledialog\ImGuiFileDialog\ImGuiFileDialog.h">
+      <Filter>Libraries\imguifiledialog</Filter>
+    </ClInclude>
+    <ClInclude Include="ME_Constants.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ME_EditorWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ME_HierarchyWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

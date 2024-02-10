@@ -1,8 +1,14 @@
 #include "ME_Application.h"
 
-#include "libraries/imgui/imgui.h"
-#include "libraries/imgui/imgui_impl_glfw.h"
-#include "libraries/imgui/imgui_impl_vulkan.h"
+#include "ME_Constants.h"
+#include "ME_Project.h"
+#include "ME_BuildInfo.h"
+#include "ME_ConsoleWindow.h"
+
+#include <imgui.h>
+#include <imgui_impl_glfw.h>
+#include <imgui_impl_vulkan.h>
+#include <ImGuiFileDialog.h>
 
 #include <Minty.h>
 #include <iostream>
@@ -21,6 +27,8 @@
 #include <stdexcept>
 //#include <string>
 #include <array>
+
+namespace fs = std::filesystem;
 
 #define CMAKE_PATH "C:/Users/mitch/source/repos/Minty-Engine/Editor/cmake/bin/cmake.exe"
 #define APPLICATION_NAME "TestProject"
@@ -403,16 +411,35 @@ std::vector<std::string> splitString(std::string s)
 }
 
 Application::Application()
-	: _project("../Projects/Tests/TestProject")
-	, _info(&_project, true)
-	, _window("Minty Editor", 1280, 720)
-	, _console()
-{}
+	: _project()
+	, _window("", 1280, 720)
+	, _editorWindows()
+{
+	// set to default window title
+	set_window_title("");
+
+	// create all the editor windows
+	_editorWindows.emplace("Console", new ConsoleWindow(*this));
+
+}
+
+mintye::Application::~Application()
+{
+	for(auto const& pair : _editorWindows)
+	{
+		delete pair.second;
+	}
+}
 
 int Application::run(int argc, char const* argv[])
 {
+	BuildInfo buildInfo
+	{
+		.debug = true
+	};
+
 	// generate engine files for project
-	generate();
+	generate(buildInfo);
 
 	// set error callback
 	glfwSetErrorCallback(glfw_error_callback);
@@ -526,6 +553,8 @@ int Application::run(int argc, char const* argv[])
 	bool show_demo_window = true;
 	ImVec4 clear_color = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
 
+	_window.maximize();
+
 	// Main loop
 	while (_window.is_open())
 	{
@@ -534,7 +563,7 @@ int Application::run(int argc, char const* argv[])
 		// - When io.WantCaptureMouse is true, do not dispatch mouse input data to your main application, or clear/overwrite your copy of the mouse data.
 		// - When io.WantCaptureKeyboard is true, do not dispatch keyboard input data to your main application, or clear/overwrite your copy of the keyboard data.
 		// Generally you may always pass all inputs to dear imgui, and hide them from your application based on those two flags.
-		glfwPollEvents();
+		Window::poll_events();
 
 		// Resize swap chain?
 		if (g_SwapChainRebuild)
@@ -555,15 +584,10 @@ int Application::run(int argc, char const* argv[])
 		ImGui_ImplGlfw_NewFrame();
 		ImGui::NewFrame();
 
-		// 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
-		ImGui::ShowDemoWindow(&show_demo_window);
+		//// 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
+		//ImGui::ShowDemoWindow(&show_demo_window);
 
-		draw_commands();
-		draw_console();
-		draw_hierarchy();
-		draw_inspector();
-		draw_scene();
-		draw_game();
+		draw_application(buildInfo);
 
 		// Rendering
 		ImGui::Render();
@@ -589,6 +613,8 @@ int Application::run(int argc, char const* argv[])
 	}
 
 	// Cleanup
+	cleanup();
+
 	err = vkDeviceWaitIdle(g_Device);
 	check_vk_result(err);
 	ImGui_ImplVulkan_Shutdown();
@@ -604,12 +630,302 @@ int Application::run(int argc, char const* argv[])
 	return 0;
 }
 
-void Application::draw_commands()
+void mintye::Application::cleanup()
 {
+	unload_scene();
+	unload_project();
+	reset_editor_windows();
+}
+
+void mintye::Application::set_window_title(minty::String const& subTitle)
+{
+	if (subTitle.length())
+	{
+		_window.set_title("Minty Editor");
+	}
+	else
+	{
+		_window.set_title(std::format("Minty Editor: {}", subTitle));
+	}
+}
+
+void mintye::Application::new_project()
+{
+	ImGui::OpenPopup("Create New Project");
+}
+
+void mintye::Application::open_project()
+{
+	IGFD::FileDialogConfig config
+	{
+		.path = "."
+	};
+	ImGuiFileDialog::Instance()->OpenDialog("open_project", "Choose project directory...", nullptr, config);
+}
+
+void mintye::Application::load_project(minty::Path const& path)
+{
+	// if existing project, unload it
+	unload_project();
+
+	// load the new one if path is valid
+	if (!std::filesystem::exists(path))
+	{
+		return;
+	}
+
+	_project = new Project(path);
+	_project->collect_assets();
+	std::filesystem::current_path(path);
+	// set window text to file name
+}
+
+void mintye::Application::unload_project()
+{
+	if (_project)
+	{
+		delete _project;
+		_project = nullptr;
+	}
+}
+
+void mintye::Application::create_new_project(minty::String const& name, minty::Path const& path, NewProjectSetupType initType)
+{
+	ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console");
+
+	// make a new directory with the name
+	Path fullPath = path / name;
+
+	// create new project directory
+	if (!fs::create_directory(fullPath))
+	{
+		console->log_error(std::format("Failed to create project at path: {}", fullPath.string()));
+		return;
+	}
+
+	// create all default project necessary directories
+
+	if (!fs::create_directory(fullPath / ASSETS_DIRECTORY_NAME))
+	{
+		console->log_error(std::format("Failed to create Assets folder in project path: {}", fullPath.string()));
+		return;
+	}
+	if (!fs::create_directory(fullPath / BUILD_DIRECTORY_NAME))
+	{
+		console->log_error(std::format("Failed to create Build folder in project path: {}", fullPath.string()));
+		return;
+	}
+
+	// create all default project necessary files
+	generate_init(fullPath);
+
+	// init other folders/files if needed
+	switch (initType)
+	{
+	case NewProjectSetupType::Default:
+		break;
+	case NewProjectSetupType::VSCode:
+	{
+		// create directory
+		if (!fs::create_directory(fullPath / VSCODE_DIRECTORY_NAME))
+		{
+			console->log_error(std::format("Failed to create .vscode folder in project path: {}", fullPath.string()));
+			return;
+		}
+
+		// create files
+		generate_vscode();
+	}
+		break;
+	}
+
+	// done
+	console->log(std::format("Created new project: {}", fullPath.string()));
+}
+
+void mintye::Application::load_scene(minty::String const& name)
+{
+	ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console");
+
+	if (!_project)
+	{
+		console->log_error(std::format("Cannot load scene \"{}\". No project loaded.", name));
+		return;
+	}
+
+	Path scenePath = _project->find_asset(name, Project::CommonFileType::Scene);
+
+	// if none found, do nothing
+	if (scenePath.empty())
+	{
+		console->log_error(std::format("Cannot load scene \"{}\". Project could not find the asset.", name));
+	}
+
+	// unload existing scene
+	unload_scene();
+
+	// load new scene
+
+}
+
+void mintye::Application::unload_scene()
+{
+
+}
+
+void mintye::Application::save_project()
+{
+	minty::Console::todo("Application::save_project()");
+}
+
+void mintye::Application::save_as_project()
+{
+	minty::Console::todo("Application::save_as_project()");
+}
+
+void mintye::Application::close_project()
+{
+	unload_project();
+}
+
+void mintye::Application::draw_application(BuildInfo& buildInfo)
+{
+	draw_menu_bar();
+	draw_commands(buildInfo);
+	draw_editor_windows();
+}
+
+void mintye::Application::draw_menu_bar()
+{
+	// dumb work around: cannot open a popup in a menu bar
+	// https://github.com/ocornut/imgui/issues/331
+
+	bool createNewProject = false;
+
+	if (ImGui::BeginMainMenuBar())
+	{
+		if (ImGui::BeginMenu("File"))
+		{
+			if (ImGui::MenuItem("New Project"))
+			{
+				createNewProject = true;
+			}
+			if (ImGui::MenuItem("Open Project")) // "Ctrl+O"
+			{
+				open_project();
+			}
+			if (ImGui::MenuItem("Save Project", nullptr, false, false)) // "Ctrl+S", disabled for now
+			{
+				save_project();
+			}
+			if (ImGui::MenuItem("Save Project as...", nullptr, false, false)) // disabled for now
+			{
+				save_as_project();
+			}
+			if (ImGui::MenuItem("Close Project", nullptr, false, _project))
+			{
+				close_project();
+			}
+
+			ImGui::Separator();
+
+			if (ImGui::MenuItem("Exit"))
+			{
+				std::exit(0);
+			}
+
+			ImGui::EndMenu();
+		}
+
+		ImGui::EndMainMenuBar();
+	}
+
+	if (createNewProject)
+	{
+		new_project();
+	}
+
+	static char newProjectTitle[64] = "";
+	static NewProjectSetupType newProjectSetupType = NewProjectSetupType::Default;
+
+	if (ImGui::BeginPopupModal("Create New Project"))
+	{
+		ImGui::Text("Create New Project");
+
+		ImGui::InputText("Project Name", newProjectTitle, IM_ARRAYSIZE(newProjectTitle));
+
+		static int currentItem = 0;
+		char const* const items[] = { "Default", "VSCode" };
+		int itemsCount = sizeof(items) / sizeof(*items);
+
+		if (ImGui::Combo("Setup Type", &currentItem, items, itemsCount))
+		{
+			newProjectSetupType = static_cast<NewProjectSetupType>(currentItem);
+		}
+
+		if (ImGui::Button("Create"))
+		{
+			IGFD::FileDialogConfig config
+			{
+				.path = "."
+			};
+			ImGuiFileDialog::Instance()->OpenDialog("new_project", "Choose directory to create project in...", nullptr, config);
+
+			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::SameLine();
+
+		if (ImGui::Button("Cancel"))
+		{
+			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::EndPopup();
+	}
+
+	// draw open file dialog
+	ImGui::SetNextWindowSize(ImVec2(520, 600), ImGuiCond_FirstUseEver);
+	if (ImGuiFileDialog::Instance()->Display("new_project"))
+	{
+		if (ImGuiFileDialog::Instance()->IsOk())
+		{
+			Path filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
+
+			// create project
+			create_new_project(newProjectTitle, filePath, newProjectSetupType);
+
+			// load it also
+			load_project(filePath / newProjectTitle);
+		}
+
+		// close
+		ImGuiFileDialog::Instance()->Close();
+	}
+	ImGui::SetNextWindowSize(ImVec2(520, 600), ImGuiCond_FirstUseEver);
+	if (ImGuiFileDialog::Instance()->Display("open_project"))
+	{
+		if (ImGuiFileDialog::Instance()->IsOk())
+		{
+			//Path filePathName = ImGuiFileDialog::Instance()->GetFilePathName();
+			Path filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
+
+			load_project(filePath);
+		}
+
+		// close
+		ImGuiFileDialog::Instance()->Close();
+	}
+}
+
+void Application::draw_commands(BuildInfo& buildInfo)
+{
+	ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console");
+
 	// begin new window
 	ImGui::Begin("Commands");
 
-	bool disabled = !_info.project || _console.is_command_running();
+	bool disabled = !_project || console->is_command_running();
 
 	if (disabled)
 	{
@@ -617,7 +933,7 @@ void Application::draw_commands()
 	}
 
 	// get debug mode
-	ImGui::Checkbox("Debug", &_info.debug);
+	ImGui::Checkbox("Debug", &buildInfo.debug);
 
 	// commands:
 
@@ -627,11 +943,11 @@ void Application::draw_commands()
 	}
 	if (ImGui::Button("Build"))
 	{
-		build();
+		build(buildInfo);
 	}
 	if (ImGui::Button("Run"))
 	{
-		run();
+		run(buildInfo);
 	}
 
 	if (disabled)
@@ -642,41 +958,40 @@ void Application::draw_commands()
 	ImGui::End();
 }
 
-void mintye::Application::draw_console()
+void mintye::Application::draw_editor_windows()
 {
-	_console.draw("Console");
+	for (auto const& pair : _editorWindows)
+	{
+		pair.second->draw();
+	}
 }
 
-void mintye::Application::draw_hierarchy()
+void mintye::Application::reset_editor_windows()
 {
-
+	for (auto const& pair : _editorWindows)
+	{
+		pair.second->reset();
+	}
 }
 
-void mintye::Application::draw_inspector()
-{
-
-}
-
-void mintye::Application::draw_game()
-{
-
-}
-
-void mintye::Application::draw_scene()
-{
-
-}
-
-void Application::generate()
+void Application::generate(BuildInfo const& buildInfo)
 {
 	generate_main();
-	generate_cmake();
+	generate_cmake(buildInfo);
 }
 
-void Application::generate_cmake()
+void Application::generate_cmake(BuildInfo const& buildInfo)
 {
+	ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console");
+
+	if (!_project)
+	{
+		console->log_error("Cannot generate cmake: no project loaded.");
+		return;
+	}
+
 	// get path to cmake file
-	std::string path = (std::filesystem::path(_info.project->get_build_path()) / "CMakeLists.txt").string();
+	std::string path = (Path(_project->get_build_path()) / "CMakeLists.txt").string();
 
 	// open file to overwrite
 	std::ofstream file(path, std::ios::trunc);
@@ -684,7 +999,7 @@ void Application::generate_cmake()
 	// if not open, error
 	if (!file.is_open())
 	{
-		minty::Console::error(std::string("Could not open cmake file: ") + path);
+		console->log_error(String("Could not open cmake file: ") + path);
 		return;
 	}
 
@@ -704,7 +1019,7 @@ void Application::generate_cmake()
 		"set(CMAKE_CXX_STANDARD_REQUIRED ON)" << std::endl <<
 		"set(CMAKE_CXX_EXTENSIONS OFF)" << std::endl;
 
-	if (_info.debug)
+	if (buildInfo.debug)
 	{
 		// only ignore if in debug mode
 		file << "set(CMAKE_EXE_LINKER_FLAGS /NODEFAULTLIB:\\\"LIBCMT\\\")" << std::endl;
@@ -712,8 +1027,8 @@ void Application::generate_cmake()
 
 	// get all local paths for source files
 	std::stringstream pathsStream;
-	minty::Path buildPath = _info.project->get_build_path();
-	for (minty::Path const& path : _info.project->find_assets(Project::CommonFileTypes::Source))
+	minty::Path buildPath = _project->get_build_path();
+	for (minty::Path const& path : _project->find_assets(Project::CommonFileType::Source))
 	{
 		pathsStream << " " << std::filesystem::relative(path, buildPath).generic_string();
 	}
@@ -730,7 +1045,7 @@ void Application::generate_cmake()
 		"target_include_directories(${PROJECT_NAME} PRIVATE C:/Users/mitch/source/repos/Minty-Engine/Runtime PUBLIC ${VULKAN_INCLUDE_DIRS})" << std::endl <<
 		// include and link Vulkan
 		"include_directories(${Vulkan_INCLUDE_DIRS})" << std::endl <<
-		"target_link_libraries(${PROJECT_NAME} C:/Users/mitch/source/repos/Minty-Engine/Runtime/x64/" << _info.get_config() << "/MintyRuntime.lib)" << std::endl <<
+		"target_link_libraries(${PROJECT_NAME} C:/Users/mitch/source/repos/Minty-Engine/Runtime/x64/" << buildInfo.get_config() << "/MintyRuntime.lib)" << std::endl <<
 		"target_link_libraries(${PROJECT_NAME} ${Vulkan_LIBRARIES})";
 
 	file.close();
@@ -738,8 +1053,16 @@ void Application::generate_cmake()
 
 void Application::generate_main()
 {
+	ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console");
+
+	if (!_project)
+	{
+		console->log_error("Cannot generate main: no project loaded.");
+		return;
+	}
+
 	// get path to cmake file
-	std::string path = (std::filesystem::path(_info.project->get_build_path()) / "main.cpp").string();
+	std::string path = (std::filesystem::path(_project->get_build_path()) / "main.cpp").string();
 
 	// open file to overwrite
 	std::ofstream file(path, std::ios::trunc);
@@ -761,66 +1084,327 @@ void Application::generate_main()
 		"#include <string>" << std::endl <<
 		"#include <format>" << std::endl <<
 		"#include <filesystem>" << std::endl <<
-		"#include \"../Assets/Scripts/init.h\"" << std::endl <<
+		"#include \"../Assets/init.h\"" << std::endl <<
 		"int main(int argc, char const* argv[]) {" << std::endl <<
-		"	std::filesystem::current_path(\"" << _info.project->get_base_path().generic_string() << "\");" << std::endl << // move out of Build/Debug or Build/Release folder, into base folder
+		"	std::filesystem::current_path(\"" << _project->get_base_path().generic_string() << "\");" << std::endl << // move out of Build/Debug or Build/Release folder, into base folder
 		"	minty::Console::log(std::filesystem::current_path().string());" << std::endl <<
-		"	minty::Info info(\"TestProject - HARD CODED NAME\", 0, 0, 0);" << std::endl <<
-		"	minty::Runtime rt(info);" << std::endl <<
-		"	if(int code = init(rt)) { minty::Console::error(std::format(\"Failed to init program with error code {}.\", code)); return code; }" << std::endl <<
-		"	int result = rt.run();" << std::endl <<
-		"	if(int code = destroy(rt)) { minty::Console::error(std::format(\"Failed to destroy program with error code {}.\", code)); return code; }" << std::endl <<
-		"	return result;" << std::endl <<
+		"	minty::Info info(\"" << _project->get_name() << "\", 0, 0, 0);" << std::endl <<
+		"	minty::Engine engine(info);" << std::endl <<
+		"	engine.init();" << std::endl <<
+		"	if(int code = init(engine)) { minty::Console::error(std::format(\"Failed to init program with error code {}.\", code)); return code; }" << std::endl <<
+		"	engine.start();" << std::endl <<
+		"	engine.run();" << std::endl <<
+		"	engine.cleanup();" << std::endl <<
+		"	if(int code = destroy(engine)) { minty::Console::error(std::format(\"Failed to destroy program with error code {}.\", code)); return code; }" << std::endl <<
+		"	engine.destroy();" << std::endl <<
+		"	return engine.get_exit_code();" << std::endl <<
 		"}";
+
+	file.close();
+}
+
+void mintye::Application::generate_vscode()
+{
+	ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console");
+
+	if (!_project)
+	{
+		console->log_error("Cannot generate vscode: no project loaded.");
+		return;
+	}
+
+	// get path to files file
+	Path vsCodePath = _project->get_sub_path(VSCODE_DIRECTORY_NAME);
+	String cppPropertiesPath = (vsCodePath / "c_cpp_properties.json").string();
+	String launchPath = (vsCodePath / "launch.json").string();
+	String settingsPath = (vsCodePath / "settings.json").string();
+
+	// open file to overwrite
+	std::ofstream file(cppPropertiesPath, std::ios::trunc);
+
+	// if not open, error
+	if (!file.is_open())
+	{
+		console->log_error(std::format("Could not open c_cpp_properties.json file: {}", cppPropertiesPath));
+		return;
+	}
+	
+	file
+		<< "{" << std::endl
+		<< "    \"configurations\": [" << std::endl
+		<< "        {" << std::endl
+		<< "            \"name\": \"Win32\"," << std::endl
+		<< "            \"includePath\": [" << std::endl
+		<< "                \"${workspaceFolder}/**\"," << std::endl
+		<< "                \"C:\\\\Users\\\\mitch\\\\source\\\\repos\\\\Minty-Engine\\\\Runtime\"," << std::endl
+		<< "                \"${Vulkan_INCLUDE_DIR}\"" << std::endl
+		<< "            ]," << std::endl
+		<< "            \"defines\": [" << std::endl
+		<< "                \"_DEBUG\"," << std::endl
+		<< "                \"UNICODE\"," << std::endl
+		<< "                \"_UNICODE\"" << std::endl
+		<< "            ]," << std::endl
+		<< "            \"windowsSdkVersion\": \"10.0.22621.0\"," << std::endl
+		<< "            \"compilerPath\": \"cl.exe\"," << std::endl
+		<< "            \"cStandard\": \"c17\"," << std::endl
+		<< "            \"cppStandard\": \"c++20\"," << std::endl
+		<< "            \"intelliSenseMode\": \"windows-msvc-x64\"" << std::endl
+		<< "        }" << std::endl
+		<< "    ]," << std::endl
+		<< "    \"version\": 4" << std::endl
+		<< "}" << std::endl;
+
+	console->log_warning("c_cpp_properties.json: hard coded cmake.sourceDirectory");
+
+	file.close();
+
+	file = std::ofstream(launchPath, std::ios::trunc);
+
+	if (!file.is_open())
+	{
+		console->log_error(std::format("Could not open launch.json file: {}", launchPath));
+		return;
+	}
+
+	file
+		<< "{" << std::endl
+		<< "    \"version\": \"0.2.0\"," << std::endl
+		<< "    \"configurations\": [" << std::endl
+		<< "        {" << std::endl
+		<< "            \"name\": \"(msvc) Launch\"," << std::endl
+		<< "            \"type\": \"cppvsdbg\"," << std::endl
+		<< "            \"request\": \"launch\"," << std::endl
+		<< "            // Resolved by CMake Tools:" << std::endl
+		<< "            \"program\": \"${command:cmake.launchTargetPath}\"," << std::endl
+		<< "            \"args\": []," << std::endl
+		<< "            \"stopAtEntry\": false," << std::endl
+		<< "            \"cwd\": \"${workspaceFolder}\"," << std::endl
+		<< "            \"environment\": [" << std::endl
+		<< "                {" << std::endl
+		<< "                    // add the directory where our target was built to the PATHs" << std::endl
+		<< "                    // it gets resolved by CMake Tools:" << std::endl
+		<< "                    \"name\": \"PATH\"," << std::endl
+		<< "                    \"value\": \"${env:PATH}:${command:cmake.getLaunchTargetDirectory}\"" << std::endl
+		<< "                }" << std::endl
+		<< "            ]," << std::endl
+		<< "            \"console\": \"internalConsole\"" << std::endl
+		<< "        }" << std::endl
+		<< "    ]" << std::endl
+		<< "}" << std::endl;
+
+	file.close();
+
+	file = std::ofstream(settingsPath, std::ios::trunc);
+
+	if (!file.is_open())
+	{
+		console->log_error(std::format("Could not open settings.json file: {}", settingsPath));
+		return;
+	}
+
+	file
+		<< "{" << std::endl
+		<< "    \"files.associations\": {" << std::endl
+		<< "        \"ostream\": \"cpp\"," << std::endl
+		<< "        \"algorithm\": \"cpp\"," << std::endl
+		<< "        \"array\": \"cpp\"," << std::endl
+		<< "        \"atomic\": \"cpp\"," << std::endl
+		<< "        \"bit\": \"cpp\"," << std::endl
+		<< "        \"cctype\": \"cpp\"," << std::endl
+		<< "        \"charconv\": \"cpp\"," << std::endl
+		<< "        \"chrono\": \"cpp\"," << std::endl
+		<< "        \"clocale\": \"cpp\"," << std::endl
+		<< "        \"cmath\": \"cpp\"," << std::endl
+		<< "        \"compare\": \"cpp\"," << std::endl
+		<< "        \"concepts\": \"cpp\"," << std::endl
+		<< "        \"cstddef\": \"cpp\"," << std::endl
+		<< "        \"cstdint\": \"cpp\"," << std::endl
+		<< "        \"cstdio\": \"cpp\"," << std::endl
+		<< "        \"cstdlib\": \"cpp\"," << std::endl
+		<< "        \"cstring\": \"cpp\"," << std::endl
+		<< "        \"ctime\": \"cpp\"," << std::endl
+		<< "        \"cwchar\": \"cpp\"," << std::endl
+		<< "        \"deque\": \"cpp\"," << std::endl
+		<< "        \"exception\": \"cpp\"," << std::endl
+		<< "        \"filesystem\": \"cpp\"," << std::endl
+		<< "        \"format\": \"cpp\"," << std::endl
+		<< "        \"forward_list\": \"cpp\"," << std::endl
+		<< "        \"fstream\": \"cpp\"," << std::endl
+		<< "        \"functional\": \"cpp\"," << std::endl
+		<< "        \"initializer_list\": \"cpp\"," << std::endl
+		<< "        \"iomanip\": \"cpp\"," << std::endl
+		<< "        \"ios\": \"cpp\"," << std::endl
+		<< "        \"iosfwd\": \"cpp\"," << std::endl
+		<< "        \"iostream\": \"cpp\"," << std::endl
+		<< "        \"istream\": \"cpp\"," << std::endl
+		<< "        \"iterator\": \"cpp\"," << std::endl
+		<< "        \"limits\": \"cpp\"," << std::endl
+		<< "        \"list\": \"cpp\"," << std::endl
+		<< "        \"locale\": \"cpp\"," << std::endl
+		<< "        \"map\": \"cpp\"," << std::endl
+		<< "        \"memory\": \"cpp\"," << std::endl
+		<< "        \"mutex\": \"cpp\"," << std::endl
+		<< "        \"new\": \"cpp\"," << std::endl
+		<< "        \"optional\": \"cpp\"," << std::endl
+		<< "        \"ratio\": \"cpp\"," << std::endl
+		<< "        \"set\": \"cpp\"," << std::endl
+		<< "        \"sstream\": \"cpp\"," << std::endl
+		<< "        \"stdexcept\": \"cpp\"," << std::endl
+		<< "        \"stop_token\": \"cpp\"," << std::endl
+		<< "        \"streambuf\": \"cpp\"," << std::endl
+		<< "        \"string\": \"cpp\"," << std::endl
+		<< "        \"system_error\": \"cpp\"," << std::endl
+		<< "        \"thread\": \"cpp\"," << std::endl
+		<< "        \"tuple\": \"cpp\"," << std::endl
+		<< "        \"type_traits\": \"cpp\"," << std::endl
+		<< "        \"typeinfo\": \"cpp\"," << std::endl
+		<< "        \"unordered_map\": \"cpp\"," << std::endl
+		<< "        \"unordered_set\": \"cpp\"," << std::endl
+		<< "        \"utility\": \"cpp\"," << std::endl
+		<< "        \"vector\": \"cpp\"," << std::endl
+		<< "        \"xfacet\": \"cpp\"," << std::endl
+		<< "        \"xhash\": \"cpp\"," << std::endl
+		<< "        \"xiosbase\": \"cpp\"," << std::endl
+		<< "        \"xlocale\": \"cpp\"," << std::endl
+		<< "        \"xlocbuf\": \"cpp\"," << std::endl
+		<< "        \"xlocinfo\": \"cpp\"," << std::endl
+		<< "        \"xlocmes\": \"cpp\"," << std::endl
+		<< "        \"xlocmon\": \"cpp\"," << std::endl
+		<< "        \"xlocnum\": \"cpp\"," << std::endl
+		<< "        \"xloctime\": \"cpp\"," << std::endl
+		<< "        \"xmemory\": \"cpp\"," << std::endl
+		<< "        \"xstring\": \"cpp\"," << std::endl
+		<< "        \"xtr1common\": \"cpp\"," << std::endl
+		<< "        \"xtree\": \"cpp\"," << std::endl
+		<< "        \"xutility\": \"cpp\"," << std::endl
+		<< "        \"regex\": \"cpp\"" << std::endl
+		<< "    }," << std::endl
+		<< "    \"liveServer.settings.port\": 5501," << std::endl
+		<< "    \"cmake.sourceDirectory\": \"C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build\"," << std::endl
+		<< "    \"cmake.loggingLevel\": \"debug\"," << std::endl
+		<< "}" << std::endl;
+
+	console->log_warning("settings.json: hard coded cmake.sourceDirectory");
+
+	file.close();
+}
+
+void mintye::Application::generate_init(minty::Path const& path)
+{
+	ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console");
+
+	// get path to files file
+	Path assetsPath = path / ASSETS_DIRECTORY_NAME;
+	Path hPath = assetsPath / INIT_H_NAME;
+	Path cppPath = assetsPath / INIT_CPP_NAME;
+
+	// open file to overwrite
+	std::ofstream file(hPath, std::ios::trunc);
+
+	// if not open, error
+	if (!file.is_open())
+	{
+		console->log_error(std::format("Could not open {} file: {}", INIT_H_NAME, hPath.string()));
+		return;
+	}
+
+	file
+		<< "#pragma once" << std::endl
+		<< "" << std::endl
+		<< "#include <Minty.h>" << std::endl
+		<< "" << std::endl
+		<< "int init(minty::Engine& engine);" << std::endl
+		<< "int destroy(minty::Engine& engine);" << std::endl;
+
+	file.close();
+
+	// open file to overwrite
+	file = std::ofstream(cppPath, std::ios::trunc);
+
+	// if not open, error
+	if (!file.is_open())
+	{
+		console->log_error(std::format("Could not open {} file: {}", INIT_CPP_NAME, cppPath.string()));
+		return;
+	}
+
+	file
+		<< "#include \"init.h\"" << std::endl
+		<< "" << std::endl
+		<< "using namespace minty;" << std::endl
+		<< "" << std::endl
+		<< "int init(Engine &engine)" << std::endl
+		<< "{" << std::endl
+		<< "    return 0;" << std::endl
+		<< "}" << std::endl
+		<< "" << std::endl
+		<< "int destroy(Engine& engine)" << std::endl
+		<< "{" << std::endl
+		<< "    return 0;" << std::endl
+		<< "}" << std::endl;
 
 	file.close();
 }
 
 void Application::clean()
 {
-	_console.log_important("clean");
+	ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console");
+
+	if (!_project)
+	{
+		console->log_error("Cannot clean: no project loaded.");
+		return;
+	}
+
+	console->log_important("clean");
 
 	// clean the build
-	_console.run_command("cd " + _info.project->get_build_path().string() + " && " + std::filesystem::absolute(CMAKE_PATH).string() + " --build . --target clean");
+	console->run_command("cd " + _project->get_build_path().string() + " && " + std::filesystem::absolute(CMAKE_PATH).string() + " --build . --target clean");
 }
 
-void Application::build()
+void Application::build(BuildInfo const& buildInfo)
 {
-	_console.log_important("build");
+	ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console");
 
-	_console.log_important("\tgenerating cmake");
+	if (!_project)
+	{
+		console->log_error("Cannot build: no project loaded.");
+		return;
+	}
 
-	generate_cmake();
+	console->log_important("build");
 
-	_console.log_important("\tgenerating main");
+	console->log_important("\tgenerating cmake");
+
+	generate_cmake(buildInfo);
+
+	console->log_important("\tgenerating main");
 
 	generate_main();
 
-	_console.log_important("\tbuilding program");
+	console->log_important("\tbuilding program");
 
-	std::string command = "cd " + _info.project->get_build_path().string() + " && " + std::filesystem::absolute(CMAKE_PATH).string();
-	_console.run_commands({
+	std::string command = "cd " + _project->get_build_path().string() + " && " + std::filesystem::absolute(CMAKE_PATH).string();
+	console->run_commands({
 		// // make cmake files if needed
 		command + " .",
 		// build program
-		command + " --build . --config " + _info.get_config(),
+		command + " --build . --config " + buildInfo.get_config(),
 		});
 }
 
-void Application::run()
+void Application::run(BuildInfo const& buildInfo)
 {
-	_console.log_important("run");
+	ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console");
+
+	if (!_project)
+	{
+		console->log_error("Cannot run: no project loaded.");
+		return;
+	}
+
+	console->log_important("run");
 
 	// call executable, pass in project path as argument for the runtime, so it knows what to run
-	_console.run_command("cd " + _info.project->get_build_path().string() + " && cd " + _info.get_config() + " && call " + EXE_NAME + " " + _info.project->get_base_path().string());
-}
-
-mintye::Application::BuildInfo::BuildInfo(Project* const project, bool const debug)
-	: project(project)
-	, debug(debug)
-{}
-
-std::string const mintye::Application::BuildInfo::get_config() const
-{
-	return debug ? "Debug" : "Release";
+	console->run_command("cd " + _project->get_build_path().string() + " && cd " + buildInfo.get_config() + " && call " + EXE_NAME + " " + _project->get_base_path().string());
 }

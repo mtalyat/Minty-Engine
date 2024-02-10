@@ -90,8 +90,7 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
 }
 
 RenderEngine::RenderEngine(Window* const window)
-	: _builder(nullptr)
-	, _window(window)
+	: _window(window)
 	, _boundIds()
 	, _view()
 	, _backgroundColor({ 250, 220, 192, 255 }) // light tan color
@@ -111,10 +110,9 @@ RenderEngine::~RenderEngine()
 
 void minty::RenderEngine::init(RenderEngineBuilder const& builder)
 {
-	// keep track of builder
-	_builder = &builder;
+	if (_initialized) return; // already initialized, do nothing
 
-	create_instance();
+	create_instance(builder);
 	setup_debug_messenger();
 	create_surface();
 	pick_physical_device();
@@ -130,9 +128,6 @@ void minty::RenderEngine::init(RenderEngineBuilder const& builder)
 	create_sync_objects();
 
 	_initialized = true;
-
-	// builder no longer needed
-	_builder = nullptr;
 }
 
 void RenderEngine::render_frame()
@@ -220,17 +215,12 @@ void RenderEngine::render_frame()
 	if (_frame == MAX_FRAMES_IN_FLIGHT) _frame = 0;
 }
 
-bool RenderEngine::is_running() const
-{
-	return _window->is_open();
-}
-
 bool minty::RenderEngine::is_initialized() const
 {
 	return _initialized;
 }
 
-void RenderEngine::create_instance()
+void RenderEngine::create_instance(RenderEngineBuilder const& builder)
 {
 	// check if we can use validation layers
 	if (enableValidationLayers && !check_validation_layer_support())
@@ -246,7 +236,7 @@ void RenderEngine::create_instance()
 
 	VkApplicationInfo appInfo;
 
-	Info const* const info = _builder->info;
+	Info const* const info = builder.info;
 
 	if (info)
 	{

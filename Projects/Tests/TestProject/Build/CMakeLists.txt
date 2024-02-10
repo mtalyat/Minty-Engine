@@ -1,4 +1,4 @@
-# 2024-02-08 06:47:55
+# 2024-02-10 20:13:08
 cmake_minimum_required(VERSION 3.16)
 project(TestProject LANGUAGES CXX)
 find_package(Vulkan REQUIRED)
@@ -6,7 +6,7 @@ set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
 set(CMAKE_EXE_LINKER_FLAGS /NODEFAULTLIB:\"LIBCMT\")
-set(SOURCES main.cpp ../Assets/Scripts/Components/TestComponent.cpp ../Assets/Scripts/Systems/CameraControllerSystem.cpp ../Assets/Scripts/Systems/MoveSystem.cpp ../Assets/Scripts/Systems/TestSystem.cpp ../Assets/Scripts/init.cpp)
+set(SOURCES main.cpp ../Assets/Scripts/Components/TestComponent.cpp ../Assets/Scripts/Systems/CameraControllerSystem.cpp ../Assets/Scripts/Systems/MoveSystem.cpp ../Assets/Scripts/Systems/TestSystem.cpp ../Assets/init.cpp)
 add_executable(${PROJECT_NAME} ${SOURCES})
 set_property(TARGET ${PROJECT_NAME} PROPERTY INTERPROCEDURAL_OPTIMIZATION_RELEASE TRUE)
 set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
