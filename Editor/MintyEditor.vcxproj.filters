@@ -66,14 +66,14 @@
     <ClCompile Include="ME_BuildInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="libraries\imguifiledialog\ImGuiFileDialog\ImGuiFileDialog.cpp">
-      <Filter>Libraries\imguifiledialog</Filter>
-    </ClCompile>
     <ClCompile Include="ME_EditorWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ME_HierarchyWindow.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="libraries\imguifiledialog\ImGuiFileDialog.cpp">
+      <Filter>Libraries\imguifiledialog</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -92,9 +92,6 @@
     <ClInclude Include="ME_BuildInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="libraries\imguifiledialog\ImGuiFileDialog\ImGuiFileDialog.h">
-      <Filter>Libraries\imguifiledialog</Filter>
-    </ClInclude>
     <ClInclude Include="ME_Constants.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -103,6 +100,9 @@
     </ClInclude>
     <ClInclude Include="ME_HierarchyWindow.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\imguifiledialog\ImGuiFileDialog.h">
+      <Filter>Libraries\imguifiledialog</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

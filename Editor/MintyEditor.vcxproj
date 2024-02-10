@@ -125,7 +125,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Libraries\VulkanSDK\1.3.261.1\Include;C:\Libraries\GLFW\glfw-3.3.8.bin.WIN64\include;C:\Users\mitch\source\repos\Minty-Engine\Runtime;C:\Users\mitch\source\repos\Minty-Engine\Editor\libraries\imgui;C:\Users\mitch\source\repos\Minty-Engine\Editor\libraries\imguifiledialog\ImGuiFileDialog;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Libraries\VulkanSDK\1.3.261.1\Include;C:\Libraries\GLFW\glfw-3.3.8.bin.WIN64\include;C:\Users\mitch\source\repos\Minty-Engine\Runtime;C:\Users\mitch\source\repos\Minty-Engine\Editor\libraries\imgui;C:\Users\mitch\source\repos\Minty-Engine\Editor\libraries\imguifiledialog;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
@@ -149,7 +149,7 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>C:\Libraries\VulkanSDK\1.3.261.1\Include;C:\Libraries\GLFW\glfw-3.3.8.bin.WIN64\include;C:\Users\mitch\source\repos\Minty-Engine\Runtime;C:\Users\mitch\source\repos\Minty-Engine\Editor\libraries\imgui;C:\Users\mitch\source\repos\Minty-Engine\Editor\libraries\imguifiledialog\ImGuiFileDialog;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\Libraries\VulkanSDK\1.3.261.1\Include;C:\Libraries\GLFW\glfw-3.3.8.bin.WIN64\include;C:\Users\mitch\source\repos\Minty-Engine\Runtime;C:\Users\mitch\source\repos\Minty-Engine\Editor\libraries\imgui;C:\Users\mitch\source\repos\Minty-Engine\Editor\libraries\imguifiledialog;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BufferSecurityCheck>true</BufferSecurityCheck>
@@ -170,7 +170,7 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="libraries\imguifiledialog\ImGuiFileDialog\ImGuiFileDialog.cpp" />
+    <ClCompile Include="libraries\imguifiledialog\ImGuiFileDialog.cpp" />
     <ClCompile Include="libraries\imgui\imgui.cpp" />
     <ClCompile Include="libraries\imgui\imgui_demo.cpp" />
     <ClCompile Include="libraries\imgui\imgui_draw.cpp" />
@@ -189,7 +189,7 @@
     <ClCompile Include="ProjectConfig.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="libraries\imguifiledialog\ImGuiFileDialog\ImGuiFileDialog.h" />
+    <ClInclude Include="libraries\imguifiledialog\ImGuiFileDialog.h" />
     <ClInclude Include="ME_Application.h" />
     <ClInclude Include="ME_BuildInfo.h" />
     <ClInclude Include="ME_ConsoleWindow.h" />
