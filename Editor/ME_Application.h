@@ -58,6 +58,7 @@ namespace mintye
 #pragma region Windows
 
 		void draw_application(BuildInfo& buildInfo);
+		void draw_dock_space();
 		void draw_menu_bar();
 		void draw_commands(BuildInfo& buildInfo);
 		void draw_editor_windows();
