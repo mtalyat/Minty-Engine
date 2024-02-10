@@ -58,10 +58,15 @@ namespace mintye
 #pragma region Windows
 
 		void draw_application(BuildInfo& buildInfo);
+
 		void draw_dock_space();
+		
 		void draw_menu_bar();
+		
 		void draw_commands(BuildInfo& buildInfo);
+		
 		void draw_editor_windows();
+		
 		void reset_editor_windows();
 
 		template<typename T>
@@ -96,7 +101,6 @@ namespace mintye
 		void unload_scene();
 
 #pragma endregion
-
 
 #pragma region Building and Running
 
@@ -147,7 +151,7 @@ namespace mintye
 #pragma endregion
 	};
 	template<typename T>
-	inline T* Application::find_editor_window(minty::String const& name)
+	T* Application::find_editor_window(minty::String const& name)
 	{
 		auto found = _editorWindows.find(name);
 

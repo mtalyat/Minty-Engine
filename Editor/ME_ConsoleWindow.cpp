@@ -38,6 +38,7 @@ void mintye::ConsoleWindow::draw()
 	ImGui::SetNextWindowSize(ImVec2(520, 600), ImGuiCond_FirstUseEver);
 	if (!ImGui::Begin("Console"))
 	{
+		ImGui::End();
 		return;
 	}
 

@@ -180,23 +180,31 @@
     <ClCompile Include="libraries\imgui\imgui_tables.cpp" />
     <ClCompile Include="libraries\imgui\imgui_widgets.cpp" />
     <ClCompile Include="ME_Application.cpp" />
+    <ClCompile Include="ME_AssetsWindow.cpp" />
     <ClCompile Include="ME_BuildInfo.cpp" />
     <ClCompile Include="ME_ConsoleWindow.cpp" />
     <ClCompile Include="ME_EditorWindow.cpp" />
+    <ClCompile Include="ME_GameWindow.cpp" />
     <ClCompile Include="ME_HierarchyWindow.cpp" />
     <ClCompile Include="ME_Project.cpp" />
+    <ClCompile Include="ME_PropertiesWindow.cpp" />
+    <ClCompile Include="ME_SceneWindow.cpp" />
     <ClCompile Include="Program.cpp" />
     <ClCompile Include="ProjectConfig.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="libraries\imguifiledialog\ImGuiFileDialog.h" />
     <ClInclude Include="ME_Application.h" />
+    <ClInclude Include="ME_AssetsWindow.h" />
     <ClInclude Include="ME_BuildInfo.h" />
     <ClInclude Include="ME_ConsoleWindow.h" />
     <ClInclude Include="ME_Constants.h" />
     <ClInclude Include="ME_EditorWindow.h" />
+    <ClInclude Include="ME_GameWindow.h" />
     <ClInclude Include="ME_HierarchyWindow.h" />
     <ClInclude Include="ME_Project.h" />
+    <ClInclude Include="ME_PropertiesWindow.h" />
+    <ClInclude Include="ME_SceneWindow.h" />
     <ClInclude Include="ProjectConfig.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

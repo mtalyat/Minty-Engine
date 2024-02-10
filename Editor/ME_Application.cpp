@@ -3,7 +3,13 @@
 #include "ME_Constants.h"
 #include "ME_Project.h"
 #include "ME_BuildInfo.h"
+
 #include "ME_ConsoleWindow.h"
+#include "ME_HierarchyWindow.h"
+#include "ME_SceneWindow.h"
+#include "ME_GameWindow.h"
+#include "ME_PropertiesWindow.h"
+#include "ME_AssetsWindow.h"
 
 #include <imgui.h>
 #include <imgui_impl_glfw.h>
@@ -419,12 +425,15 @@ Application::Application()
 	set_window_title("");
 
 	// create all the editor windows
-	ConsoleWindow* console = new ConsoleWindow(*this);
-
 	// add to list so they get drawn and updated
-	_editorWindows.emplace("Console", console);
+	_editorWindows.emplace("Console", new ConsoleWindow(*this));
+	_editorWindows.emplace("Hierarchy", new HierarchyWindow(*this));
+	_editorWindows.emplace("Scene", new SceneWindow(*this));
+	_editorWindows.emplace("Game", new GameWindow(*this));
+	_editorWindows.emplace("Properties", new PropertiesWindow(*this));
+	_editorWindows.emplace("Assets", new AssetsWindow(*this));
 
-	// initialize any if needed
+	// initialize any if needed:
 
 }
 
@@ -673,6 +682,8 @@ void mintye::Application::load_project(minty::Path const& path)
 	// load the new one if path is valid
 	if (!std::filesystem::exists(path))
 	{
+		ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console");
+		console->log_error(std::format("Cannot load project with path \"{}\". It does not exist.", path.string()));
 		return;
 	}
 

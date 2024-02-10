@@ -75,6 +75,18 @@
     <ClCompile Include="libraries\imguifiledialog\ImGuiFileDialog.cpp">
       <Filter>Libraries\imguifiledialog</Filter>
     </ClCompile>
+    <ClCompile Include="ME_SceneWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ME_GameWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ME_AssetsWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ME_PropertiesWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ME_Application.h">
@@ -103,6 +115,18 @@
     </ClInclude>
     <ClInclude Include="libraries\imguifiledialog\ImGuiFileDialog.h">
       <Filter>Libraries\imguifiledialog</Filter>
+    </ClInclude>
+    <ClInclude Include="ME_SceneWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ME_GameWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ME_PropertiesWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ME_AssetsWindow.h">
+      <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

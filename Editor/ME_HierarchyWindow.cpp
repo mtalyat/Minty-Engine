@@ -14,6 +14,7 @@ void mintye::HierarchyWindow::draw()
 	ImGui::SetNextWindowSize(ImVec2(400, 800), ImGuiCond_FirstUseEver);
 	if (!ImGui::Begin("Hierarchy"))
 	{
+		ImGui::End();
 		return;
 	}
 
