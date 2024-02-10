@@ -9,3 +9,8 @@ mintye::EditorWindow::EditorWindow(Application& application)
 mintye::EditorWindow::~EditorWindow()
 {
 }
+
+Application& mintye::EditorWindow::get_application() const
+{
+	return *_application;
+}

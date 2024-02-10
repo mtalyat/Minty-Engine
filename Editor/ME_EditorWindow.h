@@ -17,6 +17,10 @@ namespace mintye
 
 		virtual ~EditorWindow();
 
+	protected:
+		Application& get_application() const;
+
+	public:
 		/// <summary>
 		/// Draws the window using ImGui.
 		/// </summary>

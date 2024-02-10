@@ -126,6 +126,7 @@ access to the entire engine without needing include each file.
 #include "M_Math.h"
 #include "M_Matrix.h"
 #include "M_Object.h"
+#include "M_Operations.h"
 #include "M_Parse.h"
 #include "M_Quaternion.h"
 #include "M_Rect.h"

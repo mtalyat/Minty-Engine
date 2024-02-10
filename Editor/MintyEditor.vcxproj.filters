@@ -60,9 +60,6 @@
     <ClCompile Include="ME_Project.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ProjectConfig.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="ME_BuildInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -96,9 +93,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ME_Project.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ProjectConfig.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ME_BuildInfo.h">

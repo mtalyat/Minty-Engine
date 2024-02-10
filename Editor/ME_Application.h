@@ -49,6 +49,10 @@ namespace mintye
 		/// <param name="argc">The command line argument count.</param>
 		/// <param name="argv">The command line arguments.</param>
 		int run(int argc, char const* argv[]);
+
+		Project* get_project() const;
+
+		minty::Engine* get_engine() const;
 	private:
 
 		void cleanup();

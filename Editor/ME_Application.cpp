@@ -641,6 +641,16 @@ int Application::run(int argc, char const* argv[])
 	return 0;
 }
 
+Project* mintye::Application::get_project() const
+{
+	return _project;
+}
+
+minty::Engine* mintye::Application::get_engine() const
+{
+	return _engine;
+}
+
 void mintye::Application::cleanup()
 {
 	unload_scene();

@@ -190,7 +190,6 @@
     <ClCompile Include="ME_PropertiesWindow.cpp" />
     <ClCompile Include="ME_SceneWindow.cpp" />
     <ClCompile Include="Program.cpp" />
-    <ClCompile Include="ProjectConfig.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="libraries\imguifiledialog\ImGuiFileDialog.h" />
@@ -205,7 +204,6 @@
     <ClInclude Include="ME_Project.h" />
     <ClInclude Include="ME_PropertiesWindow.h" />
     <ClInclude Include="ME_SceneWindow.h" />
-    <ClInclude Include="ProjectConfig.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
