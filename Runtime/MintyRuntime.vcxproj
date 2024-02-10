@@ -234,6 +234,7 @@
     <ClInclude Include="M_Entity.h" />
     <ClInclude Include="M_FiniteStateMachine.h" />
     <ClInclude Include="M_Macros.h" />
+    <ClInclude Include="M_Operations.h" />
     <ClInclude Include="M_PhysicalFile.h" />
     <ClInclude Include="M_CoordinateMode.h" />
     <ClInclude Include="M_PixelFormat.h" />
@@ -391,6 +392,7 @@
     <ClCompile Include="M_File.cpp" />
     <ClCompile Include="M_Engine.cpp" />
     <ClCompile Include="M_FiniteStateMachine.cpp" />
+    <ClCompile Include="M_Operations.cpp" />
     <ClCompile Include="M_PhysicalFile.cpp" />
     <ClCompile Include="M_PixelCoordinateMode.cpp" />
     <ClCompile Include="M_Buffer.cpp" />

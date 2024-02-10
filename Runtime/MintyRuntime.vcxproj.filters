@@ -504,6 +504,9 @@
     <ClInclude Include="M_Time.h">
       <Filter>Header Files</Filter>
     </ClInclude>
+    <ClInclude Include="M_Operations.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -828,6 +831,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_Time.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_Operations.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -15,7 +15,13 @@ void mintye::AssetsWindow::draw()
 		return;
 	}
 
+	// TODO: create explorer in window
 
+	// for now, button to open the folder
+	if (ImGui::Button("Open Assets Folder"))
+	{
+
+	}
 
 	ImGui::End();
 }
