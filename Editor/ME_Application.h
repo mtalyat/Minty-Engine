@@ -121,12 +121,6 @@ namespace mintye
 #pragma region File Generation
 
 		/// <summary>
-		/// Generates all necessary files for the target project.
-		/// </summary>
-		/// <param name="info"></param>
-		void generate(BuildInfo const& buildInfo);
-
-		/// <summary>
 		/// Generates and updates the cmake file for the target project.
 		/// </summary>
 		/// <param name="info">The target info.</param>

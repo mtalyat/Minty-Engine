@@ -443,9 +443,6 @@ int Application::run(int argc, char const* argv[])
 		.debug = true
 	};
 
-	// generate engine files for project
-	generate(buildInfo);
-
 	// set error callback
 	glfwSetErrorCallback(glfw_error_callback);
 
@@ -1026,12 +1023,6 @@ void mintye::Application::reset_editor_windows()
 	{
 		pair.second->reset();
 	}
-}
-
-void Application::generate(BuildInfo const& buildInfo)
-{
-	generate_main();
-	generate_cmake(buildInfo);
 }
 
 void Application::generate_cmake(BuildInfo const& buildInfo)
