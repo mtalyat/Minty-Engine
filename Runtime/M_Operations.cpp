@@ -52,3 +52,14 @@ void minty::Operations::open_directory(Path const& path)
 	system(std::format("open \"{}\"", directory.string()).c_str());
 #endif
 }
+
+void minty::Operations::open(Path const& path)
+{
+#ifdef MINTY_WINDOWS
+	system(std::format("start explorer \"{}\"", path.string()).c_str());
+#elif defined(MINTY_APPLE)
+	system(std::format("xdg-open \"{}\"", path.string()).c_str());
+#elif defined(MINTY_LINUX)
+	system(std::format("open \"{}\"", path.string()).c_str());
+#endif
+}

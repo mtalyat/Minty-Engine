@@ -658,6 +658,30 @@ void mintye::Application::cleanup()
 	reset_editor_windows();
 }
 
+void mintye::Application::set_project(Project* const project)
+{
+	// set new project
+	_project = project;
+
+	// set for all windows
+	for (auto const& pair : _editorWindows)
+	{
+		pair.second->set_project(_project);
+	}
+}
+
+void mintye::Application::set_engine(minty::Engine* const engine)
+{
+	// set new engine
+	_engine = engine;
+
+	// set for all windows
+	for (auto const& pair : _editorWindows)
+	{
+		pair.second->set_engine(_engine);
+	}
+}
+
 void mintye::Application::set_window_title(minty::String const& subTitle)
 {
 	if (subTitle.length())
@@ -697,9 +721,17 @@ void mintye::Application::load_project(minty::Path const& path)
 		return;
 	}
 
-	_project = new Project(path);
-	_project->collect_assets();
-	std::filesystem::current_path(path);
+	// create new project
+	Project* project = new Project(path);
+	project->collect_assets();
+	//std::filesystem::current_path(path);
+
+	// create new engine
+	Engine* engine = new Engine(project->get_info());
+
+	// set new types
+	set_project(project);
+	set_engine(engine);
 	// set window text to file name
 }
 
@@ -708,7 +740,15 @@ void mintye::Application::unload_project()
 	if (_project)
 	{
 		delete _project;
-		_project = nullptr;
+		set_project(nullptr);
+	}
+
+	if (_engine)
+	{
+		_engine->stop();
+		_engine->destroy();
+		delete _engine;
+		set_engine(nullptr);
 	}
 }
 

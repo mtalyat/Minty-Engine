@@ -38,6 +38,8 @@ namespace mintye
 		};
 
 	private:
+		minty::Info _info;
+
 		// the base minty::Path of the project
 		minty::Path _base;
 
@@ -50,13 +52,19 @@ namespace mintye
 		Project(minty::Path const& path);
 
 		/// <summary>
-		/// Gets the name of the project.
+		/// Gets the info for this Project.
 		/// </summary>
 		/// <returns></returns>
-		minty::String get_name() const;
+		minty::Info const& get_info() const;
 
 		/// <summary>
-		/// Gets the base file path for this project.
+		/// Gets the name of this Project.
+		/// </summary>
+		/// <returns></returns>
+		minty::String const& get_name() const;
+
+		/// <summary>
+		/// Gets the base file path for this Project.
 		/// </summary>
 		/// <returns></returns>
 		minty::Path get_base_path() const;

@@ -15,5 +15,11 @@ namespace minty
 		/// </summary>
 		/// <param name="path"></param>
 		void open_directory(Path const& path);
+
+		/// <summary>
+		/// Opens the file or directory at the given path.
+		/// </summary>
+		/// <param name="path"></param>
+		void open(Path const& path);
 	}
 }

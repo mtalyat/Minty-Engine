@@ -10,13 +10,19 @@ using namespace minty;
 using namespace mintye;
 
 Project::Project(minty::Path const& path)
-	: _base(std::filesystem::absolute(path))
+	: _info(path.stem().string(), 0, 0, 0)
+	, _base(std::filesystem::absolute(path))
 	, _files()
 {}
 
-minty::String mintye::Project::get_name() const
+minty::Info const& mintye::Project::get_info() const
 {
-	return _base.stem().string();
+	return _info;
+}
+
+minty::String const& mintye::Project::get_name() const
+{
+	return _info.get_application_name();
 }
 
 Path Project::get_base_path() const

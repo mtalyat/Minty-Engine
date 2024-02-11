@@ -50,17 +50,32 @@ namespace mintye
 		/// <param name="argv">The command line arguments.</param>
 		int run(int argc, char const* argv[]);
 
+	private:
+		void cleanup();
+
+#pragma region Get
+
+	public:
 		Project* get_project() const;
 
 		minty::Engine* get_engine() const;
-	private:
 
-		void cleanup();
+#pragma endregion
+
+#pragma region Set
+
+	private:
+		void set_project(Project* const project);
+
+		void set_engine(minty::Engine* const engine);
 
 		void set_window_title(minty::String const& subTitle);
 
+#pragma endregion
+
 #pragma region Windows
 
+	private:
 		void draw_application(BuildInfo& buildInfo);
 
 		void draw_dock_space();
@@ -73,6 +88,7 @@ namespace mintye
 		
 		void reset_editor_windows();
 
+	public:
 		template<typename T>
 		T* find_editor_window(minty::String const& name);
 
@@ -80,6 +96,7 @@ namespace mintye
 
 #pragma region Project
 
+	private:
 		void new_project();
 
 		void open_project();
@@ -100,6 +117,7 @@ namespace mintye
 
 #pragma region Scene
 
+	private:
 		void load_scene(minty::String const& name);
 
 		void unload_scene();
@@ -108,6 +126,7 @@ namespace mintye
 
 #pragma region Building and Running
 
+	private:
 		/// <summary>
 		/// Cleans the target project.
 		/// </summary>
@@ -128,6 +147,7 @@ namespace mintye
 
 #pragma region File Generation
 
+		private:
 		/// <summary>
 		/// Generates and updates the cmake file for the target project.
 		/// </summary>
@@ -154,6 +174,7 @@ namespace mintye
 
 #pragma endregion
 	};
+
 	template<typename T>
 	T* Application::find_editor_window(minty::String const& name)
 	{
