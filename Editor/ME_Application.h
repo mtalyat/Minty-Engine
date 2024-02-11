@@ -32,6 +32,7 @@ namespace mintye
 		// info needed for a loaded project:
 		Project* _project;
 		minty::Engine* _engine;
+		minty::ID _sceneId;
 
 		// window being drawn to:
 		minty::Window _window;
@@ -53,21 +54,14 @@ namespace mintye
 	private:
 		void cleanup();
 
-#pragma region Get
-
-	public:
-		Project* get_project() const;
-
-		minty::Engine* get_engine() const;
-
-#pragma endregion
-
 #pragma region Set
 
 	private:
 		void set_project(Project* const project);
 
 		void set_engine(minty::Engine* const engine);
+
+		void set_scene(minty::ID const sceneId);
 
 		void set_window_title(minty::String const& subTitle);
 
@@ -118,7 +112,7 @@ namespace mintye
 #pragma region Scene
 
 	private:
-		void load_scene(minty::String const& name);
+		void load_scene(minty::Path const& path);
 
 		void unload_scene();
 

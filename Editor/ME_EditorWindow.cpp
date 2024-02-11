@@ -34,3 +34,8 @@ void mintye::EditorWindow::set_engine(minty::Engine* const engine)
 {
 	_engine = engine;
 }
+
+void mintye::EditorWindow::set_scene(minty::Scene* const scene)
+{
+	_scene = scene;
+}

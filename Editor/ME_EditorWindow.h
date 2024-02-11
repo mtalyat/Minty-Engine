@@ -14,6 +14,7 @@ namespace mintye
 		Application* _application;
 		Project* _project;
 		minty::Engine* _engine;
+		minty::Scene* _scene;
 
 	public:
 		EditorWindow(Application& application);
@@ -31,6 +32,8 @@ namespace mintye
 		virtual void set_project(Project* const project);
 
 		virtual void set_engine(minty::Engine* const engine);
+
+		virtual void set_scene(minty::Scene* const scene);
 
 		/// <summary>
 		/// Draws the window using ImGui.

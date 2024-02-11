@@ -418,6 +418,8 @@ std::vector<std::string> splitString(std::string s)
 
 Application::Application()
 	: _project()
+	, _engine()
+	, _sceneId(ERROR_ID)
 	, _window("", 1280, 720)
 	, _editorWindows()
 {
@@ -641,16 +643,6 @@ int Application::run(int argc, char const* argv[])
 	return 0;
 }
 
-Project* mintye::Application::get_project() const
-{
-	return _project;
-}
-
-minty::Engine* mintye::Application::get_engine() const
-{
-	return _engine;
-}
-
 void mintye::Application::cleanup()
 {
 	unload_scene();
@@ -682,15 +674,30 @@ void mintye::Application::set_engine(minty::Engine* const engine)
 	}
 }
 
+void mintye::Application::set_scene(minty::ID const id)
+{
+	// set new scene
+	_sceneId = id;
+
+	// get the scene with the id, or null if empty id
+	Scene* scene = id == ERROR_ID ? nullptr : &_engine->get_scene_manager().get_scene(id);
+
+	// set for all windows
+	for (auto const& pair : _editorWindows)
+	{
+		pair.second->set_scene(scene);
+	}
+}
+
 void mintye::Application::set_window_title(minty::String const& subTitle)
 {
 	if (subTitle.length())
 	{
-		_window.set_title("Minty Editor");
+		_window.set_title(std::format("Minty Editor: {}", subTitle));
 	}
 	else
 	{
-		_window.set_title(std::format("Minty Editor: {}", subTitle));
+		_window.set_title("Minty Editor");
 	}
 }
 
@@ -728,20 +735,26 @@ void mintye::Application::load_project(minty::Path const& path)
 
 	// create new engine
 	Engine* engine = new Engine(project->get_info());
+	engine->init(&_window);
 
 	// set new types
 	set_project(project);
 	set_engine(engine);
+
+	// load a scene, if any found
+	Path sceneName = project->find_asset(Project::CommonFileType::Scene);
+	if (!sceneName.empty())
+	{
+		load_scene(sceneName.stem().string());
+	}
+
 	// set window text to file name
+	set_window_title(project->get_name());
 }
 
 void mintye::Application::unload_project()
 {
-	if (_project)
-	{
-		delete _project;
-		set_project(nullptr);
-	}
+	unload_scene();
 
 	if (_engine)
 	{
@@ -749,6 +762,12 @@ void mintye::Application::unload_project()
 		_engine->destroy();
 		delete _engine;
 		set_engine(nullptr);
+	}
+
+	if (_project)
+	{
+		delete _project;
+		set_project(nullptr);
 	}
 }
 
@@ -806,34 +825,47 @@ void mintye::Application::create_new_project(minty::String const& name, minty::P
 	console->log(std::format("Created new project: {}", fullPath.string()));
 }
 
-void mintye::Application::load_scene(minty::String const& name)
+void mintye::Application::load_scene(minty::Path const& path)
 {
 	ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console");
 
 	if (!_project)
 	{
-		console->log_error(std::format("Cannot load scene \"{}\". No project loaded.", name));
+		console->log_error(std::format("Cannot load scene \"{}\". No project loaded.", path.string()));
 		return;
 	}
 
-	Path scenePath = _project->find_asset(name, Project::CommonFileType::Scene);
+	if (!_engine)
+	{
+		console->log_error(std::format("Cannot load scene \"{}\". No engine loaded.", path.string()));
+		return;
+	}
 
 	// if none found, do nothing
-	if (scenePath.empty())
+	if (path.empty())
 	{
-		console->log_error(std::format("Cannot load scene \"{}\". Project could not find the asset.", name));
+		console->log_error(std::format("Cannot load scene \"{}\". Project could not find the asset.", path.string()));
 	}
 
 	// unload existing scene
 	unload_scene();
 
 	// load new scene
-
+	SceneManager& sceneManager = _engine->get_scene_manager();
+	set_scene(sceneManager.create_scene(path));
+	sceneManager.load_scene(_sceneId);
+	sceneManager.load();
 }
 
 void mintye::Application::unload_scene()
 {
-
+	if (_sceneId != ERROR_ID)
+	{
+		SceneManager& sceneManager = _engine->get_scene_manager();
+		sceneManager.unload();
+		sceneManager.destroy();
+		_sceneId = ERROR_ID;
+	}
 }
 
 void mintye::Application::save_project()

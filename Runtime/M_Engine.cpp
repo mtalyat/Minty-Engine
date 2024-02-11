@@ -44,6 +44,7 @@ Engine::Engine(Info const& info)
 	, _frameCount()
 	, _running()
 	, _exitCode()
+	, _personalWindow()
 {}
 
 Engine::~Engine()
@@ -127,7 +128,8 @@ bool minty::Engine::init(Window* const window)
 	destroy();
 
 	// create necessary components
-	_window = window != nullptr ? window : new Window(_info.get_application_name(), WIDTH, HEIGHT, &_globalInput);
+	_personalWindow = window == nullptr;
+	_window = _personalWindow ? new Window(_info.get_application_name(), WIDTH, HEIGHT, &_globalInput) : window;
 	_renderEngine = new RenderEngine(_window);
 	_audioEngine = new AudioEngine();
 	_sceneManager = new SceneManager(*this);
@@ -248,10 +250,26 @@ void minty::Engine::cleanup()
 
 void minty::Engine::destroy()
 {
-	if (_window) delete _window;
-	if (_renderEngine) delete _renderEngine;
-	if (_audioEngine) delete _audioEngine;
-	if (_sceneManager) delete _sceneManager;
+	if (_window && _personalWindow)
+	{
+		delete _window;
+		_window = nullptr;
+	}
+	if (_renderEngine)
+	{
+		delete _renderEngine;
+		_renderEngine = nullptr;
+	}
+	if (_audioEngine)
+	{
+		delete _audioEngine;
+		_audioEngine = nullptr;
+	}
+	if (_sceneManager)
+	{
+		delete _sceneManager;
+		_sceneManager = nullptr;
+	}
 }
 
 void minty::Engine::record_time()

@@ -27,6 +27,7 @@ namespace minty
 		size_t _frameCount;
 		bool _running;
 		int _exitCode;
+		bool _personalWindow;
 	public:
 		/// <summary>
 		/// Creates a new Engine.
