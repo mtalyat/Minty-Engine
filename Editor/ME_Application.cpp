@@ -11,12 +11,6 @@
 #include "ME_PropertiesWindow.h"
 #include "ME_AssetsWindow.h"
 
-#include <imgui.h>
-#include <imgui_impl_glfw.h>
-#include <imgui_impl_vulkan.h>
-#include <ImGuiFileDialog.h>
-
-#include <Minty.h>
 #include <iostream>
 #include <vector>
 #include <cstring>
@@ -865,7 +859,7 @@ void mintye::Application::unload_scene()
 		SceneManager& sceneManager = _engine->get_scene_manager();
 		sceneManager.unload();
 		sceneManager.destroy();
-		_sceneId = ERROR_ID;
+		set_scene(ERROR_ID);
 	}
 }
 

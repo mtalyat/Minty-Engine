@@ -1,7 +1,5 @@
 #include "ME_HierarchyWindow.h"
 
-#include <imgui.h>
-
 using namespace mintye;
 using namespace minty;
 

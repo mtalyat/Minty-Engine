@@ -25,7 +25,7 @@
 #include "M_TransformComponent.h"
 #include "M_UITransformComponent.h"
 
-#include "glfw.hpp"
+#include "M_GLFW.h"
 #include <iostream>
 
 using namespace minty;

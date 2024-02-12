@@ -1,7 +1,5 @@
 #include "ME_SceneWindow.h"
 
-#include <imgui.h>
-
 mintye::SceneWindow::SceneWindow(Application& application)
 	: EditorWindow(application)
 {}

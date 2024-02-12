@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Minty.h>
+#include "ME_Minty.h"
 #include <unordered_map>
 
 namespace mintye

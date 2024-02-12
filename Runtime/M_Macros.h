@@ -1,5 +1,10 @@
 #pragma once
 
+// Optional macros from outside of the runtime:
+/*
+* MINTY_IMGUI
+*/
+
 #ifdef NDEBUG
 #define MINTY_RELEASE
 #else

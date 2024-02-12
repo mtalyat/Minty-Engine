@@ -1,8 +1,6 @@
 #pragma once
 #include "ME_EditorWindow.h"
 
-#include <imgui.h>
-
 #include <vector>
 #include <queue>
 

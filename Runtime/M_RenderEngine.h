@@ -10,8 +10,8 @@
 #include "M_Entity.h"
 #include "M_Matrix.h"
 
-#include "glm.hpp"
-#include "vulkan.h"
+#include "M_GLM.hpp"
+#include "M_Vulkan.h"
 
 #include <array>
 #include <vector>

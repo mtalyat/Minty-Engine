@@ -1,7 +1,5 @@
 #include "ME_PropertiesWindow.h"
 
-#include <imgui.h>
-
 mintye::PropertiesWindow::PropertiesWindow(Application& application)
 	: EditorWindow(application)
 {}

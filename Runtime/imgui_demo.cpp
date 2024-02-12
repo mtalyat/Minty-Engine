@@ -1,3 +1,4 @@
+#include "pch.h"
 // dear imgui, v1.90 WIP
 // (demo code)
 
@@ -94,7 +95,7 @@ Index of this file:
 #define _CRT_SECURE_NO_WARNINGS
 #endif
 
-#include "imgui.h"
+#include "libraries/imgui/imgui.h"
 #ifndef IMGUI_DISABLE
 
 // System includes

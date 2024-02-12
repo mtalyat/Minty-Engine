@@ -16,12 +16,6 @@
     <Filter Include="Libraries">
       <UniqueIdentifier>{c0f650f8-da6b-48af-b7a0-12d7a3ea03a1}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Libraries\imgui">
-      <UniqueIdentifier>{88f785d1-ab77-4e53-9116-af5a7eb4b67e}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Libraries\imguifiledialog">
-      <UniqueIdentifier>{5b7b77c6-47f5-456e-994d-b19c5c45bdaa}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Program.cpp">
@@ -29,30 +23,6 @@
     </ClCompile>
     <ClCompile Include="ME_Application.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="libraries\imgui\imgui_stdlib.cpp">
-      <Filter>Libraries\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="libraries\imgui\imgui_tables.cpp">
-      <Filter>Libraries\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="libraries\imgui\imgui_widgets.cpp">
-      <Filter>Libraries\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="libraries\imgui\imgui.cpp">
-      <Filter>Libraries\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="libraries\imgui\imgui_demo.cpp">
-      <Filter>Libraries\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="libraries\imgui\imgui_draw.cpp">
-      <Filter>Libraries\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="libraries\imgui\imgui_impl_vulkan.cpp">
-      <Filter>Libraries\imgui</Filter>
-    </ClCompile>
-    <ClCompile Include="libraries\imgui\imgui_impl_glfw.cpp">
-      <Filter>Libraries\imgui</Filter>
     </ClCompile>
     <ClCompile Include="ME_ConsoleWindow.cpp">
       <Filter>Source Files</Filter>
@@ -68,9 +38,6 @@
     </ClCompile>
     <ClCompile Include="ME_HierarchyWindow.cpp">
       <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="libraries\imguifiledialog\ImGuiFileDialog.cpp">
-      <Filter>Libraries\imguifiledialog</Filter>
     </ClCompile>
     <ClCompile Include="ME_SceneWindow.cpp">
       <Filter>Source Files</Filter>
@@ -107,9 +74,6 @@
     <ClInclude Include="ME_HierarchyWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="libraries\imguifiledialog\ImGuiFileDialog.h">
-      <Filter>Libraries\imguifiledialog</Filter>
-    </ClInclude>
     <ClInclude Include="ME_SceneWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -120,6 +84,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ME_AssetsWindow.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ME_Minty.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

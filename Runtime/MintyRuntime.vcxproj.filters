@@ -58,6 +58,12 @@
     <Filter Include="Header Files\Transform">
       <UniqueIdentifier>{30483a13-5871-4e8e-9c19-a93c57aff238}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Libraries\imgui">
+      <UniqueIdentifier>{262fae94-dccc-459c-8b18-0468fd5e0636}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Libraries\imguifiledialog">
+      <UniqueIdentifier>{bd1db8bd-8d93-4302-89d0-c8d21edf3ae3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -183,7 +189,7 @@
     <ClInclude Include="M_InputMap.h">
       <Filter>Header Files\Input</Filter>
     </ClInclude>
-    <ClInclude Include="glm.hpp">
+    <ClInclude Include="M_GLM.hpp">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="M_Error.h">
@@ -201,7 +207,7 @@
     <ClInclude Include="M_CursorMode.h">
       <Filter>Header Files\Input</Filter>
     </ClInclude>
-    <ClInclude Include="glfw.hpp">
+    <ClInclude Include="M_GLFW.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="M_RelationshipComponent.h">
@@ -234,7 +240,7 @@
     <ClInclude Include="M_File.h">
       <Filter>Header Files\Files</Filter>
     </ClInclude>
-    <ClInclude Include="vulkan.h">
+    <ClInclude Include="M_Vulkan.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="M_Text.h">
@@ -506,6 +512,18 @@
     </ClInclude>
     <ClInclude Include="M_Operations.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="M_ImGui.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\imguifiledialog\ImGuiFileDialog.h">
+      <Filter>Libraries\imguifiledialog</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\imguifiledialog\ImGuiFileDialogConfig.h">
+      <Filter>Libraries\imguifiledialog</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\imgui\imgui.h">
+      <Filter>Libraries\imgui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -835,6 +853,33 @@
     </ClCompile>
     <ClCompile Include="M_Operations.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui.cpp">
+      <Filter>Libraries\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui_demo.cpp">
+      <Filter>Libraries\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui_draw.cpp">
+      <Filter>Libraries\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui_impl_glfw.cpp">
+      <Filter>Libraries\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui_impl_vulkan.cpp">
+      <Filter>Libraries\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui_stdlib.cpp">
+      <Filter>Libraries\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui_tables.cpp">
+      <Filter>Libraries\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui_widgets.cpp">
+      <Filter>Libraries\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGuiFileDialog.cpp">
+      <Filter>Libraries\imguifiledialog</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

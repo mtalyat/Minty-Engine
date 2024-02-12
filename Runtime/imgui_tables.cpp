@@ -1,3 +1,4 @@
+#include "pch.h"
 // dear imgui, v1.90 WIP
 // (tables and columns code)
 
@@ -193,9 +194,9 @@ Index of this file:
 #define IMGUI_DEFINE_MATH_OPERATORS
 #endif
 
-#include "imgui.h"
+#include "libraries/imgui/imgui.h"
 #ifndef IMGUI_DISABLE
-#include "imgui_internal.h"
+#include "libraries/imgui/imgui_internal.h"
 
 // System includes
 #include <stdint.h>     // intptr_t

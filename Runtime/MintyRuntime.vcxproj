@@ -214,6 +214,10 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="M_ImGui.h" />
+    <ClInclude Include="libraries\imguifiledialog\ImGuiFileDialog.h" />
+    <ClInclude Include="libraries\imguifiledialog\ImGuiFileDialogConfig.h" />
+    <ClInclude Include="libraries\imgui\imgui.h" />
     <ClInclude Include="miniaudio.h" />
     <ClInclude Include="M_Animation.h" />
     <ClInclude Include="M_AnimationBuilder.h" />
@@ -248,8 +252,8 @@
     <ClInclude Include="M_SerializationData.h" />
     <ClInclude Include="M_Dynamic.h" />
     <ClInclude Include="framework.h" />
-    <ClInclude Include="glfw.hpp" />
-    <ClInclude Include="glm.hpp" />
+    <ClInclude Include="M_GLFW.h" />
+    <ClInclude Include="M_GLM.hpp" />
     <ClInclude Include="libraries\entt\entt.hpp" />
     <ClInclude Include="M_CursorMode.h" />
     <ClInclude Include="M_DirtyComponent.h" />
@@ -362,11 +366,20 @@
     <ClInclude Include="soloud_waveshaperfilter.h" />
     <ClInclude Include="soloud_wavstream.h" />
     <ClInclude Include="stb_vorbis.h" />
-    <ClInclude Include="vulkan.h" />
+    <ClInclude Include="M_Vulkan.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="dr_impl.cpp" />
+    <ClCompile Include="imgui.cpp" />
+    <ClCompile Include="ImGuiFileDialog.cpp" />
+    <ClCompile Include="imgui_demo.cpp" />
+    <ClCompile Include="imgui_draw.cpp" />
+    <ClCompile Include="imgui_impl_glfw.cpp" />
+    <ClCompile Include="imgui_impl_vulkan.cpp" />
+    <ClCompile Include="imgui_stdlib.cpp" />
+    <ClCompile Include="imgui_tables.cpp" />
+    <ClCompile Include="imgui_widgets.cpp" />
     <ClCompile Include="M_Animation.cpp" />
     <ClCompile Include="M_AnimationSystem.cpp" />
     <ClCompile Include="M_Animator.cpp" />

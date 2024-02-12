@@ -10,8 +10,11 @@ access to the entire engine without needing include each file.
 */
 
 // LIBRARIES
-#include "vulkan.h"
-#include "glm.hpp"
+#include "M_Vulkan.h"
+#include "M_GLM.hpp"
+#ifdef MINTY_IMGUI
+#include "M_ImGui.h"
+#endif
 
 // ANIMATION
 #include "M_Animation.h"

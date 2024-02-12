@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Minty.h>
+#include "ME_Minty.h"
 #include <string>
 #include <filesystem>
 #include <unordered_map>

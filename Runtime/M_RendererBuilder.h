@@ -11,7 +11,7 @@
 #include "M_MaterialTemplateBuilder.h"
 #include "M_MaterialBuilder.h"
 
-#include "vulkan.h"
+#include "M_Vulkan.h"
 
 namespace minty
 {

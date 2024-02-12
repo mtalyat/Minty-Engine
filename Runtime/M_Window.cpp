@@ -3,7 +3,7 @@
 #include "M_Console.h"
 #include "M_Error.h"
 #include "M_InputMap.h"
-#include "glfw.hpp"
+#include "M_GLFW.h"
 #include <format>
 #include <string>
 

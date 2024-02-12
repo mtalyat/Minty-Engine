@@ -2,7 +2,7 @@
 
 #include "M_Object.h"
 #include "M_Vector.h"
-#include "glm.hpp"
+#include "M_GLM.hpp"
 
 namespace minty
 {

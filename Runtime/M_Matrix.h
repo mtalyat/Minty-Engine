@@ -1,7 +1,7 @@
 #pragma once
 
 #include "M_Types.h"
-#include "glm.hpp"
+#include "M_GLM.hpp"
 
 namespace minty
 {

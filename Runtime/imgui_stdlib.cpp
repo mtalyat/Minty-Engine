@@ -1,3 +1,4 @@
+#include "pch.h"
 // dear imgui: wrappers for C++ standard library (STL) types (std::string, etc.)
 // This is also an example of how you may wrap your own similar types.
 
@@ -7,8 +8,8 @@
 // See more C++ related extension (fmt, RAII, syntaxis sugar) on Wiki:
 //   https://github.com/ocornut/imgui/wiki/Useful-Extensions#cness
 
-#include "imgui.h"
-#include "imgui_stdlib.h"
+#include "libraries/imgui/imgui.h"
+#include "libraries/imgui/imgui_stdlib.h"
 
 // Clang warnings with -Weverything
 #if defined(__clang__)

@@ -1,7 +1,5 @@
 #include "ME_GameWindow.h"
 
-#include <imgui.h>
-
 mintye::GameWindow::GameWindow(Application& application)
 	: EditorWindow(application)
 {}
