@@ -35,7 +35,7 @@ namespace mintye
 		// info needed for the editor:
 		minty::Path _path;
 		minty::Window _window;
-		minty::Engine* _engine;
+		minty::Runtime* _runtime;
 
 		// info needed for a loaded project:
 		Project* _project;
@@ -55,7 +55,7 @@ namespace mintye
 		/// <param name="argv">The command line arguments.</param>
 		int run(int argc, char const* argv[]);
 
-		minty::Engine& get_engine() const;
+		minty::Runtime& get_runtime() const;
 
 	private:
 		void cleanup();

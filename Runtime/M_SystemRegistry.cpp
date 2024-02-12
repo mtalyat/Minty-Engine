@@ -3,7 +3,7 @@
 
 #include "M_System.h"
 #include "M_Console.h"
-#include "M_Engine.h"
+#include "M_Runtime.h"
 #include "M_Parse.h"
 
 #include <sstream>
@@ -12,7 +12,7 @@ namespace minty
 {
 	std::map<String const, SystemRegistry::SystemFunc const> SystemRegistry::_systemTypes = std::map<String const, SystemRegistry::SystemFunc const>();
 
-	SystemRegistry::SystemRegistry(Engine& engine, ID const sceneId)
+	SystemRegistry::SystemRegistry(Runtime& engine, ID const sceneId)
 		: SceneObject(engine, sceneId)
 		, _orderedSystems()
 		, _allSystems()

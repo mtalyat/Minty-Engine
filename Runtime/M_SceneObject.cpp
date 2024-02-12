@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "M_SceneObject.h"
 
-#include "M_Engine.h"
+#include "M_Runtime.h"
 #include "M_Scene.h"
 
 using namespace minty;
@@ -11,7 +11,7 @@ minty::SceneObject::SceneObject()
 	, _sceneId()
 {}
 
-minty::SceneObject::SceneObject(Engine& engine, ID const sceneId)
+minty::SceneObject::SceneObject(Runtime& engine, ID const sceneId)
 	: _engine(&engine)
 	, _sceneId(sceneId)
 {}
@@ -20,14 +20,14 @@ minty::SceneObject::~SceneObject()
 {
 }
 
-Engine& minty::SceneObject::get_engine() const
+Runtime& minty::SceneObject::get_engine() const
 {
 	MINTY_ASSERT(_engine != nullptr, "SceneObject::get_engine(): engine is null.");
 
 	return *_engine;
 }
 
-void minty::SceneObject::set_engine(Engine& engine)
+void minty::SceneObject::set_engine(Runtime& engine)
 {
 	_engine = &engine;
 }

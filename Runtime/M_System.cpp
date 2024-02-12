@@ -1,14 +1,14 @@
 #include "pch.h"
 #include "M_System.h"
 
-#include "M_Engine.h"
+#include "M_Runtime.h"
 #include "M_Scene.h"
 #include "M_EntityRegistry.h"
 #include "M_SystemRegistry.h"
 
 using namespace minty;
 
-minty::System::System(Engine& engine, ID const sceneId)
+minty::System::System(Runtime& engine, ID const sceneId)
 	: SceneObject(engine, sceneId)
 	, _enabled(true)
 {}

@@ -3,7 +3,7 @@
 
 namespace minty
 {
-	class Engine;
+	class Runtime;
 	class EntityRegistry;
 	class SystemRegistry;
 
@@ -15,7 +15,7 @@ namespace minty
 	{
 	private:
 		ID _id;
-		Engine* _engine;
+		Runtime* _engine;
 		EntityRegistry* _entities;
 		SystemRegistry* _systems;
 
@@ -23,7 +23,7 @@ namespace minty
 		/// <summary>
 		/// Creates an empty Scene.
 		/// </summary>
-		Scene(Engine& engine, ID const sceneId);
+		Scene(Runtime& engine, ID const sceneId);
 
 		~Scene();
 
@@ -39,7 +39,7 @@ namespace minty
 		//// copy
 		//Scene& operator=(Scene const& other);
 
-		Engine& get_engine() const;
+		Runtime& get_engine() const;
 
 		/// <summary>
 		/// Gets the EntityRegistry used in the Scene.

@@ -214,6 +214,7 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="M_Engine.h" />
     <ClInclude Include="M_ImGui.h" />
     <ClInclude Include="libraries\imguifiledialog\ImGuiFileDialog.h" />
     <ClInclude Include="libraries\imguifiledialog\ImGuiFileDialogConfig.h" />
@@ -242,6 +243,7 @@
     <ClInclude Include="M_PhysicalFile.h" />
     <ClInclude Include="M_CoordinateMode.h" />
     <ClInclude Include="M_PixelFormat.h" />
+    <ClInclude Include="M_RuntimeBuilder.h" />
     <ClInclude Include="M_SpritePushData.h" />
     <ClInclude Include="M_SpriteBuilder.h" />
     <ClInclude Include="M_TextureAtlasBuilder.h" />
@@ -283,7 +285,7 @@
     <ClInclude Include="M_Console.h" />
     <ClInclude Include="M_Event.h" />
     <ClInclude Include="M_File.h" />
-    <ClInclude Include="M_Engine.h" />
+    <ClInclude Include="M_Runtime.h" />
     <ClInclude Include="M_InputMap.h" />
     <ClInclude Include="M_Key.h" />
     <ClInclude Include="M_Math.h" />
@@ -400,10 +402,11 @@
     <ClCompile Include="M_CursorMode.cpp" />
     <ClCompile Include="M_DirtyComponent.cpp" />
     <ClCompile Include="M_Encoding.cpp" />
+    <ClCompile Include="M_Engine.cpp" />
     <ClCompile Include="M_EntityRegistry.cpp" />
     <ClCompile Include="M_Error.cpp" />
     <ClCompile Include="M_File.cpp" />
-    <ClCompile Include="M_Engine.cpp" />
+    <ClCompile Include="M_Runtime.cpp" />
     <ClCompile Include="M_FiniteStateMachine.cpp" />
     <ClCompile Include="M_Operations.cpp" />
     <ClCompile Include="M_PhysicalFile.cpp" />

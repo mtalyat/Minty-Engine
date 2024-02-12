@@ -1,8 +1,9 @@
 #include "pch.h"
 #include "M_AudioSystem.h"
 
+#include "M_AudioEngine.h"
 #include "M_Scene.h"
-#include "M_Engine.h"
+#include "M_Runtime.h"
 #include "M_EntityRegistry.h"
 
 #include "M_AudioListenerComponent.h"
@@ -12,7 +13,7 @@
 
 using namespace minty;
 
-minty::AudioSystem::AudioSystem(Engine& engine, ID const sceneId)
+minty::AudioSystem::AudioSystem(Runtime& engine, ID const sceneId)
 	: System::System(engine, sceneId)
 {}
 

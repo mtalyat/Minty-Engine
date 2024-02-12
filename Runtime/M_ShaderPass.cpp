@@ -15,7 +15,7 @@ minty::ShaderPass::ShaderPass()
 	, _descriptorSet()
 {}
 
-minty::ShaderPass::ShaderPass(ShaderPassBuilder const& builder, Engine& engine, ID const sceneId)
+minty::ShaderPass::ShaderPass(ShaderPassBuilder const& builder, Runtime& engine, ID const sceneId)
 	: RenderObject(engine, sceneId)
 	, _shaderId(builder.shaderId)
 	, _pipeline()

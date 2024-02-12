@@ -3,20 +3,20 @@
 
 #include "M_Asset.h"
 #include "M_Runtime.h"
-#include "M_Engine.h"
+#include "M_Runtime.h"
 #include "M_Node.h"
 #include "M_Reader.h"
 #include "M_Console.h"
 #include "M_SerializationData.h"
 #include "M_Scene.h"
-#include "M_Engine.h"
+#include "M_Runtime.h"
 #include "M_RenderEngine.h"
 
 #include "M_NameComponent.h"
 
 using namespace minty;
 
-minty::SceneManager::SceneManager(Engine& engine)
+minty::SceneManager::SceneManager(Runtime& engine)
 	: _engine(&engine)
 	, _loaded()
 	, _scenes()

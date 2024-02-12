@@ -16,14 +16,14 @@ minty::DescriptorSet::DescriptorSet()
 	, _dirties()
 {}
 
-minty::DescriptorSet::DescriptorSet(Engine& engine, ID const sceneId)
+minty::DescriptorSet::DescriptorSet(Runtime& engine, ID const sceneId)
 	: RenderObject::RenderObject(engine, sceneId)
 	, _descriptorSets()
 	, _descriptors()
 	, _dirties()
 {}
 
-minty::DescriptorSet::DescriptorSet(std::array<VkDescriptorSet, MAX_FRAMES_IN_FLIGHT> const& descriptorSets, std::unordered_map<String, std::array<DescriptorData, MAX_FRAMES_IN_FLIGHT>> const& datas, Engine& engine, ID const sceneId)
+minty::DescriptorSet::DescriptorSet(std::array<VkDescriptorSet, MAX_FRAMES_IN_FLIGHT> const& descriptorSets, std::unordered_map<String, std::array<DescriptorData, MAX_FRAMES_IN_FLIGHT>> const& datas, Runtime& engine, ID const sceneId)
 	: RenderObject::RenderObject(engine, sceneId)
 	, _descriptorSets(descriptorSets)
 	, _descriptors(datas)

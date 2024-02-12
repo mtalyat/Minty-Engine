@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "M_Object.h"
 
-#include "M_Engine.h"
+#include "M_Runtime.h"
 #include "M_RenderEngine.h"
 #include "M_RenderSystem.h"
 #include "M_Scene.h"
@@ -14,7 +14,7 @@ minty::RenderObject::RenderObject()
 	: SceneObject()
 {}
 
-RenderObject::RenderObject(Engine& engine, ID const sceneId)
+RenderObject::RenderObject(Runtime& engine, ID const sceneId)
 	: SceneObject(engine, sceneId)
 {}
 

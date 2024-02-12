@@ -1,8 +1,9 @@
 #include "pch.h"
 #include "M_RenderSystem.h"
 
+#include "M_RenderEngine.h"
 #include "M_Asset.h"
-#include "M_Engine.h"
+#include "M_Runtime.h"
 #include "M_Builtin.h"
 #include "M_Vector.h"
 #include "M_GLM.hpp"
@@ -25,7 +26,7 @@ using namespace minty;
 using namespace minty::vk;
 using namespace minty::Builtin;
 
-minty::RenderSystem::RenderSystem(Engine& engine, ID const sceneId)
+minty::RenderSystem::RenderSystem(Runtime& engine, ID const sceneId)
 	: System::System(engine, sceneId)
 {}
 

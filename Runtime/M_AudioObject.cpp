@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "M_AudioObject.h"
 
-#include "M_Engine.h"
+#include "M_Runtime.h"
 #include "M_AudioEngine.h"
 
 using namespace minty;
@@ -10,7 +10,7 @@ minty::AudioObject::AudioObject()
 	: SceneObject()
 {}
 
-minty::AudioObject::AudioObject(Engine& engine, ID const sceneId)
+minty::AudioObject::AudioObject(Runtime& engine, ID const sceneId)
 	: SceneObject(engine, sceneId)
 {}
 

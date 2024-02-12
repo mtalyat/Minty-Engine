@@ -28,7 +28,7 @@ namespace minty
 		Entity _listener;
 		SoundData _listenerData;
 	public:
-		AudioSystem(Engine& engine, ID const sceneId);
+		AudioSystem(Runtime& engine, ID const sceneId);
 
 		void update() override;
 

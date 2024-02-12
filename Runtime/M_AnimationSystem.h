@@ -18,7 +18,7 @@ namespace minty
         Register<Animation> _animations;
 
     public:
-        AnimationSystem(Engine& engine, ID const sceneId);
+        AnimationSystem(Runtime& engine, ID const sceneId);
 
         void update() override;
 

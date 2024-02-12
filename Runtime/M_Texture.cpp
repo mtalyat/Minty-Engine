@@ -26,7 +26,7 @@ minty::Texture::Texture()
 	, _sampler()
 {}
 
-Texture::Texture(TextureBuilder const& builder, Engine& engine, ID const sceneId)
+Texture::Texture(TextureBuilder const& builder, Runtime& engine, ID const sceneId)
 	: RenderObject::RenderObject(engine, sceneId)
 	, _width(builder.width)
 	, _height(builder.height)

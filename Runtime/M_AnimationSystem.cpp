@@ -8,14 +8,14 @@
 #include "M_Asset.h"
 #include "M_RenderEngine.h"
 #include "M_RenderSystem.h"
-#include "M_Engine.h"
+#include "M_Runtime.h"
 #include "M_EntityRegistry.h"
 #include "M_SystemRegistry.h"
 #include "M_Scene.h"
 
 using namespace minty;
 
-minty::AnimationSystem::AnimationSystem(Engine& engine, ID const sceneId)
+minty::AnimationSystem::AnimationSystem(Runtime& engine, ID const sceneId)
 	: System(engine, sceneId)
 	, _animators()
 	, _animations()

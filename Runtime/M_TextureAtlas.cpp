@@ -21,7 +21,7 @@ minty::TextureAtlas::TextureAtlas()
 	, _createdSlices()
 {}
 
-minty::TextureAtlas::TextureAtlas(TextureAtlasBuilder const& builder, Engine& engine, ID const sceneId)
+minty::TextureAtlas::TextureAtlas(TextureAtlasBuilder const& builder, Runtime& engine, ID const sceneId)
 	: RenderObject(engine, sceneId)
 	, _textureId(builder.textureId)
 	, _materialId(builder.materialId)

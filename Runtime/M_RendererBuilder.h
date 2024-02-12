@@ -1,21 +1,10 @@
 #pragma once
-#include "M_Base.h"
-
-#include "M_Info.h"
-#include "M_Window.h"
-#include "M_Register.h"
-
-#include "M_TextureBuilder.h"
-#include "M_ShaderBuilder.h"
-#include "M_ShaderPassBuilder.h"
-#include "M_MaterialTemplateBuilder.h"
-#include "M_MaterialBuilder.h"
-
-#include "M_Vulkan.h"
 
 namespace minty
 {
 	class RenderEngine;
+	class Info;
+	class Window;
 
 	/// <summary>
 	/// Holds data to create a new RenderEngine.
@@ -23,5 +12,7 @@ namespace minty
 	struct RenderEngineBuilder
 	{
 		Info const* info;
+
+		Window* window;
 	};
 }

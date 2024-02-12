@@ -14,7 +14,7 @@ namespace minty
 	public:
 		AudioObject();
 
-		AudioObject(Engine& engine, ID const sceneId);
+		AudioObject(Runtime& engine, ID const sceneId);
 
 		virtual ~AudioObject();
 

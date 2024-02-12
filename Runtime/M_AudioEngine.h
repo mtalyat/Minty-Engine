@@ -1,6 +1,6 @@
 #pragma once
+#include "M_Engine.h"
 
-#include "M_Object.h"
 #include "M_Vector.h"
 #include "M_Audio.h"
 
@@ -13,7 +13,7 @@ namespace minty
 	/// Handles audio for the game engine.
 	/// </summary>
 	class AudioEngine
-		: public Object
+		: public Engine
 	{
 	private:
 		SoLoud::Soloud _engine;

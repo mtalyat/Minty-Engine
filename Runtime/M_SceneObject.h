@@ -3,27 +3,27 @@
 
 namespace minty
 {
-	class Engine;
+	class Runtime;
 	class Scene;
 
 	class SceneObject
 		: public Object
 	{
 	private:
-		Engine* _engine;
+		Runtime* _engine;
 
 		ID _sceneId;
 	public:
 		SceneObject();
 
-		SceneObject(Engine& engine, ID const sceneId);
+		SceneObject(Runtime& engine, ID const sceneId);
 
 		virtual ~SceneObject();
 
 	public:
-		Engine& get_engine() const;
+		Runtime& get_engine() const;
 
-		void set_engine(Engine& engine);
+		void set_engine(Runtime& engine);
 
 		Scene& get_scene() const;
 

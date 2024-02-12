@@ -7,7 +7,7 @@
 
 namespace minty
 {
-    class Engine;
+    class Runtime;
 
     /// <summary>
     /// Handles User Interface (UI) inputs.
@@ -22,7 +22,7 @@ namespace minty
         InputMap::ClickEvent_t::func _onMouseClick;
 
     public:
-        UISystem(Engine& engine, ID const sceneId);
+        UISystem(Runtime& engine, ID const sceneId);
 
         void load() override;
 

@@ -6,7 +6,7 @@
 #include "M_SpritePushData.h"
 
 #include "M_Console.h"
-#include "M_Engine.h"
+#include "M_Runtime.h"
 #include "M_File.h"
 #include "M_Scene.h"
 #include "M_EntityRegistry.h"
@@ -31,14 +31,8 @@
 #include "M_Matrix.h"
 #include "M_Builtin.h"
 
-//#include <vulkan/vulkan.h>
-#define GLFW_INCLUDE_VULKAN
-#include <GLFW/glfw3.h>
-
-#define GLM_FORCE_RADIANS
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+#include "M_GLFW.h"
+#include "M_GLM.hpp"
 
 #include <iostream>
 #include <stdexcept>
@@ -89,8 +83,8 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
 	}
 }
 
-RenderEngine::RenderEngine(Window* const window)
-	: _window(window)
+RenderEngine::RenderEngine()
+	: _window()
 	, _boundIds()
 	, _view()
 	, _backgroundColor({ 250, 220, 192, 255 }) // light tan color
@@ -111,6 +105,8 @@ RenderEngine::~RenderEngine()
 void minty::RenderEngine::init(RenderEngineBuilder const& builder)
 {
 	if (_initialized) return; // already initialized, do nothing
+
+	_window = builder.window;
 
 	create_instance(builder);
 	setup_debug_messenger();
@@ -147,17 +143,14 @@ void RenderEngine::render_frame()
 		Error::abort("Failed to acquire swap chain image.");
 	}
 
+	// record the command buffer so we know what to do to render stuff to the screen
+	record_command_buffer(_commandBuffers[_frame], imageIndex);
+
 	// reset the fence states so they can be used to wait again
 	vkResetFences(_device, 1, &_inFlightFences[_frame]);
 
 	// reset command buffer
-	vkResetCommandBuffer(_commandBuffers[_frame], 0);
-
-	// record the command buffer so we know what to do to render stuff to the screen
-	record_command_buffer(_commandBuffers[_frame], imageIndex);
-
-	// update uniform information
-	//update_uniform_buffer();
+	//vkResetCommandBuffer(_commandBuffers[_frame], 0);
 
 	// submit the command buffer
 	VkSubmitInfo submitInfo
@@ -1505,8 +1498,9 @@ void RenderEngine::record_command_buffer(VkCommandBuffer commandBuffer, uint32_t
 	VkCommandBufferBeginInfo beginInfo
 	{
 		.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
-		.flags = 0, // Optional
-		.pInheritanceInfo = nullptr, // Optional
+#ifdef MINTY_IMGUI
+		.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT,
+#endif
 	};
 
 	if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {

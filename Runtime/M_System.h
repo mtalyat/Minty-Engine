@@ -3,7 +3,7 @@
 
 namespace minty
 {
-	class Engine;
+	class Runtime;
 	class Scene;
 	class EntityRegistry;
 	class SystemRegistry;
@@ -22,7 +22,7 @@ namespace minty
 		/// <summary>
 		/// Creates a new System.
 		/// </summary>
-		System(Engine& engine, ID const sceneId);
+		System(Runtime& engine, ID const sceneId);
 
 		virtual ~System();
 

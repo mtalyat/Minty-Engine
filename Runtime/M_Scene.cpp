@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "M_Scene.h"
 
-#include "M_Engine.h"
+#include "M_Runtime.h"
 #include "M_EntityRegistry.h"
 #include "M_SystemRegistry.h"
 
@@ -11,7 +11,7 @@
 
 using namespace minty;
 
-minty::Scene::Scene(Engine& engine, ID const sceneId)
+minty::Scene::Scene(Runtime& engine, ID const sceneId)
 	: _id(sceneId)
 	, _engine(&engine)
 	, _entities(new EntityRegistry())
@@ -72,7 +72,7 @@ Scene& minty::Scene::operator=(Scene&& other) noexcept
 //	return *this;
 //}
 
-Engine& minty::Scene::get_engine() const
+Runtime& minty::Scene::get_engine() const
 {
 	return *_engine;
 }

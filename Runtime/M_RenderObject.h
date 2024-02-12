@@ -22,7 +22,7 @@ namespace minty
 		/// Creates a new RenderObject.
 		/// </summary>
 		/// <param name="renderer"></param>
-		RenderObject(Engine& engine, ID const sceneId);
+		RenderObject(Runtime& engine, ID const sceneId);
 
 		virtual ~RenderObject();
 

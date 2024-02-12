@@ -37,7 +37,7 @@ namespace minty
 		Register<Mesh> _meshes;
 
 	public:
-		RenderSystem(Engine& engine, ID const sceneId);
+		RenderSystem(Runtime& engine, ID const sceneId);
 
 		~RenderSystem();
 

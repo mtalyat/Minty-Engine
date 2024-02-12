@@ -32,7 +32,7 @@ namespace minty
 		/// </summary>
 		TextureAtlas();
 
-		TextureAtlas(TextureAtlasBuilder const& builder, Engine& engine, ID const sceneId);
+		TextureAtlas(TextureAtlasBuilder const& builder, Runtime& engine, ID const sceneId);
 
 		~TextureAtlas();
 

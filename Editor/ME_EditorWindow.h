@@ -24,7 +24,7 @@ namespace mintye
 	protected:
 		Application& get_application() const;
 
-		minty::Engine& get_engine() const;
+		minty::Runtime& get_runtime() const;
 
 		Project* get_project() const;
 

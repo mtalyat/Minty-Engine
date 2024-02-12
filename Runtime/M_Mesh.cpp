@@ -21,7 +21,7 @@ minty::Mesh::Mesh()
 	, _indexType()
 {}
 
-minty::Mesh::Mesh(Engine& engine, ID const sceneId)
+minty::Mesh::Mesh(Runtime& engine, ID const sceneId)
 	: RenderObject::RenderObject(engine, sceneId)
 	, _vertexCount()
 	, _vertexSize()

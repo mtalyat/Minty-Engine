@@ -5,14 +5,14 @@
 
 namespace minty
 {
-	class Engine;
+	class Runtime;
 	class Scene;
 
 	class SceneManager
 		: public Object
 	{
 	private:
-		Engine* _engine;
+		Runtime* _engine;
 
 		// if the scene manager has been loaded or not
 		// if not, no scenes will receive events
@@ -23,7 +23,7 @@ namespace minty
 		Scene* _loadedScene;
 
 	public:
-		SceneManager(Engine& engine);
+		SceneManager(Runtime& engine);
 
 		/// <summary>
 		/// Creates and loads an empty Scene.

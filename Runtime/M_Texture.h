@@ -34,7 +34,7 @@ namespace minty
 		/// </summary>
 		/// <param name="builder"></param>
 		/// <param name="renderer"></param>
-		Texture(TextureBuilder const& builder, Engine& engine, ID const sceneId);
+		Texture(TextureBuilder const& builder, Runtime& engine, ID const sceneId);
 
 		/// <summary>
 		/// Destroys all of the resources associated with this Texture.

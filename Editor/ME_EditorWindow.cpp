@@ -17,9 +17,9 @@ Application& mintye::EditorWindow::get_application() const
 	return *_application;
 }
 
-minty::Engine& mintye::EditorWindow::get_engine() const
+minty::Runtime& mintye::EditorWindow::get_runtime() const
 {
-	return _application->get_engine();
+	return _application->get_runtime();
 }
 
 Project* mintye::EditorWindow::get_project() const

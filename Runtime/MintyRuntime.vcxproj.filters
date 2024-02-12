@@ -72,7 +72,7 @@
     <ClInclude Include="pch.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="M_Engine.h">
+    <ClInclude Include="M_Runtime.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Minty.h">
@@ -525,6 +525,12 @@
     <ClInclude Include="libraries\imgui\imgui.h">
       <Filter>Libraries\imgui</Filter>
     </ClInclude>
+    <ClInclude Include="M_Engine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="M_RuntimeBuilder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -533,7 +539,7 @@
     <ClCompile Include="pch.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="M_Engine.cpp">
+    <ClCompile Include="M_Runtime.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_CommandLineParser.cpp">
@@ -880,6 +886,9 @@
     </ClCompile>
     <ClCompile Include="ImGuiFileDialog.cpp">
       <Filter>Libraries\imguifiledialog</Filter>
+    </ClCompile>
+    <ClCompile Include="M_Engine.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

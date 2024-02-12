@@ -16,7 +16,7 @@ minty::Shader::Shader()
 	, _descriptorSet()
 {}
 
-minty::Shader::Shader(ShaderBuilder const& builder, Engine& engine, ID const sceneId)
+minty::Shader::Shader(ShaderBuilder const& builder, Runtime& engine, ID const sceneId)
 	: RenderObject::RenderObject(engine, sceneId)
 	, _descriptorSet(engine, sceneId)
 {

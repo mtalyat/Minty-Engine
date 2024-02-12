@@ -15,7 +15,7 @@ minty::Material::Material()
 	, _passDescriptorSets()
 {}
 
-minty::Material::Material(MaterialBuilder const& builder, Engine& engine, ID const sceneId)
+minty::Material::Material(MaterialBuilder const& builder, Runtime& engine, ID const sceneId)
 	: RenderObject(engine, sceneId)
 	, _templateId(builder.templateId)
 	, _passDescriptorSets()

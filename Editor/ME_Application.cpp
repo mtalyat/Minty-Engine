@@ -413,7 +413,7 @@ std::vector<std::string> splitString(std::string s)
 Application::Application()
 	: _path(std::filesystem::current_path())
 	, _window("", 1280, 720)
-	, _engine(new Engine(Info(NAME, 0, 0, 0)))
+	, _runtime(new Runtime(Info(NAME, 0, 0, 0)))
 	, _project()
 	, _sceneId(ERROR_ID)
 	, _editorWindows()
@@ -421,8 +421,12 @@ Application::Application()
 	// set to default window title
 	set_window_title("");
 
+	RuntimeBuilder runtimeBuilder {
+		.window = &_window,
+	};
+
 	// initalize the engine
-	_engine->init(&_window);
+	_runtime->init(runtimeBuilder);
 
 	// create all the editor windows
 	// add to list so they get drawn and updated
@@ -444,18 +448,18 @@ mintye::Application::~Application()
 		delete pair.second;
 	}
 
-	if (_engine)
+	if (_runtime)
 	{
 		// stop if needed
-		if (_engine->is_running())
+		if (_runtime->is_running())
 		{
-			_engine->stop();
-			_engine->cleanup();
+			_runtime->stop();
+			_runtime->cleanup();
 		}
 
 		// cleanup and destroy
-		_engine->destroy();
-		delete _engine;
+		_runtime->destroy();
+		delete _runtime;
 	}
 }
 
@@ -655,9 +659,9 @@ int Application::run(int argc, char const* argv[])
 	return 0;
 }
 
-minty::Engine& mintye::Application::get_engine() const
+minty::Runtime& mintye::Application::get_runtime() const
 {
-	return *_engine;
+	return *_runtime;
 }
 
 void mintye::Application::cleanup()
@@ -685,7 +689,7 @@ void mintye::Application::set_scene(minty::ID const id)
 	_sceneId = id;
 
 	// get the scene with the id, or null if empty id
-	Scene* scene = id == ERROR_ID ? nullptr : &_engine->get_scene_manager().get_scene(id);
+	Scene* scene = id == ERROR_ID ? nullptr : &_runtime->get_scene_manager().get_scene(id);
 
 	// set for all windows
 	for (auto const& pair : _editorWindows)
@@ -830,7 +834,7 @@ void mintye::Application::load_scene(minty::Path const& path)
 		return;
 	}
 
-	if (!_engine)
+	if (!_runtime)
 	{
 		console->log_error(std::format("Cannot load scene \"{}\". No engine loaded.", path.string()));
 		return;
@@ -846,7 +850,7 @@ void mintye::Application::load_scene(minty::Path const& path)
 	unload_scene();
 
 	// load new scene
-	SceneManager& sceneManager = _engine->get_scene_manager();
+	SceneManager& sceneManager = _runtime->get_scene_manager();
 	set_scene(sceneManager.create_scene(path));
 	sceneManager.load_scene(_sceneId);
 	sceneManager.load();
@@ -856,7 +860,7 @@ void mintye::Application::unload_scene()
 {
 	if (_sceneId != ERROR_ID)
 	{
-		SceneManager& sceneManager = _engine->get_scene_manager();
+		SceneManager& sceneManager = _runtime->get_scene_manager();
 		sceneManager.unload();
 		sceneManager.destroy();
 		set_scene(ERROR_ID);

@@ -30,7 +30,7 @@ namespace minty
 		/// </summary>
 		/// <param name="builder"></param>
 		/// <param name="renderer"></param>
-		Material(MaterialBuilder const& builder, Engine& engine, ID const sceneId);
+		Material(MaterialBuilder const& builder, Runtime& engine, ID const sceneId);
 
 		/// <summary>
 		/// Destroys all of the resources associated with this Material.

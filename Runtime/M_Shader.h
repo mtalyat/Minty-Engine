@@ -40,7 +40,7 @@ namespace minty
 		/// </summary>
 		/// <param name="layout"></param>
 		/// <param name="pipeline"></param>
-		Shader(ShaderBuilder const& builder, Engine& engine, ID const sceneId);
+		Shader(ShaderBuilder const& builder, Runtime& engine, ID const sceneId);
 
 		/// <summary>
 		/// Destroys all of the resources associated with this Shader.

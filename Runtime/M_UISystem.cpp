@@ -1,13 +1,13 @@
 #include "pch.h"
 #include "M_UISystem.h"
 
-#include "M_Engine.h"
+#include "M_Runtime.h"
 #include "M_UITransformComponent.h"
 #include "M_Scene.h"
 
 using namespace minty;
 
-minty::UISystem::UISystem(Engine& engine, ID const sceneId)
+minty::UISystem::UISystem(Runtime& engine, ID const sceneId)
 	: System(engine, sceneId)
 {
 	_onMouseMove = [this](MouseMoveEventArgs const& args)

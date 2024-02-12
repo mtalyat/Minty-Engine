@@ -1,5 +1,5 @@
 #pragma once
-#include "M_Object.h"
+#include "M_Engine.h"
 
 #include "M_Register.h"
 #include "M_Color.h"
@@ -61,7 +61,7 @@ namespace minty
 	/// Handles rendering for the game engine.
 	/// </summary>
 	class RenderEngine
-		: public Object
+		: public Engine
 	{
 	private:
 		Window* _window;
@@ -111,7 +111,7 @@ namespace minty
 		/// <summary>
 		/// Creates a new RenderEngine that will render to the given Window.
 		/// </summary>
-		RenderEngine(Window* const window);
+		RenderEngine();
 
 		~RenderEngine();
 
