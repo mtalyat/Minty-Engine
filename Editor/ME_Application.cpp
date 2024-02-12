@@ -417,14 +417,18 @@ std::vector<std::string> splitString(std::string s)
 }
 
 Application::Application()
-	: _project()
-	, _engine()
-	, _sceneId(ERROR_ID)
+	: _path(std::filesystem::current_path())
 	, _window("", 1280, 720)
+	, _engine(new Engine(Info(NAME, 0, 0, 0)))
+	, _project()
+	, _sceneId(ERROR_ID)
 	, _editorWindows()
 {
 	// set to default window title
 	set_window_title("");
+
+	// initalize the engine
+	_engine->init(&_window);
 
 	// create all the editor windows
 	// add to list so they get drawn and updated
@@ -444,6 +448,20 @@ mintye::Application::~Application()
 	for(auto const& pair : _editorWindows)
 	{
 		delete pair.second;
+	}
+
+	if (_engine)
+	{
+		// stop if needed
+		if (_engine->is_running())
+		{
+			_engine->stop();
+			_engine->cleanup();
+		}
+
+		// cleanup and destroy
+		_engine->destroy();
+		delete _engine;
 	}
 }
 
@@ -643,6 +661,11 @@ int Application::run(int argc, char const* argv[])
 	return 0;
 }
 
+minty::Engine& mintye::Application::get_engine() const
+{
+	return *_engine;
+}
+
 void mintye::Application::cleanup()
 {
 	unload_scene();
@@ -659,18 +682,6 @@ void mintye::Application::set_project(Project* const project)
 	for (auto const& pair : _editorWindows)
 	{
 		pair.second->set_project(_project);
-	}
-}
-
-void mintye::Application::set_engine(minty::Engine* const engine)
-{
-	// set new engine
-	_engine = engine;
-
-	// set for all windows
-	for (auto const& pair : _editorWindows)
-	{
-		pair.second->set_engine(_engine);
 	}
 }
 
@@ -693,11 +704,11 @@ void mintye::Application::set_window_title(minty::String const& subTitle)
 {
 	if (subTitle.length())
 	{
-		_window.set_title(std::format("Minty Editor: {}", subTitle));
+		_window.set_title(std::format("{}: {}", NAME, subTitle));
 	}
 	else
 	{
-		_window.set_title("Minty Editor");
+		_window.set_title(NAME);
 	}
 }
 
@@ -731,15 +742,10 @@ void mintye::Application::load_project(minty::Path const& path)
 	// create new project
 	Project* project = new Project(path);
 	project->collect_assets();
-	//std::filesystem::current_path(path);
-
-	// create new engine
-	Engine* engine = new Engine(project->get_info());
-	engine->init(&_window);
+	std::filesystem::current_path(path);
 
 	// set new types
 	set_project(project);
-	set_engine(engine);
 
 	// load a scene, if any found
 	Path sceneName = project->find_asset(Project::CommonFileType::Scene);
@@ -756,19 +762,14 @@ void mintye::Application::unload_project()
 {
 	unload_scene();
 
-	if (_engine)
-	{
-		_engine->stop();
-		_engine->destroy();
-		delete _engine;
-		set_engine(nullptr);
-	}
-
 	if (_project)
 	{
 		delete _project;
 		set_project(nullptr);
 	}
+
+	// reset path
+	std::filesystem::current_path(_path);
 }
 
 void mintye::Application::create_new_project(minty::String const& name, minty::Path const& path, NewProjectSetupType initType)
@@ -865,6 +866,22 @@ void mintye::Application::unload_scene()
 		sceneManager.unload();
 		sceneManager.destroy();
 		_sceneId = ERROR_ID;
+	}
+}
+
+void mintye::Application::open_asset(minty::Path const& path)
+{
+	Path extension = path.extension();
+
+	if (extension == SCENE_EXTENSION)
+	{
+		// open the scene
+		load_scene(path);
+	}
+	else
+	{
+		// cannot open in the editor, open on the OS
+		minty::Operations::open(path);
 	}
 }
 

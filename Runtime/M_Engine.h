@@ -43,6 +43,8 @@ namespace minty
 
 		Time const& get_time() const;
 
+		bool is_running() const;
+
 		/// <summary>
 		/// Gets the global input map that is persistent across all Scenes and Windows.
 		/// </summary>

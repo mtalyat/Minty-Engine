@@ -24,14 +24,14 @@ namespace mintye
 	protected:
 		Application& get_application() const;
 
+		minty::Engine& get_engine() const;
+
 		Project* get_project() const;
 
-		minty::Engine* get_engine() const;
+		minty::Scene* get_scene() const;
 
 	public:
 		virtual void set_project(Project* const project);
-
-		virtual void set_engine(minty::Engine* const engine);
 
 		virtual void set_scene(minty::Scene* const scene);
 

@@ -15,6 +15,9 @@ namespace mintye
 	class Application
 	{
 	private:
+		constexpr static char const* NAME = "Minty Editor";
+
+	private:
 		enum class NewProjectSetupType
 		{
 			/// <summary>
@@ -29,13 +32,14 @@ namespace mintye
 		};
 
 	private:
+		// info needed for the editor:
+		minty::Path _path;
+		minty::Window _window;
+		minty::Engine* _engine;
+
 		// info needed for a loaded project:
 		Project* _project;
-		minty::Engine* _engine;
 		minty::ID _sceneId;
-
-		// window being drawn to:
-		minty::Window _window;
 
 		// editor windows to be drawn
 		std::unordered_map<minty::String, EditorWindow*> _editorWindows;
@@ -51,6 +55,8 @@ namespace mintye
 		/// <param name="argv">The command line arguments.</param>
 		int run(int argc, char const* argv[]);
 
+		minty::Engine& get_engine() const;
+
 	private:
 		void cleanup();
 
@@ -58,8 +64,6 @@ namespace mintye
 
 	private:
 		void set_project(Project* const project);
-
-		void set_engine(minty::Engine* const engine);
 
 		void set_scene(minty::ID const sceneId);
 
@@ -73,13 +77,13 @@ namespace mintye
 		void draw_application(BuildInfo& buildInfo);
 
 		void draw_dock_space();
-		
+
 		void draw_menu_bar();
-		
+
 		void draw_commands(BuildInfo& buildInfo);
-		
+
 		void draw_editor_windows();
-		
+
 		void reset_editor_windows();
 
 	public:
@@ -118,6 +122,18 @@ namespace mintye
 
 #pragma endregion
 
+#pragma region Assets
+
+	public:
+		/// <summary>
+		/// Opens the asset in the editor, or in the system if the editor does not support it
+		/// </summary>
+		/// <param name="path"></param>
+		void open_asset(minty::Path const& path);
+
+#pragma endregion
+
+
 #pragma region Building and Running
 
 	private:
@@ -141,7 +157,7 @@ namespace mintye
 
 #pragma region File Generation
 
-		private:
+	private:
 		/// <summary>
 		/// Generates and updates the cmake file for the target project.
 		/// </summary>

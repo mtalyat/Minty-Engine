@@ -63,6 +63,11 @@ Time const& minty::Engine::get_time() const
 	return _time;
 }
 
+bool minty::Engine::is_running() const
+{
+	return _running;
+}
+
 InputMap& minty::Engine::get_global_input_map()
 {
 	return _globalInput;

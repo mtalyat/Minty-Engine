@@ -80,7 +80,8 @@ void mintye::AssetsWindow::draw()
 		// if clicked, open the file
 		if (ImGui::Button(path.string().c_str(), itemSize))
 		{
-			minty::Operations::open(project->get_assets_path() / _path / path);
+			Application app = get_application();
+			app.open_asset(project->get_assets_path() / _path / path);
 		}
 	}
 	

@@ -11,14 +11,41 @@ mintye::HierarchyWindow::HierarchyWindow(Application& application)
 
 void mintye::HierarchyWindow::draw()
 {
+	Scene* scene = get_scene();
+
 	ImGui::SetNextWindowSize(ImVec2(400, 800), ImGuiCond_FirstUseEver);
-	if (!ImGui::Begin("Hierarchy"))
+	if (!ImGui::Begin("Hierarchy") || !scene)
 	{
 		ImGui::End();
 		return;
 	}
 
+	// split 50/50 into systems and entities, for now
+	float windowHeight = ImGui::GetContentRegionAvail().y - ImGui::GetStyle().ItemSpacing.y;
+	float splitHeight = windowHeight * 0.5f;
 
+	// draw systems
+	SystemRegistry& systemRegistry = scene->get_system_registry();
+	if (ImGui::BeginChild("HierarchySystems", ImVec2(0, splitHeight), true))
+	{
+		ImGui::Text("Systems");
+		ImGui::Separator();
+	}
+	ImGui::EndChild();
+	
+	// draw entities
+	EntityRegistry* entityRegistry = &scene->get_entity_registry();
+	if (ImGui::BeginChild("HierarchyEntities", ImVec2(0.0f, 0.0f), true))
+	{
+		ImGui::Text("Entities");
+		ImGui::Separator();
+
+		for (auto [entity]: entityRegistry->storage<Entity>().each())
+		{
+			ImGui::Text(entityRegistry->get_name(entity).c_str());
+		}
+	}
+	ImGui::EndChild();
 
 	ImGui::End();
 }
