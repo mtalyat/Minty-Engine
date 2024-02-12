@@ -183,6 +183,9 @@ namespace minty
 		// cursor position
 		static void cursor_callback(GLFWwindow* window, double xpos, double ypos);
 
+		// error reporting
+		static void error_callback(int const error, char const* description);
+
 	public:
 		friend String to_string(Window const& value);
 	};

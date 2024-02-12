@@ -33,6 +33,7 @@ minty::Window::Window(String const& title, int const x, int const y, int const w
 	if (_windowCount == 0)
 	{
 		glfwInit();
+		glfwSetErrorCallback(error_callback);
 	}
 	_windowCount++;
 
@@ -345,6 +346,11 @@ void minty::Window::cursor_callback(GLFWwindow* window, double xpos, double ypos
 	{
 		w->trigger_cursor(static_cast<float>(xpos), static_cast<float>(ypos));
 	}
+}
+
+void minty::Window::error_callback(int const error, char const* description)
+{
+	Console::error(std::format("Window GLFW Error: code = {}, message = \"{}\"", error, description));
 }
 
 void minty::Window::scroll_callback(GLFWwindow* window, double xoffset, double yoffset)

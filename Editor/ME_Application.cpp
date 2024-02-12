@@ -70,10 +70,6 @@ static ImGui_ImplVulkanH_Window g_MainWindowData;
 static int                      g_MinImageCount = 2;
 static bool                     g_SwapChainRebuild = false;
 
-static void glfw_error_callback(int error, const char* description)
-{
-	fprintf(stderr, "GLFW Error %d: %s\n", error, description);
-}
 static void check_vk_result(VkResult err)
 {
 	if (err == 0)
@@ -428,6 +424,9 @@ Application::Application()
 	// initalize the engine
 	_runtime->init(runtimeBuilder);
 
+	// initialize the render engine to work with ImGui
+
+
 	// create all the editor windows
 	// add to list so they get drawn and updated
 	_editorWindows.emplace("Console", new ConsoleWindow(*this));
@@ -469,9 +468,6 @@ int Application::run(int argc, char const* argv[])
 	{
 		.debug = true
 	};
-
-	// set error callback
-	glfwSetErrorCallback(glfw_error_callback);
 
 	ImVector<const char*> extensions;
 	uint32_t extensions_count = 0;
