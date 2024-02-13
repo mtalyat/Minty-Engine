@@ -102,6 +102,13 @@ mintye::Application::~Application()
 
 int Application::run(int argc, char const* argv[])
 {
+	// TODO: remove this
+	// if the TestProject exists, open it by default
+	if (std::filesystem::exists("../Projects/Tests/TestProject"))
+	{
+		load_project("../Projects/Tests/TestProject");
+	}
+
 	_runtime->start();
 
 	_runtime->run();
