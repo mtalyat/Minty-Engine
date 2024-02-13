@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "M_Runtime.h"
 
-#include "M_RendererBuilder.h"
+#include "M_RenderEngineBuilder.h"
 #include "M_Info.h"
 #include "M_Console.h"
 
@@ -176,17 +176,14 @@ bool minty::Runtime::start()
 {
 	if (_running) return true; // already started
 
-	// if no scenes at all, abort
-	if (!_sceneManager->size())
+	// if there are scenes, load them
+	if (_sceneManager->size())
 	{
-		Console::error("Aborting game. No Scenes loaded.");
-		return false;
-	}
-
-	// if no scene loaded, just load the first scene
-	if (!_sceneManager->get_loaded_scene())
-	{
-		_sceneManager->load_scene(0);
+		// if no scene loaded, just load the first scene
+		if (!_sceneManager->get_loaded_scene())
+		{
+			_sceneManager->load_scene(0);
+		}
 	}
 
 	// start the scene(s)

@@ -33,6 +33,7 @@ namespace mintye
 
 	private:
 		// info needed for the editor:
+		minty::Info _info;
 		minty::Path _path;
 		minty::Window _window;
 		minty::Runtime* _runtime;
@@ -56,6 +57,8 @@ namespace mintye
 		int run(int argc, char const* argv[]);
 
 		minty::Runtime& get_runtime() const;
+		
+		void draw();
 
 	private:
 		void cleanup();
@@ -71,11 +74,9 @@ namespace mintye
 
 #pragma endregion
 
-#pragma region Windows
+#pragma region Drawing
 
 	private:
-		void draw_application(BuildInfo& buildInfo);
-
 		void draw_dock_space();
 
 		void draw_menu_bar();

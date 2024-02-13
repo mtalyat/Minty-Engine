@@ -2,7 +2,6 @@
 
 namespace minty
 {
-	class RenderEngine;
 	class Info;
 	class Window;
 

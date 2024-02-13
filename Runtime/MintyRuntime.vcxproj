@@ -297,7 +297,7 @@
     <ClInclude Include="M_MaterialBuilder.h" />
     <ClInclude Include="M_RenderObject.h" />
     <ClInclude Include="M_PushConstantInfo.h" />
-    <ClInclude Include="M_RendererBuilder.h" />
+    <ClInclude Include="M_RenderEngineBuilder.h" />
     <ClInclude Include="M_ShaderBuilder.h" />
     <ClInclude Include="M_ShaderPassBuilder.h" />
     <ClInclude Include="M_TextureBuilder.h" />

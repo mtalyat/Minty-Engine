@@ -63,7 +63,7 @@ namespace minty
 	class RenderEngine
 		: public Engine
 	{
-	private:
+	protected:
 		Window* _window;
 
 		// assets
@@ -81,7 +81,7 @@ namespace minty
 
 		// (Vulkan) rendering components
 		VkDevice _device;
-		VkInstance instance;
+		VkInstance _instance;
 		VkPhysicalDevice _physicalDevice = nullptr;
 
 		VkDebugUtilsMessengerEXT _debugMessenger;
@@ -116,18 +116,24 @@ namespace minty
 		~RenderEngine();
 
 		/// <summary>
-		/// Draws a frame to the screen.
-		/// </summary>
-		void render_frame();
-
-		/// <summary>
 		/// Checks if this RenderEngine has been initialized.
 		/// </summary>
 		/// <returns>True if the engine is initialized.</returns>
 		bool is_initialized() const;
 
+#pragma region Frame
+
+	public:
+		/// <summary>
+		/// Draws a frame to the screen.
+		/// </summary>
+		virtual void render_frame();
+
+#pragma endregion
+
 #pragma region Get
 
+	public:
 		/// <summary>
 		/// Gets the device that this RenderEngine is rendering to.
 		/// </summary>
@@ -166,7 +172,7 @@ namespace minty
 		/// <summary>
 		/// Initializes the RenderEngine.
 		/// </summary>
-		void init(RenderEngineBuilder const& builder);
+		virtual void init(RenderEngineBuilder const& builder);
 
 	private:
 		/// <summary>
@@ -266,7 +272,7 @@ namespace minty
 		/// <summary>
 		/// Cleans up all of the render engine resources.
 		/// </summary>
-		void destroy();
+		virtual void destroy();
 
 #pragma endregion
 
@@ -384,6 +390,9 @@ namespace minty
 
 #pragma region Drawing
 
+	protected:
+		virtual void draw(VkCommandBuffer commandBuffer);
+
 	private:
 		void draw_scene(VkCommandBuffer commandBuffer);
 
@@ -455,7 +464,7 @@ namespace minty
 
 #pragma endregion
 
-	private:
+	protected:
 		/// <summary>
 		/// Finds the depth rendering format that can be used.
 		/// </summary>
@@ -526,7 +535,7 @@ namespace minty
 		/// </summary>
 		/// <param name="availableFormats">The available surface formats.</param>
 		/// <returns>The chosen format.</returns>
-		VkSurfaceFormatKHR choose_swap_surface_format(const std::vector<VkSurfaceFormatKHR>& availableFormats);
+		virtual VkSurfaceFormatKHR choose_swap_surface_format(const std::vector<VkSurfaceFormatKHR>& availableFormats);
 
 		/// <summary>
 		/// Checks if the given device supports a swap chain.

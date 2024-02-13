@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "M_RenderEngine.h"
 
-#include "M_RendererBuilder.h"
+#include "M_RenderEngineBuilder.h"
 #include "M_DrawCallObjectInfo.h"
 #include "M_SpritePushData.h"
 
@@ -273,7 +273,7 @@ void RenderEngine::create_instance(RenderEngineBuilder const& builder)
 		createInfo.pNext = nullptr;
 	}
 
-	if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS)
+	if (vkCreateInstance(&createInfo, nullptr, &_instance) != VK_SUCCESS)
 	{
 		Error::abort("failed to create instance!");
 	}
@@ -551,7 +551,7 @@ void RenderEngine::create_image_views()
 void RenderEngine::create_surface()
 {
 	// create window surface that vulkan can use to draw
-	if (glfwCreateWindowSurface(instance, _window->get_raw(), nullptr, &_surface) != VK_SUCCESS) {
+	if (glfwCreateWindowSurface(_instance, _window->get_raw(), nullptr, &_surface) != VK_SUCCESS) {
 		Error::abort("Failed to create window surface.");
 	}
 }
@@ -560,7 +560,7 @@ void RenderEngine::pick_physical_device()
 {
 	// find number of hardware GPUs
 	uint32_t deviceCount = 0;
-	vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
+	vkEnumeratePhysicalDevices(_instance, &deviceCount, nullptr);
 
 	// if zero, error
 	if (deviceCount == 0)
@@ -570,7 +570,7 @@ void RenderEngine::pick_physical_device()
 
 	// get devices
 	std::vector<VkPhysicalDevice> devices(deviceCount);
-	vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
+	vkEnumeratePhysicalDevices(_instance, &deviceCount, devices.data());
 
 	// find a suitable device, pick the first one
 	for (const auto& device : devices) {
@@ -756,7 +756,7 @@ VkPresentModeKHR RenderEngine::choose_swap_present_mode(const std::vector<VkPres
 
 VkSurfaceFormatKHR RenderEngine::choose_swap_surface_format(const std::vector<VkSurfaceFormatKHR>& availableFormats) {
 	for (const auto& availableFormat : availableFormats) {
-		// VK_FORMAT_R8G8B8A8_UINT?
+		// VK_FORMAT_R8G8B8A8_UINT
 		if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
 			return availableFormat;
 		}
@@ -912,8 +912,15 @@ void RenderEngine::create_logical_device()
 	vkGetDeviceQueue(_device, indices.presentFamily.value(), 0, &_presentQueue);
 }
 
+void minty::RenderEngine::draw(VkCommandBuffer commandBuffer)
+{
+	draw_scene(commandBuffer);
+}
+
 void minty::RenderEngine::draw_scene(VkCommandBuffer commandBuffer)
 {
+	if (!_registry) return;
+
 	// sort sprites so they render in the correct order, since Z does not matter
 	_registry->sort<SpriteComponent>([](SpriteComponent const& left, SpriteComponent const& right)
 		{
@@ -1161,7 +1168,7 @@ void RenderEngine::setup_debug_messenger() {
 	VkDebugUtilsMessengerCreateInfoEXT createInfo;
 	populate_debug_messenger_create_info(createInfo);
 
-	if (CreateDebugUtilsMessengerEXT(instance, &createInfo, nullptr, &_debugMessenger) != VK_SUCCESS) {
+	if (CreateDebugUtilsMessengerEXT(_instance, &createInfo, nullptr, &_debugMessenger) != VK_SUCCESS) {
 		Error::abort("Failed to set up debug messenger.");
 	}
 }
@@ -1541,7 +1548,7 @@ void RenderEngine::record_command_buffer(VkCommandBuffer commandBuffer, uint32_t
 	_view.bind(commandBuffer);
 
 	// render meshes
-	draw_scene(commandBuffer);
+	draw(commandBuffer);
 
 	// done rendering
 	vkCmdEndRenderPass(commandBuffer);
@@ -1613,10 +1620,10 @@ void RenderEngine::destroy()
 	vkDestroyRenderPass(_device, _renderPass, nullptr);
 	vkDestroyDevice(_device, nullptr);
 	if (enableValidationLayers) {
-		DestroyDebugUtilsMessengerEXT(instance, _debugMessenger, nullptr);
+		DestroyDebugUtilsMessengerEXT(_instance, _debugMessenger, nullptr);
 	}
-	vkDestroySurfaceKHR(instance, _surface, nullptr);
-	vkDestroyInstance(instance, nullptr);
+	vkDestroySurfaceKHR(_instance, _surface, nullptr);
+	vkDestroyInstance(_instance, nullptr);
 
 	_initialized = false;
 }

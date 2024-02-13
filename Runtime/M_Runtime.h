@@ -6,6 +6,7 @@
 #include "M_SceneManager.h"
 #include "M_Info.h"
 #include "M_Time.h"
+#include "M_Engine.h"
 #include "M_Types.h"
 #include <unordered_map>
 
@@ -202,12 +203,17 @@ namespace minty
 		// not found
 		return nullptr;
 	}
+
 	template<typename T>
 	void Runtime::set_engine(T* const engine)
 	{
 		MINTY_ASSERT(_initialized, "Runtime::set_engine(): Runtime is not initialized.");
 		bool isType = is_type<T, Engine>();
 		MINTY_ASSERT(isType, "The type given to Runtime::set_engine() must derive from Engine.");
+
+		// set reference to self
+		Engine* e = static_cast<Engine*>(engine);
+		e->set_runtime(*this);
 
 		// if engine already exists, dispose of it and replace it
 		String name = typeid(T).name();

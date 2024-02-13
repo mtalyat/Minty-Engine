@@ -51,6 +51,9 @@
     <ClCompile Include="ME_PropertiesWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ME_ApplicationRenderEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ME_Application.h">
@@ -87,6 +90,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ME_Minty.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ME_ApplicationRenderEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
