@@ -83,10 +83,10 @@ String minty::to_string(UITransformComponent const& value)
 void minty::UITransformComponent::serialize(Writer& writer) const
 {
 	writer.write("anchor", to_string(anchorMode));
-	writer.write("x", x, 0.0f);
-	writer.write("y", y, 0.0f);
-	writer.write("width", width, 0.0f);
-	writer.write("height", height, 0.0f);
+	writer.write("x", x);
+	writer.write("y", y);
+	writer.write("width", width);
+	writer.write("height", height);
 }
 
 void minty::UITransformComponent::deserialize(Reader const& reader)

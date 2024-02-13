@@ -238,28 +238,6 @@ namespace minty
 
 #pragma endregion
 
-#pragma region Default Writing
-
-		template<typename T>
-		void write(String const& name, T const& value, T const& defaultValue)
-		{
-			if (value != defaultValue)
-			{
-				write(name, value);
-			}
-		}
-
-		template<typename T, typename U>
-		void write(String const& name, T const& value, U const& defaultValue)
-		{
-			if (value != defaultValue)
-			{
-				write(name, value);
-			}
-		}
-
-#pragma endregion
-
 	public:
 		friend String to_string(Writer const& value);
 	};

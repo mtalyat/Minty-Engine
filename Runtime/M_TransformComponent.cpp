@@ -33,9 +33,9 @@ Vector3 minty::TransformComponent::get_right() const
 
 void minty::TransformComponent::serialize(Writer& writer) const
 {
-	writer.write("position", localPosition, Vector3());
-	writer.write("rotation", localRotation, Quaternion());
-	writer.write("scale", localScale, Vector3(1.0f, 1.0f, 1.0f));
+	writer.write("position", localPosition);
+	writer.write("rotation", localRotation);
+	writer.write("scale", localScale);
 }
 
 void minty::TransformComponent::deserialize(Reader const& reader)

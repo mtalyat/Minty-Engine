@@ -15,7 +15,7 @@ void minty::AudioSourceComponent::serialize(Writer& writer) const
 
 	AudioSystem const* audioSystem = data.scene->get_system_registry().find<AudioSystem>();
 
-	writer.write("volume", volume, 1.0f);
+	writer.write("volume", volume);
 	writer.write("clip", audioSystem->get_name(clipId));
 	writer.write("attenuation", attenuation);
 	writer.write("near", nearDistance);

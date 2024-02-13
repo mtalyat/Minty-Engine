@@ -114,7 +114,6 @@ namespace minty
 
 #pragma endregion
 
-
 #pragma region Exit
 
 		/// <summary>

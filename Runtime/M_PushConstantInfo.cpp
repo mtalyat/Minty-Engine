@@ -7,8 +7,8 @@ void minty::PushConstantInfo::serialize(Writer& writer) const
 {
 	writer.write("name", name);
 	writer.write("stageFlags", vk::to_string(stageFlags));
-	writer.write("offset", offset, 0u);
-	writer.write("size", size, 0u);
+	writer.write("offset", offset);
+	writer.write("size", size);
 }
 
 void minty::PushConstantInfo::deserialize(Reader const& reader)
