@@ -218,6 +218,10 @@ void mintye::Application::load_project(minty::Path const& path)
 	// set new types
 	set_project(project);
 
+	// load assemblies
+	// C:\Users\mitch\source\repos\Minty-Engine\Projects\Tests\TestProject\Assembly\bin\Debug
+	_runtime->emplace_assembly<CSharpAssembly>(std::format("Assembly/bin/Debug/TestProject.dll"));
+
 	// load a scene, if any found
 	Path sceneName = project->find_asset(Project::CommonFileType::Scene);
 	if (!sceneName.empty())
