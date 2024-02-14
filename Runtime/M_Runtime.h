@@ -8,6 +8,8 @@
 #include "M_Time.h"
 #include "M_Engine.h"
 #include "M_Types.h"
+#include "M_Mono.h"
+#include "M_TypeRegister.h"
 #include <unordered_map>
 
 namespace minty
@@ -15,6 +17,7 @@ namespace minty
 	class Engine;
 	class RenderEngine;
 	class AudioEngine;
+	class Assembly;
 
 	/// <summary>
 	/// Handles the core part of the engine, which includes running a game.
@@ -22,21 +25,49 @@ namespace minty
 	class Runtime
 	{
 	private:
+		enum class State
+		{
+			/// <summary>
+			/// The Runtime has not been initialized.
+			/// </summary>
+			Uninitialized,
+
+			/// <summary>
+			/// The Runtime has been initialized, but not started.
+			/// </summary>
+			Initialized,
+
+			/// <summary>
+			/// The Runtime is running.
+			/// </summary>
+			Running,
+
+			/// <summary>
+			/// The Runtime has stopped running.
+			/// </summary>
+			Stopped = Initialized,
+
+			/// <summary>
+			/// The Runtime has been destroyed.
+			/// </summary>
+			Destroyed = Uninitialized,
+		};
+
+	private:
 		constexpr static size_t RENDER_ENGINE_INDEX = 0;
 		constexpr static size_t AUDIO_ENGINE_INDEX = 0;
 
 	private:
+		State _state;
 		Info _info;
 		Time _time;
 		InputMap _globalInput;
 		Window* _window;
-		std::vector<Engine*> _engines;
-		std::unordered_map<String, size_t> _enginesLookup;
 		SceneManager* _sceneManager;
+		TypeRegister<Engine> _engines;
+		TypeRegister<Assembly> _assemblies;
 
-		bool _initialized;
 		size_t _frameCount;
-		bool _running;
 		int _exitCode;
 		bool _personalWindow;
 	public:
@@ -177,6 +208,18 @@ namespace minty
 
 #pragma endregion
 
+#pragma region Assemblies
+
+		public:
+			template<typename T>
+			T* emplace_assembly(Path const& path);
+
+			template<typename T>
+			bool erase_assembly();
+
+#pragma endregion
+
+
 	private:
 		/// <summary>
 		/// Updates the _time object.
@@ -190,47 +233,62 @@ namespace minty
 	template<typename T>
 	T* Runtime::get_engine() const
 	{
-		MINTY_ASSERT(_initialized, "Runtime::get_engine(): Runtime is not initialized.");
+		MINTY_ASSERT(_state >= State::Initialized, "Runtime::get_engine(): Runtime is not initialized.");
 
-		auto found = _enginesLookup.find(typeid(T).name);
-
-		if (found != _enginesLookup.end())
-		{
-			return static_cast<T*>(_engines.at(found->second));
-		}
-
-		// not found
-		return nullptr;
+		return _engines.get<T>();
 	}
 
 	template<typename T>
 	void Runtime::set_engine(T* const engine)
 	{
-		MINTY_ASSERT(_initialized, "Runtime::set_engine(): Runtime is not initialized.");
-		bool isType = is_type<T, Engine>();
-		MINTY_ASSERT(isType, "The type given to Runtime::set_engine() must derive from Engine.");
+		MINTY_ASSERT(_state >= State::Initialized, "Runtime::set_engine(): Runtime is not initialized.");
 
 		// set reference to self
 		Engine* e = static_cast<Engine*>(engine);
 		e->set_runtime(*this);
 
 		// if engine already exists, dispose of it and replace it
-		String name = typeid(T).name();
-		auto found = _enginesLookup.find(name);
-
-		if (found != _enginesLookup.end())
+		T* other = _engines.get<T>();
+		if (other)
 		{
-			// destroy old engine
-			delete _engines.at(found->second);
+			delete other;
+		}
 
-			// set new engine
-			_engines[found->second] = engine;
-		}
-		else
+		// set engine
+		_engines.emplace<T>(engine);
+	}
+	
+	template<typename T>
+	T* Runtime::emplace_assembly(Path const& path)
+	{
+		// erase old value if needed
+		erase_assembly<T>();
+
+		// create new
+		T* t = new T();
+
+		// load at path
+		t->load(path);
+
+		// add to assemblies
+		_assemblies.emplace<T>(t);
+
+		return t;
+	}
+	
+	template<typename T>
+	bool Runtime::erase_assembly()
+	{
+		// get old value and delete if it exists
+		T* t = _assemblies.get<T>();
+		if (t)
 		{
-			// add new engine to the back
-			_enginesLookup.emplace(name, _engines.size());
-			_engines.push_back(engine);
+			delete t;
+			_assemblies.erase<T>();
+			return true;
 		}
+
+		// value did not exist
+		return false;
 	}
 }

@@ -176,6 +176,12 @@
       </IgnoreSpecificDefaultLibraries>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
     </Lib>
+    <PostBuildEvent>
+      <Command>xcopy /y "C:\Libraries\Mono\lib\*.dll" "$(TargetDir)"</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Copy Mono to build output.</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
@@ -212,8 +218,16 @@
       <AdditionalDependencies>vulkan-1.lib;glfw3_mt.lib;zlib-static.lib;mono-2.0-sgen.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>C:\Libraries\VulkanSDK\1.3.261.1\Lib;C:\Libraries\GLFW\glfw-3.3.8.bin.WIN64\lib-vc2022;C:\Libraries\ZLIB\lib;C:\Libraries\Mono\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
+    <PostBuildEvent>
+      <Command>xcopy /y "C:\Libraries\Mono\lib\*.dll" "$(TargetDir)"</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Copy Mono to build output.</Message>
+    </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClInclude Include="M_Assembly.h" />
+    <ClInclude Include="M_CSharpAssembly.h" />
     <ClInclude Include="M_Engine.h" />
     <ClInclude Include="M_ImGui.h" />
     <ClInclude Include="libraries\imguifiledialog\ImGuiFileDialog.h" />
@@ -239,6 +253,7 @@
     <ClInclude Include="M_Entity.h" />
     <ClInclude Include="M_FiniteStateMachine.h" />
     <ClInclude Include="M_Macros.h" />
+    <ClInclude Include="M_Mono.h" />
     <ClInclude Include="M_Operations.h" />
     <ClInclude Include="M_PhysicalFile.h" />
     <ClInclude Include="M_CoordinateMode.h" />
@@ -248,6 +263,7 @@
     <ClInclude Include="M_SpriteBuilder.h" />
     <ClInclude Include="M_TextureAtlasBuilder.h" />
     <ClInclude Include="M_Time.h" />
+    <ClInclude Include="M_TypeRegister.h" />
     <ClInclude Include="M_UIPushData.h" />
     <ClInclude Include="M_RenderSystem.h" />
     <ClInclude Include="M_SceneObject.h" />
@@ -386,6 +402,7 @@
     <ClCompile Include="M_AnimationSystem.cpp" />
     <ClCompile Include="M_Animator.cpp" />
     <ClCompile Include="M_AnimatorComponent.cpp" />
+    <ClCompile Include="M_Assembly.cpp" />
     <ClCompile Include="M_Asset.cpp" />
     <ClCompile Include="M_AudioClip.cpp" />
     <ClCompile Include="M_AudioEngine.cpp" />
@@ -394,6 +411,7 @@
     <ClCompile Include="M_AudioSourceComponent.cpp" />
     <ClCompile Include="M_AudioSystem.cpp" />
     <ClCompile Include="M_Compression.cpp" />
+    <ClCompile Include="M_CSharpAssembly.cpp" />
     <ClCompile Include="M_Dynamic.cpp" />
     <ClCompile Include="M_CameraComponent.cpp" />
     <ClCompile Include="M_Color.cpp" />

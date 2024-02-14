@@ -64,6 +64,15 @@
     <Filter Include="Libraries\imguifiledialog">
       <UniqueIdentifier>{bd1db8bd-8d93-4302-89d0-c8d21edf3ae3}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Libraries">
+      <UniqueIdentifier>{29ecdbd6-4808-40b8-a87b-611e78590c6d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Libraries\entt">
+      <UniqueIdentifier>{82679ae3-2406-4819-ab6a-047a1331f24a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Assemblies">
+      <UniqueIdentifier>{caaadc08-3a32-48f8-8207-eb7292a7bcb2}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -150,9 +159,6 @@
     <ClInclude Include="M_CameraComponent.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
-    <ClInclude Include="libraries\entt\entt.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="M_MeshComponent.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
@@ -189,9 +195,6 @@
     <ClInclude Include="M_InputMap.h">
       <Filter>Header Files\Input</Filter>
     </ClInclude>
-    <ClInclude Include="M_GLM.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="M_Error.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -206,9 +209,6 @@
     </ClInclude>
     <ClInclude Include="M_CursorMode.h">
       <Filter>Header Files\Input</Filter>
-    </ClInclude>
-    <ClInclude Include="M_GLFW.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="M_RelationshipComponent.h">
       <Filter>Header Files\Components</Filter>
@@ -239,9 +239,6 @@
     </ClInclude>
     <ClInclude Include="M_File.h">
       <Filter>Header Files\Files</Filter>
-    </ClInclude>
-    <ClInclude Include="M_Vulkan.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="M_Text.h">
       <Filter>Header Files</Filter>
@@ -513,9 +510,6 @@
     <ClInclude Include="M_Operations.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="M_ImGui.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="libraries\imguifiledialog\ImGuiFileDialog.h">
       <Filter>Libraries\imguifiledialog</Filter>
     </ClInclude>
@@ -529,6 +523,33 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="M_RuntimeBuilder.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="M_GLM.hpp">
+      <Filter>Header Files\Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="M_GLFW.h">
+      <Filter>Header Files\Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="M_ImGui.h">
+      <Filter>Header Files\Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Mono.h">
+      <Filter>Header Files\Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Vulkan.h">
+      <Filter>Header Files\Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\entt\entt.hpp">
+      <Filter>Libraries\entt</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Assembly.h">
+      <Filter>Header Files\Assemblies</Filter>
+    </ClInclude>
+    <ClInclude Include="M_CSharpAssembly.h">
+      <Filter>Header Files\Assemblies</Filter>
+    </ClInclude>
+    <ClInclude Include="M_TypeRegister.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
@@ -888,6 +909,12 @@
       <Filter>Libraries\imguifiledialog</Filter>
     </ClCompile>
     <ClCompile Include="M_Engine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_Assembly.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_CSharpAssembly.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

@@ -15,6 +15,7 @@ access to the entire engine without needing include each file.
 #ifdef MINTY_IMGUI
 #include "M_ImGui.h"
 #endif
+#include "M_Mono.h"
 
 // ANIMATION
 #include "M_Animation.h"
@@ -23,6 +24,10 @@ access to the entire engine without needing include each file.
 #include "M_Animator.h"
 #include "M_AnimatorBuilder.h"
 #include "M_AnimatorComponent.h"
+
+// ASSEMBLIES
+#include "M_Assembly.h"
+#include "M_CSharpAssembly.h"
 
 // AUDIO
 #include "M_Audio.h"
@@ -138,6 +143,8 @@ access to the entire engine without needing include each file.
 #include "M_RuntimeBuilder.h"
 #include "M_Stopwatch.h"
 #include "M_Text.h"
+#include "M_Time.h"
+#include "M_TypeRegister.h"
 #include "M_Types.h"
 #include "M_Vector.h"
 #include "M_Window.h"

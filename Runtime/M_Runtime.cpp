@@ -28,6 +28,8 @@
 #include "M_TransformComponent.h"
 #include "M_UITransformComponent.h"
 
+#include "M_CSharpAssembly.h"
+
 #include "M_GLFW.h"
 #include <iostream>
 
@@ -38,15 +40,14 @@ uint32_t const WIDTH = 800;
 uint32_t const HEIGHT = 600;
 
 Runtime::Runtime(Info const& info)
-	: _info(info)
+	: _state(State::Uninitialized)
+	, _info(info)
 	, _globalInput()
 	, _window()
-	, _engines()
-	, _enginesLookup()
 	, _sceneManager()
-	, _initialized()
+	, _engines()
+	, _assemblies()
 	, _frameCount()
-	, _running()
 	, _exitCode()
 	, _personalWindow()
 {}
@@ -69,7 +70,7 @@ Time const& minty::Runtime::get_time() const
 
 bool minty::Runtime::is_running() const
 {
-	return _running;
+	return _state == State::Running;
 }
 
 InputMap& minty::Runtime::get_global_input_map()
@@ -84,24 +85,24 @@ InputMap const& minty::Runtime::get_global_input_map() const
 
 Window& minty::Runtime::get_window() const
 {
-	MINTY_ASSERT(_initialized, "Runtime::get_window(): Runtime is not initialized.");
+	MINTY_ASSERT(_state >= State::Initialized, "Runtime::get_window(): Runtime is not initialized.");
 
 	return *_window;
 }
 
 RenderEngine& minty::Runtime::get_render_engine() const
 {
-	return *static_cast<RenderEngine*>(_engines[RENDER_ENGINE_INDEX]);
+	return *static_cast<RenderEngine*>(_engines.at(RENDER_ENGINE_INDEX));
 }
 
 AudioEngine& minty::Runtime::get_audio_engine() const
 {
-	return *static_cast<AudioEngine*>(_engines[AUDIO_ENGINE_INDEX]);
+	return *static_cast<AudioEngine*>(_engines.at(AUDIO_ENGINE_INDEX));
 }
 
 SceneManager& minty::Runtime::get_scene_manager() const
 {
-	MINTY_ASSERT(_initialized, "Runtime::get_scene_manager(): Runtime is not initialized.");
+	MINTY_ASSERT(_state >= State::Initialized, "Runtime::get_scene_manager(): Runtime is not initialized.");
 
 	return *_sceneManager;
 }
@@ -124,14 +125,15 @@ void minty::Runtime::abort(int const code, String const& message)
 void minty::Runtime::exit(int const code)
 {
 	_exitCode = code;
-	_running = false;
+	if (_state == State::Running) _state = State::Stopped;
 }
 
 bool minty::Runtime::init(RuntimeBuilder const& builder)
 {
-	if (_initialized) return true;
+	// already initialized
+	if (_state > State::Uninitialized) return true;
 
-	_initialized = true;
+	_state = State::Initialized;
 
 	// create necessary components
 	_personalWindow = builder.window == nullptr;
@@ -140,6 +142,12 @@ bool minty::Runtime::init(RuntimeBuilder const& builder)
 
 	set_engine<RenderEngine>(builder.renderEngine ? builder.renderEngine : new RenderEngine());
 	set_engine<AudioEngine>(builder.audioEngine ? builder.audioEngine : new AudioEngine());
+
+	//// init any loaded assemblies
+	//for (Assembly* const assembly : _assemblies)
+	//{
+	//	assembly->init();
+	//}
 
 	// perform static operations that happen once
 	static bool registered = false;
@@ -174,7 +182,9 @@ bool minty::Runtime::init(RuntimeBuilder const& builder)
 
 bool minty::Runtime::start()
 {
-	if (_running) return true; // already started
+	if (_state == State::Running) return true; // already started
+
+	_state = State::Running;
 
 	// if there are scenes, load them
 	if (_sceneManager->size())
@@ -194,14 +204,12 @@ bool minty::Runtime::start()
 	_time.end = _time.start;
 	record_time();
 
-	_running = true;
-
 	return true;
 }
 
 void Runtime::run()
 {
-	while (_running && loop()) {}
+	while (_state == State::Running && loop()) {}
 }
 
 bool minty::Runtime::loop()
@@ -215,6 +223,12 @@ bool minty::Runtime::loop()
 
 	// run window events
 	glfwPollEvents();
+
+	// run script assemblies
+	for (Assembly* const assembly : _assemblies)
+	{
+		assembly->update();
+	}
 
 	// update scene(s)
 	_sceneManager->update();
@@ -236,7 +250,7 @@ bool minty::Runtime::loop()
 
 void minty::Runtime::stop()
 {
-	if (_running)
+	if (_state == State::Running)
 	{
 		exit(0);
 	}
@@ -254,9 +268,9 @@ void minty::Runtime::cleanup()
 
 void minty::Runtime::destroy()
 {
-	if (!_initialized) return;
+	if (_state == State::Destroyed) return;
 
-	_initialized = false;
+	_state = State::Destroyed;
 
 	if (_sceneManager)
 	{
@@ -264,12 +278,17 @@ void minty::Runtime::destroy()
 		_sceneManager = nullptr;
 	}
 
-	for (auto const& engine : _engines)
+	for (auto const engine : _engines)
 	{
 		delete engine;
 	}
 	_engines.clear();
-	_enginesLookup.clear();
+
+	for (auto const assembly : _assemblies)
+	{
+		delete assembly;
+	}
+	_assemblies.clear();
 
 	if (_window && _personalWindow)
 	{

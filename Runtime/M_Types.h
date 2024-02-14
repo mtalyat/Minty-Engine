@@ -4,6 +4,8 @@
 #include <string>
 #include <filesystem>
 #include <type_traits>
+#include <typeindex>
+#include <typeinfo>
 #include <chrono>
 
 namespace minty
@@ -24,6 +26,8 @@ namespace minty
 	typedef std::filesystem::path Path;
 
 	typedef std::chrono::steady_clock::time_point TimePoint;
+
+	typedef std::type_index TypeID;
 
 	// ID types
 
