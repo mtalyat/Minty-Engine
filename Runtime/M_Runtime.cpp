@@ -1,12 +1,14 @@
 #include "pch.h"
 #include "M_Runtime.h"
 
+#include "M_InputMap.h"
 #include "M_RenderEngineBuilder.h"
 #include "M_Info.h"
 #include "M_Console.h"
 
 #include "M_RenderEngine.h"
 #include "M_AudioEngine.h"
+#include "M_ScriptEngine.h"
 
 #include "M_SystemRegistry.h"
 #include "M_AnimationSystem.h"
@@ -28,12 +30,9 @@
 #include "M_TransformComponent.h"
 #include "M_UITransformComponent.h"
 
-#include "M_CSharpAssembly.h"
-
 #include "M_GLFW.h"
 #include <iostream>
 
-using namespace minty;
 using namespace minty;
 
 uint32_t const WIDTH = 800;
@@ -46,7 +45,6 @@ Runtime::Runtime(Info const& info)
 	, _window()
 	, _sceneManager()
 	, _engines()
-	, _assemblies()
 	, _frameCount()
 	, _exitCode()
 	, _personalWindow()
@@ -73,14 +71,9 @@ bool minty::Runtime::is_running() const
 	return _state == State::Running;
 }
 
-InputMap& minty::Runtime::get_global_input_map()
+InputMap& minty::Runtime::get_global_input_map() const
 {
-	return _globalInput;
-}
-
-InputMap const& minty::Runtime::get_global_input_map() const
-{
-	return _globalInput;
+	return *_globalInput;
 }
 
 Window& minty::Runtime::get_window() const
@@ -98,6 +91,11 @@ RenderEngine& minty::Runtime::get_render_engine() const
 AudioEngine& minty::Runtime::get_audio_engine() const
 {
 	return *static_cast<AudioEngine*>(_engines.at(AUDIO_ENGINE_INDEX));
+}
+
+ScriptEngine& minty::Runtime::get_script_engine() const
+{
+	return *static_cast<ScriptEngine*>(_engines.at(SCRIPT_ENGINE_INDEX));
 }
 
 SceneManager& minty::Runtime::get_scene_manager() const
@@ -137,17 +135,12 @@ bool minty::Runtime::init(RuntimeBuilder const& builder)
 
 	// create necessary components
 	_personalWindow = builder.window == nullptr;
-	_window = _personalWindow ? new Window(_info.get_application_name(), WIDTH, HEIGHT, &_globalInput) : builder.window;
+	_window = _personalWindow ? new Window(_info.get_application_name(), WIDTH, HEIGHT, _globalInput) : builder.window;
 	_sceneManager = new SceneManager(*this);
 
 	set_engine<RenderEngine>(builder.renderEngine ? builder.renderEngine : new RenderEngine());
 	set_engine<AudioEngine>(builder.audioEngine ? builder.audioEngine : new AudioEngine());
-
-	//// init any loaded assemblies
-	//for (Assembly* const assembly : _assemblies)
-	//{
-	//	assembly->init();
-	//}
+	set_engine<ScriptEngine>(builder.scriptEngine ? builder.scriptEngine : new ScriptEngine());
 
 	// perform static operations that happen once
 	static bool registered = false;
@@ -224,12 +217,6 @@ bool minty::Runtime::loop()
 	// run window events
 	glfwPollEvents();
 
-	// run script assemblies
-	for (Assembly* const assembly : _assemblies)
-	{
-		assembly->update();
-	}
-
 	// update scene(s)
 	_sceneManager->update();
 
@@ -272,11 +259,7 @@ void minty::Runtime::destroy()
 
 	_state = State::Destroyed;
 
-	if (_sceneManager)
-	{
-		delete _sceneManager;
-		_sceneManager = nullptr;
-	}
+	MINTY_DELETE(_sceneManager);
 
 	for (auto const engine : _engines)
 	{
@@ -284,17 +267,7 @@ void minty::Runtime::destroy()
 	}
 	_engines.clear();
 
-	for (auto const assembly : _assemblies)
-	{
-		delete assembly;
-	}
-	_assemblies.clear();
-
-	if (_window && _personalWindow)
-	{
-		delete _window;
-		_window = nullptr;
-	}
+	MINTY_DELETE_COND(_window, _personalWindow);
 }
 
 void minty::Runtime::record_time()

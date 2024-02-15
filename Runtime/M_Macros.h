@@ -20,3 +20,9 @@
 #else
 #error "Unsupported operating system."
 #endif
+
+// Deletes and sets the given pointer to null.
+#define MINTY_DELETE(pointer) if((pointer)) { delete (pointer); (pointer) = nullptr; }
+
+// Deletes and sets the given pointer to null, if the condition is true.
+#define MINTY_DELETE_COND(pointer, condition) if((pointer) && (condition)) { delete (pointer); (pointer) = nullptr; }

@@ -10,6 +10,7 @@ namespace minty
 	struct Component
 		: public Object
 	{
+	public:
 		virtual ~Component() {}
 
 		virtual void serialize(Writer& writer) const override {}

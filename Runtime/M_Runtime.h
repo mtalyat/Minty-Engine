@@ -1,7 +1,6 @@
 #pragma once
 
 #include "M_RuntimeBuilder.h"
-#include "M_InputMap.h"
 #include "M_Window.h"
 #include "M_SceneManager.h"
 #include "M_Info.h"
@@ -10,15 +9,21 @@
 #include "M_Types.h"
 #include "M_Mono.h"
 #include "M_TypeRegister.h"
+#include "M_AssemblyType.h"
 #include <unordered_map>
 
 namespace minty
 {
 	class Engine;
+	class InputMap;
 	class RenderEngine;
 	class AudioEngine;
+	class ScriptEngine;
 	class Assembly;
+}
 
+namespace minty
+{
 	/// <summary>
 	/// Handles the core part of the engine, which includes running a game.
 	/// </summary>
@@ -55,17 +60,17 @@ namespace minty
 
 	private:
 		constexpr static size_t RENDER_ENGINE_INDEX = 0;
-		constexpr static size_t AUDIO_ENGINE_INDEX = 0;
+		constexpr static size_t AUDIO_ENGINE_INDEX = 1;
+		constexpr static size_t SCRIPT_ENGINE_INDEX = 2;
 
 	private:
 		State _state;
 		Info _info;
 		Time _time;
-		InputMap _globalInput;
+		InputMap* _globalInput;
 		Window* _window;
 		SceneManager* _sceneManager;
 		TypeRegister<Engine> _engines;
-		TypeRegister<Assembly> _assemblies;
 
 		size_t _frameCount;
 		int _exitCode;
@@ -91,13 +96,7 @@ namespace minty
 		/// Gets the global input map that is persistent across all Scenes and Windows.
 		/// </summary>
 		/// <returns></returns>
-		InputMap& get_global_input_map();
-
-		/// <summary>
-		/// Gets the global input map that is persistent across all Scenes and Windows.
-		/// </summary>
-		/// <returns></returns>
-		InputMap const& get_global_input_map() const;
+		InputMap& get_global_input_map() const;
 
 		/// <summary>
 		/// Gets the Window for this Engine.
@@ -142,6 +141,12 @@ namespace minty
 		/// </summary>
 		/// <returns></returns>
 		AudioEngine& get_audio_engine() const;
+
+		/// <summary>
+		/// Gets the ScriptEngine for this Engine.
+		/// </summary>
+		/// <returns></returns>
+		ScriptEngine& get_script_engine() const;
 
 #pragma endregion
 
@@ -211,11 +216,7 @@ namespace minty
 #pragma region Assemblies
 
 		public:
-			template<typename T>
-			T* emplace_assembly(Path const& path);
 
-			template<typename T>
-			bool erase_assembly();
 
 #pragma endregion
 
@@ -256,39 +257,5 @@ namespace minty
 
 		// set engine
 		_engines.emplace<T>(engine);
-	}
-	
-	template<typename T>
-	T* Runtime::emplace_assembly(Path const& path)
-	{
-		// erase old value if needed
-		erase_assembly<T>();
-
-		// create new
-		T* t = new T();
-
-		// load at path
-		t->load(path);
-
-		// add to assemblies
-		_assemblies.emplace<T>(t);
-
-		return t;
-	}
-	
-	template<typename T>
-	bool Runtime::erase_assembly()
-	{
-		// get old value and delete if it exists
-		T* t = _assemblies.get<T>();
-		if (t)
-		{
-			delete t;
-			_assemblies.erase<T>();
-			return true;
-		}
-
-		// value did not exist
-		return false;
 	}
 }

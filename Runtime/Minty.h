@@ -25,10 +25,6 @@ access to the entire engine without needing include each file.
 #include "M_AnimatorBuilder.h"
 #include "M_AnimatorComponent.h"
 
-// ASSEMBLIES
-#include "M_Assembly.h"
-#include "M_CSharpAssembly.h"
-
 // AUDIO
 #include "M_Audio.h"
 #include "M_AudioClip.h"
@@ -101,6 +97,14 @@ access to the entire engine without needing include each file.
 // SCENES
 #include "M_Scene.h"
 #include "M_SceneManager.h"
+
+// SCRIPTING
+#include "M_Accessibility.h"
+#include "M_AssemblyType.h"
+#include "M_Script.h"
+#include "M_ScriptEngine.h"
+#include "M_ScriptComponent.h"
+#include "M_ScriptObject.h"
 
 // SERIALIZATION
 #include "M_ISerializable.h"

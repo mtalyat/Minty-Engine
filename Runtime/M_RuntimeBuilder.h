@@ -4,6 +4,7 @@ namespace minty
 {
 	class RenderEngine;
 	class AudioEngine;
+	class ScriptEngine;
 	class Window;
 
 	struct RuntimeBuilder
@@ -13,5 +14,7 @@ namespace minty
 		RenderEngine* renderEngine = nullptr;
 
 		AudioEngine* audioEngine = nullptr;
+
+		ScriptEngine* scriptEngine = nullptr;
 	};
 }

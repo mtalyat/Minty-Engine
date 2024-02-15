@@ -76,6 +76,11 @@ Application::Application()
 	_editorWindows.emplace("Game", new GameWindow(*this));
 	_editorWindows.emplace("Properties", new PropertiesWindow(*this));
 	_editorWindows.emplace("Assets", new AssetsWindow(*this));
+
+	// load the engine and editor assemblies
+	ScriptEngine& scriptEngine = _runtime->get_script_engine();
+	scriptEngine.load_assembly(AssemblyType::Engine, std::format("../Libraries/MintyEngine/bin/Debug/MintyEngine.dll"));
+	scriptEngine.load_assembly(AssemblyType::Editor, std::format("../Libraries/MintyEditor/bin/Debug/MintyEditor.dll"));
 }
 
 mintye::Application::~Application()
@@ -220,7 +225,7 @@ void mintye::Application::load_project(minty::Path const& path)
 
 	// load assemblies
 	// C:\Users\mitch\source\repos\Minty-Engine\Projects\Tests\TestProject\Assembly\bin\Debug
-	_runtime->emplace_assembly<CSharpAssembly>(std::format("Assembly/bin/Debug/TestProject.dll"));
+	_runtime->get_script_engine().load_assembly(AssemblyType::Project, std::format("Assembly/bin/Debug/TestProject.dll"));
 
 	// load a scene, if any found
 	Path sceneName = project->find_asset(Project::CommonFileType::Scene);

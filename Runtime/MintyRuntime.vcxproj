@@ -226,8 +226,8 @@
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="M_Assembly.h" />
-    <ClInclude Include="M_CSharpAssembly.h" />
+    <ClInclude Include="M_Accessibility.h" />
+    <ClInclude Include="M_AssemblyType.h" />
     <ClInclude Include="M_Engine.h" />
     <ClInclude Include="M_ImGui.h" />
     <ClInclude Include="libraries\imguifiledialog\ImGuiFileDialog.h" />
@@ -259,6 +259,10 @@
     <ClInclude Include="M_CoordinateMode.h" />
     <ClInclude Include="M_PixelFormat.h" />
     <ClInclude Include="M_RuntimeBuilder.h" />
+    <ClInclude Include="M_Script.h" />
+    <ClInclude Include="M_ScriptComponent.h" />
+    <ClInclude Include="M_ScriptEngine.h" />
+    <ClInclude Include="M_ScriptObject.h" />
     <ClInclude Include="M_SpritePushData.h" />
     <ClInclude Include="M_SpriteBuilder.h" />
     <ClInclude Include="M_TextureAtlasBuilder.h" />
@@ -398,11 +402,12 @@
     <ClCompile Include="imgui_stdlib.cpp" />
     <ClCompile Include="imgui_tables.cpp" />
     <ClCompile Include="imgui_widgets.cpp" />
+    <ClCompile Include="M_Accessibility.cpp" />
     <ClCompile Include="M_Animation.cpp" />
     <ClCompile Include="M_AnimationSystem.cpp" />
     <ClCompile Include="M_Animator.cpp" />
     <ClCompile Include="M_AnimatorComponent.cpp" />
-    <ClCompile Include="M_Assembly.cpp" />
+    <ClCompile Include="M_AssemblyType.cpp" />
     <ClCompile Include="M_Asset.cpp" />
     <ClCompile Include="M_AudioClip.cpp" />
     <ClCompile Include="M_AudioEngine.cpp" />
@@ -411,7 +416,6 @@
     <ClCompile Include="M_AudioSourceComponent.cpp" />
     <ClCompile Include="M_AudioSystem.cpp" />
     <ClCompile Include="M_Compression.cpp" />
-    <ClCompile Include="M_CSharpAssembly.cpp" />
     <ClCompile Include="M_Dynamic.cpp" />
     <ClCompile Include="M_CameraComponent.cpp" />
     <ClCompile Include="M_Color.cpp" />
@@ -453,6 +457,10 @@
     <ClCompile Include="M_DescriptorSet.cpp" />
     <ClCompile Include="M_RenderObject.cpp" />
     <ClCompile Include="M_PushConstantInfo.cpp" />
+    <ClCompile Include="M_Script.cpp" />
+    <ClCompile Include="M_ScriptComponent.cpp" />
+    <ClCompile Include="M_ScriptEngine.cpp" />
+    <ClCompile Include="M_ScriptObject.cpp" />
     <ClCompile Include="M_ShaderBuilder.cpp" />
     <ClCompile Include="M_RenderSystem.cpp" />
     <ClCompile Include="M_Scene.cpp" />
