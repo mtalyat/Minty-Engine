@@ -2,12 +2,19 @@
 #include "M_EntityRegistry.h"
 
 #include "M_SerializationData.h"
-
 #include "M_Console.h"
+#include "M_Runtime.h"
+
 #include "M_NameComponent.h"
 #include "M_RelationshipComponent.h"
 #include "M_TransformComponent.h"
 #include "M_DirtyComponent.h"
+
+#include "M_Script.h"
+#include "M_ScriptObject.h"
+#include "M_ScriptEngine.h"
+#include "M_ScriptComponent.h"
+
 #include <sstream>
 #include <map>
 
@@ -16,10 +23,11 @@ using namespace minty;
 std::map<String const, EntityRegistry::ComponentFuncs const> EntityRegistry::_components = std::map<String const, EntityRegistry::ComponentFuncs const>();
 std::map<uint32_t const, String const> EntityRegistry::_componentTypes = std::map<uint32_t const, String const>();
 
-minty::EntityRegistry::EntityRegistry()
-	: entt::registry()
-	, Object()
+minty::EntityRegistry::EntityRegistry(Runtime& engine, ID const sceneId)
+	: SceneObject(engine, sceneId)
+	, entt::registry()
 {
+	// TODO: this does not account for when somebody gets the component by reference and updates it that wey
 	// make it so whenever a transform is editied, it is marked as dirty
 	on_construct<TransformComponent>().connect<&EntityRegistry::emplace_or_replace<DirtyComponent>>();
 	on_update<TransformComponent>().connect<&EntityRegistry::emplace_or_replace<DirtyComponent>>();
@@ -125,7 +133,7 @@ Component* minty::EntityRegistry::emplace_by_name(String const& name, Entity con
 	else
 	{
 		// name found
-		return found->second.emplace(*this, entity);
+		return found->second.emplace(*this, entity, name);
 	}
 }
 
@@ -141,7 +149,7 @@ Component* minty::EntityRegistry::get_by_name(String const& name, Entity const e
 	else
 	{
 		// name found
-		return const_cast<Component*>(static_cast<Component const*>(found->second.get(*this, entity)));
+		return const_cast<Component*>(static_cast<Component const*>(found->second.get(*this, entity, name)));
 	}
 }
 
@@ -157,7 +165,7 @@ Component const* minty::EntityRegistry::get_by_name(String const& name, Entity c
 	else
 	{
 		// name found
-		return found->second.get(*this, entity);
+		return found->second.get(*this, entity, name);
 	}
 }
 
@@ -201,7 +209,7 @@ void minty::EntityRegistry::erase_by_name(String const& name, Entity const entit
 	else
 	{
 		// name found
-		found->second.erase(*this, entity);
+		found->second.erase(*this, entity, name);
 	}
 }
 
@@ -230,6 +238,76 @@ void minty::EntityRegistry::print(Entity const entity) const
 size_t minty::EntityRegistry::size() const
 {
 	return this->storage<Entity>()->size();
+}
+
+void minty::EntityRegistry::register_script(String const& name)
+{
+	// scripts work by adding/getting/removing from the ScriptComponent
+	// funcs
+	ComponentFuncs funcs = {
+		.emplace = [](EntityRegistry& registry, Entity const entity, String const& name) -> Component*
+		{
+			// get the script component
+			ScriptComponent* component = registry.try_get<ScriptComponent>(entity);
+
+			// if component dne, add it quick
+			if (!component)
+			{
+				component = &registry.emplace<ScriptComponent>(entity);
+			} 
+			else if(component->scripts.contains(name))
+			{
+				// if the script component exists, do nothing
+				return component;
+			}
+
+			// get the script engine
+			ScriptEngine& engine = registry.get_runtime().get_script_engine();
+
+			// get the script based on the name
+			Script const* script = engine.get_script(name);
+
+			// no script found
+			if (!script) return nullptr;
+
+			// add a script object to it
+			component->scripts.emplace(name, ScriptObject(*script));
+
+			// return the component
+			return component;
+		},
+		.get = [](EntityRegistry const& registry, Entity const entity, String const& name) -> Component const*
+		{
+			// get the component
+			ScriptComponent const* component = registry.try_get<ScriptComponent>(entity);
+
+			// if no component, no script
+			if (!component) return nullptr;
+
+			// check if script exists
+			auto found = component->scripts.find(name);
+
+			// if no script
+			if (found == component->scripts.end())
+			{
+				return nullptr;
+			}
+
+			// found it
+			return &found->second;
+		},
+		.erase = [](EntityRegistry& registry, Entity const entity, String const& name) -> void
+		{
+			// get the script component
+			ScriptComponent* component = registry.try_get<ScriptComponent>(entity);
+
+			// search and erase the script
+			component->scripts.erase(name);
+		},
+	};
+	_components.emplace(name, funcs);
+
+	Console::info(std::format("Registered script {}.", name));
 }
 
 void minty::EntityRegistry::serialize(Writer& writer) const

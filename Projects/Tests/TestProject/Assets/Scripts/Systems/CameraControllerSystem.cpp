@@ -2,8 +2,8 @@
 
 using namespace minty;
 
-game::CameraControllerSystem::CameraControllerSystem(Engine& engine, ID const sceneId)
-    : System::System(engine, sceneId)
+game::CameraControllerSystem::CameraControllerSystem(Runtime& runtime, ID const sceneId)
+    : System::System(runtime, sceneId)
     , pitch()
     , yaw()
     , mouseDown()

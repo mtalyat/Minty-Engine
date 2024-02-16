@@ -1,18 +1,30 @@
 #pragma once
 #include "M_Engine.h"
 
-#include "M_Mono.h"
 #include "M_AssemblyType.h"
 #include "M_Accessibility.h"
+#include "M_Script.h"
 #include <unordered_map>
 
-namespace minty::Scripting
-{
-	class Script;
-}
+struct _MonoDomain;
+typedef struct _MonoDomain MonoDomain;
+struct _MonoAssembly;
+typedef struct _MonoAssembly MonoAssembly;
+struct _MonoClass;
+typedef struct _MonoClass MonoClass;
+struct _MonoMethod;
+typedef struct _MonoMethod MonoMethod;
+struct _MonoClassField;
+typedef struct _MonoClassField MonoClassField;
+struct _MonoType;
+typedef struct _MonoType MonoType;
+struct _MonoProperty;
+typedef struct _MonoProperty MonoProperty;
 
 namespace minty
 {
+	class Script;
+
 	class ScriptEngine
 		: public Engine
 	{
@@ -20,7 +32,7 @@ namespace minty
 		struct AssemblyInfo
 		{
 			MonoAssembly* assembly;
-			std::unordered_map<String, Scripting::Script*> scripts;
+			std::unordered_map<String, Script> scripts;
 		};
 	private:
 		MonoDomain* _rootDomain;
@@ -52,6 +64,10 @@ namespace minty
 		MonoClass* get_class(AssemblyType const assm, String const& namespaceName, String const& className) const;
 
 		std::vector<MonoClass*> get_classes(AssemblyType const assm, MonoClass* const baseKlass = nullptr) const;
+
+		String get_class_name(MonoClass* const klass) const;
+
+		String get_class_namespace(MonoClass* const klass) const;
 
 		bool check_class_inheritance(MonoClass* const klass, MonoClass* const baseKlass) const;
 
@@ -88,6 +104,14 @@ namespace minty
 		void invoke_method(MonoObject* const object, MonoMethod* const method, std::vector<void*>& arguments) const;
 
 		MonoObject* create_instance(MonoClass* const classType) const;
+
+		Script* get_script(AssemblyType const assm, String const& name);
+
+		Script const* get_script(AssemblyType const assm, String const& name) const;
+
+		Script* get_script(String const& name);
+
+		Script const* get_script(String const& name) const;
 
 #pragma endregion
 	};

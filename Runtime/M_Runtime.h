@@ -7,7 +7,6 @@
 #include "M_Time.h"
 #include "M_Engine.h"
 #include "M_Types.h"
-#include "M_Mono.h"
 #include "M_TypeRegister.h"
 #include "M_AssemblyType.h"
 #include <unordered_map>
@@ -178,7 +177,7 @@ namespace minty
 		/// <summary>
 		/// Initializes the engine using the given window, or creates a new one if none given.
 		/// </summary>
-		bool init(RuntimeBuilder const& builder);
+		bool init(RuntimeBuilder const* builder = nullptr);
 
 		/// <summary>
 		/// Starts the engine, if it is not already running.

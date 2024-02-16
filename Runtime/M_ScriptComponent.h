@@ -2,7 +2,7 @@
 #include "M_Component.h"
 
 #include "M_ScriptObject.h"
-#include <vector>
+#include <unordered_map>
 
 namespace minty
 {
@@ -14,7 +14,7 @@ namespace minty
 	struct ScriptComponent
 		: public Component
 	{
-		std::vector<Scripting::ScriptObject> scripts;
+		std::unordered_map<String, ScriptObject> scripts;
 
 	public:
 		void serialize(Writer& writer) const override;

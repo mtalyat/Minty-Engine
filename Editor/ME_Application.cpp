@@ -59,7 +59,7 @@ Application::Application()
 		.window = &_window,
 		.renderEngine = renderEngine,
 	};
-	_runtime->init(runtimeBuilder);
+	_runtime->init(&runtimeBuilder);
 
 	// init the render engine
 	RenderEngineBuilder renderEngineBuilder{
@@ -670,9 +670,13 @@ void Application::generate_cmake(BuildInfo const& buildInfo)
 		"set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY \"MultiThreaded$<$<CONFIG:Debug>:Debug>\")" << std::endl <<
 		// include the runtime dir
 		"target_include_directories(${PROJECT_NAME} PRIVATE C:/Users/mitch/source/repos/Minty-Engine/Runtime PUBLIC ${VULKAN_INCLUDE_DIRS})" << std::endl <<
+		// copy any DLL's that the Runtime uses
+		"add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different \"C:/Users/mitch/source/repos/Minty-Engine/Runtime/x64/" << buildInfo.get_config() << "/mono-2.0-sgen.dll\" $<TARGET_FILE_DIR:${PROJECT_NAME}>)" << std::endl <<
 		// include and link Vulkan
 		"include_directories(${Vulkan_INCLUDE_DIRS})" << std::endl <<
+		// target and link the MintyRuntime.lib
 		"target_link_libraries(${PROJECT_NAME} C:/Users/mitch/source/repos/Minty-Engine/Runtime/x64/" << buildInfo.get_config() << "/MintyRuntime.lib)" << std::endl <<
+		// target and link the vulkan libs
 		"target_link_libraries(${PROJECT_NAME} ${Vulkan_LIBRARIES})";
 
 	file.close();
@@ -704,6 +708,8 @@ void Application::generate_main()
 	// get timestamp
 	const auto now = std::chrono::system_clock::now();
 
+	Info const& projectInfo = _project->get_info();
+
 	// write contents
 	file <<
 		"// " << std::format("{:%Y-%m-%d %H:%M:%OS}", now) << std::endl <<
@@ -715,16 +721,16 @@ void Application::generate_main()
 		"int main(int argc, char const* argv[]) {" << std::endl <<
 		"	std::filesystem::current_path(\"" << _project->get_base_path().generic_string() << "\");" << std::endl << // move out of Build/Debug or Build/Release folder, into base folder
 		"	minty::Console::log(std::filesystem::current_path().string());" << std::endl <<
-		"	minty::Info info(\"" << _project->get_name() << "\", 0, 0, 0);" << std::endl <<
-		"	minty::Engine engine(info);" << std::endl <<
-		"	engine.init();" << std::endl <<
-		"	if(int code = init(engine)) { minty::Console::error(std::format(\"Failed to init program with error code {}.\", code)); return code; }" << std::endl <<
-		"	engine.start();" << std::endl <<
-		"	engine.run();" << std::endl <<
-		"	engine.cleanup();" << std::endl <<
-		"	if(int code = destroy(engine)) { minty::Console::error(std::format(\"Failed to destroy program with error code {}.\", code)); return code; }" << std::endl <<
-		"	engine.destroy();" << std::endl <<
-		"	return engine.get_exit_code();" << std::endl <<
+		"	minty::Info info(\"" << projectInfo.get_application_name() << "\", " << projectInfo.get_application_major() << ", " << projectInfo.get_application_minor() << ", " << projectInfo.get_application_patch() << ");" << std::endl <<
+		"	minty::Runtime runtime(info);" << std::endl <<
+		"	runtime.init();" << std::endl <<
+		"	if(int code = init(runtime)) { minty::Console::error(std::format(\"Failed to init program with error code {}.\", code)); return code; }" << std::endl <<
+		"	runtime.start();" << std::endl <<
+		"	runtime.run();" << std::endl <<
+		"	runtime.cleanup();" << std::endl <<
+		"	if(int code = destroy(runtime)) { minty::Console::error(std::format(\"Failed to destroy program with error code {}.\", code)); return code; }" << std::endl <<
+		"	runtime.destroy();" << std::endl <<
+		"	return runtime.get_exit_code();" << std::endl <<
 		"}";
 
 	file.close();

@@ -4,8 +4,8 @@
 
 using namespace minty;
 
-game::TestSystem::TestSystem(Engine& engine, ID const sceneId)
-    : System::System(engine, sceneId)
+game::TestSystem::TestSystem(Runtime& runtime, ID const sceneId)
+    : System::System(runtime, sceneId)
 {}
 
 void game::TestSystem::update()

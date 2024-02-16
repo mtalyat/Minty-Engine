@@ -2,7 +2,6 @@
 #include "M_ScriptComponent.h"
 
 using namespace minty;
-using namespace minty::Scripting;
 
 void minty::ScriptComponent::serialize(Writer& writer) const
 {

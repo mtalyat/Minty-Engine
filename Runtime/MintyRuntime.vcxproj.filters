@@ -564,6 +564,9 @@
     <ClInclude Include="M_ScriptEngine.h">
       <Filter>Header Files\Scripting</Filter>
     </ClInclude>
+    <ClInclude Include="M_ScriptSystem.h">
+      <Filter>Header Files\Scripting</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -939,6 +942,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_ScriptEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_ScriptSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

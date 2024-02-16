@@ -14,7 +14,7 @@ using namespace minty;
 minty::Scene::Scene(Runtime& engine, ID const sceneId)
 	: _id(sceneId)
 	, _engine(&engine)
-	, _entities(new EntityRegistry())
+	, _entities(new EntityRegistry(engine, sceneId))
 	, _systems(new SystemRegistry(engine, sceneId))
 {}
 

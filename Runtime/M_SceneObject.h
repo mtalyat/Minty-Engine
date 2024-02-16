@@ -10,7 +10,7 @@ namespace minty
 		: public Object
 	{
 	private:
-		Runtime* _engine;
+		Runtime* _runtime;
 
 		ID _sceneId;
 	public:
@@ -21,9 +21,9 @@ namespace minty
 		virtual ~SceneObject();
 
 	public:
-		Runtime& get_engine() const;
+		Runtime& get_runtime() const;
 
-		void set_engine(Runtime& engine);
+		void set_runtime(Runtime& engine);
 
 		Scene& get_scene() const;
 

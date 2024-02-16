@@ -1,28 +1,26 @@
 #pragma once
-#include "M_Object.h"
+#include "M_Component.h"
 
-#include "M_Mono.h"
+struct _MonoObject;
+typedef struct _MonoObject MonoObject;
+struct _MonoClassField;
+typedef struct _MonoClassField MonoClassField;
 
 namespace minty
-{
-	class Assembly;
-}
-
-namespace minty::Scripting
 {
 	class Script;
 
 	class ScriptObject
-		: public Object
+		: public Component
 	{
 	private:
-		Script* _script;
-		Assembly* _assembly;
-		MonoClass* _class;
+		Script const* _script;
 		MonoObject* _object;
 
 	public:
+		ScriptObject(Script const& script);
 
+		void invoke(String const& name) const;
 		
 	public:
 		void serialize(Writer& writer) const override;

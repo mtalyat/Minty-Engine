@@ -2,15 +2,16 @@
 #include "M_Object.h"
 
 #include "M_AssemblyType.h"
-#include "M_Mono.h"
+
+struct _MonoClass;
+typedef struct _MonoClass MonoClass;
+struct _MonoObject;
+typedef struct _MonoObject MonoObject;
 
 namespace minty
 {
 	class ScriptEngine;
-}
 
-namespace minty::Scripting
-{
 	/// <summary>
 	/// Holds meta data for the C# script.
 	/// </summary>
@@ -32,6 +33,8 @@ namespace minty::Scripting
 		AssemblyType get_assembly_type() const;
 
 		MonoClass* get_class() const;
+
+		MonoObject* create_instance() const;
 
 	public:
 		void serialize(Writer& writer) const override;

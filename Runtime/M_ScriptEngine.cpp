@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "M_ScriptEngine.h"
 
+#include "M_Mono.h"
+
 #include "M_File.h"
 #include "M_Console.h"
 
@@ -60,11 +62,18 @@ bool minty::ScriptEngine::load_assembly(AssemblyType const type, Path const& pat
 	_assemblies[type] = AssemblyInfo
 	{
 		.assembly = assembly,
+		.scripts = std::unordered_map<String, Script>()
 	};
+	AssemblyInfo& info = _assemblies[type];
 
 	// load all of the scripts
 	MonoClass* scriptBaseClass = get_class(AssemblyType::Engine, "MintyEngine", "Script");
 	std::vector<MonoClass*> scriptClasses = get_classes(type, scriptBaseClass);
+	for (MonoClass* const klass : scriptClasses)
+	{
+		// add script by name
+		info.scripts.emplace(get_class_name(klass), Script(*this, type, *klass));
+	}
 
 	Console::log(std::format("Assembly at \"{}\" loaded {} scripts.", path.string(), scriptClasses.size()));
 
@@ -178,6 +187,16 @@ std::vector<MonoClass*> minty::ScriptEngine::get_classes(AssemblyType const assm
 	}
 
 	return classes;
+}
+
+String minty::ScriptEngine::get_class_name(MonoClass* const klass) const
+{
+	return mono_class_get_name(klass);
+}
+
+String minty::ScriptEngine::get_class_namespace(MonoClass* const klass) const
+{
+	return mono_class_get_namespace(klass);
 }
 
 bool minty::ScriptEngine::check_class_inheritance(MonoClass* const klass, MonoClass* const baseKlass) const
@@ -406,4 +425,60 @@ MonoObject* minty::ScriptEngine::create_instance(MonoClass* const klass) const
 	mono_runtime_object_init(instance);
 
 	return instance;
+}
+
+Script* minty::ScriptEngine::get_script(AssemblyType const assm, String const& name)
+{
+	AssemblyInfo& info = _assemblies.at(assm);
+
+	// if name found, return that script
+	auto found = info.scripts.find(name);
+
+	if (found != info.scripts.end())
+	{
+		return &found->second;
+	}
+
+	return nullptr;
+}
+
+Script const* minty::ScriptEngine::get_script(AssemblyType const assm, String const& name) const
+{
+	AssemblyInfo const& info = _assemblies.at(assm);
+
+	// if name found, return that script
+	auto const found = info.scripts.find(name);
+
+	if (found != info.scripts.end())
+	{
+		return &found->second;
+	}
+
+	return nullptr;
+}
+
+Script* minty::ScriptEngine::get_script(String const& name)
+{
+	// go through each assembly type
+	for (auto& pair : _assemblies)
+	{
+		Script* script = get_script(pair.first, name);
+
+		if (script) return script;
+	}
+
+	return nullptr;
+}
+
+Script const* minty::ScriptEngine::get_script(String const& name) const
+{
+	// go through each assembly type
+	for (auto const& pair : _assemblies)
+	{
+		Script const* script = get_script(pair.first, name);
+
+		if (script) return script;
+	}
+
+	return nullptr;
 }

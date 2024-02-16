@@ -14,6 +14,7 @@
 #include "M_AnimationSystem.h"
 #include "M_AudioSystem.h"
 #include "M_RenderSystem.h"
+#include "M_ScriptSystem.h"
 #include "M_UISystem.h"
 
 #include "M_EntityRegistry.h"
@@ -26,6 +27,7 @@
 #include "M_NameComponent.h"
 #include "M_RelationshipComponent.h"
 #include "M_RenderableComponent.h"
+#include "M_ScriptComponent.h"
 #include "M_SpriteComponent.h"
 #include "M_TransformComponent.h"
 #include "M_UITransformComponent.h"
@@ -126,7 +128,7 @@ void minty::Runtime::exit(int const code)
 	if (_state == State::Running) _state = State::Stopped;
 }
 
-bool minty::Runtime::init(RuntimeBuilder const& builder)
+bool minty::Runtime::init(RuntimeBuilder const* builder)
 {
 	// already initialized
 	if (_state > State::Uninitialized) return true;
@@ -134,13 +136,13 @@ bool minty::Runtime::init(RuntimeBuilder const& builder)
 	_state = State::Initialized;
 
 	// create necessary components
-	_personalWindow = builder.window == nullptr;
-	_window = _personalWindow ? new Window(_info.get_application_name(), WIDTH, HEIGHT, _globalInput) : builder.window;
+	_personalWindow = !builder || !builder->window;
+	_window = _personalWindow ? new Window(_info.get_application_name(), WIDTH, HEIGHT, _globalInput) : builder->window;
 	_sceneManager = new SceneManager(*this);
 
-	set_engine<RenderEngine>(builder.renderEngine ? builder.renderEngine : new RenderEngine());
-	set_engine<AudioEngine>(builder.audioEngine ? builder.audioEngine : new AudioEngine());
-	set_engine<ScriptEngine>(builder.scriptEngine ? builder.scriptEngine : new ScriptEngine());
+	set_engine<RenderEngine>(builder && builder->renderEngine ? builder->renderEngine : new RenderEngine());
+	set_engine<AudioEngine>(builder && builder->audioEngine ? builder->audioEngine : new AudioEngine());
+	set_engine<ScriptEngine>(builder && builder->scriptEngine ? builder->scriptEngine : new ScriptEngine());
 
 	// perform static operations that happen once
 	static bool registered = false;
@@ -151,6 +153,7 @@ bool minty::Runtime::init(RuntimeBuilder const& builder)
 		SystemRegistry::register_system<AnimationSystem>("Animation");
 		SystemRegistry::register_system<AudioSystem>("Audio");
 		SystemRegistry::register_system<RenderSystem>("Render");
+		SystemRegistry::register_system<ScriptSystem>("Script");
 		SystemRegistry::register_system<UISystem>("UI");
 
 		// components
@@ -163,6 +166,7 @@ bool minty::Runtime::init(RuntimeBuilder const& builder)
 		EntityRegistry::register_component<NameComponent>("Name");
 		EntityRegistry::register_component<RelationshipComponent>("Relationship");
 		EntityRegistry::register_component<RenderableComponent>("Renderable");
+		EntityRegistry::register_component<ScriptComponent>("Script");
 		EntityRegistry::register_component<SpriteComponent>("Sprite");
 		EntityRegistry::register_component<TransformComponent>("Transform");
 		EntityRegistry::register_component<UITransformComponent>("UITransform");

@@ -15,7 +15,6 @@ access to the entire engine without needing include each file.
 #ifdef MINTY_IMGUI
 #include "M_ImGui.h"
 #endif
-#include "M_Mono.h"
 
 // ANIMATION
 #include "M_Animation.h"
@@ -105,6 +104,7 @@ access to the entire engine without needing include each file.
 #include "M_ScriptEngine.h"
 #include "M_ScriptComponent.h"
 #include "M_ScriptObject.h"
+#include "M_ScriptSystem.h"
 
 // SERIALIZATION
 #include "M_ISerializable.h"

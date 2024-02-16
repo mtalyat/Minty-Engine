@@ -5,7 +5,7 @@ using namespace game;
 
 void game::TestComponent::serialize(Writer &writer) const
 {
-    writer.write("rotationSpeed", rotationSpeed, Vector3());
+    writer.write("rotationSpeed", rotationSpeed);
 }
 
 void game::TestComponent::deserialize(Reader const &reader)

@@ -19,7 +19,7 @@ using namespace game;
 InputMap input;
 
 // called when the engine is initialized
-int init(Engine& engine)
+int init(Runtime& runtime)
 {
     try
     {
@@ -32,15 +32,19 @@ int init(Engine& engine)
         SystemRegistry::register_system<game::CameraControllerSystem>("CameraController");
         SystemRegistry::register_system<game::MoveSystem>("Move");
 
-        Window &window = engine.get_window();
+        Window &window = runtime.get_window();
         // window.maximize();
-        RenderEngine &renderer = engine.get_render_engine();
-        AudioEngine &audio = engine.get_audio_engine();
-        SceneManager &sceneManager = engine.get_scene_manager();
+        RenderEngine &renderer = runtime.get_render_engine();
+        AudioEngine &audio = runtime.get_audio_engine();
+        SceneManager &sceneManager = runtime.get_scene_manager();
 
         // initialize renderer for this project
         {
-            RenderEngineBuilder rb(&engine.get_info());
+            RenderEngineBuilder rb
+            {
+                .info= &runtime.get_info(),
+                .window = &window,
+            };
             renderer.init(rb);
         }
         
@@ -187,7 +191,7 @@ int init(Engine& engine)
 }
 
 // called when the engine is destroyed
-int destroy(Engine& engine)
+int destroy(Runtime& runtime)
 {
     Console::log("Game over.");
 

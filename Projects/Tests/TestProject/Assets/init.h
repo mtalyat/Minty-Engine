@@ -2,5 +2,5 @@
 
 #include <Minty.h>
 
-int init(minty::Engine& runtime);
-int destroy(minty::Engine& runtime);
+int init(minty::Runtime& runtime);
+int destroy(minty::Runtime& runtime);

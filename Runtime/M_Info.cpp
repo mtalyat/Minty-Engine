@@ -22,6 +22,21 @@ String const& minty::Info::get_application_name() const
 	return _applicationName;
 }
 
+uint32_t minty::Info::get_application_major() const
+{
+	return _applicationMajor;
+}
+
+uint32_t minty::Info::get_application_minor() const
+{
+	return _applicationMinor;
+}
+
+uint32_t minty::Info::get_application_patch() const
+{
+	return _applicationPatch;
+}
+
 uint32_t minty::Info::get_application_version() const
 {
 	return VK_MAKE_VERSION(_applicationMajor, _applicationMinor, _applicationPatch);

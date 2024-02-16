@@ -1,4 +1,4 @@
-# 2024-02-10 20:47:14
+# 2024-02-16 05:27:27
 cmake_minimum_required(VERSION 3.16)
 project(TestProject LANGUAGES CXX)
 find_package(Vulkan REQUIRED)
@@ -11,6 +11,7 @@ add_executable(${PROJECT_NAME} ${SOURCES})
 set_property(TARGET ${PROJECT_NAME} PROPERTY INTERPROCEDURAL_OPTIMIZATION_RELEASE TRUE)
 set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
 target_include_directories(${PROJECT_NAME} PRIVATE C:/Users/mitch/source/repos/Minty-Engine/Runtime PUBLIC ${VULKAN_INCLUDE_DIRS})
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different "C:/Users/mitch/source/repos/Minty-Engine/Runtime/x64/Debug/mono-2.0-sgen.dll" $<TARGET_FILE_DIR:${PROJECT_NAME}>)
 include_directories(${Vulkan_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} C:/Users/mitch/source/repos/Minty-Engine/Runtime/x64/Debug/MintyRuntime.lib)
 target_link_libraries(${PROJECT_NAME} ${Vulkan_LIBRARIES})

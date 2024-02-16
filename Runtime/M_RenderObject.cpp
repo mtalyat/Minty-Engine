@@ -23,7 +23,7 @@ RenderObject::~RenderObject()
 
 RenderEngine& minty::RenderObject::get_render_engine() const
 {
-	return get_engine().get_render_engine();
+	return get_runtime().get_render_engine();
 }
 
 RenderSystem* minty::RenderObject::get_render_system() const

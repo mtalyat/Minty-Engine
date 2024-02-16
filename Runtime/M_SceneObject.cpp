@@ -7,12 +7,12 @@
 using namespace minty;
 
 minty::SceneObject::SceneObject()
-	: _engine()
+	: _runtime()
 	, _sceneId()
 {}
 
 minty::SceneObject::SceneObject(Runtime& engine, ID const sceneId)
-	: _engine(&engine)
+	: _runtime(&engine)
 	, _sceneId(sceneId)
 {}
 
@@ -20,21 +20,21 @@ minty::SceneObject::~SceneObject()
 {
 }
 
-Runtime& minty::SceneObject::get_engine() const
+Runtime& minty::SceneObject::get_runtime() const
 {
-	MINTY_ASSERT(_engine != nullptr, "SceneObject::get_engine(): engine is null.");
+	MINTY_ASSERT(_runtime != nullptr, "SceneObject::get_engine(): engine is null.");
 
-	return *_engine;
+	return *_runtime;
 }
 
-void minty::SceneObject::set_engine(Runtime& engine)
+void minty::SceneObject::set_runtime(Runtime& engine)
 {
-	_engine = &engine;
+	_runtime = &engine;
 }
 
 Scene& minty::SceneObject::get_scene() const
 {
-	return get_engine().get_scene_manager().get_scene(_sceneId);
+	return get_runtime().get_scene_manager().get_scene(_sceneId);
 }
 
 ID minty::SceneObject::get_scene_id() const

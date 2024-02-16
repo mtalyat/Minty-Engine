@@ -22,7 +22,7 @@ namespace minty
 		/// <summary>
 		/// Creates a new System.
 		/// </summary>
-		System(Runtime& engine, ID const sceneId);
+		System(Runtime& runtime, ID const sceneId);
 
 		virtual ~System();
 

@@ -134,7 +134,7 @@ namespace minty
 	template<class T>
 	T* SystemRegistry::emplace(String const& name, int const priority)
 	{
-		return static_cast<T*>(this->emplace(name, new T(get_engine(), get_scene_id()), priority));
+		return static_cast<T*>(this->emplace(name, new T(get_runtime(), get_scene_id()), priority));
 	}
 
 	template<class T>

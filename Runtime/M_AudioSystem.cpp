@@ -276,7 +276,7 @@ void minty::AudioSystem::destroy_all_clips()
 
 AudioEngine& minty::AudioSystem::get_audio_engine() const
 {
-	return get_engine().get_audio_engine();
+	return get_runtime().get_audio_engine();
 }
 
 void minty::AudioSystem::set_listener(Entity const entity)

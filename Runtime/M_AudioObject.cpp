@@ -19,5 +19,5 @@ minty::AudioObject::~AudioObject()
 
 AudioEngine& minty::AudioObject::get_audio_engine() const
 {
-	return get_engine().get_audio_engine();
+	return get_runtime().get_audio_engine();
 }

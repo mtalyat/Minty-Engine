@@ -11,7 +11,7 @@ namespace game
         bool _paused = false;
 
     public:
-        TestSystem(minty::Engine& engine, minty::ID const sceneId);
+        TestSystem(minty::Runtime& runtime, minty::ID const sceneId);
 
         void update() override;
 

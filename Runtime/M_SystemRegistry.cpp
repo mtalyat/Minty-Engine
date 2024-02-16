@@ -86,7 +86,7 @@ namespace minty
 		else
 		{
 			// name found
-			System* system = found->second(get_engine(), get_scene_id());
+			System* system = found->second(get_runtime(), get_scene_id());
 			this->emplace(name, system, priority);
 			return system;
 		}

@@ -1,6 +1,7 @@
 #pragma once
-
+#include "M_SceneObject.h"
 #include "M_Entity.h"
+
 #include "M_Object.h"
 #include "M_Console.h"
 #include <map>
@@ -8,14 +9,15 @@
 namespace minty
 {
 	struct Component;
+	class Script;
 
 	class EntityRegistry
-		: public Object, public entt::registry
+		: public SceneObject, public entt::registry
 	{
 	public:
-		typedef std::function<Component* (EntityRegistry&, Entity const)> ComponentEmplaceFunc;
-		typedef std::function<Component const* (EntityRegistry const&, Entity const)> ComponentGetFunc;
-		typedef std::function<void(EntityRegistry&, Entity const)> ComponentEraseFunc;
+		typedef std::function<Component* (EntityRegistry&, Entity const, String const&)> ComponentEmplaceFunc;
+		typedef std::function<Component const* (EntityRegistry const&, Entity const, String const&)> ComponentGetFunc;
+		typedef std::function<void(EntityRegistry&, Entity const, String const&)> ComponentEraseFunc;
 
 	private:
 		struct ComponentFuncs
@@ -29,7 +31,7 @@ namespace minty
 		static std::map<uint32_t const, String const> _componentTypes; // type id index -> name
 
 	public:
-		EntityRegistry();
+		EntityRegistry(Runtime& engine, ID const sceneId);
 
 		~EntityRegistry();
 
@@ -149,6 +151,8 @@ namespace minty
 		template <class T>
 		static void register_component(String const& name);
 
+		static void register_script(String const& name);
+
 		void serialize(Writer& writer) const override;
 		void serialize_entity(Writer& writer, Entity const entity) const;
 		Node serialize_entity(Entity const entity) const;
@@ -176,9 +180,9 @@ namespace minty
 	{
 		// funcs
 		ComponentFuncs funcs = {
-			.emplace = [](EntityRegistry& registry, Entity const entity) { return &registry.emplace<T>(entity); },
-			.get = [](EntityRegistry const& registry, Entity const entity) { return registry.try_get<T>(entity); },
-			.erase = [](EntityRegistry& registry, Entity const entity) { registry.erase<T>(entity); },
+			.emplace = [](EntityRegistry& registry, Entity const entity, String const& name) -> Component* { return &registry.emplace<T>(entity); },
+			.get = [](EntityRegistry const& registry, Entity const entity, String const& name) -> Component const* { return registry.try_get<T>(entity); },
+			.erase = [](EntityRegistry& registry, Entity const entity, String const& name) -> void { registry.erase<T>(entity); },
 		};
 		_components.emplace(name, funcs);
 
@@ -187,6 +191,6 @@ namespace minty
 		// type names
 		_componentTypes.emplace(info.index(), name);
 
-		Console::info(std::format("Registered component {}", name));
+		Console::info(std::format("Registered component {}.", name));
 	}
 }

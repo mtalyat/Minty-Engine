@@ -50,7 +50,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "TestProject::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-TestProject-Debug-999a1e76dd888d057151.json",
+					"jsonFile" : "target-TestProject-Debug-407cb803aaa9d10a5cd9.json",
 					"name" : "TestProject",
 					"projectIndex" : 0
 				},
@@ -112,7 +112,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "TestProject::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-TestProject-Release-5bab2bd2b39e3f1f73d0.json",
+					"jsonFile" : "target-TestProject-Release-98fa9303c8da7fbc19b2.json",
 					"name" : "TestProject",
 					"projectIndex" : 0
 				},
@@ -174,7 +174,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "TestProject::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-TestProject-MinSizeRel-4d9909a10e3f8b6bd9ba.json",
+					"jsonFile" : "target-TestProject-MinSizeRel-854e1148bba902825df0.json",
 					"name" : "TestProject",
 					"projectIndex" : 0
 				},
@@ -236,7 +236,7 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "TestProject::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-TestProject-RelWithDebInfo-7e8946d5768f14c4b5c4.json",
+					"jsonFile" : "target-TestProject-RelWithDebInfo-af166b3e4c6d524eef23.json",
 					"name" : "TestProject",
 					"projectIndex" : 0
 				},
@@ -259,6 +259,6 @@
 	"version" : 
 	{
 		"major" : 2,
-		"minor" : 5
+		"minor" : 6
 	}
 }

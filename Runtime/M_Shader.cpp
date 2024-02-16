@@ -286,7 +286,7 @@ DescriptorSet minty::Shader::create_descriptor_set(uint32_t const set, bool cons
 	if (set == DESCRIPTOR_SET_INVALID)
 	{
 		// invalid set, so just create an empty descriptor
-		return DescriptorSet(get_engine(), get_scene_id());
+		return DescriptorSet(get_runtime(), get_scene_id());
 	}
 
 	// create and allocate sets
@@ -363,7 +363,7 @@ DescriptorSet minty::Shader::create_descriptor_set(uint32_t const set, bool cons
 	}
 
 	// all done, create set
-	DescriptorSet descriptorSet(descriptorSets, datas, get_engine(), get_scene_id());
+	DescriptorSet descriptorSet(descriptorSets, datas, get_runtime(), get_scene_id());
 
 	// "initialize" it if told to
 	if (initialize)

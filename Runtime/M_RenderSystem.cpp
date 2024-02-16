@@ -72,7 +72,7 @@ void minty::RenderSystem::update_camera(CameraComponent const& camera, Transform
 	// TODO: don't use lookat
 	// maybe invert global?
 
-	RenderEngine& renderEngine = get_engine().get_render_engine();
+	RenderEngine& renderEngine = get_runtime().get_render_engine();
 
 	// get projection
 	Matrix4 proj;
@@ -104,38 +104,38 @@ void minty::RenderSystem::update_camera(CameraComponent const& camera, Transform
 
 ID minty::RenderSystem::create_texture(TextureBuilder const& builder)
 {
-	return _textures.emplace(builder.name, Texture(builder, get_engine(), get_scene_id()));
+	return _textures.emplace(builder.name, Texture(builder, get_runtime(), get_scene_id()));
 }
 
 ID minty::RenderSystem::create_sprite(SpriteBuilder const& builder)
 {
-	return _sprites.emplace(builder.name, Sprite(builder, get_engine(), get_scene_id()));
+	return _sprites.emplace(builder.name, Sprite(builder, get_runtime(), get_scene_id()));
 }
 
 ID minty::RenderSystem::create_shader(ShaderBuilder const& builder)
 {
-	return _shaders.emplace(builder.name, Shader(builder, get_engine(), get_scene_id()));
+	return _shaders.emplace(builder.name, Shader(builder, get_runtime(), get_scene_id()));
 }
 
 ID minty::RenderSystem::create_shader_pass(ShaderPassBuilder const& builder)
 {
-	return _shaderPasses.emplace(builder.name, ShaderPass(builder, get_engine(), get_scene_id()));
+	return _shaderPasses.emplace(builder.name, ShaderPass(builder, get_runtime(), get_scene_id()));
 }
 
 ID minty::RenderSystem::create_material_template(MaterialTemplateBuilder const& builder)
 {
-	return _materialTemplates.emplace(builder.name, MaterialTemplate(builder, get_engine(), get_scene_id()));
+	return _materialTemplates.emplace(builder.name, MaterialTemplate(builder, get_runtime(), get_scene_id()));
 }
 
 ID minty::RenderSystem::create_material(MaterialBuilder const& builder)
 {
-	return _materials.emplace(builder.name, Material(builder, get_engine(), get_scene_id()));
+	return _materials.emplace(builder.name, Material(builder, get_runtime(), get_scene_id()));
 }
 
 ID minty::RenderSystem::create_mesh()
 {
 	// just create a brand new mesh
-	return _meshes.emplace(Mesh(get_engine(), get_scene_id()));
+	return _meshes.emplace(Mesh(get_runtime(), get_scene_id()));
 }
 
 ID minty::RenderSystem::get_or_create_mesh(String const& name)
@@ -147,7 +147,7 @@ ID minty::RenderSystem::get_or_create_mesh(String const& name)
 	}
 
 	// create new
-	return _meshes.emplace(name, Mesh(get_engine(), get_scene_id()));
+	return _meshes.emplace(name, Mesh(get_runtime(), get_scene_id()));
 }
 
 ID minty::RenderSystem::get_or_create_mesh(MeshType const type)
@@ -161,7 +161,7 @@ ID minty::RenderSystem::get_or_create_mesh(MeshType const type)
 	}
 
 	// create new
-	ID id = _meshes.emplace(name, Mesh(get_engine(), get_scene_id()));
+	ID id = _meshes.emplace(name, Mesh(get_runtime(), get_scene_id()));
 	Mesh& mesh = _meshes.at(id);
 
 	switch (type)
@@ -1030,7 +1030,7 @@ void minty::RenderSystem::deserialize(Reader const& reader)
 				.pivot = atlasReader.read_object("pivot", Vector2(0.5f, 0.5f))
 			};
 
-			TextureAtlas atlas(builder, get_engine(), get_scene_id());
+			TextureAtlas atlas(builder, get_runtime(), get_scene_id());
 
 			if (Node const* spritesNode = atlasNode.find("sprites"))
 			{
