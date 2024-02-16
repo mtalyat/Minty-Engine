@@ -353,6 +353,12 @@ void minty::EntityRegistry::register_script(String const& name)
 				if (!eventComp) eventComp = &registry.emplace<ScriptOnUnloadComponent>(entity);
 				eventComp->scriptIds.emplace(id);
 			}
+			if (script->has_method(SCRIPT_METHOD_NAME_ONDESTROY))
+			{
+				ScriptOnDestroyComponent* eventComp = registry.try_get<ScriptOnDestroyComponent>(entity);
+				if (!eventComp) eventComp = &registry.emplace<ScriptOnDestroyComponent>(entity);
+				eventComp->scriptIds.emplace(id);
+			}
 
 			// return the component
 			return component;
@@ -393,9 +399,10 @@ void minty::EntityRegistry::register_script(String const& name)
 			component->scripts.erase(name);
 
 			// get the other components and erase if needed
-			if (ScriptOnLoadComponent* onloadComponent = registry.try_get<ScriptOnLoadComponent>(entity)) onloadComponent->scriptIds.erase(id);
-			if (ScriptOnUpdateComponent* onupdateComponent = registry.try_get<ScriptOnUpdateComponent>(entity)) onupdateComponent->scriptIds.erase(id);
-			if (ScriptOnUnloadComponent* onunloadComponent = registry.try_get<ScriptOnUnloadComponent>(entity)) onunloadComponent->scriptIds.erase(id);
+			if (ScriptOnLoadComponent* eventComp = registry.try_get<ScriptOnLoadComponent>(entity)) eventComp->scriptIds.erase(id);
+			if (ScriptOnUpdateComponent* eventComp = registry.try_get<ScriptOnUpdateComponent>(entity)) eventComp->scriptIds.erase(id);
+			if (ScriptOnUnloadComponent* eventComp = registry.try_get<ScriptOnUnloadComponent>(entity)) eventComp->scriptIds.erase(id);
+			if (ScriptOnDestroyComponent* eventComp = registry.try_get<ScriptOnDestroyComponent>(entity)) eventComp->scriptIds.erase(id);
 		},
 	};
 	_components.emplace(name, funcs);
