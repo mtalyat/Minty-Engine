@@ -6,6 +6,7 @@
 #include "M_Runtime.h"
 
 #include "M_NameComponent.h"
+#include "M_IDComponent.h"
 #include "M_RelationshipComponent.h"
 #include "M_TransformComponent.h"
 #include "M_DirtyComponent.h"
@@ -54,15 +55,26 @@ EntityRegistry& minty::EntityRegistry::operator=(EntityRegistry&& other) noexcep
 
 Entity minty::EntityRegistry::create()
 {
-	return entt::registry::create();
+	return create(UUID());
+}
+
+Entity minty::EntityRegistry::create(UUID const uuid)
+{
+	Entity entity = entt::registry::create();
+	emplace<IDComponent>(entity).id = uuid;
+	return entity;
 }
 
 Entity minty::EntityRegistry::create(String const& name)
 {
-	Entity e = create();
-	NameComponent& nameComponent = this->emplace<NameComponent>(e);
-	nameComponent.name = name;
-	return e;
+	return create(name, UUID());
+}
+
+Entity minty::EntityRegistry::create(String const& name, UUID const uuid)
+{
+	Entity entity = create(uuid);
+	if(!name.empty()) emplace<NameComponent>(entity).name = name;
+	return entity;
 }
 
 void minty::EntityRegistry::destroy(Entity const entity)
@@ -151,6 +163,24 @@ String minty::EntityRegistry::get_name(Entity const entity) const
 	{
 		return "";
 	}
+}
+
+UUID minty::EntityRegistry::get_id(Entity const entity) const
+{
+	// null entity means no id
+	if (entity == NULL_ENTITY)
+	{
+		return UUID::create_empty();
+	}
+
+	if (IDComponent const* comp = try_get<IDComponent>(entity))
+	{
+		return comp->id;
+	}
+
+	// entity has no IDComponent somehow
+	Console::error(std::format("EntityRegistry::get_id(): Entity \"{}\" has no IDComponent.", get_name(entity)));
+	return UUID::create_empty();
 }
 
 void minty::EntityRegistry::set_name(Entity const entity, String const& name)
@@ -414,14 +444,35 @@ void minty::EntityRegistry::serialize(Writer& writer) const
 {
 	// write each entity, and each component under it
 	String entityName;
+	UUID entityId;
+
+	String nodeName;
+	String nodeValue;
 
 	for (auto [entity] : this->storage<Entity>()->each())
 	{
 		// get name
-		entityName = this->get_name(entity);
+		entityName = get_name(entity);
 
-		// use "-" instead of ""
-		if (entityName.empty()) entityName = "-";
+		// get ID
+		entityId = get_id(entity);
+
+		// if id is empty, generate one
+		if (entityId.empty()) entityId = UUID();
+
+		// if no name, just print ID
+		if (entityName.empty())
+		{
+			// ID
+			nodeName = to_string(entityId);
+			nodeValue = Text::EMPTY;
+		}
+		else
+		{
+			// name: ID
+			nodeName = entityName;
+			nodeValue = to_string(entityId);
+		}
 
 		// serialize entity
 		Node entityNode(entityName);
@@ -441,15 +492,36 @@ void minty::EntityRegistry::deserialize(Reader const& reader)
 	Node const& node = reader.get_node();
 	SerializationData data = *static_cast<SerializationData const*>(reader.get_data());
 
+	String name;
+	String value;
+	UUID id;
+
+	Entity entity;
+
 	// for each entity name given
 	for (auto const& entityNode : node.get_children())
 	{
-		// create the entity
-		Entity entity = create();
-		data.entity = entity;
+		// get the name and ID from the node
+		if (entityNode.has_data())
+		{
+			name = entityNode.get_name();
+			value = entityNode.get_data();
+		}
+		else
+		{
+			// no data, so the "name" must be the ID, and there is no name
+			name = Text::EMPTY;
+			value = entityNode.get_name();
+		}
 
-		// set name
-		set_name(entity, entityNode.get_name());
+		// convert value to ID, or generate a new one if needed
+		if (!Parse::try_uuid(value, id))
+		{
+			id = UUID();
+		}
+
+		entity = create(name, id);
+		data.entity = entity;
 
 		// cycle through each component on entity
 		for (auto const& compNode : entityNode.get_children())
@@ -498,8 +570,8 @@ void minty::EntityRegistry::serialize_entity(Writer& writer, Entity const entity
 
 			String name = found->second;
 
-			// ignore NameComponent, that is used when writing the entity node
-			if (name.compare("Name") == 0)
+			// ignore NameComponent and IDComponent, those are used when writing the entity node
+			if (name.compare("Name") == 0 || name.compare("ID") == 0)
 			{
 				continue;
 			}

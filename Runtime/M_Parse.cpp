@@ -2,6 +2,7 @@
 #include "M_Parse.h"
 
 #include "M_Text.h"
+#include "M_Encoding.h"
 
 using namespace minty;
 using namespace minty::Parse;
@@ -155,6 +156,23 @@ bool minty::Parse::try_int(String const& string, int& value)
     if (is_signed_integer(string))
     {
         value = std::stoi(string);
+        return true;
+    }
+
+    return false;
+}
+
+UUID minty::Parse::to_uuid(String const& string)
+{
+    return Encoding::decode_base64(string).get<uint64_t>();
+}
+
+bool minty::Parse::try_uuid(String const& string, UUID& value)
+{
+    // UUIDs stored as base64
+    if (Encoding::is_base64(string))
+    {
+        value = Encoding::decode_base64(string).get<uint64_t>();
         return true;
     }
 

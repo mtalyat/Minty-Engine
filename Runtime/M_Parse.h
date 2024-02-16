@@ -1,6 +1,7 @@
 #pragma once
 
 #include "M_Types.h"
+#include "M_UUID.h"
 #include <string>
 
 namespace minty::Parse
@@ -64,6 +65,21 @@ namespace minty::Parse
 	/// <param name="value">The parsed value.</param>
 	/// <returns>True if the parse was successful, otherwise false.</returns>
 	bool try_int(String const& string, int& value);
+
+	/// <summary>
+	/// Parses the given string into a UUID.
+	/// </summary>
+	/// <param name="string">The string to parse.</param>
+	/// <returns>The parsed value.</returns>
+	UUID to_uuid(String const& string);
+
+	/// <summary>
+	/// Attempts to parse the given string into a UUID.
+	/// </summary>
+	/// <param name="string">The string to parse.</param>
+	/// <param name="value">The parsed value.</param>
+	/// <returns>True if the parse was successful, otherwise false.</returns>
+	bool try_uuid(String const& string, UUID& value);
 
 	/// <summary>
 	/// Parses the given string into an ID.

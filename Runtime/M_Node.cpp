@@ -157,6 +157,13 @@ ID minty::Node::to_id(ID const defaultValue) const
 	return defaultValue;
 }
 
+UUID minty::Node::to_uuid() const
+{
+    UUID out;
+    Parse::try_uuid(_data, out);
+    return out;
+}
+
 unsigned int minty::Node::to_uint(unsigned int const defaultValue) const
 {
 	unsigned int out;

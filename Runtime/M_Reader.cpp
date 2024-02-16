@@ -157,6 +157,31 @@ bool minty::Reader::try_read_id(String const& name, ID& value) const
 	return false;
 }
 
+UUID minty::Reader::to_uuid() const
+{
+	return _node->to_uuid();
+}
+
+UUID minty::Reader::read_uuid(String const& name) const
+{
+	if (Node const* child = _node->find(name))
+	{
+		return child->to_uuid();
+	}
+
+	return UUID();
+}
+
+bool minty::Reader::try_read_uuid(String const& name, UUID& value) const
+{
+	if (Node const* child = _node->find(name))
+	{
+		value = child->to_uuid();
+		return true;
+	}
+	return false;
+}
+
 float minty::Reader::to_float(float const defaultValue) const
 {
 	return _node->to_float(defaultValue);

@@ -2,6 +2,7 @@
 #include "M_SceneObject.h"
 #include "M_Entity.h"
 
+#include "M_UUID.h"
 #include "M_Object.h"
 #include "M_Console.h"
 #include <map>
@@ -41,17 +42,32 @@ namespace minty
 		EntityRegistry& operator=(EntityRegistry&& other) noexcept;
 
 		/// <summary>
-		/// Creates a new Entity.
+		/// Creates a new Entity with a new UUID.
 		/// </summary>
-		/// <returns>The new Entity created.</returns>
+		/// <returns>The new Entity created with an IDComponent.</returns>
 		Entity create();
 
 		/// <summary>
-		/// Creates a new Entity with the given name on a NameComponent.
+		/// Creates a new Entity with the given UUID.
+		/// </summary>
+		/// <param name="uuid">The ID of this Entity.</param>
+		/// <returns>The new Entity with an IDComponent attached, with the given UUID.</returns>
+		Entity create(UUID const uuid);
+
+		/// <summary>
+		/// Creates a new Entity with a new UUID and with the given name.
 		/// </summary>
 		/// <param name="name">The name of the Entity.</param>
 		/// <returns>The new Entity with a NameComponent attached, with the given name.</returns>
 		Entity create(String const& name);
+
+		/// <summary>
+		/// Creates a new Entity with the given name and UUID.
+		/// </summary>
+		/// <param name="name">The name of the Entity.</param>
+		/// <param name="uuid">The ID of this Entity.</param>
+		/// <returns>The new Entity with a NameComponent and IDComponent.</returns>
+		Entity create(String const& name, UUID const uuid);
 
 		/// <summary>
 		/// Marks the given Entity for destruction.
@@ -109,6 +125,8 @@ namespace minty
 		/// <param name="entity">The Entity to get the name from.</param>
 		/// <returns>The name of the Entity, or "" if no name.</returns>
 		String get_name(Entity const entity) const;
+
+		UUID get_id(Entity const entity) const;
 
 		/// <summary>
 		/// Sets the NameComponent name of the Entity. Emplaces a NameComponent if needed. If no name is given ("" or "_"), then the NameComponent is removed.

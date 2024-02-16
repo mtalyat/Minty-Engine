@@ -570,6 +570,12 @@
     <ClInclude Include="M_DestroyComponent.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
+    <ClInclude Include="M_UUID.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="M_IDComponent.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -951,6 +957,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_DestroyComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_UUID.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_IDComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

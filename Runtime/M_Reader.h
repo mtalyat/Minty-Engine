@@ -3,6 +3,7 @@
 #include "M_Base.h"
 #include "M_Node.h"
 #include "M_Register.h"
+#include "M_UUID.h"
 #include <map>
 #include <unordered_map>
 #include <set>
@@ -94,6 +95,12 @@ namespace minty
 		ID read_id(String const& name, ID const defaultValue = ERROR_ID) const;
 
 		bool try_read_id(String const& name, ID& value) const;
+
+		UUID to_uuid() const;
+
+		UUID read_uuid(String const& name) const;
+
+		bool try_read_uuid(String const& name, UUID& value) const;
 
 		float to_float(float const defaultValue = 0.0f) const;
 

@@ -3,6 +3,7 @@
 #include "M_Base.h"
 #include "M_Node.h"
 #include "M_Register.h"
+#include "M_UUID.h"
 #include <map>
 #include <unordered_map>
 #include <set>

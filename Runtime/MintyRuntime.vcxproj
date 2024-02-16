@@ -230,6 +230,7 @@
     <ClInclude Include="M_AssemblyType.h" />
     <ClInclude Include="M_DestroyComponent.h" />
     <ClInclude Include="M_Engine.h" />
+    <ClInclude Include="M_IDComponent.h" />
     <ClInclude Include="M_ImGui.h" />
     <ClInclude Include="libraries\imguifiledialog\ImGuiFileDialog.h" />
     <ClInclude Include="libraries\imguifiledialog\ImGuiFileDialogConfig.h" />
@@ -344,6 +345,7 @@
     <ClInclude Include="M_SpriteComponent.h" />
     <ClInclude Include="M_UITransformComponent.h" />
     <ClInclude Include="M_UISystem.h" />
+    <ClInclude Include="M_UUID.h" />
     <ClInclude Include="M_Vector.h" />
     <ClInclude Include="M_Viewport.h" />
     <ClInclude Include="M_VirtualFile.h" />
@@ -431,6 +433,7 @@
     <ClCompile Include="M_EntityRegistry.cpp" />
     <ClCompile Include="M_Error.cpp" />
     <ClCompile Include="M_File.cpp" />
+    <ClCompile Include="M_IDComponent.cpp" />
     <ClCompile Include="M_Runtime.cpp" />
     <ClCompile Include="M_FiniteStateMachine.cpp" />
     <ClCompile Include="M_Operations.cpp" />
@@ -488,6 +491,7 @@
     <ClCompile Include="M_SpriteComponent.cpp" />
     <ClCompile Include="M_UITransformComponent.cpp" />
     <ClCompile Include="M_UISystem.cpp" />
+    <ClCompile Include="M_UUID.cpp" />
     <ClCompile Include="M_Vector.cpp" />
     <ClCompile Include="M_Viewport.cpp" />
     <ClCompile Include="M_VirtualFile.cpp" />

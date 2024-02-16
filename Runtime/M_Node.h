@@ -1,6 +1,7 @@
 #pragma once
 
 #include "M_Types.h"
+#include "M_UUID.h"
 #include <vector>
 #include <unordered_map>
 
@@ -93,6 +94,8 @@ namespace minty
 		/// Converts this Node's data to an ID.
 		/// </summary>
 		ID to_id(ID const defaultValue = 0) const;
+
+		UUID to_uuid() const;
 
 		/// <summary>
 		/// Converts this Node's data to an unsigned int.
