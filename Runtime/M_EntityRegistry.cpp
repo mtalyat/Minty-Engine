@@ -360,8 +360,8 @@ void minty::EntityRegistry::register_script(String const& name)
 				eventComp->scriptIds.emplace(id);
 			}
 
-			// return the component
-			return component;
+			// return the script object
+			return &component->scripts.at(id);
 		},
 		.get = [](EntityRegistry const& registry, Entity const entity, String const& name) -> Component const*
 		{
@@ -380,7 +380,7 @@ void minty::EntityRegistry::register_script(String const& name)
 				return nullptr;
 			}
 
-			// found it
+			// found it, return the script object
 			return &component->scripts.at(found);
 		},
 		.erase = [](EntityRegistry& registry, Entity const entity, String const& name) -> void

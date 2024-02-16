@@ -68,6 +68,20 @@ void minty::ScriptObject::serialize_field(Writer& writer, String const& name, Mo
 
 	switch (fieldTypeEnum)
 	{
+	case MONO_TYPE_I4: // int
+	{
+		int value;
+		engine.get_field_value(_object, field, &value);
+		writer.write(name, value);
+		break;
+	}
+	case MONO_TYPE_U4: // uint
+	{
+		unsigned int value;
+		engine.get_field_value(_object, field, &value);
+		writer.write(name, value);
+		break;
+	}
 	case MONO_TYPE_R4: // float
 	{
 		float value;
@@ -92,6 +106,18 @@ void minty::ScriptObject::deserialize_field(Reader const& reader, String const& 
 
 	switch (fieldTypeEnum)
 	{
+	case MONO_TYPE_I4: // int
+	{
+		int value = reader.read_int(name);
+		engine.set_field_value(_object, field, &value);
+		break;
+	}
+	case MONO_TYPE_U4: // uint
+	{
+		unsigned int value = reader.read_uint(name);
+		engine.set_field_value(_object, field, &value);
+		break;
+	}
 	case MONO_TYPE_R4: // float
 	{
 		float value = reader.read_float(name);

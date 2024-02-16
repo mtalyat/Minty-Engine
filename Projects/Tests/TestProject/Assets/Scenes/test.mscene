@@ -80,6 +80,7 @@ entities
         Animator
             animator: animator2
         TestScript
+            count: 1000
 #    Sprite
 #        Renderable
 #        Transform
