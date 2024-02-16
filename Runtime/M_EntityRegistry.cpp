@@ -6,7 +6,6 @@
 #include "M_Runtime.h"
 
 #include "M_NameComponent.h"
-#include "M_IDComponent.h"
 #include "M_RelationshipComponent.h"
 #include "M_TransformComponent.h"
 #include "M_DirtyComponent.h"
@@ -28,6 +27,8 @@ std::map<uint32_t const, String const> EntityRegistry::_componentTypes = std::ma
 minty::EntityRegistry::EntityRegistry(Runtime& engine, ID const sceneId)
 	: SceneObject(engine, sceneId)
 	, entt::registry()
+	, _idToEntity()
+	, _entityToId()
 {
 	// TODO: this does not account for when somebody gets the component by reference and updates it that wey
 	// make it so whenever a transform is editied, it is marked as dirty
@@ -61,7 +62,8 @@ Entity minty::EntityRegistry::create()
 Entity minty::EntityRegistry::create(UUID const uuid)
 {
 	Entity entity = entt::registry::create();
-	emplace<IDComponent>(entity).id = uuid;
+	MINTY_ASSERT(!_idToEntity.contains(uuid), std::format("EntityRegistry::create(): There was a UUID collision with id: {}.", static_cast<uint64_t>(uuid)));
+	add_to_lookup(entity, uuid);
 	return entity;
 }
 
@@ -92,6 +94,9 @@ void minty::EntityRegistry::destroy_immediate(Entity const entity)
 		ondestroy->invoke(SCRIPT_METHOD_NAME_ONDESTROY, *script);
 	}
 
+	// remove from lookups
+	remove_from_lookup(entity);
+
 	// destroy entity
 	entt::registry::destroy(entity);
 }
@@ -102,6 +107,12 @@ void minty::EntityRegistry::destroy_all()
 	for (auto [entity, destroy, script, ondestroy] : view<DestroyComponent const, ScriptComponent const, ScriptOnDestroyComponent const>().each())
 	{
 		ondestroy.invoke(SCRIPT_METHOD_NAME_ONDESTROY, script);
+	}
+
+	// remove them from lookup
+	for (auto [entity, destroy] : view<DestroyComponent const>().each())
+	{
+		remove_from_lookup(entity);
 	}
 
 	// get the entities that are ready for destruction
@@ -121,6 +132,10 @@ void minty::EntityRegistry::clear()
 
 	// destroy them all
 	entt::registry::clear();
+
+	// clear the lookup list
+	_idToEntity.clear();
+	_entityToId.clear();
 }
 
 Entity minty::EntityRegistry::find(String const& string) const
@@ -141,6 +156,13 @@ Entity minty::EntityRegistry::find(String const& string) const
 
 	// did not find entity
 	return NULL_ENTITY;
+}
+
+Entity minty::EntityRegistry::find(UUID const uuid) const
+{
+	MINTY_ASSERT(_idToEntity.contains(uuid), std::format("EntityRegistry::find(): UUID {} is missing an Entity.", static_cast<uint64_t>(uuid)));
+
+	return _idToEntity.at(uuid);
 }
 
 String minty::EntityRegistry::get_name(Entity const entity) const
@@ -167,20 +189,9 @@ String minty::EntityRegistry::get_name(Entity const entity) const
 
 UUID minty::EntityRegistry::get_id(Entity const entity) const
 {
-	// null entity means no id
-	if (entity == NULL_ENTITY)
-	{
-		return UUID::create_empty();
-	}
+	MINTY_ASSERT(_entityToId.contains(entity), std::format("EntityRegistry::get_id(): Entity {} is missing a UUID.", static_cast<uint32_t>(entity)));
 
-	if (IDComponent const* comp = try_get<IDComponent>(entity))
-	{
-		return comp->id;
-	}
-
-	// entity has no IDComponent somehow
-	Console::error(std::format("EntityRegistry::get_id(): Entity \"{}\" has no IDComponent.", get_name(entity)));
-	return UUID::create_empty();
+	return _entityToId.at(entity);
 }
 
 void minty::EntityRegistry::set_name(Entity const entity, String const& name)
@@ -544,6 +555,18 @@ void minty::EntityRegistry::deserialize(Reader const& reader)
 bool minty::EntityRegistry::is_name_empty(String const& name)
 {
 	return name.size() == 0 || (name.size() == 1 && name.at(0) == '_');
+}
+
+void minty::EntityRegistry::add_to_lookup(Entity const entity, UUID const id)
+{
+	_idToEntity.emplace(id, entity);
+	_entityToId.emplace(entity, id);
+}
+
+void minty::EntityRegistry::remove_from_lookup(Entity const entity)
+{
+	_idToEntity.erase(_entityToId.at(entity));
+	_entityToId.erase(entity);
 }
 
 void minty::EntityRegistry::serialize_entity(Writer& writer, Entity const entity) const

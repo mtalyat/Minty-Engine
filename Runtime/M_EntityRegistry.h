@@ -6,6 +6,7 @@
 #include "M_Object.h"
 #include "M_Console.h"
 #include <map>
+#include <unordered_map>
 
 namespace minty
 {
@@ -30,6 +31,9 @@ namespace minty
 
 		static std::map<String const, ComponentFuncs const> _components; // name -> creation/get funcs
 		static std::map<uint32_t const, String const> _componentTypes; // type id index -> name
+
+		std::unordered_map<UUID, Entity> _idToEntity;
+		std::unordered_map<Entity, UUID> _entityToId;
 
 	public:
 		EntityRegistry(Runtime& engine, ID const sceneId);
@@ -107,8 +111,15 @@ namespace minty
 		/// Finds the first Entity with the given name.
 		/// </summary>
 		/// <param name="string"></param>
-		/// <returns>The Entity, if found, otherwise NULL_ENTITY.</returns>
+		/// <returns>The Entity, or NULL_ENTITY if not found.</returns>
 		Entity find(String const& string) const;
+
+		/// <summary>
+		/// Finds the Entity with the given UUID.
+		/// </summary>
+		/// <param name="uuid"></param>
+		/// <returns>The Entity, or NULL_ENTITY if not found.</returns>
+		Entity find(UUID const uuid) const;
 
 		/// <summary>
 		/// Finds the first Entity with the given Component type.
@@ -126,6 +137,11 @@ namespace minty
 		/// <returns>The name of the Entity, or "" if no name.</returns>
 		String get_name(Entity const entity) const;
 
+		/// <summary>
+		/// Gets the ID of the given Entity.
+		/// </summary>
+		/// <param name="entity">The Entity to get the ID from.</param>
+		/// <returns>The ID of the Entity, or 0 if no ID was found.</returns>
 		UUID get_id(Entity const entity) const;
 
 		/// <summary>
@@ -198,9 +214,14 @@ namespace minty
 		/// Registers the Component, so the Component can be dynamically created by name.
 		/// </summary>
 		/// <typeparam name="T">The Component to register.</typeparam>
+		/// <param name="name">The name of the Component to register.</param>
 		template <class T>
 		static void register_component(String const& name);
 
+		/// <summary>
+		/// Registers the Script, so the Script can be dynamically created by name.
+		/// </summary>
+		/// <param name="name">The name of the Script to register.</param>
 		static void register_script(String const& name);
 
 		void serialize(Writer& writer) const override;
@@ -209,6 +230,10 @@ namespace minty
 		void deserialize(Reader const& reader) override;
 
 		static bool is_name_empty(String const& name);
+
+	private:
+		void add_to_lookup(Entity const entity, UUID const id);
+		void remove_from_lookup(Entity const entity);
 	};
 
 	template<class T>

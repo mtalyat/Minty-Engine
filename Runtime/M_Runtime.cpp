@@ -9,7 +9,6 @@
 #include "M_RenderEngine.h"
 #include "M_AudioEngine.h"
 #include "M_ScriptEngine.h"
-
 #include "M_SystemRegistry.h"
 #include "M_AnimationSystem.h"
 #include "M_AudioSystem.h"
@@ -24,7 +23,6 @@
 #include "M_CameraComponent.h"
 #include "M_DirtyComponent.h"
 #include "M_DestroyComponent.h"
-#include "M_IDComponent.h"
 #include "M_MeshComponent.h"
 #include "M_NameComponent.h"
 #include "M_RelationshipComponent.h"
@@ -162,7 +160,6 @@ bool minty::Runtime::init(RuntimeBuilder const* builder)
 	EntityRegistry::register_component<CameraComponent>("Camera");
 	EntityRegistry::register_component<DestroyComponent>("Destroy");
 	EntityRegistry::register_component<DirtyComponent>("Dirty");
-	EntityRegistry::register_component<IDComponent>("ID");
 	EntityRegistry::register_component<MeshComponent>("Mesh");
 	EntityRegistry::register_component<NameComponent>("Name");
 	EntityRegistry::register_component<RelationshipComponent>("Relationship");
