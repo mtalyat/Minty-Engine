@@ -2,6 +2,7 @@
 #include "M_ScriptEngine.h"
 
 #include "M_Mono.h"
+#include "M_EntityRegistry.h"
 
 #include "M_File.h"
 #include "M_Console.h"
@@ -71,8 +72,13 @@ bool minty::ScriptEngine::load_assembly(AssemblyType const type, Path const& pat
 	std::vector<MonoClass*> scriptClasses = get_classes(type, scriptBaseClass);
 	for (MonoClass* const klass : scriptClasses)
 	{
-		// add script by name
-		info.scripts.emplace(get_class_name(klass), Script(*this, type, *klass));
+		String name = get_class_name(klass);
+
+		// add script by name to the assembly
+		info.scripts.emplace(name, Script(*this, type, *klass));
+
+		// also register with the entity registry so it can be added/removed as a "component"
+		EntityRegistry::register_script(name);
 	}
 
 	Console::log(std::format("Assembly at \"{}\" loaded {} scripts.", path.string(), scriptClasses.size()));

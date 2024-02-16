@@ -20,6 +20,8 @@ namespace minty
 	public:
 		ScriptObject(Script const& script);
 
+		~ScriptObject();
+
 		void invoke(String const& name) const;
 		
 	public:

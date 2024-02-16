@@ -172,8 +172,14 @@ namespace minty
 	template<class T>
 	void SystemRegistry::register_system(String const& name)
 	{
+		if (_systemTypes.contains(name))
+		{
+			Console::info(std::format("System {} already registered.", name));
+			return;
+		}
+
 		_systemTypes.emplace(name, [](Runtime& engine, ID const sceneId) { return new T(engine, sceneId); });
 
-		Console::info(std::format("Registered system {}", name));
+		Console::info(std::format("Registered system {}.", name));
 	}
 }

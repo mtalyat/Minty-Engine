@@ -1,4 +1,4 @@
-// 2024-02-16 05:27:27
+// 2024-02-16 06:36:20
 #include <Minty.h>
 #include <string>
 #include <format>
@@ -10,6 +10,8 @@ int main(int argc, char const* argv[]) {
 	minty::Info info("TestProject", 0, 0, 0);
 	minty::Runtime runtime(info);
 	runtime.init();
+	runtime.get_script_engine().load_assembly(minty::AssemblyType::Engine, "Assembly/bin/Debug/MintyEngine.dll");
+	runtime.get_script_engine().load_assembly(minty::AssemblyType::Project, "Assembly/bin/Debug/Assembly.dll");
 	if(int code = init(runtime)) { minty::Console::error(std::format("Failed to init program with error code {}.", code)); return code; }
 	runtime.start();
 	runtime.run();

@@ -225,7 +225,7 @@ void mintye::Application::load_project(minty::Path const& path)
 
 	// load assemblies
 	// C:\Users\mitch\source\repos\Minty-Engine\Projects\Tests\TestProject\Assembly\bin\Debug
-	_runtime->get_script_engine().load_assembly(AssemblyType::Project, std::format("Assembly/bin/Debug/TestProject.dll"));
+	_runtime->get_script_engine().load_assembly(AssemblyType::Project, std::format("Assembly/bin/Debug/Assembly.dll"));
 
 	// load a scene, if any found
 	Path sceneName = project->find_asset(Project::CommonFileType::Scene);
@@ -682,7 +682,7 @@ void Application::generate_cmake(BuildInfo const& buildInfo)
 	file.close();
 }
 
-void Application::generate_main()
+void Application::generate_main(BuildInfo const& buildInfo)
 {
 	ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console");
 
@@ -724,6 +724,8 @@ void Application::generate_main()
 		"	minty::Info info(\"" << projectInfo.get_application_name() << "\", " << projectInfo.get_application_major() << ", " << projectInfo.get_application_minor() << ", " << projectInfo.get_application_patch() << ");" << std::endl <<
 		"	minty::Runtime runtime(info);" << std::endl <<
 		"	runtime.init();" << std::endl <<
+		"	runtime.get_script_engine().load_assembly(minty::AssemblyType::Engine, \"Assembly/bin/" << buildInfo.get_config() << "/MintyEngine.dll\");" << std::endl <<
+		"	runtime.get_script_engine().load_assembly(minty::AssemblyType::Project, \"Assembly/bin/" << buildInfo.get_config() << "/Assembly.dll\");" << std::endl <<
 		"	if(int code = init(runtime)) { minty::Console::error(std::format(\"Failed to init program with error code {}.\", code)); return code; }" << std::endl <<
 		"	runtime.start();" << std::endl <<
 		"	runtime.run();" << std::endl <<
@@ -1013,7 +1015,7 @@ void Application::build(BuildInfo const& buildInfo)
 
 	console->log_important("\tgenerating main");
 
-	generate_main();
+	generate_main(buildInfo);
 
 	console->log_important("\tbuilding program");
 

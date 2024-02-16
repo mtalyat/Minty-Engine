@@ -49,7 +49,7 @@ systems
             - Animations/animator2.manimator
     CameraController
     Move
-    Test
+    Script
 entities
     Camera
         Transform
@@ -79,6 +79,7 @@ entities
             clip: cow-bells
         Animator
             animator: animator2
+        TestScript
 #    Sprite
 #        Renderable
 #        Transform

@@ -242,6 +242,15 @@ size_t minty::EntityRegistry::size() const
 
 void minty::EntityRegistry::register_script(String const& name)
 {
+	if (_components.contains(name))
+	{
+		Console::info(std::format("Script {} already registered.", name));
+		return;
+	}
+
+	// TODO: this can be generic for each type of script, so this does not need to be copied per script. 
+	// Make this so it just uses the same ComponentFuncs
+	
 	// scripts work by adding/getting/removing from the ScriptComponent
 	// funcs
 	ComponentFuncs funcs = {

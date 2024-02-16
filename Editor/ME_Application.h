@@ -169,7 +169,7 @@ namespace mintye
 		/// Generates the main file for the target project.
 		/// </summary>
 		/// <param name="info"></param>
-		void generate_main();
+		void generate_main(BuildInfo const& buildInfo);
 
 		/// <summary>
 		/// Generates all of the files for a vscode project setup.

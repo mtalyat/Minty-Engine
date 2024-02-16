@@ -144,35 +144,29 @@ bool minty::Runtime::init(RuntimeBuilder const* builder)
 	set_engine<AudioEngine>(builder && builder->audioEngine ? builder->audioEngine : new AudioEngine());
 	set_engine<ScriptEngine>(builder && builder->scriptEngine ? builder->scriptEngine : new ScriptEngine());
 
-	// perform static operations that happen once
-	static bool registered = false;
+	// register all built in systems and components
+	
+	// systems
+	SystemRegistry::register_system<AnimationSystem>("Animation");
+	SystemRegistry::register_system<AudioSystem>("Audio");
+	SystemRegistry::register_system<RenderSystem>("Render");
+	SystemRegistry::register_system<ScriptSystem>("Script");
+	SystemRegistry::register_system<UISystem>("UI");
 
-	if (!registered)
-	{
-		// systems
-		SystemRegistry::register_system<AnimationSystem>("Animation");
-		SystemRegistry::register_system<AudioSystem>("Audio");
-		SystemRegistry::register_system<RenderSystem>("Render");
-		SystemRegistry::register_system<ScriptSystem>("Script");
-		SystemRegistry::register_system<UISystem>("UI");
-
-		// components
-		EntityRegistry::register_component<AnimatorComponent>("Animator");
-		EntityRegistry::register_component<AudioListenerComponent>("AudioListener");
-		EntityRegistry::register_component<AudioSourceComponent>("AudioSource");
-		EntityRegistry::register_component<CameraComponent>("Camera");
-		EntityRegistry::register_component<DirtyComponent>("Dirty");
-		EntityRegistry::register_component<MeshComponent>("Mesh");
-		EntityRegistry::register_component<NameComponent>("Name");
-		EntityRegistry::register_component<RelationshipComponent>("Relationship");
-		EntityRegistry::register_component<RenderableComponent>("Renderable");
-		EntityRegistry::register_component<ScriptComponent>("Script");
-		EntityRegistry::register_component<SpriteComponent>("Sprite");
-		EntityRegistry::register_component<TransformComponent>("Transform");
-		EntityRegistry::register_component<UITransformComponent>("UITransform");
-
-		registered = true;
-	}
+	// components
+	EntityRegistry::register_component<AnimatorComponent>("Animator");
+	EntityRegistry::register_component<AudioListenerComponent>("AudioListener");
+	EntityRegistry::register_component<AudioSourceComponent>("AudioSource");
+	EntityRegistry::register_component<CameraComponent>("Camera");
+	EntityRegistry::register_component<DirtyComponent>("Dirty");
+	EntityRegistry::register_component<MeshComponent>("Mesh");
+	EntityRegistry::register_component<NameComponent>("Name");
+	EntityRegistry::register_component<RelationshipComponent>("Relationship");
+	EntityRegistry::register_component<RenderableComponent>("Renderable");
+	EntityRegistry::register_component<ScriptComponent>("Script");
+	EntityRegistry::register_component<SpriteComponent>("Sprite");
+	EntityRegistry::register_component<TransformComponent>("Transform");
+	EntityRegistry::register_component<UITransformComponent>("UITransform");
 
 	return true;
 }

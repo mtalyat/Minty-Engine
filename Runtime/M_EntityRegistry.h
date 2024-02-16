@@ -178,6 +178,12 @@ namespace minty
 	template<class T>
 	void EntityRegistry::register_component(String const& name)
 	{
+		if (_components.contains(name))
+		{
+			Console::info(std::format("Component {} already registered.", name));
+			return;
+		}
+
 		// funcs
 		ComponentFuncs funcs = {
 			.emplace = [](EntityRegistry& registry, Entity const entity, String const& name) -> Component* { return &registry.emplace<T>(entity); },

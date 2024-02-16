@@ -3,11 +3,9 @@
 #include "Scripts/types.h"
 
 // components
-#include "Scripts/Components/TestComponent.h"
 #include "Scripts/Components/MoveComponent.h"
 
 // system
-#include "Scripts/Systems/TestSystem.h"
 #include "Scripts/Systems/CameraControllerSystem.h"
 #include "Scripts/Systems/MoveSystem.h"
 
@@ -24,11 +22,9 @@ int init(Runtime& runtime)
     try
     {
         // components
-        EntityRegistry::register_component<game::TestComponent>("Test");
         EntityRegistry::register_component<game::MoveComponent>("Move");
 
         // systems
-        SystemRegistry::register_system<game::TestSystem>("Test");
         SystemRegistry::register_system<game::CameraControllerSystem>("CameraController");
         SystemRegistry::register_system<game::MoveSystem>("Move");
 
@@ -146,12 +142,6 @@ int init(Runtime& runtime)
                                { moveSystem->faster = true; });
         input.emplace_key_up(Key::LeftControl, [moveSystem](KeyPressEventArgs const &args)
                              { moveSystem->faster = false; });
-
-        TestSystem *testSystem = sr.find<TestSystem>();
-        input.emplace_key_down(Key::Pause, [testSystem](KeyPressEventArgs const &args)
-                               { testSystem->toggle_pause(); });
-        input.emplace_key_down(Key::Insert, [testSystem](KeyPressEventArgs const &args)
-                               { testSystem->reset(); });
 
         CameraControllerSystem *cameraControllerSystem = sr.find<CameraControllerSystem>();
         input.emplace_mouse_down(MouseButton::Left, [cameraControllerSystem, windowPtr](MouseClickEventArgs const &args)
