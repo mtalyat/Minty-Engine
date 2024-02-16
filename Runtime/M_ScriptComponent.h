@@ -1,6 +1,7 @@
 #pragma once
 #include "M_Component.h"
 
+#include "M_Types.h"
 #include "M_ScriptObject.h"
 #include "M_Register.h"
 #include <unordered_set>
@@ -16,9 +17,6 @@ namespace minty
 		: public Component
 	{
 		Register<ScriptObject> scripts;
-
-		void serialize(Writer& writer) const override;
-		void deserialize(Reader const& reader) override;
 	};
 
 	/// <summary>
@@ -29,28 +27,22 @@ namespace minty
 	{
 		std::unordered_set<ID> scriptIds;
 
-		void serialize(Writer& writer) const override;
-		void deserialize(Reader const& reader) override;
+		void invoke(String const& method, ScriptComponent const& script) const;
 	};
 
 	struct ScriptOnLoadComponent
 		: public ScriptEventComponent
-	{
-		void serialize(Writer& writer) const override;
-		void deserialize(Reader const& reader) override;
-	};
+	{};
 
 	struct ScriptOnUpdateComponent
 		: public ScriptEventComponent
-	{
-		void serialize(Writer& writer) const override;
-		void deserialize(Reader const& reader) override;
-	};
+	{};
 
 	struct ScriptOnUnloadComponent
 		: public ScriptEventComponent
-	{
-		void serialize(Writer& writer) const override;
-		void deserialize(Reader const& reader) override;
-	};
+	{};
+
+	struct ScriptOnDestroyComponent
+		: public ScriptEventComponent
+	{};
 }

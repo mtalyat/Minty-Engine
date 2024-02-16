@@ -191,6 +191,9 @@ void minty::Scene::finalize()
 {
 	// remove all dirty tags
 	_entities->clear<DirtyComponent>();
+
+	// destroy all entities tagged with the destroy tag
+	_entities->destroy_all();
 }
 
 void minty::Scene::serialize(Writer& writer) const

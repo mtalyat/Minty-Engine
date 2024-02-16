@@ -9,6 +9,7 @@
 #include "M_RelationshipComponent.h"
 #include "M_TransformComponent.h"
 #include "M_DirtyComponent.h"
+#include "M_DestroyComponent.h"
 
 #include "M_Script.h"
 #include "M_ScriptObject.h"
@@ -34,7 +35,11 @@ minty::EntityRegistry::EntityRegistry(Runtime& engine, ID const sceneId)
 }
 
 minty::EntityRegistry::~EntityRegistry()
-{}
+{
+	// clear entities, if there are any
+	// (making sure OnDestroy gets called)
+	clear();
+}
 
 minty::EntityRegistry::EntityRegistry(EntityRegistry&& other) noexcept
 	: entt::registry(std::move(other))
@@ -58,6 +63,52 @@ Entity minty::EntityRegistry::create(String const& name)
 	NameComponent& nameComponent = this->emplace<NameComponent>(e);
 	nameComponent.name = name;
 	return e;
+}
+
+void minty::EntityRegistry::destroy(Entity const entity)
+{
+	emplace_or_replace<DestroyComponent>(entity);
+}
+
+void minty::EntityRegistry::destroy_immediate(Entity const entity)
+{
+	// if has an OnDestroy script, call that
+	ScriptComponent const* script = try_get<ScriptComponent>(entity);
+	ScriptOnDestroyComponent const* ondestroy = try_get<ScriptOnDestroyComponent>(entity);
+	if (script && ondestroy)
+	{
+		ondestroy->invoke(SCRIPT_METHOD_NAME_ONDESTROY, *script);
+	}
+
+	// destroy entity
+	entt::registry::destroy(entity);
+}
+
+void minty::EntityRegistry::destroy_all()
+{
+	// call OnDestroy on any scripts
+	for (auto [entity, destroy, script, ondestroy] : view<DestroyComponent const, ScriptComponent const, ScriptOnDestroyComponent const>().each())
+	{
+		ondestroy.invoke(SCRIPT_METHOD_NAME_ONDESTROY, script);
+	}
+
+	// get the entities that are ready for destruction
+	auto destroyView = view<DestroyComponent const>();
+
+	// destroy them all
+	entt::registry::destroy(destroyView.begin(), destroyView.end());
+}
+
+void minty::EntityRegistry::clear()
+{
+	// call OnDestroy on any scripts
+	for (auto [entity, script, ondestroy] : view<ScriptComponent const, ScriptOnDestroyComponent const>().each())
+	{
+		ondestroy.invoke(SCRIPT_METHOD_NAME_ONDESTROY, script);
+	}
+
+	// destroy them all
+	entt::registry::clear();
 }
 
 Entity minty::EntityRegistry::find(String const& string) const

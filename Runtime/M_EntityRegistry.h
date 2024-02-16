@@ -53,6 +53,38 @@ namespace minty
 		/// <returns>The new Entity with a NameComponent attached, with the given name.</returns>
 		Entity create(String const& name);
 
+		/// <summary>
+		/// Marks the given Entity for destruction.
+		/// </summary>
+		/// <param name="entity"></param>
+		void destroy(Entity const entity);
+
+		/// <summary>
+		/// Destroys the given Entity right now.
+		/// </summary>
+		/// <param name="entity"></param>
+		void destroy_immediate(Entity const entity);
+
+		/// <summary>
+		/// Destroys all Entities marked with the Destroy component.
+		/// </summary>
+		void destroy_all();
+
+		/// <summary>
+		/// Destroys the given component from any Entity that has it.
+		/// </summary>
+		/// <typeparam name="Type"></typeparam>
+		template<typename Type>
+		void clear()
+		{
+			entt::registry::clear<Type>();
+		}
+
+		/// <summary>
+		/// Destroys everything in this EntityRegistry.
+		/// </summary>
+		void clear();
+
 		//~EntityRegistry();
 
 		/// <summary>

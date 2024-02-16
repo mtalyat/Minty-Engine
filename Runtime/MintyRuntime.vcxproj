@@ -228,6 +228,7 @@
   <ItemGroup>
     <ClInclude Include="M_Accessibility.h" />
     <ClInclude Include="M_AssemblyType.h" />
+    <ClInclude Include="M_DestroyComponent.h" />
     <ClInclude Include="M_Engine.h" />
     <ClInclude Include="M_ImGui.h" />
     <ClInclude Include="libraries\imguifiledialog\ImGuiFileDialog.h" />
@@ -417,6 +418,7 @@
     <ClCompile Include="M_AudioSourceComponent.cpp" />
     <ClCompile Include="M_AudioSystem.cpp" />
     <ClCompile Include="M_Compression.cpp" />
+    <ClCompile Include="M_DestroyComponent.cpp" />
     <ClCompile Include="M_Dynamic.cpp" />
     <ClCompile Include="M_CameraComponent.cpp" />
     <ClCompile Include="M_Color.cpp" />
