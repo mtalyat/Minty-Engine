@@ -2,7 +2,8 @@
 #include "M_Component.h"
 
 #include "M_ScriptObject.h"
-#include <unordered_map>
+#include "M_Register.h"
+#include <unordered_set>
 
 namespace minty
 {
@@ -14,9 +15,41 @@ namespace minty
 	struct ScriptComponent
 		: public Component
 	{
-		std::unordered_map<String, ScriptObject> scripts;
+		Register<ScriptObject> scripts;
 
-	public:
+		void serialize(Writer& writer) const override;
+		void deserialize(Reader const& reader) override;
+	};
+
+	/// <summary>
+	/// The base component type for all ScriptOnXComponents.
+	/// </summary>
+	struct ScriptEventComponent
+		: public Component
+	{
+		std::unordered_set<ID> scriptIds;
+
+		void serialize(Writer& writer) const override;
+		void deserialize(Reader const& reader) override;
+	};
+
+	struct ScriptOnLoadComponent
+		: public ScriptEventComponent
+	{
+		void serialize(Writer& writer) const override;
+		void deserialize(Reader const& reader) override;
+	};
+
+	struct ScriptOnUpdateComponent
+		: public ScriptEventComponent
+	{
+		void serialize(Writer& writer) const override;
+		void deserialize(Reader const& reader) override;
+	};
+
+	struct ScriptOnUnloadComponent
+		: public ScriptEventComponent
+	{
 		void serialize(Writer& writer) const override;
 		void deserialize(Reader const& reader) override;
 	};

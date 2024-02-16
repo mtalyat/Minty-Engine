@@ -36,6 +36,7 @@ namespace minty
 
 		MonoObject* create_instance() const;
 
+		bool has_method(String const& name) const;
 	public:
 		void serialize(Writer& writer) const override;
 		void deserialize(Reader const& reader) override;

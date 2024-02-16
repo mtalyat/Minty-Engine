@@ -16,11 +16,11 @@ void minty::ScriptSystem::load()
 {
 	EntityRegistry& registry = get_entity_registry();
 
-	for (auto [entity, script] : registry.view<ScriptComponent>().each())
+	for (auto [entity, script, onload] : registry.view<ScriptComponent const, ScriptOnLoadComponent const>().each())
 	{
-		for (auto const& pair : script.scripts)
+		for (auto const id : onload.scriptIds)
 		{
-			pair.second.invoke(SCRIPT_METHOD_NAME_ONLOAD);
+			script.scripts.at(id).invoke(SCRIPT_METHOD_NAME_ONLOAD);
 		}
 	}
 }
@@ -29,11 +29,11 @@ void minty::ScriptSystem::update()
 {
 	EntityRegistry& registry = get_entity_registry();
 
-	for (auto [entity, script] : registry.view<ScriptComponent>().each())
+	for (auto [entity, script, onupdate] : registry.view<ScriptComponent const, ScriptOnUpdateComponent const>().each())
 	{
-		for (auto const& pair : script.scripts)
+		for (auto const id : onupdate.scriptIds)
 		{
-			pair.second.invoke(SCRIPT_METHOD_NAME_ONUPDATE);
+			script.scripts.at(id).invoke(SCRIPT_METHOD_NAME_ONUPDATE);
 		}
 	}
 }
@@ -42,11 +42,11 @@ void minty::ScriptSystem::unload()
 {
 	EntityRegistry& registry = get_entity_registry();
 
-	for (auto [entity, script] : registry.view<ScriptComponent>().each())
+	for (auto [entity, script, onunload] : registry.view<ScriptComponent const, ScriptOnUnloadComponent const>().each())
 	{
-		for (auto const& pair : script.scripts)
+		for (auto const id : onunload.scriptIds)
 		{
-			pair.second.invoke(SCRIPT_METHOD_NAME_ONUNLOAD);
+			script.scripts.at(id).invoke(SCRIPT_METHOD_NAME_ONUNLOAD);
 		}
 	}
 }

@@ -280,7 +280,28 @@ void minty::EntityRegistry::register_script(String const& name)
 			if (!script) return nullptr;
 
 			// add a script object to it
-			component->scripts.emplace(name, ScriptObject(*script));
+			ID id = component->scripts.emplace(name, ScriptObject(*script));
+			component->scripts.at(id).invoke(SCRIPT_METHOD_NAME_ONCREATE);
+
+			// now add the helper components, if they are needed
+			if (script->has_method(SCRIPT_METHOD_NAME_ONLOAD))
+			{
+				ScriptOnLoadComponent* eventComp = registry.try_get<ScriptOnLoadComponent>(entity);
+				if (!eventComp) eventComp = &registry.emplace<ScriptOnLoadComponent>(entity);
+				eventComp->scriptIds.emplace(id);
+			}
+			if (script->has_method(SCRIPT_METHOD_NAME_ONUPDATE))
+			{
+				ScriptOnUpdateComponent* eventComp = registry.try_get<ScriptOnUpdateComponent>(entity);
+				if (!eventComp) eventComp = &registry.emplace<ScriptOnUpdateComponent>(entity);
+				eventComp->scriptIds.emplace(id);
+			}
+			if (script->has_method(SCRIPT_METHOD_NAME_ONUNLOAD))
+			{
+				ScriptOnUnloadComponent* eventComp = registry.try_get<ScriptOnUnloadComponent>(entity);
+				if (!eventComp) eventComp = &registry.emplace<ScriptOnUnloadComponent>(entity);
+				eventComp->scriptIds.emplace(id);
+			}
 
 			// return the component
 			return component;
@@ -297,21 +318,33 @@ void minty::EntityRegistry::register_script(String const& name)
 			auto found = component->scripts.find(name);
 
 			// if no script
-			if (found == component->scripts.end())
+			if (found == ERROR_ID)
 			{
 				return nullptr;
 			}
 
 			// found it
-			return &found->second;
+			return &component->scripts.at(found);
 		},
 		.erase = [](EntityRegistry& registry, Entity const entity, String const& name) -> void
 		{
 			// get the script component
 			ScriptComponent* component = registry.try_get<ScriptComponent>(entity);
 
-			// search and erase the script
+			// get the ID of the script with the name
+			ID id = component->scripts.get_id(name);
+
+			// if not there, skip
+			if (id == ERROR_ID) return;
+
+			// destroy the script
+			component->scripts.at(id).invoke(SCRIPT_METHOD_NAME_ONDESTROY);
 			component->scripts.erase(name);
+
+			// get the other components and erase if needed
+			if (ScriptOnLoadComponent* onloadComponent = registry.try_get<ScriptOnLoadComponent>(entity)) onloadComponent->scriptIds.erase(id);
+			if (ScriptOnUpdateComponent* onupdateComponent = registry.try_get<ScriptOnUpdateComponent>(entity)) onupdateComponent->scriptIds.erase(id);
+			if (ScriptOnUnloadComponent* onunloadComponent = registry.try_get<ScriptOnUnloadComponent>(entity)) onunloadComponent->scriptIds.erase(id);
 		},
 	};
 	_components.emplace(name, funcs);

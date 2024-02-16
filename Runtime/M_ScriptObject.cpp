@@ -13,14 +13,10 @@ using namespace minty::Scripting;
 minty::ScriptObject::ScriptObject(Script const& script)
 	: _script(&script)
 	, _object(script.create_instance())
-{
-	invoke("OnCreate");
-}
+{}
 
 minty::ScriptObject::~ScriptObject()
-{
-	invoke("OnDestroy");
-}
+{}
 
 void minty::ScriptObject::invoke(String const& name) const
 {

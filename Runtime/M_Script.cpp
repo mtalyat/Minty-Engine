@@ -34,6 +34,11 @@ MonoObject* minty::Script::create_instance() const
 	return _engine->create_instance(_class);
 }
 
+bool minty::Script::has_method(String const& name) const
+{
+	return _engine->get_method(_class, name);
+}
+
 void minty::Script::serialize(Writer& writer) const
 {
 
