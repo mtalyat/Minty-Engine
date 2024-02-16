@@ -528,6 +528,11 @@ void minty::EntityRegistry::deserialize(Reader const& reader)
 		// convert value to ID, or generate a new one if needed
 		if (!Parse::try_uuid(value, id))
 		{
+			// the value must be the name instead
+			name = value;
+			value = Text::EMPTY;
+
+			// generate a new ID
 			id = UUID();
 		}
 
