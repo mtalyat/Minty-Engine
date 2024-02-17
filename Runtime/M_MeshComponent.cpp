@@ -9,6 +9,8 @@
 #include "M_RenderSystem.h"
 #include "M_File.h"
 #include "M_SystemRegistry.h"
+#include "M_Reader.h"
+#include "M_Writer.h"
 
 using namespace minty;
 

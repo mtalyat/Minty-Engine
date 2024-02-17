@@ -20,6 +20,8 @@
 #include "M_MaterialTemplateBuilder.h"
 #include "M_ShaderPassBuilder.h"
 #include "M_ShaderBuilder.h"
+#include "M_Reader.h"
+#include "M_Writer.h"
 
 using namespace minty;
 using namespace minty;

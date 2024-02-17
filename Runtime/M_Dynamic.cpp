@@ -6,6 +6,8 @@
 #include "M_Encoding.h"
 #include "M_Vector.h"
 #include "M_Quaternion.h"
+#include "M_Reader.h"
+#include "M_Writer.h"
 
 using namespace minty;
 

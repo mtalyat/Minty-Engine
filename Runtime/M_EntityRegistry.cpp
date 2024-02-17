@@ -16,6 +16,9 @@
 #include "M_ScriptEngine.h"
 #include "M_ScriptComponent.h"
 
+#include "M_Reader.h"
+#include "M_Writer.h"
+
 #include <sstream>
 #include <map>
 

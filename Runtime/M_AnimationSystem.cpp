@@ -12,6 +12,8 @@
 #include "M_EntityRegistry.h"
 #include "M_SystemRegistry.h"
 #include "M_Scene.h"
+#include "M_Reader.h"
+#include "M_Writer.h"
 
 using namespace minty;
 

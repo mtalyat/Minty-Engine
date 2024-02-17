@@ -21,6 +21,7 @@ namespace minty
 {
 	struct CameraComponent;
 	struct TransformComponent;
+	class Node;
 
 	class RenderSystem
 		: public System

@@ -11,6 +11,8 @@
 #include "M_SystemRegistry.h"
 #include "M_Dynamic.h"
 #include "M_Component.h"
+#include "M_Reader.h"
+#include "M_Writer.h"
 
 using namespace minty;
 

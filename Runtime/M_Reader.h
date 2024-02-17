@@ -1,9 +1,10 @@
 #pragma once
 
 #include "M_Base.h"
-#include "M_Node.h"
 #include "M_Register.h"
 #include "M_UUID.h"
+#include "M_Color.h"
+#include "M_Node.h"
 #include <map>
 #include <unordered_map>
 #include <set>
@@ -12,6 +13,7 @@
 
 namespace minty
 {
+	class Node;
 	class Object;
 	class ISerializable;
 
@@ -125,6 +127,12 @@ namespace minty
 		bool read_bool(String const& name, bool const defaultValue = false) const;
 
 		bool try_read_bool(String const& name, bool& value) const;
+
+		Color to_color(Color const defaultValue = Color()) const;
+
+		Color read_color(String const& name, Color const defaultValue = Color()) const;
+
+		bool try_read_color(String const& name, Color& color) const;
 	public:
 		template<typename T>
 		void to_object_ref(T& value) const

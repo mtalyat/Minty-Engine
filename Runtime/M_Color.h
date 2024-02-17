@@ -11,6 +11,8 @@ namespace minty
 	{
 	public:
 		typedef int color_t;
+		constexpr static Byte MAX_CHANNEL = 255;
+		constexpr static Byte MIN_CHANNEL = 0;
 
 	public:
 		/// <summary>
@@ -72,7 +74,10 @@ namespace minty
 		operator color_t() const;
 
 		// assignment operator
-		Color& operator=(const Color& color);
+		Color& operator=(Color const& color);
+
+		friend std::ostream& operator<<(std::ostream& stream, Color const& color);
+		friend std::istream& operator>>(std::istream& stream, Color const& color);
 
 		/// <summary>
 		/// Gets the red value as a scale from 0.0f to 1.0f.
@@ -111,6 +116,10 @@ namespace minty
 		/// <param name="percent">The percentage to lighten the color by.</param>
 		/// <returns>A new lightened color.</returns>
 		Color lighten(float const percent) const;
+
+		String toHex() const;
+
+		static Color fromHex(String const& string);
 
 		/// <summary>
 		/// Lerps two colors using the red, green and blue. The alpha value is set to the left argument alpha.

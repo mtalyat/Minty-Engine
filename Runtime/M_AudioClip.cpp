@@ -3,6 +3,8 @@
 
 #include "M_Asset.h"
 #include "M_Console.h"
+#include "M_Reader.h"
+#include "M_Writer.h"
 
 minty::AudioClip::AudioClip()
 	: _clip()

@@ -1,6 +1,9 @@
 #include "pch.h"
 #include "M_PushConstantInfo.h"
 
+#include "M_Reader.h"
+#include "M_Writer.h"
+
 using namespace minty;
 
 void minty::PushConstantInfo::serialize(Writer& writer) const

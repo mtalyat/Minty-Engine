@@ -2,6 +2,8 @@
 #include "M_TransformComponent.h"
 
 #include "M_GLM.hpp"
+#include "M_Reader.h"
+#include "M_Writer.h"
 
 using namespace minty;
 

@@ -2,6 +2,8 @@
 #include "M_CameraComponent.h"
 
 #include "M_Console.h"
+#include "M_Reader.h"
+#include "M_Writer.h"
 
 using namespace minty;
 

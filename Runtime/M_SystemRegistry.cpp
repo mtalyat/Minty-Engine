@@ -5,6 +5,8 @@
 #include "M_Console.h"
 #include "M_Runtime.h"
 #include "M_Parse.h"
+#include "M_Reader.h"
+#include "M_Writer.h"
 
 #include <sstream>
 

@@ -1,6 +1,9 @@
 #include "pch.h"
 #include "M_FiniteStateMachine.h"
 
+#include "M_Reader.h"
+#include "M_Writer.h"
+
 using namespace minty;
 
 minty::FSM::Scope::Scope()

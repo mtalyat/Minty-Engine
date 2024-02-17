@@ -2,6 +2,7 @@
 
 #include "M_Object.h"
 #include "M_Entity.h"
+#include "M_Node.h"
 #include <vector>
 #include <unordered_map>
 

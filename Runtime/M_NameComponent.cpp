@@ -1,6 +1,9 @@
 #include "pch.h"
 #include "M_NameComponent.h"
 
+#include "M_Reader.h"
+#include "M_Writer.h"
+
 using namespace minty;
 
 void minty::NameComponent::serialize(Writer& writer) const

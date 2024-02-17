@@ -1,9 +1,10 @@
 #pragma once
 
 #include "M_Base.h"
-#include "M_Node.h"
 #include "M_Register.h"
 #include "M_UUID.h"
+#include "M_Color.h"
+#include "M_Node.h"
 #include <map>
 #include <unordered_map>
 #include <set>
@@ -12,6 +13,7 @@
 
 namespace minty
 {
+	class Node;
 	class Object;
 	class ISerializable;
 

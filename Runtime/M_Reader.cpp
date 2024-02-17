@@ -282,6 +282,31 @@ bool minty::Reader::try_read_bool(String const& name, bool& value) const
 	return false;
 }
 
+Color minty::Reader::to_color(Color const defaultValue) const
+{
+	return Color::fromHex(_node->to_string());
+}
+
+Color minty::Reader::read_color(String const& name, Color const defaultValue) const
+{
+	if (Node const* child = _node->find(name))
+	{
+		return Color::fromHex(child->to_string());
+	}
+
+	return defaultValue;
+}
+
+bool minty::Reader::try_read_color(String const& name, Color& value) const
+{
+	if (Node const* child = _node->find(name))
+	{
+		value = Color::fromHex(child->to_string());
+		return true;
+	}
+	return false;
+}
+
 String minty::to_string(Reader const& value)
 {
 	return std::format("Reader(node = {})", to_string(*value._node));

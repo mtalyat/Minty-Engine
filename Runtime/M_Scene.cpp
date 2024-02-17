@@ -8,6 +8,8 @@
 #include "M_TransformComponent.h"
 #include "M_RelationshipComponent.h"
 #include "M_DirtyComponent.h"
+#include "M_Reader.h"
+#include "M_Writer.h"
 
 using namespace minty;
 
