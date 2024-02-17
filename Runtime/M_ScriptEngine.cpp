@@ -10,6 +10,13 @@
 using namespace minty;
 using namespace minty::Scripting;
 
+struct ScriptEngineData
+{
+	Scene* scene;
+};
+
+static ScriptEngineData _data;
+
 minty::ScriptEngine::ScriptEngine()
 	: _rootDomain()
 	, _appDomain()
@@ -36,6 +43,13 @@ minty::ScriptEngine::~ScriptEngine()
 		mono_assembly_close(pair.second.assembly);
 	}
 	_assemblies.clear();
+}
+
+void minty::ScriptEngine::set_scene(Scene* scene)
+{
+	Engine::set_scene(scene);
+
+	_data.scene = scene;
 }
 
 bool minty::ScriptEngine::load_assembly(AssemblyType const type, Path const& path)

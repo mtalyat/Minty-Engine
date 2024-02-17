@@ -47,8 +47,6 @@ systems
         animators
             - Animations/animator.manimator
             - Animations/animator2.manimator
-    CameraController
-    Move
     Script
 entities
     Camera
@@ -58,7 +56,6 @@ entities
             perspective: 1
             near: 0.1
             far: 100.0
-        Move
         AudioListener
     Sprite
         Renderable

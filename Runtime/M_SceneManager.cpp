@@ -17,7 +17,7 @@
 using namespace minty;
 
 minty::SceneManager::SceneManager(Runtime& engine)
-	: _engine(&engine)
+	: _runtime(&engine)
 	, _loaded()
 	, _scenes()
 	, _loadedScene()
@@ -32,7 +32,7 @@ ID minty::SceneManager::create_scene(String const& name, Path const& path)
 {
 	// create the scene
 	ID id = _scenes.get_next();
-	Scene* scene = new Scene(*_engine, id); // deleted in a destroy function
+	Scene* scene = new Scene(*_runtime, id); // deleted in a destroy function
 	ID actualId = _scenes.emplace(name, scene);
 
 	MINTY_ASSERT(id == actualId, "SceneManager::create_scene(): next ID does not match actual ID.");
@@ -82,7 +82,7 @@ void minty::SceneManager::load_scene(ID const id)
 	_loadedScene = scene;
 
 	// set renderer to use this new scene
-	_engine->get_render_engine().set_scene(_loadedScene);
+	_runtime->set_engine_scene(_loadedScene);
 
 	// load event
 	if (_loaded && _loadedScene)

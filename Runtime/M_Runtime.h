@@ -147,6 +147,12 @@ namespace minty
 		/// <returns></returns>
 		ScriptEngine& get_script_engine() const;
 
+		/// <summary>
+		/// Updates the Scene for all of the loaded Engines.
+		/// </summary>
+		/// <param name="scene"></param>
+		void set_engine_scene(Scene* const scene);
+
 #pragma endregion
 
 #pragma region Exit

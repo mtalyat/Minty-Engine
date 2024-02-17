@@ -1,33 +1,25 @@
 #include "init.h"
 
-#include "Scripts/types.h"
-
-// components
-#include "Scripts/Components/MoveComponent.h"
-
-// system
-#include "Scripts/Systems/CameraControllerSystem.h"
-#include "Scripts/Systems/MoveSystem.h"
-
 #include <iostream>
 
 using namespace minty;
-using namespace game;
 
 InputMap input;
+
+struct MaterialBufferObject
+{
+    minty::ID textureId;
+    int x;
+    int y;
+    int z;
+    minty::Vector4 color;
+};
 
 // called when the engine is initialized
 int init(Runtime& runtime)
 {
     try
     {
-        // components
-        EntityRegistry::register_component<game::MoveComponent>("Move");
-
-        // systems
-        SystemRegistry::register_system<game::CameraControllerSystem>("CameraController");
-        SystemRegistry::register_system<game::MoveSystem>("Move");
-
         Window &window = runtime.get_window();
         // window.maximize();
         RenderEngine &renderer = runtime.get_render_engine();
@@ -111,61 +103,6 @@ int init(Runtime& runtime)
             AnimatorComponent& animatorComp = erPtr->get<AnimatorComponent>(spriteEntity);
             animatorComp.animator.set_variable("flicker", (animatorComp.animator.get_variable("flicker") + 1) & 1);
         });
-
-        MoveSystem *moveSystem = sr.find<MoveSystem>();
-        input.emplace_key_down(Key::W, [moveSystem](KeyPressEventArgs const &args)
-                               { moveSystem->forward += 1.0f; });
-        input.emplace_key_up(Key::W, [moveSystem](KeyPressEventArgs const &args)
-                             { moveSystem->forward -= 1.0f; });
-        input.emplace_key_down(Key::S, [moveSystem](KeyPressEventArgs const &args)
-                               { moveSystem->forward += -1.0f; });
-        input.emplace_key_up(Key::S, [moveSystem](KeyPressEventArgs const &args)
-                             { moveSystem->forward -= -1.0f; });
-        input.emplace_key_down(Key::D, [moveSystem](KeyPressEventArgs const &args)
-                               { moveSystem->right += 1.0f; });
-        input.emplace_key_up(Key::D, [moveSystem](KeyPressEventArgs const &args)
-                             { moveSystem->right -= 1.0f; });
-        input.emplace_key_down(Key::A, [moveSystem](KeyPressEventArgs const &args)
-                               { moveSystem->right += -1.0f; });
-        input.emplace_key_up(Key::A, [moveSystem](KeyPressEventArgs const &args)
-                             { moveSystem->right -= -1.0f; });
-        input.emplace_key_down(Key::Space, [moveSystem](KeyPressEventArgs const &args)
-                               { moveSystem->up += -1.0f; });
-        input.emplace_key_up(Key::Space, [moveSystem](KeyPressEventArgs const &args)
-                             { moveSystem->up -= -1.0f; });
-        input.emplace_key_down(Key::LeftShift, [moveSystem](KeyPressEventArgs const &args)
-                               { moveSystem->up += 1.0f; });
-        input.emplace_key_up(Key::LeftShift, [moveSystem](KeyPressEventArgs const &args)
-                             { moveSystem->up -= 1.0f; });
-
-        input.emplace_key_down(Key::LeftControl, [moveSystem](KeyPressEventArgs const &args)
-                               { moveSystem->faster = true; });
-        input.emplace_key_up(Key::LeftControl, [moveSystem](KeyPressEventArgs const &args)
-                             { moveSystem->faster = false; });
-
-        CameraControllerSystem *cameraControllerSystem = sr.find<CameraControllerSystem>();
-        input.emplace_mouse_down(MouseButton::Left, [cameraControllerSystem, windowPtr](MouseClickEventArgs const &args)
-                                 {
-                                     if (cameraControllerSystem->mouseDown)
-                                     {
-                                         // free to move
-                                         cameraControllerSystem->mouseDown = false;
-                                         windowPtr->set_cursor_mode(CursorMode::Normal);
-                                     }
-                                     else
-                                     {
-                                         // lock movement, move camera around
-                                         cameraControllerSystem->mouseDown = true;
-                                         windowPtr->set_cursor_mode(CursorMode::Disabled);
-                                     } });
-
-        input.emplace_mouse_move([cameraControllerSystem](MouseMoveEventArgs const &args)
-                                 {
-            if(cameraControllerSystem->mouseDown)
-            {
-                cameraControllerSystem->pitch -= args.dy;
-                cameraControllerSystem->yaw += args.dx;
-            } });
 
         windowPtr->set_input(&input);
     }

@@ -100,6 +100,14 @@ ScriptEngine& minty::Runtime::get_script_engine() const
 	return *static_cast<ScriptEngine*>(_engines.at(SCRIPT_ENGINE_INDEX));
 }
 
+void minty::Runtime::set_engine_scene(Scene* const scene)
+{
+	for (auto& engine : _engines)
+	{
+		engine->set_scene(scene);
+	}
+}
+
 SceneManager& minty::Runtime::get_scene_manager() const
 {
 	MINTY_ASSERT(_state >= State::Initialized, "Runtime::get_scene_manager(): Runtime is not initialized.");

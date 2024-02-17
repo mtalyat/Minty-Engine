@@ -2,10 +2,10 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "Release/TestProject.exe"
+			"path" : "MinSizeRel/TestProject.exe"
 		},
 		{
-			"path" : "Release/TestProject.pdb"
+			"path" : "MinSizeRel/TestProject.pdb"
 		}
 	],
 	"backtrace" : 1,
@@ -65,7 +65,7 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : "/DWIN32 /D_WINDOWS /GR /EHsc /O2 /Ob2 /DNDEBUG -std:c++20 -MT /GL"
+					"fragment" : "/DWIN32 /D_WINDOWS /GR /EHsc /O1 /Ob1 /DNDEBUG -std:c++20 -MT"
 				}
 			],
 			"includes" : 
@@ -91,9 +91,7 @@
 			"sourceIndexes" : 
 			[
 				0,
-				1,
-				2,
-				3
+				1
 			]
 		}
 	],
@@ -109,15 +107,11 @@
 		"commandFragments" : 
 		[
 			{
-				"fragment" : "/DWIN32 /D_WINDOWS /GR /EHsc /O2 /Ob2 /DNDEBUG -MT /GL",
+				"fragment" : "/DWIN32 /D_WINDOWS /GR /EHsc /O1 /Ob1 /DNDEBUG -MT",
 				"role" : "flags"
 			},
 			{
 				"fragment" : "/NODEFAULTLIB:\"LIBCMT\" /INCREMENTAL:NO /subsystem:console",
-				"role" : "flags"
-			},
-			{
-				"fragment" : "/INCREMENTAL:NO /LTCG",
 				"role" : "flags"
 			},
 			{
@@ -135,8 +129,7 @@
 				"role" : "libraries"
 			}
 		],
-		"language" : "CXX",
-		"lto" : true
+		"language" : "CXX"
 	},
 	"name" : "TestProject",
 	"nameOnDisk" : "TestProject.exe",
@@ -152,9 +145,7 @@
 			"sourceIndexes" : 
 			[
 				0,
-				1,
-				2,
-				3
+				1
 			]
 		}
 	],
@@ -164,18 +155,6 @@
 			"backtrace" : 1,
 			"compileGroupIndex" : 0,
 			"path" : "main.cpp",
-			"sourceGroupIndex" : 0
-		},
-		{
-			"backtrace" : 1,
-			"compileGroupIndex" : 0,
-			"path" : "C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Assets/Scripts/Systems/CameraControllerSystem.cpp",
-			"sourceGroupIndex" : 0
-		},
-		{
-			"backtrace" : 1,
-			"compileGroupIndex" : 0,
-			"path" : "C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Assets/Scripts/Systems/MoveSystem.cpp",
 			"sourceGroupIndex" : 0
 		},
 		{

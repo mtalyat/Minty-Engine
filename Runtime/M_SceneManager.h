@@ -12,7 +12,7 @@ namespace minty
 		: public Object
 	{
 	private:
-		Runtime* _engine;
+		Runtime* _runtime;
 
 		// if the scene manager has been loaded or not
 		// if not, no scenes will receive events
