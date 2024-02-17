@@ -2,6 +2,9 @@
 
 namespace minty
 {
+	constexpr static char const* ASSEMBLY_ENGINE_NAME = "MintyEngine";
+	constexpr static char const* ASSEMBLY_EDITOR_NAME = "MintyEditor";
+
 	/// <summary>
 	/// Defines how many frames are within one flight when sent to the GPU device.
 	/// </summary>

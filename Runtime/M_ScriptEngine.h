@@ -44,6 +44,8 @@ namespace minty
 
 		virtual ~ScriptEngine();
 
+		void set_runtime(Runtime& runtime) override;
+
 		void set_scene(Scene* scene) override;
 
 #pragma region Assemblies

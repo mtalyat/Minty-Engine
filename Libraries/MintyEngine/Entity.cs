@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 namespace MintyEngine
 {
     /// <summary>
-    /// A Script is a custom component that can add extra functionality to an Entity.
+    /// Represents a game object within the Scene.
     /// </summary>
-    public class Script : Component
+    public class Entity
     {
 
     }

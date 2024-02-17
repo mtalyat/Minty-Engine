@@ -263,6 +263,7 @@
     <ClInclude Include="M_Script.h" />
     <ClInclude Include="M_ScriptComponent.h" />
     <ClInclude Include="M_ScriptEngine.h" />
+    <ClInclude Include="M_ScriptLinkage.h" />
     <ClInclude Include="M_ScriptObject.h" />
     <ClInclude Include="M_ScriptSystem.h" />
     <ClInclude Include="M_SpritePushData.h" />
@@ -464,6 +465,7 @@
     <ClCompile Include="M_Script.cpp" />
     <ClCompile Include="M_ScriptComponent.cpp" />
     <ClCompile Include="M_ScriptEngine.cpp" />
+    <ClCompile Include="M_ScriptLinkage.cpp" />
     <ClCompile Include="M_ScriptObject.cpp" />
     <ClCompile Include="M_ScriptSystem.cpp" />
     <ClCompile Include="M_ShaderBuilder.cpp" />

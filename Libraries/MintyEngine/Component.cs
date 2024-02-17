@@ -7,10 +7,10 @@ using System.Threading.Tasks;
 namespace MintyEngine
 {
     /// <summary>
-    /// A Script is a custom component that can add extra functionality to an Entity.
+    /// A component is some sort of data that adds functionality to an Entity.
     /// </summary>
-    public class Script : Component
+    public class Component
     {
-
+        
     }
 }

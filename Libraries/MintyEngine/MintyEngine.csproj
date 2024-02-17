@@ -41,6 +41,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Component.cs" />
+    <Compile Include="Debug.cs" />
+    <Compile Include="Entity.cs" />
+    <Compile Include="Runtime.cs" />
     <Compile Include="Script.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

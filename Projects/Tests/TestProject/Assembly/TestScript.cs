@@ -1,5 +1,4 @@
-﻿using System;
-using MintyEngine;
+﻿using MintyEngine;
 
 class TestScript : Script
 {
@@ -7,27 +6,28 @@ class TestScript : Script
 
     void OnCreate()
     {
-        Console.WriteLine("TestClass.OnCreate()");
+        Debug.Log("TestClass.OnCreate()");
     }
 
     void OnLoad()
     {
-        Console.WriteLine("TestClass.OnLoad()" + count);
+        Debug.Warn("TestClass.OnLoad()" + count);
     }
 
     void OnUpdate()
     {
-        Console.WriteLine("TestClass.OnUpdate()");
+        Debug.Error("TestClass.OnUpdate()");
         count++;
     }
 
     void OnUnload()
     {
-        Console.WriteLine("TestClass.OnUnload()" + count);
+        Debug.Assert(count >= 5000, "TestClass.OnUnload() under 5k");
+        Debug.Assert(count < 5000, "TestClass.OnUnload() over 5k");
     }
 
     void OnDestroy()
     {
-        Console.WriteLine("TestClass.OnDestroy()");
+        Debug.Log("TestClass.OnDestroy()", Debug.Color.BrightMagenta);
     }
 }

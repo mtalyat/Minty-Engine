@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "M_ScriptEngine.h"
 
+#include "M_ScriptLinkage.h"
+
 #include "M_Mono.h"
 #include "M_EntityRegistry.h"
 
@@ -12,10 +14,26 @@ using namespace minty::Scripting;
 
 struct ScriptEngineData
 {
+	Runtime* runtime;
 	Scene* scene;
 };
 
 static ScriptEngineData _data;
+
+// SCRIPT FUNCTIONS C++ -> C#
+/*
+* OnCreate
+* OnDestroy
+* OnLoad
+* OnUnload
+* OnUpdate
+* OnFixedUpdate / physics update
+* OnFinalize / late update
+* OnEnable
+* OnDisable
+*/
+
+// SCRIPT FUNCTIONS C# -> C++
 
 minty::ScriptEngine::ScriptEngine()
 	: _rootDomain()
@@ -43,6 +61,13 @@ minty::ScriptEngine::~ScriptEngine()
 		mono_assembly_close(pair.second.assembly);
 	}
 	_assemblies.clear();
+}
+
+void minty::ScriptEngine::set_runtime(Runtime& runtime)
+{
+	Engine::set_runtime(runtime);
+
+	_data.runtime = &runtime;
 }
 
 void minty::ScriptEngine::set_scene(Scene* scene)
@@ -96,6 +121,12 @@ bool minty::ScriptEngine::load_assembly(AssemblyType const type, Path const& pat
 	}
 
 	Console::log(std::format("Assembly at \"{}\" loaded {} scripts.", path.string(), scriptClasses.size()));
+
+	// if engine, link
+	if (type == AssemblyType::Engine)
+	{
+		ScriptLinkage::Link();
+	}
 
 	return true;
 }
