@@ -107,7 +107,7 @@ AudioHandle minty::AudioSystem::play_spatial(Entity const entity, float const vo
 {
 	EntityRegistry& entityRegistry = get_entity_registry();
 
-	MINTY_ASSERT(entityRegistry.all_of<AudioSourceComponent>(entity), "The entity for play_spatial must have an AudioSourceComponent component.");
+	MINTY_ASSERT_MESSAGE(entityRegistry.all_of<AudioSourceComponent>(entity), "The entity for play_spatial must have an AudioSourceComponent component.");
 
 	AudioSourceComponent& source = entityRegistry.get<AudioSourceComponent>(entity);
 
@@ -122,7 +122,7 @@ AudioHandle minty::AudioSystem::play_spatial(ID const id, Entity const entity, f
 
 	EntityRegistry& entityRegistry = get_entity_registry();
 
-	MINTY_ASSERT(entityRegistry.all_of<AudioSourceComponent>(entity), "The entity for play_spatial must have an AudioSourceComponent component.");
+	MINTY_ASSERT_MESSAGE(entityRegistry.all_of<AudioSourceComponent>(entity), "The entity for play_spatial must have an AudioSourceComponent component.");
 
 	AudioSourceComponent& source = entityRegistry.get<AudioSourceComponent>(entity);
 	AudioEngine& audioEngine = get_audio_engine();
@@ -281,7 +281,7 @@ AudioEngine& minty::AudioSystem::get_audio_engine() const
 
 void minty::AudioSystem::set_listener(Entity const entity)
 {
-	MINTY_ASSERT(get_entity_registry().all_of<AudioListenerComponent>(entity), "Listener Entity must have an AudioListenerComponent component.");
+	MINTY_ASSERT_MESSAGE(get_entity_registry().all_of<AudioListenerComponent>(entity), "Listener Entity must have an AudioListenerComponent component.");
 
 	_listener = entity;
 	update_sound_data(_listenerData, entity);

@@ -691,42 +691,42 @@ void minty::RenderSystem::destroy_assets()
 
 Texture& minty::RenderSystem::get_texture(ID const id)
 {
-	MINTY_ASSERT(_textures.contains(id), std::format("RenderSystem::get_texture(): Textures does not contain the ID {}.", id));
+	MINTY_ASSERT(_textures.contains(id));
 	
 	return _textures.at(id);
 }
 
 Texture const& minty::RenderSystem::get_texture(ID const id) const
 {
-	MINTY_ASSERT(_textures.contains(id), std::format("RenderSystem::get_texture(): Textures does not contain the ID {}.", id));
+	MINTY_ASSERT(_textures.contains(id));
 
 	return _textures.at(id);
 }
 
 Sprite& minty::RenderSystem::get_sprite(ID const id)
 {
-	MINTY_ASSERT(_sprites.contains(id), std::format("RenderSystem::get_sprite(): Sprites does not contain the ID {}.", id));
+	MINTY_ASSERT(_sprites.contains(id));
 
 	return _sprites.at(id);
 }
 
 Sprite const& minty::RenderSystem::get_sprite(ID const id) const
 {
-	MINTY_ASSERT(_sprites.contains(id), std::format("RenderSystem::get_sprite(): Sprites does not contain the ID {}.", id));
+	MINTY_ASSERT(_sprites.contains(id));
 
 	return _sprites.at(id);
 }
 
 Shader& minty::RenderSystem::get_shader(ID const id)
 {
-	MINTY_ASSERT(_shaders.contains(id), std::format("RenderSystem::get_shader(): Shaders does not contain the ID {}.", id));
+	MINTY_ASSERT(_shaders.contains(id));
 
 	return _shaders.at(id);
 }
 
 Shader const& minty::RenderSystem::get_shader(ID const id) const
 {
-	MINTY_ASSERT(_shaders.contains(id), std::format("RenderSystem::get_shader(): Shaders does not contain the ID {}.", id));
+	MINTY_ASSERT(_shaders.contains(id));
 
 	return _shaders.at(id);
 }
@@ -743,14 +743,14 @@ Shader const& minty::RenderSystem::get_shader_from_material_id(ID const id) cons
 
 ShaderPass& minty::RenderSystem::get_shader_pass(ID const id)
 {
-	MINTY_ASSERT(_shaderPasses.contains(id), std::format("RenderSystem::get_shader_pass(): ShaderPasses does not contain the ID {}.", id));
+	MINTY_ASSERT(_shaderPasses.contains(id));
 
 	return _shaderPasses.at(id);
 }
 
 ShaderPass const& minty::RenderSystem::get_shader_pass(ID const id) const
 {
-	MINTY_ASSERT(_shaderPasses.contains(id), std::format("RenderSystem::get_shader_pass(): ShaderPasses does not contain the ID {}.", id));
+	MINTY_ASSERT(_shaderPasses.contains(id));
 
 	return _shaderPasses.at(id);
 }
@@ -767,14 +767,14 @@ ShaderPass const& minty::RenderSystem::get_shader_pass_from_material_id(ID const
 
 MaterialTemplate& minty::RenderSystem::get_material_template(ID const id)
 {
-	MINTY_ASSERT(_materialTemplates.contains(id), std::format("RenderSystem::get_material_template(): MaterialTemplates does not contain the ID {}.", id));
+	MINTY_ASSERT(_materialTemplates.contains(id));
 
 	return _materialTemplates.at(id);
 }
 
 MaterialTemplate const& minty::RenderSystem::get_material_template(ID const id) const
 {
-	MINTY_ASSERT(_materialTemplates.contains(id), std::format("RenderSystem::get_material_template(): MaterialTemplates does not contain the ID {}.", id));
+	MINTY_ASSERT(_materialTemplates.contains(id));
 
 	return _materialTemplates.at(id);
 }
@@ -791,28 +791,28 @@ MaterialTemplate const& minty::RenderSystem::get_material_template_from_material
 
 Material& minty::RenderSystem::get_material(ID const id)
 {
-	MINTY_ASSERT(_materials.contains(id), std::format("RenderSystem::get_material(): Materials does not contain the ID {}.", id));
+	MINTY_ASSERT(_materials.contains(id));
 
 	return _materials.at(id);
 }
 
 Material const& minty::RenderSystem::get_material(ID const id) const
 {
-	MINTY_ASSERT(_materials.contains(id), std::format("RenderSystem::get_material(): Materials does not contain the ID {}.", id));
+	MINTY_ASSERT(_materials.contains(id));
 
 	return _materials.at(id);
 }
 
 Mesh& minty::RenderSystem::get_mesh(ID const id)
 {
-	MINTY_ASSERT(_meshes.contains(id), std::format("RenderSystem::get_mesh(): Meshes does not contain the ID {}.", id));
+	MINTY_ASSERT(_meshes.contains(id));
 
 	return _meshes.at(id);
 }
 
 Mesh const& minty::RenderSystem::get_mesh(ID const id) const
 {
-	MINTY_ASSERT(_meshes.contains(id), std::format("RenderSystem::get_mesh(): Meshes does not contain the ID {}.", id));
+	MINTY_ASSERT(_meshes.contains(id));
 
 	return _meshes.at(id);
 }
@@ -854,7 +854,7 @@ void minty::RenderSystem::load_descriptor_values(std::unordered_map<String, Dyna
 				else
 				{
 					// if index name does not exist, show warning and set to ERROR_ID
-					Console::warn(std::format("Failed to load_animation texture with index {} into descriptor named \"{}\".", i, info.name));
+					MINTY_WARN_FORMAT("Failed to load_animation texture with index {} into descriptor named \"{}\".", i, info.name);
 					ids[i] = ERROR_ID;
 				}
 			}

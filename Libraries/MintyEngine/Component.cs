@@ -11,6 +11,6 @@ namespace MintyEngine
     /// </summary>
     public class Component
     {
-        
+        public readonly Entity Entity;
     }
 }

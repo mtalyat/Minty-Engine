@@ -140,7 +140,7 @@ void RenderEngine::render_frame()
 		return;
 	}
 	else if (r != VK_SUCCESS && r != VK_SUBOPTIMAL_KHR) {
-		Error::abort("Failed to acquire swap chain image.");
+		MINTY_ABORT("Failed to acquire swap chain image.");
 	}
 
 	// record the command buffer so we know what to do to render stuff to the screen
@@ -200,7 +200,7 @@ void RenderEngine::render_frame()
 		recreate_swap_chain();
 	}
 	else if (r != VK_SUCCESS) {
-		Error::abort("Failed to present swap chain image.");
+		MINTY_ABORT("Failed to present swap chain image.");
 	}
 
 	// move to next frame
@@ -218,7 +218,7 @@ void RenderEngine::create_instance(RenderEngineBuilder const& builder)
 	// check if we can use validation layers
 	if (enableValidationLayers && !check_validation_layer_support())
 	{
-		Error::abort("Validation layers requested, but not available.");
+		MINTY_ABORT("Validation layers requested, but not available.");
 	}
 
 	// get glfw extensions
@@ -275,7 +275,7 @@ void RenderEngine::create_instance(RenderEngineBuilder const& builder)
 
 	if (vkCreateInstance(&createInfo, nullptr, &_instance) != VK_SUCCESS)
 	{
-		Error::abort("failed to create instance!");
+		MINTY_ABORT("failed to create instance!");
 	}
 }
 
@@ -304,7 +304,7 @@ VkFormat RenderEngine::find_supported_format(const std::vector<VkFormat>& candid
 		}
 	}
 
-	Error::abort("Failed to find_animation supported format.");
+	MINTY_ABORT("Failed to find_animation supported format.");
 
 	return VkFormat();
 }
@@ -334,7 +334,7 @@ void RenderEngine::create_image(uint32_t width, uint32_t height, VkFormat format
 	imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
 	if (vkCreateImage(_device, &imageInfo, nullptr, &image) != VK_SUCCESS) {
-		Error::abort("Failed to create image.");
+		MINTY_ABORT("Failed to create image.");
 	}
 
 	VkMemoryRequirements memRequirements;
@@ -346,7 +346,7 @@ void RenderEngine::create_image(uint32_t width, uint32_t height, VkFormat format
 	allocInfo.memoryTypeIndex = find_memory_type(memRequirements.memoryTypeBits, properties);
 
 	if (vkAllocateMemory(_device, &allocInfo, nullptr, &imageMemory) != VK_SUCCESS) {
-		Error::abort("Failed to allocate image memory.");
+		MINTY_ABORT("Failed to allocate image memory.");
 	}
 
 	vkBindImageMemory(_device, image, imageMemory, 0);
@@ -391,7 +391,7 @@ VkImageView RenderEngine::create_image_view(VkImage image, VkFormat format, VkIm
 
 	VkImageView imageView;
 	if (vkCreateImageView(_device, &viewInfo, nullptr, &imageView) != VK_SUCCESS) {
-		Error::abort("Failed to create texture image view.");
+		MINTY_ABORT("Failed to create texture image view.");
 	}
 
 	return imageView;
@@ -413,7 +413,7 @@ VkShaderModule minty::RenderEngine::create_shader_module(std::vector<char> const
 
 	VkShaderModule shaderModule;
 	if (vkCreateShaderModule(_device, &createInfo, nullptr, &shaderModule) != VK_SUCCESS) {
-		Error::abort("Failed to create shader module.");
+		MINTY_ABORT("Failed to create shader module.");
 	}
 
 	return shaderModule;
@@ -552,7 +552,7 @@ void RenderEngine::create_surface()
 {
 	// create window surface that vulkan can use to draw
 	if (glfwCreateWindowSurface(_instance, _window->get_raw(), nullptr, &_surface) != VK_SUCCESS) {
-		Error::abort("Failed to create window surface.");
+		MINTY_ABORT("Failed to create window surface.");
 	}
 }
 
@@ -565,7 +565,7 @@ void RenderEngine::pick_physical_device()
 	// if zero, error
 	if (deviceCount == 0)
 	{
-		Error::abort("Failed to find_animation GPU's with Vulkan support.");
+		MINTY_ABORT("Failed to find_animation GPU's with Vulkan support.");
 	}
 
 	// get devices
@@ -582,7 +582,7 @@ void RenderEngine::pick_physical_device()
 
 	// none found
 	if (_physicalDevice == VK_NULL_HANDLE) {
-		Error::abort("Failed to find_animation a suitable GPU.");
+		MINTY_ABORT("Failed to find_animation a suitable GPU.");
 	}
 }
 
@@ -672,7 +672,7 @@ void RenderEngine::create_swap_chain()
 
 	// create swap chain
 	if (vkCreateSwapchainKHR(_device, &createInfo, nullptr, &_swapChain) != VK_SUCCESS) {
-		Error::abort("Failed to create swap chain.");
+		MINTY_ABORT("Failed to create swap chain.");
 	}
 
 	vkGetSwapchainImagesKHR(_device, _swapChain, &imageCount, nullptr);
@@ -905,7 +905,7 @@ void RenderEngine::create_logical_device()
 	}
 
 	if (vkCreateDevice(_physicalDevice, &createInfo, nullptr, &_device) != VK_SUCCESS) {
-		Error::abort("Failed to create logical device.");
+		MINTY_ABORT("Failed to create logical device.");
 	}
 
 	vkGetDeviceQueue(_device, indices.graphicsFamily.value(), 0, &_graphicsQueue);
@@ -1169,7 +1169,7 @@ void RenderEngine::setup_debug_messenger() {
 	populate_debug_messenger_create_info(createInfo);
 
 	if (CreateDebugUtilsMessengerEXT(_instance, &createInfo, nullptr, &_debugMessenger) != VK_SUCCESS) {
-		Error::abort("Failed to set up debug messenger.");
+		MINTY_ABORT("Failed to set up debug messenger.");
 	}
 }
 
@@ -1262,7 +1262,7 @@ void RenderEngine::create_render_pass()
 	renderPassInfo.pDependencies = &dependency;
 
 	if (vkCreateRenderPass(_device, &renderPassInfo, nullptr, &_renderPass) != VK_SUCCESS) {
-		Error::abort("Failed to create render pass.");
+		MINTY_ABORT("Failed to create render pass.");
 	}
 }
 
@@ -1287,7 +1287,7 @@ void RenderEngine::create_framebuffers()
 		framebufferInfo.layers = 1;
 
 		if (vkCreateFramebuffer(_device, &framebufferInfo, nullptr, &_swapChainFramebuffers[i]) != VK_SUCCESS) {
-			Error::abort("Failed to create framebuffer.");
+			MINTY_ABORT("Failed to create framebuffer.");
 		}
 	}
 }
@@ -1445,7 +1445,7 @@ uint32_t RenderEngine::find_memory_type(uint32_t typeFilter, VkMemoryPropertyFla
 		}
 	}
 
-	Error::abort("Failed to find_animation suitable memory type.");
+	MINTY_ABORT("Failed to find_animation suitable memory type.");
 	return 0;
 }
 
@@ -1460,7 +1460,7 @@ void RenderEngine::create_command_pool(VkCommandPool& commandPool)
 	};
 
 	if (vkCreateCommandPool(_device, &poolInfo, nullptr, &commandPool) != VK_SUCCESS) {
-		Error::abort("Failed to create command pool.");
+		MINTY_ABORT("Failed to create command pool.");
 	}
 }
 
@@ -1479,7 +1479,7 @@ void RenderEngine::create_command_buffers()
 	};
 
 	if (vkAllocateCommandBuffers(_device, &allocInfo, _commandBuffers.data()) != VK_SUCCESS) {
-		Error::abort("Failed to allocate command buffers.");
+		MINTY_ABORT("Failed to allocate command buffers.");
 	}
 }
 
@@ -1511,7 +1511,7 @@ void RenderEngine::record_command_buffer(VkCommandBuffer commandBuffer, uint32_t
 	};
 
 	if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
-		Error::abort("Failed to begin recording command buffer.");
+		MINTY_ABORT("Failed to begin recording command buffer.");
 	}
 
 	// begin the render pass
@@ -1554,7 +1554,7 @@ void RenderEngine::record_command_buffer(VkCommandBuffer commandBuffer, uint32_t
 	vkCmdEndRenderPass(commandBuffer);
 
 	if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
-		Error::abort("Failed to record command buffer.");
+		MINTY_ABORT("Failed to record command buffer.");
 	}
 }
 
@@ -1587,7 +1587,7 @@ void RenderEngine::create_sync_objects()
 			vkCreateSemaphore(_device, &semaphoreInfo, nullptr, &_renderFinishedSemaphores[i]) != VK_SUCCESS ||
 			vkCreateFence(_device, &fenceInfo, nullptr, &_inFlightFences[i]) != VK_SUCCESS) {
 
-			Error::abort("Failed to create synchronization objects for a frame.");
+			MINTY_ABORT("Failed to create synchronization objects for a frame.");
 		}
 	}
 }

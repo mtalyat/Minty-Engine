@@ -76,8 +76,8 @@ void minty::Shader::update_push_constant(VkCommandBuffer const commandBuffer, vo
 	// get info of push constant
 	auto const& info = _pushConstantInfos.at(0);
 
-	MINTY_ASSERT(size <= info.size, std::format("Shader::update_push_constant(): The given size must not be larger than the push constant info size. push constant: {}, given size: {}, push constant size: {}", info.name, size, info.size));
-	MINTY_ASSERT(info.offset + offset + size <= info.size, std::format("Shader::update_push_constant(): The given offset and size will exceed the bounds of the push constant info size. push constant: {}, given offset: {}, given size: {}, push constant offset: {}, push constant size: {}", info.name, offset, size, info.offset, info.size));
+	MINTY_ASSERT_FORMAT(size <= info.size, "The given size must not be larger than the push constant info size. push constant: {}, given size: {}, push constant size: {}", info.name, size, info.size);
+	MINTY_ASSERT_FORMAT(info.offset + offset + size <= info.size, "The given offset and size will exceed the bounds of the push constant info size. push constant: {}, given offset: {}, given size: {}, push constant offset: {}, push constant size: {}", info.name, offset, size, info.offset, info.size);
 
 	// push value
 	vkCmdPushConstants(commandBuffer, _pipelineLayout, info.stageFlags, info.offset + offset, size, value);
@@ -88,8 +88,8 @@ void minty::Shader::update_push_constant(String const& name, VkCommandBuffer con
 	// get info of push constant
 	auto const& info = _pushConstantInfos.at(name);
 
-	MINTY_ASSERT(size <= info.size, std::format("Shader::update_push_constant(): The given size must not be larger than the push constant info size. push constant: {}, given size: {}, push constant size: {}", info.name, size, info.size));
-	MINTY_ASSERT(info.offset + offset + size <= info.size, std::format("Shader::update_push_constant(): The given offset and size will exceed the bounds of the push constant info size. push constant: {}, given offset: {}, given size: {}, push constant offset: {}, push constant size: {}", info.name, offset, size, info.offset, info.size));
+	MINTY_ASSERT_FORMAT(size <= info.size, "The given size must not be larger than the push constant info size. push constant: {}, given size: {}, push constant size: {}", info.name, size, info.size);
+	MINTY_ASSERT_FORMAT(info.offset + offset + size <= info.size, "The given offset and size will exceed the bounds of the push constant info size. push constant: {}, given offset: {}, given size: {}, push constant offset: {}, push constant size: {}", info.name, offset, size, info.offset, info.size);
 
 	// push value
 	vkCmdPushConstants(commandBuffer, _pipelineLayout, info.stageFlags, info.offset + offset, size, value);
@@ -125,7 +125,7 @@ void minty::Shader::create_descriptor_set_layouts(ShaderBuilder const& builder)
 		};
 
 		if (vkCreateDescriptorSetLayout(device, &layoutInfo, nullptr, &_descriptorSetLayouts.at(i)) != VK_SUCCESS) {
-			Error::abort("Failed to create descriptor set layout.");
+			MINTY_ABORT("Failed to create descriptor set layout.");
 		}
 	}
 }
@@ -162,7 +162,7 @@ void minty::Shader::create_pipeline_layout(ShaderBuilder const& builder)
 
 	// create the pipeline layout
 	if (vkCreatePipelineLayout(renderer.get_device(), &pipelineLayoutInfo, nullptr, &_pipelineLayout) != VK_SUCCESS) {
-		Error::abort("Failed to create pipeline layout.");
+		MINTY_ABORT("Failed to create pipeline layout.");
 	}
 }
 
@@ -195,10 +195,7 @@ VkDescriptorPool minty::Shader::create_pool(uint32_t const set)
 	poolInfo.pPoolSizes = poolSizes.data();
 	poolInfo.maxSets = static_cast<uint32_t>(maxSets);
 
-	if (vkCreateDescriptorPool(get_render_engine().get_device(), &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS)
-	{
-		Error::abort("Failed to create descriptor pool.");
-	}
+	VK_ASSERT(vkCreateDescriptorPool(get_render_engine().get_device(), &poolInfo, nullptr, &descriptorPool), "Failed to create descriptor pool.");
 
 	return descriptorPool;
 }

@@ -29,7 +29,7 @@ minty::TextureAtlas::TextureAtlas(TextureAtlasBuilder const& builder, Runtime& e
 	, _pivot()
 	, _createdSlices(0)
 {
-	MINTY_ASSERT(_textureId != ERROR_ID, "TextureAtlas::TextureAtlas(): Cannot create a TextureAtlas with a Texture ID of ERROR_ID.");
+	MINTY_ASSERT(_textureId != ERROR_ID);
 
 	// set sizes
 	set_slice(builder.slice, builder.coordinateMode);
@@ -40,7 +40,7 @@ minty::TextureAtlas::TextureAtlas(TextureAtlasBuilder const& builder, Runtime& e
 	{
 		RenderSystem* renderSystem = get_render_system();
 
-		MINTY_ASSERT(renderSystem != nullptr, "TextureAtlas::TextureAtlas(): renderSystem cannot be null.");
+		MINTY_ASSERT(renderSystem != nullptr);
 
 		// create a material based on this texture
 		MaterialBuilder materialBuilder;

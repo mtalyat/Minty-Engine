@@ -23,7 +23,7 @@ minty::UISystem::UISystem(Runtime& engine, ID const sceneId)
 
 void minty::UISystem::load()
 {
-	InputMap& map = get_scene().get_engine().get_global_input_map();
+	InputMap& map = get_scene().get_runtime().get_global_input_map();
 
 	map.emplace_mouse_move(_onMouseMove);
 	map.emplace_mouse(MouseButton::Left, _onMouseClick);

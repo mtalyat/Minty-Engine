@@ -2,10 +2,10 @@
 	"artifacts" : 
 	[
 		{
-			"path" : "Release/TestProject.exe"
+			"path" : "RelWithDebInfo/TestProject.exe"
 		},
 		{
-			"path" : "Release/TestProject.pdb"
+			"path" : "RelWithDebInfo/TestProject.pdb"
 		}
 	],
 	"backtrace" : 1,
@@ -36,13 +36,13 @@
 			{
 				"command" : 1,
 				"file" : 0,
-				"line" : 16,
+				"line" : 18,
 				"parent" : 0
 			},
 			{
 				"command" : 1,
 				"file" : 0,
-				"line" : 17,
+				"line" : 19,
 				"parent" : 0
 			},
 			{
@@ -54,7 +54,7 @@
 			{
 				"command" : 3,
 				"file" : 0,
-				"line" : 15,
+				"line" : 17,
 				"parent" : 0
 			}
 		]
@@ -65,7 +65,7 @@
 			"compileCommandFragments" : 
 			[
 				{
-					"fragment" : "/DWIN32 /D_WINDOWS /GR /EHsc /O2 /Ob2 /DNDEBUG -std:c++20 -MT /GL"
+					"fragment" : "/DWIN32 /D_WINDOWS /GR /EHsc /Zi /O2 /Ob1 /DNDEBUG -std:c++20 -MT"
 				}
 			],
 			"includes" : 
@@ -107,15 +107,11 @@
 		"commandFragments" : 
 		[
 			{
-				"fragment" : "/DWIN32 /D_WINDOWS /GR /EHsc /O2 /Ob2 /DNDEBUG -MT /GL",
+				"fragment" : "/DWIN32 /D_WINDOWS /GR /EHsc /Zi /O2 /Ob1 /DNDEBUG -MT",
 				"role" : "flags"
 			},
 			{
-				"fragment" : "/NODEFAULTLIB:\"LIBCMT\" /INCREMENTAL:NO /subsystem:console",
-				"role" : "flags"
-			},
-			{
-				"fragment" : "/INCREMENTAL:NO /LTCG",
+				"fragment" : "/NODEFAULTLIB:\"LIBCMT\" /debug /INCREMENTAL /subsystem:console",
 				"role" : "flags"
 			},
 			{
@@ -133,8 +129,7 @@
 				"role" : "libraries"
 			}
 		],
-		"language" : "CXX",
-		"lto" : true
+		"language" : "CXX"
 	},
 	"name" : "TestProject",
 	"nameOnDisk" : "TestProject.exe",

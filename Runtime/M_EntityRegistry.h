@@ -11,7 +11,7 @@
 namespace minty
 {
 	struct Component;
-	class Script;
+	class ScriptClass;
 
 	class EntityRegistry
 		: public SceneObject, public entt::registry

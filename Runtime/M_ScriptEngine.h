@@ -1,10 +1,10 @@
 #pragma once
 #include "M_Engine.h"
 
-#include "M_AssemblyType.h"
 #include "M_Accessibility.h"
-#include "M_Script.h"
+#include "M_ScriptAssembly.h"
 #include <unordered_map>
+#include <unordered_set>
 
 struct _MonoDomain;
 typedef struct _MonoDomain MonoDomain;
@@ -23,22 +23,19 @@ typedef struct _MonoProperty MonoProperty;
 
 namespace minty
 {
-	class Script;
+	class ScriptClass;
 
 	class ScriptEngine
 		: public Engine
 	{
-	private:
-		struct AssemblyInfo
-		{
-			MonoAssembly* assembly;
-			std::unordered_map<String, Script> scripts;
-		};
+		friend ScriptAssembly;
+		friend ScriptClass;
+		friend ScriptObject;
+
 	private:
 		MonoDomain* _rootDomain;
 		MonoDomain* _appDomain;
-		std::unordered_map<AssemblyType, AssemblyInfo> _assemblies;
-
+		std::unordered_map<String, ScriptAssembly*> _assemblies;
 	public:
 		ScriptEngine();
 
@@ -51,24 +48,45 @@ namespace minty
 #pragma region Assemblies
 
 	public:
-		bool load_assembly(AssemblyType const type, Path const& path);
+		/// <summary>
+		/// Loads the assembly from the given path. The name is automatically set to the stem of the given path.
+		/// </summary>
+		/// <param name="path">The path to the assembly.</param>
+		/// <returns>True if the assembly was successfully loaded.</returns>
+		bool load_assembly(Path const& path, bool const referenceOnly = false);
 
-		void unload_assembly(AssemblyType const type);
+		/// <summary>
+		/// Gets the assembly with the given name.
+		/// </summary>
+		/// <param name="name">The name of the assembly.</param>
+		/// <returns></returns>
+		ScriptAssembly const* get_assembly(String const& name) const;
 
-	private:
-		MonoAssembly* load_mono_assembly(Path const& path) const;
+		/// <summary>
+		/// Finds the first assembly that contains a class with the given namespace and class names.
+		/// </summary>
+		/// <param name="namespaceName"></param>
+		/// <param name="className"></param>
+		/// <returns></returns>
+		ScriptAssembly const* find_assembly(String const& namespaceName, String const& className) const;
+
+		/// <summary>
+		/// Reloads the assembly with the given name.
+		/// </summary>
+		/// <param name="name"></param>
+		void reload_assembly(String const& name);
+
+		/// <summary>
+		/// Unloads the assembly with the given name.
+		/// </summary>
+		/// <param name="name"></param>
+		void unload_assembly(String const& name);
 
 #pragma endregion
 
-#pragma region Scripting
+#pragma region Mono
 
-	public:
-		MonoAssembly* get_assembly(AssemblyType const assm) const;
-
-		MonoClass* get_class(AssemblyType const assm, String const& namespaceName, String const& className) const;
-
-		std::vector<MonoClass*> get_classes(AssemblyType const assm, MonoClass* const baseKlass = nullptr) const;
-
+	private:
 		String get_class_name(MonoClass* const klass) const;
 
 		String get_class_namespace(MonoClass* const klass) const;
@@ -107,16 +125,35 @@ namespace minty
 
 		void invoke_method(MonoObject* const object, MonoMethod* const method, std::vector<void*>& arguments) const;
 
+		String get_exception_message(MonoObject* const exception) const;
+
 		MonoObject* create_instance(MonoClass* const classType) const;
 
-		Script* get_script(AssemblyType const assm, String const& name);
-
-		Script const* get_script(AssemblyType const assm, String const& name) const;
-
-		Script* get_script(String const& name);
-
-		Script const* get_script(String const& name) const;
+	public:
+		static String get_full_name(String const& namespaceName, String const& className);
 
 #pragma endregion
+
+#pragma region Scripting
+
+	public:
+		ScriptClass const* find_class(String const& namespaceName, String const& className) const;
+
+		ScriptClass const* find_class(String const& fullName) const;
+
+		ScriptObject const& create_object(ScriptClass const& script, UUID id) const;
+
+		ScriptObject const* get_object(UUID id) const;
+
+		ScriptObject const& get_or_create_entity(UUID id);
+
+		ScriptObject const& create_object_entity(UUID id);
+
+		ScriptObject const& create_object_component(UUID id, UUID const entityId, ScriptClass const& script);
+
+		void destroy_object(UUID id);
+
+#pragma endregion
+
 	};
 }

@@ -22,7 +22,7 @@ minty::SceneObject::~SceneObject()
 
 Runtime& minty::SceneObject::get_runtime() const
 {
-	MINTY_ASSERT(_runtime != nullptr, "SceneObject::get_engine(): engine is null.");
+	MINTY_ASSERT(_runtime != nullptr);
 
 	return *_runtime;
 }

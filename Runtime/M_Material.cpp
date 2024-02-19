@@ -22,7 +22,7 @@ minty::Material::Material(MaterialBuilder const& builder, Runtime& engine, ID co
 {
 	RenderSystem* renderSystem = get_render_system();
 
-	MINTY_ASSERT(renderSystem != nullptr, "Material(): renderSystem cannot be null.");
+	MINTY_ASSERT(renderSystem != nullptr);
 
 	// use template to generate descriptor sets
 	auto const& materialTemplate = renderSystem->get_material_template(_templateId);

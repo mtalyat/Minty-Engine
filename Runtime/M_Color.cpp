@@ -162,7 +162,7 @@ std::ostream& minty::operator<<(std::ostream& stream, Color const& color)
 	return stream;
 }
 
-std::istream& minty::operator>>(std::istream& stream, Color const& color)
+std::istream& minty::operator>>(std::istream& stream, Color& color)
 {
 	// if first char is hex, discard it
 	if (stream.peek() == '#')
@@ -180,6 +180,10 @@ std::istream& minty::operator>>(std::istream& stream, Color const& color)
 	if (!std::isspace(stream.peek()))
 	{
 		stream >> std::setw(2) >> color.a;
+	}
+	else
+	{
+		color.a = Color::MAX_CHANNEL;
 	}
 	stream >> std::dec;
 	return stream;

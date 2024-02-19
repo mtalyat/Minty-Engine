@@ -8,28 +8,40 @@ typedef struct _MonoClassField MonoClassField;
 
 namespace minty
 {
-	class Script;
+	class ScriptClass;
 
 	class ScriptObject
 		: public Component
 	{
+		friend class ScriptEngine;
+
 	private:
-		Script const* _script;
+		ScriptClass const* _script;
 		MonoObject* _object;
+		uint32_t _handle; // GC handle
 
 	public:
-		ScriptObject(Script const& script);
+		ScriptObject(ScriptClass const& script);
 
 		~ScriptObject();
 
+		void destroy();
+
 		void invoke(String const& name) const;
 		
+		void set(String const& name, void* const value) const;
+
+		void get(String const& name, void* const value) const;
+
+	private:
+		MonoObject* get_object() const;
+
 	public:
 		void serialize(Writer& writer) const override;
 		void deserialize(Reader const& reader) override;
 
 	private:
-		void serialize_field(Writer& writer, String const& name, MonoClassField* const field) const;
-		void deserialize_field(Reader const& reader, String const& name, MonoClassField* const field);
+		void serialize_field(Writer& writer, String const& name, MonoClassField* const field, MonoObject* const object) const;
+		void deserialize_field(Reader const& reader, String const& name, MonoClassField* const field, MonoObject* const object);
 	};
 }

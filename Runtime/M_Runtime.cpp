@@ -80,7 +80,7 @@ InputMap& minty::Runtime::get_global_input_map() const
 
 Window& minty::Runtime::get_window() const
 {
-	MINTY_ASSERT(_state >= State::Initialized, "Runtime::get_window(): Runtime is not initialized.");
+	MINTY_ASSERT_MESSAGE(_state >= State::Initialized, "Runtime is not initialized.");
 
 	return *_window;
 }
@@ -110,7 +110,7 @@ void minty::Runtime::set_engine_scene(Scene* const scene)
 
 SceneManager& minty::Runtime::get_scene_manager() const
 {
-	MINTY_ASSERT(_state >= State::Initialized, "Runtime::get_scene_manager(): Runtime is not initialized.");
+	MINTY_ASSERT_MESSAGE(_state >= State::Initialized, "Runtime is not initialized.");
 
 	return *_sceneManager;
 }

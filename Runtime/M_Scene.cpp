@@ -74,7 +74,7 @@ Scene& minty::Scene::operator=(Scene&& other) noexcept
 //	return *this;
 //}
 
-Runtime& minty::Scene::get_engine() const
+Runtime& minty::Scene::get_runtime() const
 {
 	return *_engine;
 }

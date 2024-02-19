@@ -77,4 +77,5 @@
     "liveServer.settings.port": 5501,
     "cmake.sourceDirectory": "C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build",
     "cmake.loggingLevel": "debug",
+    "dotnet.defaultSolution": "disable",
 }

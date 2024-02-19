@@ -195,9 +195,6 @@
     <ClInclude Include="M_InputMap.h">
       <Filter>Header Files\Input</Filter>
     </ClInclude>
-    <ClInclude Include="M_Error.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="M_Matrix.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -549,16 +546,13 @@
     <ClInclude Include="M_ScriptComponent.h">
       <Filter>Header Files\Scripting</Filter>
     </ClInclude>
-    <ClInclude Include="M_Script.h">
+    <ClInclude Include="M_ScriptClass.h">
       <Filter>Header Files\Scripting</Filter>
     </ClInclude>
     <ClInclude Include="M_ScriptObject.h">
       <Filter>Header Files\Scripting</Filter>
     </ClInclude>
     <ClInclude Include="M_Accessibility.h">
-      <Filter>Header Files\Scripting</Filter>
-    </ClInclude>
-    <ClInclude Include="M_AssemblyType.h">
       <Filter>Header Files\Scripting</Filter>
     </ClInclude>
     <ClInclude Include="M_ScriptEngine.h">
@@ -574,6 +568,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="M_ScriptLinkage.h">
+      <Filter>Header Files\Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="M_ScriptAssembly.h">
       <Filter>Header Files\Scripting</Filter>
     </ClInclude>
   </ItemGroup>
@@ -672,9 +669,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_Info.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="M_Error.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_Quaternion.cpp">
@@ -938,16 +932,13 @@
     <ClCompile Include="M_ScriptComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="M_Script.cpp">
+    <ClCompile Include="M_ScriptClass.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_ScriptObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_Accessibility.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="M_AssemblyType.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_ScriptEngine.cpp">
@@ -963,6 +954,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_ScriptLinkage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_ScriptAssembly.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

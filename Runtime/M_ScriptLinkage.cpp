@@ -26,7 +26,7 @@ static void console_log(MonoString* string)
 
 static void console_log_color(MonoString* string, int color)
 {
-	Console::log(mono_string_to_string(string), static_cast<Console::Color>(color));
+	Console::log_color(mono_string_to_string(string), static_cast<Console::Color>(color));
 }
 
 static void console_warn(MonoString* string)
@@ -44,7 +44,7 @@ static void console_ass(bool condition, MonoString* string)
 	Console::ass(condition, mono_string_to_string(string));
 }
 
-void minty::ScriptLinkage::Link()
+void minty::ScriptLinkage::link()
 {
 	ADD_INTERNAL_CALL("Console_Log", console_log);
 	ADD_INTERNAL_CALL("Console_LogColor", console_log_color);

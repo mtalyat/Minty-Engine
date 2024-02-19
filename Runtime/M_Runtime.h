@@ -8,7 +8,6 @@
 #include "M_Engine.h"
 #include "M_Types.h"
 #include "M_TypeRegister.h"
-#include "M_AssemblyType.h"
 #include <unordered_map>
 
 namespace minty
@@ -218,14 +217,6 @@ namespace minty
 
 #pragma endregion
 
-#pragma region Assemblies
-
-		public:
-
-
-#pragma endregion
-
-
 	private:
 		/// <summary>
 		/// Updates the _time object.
@@ -239,7 +230,7 @@ namespace minty
 	template<typename T>
 	T* Runtime::get_engine() const
 	{
-		MINTY_ASSERT(_state >= State::Initialized, "Runtime::get_engine(): Runtime is not initialized.");
+		MINTY_ASSERT_MESSAGE(_state >= State::Initialized, "Runtime is not initialized.");
 
 		return _engines.get<T>();
 	}
@@ -247,7 +238,7 @@ namespace minty
 	template<typename T>
 	void Runtime::set_engine(T* const engine)
 	{
-		MINTY_ASSERT(_state >= State::Initialized, "Runtime::set_engine(): Runtime is not initialized.");
+		MINTY_ASSERT_MESSAGE(_state >= State::Initialized, "Runtime is not initialized.");
 
 		// set reference to self
 		Engine* e = static_cast<Engine*>(engine);

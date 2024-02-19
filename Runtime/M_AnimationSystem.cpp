@@ -25,7 +25,7 @@ minty::AnimationSystem::AnimationSystem(Runtime& engine, ID const sceneId)
 
 void minty::AnimationSystem::update()
 {
-	float deltaTime = get_scene().get_engine().get_time().elapsed;
+	float deltaTime = get_scene().get_runtime().get_time().elapsed;
 
 	EntityRegistry& registry = get_entity_registry();
 
@@ -108,28 +108,28 @@ ID minty::AnimationSystem::find_animator(String const& name) const
 
 Animation& minty::AnimationSystem::get_animation(ID const id)
 {
-	MINTY_ASSERT(_animations.contains(id), std::format("AnimationSystem::get_animation(): does not contain the ID {}.", id));
+	MINTY_ASSERT(_animations.contains(id));
 
 	return _animations.at(id);
 }
 
 Animation const& minty::AnimationSystem::get_animation(ID const id) const
 {
-	MINTY_ASSERT(_animations.contains(id), std::format("AnimationSystem::get_animation(): does not contain the ID {}.", id));
+	MINTY_ASSERT(_animations.contains(id));
 
 	return _animations.at(id);
 }
 
 Animator& minty::AnimationSystem::get_animator(ID const id)
 {
-	MINTY_ASSERT(_animators.contains(id), std::format("AnimationSystem::get_animator(): does not contain the ID {}.", id));
+	MINTY_ASSERT(_animators.contains(id));
 
 	return _animators.at(id);
 }
 
 Animator const& minty::AnimationSystem::get_animator(ID const id) const
 {
-	MINTY_ASSERT(_animators.contains(id), std::format("AnimationSystem::get_animator(): does not contain the ID {}.", id));
+	MINTY_ASSERT(_animators.contains(id));
 
 	return _animators.at(id);
 }

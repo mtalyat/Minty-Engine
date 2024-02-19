@@ -4,6 +4,7 @@
 #include "M_SerializationData.h"
 #include "M_Console.h"
 #include "M_Runtime.h"
+#include "M_Scene.h"
 
 #include "M_NameComponent.h"
 #include "M_RelationshipComponent.h"
@@ -11,7 +12,7 @@
 #include "M_DirtyComponent.h"
 #include "M_DestroyComponent.h"
 
-#include "M_Script.h"
+#include "M_ScriptClass.h"
 #include "M_ScriptObject.h"
 #include "M_ScriptEngine.h"
 #include "M_ScriptComponent.h"
@@ -65,7 +66,7 @@ Entity minty::EntityRegistry::create()
 Entity minty::EntityRegistry::create(UUID const uuid)
 {
 	Entity entity = entt::registry::create();
-	MINTY_ASSERT(!_idToEntity.contains(uuid), std::format("EntityRegistry::create(): There was a UUID collision with id: {}.", static_cast<uint64_t>(uuid)));
+	MINTY_ASSERT_FORMAT(!_idToEntity.contains(uuid), "There was a UUID collision with id: {}.", static_cast<uint64_t>(uuid));
 	add_to_lookup(entity, uuid);
 	return entity;
 }
@@ -163,7 +164,7 @@ Entity minty::EntityRegistry::find(String const& string) const
 
 Entity minty::EntityRegistry::find(UUID const uuid) const
 {
-	MINTY_ASSERT(_idToEntity.contains(uuid), std::format("EntityRegistry::find(): UUID {} is missing an Entity.", static_cast<uint64_t>(uuid)));
+	MINTY_ASSERT_FORMAT(_idToEntity.contains(uuid), "UUID {} is missing an Entity.", static_cast<uint64_t>(uuid));
 
 	return _idToEntity.at(uuid);
 }
@@ -192,7 +193,7 @@ String minty::EntityRegistry::get_name(Entity const entity) const
 
 UUID minty::EntityRegistry::get_id(Entity const entity) const
 {
-	MINTY_ASSERT(_entityToId.contains(entity), std::format("EntityRegistry::get_id(): Entity {} is missing a UUID.", static_cast<uint32_t>(entity)));
+	MINTY_ASSERT_FORMAT(_entityToId.contains(entity), "Entity {} is missing a UUID.", static_cast<uint32_t>(entity));
 
 	return _entityToId.at(entity);
 }
@@ -369,14 +370,16 @@ void minty::EntityRegistry::register_script(String const& name)
 			ScriptEngine& engine = registry.get_runtime().get_script_engine();
 
 			// get the script based on the name
-			Script const* script = engine.get_script(name);
+			ScriptClass const* script = engine.find_class(name);
 
-			// no script found
-			if (!script) return nullptr;
+			MINTY_ASSERT_FORMAT(script != nullptr, "No script with name {} found.", name);
 
 			// add a script object to it
-			ID id = component->scripts.emplace(name, ScriptObject(*script));
-			component->scripts.at(id).invoke(SCRIPT_METHOD_NAME_ONCREATE);
+			ID id = component->scripts.emplace(name, engine.create_object_component(UUID(), registry.get_id(entity), *script));
+			ScriptObject& scriptObject = component->scripts.at(id);
+
+			// call OnCreate
+			scriptObject.invoke(SCRIPT_METHOD_NAME_ONCREATE);
 
 			// now add the helper components, if they are needed
 			if (script->has_method(SCRIPT_METHOD_NAME_ONLOAD))
@@ -506,6 +509,10 @@ void minty::EntityRegistry::deserialize(Reader const& reader)
 	Node const& node = reader.get_node();
 	SerializationData data = *static_cast<SerializationData const*>(reader.get_data());
 
+	ScriptEngine* scriptEngine = data.scene->get_runtime().get_engine<ScriptEngine>();
+
+	MINTY_ASSERT(scriptEngine != nullptr);
+
 	String name;
 	String value;
 	UUID id;
@@ -539,7 +546,13 @@ void minty::EntityRegistry::deserialize(Reader const& reader)
 			id = UUID();
 		}
 
+		// create entity in registry
 		entity = create(name, id);
+		
+		// create it again for scripting
+		scriptEngine->create_object_entity(id);
+
+		// set entity in data for deserialization
 		data.entity = entity;
 
 		// cycle through each component on entity

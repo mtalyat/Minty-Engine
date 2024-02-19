@@ -8,6 +8,7 @@
 
 #include "M_File.h"
 #include "M_Console.h"
+#include "M_ScriptObject.h"
 
 using namespace minty;
 using namespace minty::Scripting;
@@ -15,7 +16,21 @@ using namespace minty::Scripting;
 struct ScriptEngineData
 {
 	Runtime* runtime;
+	ScriptEngine* engine;
 	Scene* scene;
+
+	// uuid, script object
+	std::unordered_map<UUID, ScriptObject> objects;
+
+	void reset()
+	{
+		// destroy all objects
+		for (auto& pair : objects)
+		{
+			pair.second.destroy();
+		}
+		objects.clear();
+	}
 };
 
 static ScriptEngineData _data;
@@ -34,6 +49,7 @@ static ScriptEngineData _data;
 */
 
 // SCRIPT FUNCTIONS C# -> C++
+// a lot, check ScriptLinkage.cpp
 
 minty::ScriptEngine::ScriptEngine()
 	: _rootDomain()
@@ -52,192 +68,119 @@ minty::ScriptEngine::ScriptEngine()
 	String appDomainName = "MintyDomain";
 	_appDomain = mono_domain_create_appdomain(appDomainName.data(), nullptr);
 	mono_domain_set(_appDomain, true);
+
+	_data.engine = this;
+	_data.runtime = nullptr;
+	_data.scene = nullptr;
+	_data.reset();
 }
 
 minty::ScriptEngine::~ScriptEngine()
 {
-	for (auto const& pair : _assemblies)
+	_data.reset();
+
+	for (auto& pair : _assemblies)
 	{
-		mono_assembly_close(pair.second.assembly);
+		pair.second->destroy();
+		delete pair.second;
 	}
 	_assemblies.clear();
 }
 
 void minty::ScriptEngine::set_runtime(Runtime& runtime)
 {
-	Engine::set_runtime(runtime);
+	if (&get_runtime() != &runtime)
+	{
+		Engine::set_runtime(runtime);
 
-	_data.runtime = &runtime;
+		_data.runtime = &runtime;
+		_data.scene = nullptr;
+
+		_data.reset();
+	}
 }
 
 void minty::ScriptEngine::set_scene(Scene* scene)
 {
-	Engine::set_scene(scene);
+	if (get_scene() != scene)
+	{
+		Engine::set_scene(scene);
 
-	_data.scene = scene;
+		_data.scene = scene;
+
+		_data.reset();
+	}
 }
 
-bool minty::ScriptEngine::load_assembly(AssemblyType const type, Path const& path)
+bool minty::ScriptEngine::load_assembly(Path const& path, bool const referenceOnly)
 {
-	MonoAssembly* assembly = load_mono_assembly(path);
-
-	if (!assembly)
-	{
-		// did not load successfully
-		Console::error(std::format("Could not load assembly of type {} at path \"{}\".", static_cast<int>(type), path.string()));
-
-		return false;
-	}
-
-	// loaded successfully
+	String name = path.stem().string();
 
 	// delete old assembly if there is one
-	auto found = _assemblies.find(type);
-	if (found != _assemblies.end())
+	unload_assembly(name);
+
+	// load the new assembly
+	ScriptAssembly* scriptAssembly = _assemblies.emplace(name, new ScriptAssembly(path, *this)).first->second;
+	scriptAssembly->init(referenceOnly);
+
+	// if the Script script has been loaded, then load all scripts derive from it
+	ScriptClass const* scriptScriptClass = find_class(ASSEMBLY_ENGINE_NAME, "Script");
+
+	if (scriptScriptClass)
 	{
-		mono_assembly_close(found->second.assembly);
-	}
-
-	// assign it for reference
-	_assemblies[type] = AssemblyInfo
-	{
-		.assembly = assembly,
-		.scripts = std::unordered_map<String, Script>()
-	};
-	AssemblyInfo& info = _assemblies[type];
-
-	// load all of the scripts
-	MonoClass* scriptBaseClass = get_class(AssemblyType::Engine, "MintyEngine", "Script");
-	std::vector<MonoClass*> scriptClasses = get_classes(type, scriptBaseClass);
-	for (MonoClass* const klass : scriptClasses)
-	{
-		String name = get_class_name(klass);
-
-		// add script by name to the assembly
-		info.scripts.emplace(name, Script(*this, type, *klass));
-
-		// also register with the entity registry so it can be added/removed as a "component"
-		EntityRegistry::register_script(name);
-	}
-
-	Console::log(std::format("Assembly at \"{}\" loaded {} scripts.", path.string(), scriptClasses.size()));
-
-	// if engine, link
-	if (type == AssemblyType::Engine)
-	{
-		ScriptLinkage::Link();
+		// register all Scripts with the EntityRegistry
+		for (auto const& script : scriptAssembly->get_classes(scriptScriptClass))
+		{
+			if (script->is_derived_from(*scriptScriptClass))
+			{
+				EntityRegistry::register_script(script->get_full_name());
+			}
+		}
 	}
 
 	return true;
 }
 
-void minty::ScriptEngine::unload_assembly(AssemblyType const type)
+ScriptAssembly const* minty::ScriptEngine::find_assembly(String const& namespaceName, String const& className) const
+{
+	for (auto const& pair : _assemblies)
+	{
+		if (pair.second->get_class(namespaceName, className))
+		{
+			return pair.second;
+		}
+	}
+
+	return nullptr;
+}
+
+void minty::ScriptEngine::reload_assembly(String const& name)
+{
+	Console::todo("reload assembly");
+}
+
+void minty::ScriptEngine::unload_assembly(String const& name)
 {
 	// delete assembly if there is one
-	auto found = _assemblies.find(type);
+	auto found = _assemblies.find(name);
 	if (found != _assemblies.end())
 	{
-		mono_assembly_close(found->second.assembly);
-		_assemblies.erase(type);
+		found->second->destroy();
+		delete found->second;
+		_assemblies.erase(name);
 	}
 }
 
-void print_assembly(MonoAssembly* const assembly)
+ScriptAssembly const* minty::ScriptEngine::get_assembly(String const& assemblyName) const
 {
-	MonoImage* assemblyImage = mono_assembly_get_image(assembly);
-	MonoTableInfo const* typeDefinitionsTable = mono_image_get_table_info(assemblyImage, MONO_TABLE_TYPEDEF);
-	int32_t numTypes = mono_table_info_get_rows(typeDefinitionsTable);
+	auto found = _assemblies.find(assemblyName);
 
-	for (int32_t i = 0; i < numTypes; i++)
+	if (found != _assemblies.end())
 	{
-		uint32_t cols[MONO_TYPEDEF_SIZE];
-		mono_metadata_decode_row(typeDefinitionsTable, i, cols, MONO_TYPEDEF_SIZE);
-
-		char const* nameSpace = mono_metadata_string_heap(assemblyImage, cols[MONO_TYPEDEF_NAMESPACE]);
-		char const* name = mono_metadata_string_heap(assemblyImage, cols[MONO_TYPEDEF_NAME]);
-
-		Console::log(std::format("{}.{}", nameSpace, name));
-	}
-}
-
-MonoAssembly* minty::ScriptEngine::load_mono_assembly(Path const& path) const
-{
-	if (!std::filesystem::exists(path))
-	{
-		return nullptr;
+		return found->second;
 	}
 
-	Console::log(std::format("Loading Assembly at path: \"{}\"", path.string()));
-	std::vector<char> fileData = File::read_all_chars(path);
-
-	bool const refOnly = false; // set refonly to true to do reflection stuffs
-
-	// load the assembly image
-	MonoImageOpenStatus status;
-	MonoImage* image = mono_image_open_from_data_full(fileData.data(), static_cast<uint32_t>(fileData.size()), 1, &status, refOnly);
-
-	// check for error
-	if (status != MONO_IMAGE_OK)
-	{
-		// get the error message
-		char const* errorMessage = mono_image_strerror(status);
-
-		Console::error(std::format("ScriptEngine::load_mono_assembly(): Mono error: \"{}\"", errorMessage));
-
-		return nullptr;
-	}
-
-	// load the assembly itself
-	MonoAssembly* assembly = mono_assembly_load_from_full(image, path.string().c_str(), &status, refOnly);
-	mono_image_close(image);
-
-	print_assembly(assembly);
-
-	return assembly;
-}
-
-
-MonoAssembly* minty::ScriptEngine::get_assembly(AssemblyType const assm) const
-{
-	return _assemblies.at(assm).assembly;
-}
-
-MonoClass* minty::ScriptEngine::get_class(AssemblyType const assm, String const& namespaceName, String const& className) const
-{
-	MonoImage* image = mono_assembly_get_image(get_assembly(assm));
-	MonoClass* klass = mono_class_from_name(image, namespaceName.c_str(), className.c_str());
-
-	return klass;
-}
-
-std::vector<MonoClass*> minty::ScriptEngine::get_classes(AssemblyType const assm, MonoClass* const baseKlass) const
-{
-	std::vector<MonoClass*> classes;
-
-	MonoAssembly* assembly = get_assembly(assm);
-	MonoImage* image = mono_assembly_get_image(assembly);
-	const MonoTableInfo* tableInfo = mono_image_get_table_info(image, MONO_TABLE_TYPEDEF);
-	int rows = mono_table_info_get_rows(tableInfo);
-
-	for (int i = 1; i < rows; i++)
-	{
-		uint32_t cols[MONO_TYPEDEF_SIZE];
-		mono_metadata_decode_row(tableInfo, i, cols, MONO_TYPEDEF_SIZE);
-		char const* name = mono_metadata_string_heap(image, cols[MONO_TYPEDEF_NAME]);
-		char const* nameSpace = mono_metadata_string_heap(image, cols[MONO_TYPEDEF_NAMESPACE]);
-		MonoClass* klass = mono_class_from_name(image, nameSpace, name);
-
-		if (baseKlass && (klass == baseKlass || !check_class_inheritance(klass, baseKlass)))
-		{
-			// if there is a base class, and it does not inherit from it, ignore
-			continue;
-		}
-
-		// no base class or it does inherit from the base class, so add
-		classes.push_back(klass);
-	}
-
-	return classes;
+	return nullptr;
 }
 
 String minty::ScriptEngine::get_class_name(MonoClass* const klass) const
@@ -445,8 +388,14 @@ MonoProperty* minty::ScriptEngine::get_property(MonoClass* const klass, String c
 
 void minty::ScriptEngine::invoke_method(MonoObject* const object, MonoMethod* const method) const
 {
-	std::vector<void*> empty;
-	invoke_method(object, method, empty);
+	MonoObject* exception = nullptr;
+	mono_runtime_invoke(method, object, nullptr, &exception);
+
+	if (exception)
+	{
+		//MINTY_ABORT(get_exception_message(exception));
+		MINTY_ERROR(get_exception_message(exception));
+	}
 }
 
 void minty::ScriptEngine::invoke_method(MonoObject* const object, MonoMethod* const method, std::vector<void*>& arguments) const
@@ -456,9 +405,43 @@ void minty::ScriptEngine::invoke_method(MonoObject* const object, MonoMethod* co
 
 	if (exception)
 	{
-		Console::error("Assembly::invoke_method(): An exception was thrown.");
-		return;
+		MINTY_ABORT(get_exception_message(exception));
 	}
+}
+
+String minty::ScriptEngine::get_exception_message(MonoObject* const exception) const
+{
+	if (!exception) {
+		return "";
+	}
+
+	MonoMethod* get_message_method = mono_class_get_method_from_name(mono_get_exception_class(), "get_Message", 0);
+	if (!get_message_method) {
+		//std::cerr << "Could not find the get_Message method." << std::endl;
+		return "";
+	}
+
+	MonoObject* exc = nullptr;
+	MonoObject* result = mono_runtime_invoke(get_message_method, exception, nullptr, &exc);
+	if (exc) {
+		// Handle any exception that might occur during the get_Message invocation
+		//std::cerr << "Exception occurred while getting message." << std::endl;
+		return "";
+	}
+
+	String out = Text::EMPTY;
+
+	if (result) {
+		char* str = mono_string_to_utf8((MonoString*)result);
+		//std::cout << "Exception message: " << str << std::endl;
+		out = str;
+		mono_free(str);
+	}
+	else {
+		//std::cout << "No exception message." << std::endl;
+	}
+
+	return out;
 }
 
 MonoObject* minty::ScriptEngine::create_instance(MonoClass* const klass) const
@@ -478,58 +461,115 @@ MonoObject* minty::ScriptEngine::create_instance(MonoClass* const klass) const
 	return instance;
 }
 
-Script* minty::ScriptEngine::get_script(AssemblyType const assm, String const& name)
+String minty::ScriptEngine::get_full_name(String const& namespaceName, String const& className)
 {
-	AssemblyInfo& info = _assemblies.at(assm);
-
-	// if name found, return that script
-	auto found = info.scripts.find(name);
-
-	if (found != info.scripts.end())
+	if (namespaceName.empty())
 	{
-		return &found->second;
+		return className;
 	}
-
-	return nullptr;
+	else
+	{
+		return std::format("{}.{}", namespaceName, className);
+	}
 }
 
-Script const* minty::ScriptEngine::get_script(AssemblyType const assm, String const& name) const
+ScriptClass const* minty::ScriptEngine::find_class(String const& namespaceName, String const& className) const
 {
-	AssemblyInfo const& info = _assemblies.at(assm);
-
-	// if name found, return that script
-	auto const found = info.scripts.find(name);
-
-	if (found != info.scripts.end())
-	{
-		return &found->second;
-	}
-
-	return nullptr;
+	return find_class(get_full_name(namespaceName, className));
 }
 
-Script* minty::ScriptEngine::get_script(String const& name)
+ScriptClass const* minty::ScriptEngine::find_class(String const& fullName) const
 {
-	// go through each assembly type
-	for (auto& pair : _assemblies)
-	{
-		Script* script = get_script(pair.first, name);
-
-		if (script) return script;
-	}
-
-	return nullptr;
-}
-
-Script const* minty::ScriptEngine::get_script(String const& name) const
-{
-	// go through each assembly type
 	for (auto const& pair : _assemblies)
 	{
-		Script const* script = get_script(pair.first, name);
-
-		if (script) return script;
+		if (ScriptClass const* scriptClass = pair.second->get_class(fullName))
+		{
+			return scriptClass;
+		}
 	}
 
 	return nullptr;
+}
+
+ScriptObject const& minty::ScriptEngine::create_object(ScriptClass const& script, UUID id) const
+{
+	return _data.objects.emplace(id, ScriptObject(script)).first->second;
+}
+
+ScriptObject const* minty::ScriptEngine::get_object(UUID id) const
+{
+	auto found = _data.objects.find(id);
+
+	if (found != _data.objects.end())
+	{
+		return &found->second;
+	}
+
+	return nullptr;
+}
+
+ScriptObject const& minty::ScriptEngine::get_or_create_entity(UUID id)
+{
+	// try get
+	ScriptObject const* entityObject = get_object(id);
+
+	// if found, return this
+	if (entityObject) return *entityObject;
+
+	// create new
+	return create_object_entity(id);
+}
+
+ScriptObject const& minty::ScriptEngine::create_object_entity(UUID id)
+{
+	// get the entity class
+	ScriptAssembly const* engineAssembly = get_assembly(ASSEMBLY_ENGINE_NAME);
+	MINTY_ASSERT(engineAssembly != nullptr);
+
+	ScriptClass const* entityClass = engineAssembly->get_class(ASSEMBLY_ENGINE_NAME, "Entity");
+	MINTY_ASSERT(entityClass != nullptr);
+
+	// create an instance of it
+	ScriptObject const& object = create_object(*entityClass, id);
+
+	// init
+	object.set("ID", &id);
+
+	return object;
+}
+
+ScriptObject const& minty::ScriptEngine::create_object_component(UUID id, UUID const entityId, ScriptClass const& script)
+{
+	// get the component class
+	ScriptAssembly const* engineAssembly = get_assembly(ASSEMBLY_ENGINE_NAME);
+	MINTY_ASSERT(engineAssembly != nullptr);
+
+	ScriptClass const* componentClass = engineAssembly->get_class("MintyEngine", "Component");
+	MINTY_ASSERT(componentClass != nullptr);
+
+	// check the new instance class
+	MINTY_ASSERT(script.is_derived_from(*componentClass));
+
+	// spawn the object and save it
+	ScriptObject const& object = create_object(script, id);
+
+	// init
+	ScriptObject const* entity = get_object(entityId);
+	MINTY_ASSERT(entity != nullptr);
+
+	object.set("Entity", entity->get_object());
+
+	return object;
+}
+
+void minty::ScriptEngine::destroy_object(UUID id)
+{
+	// find the object and destroy if found
+	auto found = _data.objects.find(id);
+
+	if (found != _data.objects.end())
+	{
+		found->second.destroy();
+		_data.objects.erase(id);
+	}
 }

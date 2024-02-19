@@ -20,9 +20,9 @@ int minty::Asset::check(Path const& path, char const* const extension, bool cons
 	{
 		//Console::error(std::format("Cannot find_animation asset at path \"{}\".", path.string()));
 		// cannot find asset itself
-		MINTY_ASSERT(!path.empty(), "Asset::check(): Path is empty.");
-		MINTY_ASSERT(Asset::exists(path), std::format("Asset::check(): Path does not exist: {}", std::filesystem::absolute(path).string()));
-		MINTY_ASSERT(!extension || path.extension() == extension, std::format("Asset::check(): Path does not have the correct extension. Path: {}, extension: {}", path.string(), extension));
+		MINTY_ASSERT(!path.empty());
+		MINTY_ASSERT_FORMAT(Asset::exists(path), "Path does not exist: {}", std::filesystem::absolute(path).string());
+		MINTY_ASSERT_FORMAT(!extension || path.extension() == extension, "Path does not have the correct extension. Path: {}, extension: {}", path.string(), extension);
 		return 1;
 	}
 
@@ -30,7 +30,7 @@ int minty::Asset::check(Path const& path, char const* const extension, bool cons
 	{
 		//Console::error(std::format("Cannot find_animation meta file for asset at path \"{}\".", path.string()));
 		// cannot find asset meta file
-		MINTY_ASSERT(!requiresMeta || Asset::exists_meta(path), std::format("Asset::check(): Missing appropriate meta path for path: {}, missing meta path: {}", std::filesystem::absolute(path).string(), std::filesystem::absolute(path).string() + META_EXTENSION));
+		MINTY_ASSERT_FORMAT(!requiresMeta || Asset::exists_meta(path), "Missing appropriate meta path for path: {}, missing meta path: {}", std::filesystem::absolute(path).string(), std::filesystem::absolute(path).string() + META_EXTENSION);
 		return 2;
 	}
 
@@ -55,7 +55,7 @@ Path minty::Asset::absolute(Path const& path)
 
 Node minty::Asset::load_node(Path const& path)
 {
-#if N_DEBUG
+#if MINTY_RELEASE
 	Console::error("Asset loading not implemented for release builds.");
 	return String();
 #else
@@ -80,7 +80,7 @@ Node minty::Asset::load_meta(Path const& path)
 
 std::vector<char> minty::Asset::load_chars(Path const& path)
 {
-#if N_DEBUG
+#if MINTY_RELEASE
 	Console::error("Asset loading not implemented for release builds.");
 	return String();
 #else
@@ -90,7 +90,7 @@ std::vector<char> minty::Asset::load_chars(Path const& path)
 
 String minty::Asset::load_text(Path const& path)
 {
-#if N_DEBUG
+#if MINTY_RELEASE
 	Console::error("Asset loading not implemented for release builds.");
 	return String();
 #else
@@ -100,7 +100,7 @@ String minty::Asset::load_text(Path const& path)
 
 std::vector<String> minty::Asset::load_lines(Path const& path)
 {
-#if N_DEBUG
+#if MINTY_RELEASE
 	Console::error("Asset loading not implemented for release builds.");
 	return std::vector<String>();
 #else

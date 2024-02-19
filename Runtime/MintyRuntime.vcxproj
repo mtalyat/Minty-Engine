@@ -227,7 +227,6 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="M_Accessibility.h" />
-    <ClInclude Include="M_AssemblyType.h" />
     <ClInclude Include="M_DestroyComponent.h" />
     <ClInclude Include="M_Engine.h" />
     <ClInclude Include="M_ImGui.h" />
@@ -260,7 +259,8 @@
     <ClInclude Include="M_CoordinateMode.h" />
     <ClInclude Include="M_PixelFormat.h" />
     <ClInclude Include="M_RuntimeBuilder.h" />
-    <ClInclude Include="M_Script.h" />
+    <ClInclude Include="M_ScriptClass.h" />
+    <ClInclude Include="M_ScriptAssembly.h" />
     <ClInclude Include="M_ScriptComponent.h" />
     <ClInclude Include="M_ScriptEngine.h" />
     <ClInclude Include="M_ScriptLinkage.h" />
@@ -291,7 +291,6 @@
     <ClInclude Include="M_Buffer.h" />
     <ClInclude Include="M_DescriptorSet.h" />
     <ClInclude Include="M_DrawCallObjectInfo.h" />
-    <ClInclude Include="M_Error.h" />
     <ClInclude Include="M_Info.h" />
     <ClInclude Include="M_MeshComponent.h" />
     <ClInclude Include="M_CameraComponent.h" />
@@ -411,7 +410,6 @@
     <ClCompile Include="M_AnimationSystem.cpp" />
     <ClCompile Include="M_Animator.cpp" />
     <ClCompile Include="M_AnimatorComponent.cpp" />
-    <ClCompile Include="M_AssemblyType.cpp" />
     <ClCompile Include="M_Asset.cpp" />
     <ClCompile Include="M_AudioClip.cpp" />
     <ClCompile Include="M_AudioEngine.cpp" />
@@ -431,7 +429,6 @@
     <ClCompile Include="M_Encoding.cpp" />
     <ClCompile Include="M_Engine.cpp" />
     <ClCompile Include="M_EntityRegistry.cpp" />
-    <ClCompile Include="M_Error.cpp" />
     <ClCompile Include="M_File.cpp" />
     <ClCompile Include="M_Runtime.cpp" />
     <ClCompile Include="M_FiniteStateMachine.cpp" />
@@ -462,7 +459,8 @@
     <ClCompile Include="M_DescriptorSet.cpp" />
     <ClCompile Include="M_RenderObject.cpp" />
     <ClCompile Include="M_PushConstantInfo.cpp" />
-    <ClCompile Include="M_Script.cpp" />
+    <ClCompile Include="M_ScriptAssembly.cpp" />
+    <ClCompile Include="M_ScriptClass.cpp" />
     <ClCompile Include="M_ScriptComponent.cpp" />
     <ClCompile Include="M_ScriptEngine.cpp" />
     <ClCompile Include="M_ScriptLinkage.cpp" />

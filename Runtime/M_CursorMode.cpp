@@ -14,6 +14,6 @@ String minty::to_string(CursorMode const mode)
     case CursorMode::Disabled:
         return "Disabled";
     default:
-        return minty::Error::ERROR_TEXT;
+        return Text::EMPTY;
     }
 }

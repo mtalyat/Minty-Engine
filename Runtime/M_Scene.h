@@ -39,7 +39,7 @@ namespace minty
 		//// copy
 		//Scene& operator=(Scene const& other);
 
-		Runtime& get_engine() const;
+		Runtime& get_runtime() const;
 
 		/// <summary>
 		/// Gets the EntityRegistry used in the Scene.

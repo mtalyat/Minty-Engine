@@ -84,7 +84,7 @@ bool minty::PhysicalFile::end_of_file()
 
 File::Position minty::PhysicalFile::tell()
 {
-    Error::abort("PhysicalFile::tell() not supported. Use tell_read() or tell_write().");
+    MINTY_ABORT("PhysicalFile::tell() not supported. Use tell_read() or tell_write().");
     return Position();
 }
 

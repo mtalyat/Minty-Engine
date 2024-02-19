@@ -35,7 +35,7 @@ ID minty::SceneManager::create_scene(String const& name, Path const& path)
 	Scene* scene = new Scene(*_runtime, id); // deleted in a destroy function
 	ID actualId = _scenes.emplace(name, scene);
 
-	MINTY_ASSERT(id == actualId, "SceneManager::create_scene(): next ID does not match actual ID.");
+	MINTY_ASSERT(id == actualId);
 
 	// load the data from the disk into the scene
 	Node node = Asset::load_node(path);

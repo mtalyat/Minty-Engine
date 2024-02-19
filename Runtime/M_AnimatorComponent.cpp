@@ -21,8 +21,7 @@ void minty::AnimatorComponent::serialize(Writer& writer) const
 	SerializationData const* data = static_cast<SerializationData const*>(writer.get_data());
 	AnimationSystem const* animationSystem = data->scene->get_system_registry().find<AnimationSystem>();
 
-	MINTY_ASSERT(animationSystem != nullptr, "AnimatorComponent::serialize(): animationSystem cannot be null.");
-	if (!animationSystem) return;
+	MINTY_ASSERT(animationSystem != nullptr);
 
 	writer.write("animator", animator);
 	writer.write("animation", animationSystem->get_animation_name(animationId));
@@ -35,8 +34,7 @@ void minty::AnimatorComponent::deserialize(Reader const& reader)
 	SerializationData const* data = static_cast<SerializationData const*>(reader.get_data());
 	AnimationSystem const* animationSystem = data->scene->get_system_registry().find<AnimationSystem>();
 
-	MINTY_ASSERT(animationSystem != nullptr, "AnimatorComponent::serialize(): animationSystem cannot be null.");
-	if (!animationSystem) return;
+	MINTY_ASSERT(animationSystem != nullptr);
 
 	// make copy of animator for this animatorComponent, since we want our own values and stuff
 	String animatorName;

@@ -77,7 +77,7 @@ namespace minty
 		Color& operator=(Color const& color);
 
 		friend std::ostream& operator<<(std::ostream& stream, Color const& color);
-		friend std::istream& operator>>(std::istream& stream, Color const& color);
+		friend std::istream& operator>>(std::istream& stream, Color& color);
 
 		/// <summary>
 		/// Gets the red value as a scale from 0.0f to 1.0f.

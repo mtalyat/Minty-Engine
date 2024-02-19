@@ -264,9 +264,9 @@ void minty::Animation::serialize(Writer& writer) const
 	SerializationData const* data = static_cast<SerializationData const*>(writer.get_data());
 	RenderSystem const* renderer = data->scene->get_system_registry().find<RenderSystem>();
 
-	MINTY_ASSERT(renderer != nullptr, "Animation::serialize(): RenderSystem cannot be null.");
+	MINTY_ASSERT(data != nullptr);
+	MINTY_ASSERT(renderer != nullptr);
 
-	//writer.write("name", )
 	writer.write("length", _length);
 	writer.write("loops", static_cast<bool>(_flags & ANIMATION_FLAGS_LOOPS));
 	
@@ -278,7 +278,8 @@ void minty::Animation::deserialize(Reader const& reader)
 	SerializationData const* data = static_cast<SerializationData const*>(reader.get_data());
 	RenderSystem const* renderer = data->scene->get_system_registry().find<RenderSystem>();
 
-	MINTY_ASSERT(renderer != nullptr, "Animation::deserialize(): RenderSystem cannot be null.");
+	MINTY_ASSERT(data != nullptr);
+	MINTY_ASSERT(renderer != nullptr);
 
 	Console::todo("Animation::deserialize()");
 }

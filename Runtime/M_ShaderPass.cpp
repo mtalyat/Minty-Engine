@@ -222,9 +222,7 @@ void minty::ShaderPass::create_pipeline(ShaderPassBuilder const& builder)
 	};
 
 	// create the pipeline
-	if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &_pipeline) != VK_SUCCESS) {
-		Error::abort("Failed to create graphics pipeline.");
-	}
+	VK_ASSERT(vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &_pipeline), "Failed to create graphics pipeline.");
 
 	// cleanup
 	for (size_t i = 0; i < shaderStages.size(); i++)

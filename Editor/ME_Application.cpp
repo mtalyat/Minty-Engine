@@ -79,8 +79,9 @@ Application::Application()
 
 	// load the engine and editor assemblies
 	ScriptEngine& scriptEngine = _runtime->get_script_engine();
-	scriptEngine.load_assembly(AssemblyType::Engine, std::format("../Libraries/MintyEngine/bin/Debug/MintyEngine.dll"));
-	scriptEngine.load_assembly(AssemblyType::Editor, std::format("../Libraries/MintyEditor/bin/Debug/MintyEditor.dll"));
+	scriptEngine.load_assembly("../Libraries/MintyEngine/bin/Debug/MintyEngine.dll");
+	//scriptEngine.load_assembly("../Libraries/MintyEditor/bin/Debug/MintyEditor.dll");
+	ScriptLinkage::link();
 }
 
 mintye::Application::~Application()
@@ -225,7 +226,7 @@ void mintye::Application::load_project(minty::Path const& path)
 
 	// load assemblies
 	// C:\Users\mitch\source\repos\Minty-Engine\Projects\Tests\TestProject\Assembly\bin\Debug
-	_runtime->get_script_engine().load_assembly(AssemblyType::Project, std::format("Assembly/bin/Debug/Assembly.dll"));
+	_runtime->get_script_engine().load_assembly("Assembly/bin/Debug/Assembly.dll");
 
 	// load a scene, if any found
 	Path sceneName = project->find_asset(Project::CommonFileType::Scene);
@@ -671,7 +672,9 @@ void Application::generate_cmake(BuildInfo const& buildInfo)
 		// include the runtime dir
 		"target_include_directories(${PROJECT_NAME} PRIVATE C:/Users/mitch/source/repos/Minty-Engine/Runtime PUBLIC ${VULKAN_INCLUDE_DIRS})" << std::endl <<
 		// copy any DLL's that the Runtime uses
-		"add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy_if_different \"C:/Users/mitch/source/repos/Minty-Engine/Runtime/x64/" << buildInfo.get_config() << "/mono-2.0-sgen.dll\" $<TARGET_FILE_DIR:${PROJECT_NAME}>)" << std::endl <<
+		"add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy C:/Libraries/Mono/lib/mono-2.0-sgen.dll ${CMAKE_CURRENT_BINARY_DIR}/" << buildInfo.get_config() << "/mono-2.0-sgen.dll)" << std::endl <<
+		"add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy C:/Libraries/Mono/lib/MonoPosixHelper.dll ${CMAKE_CURRENT_BINARY_DIR}/" << buildInfo.get_config() << "/MonoPosixHelper.dll)" << std::endl <<
+		"add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy C:/Libraries/Mono/lib/mscorlib.dll ${CMAKE_CURRENT_BINARY_DIR}/" << buildInfo.get_config() << "/mscorlib.dll)" << std::endl <<
 		// include and link Vulkan
 		"include_directories(${Vulkan_INCLUDE_DIRS})" << std::endl <<
 		// target and link the MintyRuntime.lib
@@ -724,8 +727,8 @@ void Application::generate_main(BuildInfo const& buildInfo)
 		"	minty::Info info(\"" << projectInfo.get_application_name() << "\", " << projectInfo.get_application_major() << ", " << projectInfo.get_application_minor() << ", " << projectInfo.get_application_patch() << ");" << std::endl <<
 		"	minty::Runtime runtime(info);" << std::endl <<
 		"	runtime.init();" << std::endl <<
-		"	runtime.get_script_engine().load_assembly(minty::AssemblyType::Engine, \"Assembly/bin/" << buildInfo.get_config() << "/MintyEngine.dll\");" << std::endl <<
-		"	runtime.get_script_engine().load_assembly(minty::AssemblyType::Project, \"Assembly/bin/" << buildInfo.get_config() << "/Assembly.dll\");" << std::endl <<
+		"	runtime.get_script_engine().load_assembly(\"Assembly/bin/" << buildInfo.get_config() << "/MintyEngine.dll\");" << std::endl <<
+		"	runtime.get_script_engine().load_assembly(\"Assembly/bin/" << buildInfo.get_config() << "/Assembly.dll\");" << std::endl <<
 		"	if(int code = init(runtime)) { minty::Console::error(std::format(\"Failed to init program with error code {}.\", code)); return code; }" << std::endl <<
 		"	runtime.start();" << std::endl <<
 		"	runtime.run();" << std::endl <<

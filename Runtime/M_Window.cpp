@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "M_Window.h"
 #include "M_Console.h"
-#include "M_Error.h"
 #include "M_InputMap.h"
 #include "M_GLFW.h"
 #include <format>
@@ -48,7 +47,7 @@ minty::Window::Window(String const& title, int const x, int const y, int const w
 
 	if (!_window)
 	{
-		Error::abort("Failed to create GLFW window \"" + title + "\".");
+		MINTY_ABORT("Failed to create GLFW window \"" + title + "\".");
 	}
 
 	if (x >= 0 && y >= 0)

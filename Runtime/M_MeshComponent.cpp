@@ -25,8 +25,7 @@ void minty::MeshComponent::deserialize(Reader const& reader)
 
 	RenderSystem* renderSystem = data.scene->get_system_registry().find<RenderSystem>();
 
-	MINTY_ASSERT(renderSystem != nullptr, "MeshComponent::deserialize(): renderSystem cannot be null.");
-	if (!renderSystem) return;
+	MINTY_ASSERT(renderSystem != nullptr);
 
 	// load meta data
 	String materialName;

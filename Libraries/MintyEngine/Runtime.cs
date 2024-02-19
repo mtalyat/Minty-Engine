@@ -8,10 +8,12 @@ namespace MintyEngine
     /// </summary>
     internal static class Runtime
     {
+        #region Console
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Console_Log(string message);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Console_LogColor(string message, int color);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Console_Warn(string message);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Console_Error(string message);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Console_Assert(string message);
+        #endregion
     }
 }

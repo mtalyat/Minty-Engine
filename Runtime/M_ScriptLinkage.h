@@ -11,6 +11,6 @@ namespace minty
 		/// <summary>
 		/// Links all of the functions, etc. to the C++ code.
 		/// </summary>
-		static void Link();
+		static void link();
 	};
 }

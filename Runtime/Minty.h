@@ -99,10 +99,11 @@ access to the entire engine without needing include each file.
 
 // SCRIPTING
 #include "M_Accessibility.h"
-#include "M_AssemblyType.h"
-#include "M_Script.h"
-#include "M_ScriptEngine.h"
+#include "M_ScriptAssembly.h"
+#include "M_ScriptClass.h"
 #include "M_ScriptComponent.h"
+#include "M_ScriptEngine.h"
+#include "M_ScriptLinkage.h"
 #include "M_ScriptObject.h"
 #include "M_ScriptSystem.h"
 
@@ -130,7 +131,6 @@ access to the entire engine without needing include each file.
 #include "M_Constants.h"
 #include "M_Dynamic.h"
 #include "M_Encoding.h"
-#include "M_Error.h"
 #include "M_Event.h"
 #include "M_FiniteStateMachine.h"
 #include "M_Info.h"

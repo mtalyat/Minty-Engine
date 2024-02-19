@@ -5,7 +5,6 @@
 #include "M_TextureBuilder.h"
 #include "M_Asset.h"
 #include "M_File.h"
-#include "M_Error.h"
 #include "M_Console.h"
 #include <format>
 
@@ -177,7 +176,7 @@ Texture::Texture(TextureBuilder const& builder, Runtime& engine, ID const sceneI
 	samplerInfo.maxLod = 0.0f;
 
 	if (vkCreateSampler(device, &samplerInfo, nullptr, &_sampler) != VK_SUCCESS) {
-		Error::abort(std::format("Failed to load_animation texture: {}", path.string()));
+		MINTY_ABORT(std::format("Failed to load_animation texture: {}", path.string()));
 	}
 }
 

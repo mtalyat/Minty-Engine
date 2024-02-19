@@ -1,0 +1,61 @@
+#include "pch.h"
+#include "M_ScriptClass.h"
+
+#include "M_Mono.h"
+
+#include "M_ScriptObject.h"
+#include "M_ScriptEngine.h"
+
+using namespace minty;
+
+minty::ScriptClass::ScriptClass(String const& namespaceName, String const& className, ScriptAssembly& assembly)
+	: _namespace(namespaceName)
+	, _name(className)
+	, _assembly(&assembly)
+	, _class()
+{
+	MonoImage* image = mono_assembly_get_image(assembly._assembly);
+	_class = mono_class_from_name(image, namespaceName.c_str(), className.c_str());
+}
+
+ScriptAssembly& minty::ScriptClass::get_assembly() const
+{
+	return *_assembly;
+}
+
+String const& minty::ScriptClass::get_namespace() const
+{
+	return _namespace;
+}
+
+String const& minty::ScriptClass::get_name() const
+{
+	return _name;
+}
+
+String minty::ScriptClass::get_full_name() const
+{
+	return ScriptEngine::get_full_name(_namespace, _name);
+}
+
+bool minty::ScriptClass::is_derived_from(ScriptClass const& other) const
+{
+	MonoClass* current = _class;
+
+	while (current != nullptr && current != other._class)
+	{
+		current = mono_class_get_parent(current);
+	}
+
+	return current;
+}
+
+ScriptObject minty::ScriptClass::create_object(UUID const id) const
+{
+	return _assembly->get_engine().create_object(*this, id);
+}
+
+bool minty::ScriptClass::has_method(String const& name) const
+{
+	return _assembly->get_engine().get_method(_class, name);
+}

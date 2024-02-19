@@ -6,24 +6,24 @@ class TestScript : Script
 
     void OnCreate()
     {
-        Debug.Log("TestClass.OnCreate()");
+        System.Console.WriteLine("C#: TestClass.OnCreate()");
+        Debug.Log("C++: TestClass.OnCreate()");
     }
 
     void OnLoad()
     {
-        Debug.Warn("TestClass.OnLoad()" + count);
+        Debug.Log("TestClass.OnLoad()" + count);
     }
 
     void OnUpdate()
     {
-        Debug.Error("TestClass.OnUpdate()");
+        Debug.Log("TestClass.OnUpdate()");
         count++;
     }
 
     void OnUnload()
     {
-        Debug.Assert(count >= 5000, "TestClass.OnUnload() under 5k");
-        Debug.Assert(count < 5000, "TestClass.OnUnload() over 5k");
+        Debug.Log("TestClass.OnUnload()");
     }
 
     void OnDestroy()

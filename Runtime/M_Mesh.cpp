@@ -573,7 +573,7 @@ String minty::to_string(MeshType const value)
 	case MeshType::Cylinder:
 		return "CYLINDER";
 	default:
-		return Error::ERROR_TEXT;
+		return Text::EMPTY;
 	}
 }
 

@@ -102,7 +102,7 @@ namespace minty
 	template<class U>
 	bool TypeRegister<T>::contains() const
 	{
-		MINTY_ASSERT((is_type<U, T>()), std::format("TypeRegister<{0}>::contains(): type U ({1}) must be derived from type T ({0}).", typeid(T).name(), typeid(U).name()));
+		MINTY_ASSERT_MESSAGE((is_type<U, T>()), std::format("Type U ({1}) must be derived from type T ({0}).", typeid(T).name(), typeid(U).name()));
 
 		return _lookup.contains(typeid(U));
 	}
@@ -111,7 +111,7 @@ namespace minty
 	template<class U>
 	bool TypeRegister<T>::contains(U* const obj) const
 	{
-		MINTY_ASSERT((is_type<U, T>()), std::format("TypeRegister<{0}>::contains(): type U ({1}) must be derived from type T ({0}).", typeid(T).name(), typeid(U).name()));
+		MINTY_ASSERT_MESSAGE((is_type<U, T>()), std::format("Type U ({1}) must be derived from type T ({0}).", typeid(T).name(), typeid(U).name()));
 
 		auto found = _lookup.find(typeid(U));
 
@@ -127,7 +127,7 @@ namespace minty
 	template<class U>
 	void TypeRegister<T>::emplace(U* const obj)
 	{
-		MINTY_ASSERT((is_type<U, T>()), std::format("TypeRegister<{0}>::emplace(): type U ({1}) must be derived from type T ({0}).", typeid(T).name(), typeid(U).name()));
+		MINTY_ASSERT_MESSAGE((is_type<U, T>()), std::format("Type U ({1}) must be derived from type T ({0}).", typeid(T).name(), typeid(U).name()));
 
 		// if the type exists, replace it, otherwise add it
 		TypeID typeId = typeid(U);
@@ -148,7 +148,7 @@ namespace minty
 	template<class U>
 	bool TypeRegister<T>::erase()
 	{
-		MINTY_ASSERT((is_type<U, T>()), std::format("TypeRegister<{0}>::erase(): type U ({1}) must be derived from type T ({0}).", typeid(T).name(), typeid(U).name()));
+		MINTY_ASSERT_MESSAGE((is_type<U, T>()), std::format("Type U ({1}) must be derived from type T ({0}).", typeid(T).name(), typeid(U).name()));
 
 		return false;
 	}
@@ -157,7 +157,7 @@ namespace minty
 	template<class U>
 	U* TypeRegister<T>::at() const
 	{
-		MINTY_ASSERT(contains(), std::format("TypeRegister<{0}>::at(): type U ({1}) is not part of this TypeRegister.", typeid(T).name(), typeid(U).name()));
+		MINTY_ASSERT_MESSAGE(contains(), std::format("Type U ({1}) is not part of this TypeRegister.", typeid(T).name(), typeid(U).name()));
 
 		return static_cast<U*>(_values.at(_lookup.at(typeid(U))));
 	}

@@ -27,8 +27,8 @@ minty::Sprite::Sprite(SpriteBuilder const& builder, Runtime& engine, ID const sc
 	, _maxCoords()
 	, _pivot()
 {
-	MINTY_ASSERT(builder.textureId != ERROR_ID, "Cannot create a sprite with ERROR_ID texture id.");
-	MINTY_ASSERT(builder.materialId != ERROR_ID, "Cannot create a sprite with ERROR_ID material id.");
+	MINTY_ASSERT(builder.textureId != ERROR_ID);
+	MINTY_ASSERT(builder.materialId != ERROR_ID);
 
 	// set values based on coordinate mode
 	// all values should be normalized inside of Sprite
