@@ -45,14 +45,14 @@ void minty::ScriptObject::set(String const& name, void* const value) const
 {
 	ScriptEngine& engine = _script->get_assembly().get_engine();
 
-	engine.get_field_value(get_object(), engine.get_field(_script->_class, name), value);
+	engine.set_field_value(get_object(), engine.get_field(_script->_class, name), value);
 }
 
 void minty::ScriptObject::get(String const& name, void* const value) const
 {
 	ScriptEngine& engine = _script->get_assembly().get_engine();
 
-	engine.set_field_value(get_object(), engine.get_field(_script->_class, name), value);
+	engine.get_field_value(get_object(), engine.get_field(_script->_class, name), value);
 }
 
 MonoObject* minty::ScriptObject::get_object() const
