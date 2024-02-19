@@ -27,6 +27,9 @@ namespace mintye
 		bool showWarnings;
 		bool showErrors;
 
+		// commands that are handled by the editor
+		std::unordered_map <minty::String, std::function<void()>> _editorCommands;
+
 		ImGuiTextFilter _filter;
 
 		int _maxLines;
@@ -42,6 +45,11 @@ namespace mintye
 		virtual void draw() override;
 
 		virtual void reset() override;
+
+		/// <summary>
+		/// Clears all text from the console.
+		/// </summary>
+		void clear();
 
 		void run_command(std::string const& command);
 

@@ -14,7 +14,12 @@ mintye::ConsoleWindow::ConsoleWindow(Application& application)
 	, _filter()
 	, _maxLines(16384)
 	, _lines()
-{}
+{
+	// create editor commands
+	_editorCommands.emplace("clear", [this]() {
+		clear();
+		});
+}
 
 ImVec4 ColorToImVec4(Console::Color const color)
 {
@@ -122,11 +127,26 @@ void mintye::ConsoleWindow::draw()
 
 void mintye::ConsoleWindow::reset()
 {
+	clear();
+}
+
+void mintye::ConsoleWindow::clear()
+{
 	_lines.clear();
 }
 
 void mintye::ConsoleWindow::run_command(std::string const& command)
 {
+	// check if editor command
+	auto found = _editorCommands.find(command);
+
+	if (found != _editorCommands.end())
+	{
+		found->second();
+		return;
+	}
+	
+	// run command on system instead
 	run_commands({ command });
 }
 
