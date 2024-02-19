@@ -226,7 +226,7 @@ void mintye::Application::load_project(minty::Path const& path)
 
 	// load assemblies
 	// C:\Users\mitch\source\repos\Minty-Engine\Projects\Tests\TestProject\Assembly\bin\Debug
-	_runtime->get_script_engine().load_assembly("Assembly/bin/Debug/Assembly.dll");
+	_runtime->get_script_engine().load_assembly(std::format("{0}/bin/Debug/{0}.dll", project->get_name()));
 
 	// load a scene, if any found
 	Path sceneName = project->find_asset(Project::CommonFileType::Scene);
@@ -727,8 +727,8 @@ void Application::generate_main(BuildInfo const& buildInfo)
 		"	minty::Info info(\"" << projectInfo.get_application_name() << "\", " << projectInfo.get_application_major() << ", " << projectInfo.get_application_minor() << ", " << projectInfo.get_application_patch() << ");" << std::endl <<
 		"	minty::Runtime runtime(info);" << std::endl <<
 		"	runtime.init();" << std::endl <<
-		"	runtime.get_script_engine().load_assembly(\"Assembly/bin/" << buildInfo.get_config() << "/MintyEngine.dll\");" << std::endl <<
-		"	runtime.get_script_engine().load_assembly(\"Assembly/bin/" << buildInfo.get_config() << "/Assembly.dll\");" << std::endl <<
+		"	runtime.get_script_engine().load_assembly(\"" << projectInfo.get_application_name() << "/bin/" << buildInfo.get_config() << "/MintyEngine.dll\");" << std::endl <<
+		"	runtime.get_script_engine().load_assembly(\"" << projectInfo.get_application_name() << "/bin/" << buildInfo.get_config() << "/" << projectInfo.get_application_name() << ".dll\");" << std::endl <<
 		"	minty::ScriptEngine::link();" << std::endl <<
 		"	if(int code = init(runtime)) { minty::Console::error(std::format(\"Failed to init program with error code {}.\", code)); return code; }" << std::endl <<
 		"	runtime.start();" << std::endl <<
