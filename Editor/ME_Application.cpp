@@ -81,7 +81,7 @@ Application::Application()
 	ScriptEngine& scriptEngine = _runtime->get_script_engine();
 	scriptEngine.load_assembly("../Libraries/MintyEngine/bin/Debug/MintyEngine.dll");
 	//scriptEngine.load_assembly("../Libraries/MintyEditor/bin/Debug/MintyEditor.dll");
-	ScriptLinkage::link();
+	ScriptEngine::link();
 }
 
 mintye::Application::~Application()
@@ -729,6 +729,7 @@ void Application::generate_main(BuildInfo const& buildInfo)
 		"	runtime.init();" << std::endl <<
 		"	runtime.get_script_engine().load_assembly(\"Assembly/bin/" << buildInfo.get_config() << "/MintyEngine.dll\");" << std::endl <<
 		"	runtime.get_script_engine().load_assembly(\"Assembly/bin/" << buildInfo.get_config() << "/Assembly.dll\");" << std::endl <<
+		"	minty::ScriptEngine::link();" << std::endl <<
 		"	if(int code = init(runtime)) { minty::Console::error(std::format(\"Failed to init program with error code {}.\", code)); return code; }" << std::endl <<
 		"	runtime.start();" << std::endl <<
 		"	runtime.run();" << std::endl <<

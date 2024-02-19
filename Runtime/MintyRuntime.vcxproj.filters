@@ -567,9 +567,6 @@
     <ClInclude Include="M_UUID.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="M_ScriptLinkage.h">
-      <Filter>Header Files\Scripting</Filter>
-    </ClInclude>
     <ClInclude Include="M_ScriptAssembly.h">
       <Filter>Header Files\Scripting</Filter>
     </ClInclude>
@@ -951,9 +948,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_UUID.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="M_ScriptLinkage.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_ScriptAssembly.cpp">

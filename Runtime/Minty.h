@@ -103,7 +103,6 @@ access to the entire engine without needing include each file.
 #include "M_ScriptClass.h"
 #include "M_ScriptComponent.h"
 #include "M_ScriptEngine.h"
-#include "M_ScriptLinkage.h"
 #include "M_ScriptObject.h"
 #include "M_ScriptSystem.h"
 

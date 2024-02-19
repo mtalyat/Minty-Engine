@@ -41,6 +41,8 @@ namespace minty
 
 		virtual ~ScriptEngine();
 
+		static void link();
+
 		void set_runtime(Runtime& runtime) override;
 
 		void set_scene(Scene* scene) override;
