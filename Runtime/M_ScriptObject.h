@@ -9,6 +9,7 @@ typedef struct _MonoClassField MonoClassField;
 namespace minty
 {
 	class ScriptClass;
+	class ScriptArguments;
 
 	class ScriptObject
 		: public Component
@@ -23,15 +24,21 @@ namespace minty
 	public:
 		ScriptObject(ScriptClass const& script);
 
+		ScriptObject(ScriptClass const& script, ScriptArguments& arguments);
+
 		~ScriptObject();
 
 		void destroy();
 
 		void invoke(String const& name) const;
 		
-		void set(String const& name, void* const value) const;
+		void set_field(String const& name, void* const value) const;
 
-		void get(String const& name, void* const value) const;
+		void get_field(String const& name, void* const value) const;
+
+		void set_property(String const& name, void* const value) const;
+
+		void get_property(String const& name, void* const value) const;
 
 	private:
 		MonoObject* get_object() const;

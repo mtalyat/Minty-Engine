@@ -2,11 +2,17 @@
 #include "M_ScriptEngine.h"
 
 #include "M_Mono.h"
+
+#include "M_Runtime.h"
+#include "M_Scene.h"
+#include "M_SceneManager.h"
 #include "M_EntityRegistry.h"
+#include "M_SystemRegistry.h"
 
 #include "M_File.h"
 #include "M_Console.h"
 #include "M_ScriptObject.h"
+#include "M_ScriptArguments.h"
 
 using namespace minty;
 using namespace minty::Scripting;
@@ -17,12 +23,15 @@ using namespace minty::Scripting;
 
 struct ScriptEngineData
 {
-	Runtime* runtime = nullptr;
 	ScriptEngine* engine = nullptr;
-	Scene* scene = nullptr;
 
 	// uuid, script object
 	std::unordered_map<UUID, ScriptObject> objects;
+
+	Scene* get_scene()
+	{
+		return engine->get_runtime().get_scene_manager().get_working_scene();
+	}
 
 	void reset()
 	{
@@ -58,22 +67,18 @@ minty::ScriptEngine::ScriptEngine()
 	, _appDomain()
 	, _assemblies()
 {
-	mono_set_assemblies_path("C:/Libraries/Mono/lib");
+	mono_set_dirs("C:/Program Files/Mono/lib", "C:/Program Files/Mono/etc");
 
 	_rootDomain = mono_jit_init("MintyRuntime");
-	if (!_rootDomain)
-	{
-		Console::error("Failed to init Mono root domain.");
-		return;
-	}
+	MINTY_ASSERT(_rootDomain != nullptr);
+
+	mono_set_assemblies_path("C:/Libraries/Mono/lib");
 
 	String appDomainName = "MintyDomain";
 	_appDomain = mono_domain_create_appdomain(appDomainName.data(), nullptr);
 	mono_domain_set(_appDomain, true);
 
 	_data.engine = this;
-	_data.runtime = nullptr;
-	_data.scene = nullptr;
 	_data.reset();
 }
 
@@ -83,10 +88,13 @@ minty::ScriptEngine::~ScriptEngine()
 
 	for (auto& pair : _assemblies)
 	{
-		pair.second->destroy();
 		delete pair.second;
 	}
 	_assemblies.clear();
+
+	mono_jit_cleanup(_rootDomain);
+	_rootDomain = nullptr;
+	_appDomain = nullptr;
 }
 
 void minty::ScriptEngine::set_runtime(Runtime& runtime)
@@ -94,21 +102,6 @@ void minty::ScriptEngine::set_runtime(Runtime& runtime)
 	if (&get_runtime() != &runtime)
 	{
 		Engine::set_runtime(runtime);
-
-		_data.runtime = &runtime;
-		_data.scene = nullptr;
-
-		_data.reset();
-	}
-}
-
-void minty::ScriptEngine::set_scene(Scene* scene)
-{
-	if (get_scene() != scene)
-	{
-		Engine::set_scene(scene);
-
-		_data.scene = scene;
 
 		_data.reset();
 	}
@@ -122,8 +115,7 @@ bool minty::ScriptEngine::load_assembly(Path const& path, bool const referenceOn
 	unload_assembly(name);
 
 	// load the new assembly
-	ScriptAssembly* scriptAssembly = _assemblies.emplace(name, new ScriptAssembly(path, *this)).first->second;
-	scriptAssembly->init(referenceOnly);
+	ScriptAssembly* scriptAssembly = _assemblies.emplace(name, new ScriptAssembly(path, *this, referenceOnly)).first->second;
 
 	// if the Script script has been loaded, then load all scripts derive from it
 	ScriptClass const* scriptScriptClass = find_class(ASSEMBLY_ENGINE_NAME, "Script");
@@ -167,7 +159,6 @@ void minty::ScriptEngine::unload_assembly(String const& name)
 	auto found = _assemblies.find(name);
 	if (found != _assemblies.end())
 	{
-		found->second->destroy();
 		delete found->second;
 		_assemblies.erase(name);
 	}
@@ -183,6 +174,11 @@ ScriptAssembly const* minty::ScriptEngine::get_assembly(String const& assemblyNa
 	}
 
 	return nullptr;
+}
+
+MonoString* minty::ScriptEngine::to_mono_string(String const& string) const
+{
+	return mono_string_new(_appDomain, string.c_str());
 }
 
 String minty::ScriptEngine::get_class_name(MonoClass* const klass) const
@@ -388,6 +384,30 @@ MonoProperty* minty::ScriptEngine::get_property(MonoClass* const klass, String c
 	return prop;
 }
 
+void minty::ScriptEngine::get_property_value(MonoObject* const object, MonoProperty* const prop, void* out) const
+{
+	MonoObject* exception = nullptr;
+
+	mono_property_get_value(prop, object, &out, &exception);
+
+	if (exception)
+	{
+		MINTY_ABORT(get_exception_message(exception));
+	}
+}
+
+void minty::ScriptEngine::set_property_value(MonoObject* const object, MonoProperty* const prop, void* in) const
+{
+	MonoObject* exception = nullptr;
+
+	mono_property_set_value(prop, object, &in, &exception);
+
+	if (exception)
+	{
+		MINTY_ABORT(get_exception_message(exception));
+	}
+}
+
 void minty::ScriptEngine::invoke_method(MonoObject* const object, MonoMethod* const method) const
 {
 	MonoObject* exception = nullptr;
@@ -451,16 +471,45 @@ MonoObject* minty::ScriptEngine::create_instance(MonoClass* const klass) const
 	// create the instance
 	MonoObject* instance = mono_object_new(_appDomain, klass);
 
-	if (!instance)
-	{
-		Console::error("Assembly::create_instance(): Failed.");
-		return nullptr;
-	}
+	MINTY_ASSERT(instance != nullptr);
 
 	// call the constructor
 	mono_runtime_object_init(instance);
 
 	return instance;
+}
+
+MonoObject* minty::ScriptEngine::create_instance(MonoClass* const klass, std::vector<void*>& values) const
+{
+	if (values.size() == 0)
+	{
+		// no arguments, use less complicated create_instance
+		return create_instance(klass);
+	}
+
+	// create the instance
+	MonoObject* instance = mono_object_new(_appDomain, klass);
+
+	MINTY_ASSERT(instance != nullptr);
+
+	// get the name and namespace
+	char const* name = mono_class_get_name(klass);
+	char const* nameSpace = mono_class_get_namespace(klass);
+
+	// get the constructor with the arguments
+	MonoMethod* ctor = mono_class_get_method_from_name(klass, ".ctor", static_cast<int>(values.size()));
+	MINTY_ASSERT(ctor != nullptr);
+
+	// call the constructor
+	invoke_method(instance, ctor, values);
+
+	// done
+	return instance;
+}
+
+void* minty::ScriptEngine::unbox(MonoObject* const object) const
+{
+	return mono_object_unbox(object);
 }
 
 String minty::ScriptEngine::get_full_name(String const& namespaceName, String const& className)
@@ -498,6 +547,11 @@ ScriptObject const& minty::ScriptEngine::create_object(ScriptClass const& script
 	return _data.objects.emplace(id, ScriptObject(script)).first->second;
 }
 
+ScriptObject const& minty::ScriptEngine::create_object(ScriptClass const& script, UUID id, ScriptArguments& scriptArguments) const
+{
+	return _data.objects.emplace(id, ScriptObject(script, scriptArguments)).first->second;
+}
+
 ScriptObject const* minty::ScriptEngine::get_object(UUID id) const
 {
 	auto found = _data.objects.find(id);
@@ -532,10 +586,9 @@ ScriptObject const& minty::ScriptEngine::create_object_entity(UUID id)
 	MINTY_ASSERT(entityClass != nullptr);
 
 	// create an instance of it
-	ScriptObject const& object = create_object(*entityClass, id);
-
-	// init
-	object.set("ID", &id);
+	uint64_t rawId = static_cast<uint64_t>(id);
+	ScriptArguments args({ &rawId });
+	ScriptObject const& object = create_object(*entityClass, id, args);
 
 	return object;
 }
@@ -552,14 +605,15 @@ ScriptObject const& minty::ScriptEngine::create_object_component(UUID id, UUID c
 	// check the new instance class
 	MINTY_ASSERT(script.is_derived_from(*componentClass));
 
-	// spawn the object and save it
-	ScriptObject const& object = create_object(script, id);
-
-	// init
+	// get entity object
 	ScriptObject const* entity = get_object(entityId);
 	MINTY_ASSERT(entity != nullptr);
+	MonoObject* entityObject = entity->get_object();
+	MINTY_ASSERT(entityObject != nullptr);
 
-	object.set("Entity", entity->get_object());
+	// spawn the object and save the entity to it
+	ScriptObject const& object = create_object(script, id);
+	object.set_property("Entity", entityObject);
 
 	return object;
 }
@@ -576,7 +630,6 @@ void minty::ScriptEngine::destroy_object(UUID id)
 	}
 }
 
-
 //
 //		LINKING
 //
@@ -592,6 +645,8 @@ static String mono_string_to_string(MonoString* const string)
 	mono_free(str);
 	return result;
 }
+
+#pragma region Console
 
 static void console_log(MonoString* string)
 {
@@ -618,6 +673,36 @@ static void console_ass(bool condition, MonoString* string)
 	Console::ass(condition, mono_string_to_string(string));
 }
 
+#pragma endregion
+
+#pragma region Entity
+
+static MonoString* entity_get_name(uint64_t id)
+{
+	if (!id)
+	{
+		return _data.engine->to_mono_string("");
+	}
+
+	Scene* scene = _data.get_scene();
+	MINTY_ASSERT(scene != nullptr);
+
+	EntityRegistry& registry = scene->get_entity_registry();
+
+	// get the entity
+	Entity entity = registry.find(id);
+
+	MINTY_ASSERT(entity != NULL_ENTITY);
+
+	// get the name
+	String name = scene->get_entity_registry().get_name(entity);
+
+	// convert to mono string and return
+	return _data.engine->to_mono_string(name);
+}
+
+#pragma endregion
+
 void minty::ScriptEngine::link()
 {
 	ADD_INTERNAL_CALL("Console_Log", console_log);
@@ -625,6 +710,8 @@ void minty::ScriptEngine::link()
 	ADD_INTERNAL_CALL("Console_Warn", console_warn);
 	ADD_INTERNAL_CALL("Console_Error", console_error);
 	ADD_INTERNAL_CALL("Console_Assert", console_ass);
+
+	ADD_INTERNAL_CALL("Entity_GetName", entity_get_name);
 }
 
 #undef ADD_INTERNAL_CALL

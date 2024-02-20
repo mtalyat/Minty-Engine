@@ -20,10 +20,13 @@ struct _MonoType;
 typedef struct _MonoType MonoType;
 struct _MonoProperty;
 typedef struct _MonoProperty MonoProperty;
+struct _MonoString;
+typedef struct _MonoString MonoString;
 
 namespace minty
 {
 	class ScriptClass;
+	class ScriptArguments;
 
 	class ScriptEngine
 		: public Engine
@@ -44,8 +47,6 @@ namespace minty
 		static void link();
 
 		void set_runtime(Runtime& runtime) override;
-
-		void set_scene(Scene* scene) override;
 
 #pragma region Assemblies
 
@@ -88,6 +89,9 @@ namespace minty
 
 #pragma region Mono
 
+	public:
+		MonoString* to_mono_string(String const& string) const;
+
 	private:
 		String get_class_name(MonoClass* const klass) const;
 
@@ -123,6 +127,10 @@ namespace minty
 
 		MonoProperty* get_property(MonoClass* const klass, String const& propertyName) const;
 
+		void get_property_value(MonoObject* const object, MonoProperty* const prop, void* out) const;
+
+		void set_property_value(MonoObject* const object, MonoProperty* const prop, void* in) const;
+
 		void invoke_method(MonoObject* const object, MonoMethod* const method) const;
 
 		void invoke_method(MonoObject* const object, MonoMethod* const method, std::vector<void*>& arguments) const;
@@ -131,6 +139,9 @@ namespace minty
 
 		MonoObject* create_instance(MonoClass* const classType) const;
 
+		MonoObject* create_instance(MonoClass* const klass, std::vector<void*>& values) const;
+
+		void* unbox(MonoObject* const object) const;
 	public:
 		static String get_full_name(String const& namespaceName, String const& className);
 
@@ -144,6 +155,8 @@ namespace minty
 		ScriptClass const* find_class(String const& fullName) const;
 
 		ScriptObject const& create_object(ScriptClass const& script, UUID id) const;
+
+		ScriptObject const& create_object(ScriptClass const& script, UUID id, ScriptArguments& scriptArguments) const;
 
 		ScriptObject const* get_object(UUID id) const;
 

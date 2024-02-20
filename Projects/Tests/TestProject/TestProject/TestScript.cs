@@ -1,4 +1,10 @@
 ﻿using MintyEngine;
+using System;
+
+class Test
+{
+    public Entity Entity = new Entity();
+}
 
 class TestScript : Script
 {
@@ -6,13 +12,14 @@ class TestScript : Script
 
     void OnCreate()
     {
-        System.Console.WriteLine("C#: TestClass.OnCreate()");
-        Debug.Log("C++: TestClass.OnCreate()");
+        Debug.Log("TestClass.OnCreate()");
+        Debug.Log($"Entity is {(Entity == null ? "null" : "not null")}");
+        Debug.Log($"Entity is {Entity}");
     }
 
     void OnLoad()
     {
-        Debug.Log("TestClass.OnLoad()" + count);
+        Debug.Log("TestClass.OnLoad()");
     }
 
     void OnUpdate()

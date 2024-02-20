@@ -25,11 +25,9 @@ namespace minty
 		std::unordered_map<String, ScriptClass> _classes;
 
 	public:
-		ScriptAssembly(Path const& path, ScriptEngine& engine);
+		ScriptAssembly(Path const& path, ScriptEngine& engine, bool const referenceOnly = false);
 
-		void init(bool const referenceOnly = false);
-
-		void destroy();
+		~ScriptAssembly();
 
 		String get_name() const;
 

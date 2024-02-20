@@ -20,13 +20,3 @@ Runtime& minty::Engine::get_runtime() const
 {
 	return *_runtime;
 }
-
-void minty::Engine::set_scene(Scene* scene)
-{
-	_scene = scene;
-}
-
-Scene* minty::Engine::get_scene() const
-{
-	return _scene;
-}

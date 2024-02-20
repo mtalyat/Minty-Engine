@@ -4,6 +4,7 @@
 #include "M_Mono.h"
 
 #include "M_ScriptClass.h"
+#include "M_ScriptArguments.h"
 #include "M_ScriptEngine.h"
 #include "M_EntityRegistry.h"
 #include "M_Console.h"
@@ -16,6 +17,12 @@ using namespace minty::Scripting;
 minty::ScriptObject::ScriptObject(ScriptClass const& script)
 	: _script(&script)
 	, _object(script.get_assembly().get_engine().create_instance(script._class))
+	, _handle(mono_gchandle_new(_object, false))
+{}
+
+minty::ScriptObject::ScriptObject(ScriptClass const& script, ScriptArguments& arguments)
+	: _script(&script)
+	, _object(script.get_assembly().get_engine().create_instance(script._class, arguments.get_values()))
 	, _handle(mono_gchandle_new(_object, false))
 {}
 
@@ -41,18 +48,32 @@ void minty::ScriptObject::invoke(String const& name) const
 	engine.invoke_method(get_object(), method);
 }
 
-void minty::ScriptObject::set(String const& name, void* const value) const
+void minty::ScriptObject::set_field(String const& name, void* const value) const
 {
 	ScriptEngine& engine = _script->get_assembly().get_engine();
 
 	engine.set_field_value(get_object(), engine.get_field(_script->_class, name), value);
 }
 
-void minty::ScriptObject::get(String const& name, void* const value) const
+void minty::ScriptObject::get_field(String const& name, void* const value) const
 {
 	ScriptEngine& engine = _script->get_assembly().get_engine();
 
 	engine.get_field_value(get_object(), engine.get_field(_script->_class, name), value);
+}
+
+void minty::ScriptObject::set_property(String const& name, void* const value) const
+{
+	ScriptEngine& engine = _script->get_assembly().get_engine();
+
+	engine.set_property_value(get_object(), engine.get_property(_script->_class, name), value);
+}
+
+void minty::ScriptObject::get_property(String const& name, void* const value) const
+{
+	ScriptEngine& engine = _script->get_assembly().get_engine();
+
+	engine.get_property_value(get_object(), engine.get_property(_script->_class, name), value);
 }
 
 MonoObject* minty::ScriptObject::get_object() const
@@ -107,7 +128,7 @@ void minty::ScriptObject::serialize_field(Writer& writer, String const& name, Mo
 	case MONO_TYPE_I4: // int
 	{
 		int value;
-		get(name, &value);
+		get_field(name, &value);
 		engine.get_field_value(object, field, &value);
 		writer.write(name, value);
 		break;

@@ -9,14 +9,11 @@
 
 using namespace minty;
 
-minty::ScriptAssembly::ScriptAssembly(Path const& path, ScriptEngine& engine)
+minty::ScriptAssembly::ScriptAssembly(Path const& path, ScriptEngine& engine, bool const referenceOnly)
 	: _path(path)
 	, _engine(&engine)
 	, _assembly()
 	, _classes()
-{}
-
-void minty::ScriptAssembly::init(bool const referenceOnly)
 {
 	MINTY_ASSERT_FORMAT(std::filesystem::exists(_path), "Assembly not found at path \"{}\".", _path.string());
 
@@ -48,8 +45,6 @@ void minty::ScriptAssembly::init(bool const referenceOnly)
 
 	String name = get_name();
 
-	ScriptClass const* scriptScriptClass = _engine->find_class(ASSEMBLY_ENGINE_NAME, "Script");
-
 	for (int i = 1; i < rows; i++)
 	{
 		// get the mono class
@@ -66,7 +61,7 @@ void minty::ScriptAssembly::init(bool const referenceOnly)
 	}
 }
 
-void minty::ScriptAssembly::destroy()
+minty::ScriptAssembly::~ScriptAssembly()
 {
 	mono_assembly_close(_assembly);
 

@@ -88,6 +88,10 @@ namespace minty
 		/// </summary>
 		void clear();
 
+		std::vector<T*>::iterator begin();
+		std::vector<T*>::iterator end();
+		std::vector<T*>::iterator cbegin() const;
+		std::vector<T*>::iterator cend() const;
 		std::vector<T*>::iterator begin() const;
 		std::vector<T*>::iterator end() const;
 	};
@@ -196,13 +200,37 @@ namespace minty
 	}
 
 	template<class T>
+	std::vector<T*>::iterator TypeRegister<T>::begin()
+	{
+		return _values.begin();
+	}
+
+	template<class T>
+	std::vector<T*>::iterator TypeRegister<T>::end()
+	{
+		return _values.end();
+	}
+
+	template<class T>
+	std::vector<T*>::iterator TypeRegister<T>::cbegin() const
+	{
+		return _values.cbegin();
+	}
+
+	template<class T>
+	std::vector<T*>::iterator TypeRegister<T>::cend() const
+	{
+		return _values.end();
+	}
+
+	template<class T>
 	std::vector<T*>::iterator TypeRegister<T>::begin() const
 	{
-		return std::vector<T*>::iterator();
+		return _values.begin();
 	}
 	template<class T>
 	std::vector<T*>::iterator TypeRegister<T>::end() const
 	{
-		return std::vector<T*>::iterator();
+		return _values.end();
 	}
 }

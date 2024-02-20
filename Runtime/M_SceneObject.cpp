@@ -2,6 +2,7 @@
 #include "M_SceneObject.h"
 
 #include "M_Runtime.h"
+#include "M_SceneManager.h"
 #include "M_Scene.h"
 
 using namespace minty;

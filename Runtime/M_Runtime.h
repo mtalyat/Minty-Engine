@@ -2,7 +2,6 @@
 
 #include "M_RuntimeBuilder.h"
 #include "M_Window.h"
-#include "M_SceneManager.h"
 #include "M_Info.h"
 #include "M_Time.h"
 #include "M_Engine.h"
@@ -13,15 +12,13 @@
 namespace minty
 {
 	class Engine;
+	class SceneManager;
 	class InputMap;
 	class RenderEngine;
 	class AudioEngine;
 	class ScriptEngine;
 	class Assembly;
-}
 
-namespace minty
-{
 	/// <summary>
 	/// Handles the core part of the engine, which includes running a game.
 	/// </summary>
@@ -145,12 +142,6 @@ namespace minty
 		/// </summary>
 		/// <returns></returns>
 		ScriptEngine& get_script_engine() const;
-
-		/// <summary>
-		/// Updates the Scene for all of the loaded Engines.
-		/// </summary>
-		/// <param name="scene"></param>
-		void set_engine_scene(Scene* const scene);
 
 #pragma endregion
 

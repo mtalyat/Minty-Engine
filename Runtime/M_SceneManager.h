@@ -21,7 +21,7 @@ namespace minty
 		Register<Scene*> _scenes;
 		// scene that is active, eg. receiving update, etc. events
 		Scene* _loadedScene;
-
+		Scene* _workingScene;
 	public:
 		SceneManager(Runtime& engine);
 
@@ -44,7 +44,7 @@ namespace minty
 		/// Destroys the Scene with the given ID.
 		/// </summary>
 		/// <param name="id">The ID of the Scene.</param>
-		void destroy_scene(ID const id);
+		bool destroy_scene(ID const id);
 
 		/// <summary>
 		/// Loads the Scene with the given ID. Unloads the current Scene first.
@@ -54,10 +54,24 @@ namespace minty
 		void load_scene(ID const id);
 
 		/// <summary>
+		/// Unloads the currently loaded Scene.
+		/// </summary>
+		void unload_scene();
+
+		/// <summary>
 		/// Gets the loaded Scene.
 		/// </summary>
 		/// <returns>A pointer to the active scene, or null if none loaded.</returns>
-		Scene* get_loaded_scene();
+		Scene* get_loaded_scene() const;
+
+		/// <summary>
+		/// Gets the working Scene.
+		/// 
+		/// The working Scene is the scene that is actively being created, destroyed, or loaded.
+		/// This is not the same as the loaded Scene, although it can be.
+		/// </summary>
+		/// <returns></returns>
+		Scene* get_working_scene() const;
 
 		/// <summary>
 		/// Get the Scene based on its ID.

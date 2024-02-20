@@ -3,6 +3,7 @@
 
 #include "M_InputMap.h"
 #include "M_RenderEngineBuilder.h"
+#include "M_SceneManager.h"
 #include "M_Info.h"
 #include "M_Console.h"
 
@@ -98,14 +99,6 @@ AudioEngine& minty::Runtime::get_audio_engine() const
 ScriptEngine& minty::Runtime::get_script_engine() const
 {
 	return *static_cast<ScriptEngine*>(_engines.at(SCRIPT_ENGINE_INDEX));
-}
-
-void minty::Runtime::set_engine_scene(Scene* const scene)
-{
-	for (auto& engine : _engines)
-	{
-		engine->set_scene(scene);
-	}
 }
 
 SceneManager& minty::Runtime::get_scene_manager() const

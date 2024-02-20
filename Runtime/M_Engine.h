@@ -21,9 +21,5 @@ namespace minty
 		virtual void set_runtime(Runtime& runtime);
 
 		Runtime& get_runtime() const;
-
-		virtual void set_scene(Scene* scene);
-
-		Scene* get_scene() const;
 	};
 }

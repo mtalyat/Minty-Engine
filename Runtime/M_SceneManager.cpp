@@ -21,6 +21,7 @@ minty::SceneManager::SceneManager(Runtime& engine)
 	, _loaded()
 	, _scenes()
 	, _loadedScene()
+	, _workingScene()
 {}
 
 ID minty::SceneManager::create_scene(Path const& path)
@@ -35,6 +36,9 @@ ID minty::SceneManager::create_scene(String const& name, Path const& path)
 	Scene* scene = new Scene(*_runtime, id); // deleted in a destroy function
 	ID actualId = _scenes.emplace(name, scene);
 
+	// set active scene for creation
+	_workingScene = scene;
+
 	MINTY_ASSERT(id == actualId);
 
 	// load the data from the disk into the scene
@@ -47,19 +51,39 @@ ID minty::SceneManager::create_scene(String const& name, Path const& path)
 	Reader reader(node, &data);
 	scene->deserialize(reader);
 
+	// all done, set active scene back to the loaded scene
+	_workingScene = _loadedScene;
+
 	// all done
 	return id;
 }
 
-void minty::SceneManager::destroy_scene(ID const id)
+bool minty::SceneManager::destroy_scene(ID const id)
 {
 	if (_scenes.contains(id))
 	{
+		// set active scene temporarily
+		Scene* scene = _scenes.at(id);
+
+		_workingScene = scene;
+
+		// if this is the loaded scene, unload it first
+		if (_loadedScene == scene)
+		{
+			unload_scene();
+		}
+
 		// delete
 		delete _scenes.at(id);
 		// erase
 		_scenes.erase(id);
+
+		_workingScene = _loadedScene;
+
+		return true;
 	}
+
+	return false;
 }
 
 void minty::SceneManager::load_scene(ID const id)
@@ -82,7 +106,7 @@ void minty::SceneManager::load_scene(ID const id)
 	_loadedScene = scene;
 
 	// set renderer to use this new scene
-	_runtime->set_engine_scene(_loadedScene);
+	_workingScene = _loadedScene;
 
 	// load event
 	if (_loaded && _loadedScene)
@@ -91,9 +115,23 @@ void minty::SceneManager::load_scene(ID const id)
 	}
 }
 
-Scene* minty::SceneManager::get_loaded_scene()
+void minty::SceneManager::unload_scene()
+{
+	if (_loadedScene)
+	{
+		_loadedScene->unload();
+		_loadedScene = nullptr;
+	}
+}
+
+Scene* minty::SceneManager::get_loaded_scene() const
 {
 	return _loadedScene;
+}
+
+Scene* minty::SceneManager::get_working_scene() const
+{
+	return _workingScene;
 }
 
 Scene& minty::SceneManager::get_scene(ID const id)
