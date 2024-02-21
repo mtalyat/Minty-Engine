@@ -25,8 +25,8 @@ class TestScript : Script
         time -= Time.ElapsedTime;
         if(time <= 0.0f)
         {
-            Destroy(this);
-            //Destroy(Entity);
+            //Destroy(this);
+            Destroy(Entity);
         }
     }
 

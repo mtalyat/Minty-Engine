@@ -79,8 +79,8 @@ Application::Application()
 
 	// load the engine and editor assemblies
 	ScriptEngine& scriptEngine = _runtime->get_script_engine();
-	scriptEngine.load_assembly("../Libraries/MintyEngine/bin/Debug/MintyEngine.dll");
-	//scriptEngine.load_assembly("../Libraries/MintyEditor/bin/Debug/MintyEditor.dll");
+	scriptEngine.load_assembly("../Libraries/MintyEngine/bin/x64/Debug/MintyEngine.dll");
+	//scriptEngine.load_assembly("../Libraries/MintyEditor/bin/x64/Debug/MintyEditor.dll");
 	ScriptEngine::link();
 }
 
@@ -226,7 +226,7 @@ void mintye::Application::load_project(minty::Path const& path)
 
 	// load assemblies
 	// C:\Users\mitch\source\repos\Minty-Engine\Projects\Tests\TestProject\Assembly\bin\Debug
-	_runtime->get_script_engine().load_assembly(std::format("{0}/bin/Debug/{0}.dll", project->get_name()));
+	_runtime->get_script_engine().load_assembly(std::format("{0}/bin/x64/Debug/{0}.dll", project->get_name()));
 
 	// load a scene, if any found
 	Path sceneName = project->find_asset(Project::CommonFileType::Scene);
@@ -734,8 +734,8 @@ void Application::generate_main(BuildInfo const& buildInfo)
 
 	file <<
 		"	runtime.init();" << std::endl <<
-		"	runtime.get_script_engine().load_assembly(\"" << projectInfo.get_application_name() << "/x64/bin/" << buildInfo.get_config() << "/MintyEngine.dll\");" << std::endl <<
-		"	runtime.get_script_engine().load_assembly(\"" << projectInfo.get_application_name() << "/x64/bin/" << buildInfo.get_config() << "/" << projectInfo.get_application_name() << ".dll\");" << std::endl <<
+		"	runtime.get_script_engine().load_assembly(\"" << projectInfo.get_application_name() << "/bin/x64/" << buildInfo.get_config() << "/MintyEngine.dll\");" << std::endl <<
+		"	runtime.get_script_engine().load_assembly(\"" << projectInfo.get_application_name() << "/bin/x64/" << buildInfo.get_config() << "/" << projectInfo.get_application_name() << ".dll\");" << std::endl <<
 		"	minty::Runtime::link();" << std::endl <<
 		"	if(int code = init(runtime)) { minty::Console::error(std::format(\"Failed to init program with error code {}.\", code)); return code; }" << std::endl <<
 		"	runtime.start();" << std::endl <<
@@ -746,7 +746,7 @@ void Application::generate_main(BuildInfo const& buildInfo)
 
 	if (buildInfo.debug)
 	{
-		file << "} catch (std::exception const& e) { minty::Console::error(std::format(\"Crash: \\\"{}\\\"\", e.what())); }" << std::endl;
+		file << "	} catch (std::exception const& e) { minty::Console::error(std::format(\"Crash: \\\"{}\\\"\", e.what())); }" << std::endl;
 	}
 
 	file << 
