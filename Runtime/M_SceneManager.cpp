@@ -24,6 +24,11 @@ minty::SceneManager::SceneManager(Runtime& engine)
 	, _workingScene()
 {}
 
+bool minty::SceneManager::is_loaded() const
+{
+	return _loaded;
+}
+
 ID minty::SceneManager::create_scene(Path const& path)
 {
 	return create_scene(path.stem().string(), path);

@@ -18,6 +18,7 @@ minty::Scene::Scene(Runtime& engine, ID const sceneId)
 	, _engine(&engine)
 	, _entities(new EntityRegistry(engine, sceneId))
 	, _systems(new SystemRegistry(engine, sceneId))
+	, _loaded()
 {}
 
 minty::Scene::~Scene()
@@ -89,8 +90,14 @@ SystemRegistry& minty::Scene::get_system_registry() const
 	return *_systems;
 }
 
+bool minty::Scene::is_loaded() const
+{
+	return _loaded;
+}
+
 void minty::Scene::load()
 {
+	_loaded = true;
 	_systems->load();
 }
 
@@ -186,6 +193,7 @@ void minty::Scene::fixed_update()
 
 void minty::Scene::unload()
 {
+	_loaded = false;
 	_systems->unload();
 }
 
@@ -195,7 +203,7 @@ void minty::Scene::finalize()
 	_entities->clear<DirtyComponent>();
 
 	// destroy all entities tagged with the destroy tag
-	_entities->destroy_all();
+	_entities->destroy_queued();
 }
 
 void minty::Scene::serialize(Writer& writer) const

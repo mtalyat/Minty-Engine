@@ -79,6 +79,11 @@ namespace minty
 		/// <param name="entity"></param>
 		void destroy(Entity const entity);
 
+		/// <summary>
+		/// Marks the Component with the given name on the given Entity for destruction.
+		/// </summary>
+		/// <param name="entity"></param>
+		/// <param name="componentName"></param>
 		void destroy(Entity const entity, String const& componentName);
 
 		/// <summary>
@@ -90,7 +95,7 @@ namespace minty
 		/// <summary>
 		/// Destroys all Entities marked with the Destroy component.
 		/// </summary>
-		void destroy_all();
+		void destroy_queued();
 
 		/// <summary>
 		/// Destroys the given component from any Entity that has it.

@@ -26,6 +26,12 @@ namespace minty
 		SceneManager(Runtime& engine);
 
 		/// <summary>
+		/// Checks if this SceneManager is loaded or not.
+		/// </summary>
+		/// <returns></returns>
+		bool is_loaded() const;
+
+		/// <summary>
 		/// Creates and loads an empty Scene.
 		/// </summary>
 		/// <param name="path">The path to the .scene file.</param>

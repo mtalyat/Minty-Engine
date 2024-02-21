@@ -18,6 +18,7 @@ namespace minty
 		Runtime* _engine;
 		EntityRegistry* _entities;
 		SystemRegistry* _systems;
+		bool _loaded;
 
 	public:
 		/// <summary>
@@ -52,6 +53,12 @@ namespace minty
 		/// </summary>
 		/// <returns></returns>
 		SystemRegistry& get_system_registry() const;
+
+		/// <summary>
+		/// Checks if this Scene is loaded or not.
+		/// </summary>
+		/// <returns></returns>
+		bool is_loaded() const;
 
 		/// <summary>
 		/// Loads this Scene.

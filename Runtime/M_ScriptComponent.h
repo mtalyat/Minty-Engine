@@ -28,6 +28,8 @@ namespace minty
 		std::unordered_set<ID> scriptIds;
 
 		void invoke(String const& method, ScriptComponent const& script) const;
+
+		void invoke(String const& method, ScriptComponent const& script, std::unordered_set<String> const& componentNames) const;
 	};
 
 	struct ScriptOnLoadComponent
