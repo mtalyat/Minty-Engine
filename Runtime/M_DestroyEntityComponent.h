@@ -6,9 +6,9 @@ namespace minty
 	/// <summary>
 	/// Used to mark when the Entity should be destroyed at the end of the frame.
 	/// </summary>
-	struct DestroyComponent
+	struct DestroyEntityComponent
 		: Component
 	{
-		friend String to_string(DestroyComponent const& value);
+		friend String to_string(DestroyEntityComponent const& value);
 	};
 }

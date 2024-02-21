@@ -23,7 +23,7 @@
 #include "M_AudioSourceComponent.h"
 #include "M_CameraComponent.h"
 #include "M_DirtyComponent.h"
-#include "M_DestroyComponent.h"
+#include "M_DestroyEntityComponent.h"
 #include "M_MeshComponent.h"
 #include "M_NameComponent.h"
 #include "M_RelationshipComponent.h"
@@ -245,6 +245,12 @@ void minty::Runtime::destroy()
 	MINTY_DELETE_COND(_window, _personalWindow);
 }
 
+void minty::Runtime::register_script(String const& namespaceName, String const& className)
+{
+	EntityRegistry::register_script(className);
+	ScriptEngine::link_script(namespaceName, className);
+}
+
 void minty::Runtime::link()
 {
 	// systems
@@ -259,8 +265,8 @@ void minty::Runtime::link()
 	register_component<AudioListenerComponent>(ASSEMBLY_ENGINE_NAME, "AudioListener");
 	register_component<AudioSourceComponent>(ASSEMBLY_ENGINE_NAME, "AudioSource");
 	register_component<CameraComponent>(ASSEMBLY_ENGINE_NAME, "Camera");
-	register_component<DestroyComponent>(ASSEMBLY_ENGINE_NAME, "Destroy");
-	register_component<DirtyComponent>(ASSEMBLY_ENGINE_NAME, "Dirty");
+	//register_component<DestroyComponent>(ASSEMBLY_ENGINE_NAME, "Destroy");
+	//register_component<DirtyComponent>(ASSEMBLY_ENGINE_NAME, "Dirty");
 	register_component<MeshComponent>(ASSEMBLY_ENGINE_NAME, "Mesh");
 	register_component<NameComponent>(ASSEMBLY_ENGINE_NAME, "Name");
 	register_component<RelationshipComponent>(ASSEMBLY_ENGINE_NAME, "Relationship");
@@ -280,7 +286,7 @@ void minty::Runtime::record_time()
 	TimePoint now = Time::now();
 
 	// calculate the times in seconds
-	_time.time = Time::calculate_duration_seconds(_time.start, now);
+	_time.total = Time::calculate_duration_seconds(_time.start, now);
 	_time.elapsed = Time::calculate_duration_seconds(_time.end, now);
 
 	_time.end = now;

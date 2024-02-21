@@ -1,6 +1,8 @@
 #pragma once
 #include "M_Component.h"
 
+#include "M_UUID.h"
+
 struct _MonoObject;
 typedef struct _MonoObject MonoObject;
 struct _MonoClassField;
@@ -22,15 +24,17 @@ namespace minty
 		uint32_t _handle; // GC handle
 
 	public:
-		ScriptObject(ScriptClass const& script);
+		ScriptObject(UUID const id, ScriptClass const& script);
 
-		ScriptObject(ScriptClass const& script, ScriptArguments& arguments);
+		ScriptObject(UUID const id, ScriptClass const& script, ScriptArguments& arguments);
 
 		~ScriptObject();
 
 		void destroy();
 
 		void invoke(String const& name) const;
+
+		ScriptClass const& get_class() const;
 		
 		void set_field(String const& name, void* const value) const;
 

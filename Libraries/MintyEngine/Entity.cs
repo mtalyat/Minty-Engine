@@ -9,7 +9,7 @@ namespace MintyEngine
     /// <summary>
     /// Represents a game object within the Scene.
     /// </summary>
-    public class Entity
+    public class Entity : Object
     {
         public readonly ulong ID;
 

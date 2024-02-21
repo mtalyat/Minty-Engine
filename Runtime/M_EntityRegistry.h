@@ -79,6 +79,8 @@ namespace minty
 		/// <param name="entity"></param>
 		void destroy(Entity const entity);
 
+		void destroy(Entity const entity, String const& componentName);
+
 		/// <summary>
 		/// Destroys the given Entity right now.
 		/// </summary>

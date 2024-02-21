@@ -10,7 +10,8 @@
 #include "M_RelationshipComponent.h"
 #include "M_TransformComponent.h"
 #include "M_DirtyComponent.h"
-#include "M_DestroyComponent.h"
+#include "M_DestroyEntityComponent.h"
+#include "M_DestroyComponentComponent.h"
 
 #include "M_ScriptClass.h"
 #include "M_ScriptObject.h"
@@ -85,7 +86,13 @@ Entity minty::EntityRegistry::create(String const& name, UUID const uuid)
 
 void minty::EntityRegistry::destroy(Entity const entity)
 {
-	emplace_or_replace<DestroyComponent>(entity);
+	emplace_or_replace<DestroyEntityComponent>(entity);
+}
+
+void minty::EntityRegistry::destroy(Entity const entity, String const& componentName)
+{
+	DestroyComponentComponent& destroyComponent = get_or_emplace<DestroyComponentComponent>(entity);
+	destroyComponent.components.emplace(componentName);
 }
 
 void minty::EntityRegistry::destroy_immediate(Entity const entity)
@@ -107,22 +114,74 @@ void minty::EntityRegistry::destroy_immediate(Entity const entity)
 
 void minty::EntityRegistry::destroy_all()
 {
+	ScriptEngine& scriptEngine = get_runtime().get_script_engine();
+
+	// destroy all components, as long as the entity itself is not being destroyed
+	for (auto [entity, destroy, script, ondestroy] : view<DestroyComponentComponent const, ScriptComponent const, ScriptOnDestroyComponent const>(entt::exclude<DestroyEntityComponent>).each())
+	{
+		// call OnDestroys
+		for (auto const& name : destroy.components)
+		{
+			// check for Script that corresponds to this Component
+			ID id = script.scripts.find(name);
+
+			// found id means there is a Script
+			if (id != ERROR_ID)
+			{
+				// call OnDestroy
+				script.scripts.at(id).invoke(SCRIPT_METHOD_NAME_ONDESTROY);
+			}
+
+			// remove from entity
+			erase_by_name(name, entity);
+		}
+	}
+
+	// erase all components without the onDestroy event
+	for (auto [entity, destroy] : view<DestroyComponentComponent const>(entt::exclude<DestroyEntityComponent, ScriptOnDestroyComponent>).each())
+	{
+		for (auto const& name : destroy.components)
+		{
+			// remove from entity
+			erase_by_name(name, entity);
+		}
+	}
+
+	// clear all tags, as the entity is still alive
+	clear<DestroyComponentComponent>();
+
 	// call OnDestroy on any scripts
-	for (auto [entity, destroy, script, ondestroy] : view<DestroyComponent const, ScriptComponent const, ScriptOnDestroyComponent const>().each())
+	for (auto [entity, destroy, script, ondestroy] : view<DestroyEntityComponent const, ScriptComponent const, ScriptOnDestroyComponent const>().each())
 	{
 		ondestroy.invoke(SCRIPT_METHOD_NAME_ONDESTROY, script);
+
+		for (auto const& scriptObject : script.scripts)
+		{
+			scriptEngine.destroy_object(scriptObject.second.id);
+		}
+
+		remove_from_lookup(entity);
+	}
+
+	// destroy scripts
+	for (auto [entity, destroy, script] : view<DestroyEntityComponent const, ScriptComponent>(entt::exclude<ScriptOnDestroyComponent>).each())
+	{
+		for (auto const& scriptObject : script.scripts)
+		{
+			scriptEngine.destroy_object(scriptObject.second.id);
+		}
+
+		remove_from_lookup(entity);
 	}
 
 	// remove them from lookup
-	for (auto [entity, destroy] : view<DestroyComponent const>().each())
+	for (auto [entity, destroy] : view<DestroyEntityComponent const>(entt::exclude<ScriptComponent>).each())
 	{
 		remove_from_lookup(entity);
 	}
 
-	// get the entities that are ready for destruction
-	auto destroyView = view<DestroyComponent const>();
-
-	// destroy them all
+	// get the entities that are ready for destruction, and destroy them all at once
+	auto destroyView = view<DestroyEntityComponent const>();
 	entt::registry::destroy(destroyView.begin(), destroyView.end());
 }
 
@@ -435,21 +494,31 @@ void minty::EntityRegistry::register_script(String const& name)
 			// get the script component
 			ScriptComponent* component = registry.try_get<ScriptComponent>(entity);
 
+			// hmm, no script to destroy
+			if (!component) return;
+
 			// get the ID of the script with the name
 			ID id = component->scripts.get_id(name);
 
 			// if not there, skip
 			if (id == ERROR_ID) return;
 
-			// destroy the script
-			component->scripts.at(id).invoke(SCRIPT_METHOD_NAME_ONDESTROY);
-			component->scripts.erase(name);
-
-			// get the other components and erase if needed
+			// get the event components and erase if needed
 			if (ScriptOnLoadComponent* eventComp = registry.try_get<ScriptOnLoadComponent>(entity)) eventComp->scriptIds.erase(id);
 			if (ScriptOnUpdateComponent* eventComp = registry.try_get<ScriptOnUpdateComponent>(entity)) eventComp->scriptIds.erase(id);
 			if (ScriptOnUnloadComponent* eventComp = registry.try_get<ScriptOnUnloadComponent>(entity)) eventComp->scriptIds.erase(id);
 			if (ScriptOnDestroyComponent* eventComp = registry.try_get<ScriptOnDestroyComponent>(entity)) eventComp->scriptIds.erase(id);
+
+			// remove from scripts
+			component->scripts.erase(id);
+
+			// TODO: erase the scripts component if needed (including each on script event component)
+
+			// get the script engine
+			ScriptEngine& engine = registry.get_runtime().get_script_engine();
+
+			// destroy the script object
+			engine.destroy_object(component->id);
 		},
 	};
 	_components.emplace(name, funcs);

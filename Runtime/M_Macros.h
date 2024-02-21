@@ -31,7 +31,7 @@
 #define MINTY_INFO(message) std::format("{}/{}()/{} -> {}", minty::Path(__FILE__).filename().string(), __func__, __LINE__, message)
 
 #ifdef MINTY_RELEASE
-#define MINTY_ABORT(message)
+#define MINTY_ABORT(message) minty::Console::error(std::format("FATAL ERROR: {}", MINTY_INFO(message)))
 #else
 #define MINTY_ABORT(message) throw std::runtime_error(MINTY_INFO(message))
 #endif

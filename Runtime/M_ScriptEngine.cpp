@@ -130,11 +130,11 @@ bool minty::ScriptEngine::load_assembly(Path const& path, bool const referenceOn
 	if (scriptScriptClass)
 	{
 		// register all Scripts with the EntityRegistry
-		for (auto const& script : scriptAssembly->get_classes(scriptScriptClass))
+		for (auto const script : scriptAssembly->get_classes(scriptScriptClass))
 		{
 			if (script->is_derived_from(*scriptScriptClass))
 			{
-				EntityRegistry::register_script(script->get_full_name());
+				Runtime::register_script(script->get_namespace(), script->get_name());
 			}
 		}
 	}
@@ -572,12 +572,12 @@ ScriptClass const* minty::ScriptEngine::search_for_class(String const& name) con
 
 ScriptObject const& minty::ScriptEngine::create_object(ScriptClass const& script, UUID id) const
 {
-	return _data.objects.emplace(id, ScriptObject(script)).first->second;
+	return _data.objects.emplace(id, ScriptObject(id, script)).first->second;
 }
 
 ScriptObject const& minty::ScriptEngine::create_object(ScriptClass const& script, UUID id, ScriptArguments& scriptArguments) const
 {
-	return _data.objects.emplace(id, ScriptObject(script, scriptArguments)).first->second;
+	return _data.objects.emplace(id, ScriptObject(id, script, scriptArguments)).first->second;
 }
 
 ScriptObject const* minty::ScriptEngine::get_object(UUID id) const
@@ -721,6 +721,28 @@ constexpr static char const* INTERNAL_CLASS_NAME = "Runtime";
 
 #define ADD_INTERNAL_CALL(csharpName, cppName) mono_add_internal_call(std::format("{}.{}::{}", ASSEMBLY_ENGINE_NAME, INTERNAL_CLASS_NAME, csharpName).c_str(), cppName)
 
+#pragma region Time
+
+static float time_get_total()
+{
+	MINTY_ASSERT(_data.engine);
+
+	Runtime& runtime = _data.engine->get_runtime();
+
+	return runtime.get_time().total;
+}
+
+static float time_get_elapsed()
+{
+	MINTY_ASSERT(_data.engine);
+
+	Runtime& runtime = _data.engine->get_runtime();
+
+	return runtime.get_time().elapsed;
+}
+
+#pragma endregion
+
 #pragma region Console
 
 static void console_log(MonoString* string)
@@ -746,6 +768,40 @@ static void console_error(MonoString* string)
 static void console_ass(bool condition, MonoString* string)
 {
 	Console::ass(condition, ScriptEngine::from_mono_string(string));
+}
+
+#pragma endregion
+
+#pragma region Object
+
+static void object_destroy_entity(UUID id)
+{
+	MINTY_ASSERT(_data.engine);
+
+	Scene* scene = _data.get_scene();
+	MINTY_ASSERT(scene);
+
+	EntityRegistry& registry = scene->get_entity_registry();
+
+	Entity entity = registry.find(id);
+	MINTY_ASSERT(entity != NULL_ENTITY);
+
+	registry.destroy(entity);
+}
+
+static void object_destroy_immediate_entity(UUID id)
+{
+	MINTY_ASSERT(_data.engine);
+
+	Scene* scene = _data.get_scene();
+	MINTY_ASSERT(scene);
+
+	EntityRegistry& registry = scene->get_entity_registry();
+
+	Entity entity = registry.find(id);
+	MINTY_ASSERT(entity != NULL_ENTITY);
+
+	registry.destroy_immediate(entity);
 }
 
 #pragma endregion
@@ -812,7 +868,7 @@ static MonoObject* entity_add_component(UUID id, MonoReflectionType* reflectionT
 	auto found = _data.types.find(type);
 	if (found == _data.types.end())
 	{
-		// type not found
+		MINTY_ABORT(std::format("{} cannot be added, it has not been registered.", mono_type_get_name(type)));
 		return nullptr;
 	}
 	ScriptClass const* scriptClass = found->second;
@@ -849,6 +905,7 @@ static MonoObject* entity_get_component(UUID id, MonoReflectionType* reflectionT
 	auto found = _data.types.find(type);
 	if (found == _data.types.end())
 	{
+		MINTY_ABORT(std::format("{} cannot be gotten, it has not been registered.", mono_type_get_name(type)));
 		// type not found
 		return nullptr;
 	}
@@ -886,13 +943,14 @@ static void entity_remove_component(UUID id, MonoReflectionType* reflectionType)
 	auto found = _data.types.find(type);
 	if (found == _data.types.end())
 	{
+		MINTY_ABORT(std::format("{} cannot be removed, it has not been registered.", mono_type_get_name(type)));
 		// type not found
 		return;
 	}
 	ScriptClass const* scriptClass = found->second;
 
-	// erase the component by name
-	registry.erase_by_name(scriptClass->get_name(), entity);
+	// destroy the component by name
+	registry.destroy(entity, scriptClass->get_name());
 }
 
 #pragma endregion
@@ -946,12 +1004,22 @@ static void transform_set_local_position(UUID id, Vector3 position)
 void minty::ScriptEngine::link()
 {
 	// link all the functions
+#pragma region Time
+	ADD_INTERNAL_CALL("Time_GetTotalTime", time_get_total);
+	ADD_INTERNAL_CALL("Time_GetElapsedTime", time_get_elapsed);
+#pragma endregion
+
 #pragma region Console
 	ADD_INTERNAL_CALL("Console_Log", console_log);
 	ADD_INTERNAL_CALL("Console_LogColor", console_log_color);
 	ADD_INTERNAL_CALL("Console_Warn", console_warn);
 	ADD_INTERNAL_CALL("Console_Error", console_error);
 	ADD_INTERNAL_CALL("Console_Assert", console_ass);
+#pragma endregion
+
+#pragma region Object
+	ADD_INTERNAL_CALL("Object_DestroyEntity", object_destroy_entity);
+	ADD_INTERNAL_CALL("Object_DestroyImmediateEntity", object_destroy_immediate_entity);
 #pragma endregion
 
 #pragma region Entity

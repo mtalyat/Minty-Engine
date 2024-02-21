@@ -14,14 +14,16 @@
 using namespace minty;
 using namespace minty::Scripting;
 
-minty::ScriptObject::ScriptObject(ScriptClass const& script)
-	: _script(&script)
+minty::ScriptObject::ScriptObject(UUID const id, ScriptClass const& script)
+	: Component(id)
+	, _script(&script)
 	, _object(script.get_assembly().get_engine().create_instance(script._class))
 	, _handle(mono_gchandle_new(_object, false))
 {}
 
-minty::ScriptObject::ScriptObject(ScriptClass const& script, ScriptArguments& arguments)
-	: _script(&script)
+minty::ScriptObject::ScriptObject(UUID const id, ScriptClass const& script, ScriptArguments& arguments)
+	: Component(id)
+	, _script(&script)
 	, _object(script.get_assembly().get_engine().create_instance(script._class, arguments.get_values()))
 	, _handle(mono_gchandle_new(_object, false))
 {}
@@ -46,6 +48,11 @@ void minty::ScriptObject::invoke(String const& name) const
 
 	// invoke it
 	engine.invoke_method(data(), method);
+}
+
+ScriptClass const& minty::ScriptObject::get_class() const
+{
+	return *_script;
 }
 
 void minty::ScriptObject::set_field(String const& name, void* const value) const

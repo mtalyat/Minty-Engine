@@ -10,12 +10,22 @@ namespace MintyEngine
     {
         // [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Class_Function();
 
+        #region Time
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static float Time_GetTotalTime();
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static float Time_GetElapsedTime();
+        #endregion
+
         #region Console
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Console_Log(string message);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Console_LogColor(string message, int color);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Console_Warn(string message);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Console_Error(string message);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Console_Assert(string message);
+        #endregion
+
+        #region Object
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Object_DestroyEntity(ulong id);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Object_DestroyImmediateEntity(ulong id);
         #endregion
 
         #region Entity

@@ -77,7 +77,7 @@ entities
         Animator
             animator: animator2
         TestScript
-            count: 1000
+            time: 3
 #    Sprite
 #        Renderable
 #        Transform

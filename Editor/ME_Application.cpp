@@ -725,17 +725,31 @@ void Application::generate_main(BuildInfo const& buildInfo)
 		"	std::filesystem::current_path(\"" << _project->get_base_path().generic_string() << "\");" << std::endl << // move out of Build/Debug or Build/Release folder, into base folder
 		"	minty::Console::log(std::filesystem::current_path().string());" << std::endl <<
 		"	minty::Info info(\"" << projectInfo.get_application_name() << "\", " << projectInfo.get_application_major() << ", " << projectInfo.get_application_minor() << ", " << projectInfo.get_application_patch() << ");" << std::endl <<
-		"	minty::Runtime runtime(info);" << std::endl <<
+		"	minty::Runtime runtime(info);" << std::endl;
+	
+	if (buildInfo.debug)
+	{
+		file << "	try {" << std::endl;
+	}
+
+	file <<
 		"	runtime.init();" << std::endl <<
-		"	runtime.get_script_engine().load_assembly(\"" << projectInfo.get_application_name() << "/bin/" << buildInfo.get_config() << "/MintyEngine.dll\");" << std::endl <<
-		"	runtime.get_script_engine().load_assembly(\"" << projectInfo.get_application_name() << "/bin/" << buildInfo.get_config() << "/" << projectInfo.get_application_name() << ".dll\");" << std::endl <<
-		"	minty::ScriptEngine::link();" << std::endl <<
+		"	runtime.get_script_engine().load_assembly(\"" << projectInfo.get_application_name() << "/x64/bin/" << buildInfo.get_config() << "/MintyEngine.dll\");" << std::endl <<
+		"	runtime.get_script_engine().load_assembly(\"" << projectInfo.get_application_name() << "/x64/bin/" << buildInfo.get_config() << "/" << projectInfo.get_application_name() << ".dll\");" << std::endl <<
+		"	minty::Runtime::link();" << std::endl <<
 		"	if(int code = init(runtime)) { minty::Console::error(std::format(\"Failed to init program with error code {}.\", code)); return code; }" << std::endl <<
 		"	runtime.start();" << std::endl <<
 		"	runtime.run();" << std::endl <<
 		"	runtime.cleanup();" << std::endl <<
 		"	if(int code = destroy(runtime)) { minty::Console::error(std::format(\"Failed to destroy program with error code {}.\", code)); return code; }" << std::endl <<
-		"	runtime.destroy();" << std::endl <<
+		"	runtime.destroy();" << std::endl;
+
+	if (buildInfo.debug)
+	{
+		file << "} catch (std::exception const& e) { minty::Console::error(std::format(\"Crash: \\\"{}\\\"\", e.what())); }" << std::endl;
+	}
+
+	file << 
 		"	return runtime.get_exit_code();" << std::endl <<
 		"}";
 

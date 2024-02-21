@@ -220,6 +220,8 @@ namespace minty
 		template<class T>
 		static void register_component(String const& namespaceName, String const& className);
 
+		static void register_script(String const& namespaceName, String const& className);
+
 		/// <summary>
 		/// Links the C++ and C# together.
 		/// </summary>

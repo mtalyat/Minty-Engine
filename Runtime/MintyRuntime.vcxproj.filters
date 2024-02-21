@@ -561,7 +561,7 @@
     <ClInclude Include="M_ScriptSystem.h">
       <Filter>Header Files\Scripting</Filter>
     </ClInclude>
-    <ClInclude Include="M_DestroyComponent.h">
+    <ClInclude Include="M_DestroyEntityComponent.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
     <ClInclude Include="M_UUID.h">
@@ -572,6 +572,9 @@
     </ClInclude>
     <ClInclude Include="M_ScriptArguments.h">
       <Filter>Header Files\Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="M_DestroyComponentComponent.h">
+      <Filter>Header Files\Components</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -947,7 +950,7 @@
     <ClCompile Include="M_ScriptSystem.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="M_DestroyComponent.cpp">
+    <ClCompile Include="M_DestroyEntityComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_UUID.cpp">

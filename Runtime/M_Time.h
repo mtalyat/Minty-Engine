@@ -19,7 +19,7 @@ namespace minty
 		/// <summary>
 		/// The total time in seconds from start to end.
 		/// </summary>
-		float time;
+		float total;
 		
 		/// <summary>
 		/// The elapsed time in seconds.

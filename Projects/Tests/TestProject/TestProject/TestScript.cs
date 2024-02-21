@@ -3,7 +3,7 @@ using System;
 
 class TestScript : Script
 {
-    public int count = 0;
+    public float time;
 
     void OnCreate()
     {
@@ -16,17 +16,18 @@ class TestScript : Script
     void OnLoad()
     {
         Debug.Log("TestClass.OnLoad()");
-        Debug.Log(Entity.GetComponent<Transform>() == null);
-        Entity.AddComponent<Transform>();
-        Debug.Log(Entity.GetComponent<Transform>() == null);
-        Entity.RemoveComponent<Transform>();
-        Debug.Log(Entity.GetComponent<Transform>() == null);
     }
 
     void OnUpdate()
     {
         Debug.Log("TestClass.OnUpdate()");
-        count++;
+        Debug.Log($"Time: {time:0.00}s");
+        time -= Time.ElapsedTime;
+        if(time <= 0.0f)
+        {
+            Destroy(this);
+            //Destroy(Entity);
+        }
     }
 
     void OnUnload()
@@ -36,6 +37,6 @@ class TestScript : Script
 
     void OnDestroy()
     {
-        Debug.Log("TestClass.OnDestroy()", Debug.Color.BrightMagenta);
+        Debug.Log("TestClass.OnDestroy()");
     }
 }
