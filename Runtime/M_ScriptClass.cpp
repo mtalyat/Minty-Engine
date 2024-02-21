@@ -59,3 +59,9 @@ bool minty::ScriptClass::has_method(String const& name) const
 {
 	return _assembly->get_engine().get_method(_class, name);
 }
+
+MonoType* minty::ScriptClass::get_type() const
+{
+	String fullName = get_full_name();
+	return mono_reflection_type_from_name(fullName.data(), _assembly->_image);
+}

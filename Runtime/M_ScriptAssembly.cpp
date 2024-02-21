@@ -13,6 +13,7 @@ minty::ScriptAssembly::ScriptAssembly(Path const& path, ScriptEngine& engine, bo
 	: _path(path)
 	, _engine(&engine)
 	, _assembly()
+	, _image()
 	, _classes()
 {
 	MINTY_ASSERT_FORMAT(std::filesystem::exists(_path), "Assembly not found at path \"{}\".", _path.string());
@@ -22,7 +23,7 @@ minty::ScriptAssembly::ScriptAssembly(Path const& path, ScriptEngine& engine, bo
 
 	// load the assembly image
 	MonoImageOpenStatus status;
-	MonoImage* image = mono_image_open_from_data_full(fileData.data(), static_cast<uint32_t>(fileData.size()), 1, &status, referenceOnly);
+	MonoImage* loadImage = mono_image_open_from_data_full(fileData.data(), static_cast<uint32_t>(fileData.size()), 1, &status, referenceOnly);
 
 	// check for error
 	if (status != MONO_IMAGE_OK)
@@ -35,12 +36,12 @@ minty::ScriptAssembly::ScriptAssembly(Path const& path, ScriptEngine& engine, bo
 	}
 
 	// load the assembly itself
-	_assembly = mono_assembly_load_from_full(image, _path.string().c_str(), &status, referenceOnly);
-	mono_image_close(image);
+	_assembly = mono_assembly_load_from_full(loadImage, _path.string().c_str(), &status, referenceOnly);
+	mono_image_close(loadImage);
 
 	// load all of the classes from the assembly
-	image = mono_assembly_get_image(_assembly);
-	const MonoTableInfo* tableInfo = mono_image_get_table_info(image, MONO_TABLE_TYPEDEF);
+	_image = mono_assembly_get_image(_assembly);
+	const MonoTableInfo* tableInfo = mono_image_get_table_info(_image, MONO_TABLE_TYPEDEF);
 	int rows = mono_table_info_get_rows(tableInfo);
 
 	String name = get_name();
@@ -50,10 +51,10 @@ minty::ScriptAssembly::ScriptAssembly(Path const& path, ScriptEngine& engine, bo
 		// get the mono class
 		uint32_t cols[MONO_TYPEDEF_SIZE];
 		mono_metadata_decode_row(tableInfo, i, cols, MONO_TYPEDEF_SIZE);
-		char const* className = mono_metadata_string_heap(image, cols[MONO_TYPEDEF_NAME]);
-		char const* namespaceName = mono_metadata_string_heap(image, cols[MONO_TYPEDEF_NAMESPACE]);
+		char const* className = mono_metadata_string_heap(_image, cols[MONO_TYPEDEF_NAME]);
+		char const* namespaceName = mono_metadata_string_heap(_image, cols[MONO_TYPEDEF_NAMESPACE]);
 		String fullName = ScriptEngine::get_full_name(namespaceName, className);
-		MonoClass* klass = mono_class_from_name(image, namespaceName, className);
+		MonoClass* klass = mono_class_from_name(_image, namespaceName, className);
 
 		// create script class and add to list
 		Console::info(std::format("Found {}::{}.", name, fullName));
@@ -111,4 +112,17 @@ std::vector<ScriptClass const*> minty::ScriptAssembly::get_classes(ScriptClass c
 	}
 
 	return classes;
+}
+
+ScriptClass const* minty::ScriptAssembly::search_for_class(String const& name) const
+{
+	for (auto const& pair : _classes)
+	{
+		if (pair.second.get_name() == name)
+		{
+			return &pair.second;
+		}
+	}
+
+	return nullptr;
 }

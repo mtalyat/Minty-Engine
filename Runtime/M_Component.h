@@ -10,6 +10,8 @@ namespace minty
 	struct Component
 		: public Object
 	{
+		UUID id;
+
 	public:
 		virtual ~Component() {}
 

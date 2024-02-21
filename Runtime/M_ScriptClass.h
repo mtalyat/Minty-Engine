@@ -7,6 +7,8 @@ struct _MonoClass;
 typedef struct _MonoClass MonoClass;
 struct _MonoObject;
 typedef struct _MonoObject MonoObject;
+struct _MonoType;
+typedef struct _MonoType MonoType;
 
 namespace minty
 {
@@ -44,5 +46,7 @@ namespace minty
 		ScriptObject create_object(UUID const id = UUID()) const;
 
 		bool has_method(String const& name) const;
+
+		MonoType* get_type() const;
 	};
 }

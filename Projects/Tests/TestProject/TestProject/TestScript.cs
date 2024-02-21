@@ -1,11 +1,6 @@
 ﻿using MintyEngine;
 using System;
 
-class Test
-{
-    public Entity Entity = new Entity();
-}
-
 class TestScript : Script
 {
     public int count = 0;
@@ -13,13 +8,19 @@ class TestScript : Script
     void OnCreate()
     {
         Debug.Log("TestClass.OnCreate()");
-        Debug.Log($"Entity is {(Entity == null ? "null" : "not null")}");
         Debug.Log($"Entity is {Entity}");
+        Entity.Name = "test";
+        Debug.Log($"Entity is now {Entity}");
     }
 
     void OnLoad()
     {
         Debug.Log("TestClass.OnLoad()");
+        Debug.Log(Entity.GetComponent<Transform>() == null);
+        Entity.AddComponent<Transform>();
+        Debug.Log(Entity.GetComponent<Transform>() == null);
+        Entity.RemoveComponent<Transform>();
+        Debug.Log(Entity.GetComponent<Transform>() == null);
     }
 
     void OnUpdate()

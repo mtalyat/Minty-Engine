@@ -44,8 +44,10 @@ namespace minty
 
 		virtual ~ScriptEngine();
 
+	public:
 		static void link();
 
+	public:
 		void set_runtime(Runtime& runtime) override;
 
 #pragma region Assemblies
@@ -91,6 +93,8 @@ namespace minty
 
 	public:
 		MonoString* to_mono_string(String const& string) const;
+
+		static String from_mono_string(MonoString* const string);
 
 	private:
 		String get_class_name(MonoClass* const klass) const;
@@ -154,19 +158,32 @@ namespace minty
 
 		ScriptClass const* find_class(String const& fullName) const;
 
+		ScriptClass const* search_for_class(String const& name) const;
+
 		ScriptObject const& create_object(ScriptClass const& script, UUID id) const;
 
 		ScriptObject const& create_object(ScriptClass const& script, UUID id, ScriptArguments& scriptArguments) const;
 
 		ScriptObject const* get_object(UUID id) const;
 
-		ScriptObject const& get_or_create_entity(UUID id);
+		ScriptObject const& get_or_create_object(UUID id, ScriptClass const& script) const;
 
-		ScriptObject const& create_object_entity(UUID id);
+		ScriptObject const& get_or_create_object(UUID id, ScriptClass const& script, ScriptArguments& scriptArguments) const;
 
-		ScriptObject const& create_object_component(UUID id, UUID const entityId, ScriptClass const& script);
+		ScriptObject const& get_or_create_entity(UUID id) const;
+
+		ScriptObject const& get_or_create_component(UUID id, UUID const entityId, ScriptClass const& script) const;
+
+		ScriptObject const& create_object_entity(UUID id) const;
+
+		ScriptObject const& create_object_component(UUID id, UUID const entityId, ScriptClass const& script) const;
 
 		void destroy_object(UUID id);
+
+	public:
+		static void link_script(String const& namespaceName, String const& className);
+
+		static void link_script(ScriptClass const& script);
 
 #pragma endregion
 

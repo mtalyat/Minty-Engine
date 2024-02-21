@@ -210,6 +210,7 @@ namespace minty
 
 		friend String to_string(EntityRegistry const& value);
 
+	public:
 		/// <summary>
 		/// Registers the Component, so the Component can be dynamically created by name.
 		/// </summary>
@@ -224,6 +225,7 @@ namespace minty
 		/// <param name="name">The name of the Script to register.</param>
 		static void register_script(String const& name);
 
+	public:
 		void serialize(Writer& writer) const override;
 		void serialize_entity(Writer& writer, Entity const entity) const;
 		Node serialize_entity(Entity const entity) const;

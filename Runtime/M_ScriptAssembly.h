@@ -7,6 +7,8 @@
 
 struct _MonoAssembly;
 typedef struct _MonoAssembly MonoAssembly;
+struct _MonoImage;
+typedef struct _MonoImage MonoImage;
 
 namespace minty
 {
@@ -21,6 +23,7 @@ namespace minty
 		Path _path;
 		ScriptEngine* _engine;
 		MonoAssembly* _assembly;
+		MonoImage* _image;
 
 		std::unordered_map<String, ScriptClass> _classes;
 
@@ -38,6 +41,8 @@ namespace minty
 		ScriptClass const* get_class(String const& fullName) const;
 
 		std::vector<ScriptClass const*> get_classes(ScriptClass const* baseClass = nullptr) const;
+
+		ScriptClass const* search_for_class(String const& name) const;
 	private:
 
 	};

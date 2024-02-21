@@ -7,6 +7,9 @@
 #include "M_Engine.h"
 #include "M_Types.h"
 #include "M_TypeRegister.h"
+#include "M_SystemRegistry.h"
+#include "M_EntityRegistry.h"
+#include "M_ScriptEngine.h"
 #include <unordered_map>
 
 namespace minty
@@ -208,6 +211,23 @@ namespace minty
 
 #pragma endregion
 
+#pragma region Linking
+
+	public:
+		template<class T>
+		static void register_system(String const& name);
+
+		template<class T>
+		static void register_component(String const& namespaceName, String const& className);
+
+		/// <summary>
+		/// Links the C++ and C# together.
+		/// </summary>
+		static void link();
+
+#pragma endregion
+
+
 	private:
 		/// <summary>
 		/// Updates the _time object.
@@ -217,7 +237,7 @@ namespace minty
 	public:
 		friend String to_string(Runtime const& value);
 	};
-	
+
 	template<typename T>
 	T* Runtime::get_engine() const
 	{
@@ -244,5 +264,18 @@ namespace minty
 
 		// set engine
 		_engines.emplace<T>(engine);
+	}
+	
+	template<class T>
+	void Runtime::register_system(String const& name)
+	{
+		SystemRegistry::register_system<T>(name);
+	}
+
+	template<class T>
+	void Runtime::register_component(String const& namespaceName, String const& className)
+	{
+		EntityRegistry::register_component<T>(className);
+		ScriptEngine::link_script(namespaceName, className);
 	}
 }

@@ -67,8 +67,8 @@ entities
             animator: animator
     Model
         Renderable
-        Transform
-            position: (0, 0, 0)
+#        Transform
+#            position: (0, 0, 0)
         Mesh
             material: material1
             type: cube

@@ -34,6 +34,7 @@ namespace minty
 		operator uint64_t() const { return _uuid; }
 		bool operator==(UUID const other) const;
 		bool operator!=(UUID const other) const;
+		bool operator!() const;
 
 		friend std::ostream& operator<<(std::ostream& stream, UUID const& object);
 		friend std::istream& operator>>(std::istream& stream, UUID& object);

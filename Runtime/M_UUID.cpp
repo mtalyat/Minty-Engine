@@ -33,6 +33,11 @@ bool minty::UUID::operator!=(UUID const other) const
 	return _uuid != other._uuid;
 }
 
+bool minty::UUID::operator!() const
+{
+	return !_uuid;
+}
+
 UUID minty::UUID::create_empty()
 {
 	return UUID(0);

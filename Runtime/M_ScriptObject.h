@@ -40,8 +40,7 @@ namespace minty
 
 		void get_property(String const& name, void* const value) const;
 
-	private:
-		MonoObject* get_object() const;
+		MonoObject* data() const;
 
 	public:
 		void serialize(Writer& writer) const override;

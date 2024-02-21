@@ -27,6 +27,7 @@ struct ScriptEngineData
 
 	// uuid, script object
 	std::unordered_map<UUID, ScriptObject> objects;
+	std::unordered_map<MonoType*, ScriptClass const*> types;
 
 	Scene* get_scene()
 	{
@@ -179,6 +180,14 @@ ScriptAssembly const* minty::ScriptEngine::get_assembly(String const& assemblyNa
 MonoString* minty::ScriptEngine::to_mono_string(String const& string) const
 {
 	return mono_string_new(_appDomain, string.c_str());
+}
+
+String minty::ScriptEngine::from_mono_string(MonoString* const string)
+{
+	char* str = mono_string_to_utf8(string);
+	String result(str);
+	mono_free(str);
+	return result;
 }
 
 String minty::ScriptEngine::get_class_name(MonoClass* const klass) const
@@ -542,6 +551,19 @@ ScriptClass const* minty::ScriptEngine::find_class(String const& fullName) const
 	return nullptr;
 }
 
+ScriptClass const* minty::ScriptEngine::search_for_class(String const& name) const
+{
+	for (auto const& pair : _assemblies)
+	{
+		if (ScriptClass const* scriptClass = pair.second->search_for_class(name))
+		{
+			return scriptClass;
+		}
+	}
+
+	return nullptr;
+}
+
 ScriptObject const& minty::ScriptEngine::create_object(ScriptClass const& script, UUID id) const
 {
 	return _data.objects.emplace(id, ScriptObject(script)).first->second;
@@ -564,7 +586,25 @@ ScriptObject const* minty::ScriptEngine::get_object(UUID id) const
 	return nullptr;
 }
 
-ScriptObject const& minty::ScriptEngine::get_or_create_entity(UUID id)
+ScriptObject const& minty::ScriptEngine::get_or_create_object(UUID id, ScriptClass const& script) const
+{
+	ScriptObject const* object = get_object(id);
+
+	if (object) return *object;
+
+	return create_object(script, id);
+}
+
+ScriptObject const& minty::ScriptEngine::get_or_create_object(UUID id, ScriptClass const& script, ScriptArguments& scriptArguments) const
+{
+	ScriptObject const* object = get_object(id);
+
+	if (object) return *object;
+
+	return create_object(script, id, scriptArguments);
+}
+
+ScriptObject const& minty::ScriptEngine::get_or_create_entity(UUID id) const
 {
 	// try get
 	ScriptObject const* entityObject = get_object(id);
@@ -576,7 +616,18 @@ ScriptObject const& minty::ScriptEngine::get_or_create_entity(UUID id)
 	return create_object_entity(id);
 }
 
-ScriptObject const& minty::ScriptEngine::create_object_entity(UUID id)
+ScriptObject const& minty::ScriptEngine::get_or_create_component(UUID id, UUID const entityId, ScriptClass const& script) const
+{
+	// try get
+	ScriptObject const* compObject = get_object(id);
+
+	if (compObject) return *compObject;
+
+	// new
+	return create_object_component(id, entityId, script);
+}
+
+ScriptObject const& minty::ScriptEngine::create_object_entity(UUID id) const
 {
 	// get the entity class
 	ScriptAssembly const* engineAssembly = get_assembly(ASSEMBLY_ENGINE_NAME);
@@ -593,7 +644,7 @@ ScriptObject const& minty::ScriptEngine::create_object_entity(UUID id)
 	return object;
 }
 
-ScriptObject const& minty::ScriptEngine::create_object_component(UUID id, UUID const entityId, ScriptClass const& script)
+ScriptObject const& minty::ScriptEngine::create_object_component(UUID id, UUID const entityId, ScriptClass const& script) const
 {
 	// get the component class
 	ScriptAssembly const* engineAssembly = get_assembly(ASSEMBLY_ENGINE_NAME);
@@ -608,7 +659,7 @@ ScriptObject const& minty::ScriptEngine::create_object_component(UUID id, UUID c
 	// get entity object
 	ScriptObject const* entity = get_object(entityId);
 	MINTY_ASSERT(entity != nullptr);
-	MonoObject* entityObject = entity->get_object();
+	MonoObject* entityObject = entity->data();
 	MINTY_ASSERT(entityObject != nullptr);
 
 	// spawn the object and save the entity to it
@@ -630,6 +681,32 @@ void minty::ScriptEngine::destroy_object(UUID id)
 	}
 }
 
+void minty::ScriptEngine::link_script(String const& namespaceName, String const& className)
+{
+	ScriptEngine* engine = _data.engine;
+
+	MINTY_ASSERT(engine != nullptr);
+
+	// find ScriptClass with the given name
+	ScriptClass const* script = engine->find_class(namespaceName, className);
+
+	// if found, register it
+	if (!script) return;
+
+	link_script(*script);
+}
+
+void minty::ScriptEngine::link_script(ScriptClass const& script)
+{
+	MonoType* type = script.get_type();
+
+	MINTY_ASSERT(type != nullptr);
+
+	_data.types[type] = &script;
+
+	Console::info(std::format("Linked {}.", script.get_full_name()));
+}
+
 //
 //		LINKING
 //
@@ -638,39 +715,31 @@ constexpr static char const* INTERNAL_CLASS_NAME = "Runtime";
 
 #define ADD_INTERNAL_CALL(csharpName, cppName) mono_add_internal_call(std::format("{}.{}::{}", ASSEMBLY_ENGINE_NAME, INTERNAL_CLASS_NAME, csharpName).c_str(), cppName)
 
-static String mono_string_to_string(MonoString* const string)
-{
-	char* str = mono_string_to_utf8(string);
-	std::string result(str);
-	mono_free(str);
-	return result;
-}
-
 #pragma region Console
 
 static void console_log(MonoString* string)
 {
-	Console::log(mono_string_to_string(string));
+	Console::log(ScriptEngine::from_mono_string(string));
 }
 
 static void console_log_color(MonoString* string, int color)
 {
-	Console::log_color(mono_string_to_string(string), static_cast<Console::Color>(color));
+	Console::log_color(ScriptEngine::from_mono_string(string), static_cast<Console::Color>(color));
 }
 
 static void console_warn(MonoString* string)
 {
-	Console::warn(mono_string_to_string(string));
+	Console::warn(ScriptEngine::from_mono_string(string));
 }
 
 static void console_error(MonoString* string)
 {
-	Console::error(mono_string_to_string(string));
+	Console::error(ScriptEngine::from_mono_string(string));
 }
 
 static void console_ass(bool condition, MonoString* string)
 {
-	Console::ass(condition, mono_string_to_string(string));
+	Console::ass(condition, ScriptEngine::from_mono_string(string));
 }
 
 #pragma endregion
@@ -679,10 +748,7 @@ static void console_ass(bool condition, MonoString* string)
 
 static MonoString* entity_get_name(uint64_t id)
 {
-	if (!id)
-	{
-		return _data.engine->to_mono_string("");
-	}
+	if (!id) return _data.engine->to_mono_string("");
 
 	Scene* scene = _data.get_scene();
 	MINTY_ASSERT(scene != nullptr);
@@ -691,7 +757,6 @@ static MonoString* entity_get_name(uint64_t id)
 
 	// get the entity
 	Entity entity = registry.find(id);
-
 	MINTY_ASSERT(entity != NULL_ENTITY);
 
 	// get the name
@@ -701,10 +766,142 @@ static MonoString* entity_get_name(uint64_t id)
 	return _data.engine->to_mono_string(name);
 }
 
+static void entity_set_name(uint64_t id, MonoString* string)
+{
+	if (!id) return;
+
+	Scene* scene = _data.get_scene();
+	MINTY_ASSERT(scene != nullptr);
+
+	EntityRegistry& registry = scene->get_entity_registry();
+
+	// get the entity
+	Entity entity = registry.find(id);
+	MINTY_ASSERT(entity != NULL_ENTITY);
+
+	// set the name
+	String name = ScriptEngine::from_mono_string(string);
+	scene->get_entity_registry().set_name(entity, name);
+}
+
+static MonoObject* entity_add_component(uint64_t id, MonoReflectionType* reflectionType)
+{
+	if (!id) return nullptr;
+
+	Scene* scene = _data.get_scene();
+	MINTY_ASSERT(scene != nullptr);
+
+	EntityRegistry& registry = scene->get_entity_registry();
+
+	// get the entity
+	Entity entity = registry.find(id);
+	MINTY_ASSERT(entity != NULL_ENTITY);
+
+	// get the component name
+	MonoType* type = mono_reflection_type_get_type(reflectionType);
+	auto found = _data.types.find(type);
+	if (found == _data.types.end())
+	{
+		// type not found
+		return nullptr;
+	}
+	ScriptClass const* scriptClass = found->second;
+
+	// get the component by name
+	Component* component = registry.get_by_name(scriptClass->get_name(), entity);
+
+	// if null, add the component
+	if (!component)
+	{
+		component = registry.emplace_by_name(scriptClass->get_name(), entity);
+	}
+
+	// create a new object for this component, if needed
+	ScriptObject const& componentObject = _data.engine->get_or_create_component(component->id, id, *scriptClass);
+	return componentObject.data();
+}
+
+static MonoObject* entity_get_component(uint64_t id, MonoReflectionType* reflectionType)
+{
+	if (!id) return nullptr;
+
+	Scene* scene = _data.get_scene();
+	MINTY_ASSERT(scene != nullptr);
+
+	EntityRegistry& registry = scene->get_entity_registry();
+
+	// get the entity
+	Entity entity = registry.find(id);
+	MINTY_ASSERT(entity != NULL_ENTITY);
+
+	// get the component name
+	MonoType* type = mono_reflection_type_get_type(reflectionType);
+	auto found = _data.types.find(type);
+	if (found == _data.types.end())
+	{
+		// type not found
+		return nullptr;
+	}
+	ScriptClass const* scriptClass = found->second;
+
+	// get the component by name
+	Component* component = registry.get_by_name(scriptClass->get_name(), entity);
+
+	// if null, return null
+	if (!component)
+	{
+		return nullptr;
+	}
+	
+	// create a new object for this component
+	ScriptObject const& componentObject = _data.engine->get_or_create_component(component->id, id, *scriptClass);
+	return componentObject.data();
+}
+
+static void entity_remove_component(uint64_t id, MonoReflectionType* reflectionType)
+{
+	if (!id) return;
+
+	Scene* scene = _data.get_scene();
+	MINTY_ASSERT(scene != nullptr);
+
+	EntityRegistry& registry = scene->get_entity_registry();
+
+	// get the entity
+	Entity entity = registry.find(id);
+	MINTY_ASSERT(entity != NULL_ENTITY);
+
+	// get the component name
+	MonoType* type = mono_reflection_type_get_type(reflectionType);
+	auto found = _data.types.find(type);
+	if (found == _data.types.end())
+	{
+		// type not found
+		return;
+	}
+	ScriptClass const* scriptClass = found->second;
+
+	// erase the component by name
+	registry.erase_by_name(scriptClass->get_name(), entity);
+}
+
 #pragma endregion
+
+#pragma region Components
+
+#pragma region Transform
+
+//static void transform_get_position
+
+#pragma endregion
+
+
+#pragma endregion
+
 
 void minty::ScriptEngine::link()
 {
+	// link all the functions
 	ADD_INTERNAL_CALL("Console_Log", console_log);
 	ADD_INTERNAL_CALL("Console_LogColor", console_log_color);
 	ADD_INTERNAL_CALL("Console_Warn", console_warn);
@@ -712,6 +909,10 @@ void minty::ScriptEngine::link()
 	ADD_INTERNAL_CALL("Console_Assert", console_ass);
 
 	ADD_INTERNAL_CALL("Entity_GetName", entity_get_name);
+	ADD_INTERNAL_CALL("Entity_SetName", entity_set_name);
+	ADD_INTERNAL_CALL("Entity_AddComponent", entity_add_component);
+	ADD_INTERNAL_CALL("Entity_GetComponent", entity_get_component);
+	ADD_INTERNAL_CALL("Entity_RemoveComponent", entity_remove_component);
 }
 
 #undef ADD_INTERNAL_CALL

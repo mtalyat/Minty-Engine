@@ -117,6 +117,7 @@ namespace minty
 		/// </summary>
 		void clear();
 
+	public:
 		/// <summary>
 		/// Registers the System, so the System can be dynamically created by name.
 		/// </summary>
@@ -124,12 +125,13 @@ namespace minty
 		template <class T>
 		static void register_system(String const& name);
 
+	public:
 		void serialize(Writer& writer) const override;
 		void deserialize(Reader const& reader) override;
 
 	public:
 		friend String to_string(SystemRegistry const& value);
-};
+	};
 
 	template<class T>
 	T* SystemRegistry::emplace(String const& name, int const priority)

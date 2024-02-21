@@ -45,38 +45,38 @@ void minty::ScriptObject::invoke(String const& name) const
 	MonoMethod* method = engine.get_method(_script->_class, name);
 
 	// invoke it
-	engine.invoke_method(get_object(), method);
+	engine.invoke_method(data(), method);
 }
 
 void minty::ScriptObject::set_field(String const& name, void* const value) const
 {
 	ScriptEngine& engine = _script->get_assembly().get_engine();
 
-	engine.set_field_value(get_object(), engine.get_field(_script->_class, name), value);
+	engine.set_field_value(data(), engine.get_field(_script->_class, name), value);
 }
 
 void minty::ScriptObject::get_field(String const& name, void* const value) const
 {
 	ScriptEngine& engine = _script->get_assembly().get_engine();
 
-	engine.get_field_value(get_object(), engine.get_field(_script->_class, name), value);
+	engine.get_field_value(data(), engine.get_field(_script->_class, name), value);
 }
 
 void minty::ScriptObject::set_property(String const& name, void* const value) const
 {
 	ScriptEngine& engine = _script->get_assembly().get_engine();
 
-	engine.set_property_value(get_object(), engine.get_property(_script->_class, name), value);
+	engine.set_property_value(data(), engine.get_property(_script->_class, name), value);
 }
 
 void minty::ScriptObject::get_property(String const& name, void* const value) const
 {
 	ScriptEngine& engine = _script->get_assembly().get_engine();
 
-	engine.get_property_value(get_object(), engine.get_property(_script->_class, name), value);
+	engine.get_property_value(data(), engine.get_property(_script->_class, name), value);
 }
 
-MonoObject* minty::ScriptObject::get_object() const
+MonoObject* minty::ScriptObject::data() const
 {
 	return _object;
 	//return mono_gchandle_get_target(_handle);
@@ -89,7 +89,7 @@ void minty::ScriptObject::serialize(Writer& writer) const
 	// use the assembly to retrieve all of the fields for this object
 	std::vector<MonoClassField*> publicFields = engine.get_fields(_script->_class, Accessibility::Public);
 
-	MonoObject* object = get_object();
+	MonoObject* object = data();
 
 	// write each name and value
 	for (MonoClassField* const field : publicFields)
@@ -105,7 +105,7 @@ void minty::ScriptObject::deserialize(Reader const& reader)
 	// use the assembly to retrieve all of the fields for this object
 	std::vector<MonoClassField*> publicFields = engine.get_fields(_script->_class, Accessibility::Public);
 
-	MonoObject* object = get_object();
+	MonoObject* object = data();
 
 	for (MonoClassField* const field : publicFields)
 	{
