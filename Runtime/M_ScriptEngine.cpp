@@ -14,6 +14,12 @@
 #include "M_ScriptObject.h"
 #include "M_ScriptArguments.h"
 
+#include "M_Vector.h"
+#include "M_Quaternion.h"
+#include "M_Matrix.h"
+
+#include "M_TransformComponent.h"
+
 using namespace minty;
 using namespace minty::Scripting;
 
@@ -746,8 +752,10 @@ static void console_ass(bool condition, MonoString* string)
 
 #pragma region Entity
 
-static MonoString* entity_get_name(uint64_t id)
+static MonoString* entity_get_name(UUID id)
 {
+	MINTY_ASSERT(_data.engine);
+
 	if (!id) return _data.engine->to_mono_string("");
 
 	Scene* scene = _data.get_scene();
@@ -766,8 +774,10 @@ static MonoString* entity_get_name(uint64_t id)
 	return _data.engine->to_mono_string(name);
 }
 
-static void entity_set_name(uint64_t id, MonoString* string)
+static void entity_set_name(UUID id, MonoString* string)
 {
+	MINTY_ASSERT(_data.engine);
+
 	if (!id) return;
 
 	Scene* scene = _data.get_scene();
@@ -784,7 +794,7 @@ static void entity_set_name(uint64_t id, MonoString* string)
 	scene->get_entity_registry().set_name(entity, name);
 }
 
-static MonoObject* entity_add_component(uint64_t id, MonoReflectionType* reflectionType)
+static MonoObject* entity_add_component(UUID id, MonoReflectionType* reflectionType)
 {
 	if (!id) return nullptr;
 
@@ -821,7 +831,7 @@ static MonoObject* entity_add_component(uint64_t id, MonoReflectionType* reflect
 	return componentObject.data();
 }
 
-static MonoObject* entity_get_component(uint64_t id, MonoReflectionType* reflectionType)
+static MonoObject* entity_get_component(UUID id, MonoReflectionType* reflectionType)
 {
 	if (!id) return nullptr;
 
@@ -858,7 +868,7 @@ static MonoObject* entity_get_component(uint64_t id, MonoReflectionType* reflect
 	return componentObject.data();
 }
 
-static void entity_remove_component(uint64_t id, MonoReflectionType* reflectionType)
+static void entity_remove_component(UUID id, MonoReflectionType* reflectionType)
 {
 	if (!id) return;
 
@@ -891,28 +901,75 @@ static void entity_remove_component(uint64_t id, MonoReflectionType* reflectionT
 
 #pragma region Transform
 
-//static void transform_get_position
+static Vector3 transform_get_local_position(UUID id)
+{
+	MINTY_ASSERT(_data.engine);
+	MINTY_ASSERT(id.valid());
+
+	Scene* scene = _data.get_scene();
+	MINTY_ASSERT(scene != nullptr);
+
+	EntityRegistry& registry = scene->get_entity_registry();
+
+	Entity entity = registry.find(id);
+	MINTY_ASSERT(entity != NULL_ENTITY);
+
+	TransformComponent* component = registry.try_get<TransformComponent>(entity);
+	MINTY_ASSERT(component != nullptr);
+
+	return component->localPosition;
+}
+
+static void transform_set_local_position(UUID id, Vector3 position)
+{
+	MINTY_ASSERT(_data.engine);
+	MINTY_ASSERT(id.valid());
+
+	Scene* scene = _data.get_scene();
+	MINTY_ASSERT(scene != nullptr);
+
+	EntityRegistry& registry = scene->get_entity_registry();
+
+	Entity entity = registry.find(id);
+	MINTY_ASSERT(entity != NULL_ENTITY);
+
+	TransformComponent* component = registry.try_get<TransformComponent>(entity);
+	MINTY_ASSERT(component != nullptr);
+
+	component->localPosition = position;
+}
 
 #pragma endregion
 
-
 #pragma endregion
-
 
 void minty::ScriptEngine::link()
 {
 	// link all the functions
+#pragma region Console
 	ADD_INTERNAL_CALL("Console_Log", console_log);
 	ADD_INTERNAL_CALL("Console_LogColor", console_log_color);
 	ADD_INTERNAL_CALL("Console_Warn", console_warn);
 	ADD_INTERNAL_CALL("Console_Error", console_error);
 	ADD_INTERNAL_CALL("Console_Assert", console_ass);
+#pragma endregion
 
+#pragma region Entity
 	ADD_INTERNAL_CALL("Entity_GetName", entity_get_name);
 	ADD_INTERNAL_CALL("Entity_SetName", entity_set_name);
 	ADD_INTERNAL_CALL("Entity_AddComponent", entity_add_component);
 	ADD_INTERNAL_CALL("Entity_GetComponent", entity_get_component);
 	ADD_INTERNAL_CALL("Entity_RemoveComponent", entity_remove_component);
+#pragma endregion
+
+#pragma region Components
+
+#pragma region Transform
+	ADD_INTERNAL_CALL("Transform_GetLocalPosition", transform_get_local_position);
+	ADD_INTERNAL_CALL("Transform_SetLocalPosition", transform_set_local_position);
+#pragma endregion
+
+#pragma endregion
 }
 
 #undef ADD_INTERNAL_CALL

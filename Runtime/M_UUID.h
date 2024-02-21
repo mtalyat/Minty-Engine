@@ -31,6 +31,8 @@ namespace minty
 
 		bool empty() const;
 
+		bool valid() const;
+
 		operator uint64_t() const { return _uuid; }
 		bool operator==(UUID const other) const;
 		bool operator!=(UUID const other) const;

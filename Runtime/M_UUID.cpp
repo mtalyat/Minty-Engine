@@ -23,6 +23,11 @@ bool minty::UUID::empty() const
 	return _uuid == 0;
 }
 
+bool minty::UUID::valid() const
+{
+	return _uuid > 0;
+}
+
 bool minty::UUID::operator==(UUID const other) const
 {
 	return _uuid == other._uuid;

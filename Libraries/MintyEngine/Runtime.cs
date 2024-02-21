@@ -29,7 +29,8 @@ namespace MintyEngine
         #region Components
 
         #region Transform
-
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static Vector3 Transform_GetLocalPosition(ulong id);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_SetLocalPosition(ulong id, Vector3 position);
         #endregion
 
         #endregion

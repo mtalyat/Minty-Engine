@@ -14,8 +14,17 @@ Matrix4 minty::TransformComponent::get_local_matrix() const
 
 Vector3 minty::TransformComponent::get_global_position() const
 {
-	// last column of the matrix is the position
-	return Vector3(globalMatrix[3]);
+	return matrix4_get_position(globalMatrix);
+}
+
+Quaternion minty::TransformComponent::get_global_rotation() const
+{
+	return matrix4_get_rotation(globalMatrix);
+}
+
+Vector3 minty::TransformComponent::get_global_scale() const
+{
+	return matrix4_get_scale(globalMatrix);
 }
 
 Vector3 minty::TransformComponent::get_forward() const
