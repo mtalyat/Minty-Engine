@@ -18,6 +18,11 @@ class TestScript : Script
         Debug.Log("TestClass.OnLoad()");
     }
 
+    void OnEnable()
+    {
+        Debug.Log("TestClass.OnEnable()");
+    }
+
     void OnUpdate()
     {
         Debug.Log("TestClass.OnUpdate()");
@@ -28,6 +33,11 @@ class TestScript : Script
             //Destroy(this);
             Destroy(Entity);
         }
+    }
+
+    void OnDisable()
+    {
+        Debug.Log("TestClass.OnDisable()");
     }
 
     void OnUnload()

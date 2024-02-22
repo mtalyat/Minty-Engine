@@ -13,6 +13,7 @@
 #include "M_DirtyComponent.h"
 #include "M_DestroyEntityComponent.h"
 #include "M_DestroyComponentComponent.h"
+#include "M_EnabledComponent.h"
 
 #include "M_ScriptClass.h"
 #include "M_ScriptObject.h"
@@ -67,6 +68,7 @@ Entity minty::EntityRegistry::create()
 
 Entity minty::EntityRegistry::create(UUID const uuid)
 {
+	// create entity with the given UUID
 	Entity entity = entt::registry::create();
 	MINTY_ASSERT_FORMAT(!_idToEntity.contains(uuid), "There was a UUID collision with id: {}.", static_cast<uint64_t>(uuid));
 	add_to_lookup(entity, uuid);
@@ -83,6 +85,46 @@ Entity minty::EntityRegistry::create(String const& name, UUID const uuid)
 	Entity entity = create(uuid);
 	if(!name.empty()) emplace<NameComponent>(entity).name = name;
 	return entity;
+}
+
+void minty::EntityRegistry::enable(Entity const entity)
+{
+	// add enabled
+	if (!all_of<EnabledComponent>(entity))
+	{
+		emplace<EnabledComponent>(entity);
+
+		// trigger event if loaded
+		if (get_scene().is_loaded())
+		{
+			ScriptComponent* scriptComponent = try_get<ScriptComponent>(entity);
+			ScriptOnEnableComponent* eventComponent = try_get<ScriptOnEnableComponent>(entity);
+			if (scriptComponent && eventComponent)
+			{
+				eventComponent->invoke(SCRIPT_METHOD_NAME_ONENABLE, *scriptComponent);
+			}
+		}
+	}
+}
+
+void minty::EntityRegistry::disable(Entity const entity)
+{
+	// remove enabled
+	if (all_of<EnabledComponent>(entity))
+	{
+		erase<EnabledComponent>(entity);
+
+		// trigger event if loaded
+		if (get_scene().is_loaded())
+		{
+			ScriptComponent* scriptComponent = try_get<ScriptComponent>(entity);
+			ScriptOnDisableComponent* eventComponent = try_get<ScriptOnDisableComponent>(entity);
+			if (scriptComponent && eventComponent)
+			{
+				eventComponent->invoke(SCRIPT_METHOD_NAME_ONDISABLE, *scriptComponent);
+			}
+		}
+	}
 }
 
 void minty::EntityRegistry::destroy(Entity const entity)
@@ -127,6 +169,7 @@ void minty::EntityRegistry::destroy_queued()
 		// call events
 		if (loaded)
 		{
+			if (ScriptOnDisableComponent* eventComp = try_get<ScriptOnDisableComponent>(entity)) eventComp->invoke(SCRIPT_METHOD_NAME_ONDISABLE, script, destroy.components);
 			if (ScriptOnUnloadComponent* eventComp = try_get<ScriptOnUnloadComponent>(entity)) eventComp->invoke(SCRIPT_METHOD_NAME_ONUNLOAD, script, destroy.components);
 		}
 		if (ScriptOnDestroyComponent* eventComp = try_get<ScriptOnDestroyComponent>(entity)) eventComp->invoke(SCRIPT_METHOD_NAME_ONDESTROY, script, destroy.components);
@@ -157,6 +200,7 @@ void minty::EntityRegistry::destroy_queued()
 		// call events
 		if (loaded)
 		{
+			if (ScriptOnDisableComponent* eventComp = try_get<ScriptOnDisableComponent>(entity)) eventComp->invoke(SCRIPT_METHOD_NAME_ONDISABLE, script);
 			if (ScriptOnUnloadComponent* eventComp = try_get<ScriptOnUnloadComponent>(entity)) eventComp->invoke(SCRIPT_METHOD_NAME_ONUNLOAD, script);
 		}
 		if (ScriptOnDestroyComponent* eventComp = try_get<ScriptOnDestroyComponent>(entity)) eventComp->invoke(SCRIPT_METHOD_NAME_ONDESTROY, script);
@@ -435,27 +479,33 @@ void minty::EntityRegistry::register_script(String const& name)
 			// now add the helper components, if they are needed
 			if (script->has_method(SCRIPT_METHOD_NAME_ONLOAD))
 			{
-				ScriptOnLoadComponent* eventComp = registry.try_get<ScriptOnLoadComponent>(entity);
-				if (!eventComp) eventComp = &registry.emplace<ScriptOnLoadComponent>(entity);
-				eventComp->scriptIds.emplace(id);
+				ScriptOnLoadComponent& eventComp = registry.get_or_emplace<ScriptOnLoadComponent>(entity);
+				eventComp.scriptIds.emplace(id);
+			}
+			if (script->has_method(SCRIPT_METHOD_NAME_ONENABLE))
+			{
+				ScriptOnEnableComponent& eventComp = registry.get_or_emplace<ScriptOnEnableComponent>(entity);
+				eventComp.scriptIds.emplace(id);
 			}
 			if (script->has_method(SCRIPT_METHOD_NAME_ONUPDATE))
 			{
-				ScriptOnUpdateComponent* eventComp = registry.try_get<ScriptOnUpdateComponent>(entity);
-				if (!eventComp) eventComp = &registry.emplace<ScriptOnUpdateComponent>(entity);
-				eventComp->scriptIds.emplace(id);
+				ScriptOnUpdateComponent& eventComp = registry.get_or_emplace<ScriptOnUpdateComponent>(entity);
+				eventComp.scriptIds.emplace(id);
+			}
+			if (script->has_method(SCRIPT_METHOD_NAME_ONDISABLE))
+			{
+				ScriptOnDisableComponent& eventComp = registry.get_or_emplace<ScriptOnDisableComponent>(entity);
+				eventComp.scriptIds.emplace(id);
 			}
 			if (script->has_method(SCRIPT_METHOD_NAME_ONUNLOAD))
 			{
-				ScriptOnUnloadComponent* eventComp = registry.try_get<ScriptOnUnloadComponent>(entity);
-				if (!eventComp) eventComp = &registry.emplace<ScriptOnUnloadComponent>(entity);
-				eventComp->scriptIds.emplace(id);
+				ScriptOnUnloadComponent& eventComp = registry.get_or_emplace<ScriptOnUnloadComponent>(entity);
+				eventComp.scriptIds.emplace(id);
 			}
 			if (script->has_method(SCRIPT_METHOD_NAME_ONDESTROY))
 			{
-				ScriptOnDestroyComponent* eventComp = registry.try_get<ScriptOnDestroyComponent>(entity);
-				if (!eventComp) eventComp = &registry.emplace<ScriptOnDestroyComponent>(entity);
-				eventComp->scriptIds.emplace(id);
+				ScriptOnDestroyComponent& eventComp = registry.get_or_emplace<ScriptOnDestroyComponent>(entity);
+				eventComp.scriptIds.emplace(id);
 			}
 
 			// return the script object
@@ -497,7 +547,9 @@ void minty::EntityRegistry::register_script(String const& name)
 
 			// get the event components and erase if needed
 			if (ScriptOnLoadComponent* eventComp = registry.try_get<ScriptOnLoadComponent>(entity)) eventComp->scriptIds.erase(id);
+			if (ScriptOnEnableComponent* eventComp = registry.try_get<ScriptOnEnableComponent>(entity)) eventComp->scriptIds.erase(id);
 			if (ScriptOnUpdateComponent* eventComp = registry.try_get<ScriptOnUpdateComponent>(entity)) eventComp->scriptIds.erase(id);
+			if (ScriptOnDisableComponent* eventComp = registry.try_get<ScriptOnDisableComponent>(entity)) eventComp->scriptIds.erase(id);
 			if (ScriptOnUnloadComponent* eventComp = registry.try_get<ScriptOnUnloadComponent>(entity)) eventComp->scriptIds.erase(id);
 			if (ScriptOnDestroyComponent* eventComp = registry.try_get<ScriptOnDestroyComponent>(entity)) eventComp->scriptIds.erase(id);
 

@@ -1,6 +1,8 @@
 #pragma once
 #include "M_Component.h"
 
+#include "M_Audio.h"
+
 namespace minty
 {
 	/// <summary>
@@ -12,12 +14,17 @@ namespace minty
 		/// <summary>
 		/// The ID of the clip to be played.
 		/// </summary>
-		ID clipId;
+		ID clipId = ERROR_ID;
+
+		/// <summary>
+		/// The handle to the sound being played, if any.
+		/// </summary>
+		AudioHandle handle = ERROR_AUDIO_HANDLE;
 
 		/// <summary>
 		/// The volume of this source.
 		/// </summary>
-		float volume;
+		float volume = 1.0f;
 		/// <summary>
 		/// The attenuation of this source.
 		/// </summary>

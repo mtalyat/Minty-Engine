@@ -218,7 +218,7 @@ namespace minty
 		static void register_system(String const& name);
 
 		template<class T>
-		static void register_component(String const& namespaceName, String const& className);
+		static void register_component(String const& namespaceName, String const& className, bool const link = false);
 
 		static void register_script(String const& namespaceName, String const& className);
 
@@ -275,9 +275,12 @@ namespace minty
 	}
 
 	template<class T>
-	void Runtime::register_component(String const& namespaceName, String const& className)
+	void Runtime::register_component(String const& namespaceName, String const& className, bool const link)
 	{
 		EntityRegistry::register_component<T>(className);
-		ScriptEngine::link_script(namespaceName, className);
+		if (link)
+		{
+			ScriptEngine::link_script(namespaceName, className);
+		}
 	}
 }

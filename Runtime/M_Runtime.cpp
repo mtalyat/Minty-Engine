@@ -24,6 +24,7 @@
 #include "M_CameraComponent.h"
 #include "M_DirtyComponent.h"
 #include "M_DestroyEntityComponent.h"
+#include "M_EnabledComponent.h"
 #include "M_MeshComponent.h"
 #include "M_NameComponent.h"
 #include "M_RelationshipComponent.h"
@@ -267,6 +268,7 @@ void minty::Runtime::link()
 	register_component<CameraComponent>(ASSEMBLY_ENGINE_NAME, "Camera");
 	//register_component<DestroyComponent>(ASSEMBLY_ENGINE_NAME, "Destroy");
 	//register_component<DirtyComponent>(ASSEMBLY_ENGINE_NAME, "Dirty");
+	register_component<EnabledComponent>(ASSEMBLY_ENGINE_NAME, "Enabled", false);
 	register_component<MeshComponent>(ASSEMBLY_ENGINE_NAME, "Mesh");
 	register_component<NameComponent>(ASSEMBLY_ENGINE_NAME, "Name");
 	register_component<RelationshipComponent>(ASSEMBLY_ENGINE_NAME, "Relationship");

@@ -10,6 +10,7 @@
 #include "M_AudioSourceComponent.h"
 #include "M_TransformComponent.h"
 #include "M_DirtyComponent.h"
+#include "M_EnabledComponent.h"
 
 using namespace minty;
 
@@ -49,6 +50,13 @@ void minty::AudioSystem::update()
 	// data for the source
 	SoundData sourceData{};
 
+	// if there are any disabled entities with an audiosource, stop playing the sound
+	for (auto [entity, source] : entityRegistry.view<AudioSourceComponent>(entt::exclude<EnabledComponent>).each())
+	{
+		stop(source.handle);
+		source.handle = ERROR_AUDIO_HANDLE;
+	}
+
 	// check all playing sounds, if they have stopped, then remove from playing
 	// if they have not stopped, then update in 3D space relative to the camera
 	for (auto& pair : _playing)
@@ -74,6 +82,15 @@ void minty::AudioSystem::update()
 	// remove finished sounds
 	for (auto const id : finished)
 	{
+		Entity entity = _playing.at(id);
+		if (entity != NULL_ENTITY)
+		{
+			// if there was an entity, reset the audio source
+			if (AudioSourceComponent* sourceComponent = entityRegistry.try_get<AudioSourceComponent>(entity))
+			{
+				sourceComponent->handle = ERROR_AUDIO_HANDLE;
+			}
+		}
 		_playing.erase(id);
 	}
 

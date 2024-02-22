@@ -73,6 +73,10 @@ namespace minty
 		/// <returns>The new Entity with a NameComponent and IDComponent.</returns>
 		Entity create(String const& name, UUID const uuid);
 
+		void enable(Entity const entity);
+
+		void disable(Entity const entity);
+
 		/// <summary>
 		/// Marks the given Entity for destruction.
 		/// </summary>

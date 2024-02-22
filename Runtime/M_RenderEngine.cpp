@@ -22,6 +22,7 @@
 #include "M_MeshComponent.h"
 #include "M_RenderableComponent.h"
 #include "M_RelationshipComponent.h"
+#include "M_EnabledComponent.h"
 
 #include "M_Asset.h"
 #include "M_Parse.h"
@@ -930,7 +931,7 @@ void minty::RenderEngine::draw_scene(VkCommandBuffer commandBuffer)
 	TransformComponent const* transformComponent;
 
 	// draw all meshes in the scene
-	for (auto&& [entity, renderable, mesh] : _registry->view<RenderableComponent const, MeshComponent>().each())
+	for (auto&& [entity, mesh, renderable, enabled] : _registry->view<MeshComponent, RenderableComponent const, EnabledComponent const>().each())
 	{
 		// get transform for entity
 		transformComponent = _registry->try_get<TransformComponent>(entity);
@@ -948,7 +949,7 @@ void minty::RenderEngine::draw_scene(VkCommandBuffer commandBuffer)
 	}
 
 	// draw all world sprites in the scene
-	for (auto&& [entity, renderable, transform, sprite] : _registry->view<RenderableComponent const, TransformComponent const, SpriteComponent const>().each())
+	for (auto&& [entity, renderable, transform, sprite, enabled] : _registry->view<RenderableComponent const, TransformComponent const, SpriteComponent const, EnabledComponent const>().each())
 	{
 		draw_sprite(commandBuffer, transform, sprite);
 	}
@@ -957,7 +958,7 @@ void minty::RenderEngine::draw_scene(VkCommandBuffer commandBuffer)
 	_registry->sort<UITransformComponent, SpriteComponent>();
 
 	// draw all UI in scene
-	for (auto&& [entity, renderable, ui, sprite] : _registry->view<RenderableComponent const, UITransformComponent const, SpriteComponent const>().each())
+	for (auto&& [entity, renderable, ui, sprite, enabled] : _registry->view<RenderableComponent const, UITransformComponent const, SpriteComponent const, EnabledComponent const>().each())
 	{
 		draw_ui(commandBuffer, ui, sprite);
 	}

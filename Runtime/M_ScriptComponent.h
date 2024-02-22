@@ -36,7 +36,15 @@ namespace minty
 		: public ScriptEventComponent
 	{};
 
+	struct ScriptOnEnableComponent
+		: public ScriptEventComponent
+	{};
+
 	struct ScriptOnUpdateComponent
+		: public ScriptEventComponent
+	{};
+
+	struct ScriptOnDisableComponent
 		: public ScriptEventComponent
 	{};
 

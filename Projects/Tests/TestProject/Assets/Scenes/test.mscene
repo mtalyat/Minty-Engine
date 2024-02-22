@@ -50,6 +50,7 @@ systems
     Script
 entities
     Camera
+        Enabled
         Transform
             position: (0, 0, -4)
         Camera
@@ -58,6 +59,7 @@ entities
             far: 100.0
         AudioListener
     Sprite
+        Enabled
         Renderable
         Transform
             position: (0, 0, -2)
@@ -66,9 +68,10 @@ entities
         Animator
             animator: animator
     Model
+        Enabled
         Renderable
-#        Transform
-#            position: (0, 0, 0)
+        Transform
+            position: (0, 0, 0)
         Mesh
             material: material1
             type: cube
@@ -77,7 +80,7 @@ entities
         Animator
             animator: animator2
         TestScript
-            time: 3
+            time: 0.5
 #    Sprite
 #        Renderable
 #        Transform

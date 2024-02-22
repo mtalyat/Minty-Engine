@@ -40,8 +40,10 @@ namespace minty
 	constexpr char const* WRAP_EXTENSION = ".wrap";
 
 	constexpr char const* SCRIPT_METHOD_NAME_ONCREATE = "OnCreate";
-	constexpr char const* SCRIPT_METHOD_NAME_ONDESTROY = "OnDestroy";
 	constexpr char const* SCRIPT_METHOD_NAME_ONLOAD = "OnLoad";
-	constexpr char const* SCRIPT_METHOD_NAME_ONUNLOAD = "OnUnload";
+	constexpr char const* SCRIPT_METHOD_NAME_ONENABLE = "OnEnable";
 	constexpr char const* SCRIPT_METHOD_NAME_ONUPDATE = "OnUpdate";
+	constexpr char const* SCRIPT_METHOD_NAME_ONDISABLE = "OnDisable";
+	constexpr char const* SCRIPT_METHOD_NAME_ONUNLOAD = "OnUnload";
+	constexpr char const* SCRIPT_METHOD_NAME_ONDESTROY = "OnDestroy";
 }

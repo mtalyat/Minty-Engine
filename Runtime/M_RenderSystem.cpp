@@ -11,6 +11,7 @@
 #include "M_EntityRegistry.h"
 #include "M_CameraComponent.h"
 #include "M_TransformComponent.h"
+#include "M_EnabledComponent.h"
 #include "M_DrawCallObjectInfo.h"
 
 #include "M_TextureBuilder.h"
@@ -51,11 +52,15 @@ void minty::RenderSystem::update()
 
 	// get camera transform
 	EntityRegistry& entityRegistry = get_entity_registry();
-	CameraComponent const& camera = entityRegistry.get<CameraComponent>(_mainCamera);
-	TransformComponent const& transformComponent = entityRegistry.get<TransformComponent>(_mainCamera);
 
-	// update camera in renderer
-	update_camera(camera, transformComponent);
+	// update camera in renderer if it is enabled
+	if (entityRegistry.try_get<EnabledComponent>(_mainCamera))
+	{
+		CameraComponent const& camera = entityRegistry.get<CameraComponent>(_mainCamera);
+		TransformComponent const& transformComponent = entityRegistry.get<TransformComponent>(_mainCamera);
+
+		update_camera(camera, transformComponent);
+	}
 }
 
 void minty::RenderSystem::unload()

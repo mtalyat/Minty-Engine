@@ -5,6 +5,7 @@
 #include "M_AnimatorBuilder.h"
 #include "M_AnimationBuilder.h"
 #include "M_SpriteComponent.h"
+#include "M_EnabledComponent.h"
 #include "M_Asset.h"
 #include "M_RenderEngine.h"
 #include "M_RenderSystem.h"
@@ -29,7 +30,7 @@ void minty::AnimationSystem::update()
 
 	EntityRegistry& registry = get_entity_registry();
 
-	for (auto&& [entity, animatorComponent] : registry.view<AnimatorComponent>().each())
+	for (auto&& [entity, animatorComponent, enabled] : registry.view<AnimatorComponent, EnabledComponent const>().each())
 	{
 		// update the animator, get the current animation ID
 		ID newId = animatorComponent.animator.update();
