@@ -30,8 +30,7 @@ class TestScript : Script
         time -= Time.ElapsedTime;
         if(time <= 0.0f)
         {
-            //Destroy(this);
-            Destroy(Entity);
+            Entity.Enabled = false;
         }
     }
 

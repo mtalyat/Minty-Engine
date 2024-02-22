@@ -31,6 +31,8 @@ namespace MintyEngine
         #region Entity
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static string Entity_GetName(ulong id);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Entity_SetName(ulong id, string name);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static bool Entity_GetEnabled(ulong id);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Entity_SetEnabled(ulong id, bool enabled);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static object Entity_AddComponent(ulong id, Type type);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static object Entity_GetComponent(ulong id, Type type);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static bool Entity_RemoveComponent(ulong id, Type type);

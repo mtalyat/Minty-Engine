@@ -19,6 +19,7 @@
 #include "M_Matrix.h"
 
 #include "M_TransformComponent.h"
+#include "M_EnabledComponent.h"
 
 using namespace minty;
 using namespace minty::Scripting;
@@ -850,6 +851,47 @@ static void entity_set_name(UUID id, MonoString* string)
 	scene->get_entity_registry().set_name(entity, name);
 }
 
+static void entity_set_enabled(UUID id, bool enabled)
+{
+	MINTY_ASSERT(_data.engine);
+	MINTY_ASSERT(id.valid());
+
+	Scene* scene = _data.get_scene();
+	MINTY_ASSERT(scene != nullptr);
+
+	EntityRegistry& registry = scene->get_entity_registry();
+
+	// get the entity
+	Entity entity = registry.find(id);
+	MINTY_ASSERT(entity != NULL_ENTITY);
+
+	if (enabled)
+	{
+		registry.enable(entity);
+	}
+	else
+	{
+		registry.disable(entity);
+	}
+}
+
+static bool entity_get_enabled(UUID id)
+{
+	MINTY_ASSERT(_data.engine);
+	MINTY_ASSERT(id.valid());
+
+	Scene* scene = _data.get_scene();
+	MINTY_ASSERT(scene != nullptr);
+
+	EntityRegistry& registry = scene->get_entity_registry();
+
+	// get the entity
+	Entity entity = registry.find(id);
+	MINTY_ASSERT(entity != NULL_ENTITY);
+
+	return registry.all_of<EnabledComponent>(entity);
+}
+
 static MonoObject* entity_add_component(UUID id, MonoReflectionType* reflectionType)
 {
 	if (!id) return nullptr;
@@ -1025,6 +1067,8 @@ void minty::ScriptEngine::link()
 #pragma region Entity
 	ADD_INTERNAL_CALL("Entity_GetName", entity_get_name);
 	ADD_INTERNAL_CALL("Entity_SetName", entity_set_name);
+	ADD_INTERNAL_CALL("Entity_GetEnabled", entity_get_enabled);
+	ADD_INTERNAL_CALL("Entity_SetEnabled", entity_set_enabled);
 	ADD_INTERNAL_CALL("Entity_AddComponent", entity_add_component);
 	ADD_INTERNAL_CALL("Entity_GetComponent", entity_get_component);
 	ADD_INTERNAL_CALL("Entity_RemoveComponent", entity_remove_component);
