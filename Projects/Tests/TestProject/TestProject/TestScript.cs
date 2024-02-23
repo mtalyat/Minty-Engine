@@ -1,9 +1,10 @@
 ﻿using MintyEngine;
-using System;
 
 class TestScript : Script
 {
     public float time;
+
+    private Transform transform;
 
     void OnCreate()
     {
@@ -16,6 +17,8 @@ class TestScript : Script
     void OnLoad()
     {
         Debug.Log("TestClass.OnLoad()");
+
+        transform = Entity.GetComponent<Transform>();
     }
 
     void OnEnable()
@@ -28,10 +31,17 @@ class TestScript : Script
         Debug.Log("TestClass.OnUpdate()");
         Debug.Log($"Time: {time:0.00}s");
         time -= Time.ElapsedTime;
-        if(time <= 0.0f)
+        
+        if (time <= 0.0f)
         {
             Entity.Enabled = false;
         }
+
+        Vector3 pos = transform.LocalPosition;
+        pos.Z += Time.ElapsedTime;
+        transform.LocalPosition = pos;
+
+        Debug.Log(transform.LocalPosition);
     }
 
     void OnDisable()

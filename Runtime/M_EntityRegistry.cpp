@@ -259,9 +259,16 @@ Entity minty::EntityRegistry::find(String const& string) const
 
 Entity minty::EntityRegistry::find(UUID const uuid) const
 {
-	MINTY_ASSERT_FORMAT(_idToEntity.contains(uuid), "UUID {} is missing an Entity.", static_cast<uint64_t>(uuid));
+	auto found = _idToEntity.find(uuid);
 
-	return _idToEntity.at(uuid);
+	if (found != _idToEntity.end())
+	{
+		return found->second;
+	}
+	else
+	{
+		return NULL_ENTITY;
+	}
 }
 
 String minty::EntityRegistry::get_name(Entity const entity) const

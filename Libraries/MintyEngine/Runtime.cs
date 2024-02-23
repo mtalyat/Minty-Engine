@@ -6,7 +6,7 @@ namespace MintyEngine
     /// <summary>
     /// Holds functionality for interacting with the Minty Runtime.
     /// </summary>
-    internal static class Runtime
+    public static class Runtime
     {
         // [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Class_Function();
 
@@ -41,8 +41,8 @@ namespace MintyEngine
         #region Components
 
         #region Transform
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static Vector3 Transform_GetLocalPosition(ulong id);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_SetLocalPosition(ulong id, Vector3 position);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_GetLocalPosition(ulong id, out Vector3 position);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_SetLocalPosition(ulong id, in Vector3 position);
         #endregion
 
         #endregion

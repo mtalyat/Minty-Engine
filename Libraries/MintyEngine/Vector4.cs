@@ -1,18 +1,17 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Security.Cryptography.X509Certificates;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace MintyEngine
 {
     /// <summary>
-    /// Represents a 3D vector/point in space.
+    /// Represents a 4D vector/point in space.
     /// </summary>
-    public struct Vector3
+    public struct Vector4
     {
-        private float _x, _y, _z;
+        private float _x, _y, _z, _w;
 
         public float X
         {
@@ -32,16 +31,23 @@ namespace MintyEngine
             set => _z = value;
         }
 
-        public Vector3(float x, float y, float z = 0.0f)
+        public float W
+        {
+            get => _w;
+            set => _w = value;
+        }
+
+        public Vector4(float x, float y, float z = 0.0f, float w = 0.0f)
         {
             _x = x;
             _y = y;
             _z = z;
+            _w = w;
         }
 
         public override string ToString()
         {
-            return $"({_x}, {_y}, {_z})";
+            return $"({_x}, {_y}, {_z}, {_w})";
         }
     }
 }

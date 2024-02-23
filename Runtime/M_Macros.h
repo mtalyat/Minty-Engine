@@ -28,7 +28,7 @@
 #define MINTY_DELETE_COND(pointer, condition) if((pointer) && (condition)) { delete (pointer); (pointer) = nullptr; }
 
 //#define MINTY_INFO(message) std::format("{}/{}()/{} -> {}", minty::Path(__FILE__).filename().string(), __func__, __LINE__, message)
-#define MINTY_INFO(message) std::format("{}/{}()/{} -> {}", minty::Path(__FILE__).filename().string(), __func__, __LINE__, message)
+#define MINTY_INFO(message) std::format("[{}][{}()][line {}] -> {}", minty::Path(__FILE__).filename().string(), __func__, __LINE__, message)
 
 #ifdef MINTY_RELEASE
 #define MINTY_ABORT(message) minty::Console::error(std::format("FATAL ERROR: {}", MINTY_INFO(message)))

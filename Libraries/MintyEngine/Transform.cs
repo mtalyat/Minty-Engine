@@ -10,7 +10,11 @@ namespace MintyEngine
     {
         public Vector3 LocalPosition
         {
-            get => Runtime.Transform_GetLocalPosition(Entity.ID);
+            get
+            {
+                Runtime.Transform_GetLocalPosition(Entity.ID, out Vector3 position);
+                return position;
+            }
             set => Runtime.Transform_SetLocalPosition(Entity.ID, value);
         }
     }

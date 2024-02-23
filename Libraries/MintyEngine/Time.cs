@@ -6,6 +6,9 @@ using System.Threading.Tasks;
 
 namespace MintyEngine
 {
+    /// <summary>
+    /// Provides an interface to get time information from the Minty Runtime.
+    /// </summary>
     public static class Time
     {
         public static float TotalTime

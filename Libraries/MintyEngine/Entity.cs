@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace MintyEngine
 {
     /// <summary>
-    /// Represents a game object within the Scene.
+    /// Represents a game object within the Scene that can have components and scripts attached to it.
     /// </summary>
     public class Entity : Object
     {

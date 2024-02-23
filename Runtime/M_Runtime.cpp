@@ -254,6 +254,8 @@ void minty::Runtime::register_script(String const& namespaceName, String const& 
 
 void minty::Runtime::link()
 {
+	Console::log("Linking the Runtime:");
+
 	// systems
 	register_system<AnimationSystem>("Animation");
 	register_system<AudioSystem>("Audio");

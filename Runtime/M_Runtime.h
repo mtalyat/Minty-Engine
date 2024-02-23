@@ -218,7 +218,7 @@ namespace minty
 		static void register_system(String const& name);
 
 		template<class T>
-		static void register_component(String const& namespaceName, String const& className, bool const link = false);
+		static void register_component(String const& namespaceName, String const& className, bool const link = true);
 
 		static void register_script(String const& namespaceName, String const& className);
 

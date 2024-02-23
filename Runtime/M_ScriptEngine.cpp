@@ -1001,8 +1001,10 @@ static void entity_remove_component(UUID id, MonoReflectionType* reflectionType)
 
 #pragma region Transform
 
-static Vector3 transform_get_local_position(UUID id)
+static void transform_get_local_position(uint64_t number, Vector3* position)
 {
+	UUID id(number);
+
 	MINTY_ASSERT(_data.engine);
 	MINTY_ASSERT(id.valid());
 
@@ -1017,10 +1019,10 @@ static Vector3 transform_get_local_position(UUID id)
 	TransformComponent* component = registry.try_get<TransformComponent>(entity);
 	MINTY_ASSERT(component != nullptr);
 
-	return component->localPosition;
+	*position = component->localPosition;
 }
 
-static void transform_set_local_position(UUID id, Vector3 position)
+static void transform_set_local_position(UUID id, Vector3* position)
 {
 	MINTY_ASSERT(_data.engine);
 	MINTY_ASSERT(id.valid());
@@ -1036,7 +1038,7 @@ static void transform_set_local_position(UUID id, Vector3 position)
 	TransformComponent* component = registry.try_get<TransformComponent>(entity);
 	MINTY_ASSERT(component != nullptr);
 
-	component->localPosition = position;
+	component->localPosition = *position;
 }
 
 #pragma endregion
