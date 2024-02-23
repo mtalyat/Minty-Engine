@@ -74,6 +74,12 @@ namespace minty
 		void set_cursor_mode(CursorMode const mode);
 
 		/// <summary>
+		/// Gets the cursor mode.
+		/// </summary>
+		/// <returns></returns>
+		CursorMode get_cursor_mode() const;
+
+		/// <summary>
 		/// Maximizes the Window.
 		/// </summary>
 		void maximize();

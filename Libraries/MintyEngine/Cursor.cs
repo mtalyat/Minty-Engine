@@ -18,9 +18,10 @@ namespace MintyEngine
     /// </summary>
     public static class Cursor
     {
-        public static void SetMode(CursorMode mode)
+        public static CursorMode Mode
         {
-            throw new NotImplementedException();
+            get => Runtime.Cursor_GetMode();
+            set => Runtime.Cursor_SetMode(value);
         }
     }
 }

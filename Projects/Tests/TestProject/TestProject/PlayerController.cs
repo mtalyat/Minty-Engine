@@ -20,6 +20,8 @@ namespace TestProject
             // add actions to input map
             Session.InputMap.AddKeysDown(OnKeyMove, Key.D, Key.A, Key.W, Key.S, Key.LeftShift, Key.Space);
             Session.InputMap.AddKeysUp(OnKeyMove, Key.D, Key.A, Key.W, Key.S, Key.LeftShift, Key.Space);
+
+            Session.InputMap.AddMouseDown(MouseButton.Left, OnMouseClick);
         }
 
         private void OnKeyMove(object sender, KeyPressEventArgs e)
@@ -46,6 +48,19 @@ namespace TestProject
                 case Key.S:
                     input.Z -= direction;
                     break;
+            }
+        }
+
+        private void OnMouseClick(object sender, MouseClickEventArgs e)
+        {
+            // toggle mouse
+            if(Cursor.Mode == CursorMode.Normal)
+            {
+                Cursor.Mode = CursorMode.Disabled;
+            }
+            else
+            {
+                Cursor.Mode = CursorMode.Normal;
             }
         }
 

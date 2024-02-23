@@ -23,6 +23,11 @@ namespace MintyEngine
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Console_Assert(string message);
         #endregion
 
+        #region Cursor
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static CursorMode Cursor_GetMode();
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Cursor_SetMode(CursorMode mode);
+        #endregion
+
         #region Object
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Object_DestroyEntity(ulong id);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Object_DestroyImmediateEntity(ulong id);

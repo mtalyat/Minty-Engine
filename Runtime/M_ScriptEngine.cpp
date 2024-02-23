@@ -3,6 +3,7 @@
 
 #include "M_Mono.h"
 
+#include "M_Window.h"
 #include "M_Runtime.h"
 #include "M_Scene.h"
 #include "M_SceneManager.h"
@@ -720,6 +721,12 @@ constexpr static char const* INTERNAL_CLASS_NAME = "Runtime";
 
 #define ADD_INTERNAL_CALL(csharpName, cppName) mono_add_internal_call(std::format("{}.{}::{}", ASSEMBLY_ENGINE_NAME, INTERNAL_CLASS_NAME, csharpName).c_str(), cppName)
 
+static Window& util_get_window()
+{
+	MINTY_ASSERT(_data.engine != nullptr);
+	return _data.engine->get_runtime().get_window();
+}
+
 #pragma region Time
 
 static float time_get_total()
@@ -767,6 +774,20 @@ static void console_error(MonoString* string)
 static void console_ass(bool condition, MonoString* string)
 {
 	Console::ass(condition, ScriptEngine::from_mono_string(string));
+}
+
+#pragma endregion
+
+#pragma region Cursor
+
+static CursorMode cursor_get_mode()
+{
+	return util_get_window().get_cursor_mode();
+}
+
+static void cursor_set_mode(CursorMode mode)
+{
+	util_get_window().set_cursor_mode(mode);
 }
 
 #pragma endregion
@@ -1194,6 +1215,11 @@ void minty::ScriptEngine::link()
 	ADD_INTERNAL_CALL("Console_Warn", console_warn);
 	ADD_INTERNAL_CALL("Console_Error", console_error);
 	ADD_INTERNAL_CALL("Console_Assert", console_ass);
+#pragma endregion
+
+#pragma region Cursor
+	ADD_INTERNAL_CALL("Cursor_GetMode", cursor_get_mode);
+	ADD_INTERNAL_CALL("Cursor_SetMode", cursor_set_mode);
 #pragma endregion
 
 #pragma region Object

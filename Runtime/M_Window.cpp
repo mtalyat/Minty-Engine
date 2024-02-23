@@ -122,6 +122,21 @@ void minty::Window::set_cursor_mode(CursorMode const mode)
 	}
 }
 
+CursorMode minty::Window::get_cursor_mode() const
+{
+	switch (glfwGetInputMode(_window, GLFW_CURSOR))
+	{
+	case GLFW_CURSOR_NORMAL:
+		return CursorMode::Normal;
+	case GLFW_CURSOR_HIDDEN:
+		return CursorMode::Hidden;
+	case GLFW_CURSOR_DISABLED:
+		return CursorMode::Disabled;
+	default:
+		return CursorMode::Normal;
+	}
+}
+
 void minty::Window::maximize()
 {
 	save_restore_info();
