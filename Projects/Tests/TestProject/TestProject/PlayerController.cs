@@ -67,8 +67,6 @@ namespace TestProject
                 movement * input.Y * transform.Up +
                 movement * input.Z * transform.Forward;
 
-            Debug.Log($"Position: {transform.LocalPosition}, Right: {transform.Right}, Up: {transform.Up}, Forward: {transform.Forward}, Move: {move}, Input: {input}");
-
             transform.LocalPosition += move;
         }
     }
