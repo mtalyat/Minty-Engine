@@ -34,6 +34,8 @@ namespace minty
 
 		void invoke(String const& name) const;
 
+		void invoke(String const& name, ScriptArguments& arguments) const;
+
 		ScriptClass const& get_class() const;
 		
 		void set_field(String const& name, void* const value) const;

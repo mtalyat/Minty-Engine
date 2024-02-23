@@ -1,7 +1,9 @@
 #include "pch.h"
 #include "M_Window.h"
 #include "M_Console.h"
-#include "M_InputMap.h"
+#include "M_ScriptClass.h"
+#include "M_ScriptEngine.h"
+#include "M_ScriptArguments.h"
 #include "M_GLFW.h"
 #include <format>
 #include <string>
@@ -10,11 +12,11 @@ using namespace minty;
 
 int Window::_windowCount = 0;
 
-Window::Window(String const& title, int const width, int const height, InputMap const* const globalInputMap)
-	: Window(title, -1, -1, width, height, globalInputMap)
+Window::Window(String const& title, int const width, int const height)
+	: Window(title, -1, -1, width, height)
 {}
 
-minty::Window::Window(String const& title, int const x, int const y, int const width, int const height, InputMap const* const globalInputMap)
+minty::Window::Window(String const& title, int const x, int const y, int const width, int const height)
 	: _title(title)
 	, _window()
 	, _width(width)
@@ -22,11 +24,8 @@ minty::Window::Window(String const& title, int const x, int const y, int const w
 	, _restoreX(x)
 	, _restoreY(y)
 	, _resized(true) // start as "resized" so render engine regenerates data on start
-	, _activeInputMap()
-	, _globalInputMap(globalInputMap)
-	, _lastMouseX()
-	, _lastMouseY()
-	, _mouseOutOfBounds(true) // start as "out of bounds"
+	, _windowScript()
+	, _inputScript()
 {
 	// if no windows have been made yet, init glfw
 	if (_windowCount == 0)
@@ -88,6 +87,12 @@ Window::~Window()
 	{
 		glfwTerminate();
 	}
+}
+
+void minty::Window::on_link(ScriptEngine& engine)
+{
+	_windowScript = engine.get_assembly(ASSEMBLY_ENGINE_NAME)->get_class("MintyEngine", "Window");
+	_inputScript = engine.get_assembly(ASSEMBLY_ENGINE_NAME)->get_class("MintyEngine", "Input");
 }
 
 void minty::Window::set_title(String const& title)
@@ -189,16 +194,6 @@ GLFWwindow* minty::Window::get_raw() const
 	return _window;
 }
 
-void minty::Window::set_input(InputMap const* const inputMap)
-{
-	_activeInputMap = inputMap;
-}
-
-InputMap const* minty::Window::get_input() const
-{
-	return _activeInputMap;
-}
-
 void minty::Window::poll_events()
 {
 	glfwPollEvents();
@@ -210,101 +205,40 @@ void minty::Window::save_restore_info()
 	glfwGetWindowSize(_window, &_width, &_height);
 }
 
-void minty::Window::trigger_key(Key const key, KeyAction const action, KeyModifiers const mods)
+void minty::Window::trigger_key(Key key, KeyAction action, KeyModifiers mods)
 {
-	KeyPressEventArgs args{
-	.key = key,
-	.action = action,
-	.mods = mods
-	};
-
-	if (_globalInputMap)
+	if (_inputScript)
 	{
-		_globalInputMap->invoke_key(args);
-	}
-
-	if (_activeInputMap)
-	{
-		_activeInputMap->invoke_key(args);
+		ScriptArguments arguments({ &key, &action, &mods });
+		_inputScript->invoke(SCRIPT_INPUT_TRIGGER_KEY, arguments);
 	}
 }
 
-void minty::Window::trigger_button(MouseButton const button, KeyAction const action, KeyModifiers const mods)
+void minty::Window::trigger_mouse_click(MouseButton button, KeyAction action, KeyModifiers mods)
 {
-	MouseClickEventArgs args{
-	.button = button,
-	.action = action,
-	.mods = mods,
-	.x = _lastMouseX,
-	.y = _lastMouseY
-	};
-
-	if (_globalInputMap)
+	if (_inputScript)
 	{
-		_globalInputMap->invoke_mouse_click(args);
-	}
-
-	if (_activeInputMap)
-	{
-		_activeInputMap->invoke_mouse_click(args);
+		ScriptArguments arguments({ &button, &action, &mods });
+		_inputScript->invoke(SCRIPT_INPUT_TRIGGER_MOUSE_CLICK, arguments);
 	}
 }
 
-void minty::Window::trigger_scroll(float dx, float dy)
+void minty::Window::trigger_mouse_scroll(float dx, float dy)
 {
-	MouseScrollEventArgs args{
-	.dx = dx,
-	.dy = dy
-	};
-
-	if (_globalInputMap)
+	if (_inputScript)
 	{
-		_globalInputMap->invoke_mouse_scroll(args);
-	}
-
-	if (_activeInputMap)
-	{
-		_activeInputMap->invoke_mouse_scroll(args);
+		ScriptArguments arguments({ &dx, &dy });
+		_inputScript->invoke(SCRIPT_INPUT_TRIGGER_MOUSE_SCROLL, arguments);
 	}
 }
 
-void minty::Window::trigger_cursor(float x, float y)
+void minty::Window::trigger_mouse_move(float x, float y)
 {
-	// find movement from last time the mouse moved
-
-	float dx, dy;
-	if (_mouseOutOfBounds)
+	if (_inputScript)
 	{
-		dx = 0.0f;
-		dy = 0.0f;
+		ScriptArguments arguments({ &x, &y });
+		_inputScript->invoke(SCRIPT_INPUT_TRIGGER_MOUSE_MOVE, arguments);
 	}
-	else
-	{
-		dx = x - _lastMouseX;
-		dy = y - _lastMouseY;
-	}
-
-	MouseMoveEventArgs args{
-		.x = x,
-		.y = y,
-		.dx = dx,
-		.dy = dy
-	};
-
-	if (_globalInputMap)
-	{
-		_globalInputMap->invoke_mouse_move(args);
-	}
-
-	if (_activeInputMap)
-	{
-		_activeInputMap->invoke_mouse_move(args);
-	}
-
-	// update mouse positions
-	_lastMouseX = x;
-	_lastMouseY = y;
-	_mouseOutOfBounds = false;
 }
 
 void Window::resize_callback(GLFWwindow* const window, int const width, int const height)
@@ -333,7 +267,7 @@ void minty::Window::button_ballback(GLFWwindow* window, int button, int action, 
 	Console::ass(w != nullptr, "Window is null on button callback.");
 	if (w)
 	{
-		w->trigger_button(static_cast<MouseButton>(button), static_cast<KeyAction>(action), static_cast<KeyModifiers>(mods));
+		w->trigger_mouse_click(static_cast<MouseButton>(button), static_cast<KeyAction>(action), static_cast<KeyModifiers>(mods));
 	}
 }
 
@@ -343,7 +277,7 @@ void minty::Window::cursor_callback(GLFWwindow* window, double xpos, double ypos
 	Console::ass(w != nullptr, "Window is null on cursor callback.");
 	if (w)
 	{
-		w->trigger_cursor(static_cast<float>(xpos), static_cast<float>(ypos));
+		w->trigger_mouse_move(static_cast<float>(xpos), static_cast<float>(ypos));
 	}
 }
 
@@ -358,7 +292,7 @@ void minty::Window::scroll_callback(GLFWwindow* window, double xoffset, double y
 	Console::ass(w != nullptr, "Window is null on scroll callback.");
 	if (w)
 	{
-		w->trigger_scroll(static_cast<float>(xoffset), static_cast<float>(yoffset));
+		w->trigger_mouse_scroll(static_cast<float>(xoffset), static_cast<float>(yoffset));
 	}
 }
 

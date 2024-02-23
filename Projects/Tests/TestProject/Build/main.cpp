@@ -13,7 +13,7 @@ int main(int argc, char const* argv[]) {
 	runtime.init();
 	runtime.get_script_engine().load_assembly("TestProject/bin/x64/Debug/MintyEngine.dll");
 	runtime.get_script_engine().load_assembly("TestProject/bin/x64/Debug/TestProject.dll");
-	minty::Runtime::link();
+	runtime.link();
 	if(int code = init(runtime)) { minty::Console::error(std::format("Failed to init program with error code {}.", code)); return code; }
 	runtime.start();
 	runtime.run();

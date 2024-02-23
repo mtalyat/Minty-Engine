@@ -45,7 +45,6 @@ uint32_t const HEIGHT = 600;
 Runtime::Runtime(Info const& info)
 	: _state(State::Uninitialized)
 	, _info(info)
-	, _globalInput()
 	, _window()
 	, _sceneManager()
 	, _engines()
@@ -73,11 +72,6 @@ Time const& minty::Runtime::get_time() const
 bool minty::Runtime::is_running() const
 {
 	return _state == State::Running;
-}
-
-InputMap& minty::Runtime::get_global_input_map() const
-{
-	return *_globalInput;
 }
 
 Window& minty::Runtime::get_window() const
@@ -155,7 +149,7 @@ bool minty::Runtime::init(RuntimeBuilder const* builder)
 
 	// create necessary components
 	_personalWindow = !builder || !builder->window;
-	_window = _personalWindow ? new Window(_info.get_application_name(), WIDTH, HEIGHT, _globalInput) : builder->window;
+	_window = _personalWindow ? new Window(_info.get_application_name(), WIDTH, HEIGHT) : builder->window;
 	_sceneManager = new SceneManager(*this);
 
 	set_engine<RenderEngine>(builder && builder->renderEngine ? builder->renderEngine : new RenderEngine(*this));
@@ -298,6 +292,12 @@ void minty::Runtime::link()
 
 	// link to C#
 	ScriptEngine::link();
+
+	// link C++ scripting handles
+	ScriptEngine& scriptEngine = get_script_engine();
+
+	// window
+	_window->on_link(scriptEngine);
 }
 
 void minty::Runtime::record_time()

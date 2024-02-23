@@ -50,6 +50,17 @@ void minty::ScriptObject::invoke(String const& name) const
 	engine.invoke_method(data(), method);
 }
 
+void minty::ScriptObject::invoke(String const& name, ScriptArguments& arguments) const
+{
+	ScriptEngine& engine = _script->get_assembly().get_engine();
+
+	// find the method to invoke
+	MonoMethod* method = engine.get_method(_script->_class, name, static_cast<int>(arguments.size()));
+
+	// invoke it
+	engine.invoke_method(data(), method, arguments.get_values());
+}
+
 ScriptClass const& minty::ScriptObject::get_class() const
 {
 	return *_script;

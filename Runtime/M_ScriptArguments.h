@@ -17,5 +17,7 @@ namespace minty
 		std::vector<void*> const& get_values() const;
 
 		std::vector<void*>& get_values();
+
+		size_t size() const;
 	};
 }

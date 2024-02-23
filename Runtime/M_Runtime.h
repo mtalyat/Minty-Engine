@@ -16,7 +16,6 @@ namespace minty
 {
 	class Engine;
 	class SceneManager;
-	class InputMap;
 	class RenderEngine;
 	class AudioEngine;
 	class ScriptEngine;
@@ -67,7 +66,6 @@ namespace minty
 		State _state;
 		Info _info;
 		Time _time;
-		InputMap* _globalInput;
 		Window* _window;
 		SceneManager* _sceneManager;
 		TypeRegister<Engine> _engines;
@@ -92,12 +90,6 @@ namespace minty
 		Time const& get_time() const;
 
 		bool is_running() const;
-
-		/// <summary>
-		/// Gets the global input map that is persistent across all Scenes and Windows.
-		/// </summary>
-		/// <returns></returns>
-		InputMap& get_global_input_map() const;
 
 		/// <summary>
 		/// Gets the Window for this Engine.
@@ -236,7 +228,7 @@ namespace minty
 		/// <summary>
 		/// Links the C++ and C# together.
 		/// </summary>
-		static void link();
+		void link();
 
 #pragma endregion
 

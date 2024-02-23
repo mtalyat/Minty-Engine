@@ -5,6 +5,7 @@
 
 #include "M_ScriptObject.h"
 #include "M_ScriptEngine.h"
+#include "M_ScriptArguments.h"
 
 using namespace minty;
 
@@ -48,6 +49,28 @@ bool minty::ScriptClass::is_derived_from(ScriptClass const& other) const
 	}
 
 	return current;
+}
+
+void minty::ScriptClass::invoke(String const& name) const
+{
+	ScriptEngine& engine = get_assembly().get_engine();
+
+	// find the method to invoke
+	MonoMethod* method = engine.get_method(_class, name);
+
+	// invoke it
+	engine.invoke_method(nullptr, method);
+}
+
+void minty::ScriptClass::invoke(String const& name, ScriptArguments& arguments) const
+{
+	ScriptEngine& engine = get_assembly().get_engine();
+
+	// find the method to invoke
+	MonoMethod* method = engine.get_method(_class, name, static_cast<int>(arguments.size()));
+
+	// invoke it
+	engine.invoke_method(nullptr, method, arguments.get_values());
 }
 
 ScriptObject minty::ScriptClass::create_object(UUID const id) const

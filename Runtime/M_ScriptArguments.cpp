@@ -16,3 +16,8 @@ std::vector<void*>& minty::ScriptArguments::get_values()
 {
 	return _values;
 }
+
+size_t minty::ScriptArguments::size() const
+{
+	return _values.size();
+}

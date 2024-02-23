@@ -12,7 +12,8 @@ struct GLFWwindow;
 
 namespace minty
 {
-	class InputMap;
+	class ScriptClass;
+	class ScriptEngine;
 
 	/// <summary>
 	/// A window on the screen.
@@ -29,11 +30,9 @@ namespace minty
 		int _width, _height;
 		int _restoreX, _restoreY;
 		bool _resized;
-		InputMap const* _activeInputMap;
-		InputMap const* _globalInputMap;
-		float _lastMouseX, _lastMouseY;
-		bool _mouseOutOfBounds;
 
+		ScriptClass const* _windowScript;
+		ScriptClass const* _inputScript;
 	public:
 		/// <summary>
 		/// Creates a new Window.
@@ -41,7 +40,7 @@ namespace minty
 		/// <param name="title">The title to be displayed on the Window.</param>
 		/// <param name="width">The width of the Window in pixels.</param>
 		/// <param name="height">The height of the Window in pixels.</param>
-		Window(String const& title, int const width, int const height, InputMap const* const globalInputMap = nullptr);
+		Window(String const& title, int const width, int const height);
 
 		/// <summary>
 		/// Creates a new Window.
@@ -50,10 +49,14 @@ namespace minty
 		/// <param name="width"></param>
 		/// <param name="height"></param>
 		/// <param name="globalInputMap"></param>
-		Window(String const& title, int const x, int const y, int const width, int const height, InputMap const* const globalInputMap = nullptr);
+		Window(String const& title, int const x, int const y, int const width, int const height);
 
 		~Window();
 
+	public:
+		void on_link(ScriptEngine& engine);
+
+	public:
 		/// <summary>
 		/// Sets the title text of this Window.
 		/// </summary>
@@ -138,18 +141,6 @@ namespace minty
 		GLFWwindow* get_raw() const;
 
 		/// <summary>
-		/// Sets the currently active InputMap for this Window.
-		/// </summary>
-		/// <param name="inputMap"></param>
-		void set_input(InputMap const* const inputMap);
-
-		/// <summary>
-		/// Gets the currently active InputMap for this Window.
-		/// </summary>
-		/// <returns></returns>
-		InputMap const* get_input() const;
-
-		/// <summary>
 		/// Processes all pending Window events.
 		/// </summary>
 		static void poll_events();
@@ -157,16 +148,16 @@ namespace minty
 		void save_restore_info();
 
 		// triggers a key in the input map
-		void trigger_key(Key const key, KeyAction const action, KeyModifiers const mods);
+		void trigger_key(Key key, KeyAction action, KeyModifiers mods);
 
 		// triggers a button in the input map
-		void trigger_button(MouseButton const button, KeyAction const action, KeyModifiers const mods);
+		void trigger_mouse_click(MouseButton button, KeyAction action, KeyModifiers mods);
 
 		// triggers a scroll in the input map
-		void trigger_scroll(float dx, float dy);
+		void trigger_mouse_scroll(float dx, float dy);
 
 		// triggers a move in the input map
-		void trigger_cursor(float x, float y);
+		void trigger_mouse_move(float x, float y);
 
 		// window resize
 		static void resize_callback(GLFWwindow* const window, int const width, int const height);

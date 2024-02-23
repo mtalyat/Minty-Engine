@@ -61,8 +61,10 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Component.cs" />
+    <Compile Include="Cursor.cs" />
     <Compile Include="Debug.cs" />
     <Compile Include="Entity.cs" />
+    <Compile Include="Input.cs" />
     <Compile Include="Object.cs" />
     <Compile Include="Quaternion.cs" />
     <Compile Include="Runtime.cs" />
@@ -73,6 +75,7 @@
     <Compile Include="Vector2.cs" />
     <Compile Include="Vector3.cs" />
     <Compile Include="Vector4.cs" />
+    <Compile Include="Window.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
