@@ -11,15 +11,22 @@ namespace minty
 	{
 	private:
 		Runtime* _runtime;
-		Scene* _scene;
+		Scene* _loadedScene;
+		Scene* _workingScene;
 
 	public:
-		Engine();
+		Engine(Runtime& runtime);
 
 		virtual ~Engine();
 
-		virtual void set_runtime(Runtime& runtime);
-
 		Runtime& get_runtime() const;
+
+		virtual void set_loaded_scene(Scene* const scene);
+
+		Scene* get_loaded_scene() const;
+
+		virtual void set_working_scene(Scene* const scene);
+
+		Scene* get_working_scene() const;
 	};
 }

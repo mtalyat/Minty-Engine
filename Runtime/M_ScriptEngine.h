@@ -40,15 +40,12 @@ namespace minty
 		MonoDomain* _appDomain;
 		std::unordered_map<String, ScriptAssembly*> _assemblies;
 	public:
-		ScriptEngine();
+		ScriptEngine(Runtime& runtime);
 
 		virtual ~ScriptEngine();
 
 	public:
 		static void link();
-
-	public:
-		void set_runtime(Runtime& runtime) override;
 
 #pragma region Assemblies
 

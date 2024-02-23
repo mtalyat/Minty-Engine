@@ -111,7 +111,7 @@ namespace minty
 		/// <summary>
 		/// Creates a new RenderEngine that will render to the given Window.
 		/// </summary>
-		RenderEngine();
+		RenderEngine(Runtime& runtime);
 
 		~RenderEngine();
 
@@ -120,6 +120,9 @@ namespace minty
 		/// </summary>
 		/// <returns>True if the engine is initialized.</returns>
 		bool is_initialized() const;
+
+	public:
+		void set_loaded_scene(Scene* const scene) override;
 
 #pragma region Frame
 

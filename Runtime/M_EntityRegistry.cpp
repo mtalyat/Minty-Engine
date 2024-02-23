@@ -127,6 +127,14 @@ void minty::EntityRegistry::disable(Entity const entity)
 	}
 }
 
+void minty::EntityRegistry::dirty(Entity const entity)
+{
+	if (!all_of<DirtyComponent>(entity))
+	{
+		emplace<DirtyComponent>(entity);
+	}
+}
+
 void minty::EntityRegistry::destroy(Entity const entity)
 {
 	emplace_or_replace<DestroyEntityComponent>(entity);

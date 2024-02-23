@@ -121,6 +121,11 @@ namespace minty
 		/// Destroys the SceneManager and all Scenes.
 		/// </summary>
 		void destroy();
+
+	private:
+		void set_loaded_scene(Scene* const scene);
+
+		void set_working_scene(Scene* const scene);
 	public:
 		friend String to_string(SceneManager const& value);
 	};

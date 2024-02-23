@@ -27,6 +27,8 @@ namespace minty
 	/// </summary>
 	class Runtime
 	{
+		friend class SceneManager;
+
 	private:
 		enum class State
 		{
@@ -84,6 +86,7 @@ namespace minty
 
 #pragma region Getters
 
+	public:
 		Info const& get_info() const;
 
 		Time const& get_time() const;
@@ -112,6 +115,7 @@ namespace minty
 
 #pragma region Engines
 
+	public:
 		/// <summary>
 		/// Gets the Engine of the specific type.
 		/// </summary>
@@ -146,10 +150,16 @@ namespace minty
 		/// <returns></returns>
 		ScriptEngine& get_script_engine() const;
 
+	private:
+		void set_loaded_scene(Scene* const scene) const;
+
+		void set_working_scene(Scene* const scene) const;
+
 #pragma endregion
 
 #pragma region Exit
 
+	public:
 		/// <summary>
 		/// Gets the exit code for this Engine.
 		/// </summary>
@@ -173,6 +183,7 @@ namespace minty
 
 #pragma region Control
 
+	public:
 		/// <summary>
 		/// Initializes the engine using the given window, or creates a new one if none given.
 		/// </summary>
@@ -253,10 +264,6 @@ namespace minty
 	{
 		MINTY_ASSERT_MESSAGE(_state >= State::Initialized, "Runtime is not initialized.");
 
-		// set reference to self
-		Engine* e = static_cast<Engine*>(engine);
-		e->set_runtime(*this);
-
 		// if engine already exists, dispose of it and replace it
 		T* other = _engines.get<T>();
 		if (other)
@@ -267,7 +274,7 @@ namespace minty
 		// set engine
 		_engines.emplace<T>(engine);
 	}
-	
+
 	template<class T>
 	void Runtime::register_system(String const& name)
 	{

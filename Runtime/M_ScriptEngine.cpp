@@ -38,7 +38,7 @@ struct ScriptEngineData
 
 	Scene* get_scene()
 	{
-		return engine->get_runtime().get_scene_manager().get_working_scene();
+		return engine->get_working_scene();
 	}
 
 	void reset()
@@ -70,8 +70,9 @@ static ScriptEngineData _data;
 // SCRIPT FUNCTIONS C# -> C++
 // a lot, check ScriptLinkage.cpp
 
-minty::ScriptEngine::ScriptEngine()
-	: _rootDomain()
+minty::ScriptEngine::ScriptEngine(Runtime& runtime)
+	: Engine(runtime)
+	, _rootDomain()
 	, _appDomain()
 	, _assemblies()
 {
@@ -103,16 +104,6 @@ minty::ScriptEngine::~ScriptEngine()
 	mono_jit_cleanup(_rootDomain);
 	_rootDomain = nullptr;
 	_appDomain = nullptr;
-}
-
-void minty::ScriptEngine::set_runtime(Runtime& runtime)
-{
-	if (&get_runtime() != &runtime)
-	{
-		Engine::set_runtime(runtime);
-
-		_data.reset();
-	}
 }
 
 bool minty::ScriptEngine::load_assembly(Path const& path, bool const referenceOnly)
@@ -1001,7 +992,7 @@ static void entity_remove_component(UUID id, MonoReflectionType* reflectionType)
 
 #pragma region Transform
 
-TransformComponent& util_get_transform_component(UUID id)
+TransformComponent& util_get_transform_component(UUID id, bool setDirty)
 {
 	MINTY_ASSERT(_data.engine);
 	MINTY_ASSERT(id.valid());
@@ -1014,6 +1005,12 @@ TransformComponent& util_get_transform_component(UUID id)
 	Entity entity = registry.find(id);
 	MINTY_ASSERT(entity != NULL_ENTITY);
 
+	// if set dirty, do that
+	if (setDirty)
+	{
+		registry.dirty(entity);
+	}
+
 	TransformComponent* component = registry.try_get<TransformComponent>(entity);
 	MINTY_ASSERT(component != nullptr);
 
@@ -1022,42 +1019,42 @@ TransformComponent& util_get_transform_component(UUID id)
 
 static void transform_get_local_position(UUID id, Vector3* position)
 {
-	TransformComponent& component = util_get_transform_component(id);
+	TransformComponent& component = util_get_transform_component(id, false);
 
 	*position = component.localPosition;
 }
 
 static void transform_set_local_position(UUID id, Vector3* position)
 {
-	TransformComponent& component = util_get_transform_component(id);
+	TransformComponent& component = util_get_transform_component(id, true);
 
 	component.localPosition = *position;
 }
 
 static void transform_get_local_rotation(UUID id, Quaternion* rotation)
 {
-	TransformComponent& component = util_get_transform_component(id);
+	TransformComponent& component = util_get_transform_component(id, false);
 
 	*rotation = component.localRotation;
 }
 
 static void transform_set_local_rotation(UUID id, Quaternion* rotation)
 {
-	TransformComponent& component = util_get_transform_component(id);
+	TransformComponent& component = util_get_transform_component(id, true);
 
 	component.localRotation = *rotation;
 }
 
 static void transform_get_local_scale(UUID id, Vector3* scale)
 {
-	TransformComponent& component = util_get_transform_component(id);
+	TransformComponent& component = util_get_transform_component(id, false);
 
 	*scale = component.localScale;
 }
 
 static void transform_set_local_scale(UUID id, Vector3* scale)
 {
-	TransformComponent& component = util_get_transform_component(id);
+	TransformComponent& component = util_get_transform_component(id, true);
 
 	component.localScale = *scale;
 }

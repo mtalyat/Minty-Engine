@@ -84,8 +84,9 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
 	}
 }
 
-RenderEngine::RenderEngine()
-	: _window()
+RenderEngine::RenderEngine(Runtime& runtime)
+	: Engine(runtime)
+	, _window()
 	, _boundIds()
 	, _view()
 	, _backgroundColor({ 250, 220, 192, 255 }) // light tan color
@@ -212,6 +213,24 @@ void RenderEngine::render_frame()
 bool minty::RenderEngine::is_initialized() const
 {
 	return _initialized;
+}
+
+void minty::RenderEngine::set_loaded_scene(Scene* const scene)
+{
+	Engine::set_loaded_scene(scene);
+
+	_scene = scene;
+
+	if (scene)
+	{
+		_renderSystem = scene->get_system_registry().find<RenderSystem>();
+		_registry = &scene->get_entity_registry();
+	}
+	else
+	{
+		_renderSystem = nullptr;
+		_registry = nullptr;
+	}
 }
 
 void RenderEngine::create_instance(RenderEngineBuilder const& builder)

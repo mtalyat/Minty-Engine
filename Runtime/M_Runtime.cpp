@@ -102,6 +102,22 @@ ScriptEngine& minty::Runtime::get_script_engine() const
 	return *static_cast<ScriptEngine*>(_engines.at(SCRIPT_ENGINE_INDEX));
 }
 
+void minty::Runtime::set_loaded_scene(Scene* const scene) const
+{
+	for (auto const engine : _engines)
+	{
+		engine->set_loaded_scene(scene);
+	}
+}
+
+void minty::Runtime::set_working_scene(Scene* const scene) const
+{
+	for (auto const engine : _engines)
+	{
+		engine->set_working_scene(scene);
+	}
+}
+
 SceneManager& minty::Runtime::get_scene_manager() const
 {
 	MINTY_ASSERT_MESSAGE(_state >= State::Initialized, "Runtime is not initialized.");
@@ -142,9 +158,9 @@ bool minty::Runtime::init(RuntimeBuilder const* builder)
 	_window = _personalWindow ? new Window(_info.get_application_name(), WIDTH, HEIGHT, _globalInput) : builder->window;
 	_sceneManager = new SceneManager(*this);
 
-	set_engine<RenderEngine>(builder && builder->renderEngine ? builder->renderEngine : new RenderEngine());
-	set_engine<AudioEngine>(builder && builder->audioEngine ? builder->audioEngine : new AudioEngine());
-	set_engine<ScriptEngine>(builder && builder->scriptEngine ? builder->scriptEngine : new ScriptEngine());
+	set_engine<RenderEngine>(builder && builder->renderEngine ? builder->renderEngine : new RenderEngine(*this));
+	set_engine<AudioEngine>(builder && builder->audioEngine ? builder->audioEngine : new AudioEngine(*this));
+	set_engine<ScriptEngine>(builder && builder->scriptEngine ? builder->scriptEngine : new ScriptEngine(*this));
 
 	return true;
 }

@@ -21,7 +21,7 @@ namespace minty
 		/// <summary>
 		/// Creates a new AudioEngine.
 		/// </summary>
-		AudioEngine();
+		AudioEngine(Runtime& runtime);
 
 		~AudioEngine();
 

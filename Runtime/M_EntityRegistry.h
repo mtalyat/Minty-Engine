@@ -77,6 +77,8 @@ namespace minty
 
 		void disable(Entity const entity);
 
+		void dirty(Entity const entity);
+
 		/// <summary>
 		/// Marks the given Entity for destruction.
 		/// </summary>

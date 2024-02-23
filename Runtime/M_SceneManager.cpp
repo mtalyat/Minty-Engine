@@ -42,7 +42,7 @@ ID minty::SceneManager::create_scene(String const& name, Path const& path)
 	ID actualId = _scenes.emplace(name, scene);
 
 	// set active scene for creation
-	_workingScene = scene;
+	set_working_scene(scene);
 
 	MINTY_ASSERT(id == actualId);
 
@@ -57,7 +57,7 @@ ID minty::SceneManager::create_scene(String const& name, Path const& path)
 	scene->deserialize(reader);
 
 	// all done, set active scene back to the loaded scene
-	_workingScene = _loadedScene;
+	set_working_scene(_loadedScene);
 
 	// all done
 	return id;
@@ -70,7 +70,7 @@ bool minty::SceneManager::destroy_scene(ID const id)
 		// set active scene temporarily
 		Scene* scene = _scenes.at(id);
 
-		_workingScene = scene;
+		set_working_scene(scene);
 
 		// if this is the loaded scene, unload it first
 		if (_loadedScene == scene)
@@ -83,7 +83,7 @@ bool minty::SceneManager::destroy_scene(ID const id)
 		// erase
 		_scenes.erase(id);
 
-		_workingScene = _loadedScene;
+		set_working_scene(_loadedScene);
 
 		return true;
 	}
@@ -107,11 +107,9 @@ void minty::SceneManager::load_scene(ID const id)
 		_loadedScene->unload();
 	}
 
-	// set value
-	_loadedScene = scene;
-
-	// set renderer to use this new scene
-	_workingScene = _loadedScene;
+	// set scene values
+	set_loaded_scene(scene);
+	set_working_scene(scene);
 
 	// load event
 	if (_loaded && _loadedScene)
@@ -125,7 +123,7 @@ void minty::SceneManager::unload_scene()
 	if (_loadedScene)
 	{
 		_loadedScene->unload();
-		_loadedScene = nullptr;
+		set_loaded_scene(nullptr);
 	}
 }
 
@@ -218,6 +216,18 @@ void minty::SceneManager::destroy()
 		delete pair.second;
 	}
 	_scenes.clear();
+}
+
+void minty::SceneManager::set_loaded_scene(Scene* const scene)
+{
+	_loadedScene = scene;
+	_runtime->set_loaded_scene(scene);
+}
+
+void minty::SceneManager::set_working_scene(Scene* const scene)
+{
+	_workingScene = scene;
+	_runtime->set_working_scene(scene);
 }
 
 String minty::to_string(SceneManager const& value)

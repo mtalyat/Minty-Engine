@@ -72,7 +72,7 @@ entities
         Animator
             animator: animator2
         TestScript
-            time: 0.5
+            time: 5
     Model Negative Z
         Enabled
         Renderable
@@ -82,7 +82,7 @@ entities
             material: material1
             type: cube
         TestScript
-            time: 0.5
+            time: 5
     Model Positive Z
         Enabled
         Renderable
@@ -92,7 +92,7 @@ entities
             material: material1
             type: cube
         TestScript
-            time: 0.5
+            time: 5
     Model Negative X
         Enabled
         Renderable
@@ -102,7 +102,7 @@ entities
             material: material1
             type: cube
         TestScript
-            time: 0.5
+            time: 5
     Model Positive X
         Enabled
         Renderable
@@ -112,4 +112,4 @@ entities
             material: material1
             type: cube
         TestScript
-            time: 0.5
+            time: 5

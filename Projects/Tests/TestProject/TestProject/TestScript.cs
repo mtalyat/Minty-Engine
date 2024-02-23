@@ -32,12 +32,14 @@ class TestScript : Script
         
         if (time <= 0.0f)
         {
-            Entity.Enabled = false;
+            Destroy(this);
         }
 
         Vector3 pos = transform.LocalPosition;
         pos.Z += Time.ElapsedTime;
         transform.LocalPosition = pos;
+
+        transform.LocalScale /= 1.0f + Time.ElapsedTime * 0.1f;
 
         Debug.Log(transform.LocalPosition);
     }
