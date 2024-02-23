@@ -64,7 +64,7 @@ minty::ScriptAssembly::ScriptAssembly(Path const& path, ScriptEngine& engine, bo
 
 minty::ScriptAssembly::~ScriptAssembly()
 {
-	mono_assembly_close(_assembly);
+	//mono_assembly_close(_assembly);
 
 	_path = Text::EMPTY;
 	_engine = nullptr;

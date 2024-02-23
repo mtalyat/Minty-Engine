@@ -94,15 +94,21 @@ minty::ScriptEngine::ScriptEngine(Runtime& runtime)
 
 minty::ScriptEngine::~ScriptEngine()
 {
+	// dispose of all C# objects
 	_data.reset();
+	// mono_gc_collect(mono_gc_max_generation());
 
+	// unload all assemblies
 	for (auto& pair : _assemblies)
 	{
 		delete pair.second;
 	}
 	_assemblies.clear();
 
-	mono_jit_cleanup(_rootDomain);
+	// dispose of Mono
+	mono_domain_unload(_appDomain);
+	// TODO: mono_jit_cleanup
+	//mono_jit_cleanup(_rootDomain);
 	_rootDomain = nullptr;
 	_appDomain = nullptr;
 }
