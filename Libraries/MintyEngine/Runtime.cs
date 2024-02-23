@@ -43,6 +43,10 @@ namespace MintyEngine
         #region Transform
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_GetLocalPosition(ulong id, out Vector3 position);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_SetLocalPosition(ulong id, in Vector3 position);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_GetLocalRotation(ulong id, out Quaternion position);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_SetLocalRotation(ulong id, in Quaternion position);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_GetLocalScale(ulong id, out Vector3 position);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_SetLocalScale(ulong id, in Vector3 position);
         #endregion
 
         #endregion

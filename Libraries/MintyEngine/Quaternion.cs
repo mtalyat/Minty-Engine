@@ -6,17 +6,21 @@ using System.Threading.Tasks;
 
 namespace MintyEngine
 {
-    public class Quaternion
+    public struct Quaternion
     {
         private float _x, _y, _z, _w;
 
-        public Quaternion()
+        private Quaternion(float x, float y, float z, float w)
         {
-            // identity Quaternion
-            _x = 0.0f;
-            _y = 0.0f;
-            _z = 0.0f;
-            _w = 1.0f;
+            _x = x;
+            _y = y;
+            _z = z;
+            _w = w;
+        }
+
+        public static Quaternion Identity()
+        {
+            return new Quaternion(0.0f, 0.0f, 0.0f, 1.0f);
         }
     }
 }

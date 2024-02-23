@@ -17,5 +17,25 @@ namespace MintyEngine
             }
             set => Runtime.Transform_SetLocalPosition(Entity.ID, value);
         }
+
+        public Quaternion LocalRotation
+        {
+            get
+            {
+                Runtime.Transform_GetLocalRotation(Entity.ID, out Quaternion rotation);
+                return rotation;
+            }
+            set => Runtime.Transform_SetLocalRotation(Entity.ID, value);
+        }
+
+        public Vector3 LocalScale
+        {
+            get
+            {
+                Runtime.Transform_GetLocalScale(Entity.ID, out Vector3 scale);
+                return scale;
+            }
+            set => Runtime.Transform_SetLocalScale(Entity.ID, value);
+        }
     }
 }

@@ -41,8 +41,6 @@ namespace minty
 		/// </summary>
 		float farPlane = DEFAULT_FAR;
 
-
-
 		void serialize(Writer& writer) const override;
 		void deserialize(Reader const& reader) override;
 

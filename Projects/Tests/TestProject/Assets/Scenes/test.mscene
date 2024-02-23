@@ -52,22 +52,14 @@ entities
     Camera
         Enabled
         Transform
-            position: (0, 0, -4)
+            position: (0, 0, 0)
         Camera
-            perspective: 1
+            perspective: 0
+            fov: 60
             near: 0.1
             far: 100.0
         AudioListener
-    Sprite
-        Enabled
-        Renderable
-        Transform
-            position: (0, 0, -2)
-        Sprite
-            sprite: x
-        Animator
-            animator: animator
-    Model
+    Model Center
         Enabled
         Renderable
         Transform
@@ -81,9 +73,43 @@ entities
             animator: animator2
         TestScript
             time: 0.5
-#    Sprite
-#        Renderable
-#        Transform
-#        Sprite
-#            sprite: brian
-#            order: 0
+    Model Negative Z
+        Enabled
+        Renderable
+        Transform
+            position: (0, 0, -2)
+        Mesh
+            material: material1
+            type: cube
+        TestScript
+            time: 0.5
+    Model Positive Z
+        Enabled
+        Renderable
+        Transform
+            position: (0, 0, 2)
+        Mesh
+            material: material1
+            type: cube
+        TestScript
+            time: 0.5
+    Model Negative X
+        Enabled
+        Renderable
+        Transform
+            position: (-2, 0, 0)
+        Mesh
+            material: material1
+            type: cube
+        TestScript
+            time: 0.5
+    Model Positive X
+        Enabled
+        Renderable
+        Transform
+            position: (2, 0, 0)
+        Mesh
+            material: material1
+            type: cube
+        TestScript
+            time: 0.5

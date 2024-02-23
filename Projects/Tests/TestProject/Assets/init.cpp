@@ -70,39 +70,39 @@ int init(Runtime& runtime)
         EntityRegistry* erPtr = &er;
 
         input.emplace_key_down(Key::E, [audioPtr, erPtr](KeyPressEventArgs const &args)
-                               { audioPtr->play_spatial("ding", erPtr->find("Model")); });
+                               { audioPtr->play_spatial("ding", erPtr->find("Model Center")); });
         input.emplace_key_up(Key::E, [audioPtr, erPtr](KeyPressEventArgs const &args)
-                             { audioPtr->play_spatial("dong", erPtr->find("Model")); });
+                             { audioPtr->play_spatial("dong", erPtr->find("Model Center")); });
 
         // quit on key close
         input.emplace_key_down(Key::Escape, [windowPtr](KeyPressEventArgs const &args)
                                { windowPtr->close(); });
 
-        // animator
-        input.emplace_key_down(Key::D1, [erPtr](KeyPressEventArgs const& args)
-        {
-            Entity spriteEntity = erPtr->find("Sprite");
-            AnimatorComponent& animatorComp = erPtr->get<AnimatorComponent>(spriteEntity);
-            animatorComp.animator.set_variable("move", (animatorComp.animator.get_variable("move") + 1) & 1);
-        });
-        input.emplace_key_down(Key::D2, [erPtr](KeyPressEventArgs const& args)
-        {
-            Entity spriteEntity = erPtr->find("Sprite");
-            AnimatorComponent& animatorComp = erPtr->get<AnimatorComponent>(spriteEntity);
-            animatorComp.animator.set_variable("flicker", (animatorComp.animator.get_variable("flicker") + 1) & 1);
-        });
-        input.emplace_key_down(Key::D3, [erPtr](KeyPressEventArgs const& args)
-        {
-            Entity spriteEntity = erPtr->find("Model");
-            AnimatorComponent& animatorComp = erPtr->get<AnimatorComponent>(spriteEntity);
-            animatorComp.animator.set_variable("move", (animatorComp.animator.get_variable("move") + 1) & 1);
-        });
-        input.emplace_key_down(Key::D4, [erPtr](KeyPressEventArgs const& args)
-        {
-            Entity spriteEntity = erPtr->find("Model");
-            AnimatorComponent& animatorComp = erPtr->get<AnimatorComponent>(spriteEntity);
-            animatorComp.animator.set_variable("flicker", (animatorComp.animator.get_variable("flicker") + 1) & 1);
-        });
+        // // animator
+        // input.emplace_key_down(Key::D1, [erPtr](KeyPressEventArgs const& args)
+        // {
+        //     Entity spriteEntity = erPtr->find("Sprite");
+        //     AnimatorComponent& animatorComp = erPtr->get<AnimatorComponent>(spriteEntity);
+        //     animatorComp.animator.set_variable("move", (animatorComp.animator.get_variable("move") + 1) & 1);
+        // });
+        // input.emplace_key_down(Key::D2, [erPtr](KeyPressEventArgs const& args)
+        // {
+        //     Entity spriteEntity = erPtr->find("Sprite");
+        //     AnimatorComponent& animatorComp = erPtr->get<AnimatorComponent>(spriteEntity);
+        //     animatorComp.animator.set_variable("flicker", (animatorComp.animator.get_variable("flicker") + 1) & 1);
+        // });
+        // input.emplace_key_down(Key::D3, [erPtr](KeyPressEventArgs const& args)
+        // {
+        //     Entity spriteEntity = erPtr->find("Model");
+        //     AnimatorComponent& animatorComp = erPtr->get<AnimatorComponent>(spriteEntity);
+        //     animatorComp.animator.set_variable("move", (animatorComp.animator.get_variable("move") + 1) & 1);
+        // });
+        // input.emplace_key_down(Key::D4, [erPtr](KeyPressEventArgs const& args)
+        // {
+        //     Entity spriteEntity = erPtr->find("Model");
+        //     AnimatorComponent& animatorComp = erPtr->get<AnimatorComponent>(spriteEntity);
+        //     animatorComp.animator.set_variable("flicker", (animatorComp.animator.get_variable("flicker") + 1) & 1);
+        // });
 
         windowPtr->set_input(&input);
     }

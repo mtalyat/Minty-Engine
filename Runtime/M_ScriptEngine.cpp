@@ -1001,10 +1001,8 @@ static void entity_remove_component(UUID id, MonoReflectionType* reflectionType)
 
 #pragma region Transform
 
-static void transform_get_local_position(uint64_t number, Vector3* position)
+TransformComponent& util_get_transform_component(UUID id)
 {
-	UUID id(number);
-
 	MINTY_ASSERT(_data.engine);
 	MINTY_ASSERT(id.valid());
 
@@ -1019,26 +1017,49 @@ static void transform_get_local_position(uint64_t number, Vector3* position)
 	TransformComponent* component = registry.try_get<TransformComponent>(entity);
 	MINTY_ASSERT(component != nullptr);
 
-	*position = component->localPosition;
+	return *component;
+}
+
+static void transform_get_local_position(UUID id, Vector3* position)
+{
+	TransformComponent& component = util_get_transform_component(id);
+
+	*position = component.localPosition;
 }
 
 static void transform_set_local_position(UUID id, Vector3* position)
 {
-	MINTY_ASSERT(_data.engine);
-	MINTY_ASSERT(id.valid());
+	TransformComponent& component = util_get_transform_component(id);
 
-	Scene* scene = _data.get_scene();
-	MINTY_ASSERT(scene != nullptr);
+	component.localPosition = *position;
+}
 
-	EntityRegistry& registry = scene->get_entity_registry();
+static void transform_get_local_rotation(UUID id, Quaternion* rotation)
+{
+	TransformComponent& component = util_get_transform_component(id);
 
-	Entity entity = registry.find(id);
-	MINTY_ASSERT(entity != NULL_ENTITY);
+	*rotation = component.localRotation;
+}
 
-	TransformComponent* component = registry.try_get<TransformComponent>(entity);
-	MINTY_ASSERT(component != nullptr);
+static void transform_set_local_rotation(UUID id, Quaternion* rotation)
+{
+	TransformComponent& component = util_get_transform_component(id);
 
-	component->localPosition = *position;
+	component.localRotation = *rotation;
+}
+
+static void transform_get_local_scale(UUID id, Vector3* scale)
+{
+	TransformComponent& component = util_get_transform_component(id);
+
+	*scale = component.localScale;
+}
+
+static void transform_set_local_scale(UUID id, Vector3* scale)
+{
+	TransformComponent& component = util_get_transform_component(id);
+
+	component.localScale = *scale;
 }
 
 #pragma endregion
@@ -1081,6 +1102,10 @@ void minty::ScriptEngine::link()
 #pragma region Transform
 	ADD_INTERNAL_CALL("Transform_GetLocalPosition", transform_get_local_position);
 	ADD_INTERNAL_CALL("Transform_SetLocalPosition", transform_set_local_position);
+	ADD_INTERNAL_CALL("Transform_GetLocalRotation", transform_get_local_rotation);
+	ADD_INTERNAL_CALL("Transform_SetLocalRotation", transform_set_local_rotation);
+	ADD_INTERNAL_CALL("Transform_GetLocalScale", transform_get_local_scale);
+	ADD_INTERNAL_CALL("Transform_SetLocalScale", transform_set_local_scale);
 #pragma endregion
 
 #pragma endregion

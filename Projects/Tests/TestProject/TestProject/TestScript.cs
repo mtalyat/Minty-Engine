@@ -10,8 +10,6 @@ class TestScript : Script
     {
         Debug.Log("TestClass.OnCreate()");
         Debug.Log($"Entity is {Entity}");
-        Entity.Name = "test";
-        Debug.Log($"Entity is now {Entity}");
     }
 
     void OnLoad()
