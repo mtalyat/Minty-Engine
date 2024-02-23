@@ -303,7 +303,7 @@ UUID minty::EntityRegistry::get_id(Entity const entity) const
 void minty::EntityRegistry::set_name(Entity const entity, String const& name)
 {
 	// check if name is a real name, or empty
-	if (name.empty() || (name.size() == 1 && name.front() == '_'))
+	if (name.empty())
 	{
 		// name is empty, remove the component if it exists
 		if(any_of<NameComponent>(entity))
