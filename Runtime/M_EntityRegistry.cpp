@@ -83,7 +83,7 @@ Entity minty::EntityRegistry::create(String const& name)
 Entity minty::EntityRegistry::create(String const& name, UUID const uuid)
 {
 	Entity entity = create(uuid);
-	if(!name.empty()) emplace<NameComponent>(entity).name = name;
+	if (!name.empty()) emplace<NameComponent>(entity).name = name;
 	return entity;
 }
 
@@ -135,9 +135,186 @@ void minty::EntityRegistry::dirty(Entity const entity)
 	}
 }
 
-void minty::EntityRegistry::destroy(Entity const entity)
+void minty::EntityRegistry::set_parent(Entity const entity, Entity const parentEntity)
 {
-	emplace_or_replace<DestroyEntityComponent>(entity);
+	// get or emplace: this entity could not have a relationship
+	RelationshipComponent& relationship = get_or_emplace<RelationshipComponent>(entity);
+
+	// already the parent
+	if (relationship.parent == parentEntity) return;
+
+	// get old parent if any, remove from children
+	if (relationship.parent != NULL_ENTITY)
+	{
+		RelationshipComponent& parentRelationship = get<RelationshipComponent>(parentEntity);
+
+		MINTY_ASSERT(parentRelationship.children >= 1);
+
+		// if this is the last child, remove all references
+		if (parentRelationship.children == 1)
+		{
+			parentRelationship.first = NULL_ENTITY;
+			parentRelationship.last = NULL_ENTITY;
+		}
+		else
+		{
+			// if this is the first child, set the first child to the next sibling
+			if (entity == parentRelationship.first)
+			{
+				RelationshipComponent& siblingRelationship = get<RelationshipComponent>(relationship.next);
+				siblingRelationship.prev = NULL_ENTITY;
+
+				parentRelationship.first = relationship.next;
+			}
+
+			// if this is the last child, set the last child to the prev sibling
+			if (entity == parentRelationship.last)
+			{
+				RelationshipComponent& siblingRelationship = get<RelationshipComponent>(relationship.prev);
+				siblingRelationship.prev = NULL_ENTITY;
+
+				parentRelationship.last = relationship.prev;
+			}
+		}
+
+		parentRelationship.children--;
+
+		// if parent no longer has children, remove its component
+		if (!parentRelationship.children)
+		{
+			erase<RelationshipComponent>(relationship.parent);
+		}
+	}
+
+	// set new parent
+	relationship.parent = parentEntity;
+	relationship.prev = NULL_ENTITY;
+	relationship.next = NULL_ENTITY;
+
+	// because it is likely that the global position has changed, update that too
+	dirty(entity);
+
+	// update new parent's children
+	if (relationship.parent != NULL_ENTITY)
+	{
+		// get or emplace here: the new parent could not have a relationship component
+		RelationshipComponent& parentRelationship = get_or_emplace<RelationshipComponent>(parentEntity);
+
+		// add new child to end of list
+
+		if (!parentRelationship.children)
+		{
+			// if children list is empty, add to front and back
+			parentRelationship.first = entity;
+			parentRelationship.last = entity;
+		}
+		else
+		{
+			// if children list is not empty, add to back
+			RelationshipComponent& lastSiblingRelationship = get_or_emplace<RelationshipComponent>(parentRelationship.last);
+
+			lastSiblingRelationship.next = entity;
+			relationship.prev = parentRelationship.last;
+			parentRelationship.last = entity;
+		}
+
+		parentRelationship.children++;
+	}
+}
+
+Entity minty::EntityRegistry::get_parent(Entity const entity) const
+{
+	if (RelationshipComponent const* component = try_get<RelationshipComponent>(entity))
+	{
+		return component->parent;
+	}
+
+	return NULL_ENTITY;
+}
+
+size_t minty::EntityRegistry::get_child_count(Entity const entity) const
+{
+	if (RelationshipComponent const* component = try_get<RelationshipComponent>(entity))
+	{
+		return component->children;
+	}
+
+	return 0;
+}
+
+Entity minty::EntityRegistry::get_child(Entity const entity, size_t const index) const
+{
+	if (RelationshipComponent const* component = try_get<RelationshipComponent>(entity))
+	{
+		Entity child = component->first;
+
+		for (size_t i = 0; i < index && child != NULL_ENTITY; i++)
+		{
+			// get next entity
+			RelationshipComponent const& childComponent = get<RelationshipComponent>(child);
+			child = childComponent.next;
+		}
+
+		return child;
+	}
+
+	return NULL_ENTITY;
+}
+
+void minty::EntityRegistry::detach_children(Entity const entity)
+{
+	if (!all_of<RelationshipComponent>(entity))
+	{
+		// no relationship
+		return;
+	}
+
+	RelationshipComponent& component = get<RelationshipComponent>(entity);
+
+	// for each child, unset the parent
+	while (component.first != NULL_ENTITY)
+	{
+		set_parent(component.first, NULL_ENTITY);
+	}
+}
+
+void minty::EntityRegistry::destroy(Entity const entity, bool const includeChildren)
+{
+	if (!includeChildren)
+	{
+		// destroy the Entity only
+		emplace_or_replace<DestroyEntityComponent>(entity);
+		return;
+	}
+
+	// destroy self and all children
+	std::vector<Entity> stack;
+	stack.push_back(entity);
+
+	while (!stack.empty())
+	{
+		// get the entity
+		Entity e = stack.back();
+		stack.pop_back();
+
+		// add
+		emplace_or_replace<DestroyEntityComponent>(e);
+
+		// add children to stack
+		if (RelationshipComponent* component = try_get<RelationshipComponent>(e))
+		{
+			e = component->first;
+
+			while (e != NULL_ENTITY)
+			{
+				// add to stack
+				stack.push_back(e);
+
+				// move to next child
+				e = component->next;
+			}
+		}
+	}
 }
 
 void minty::EntityRegistry::destroy(Entity const entity, String const& componentName)
@@ -146,21 +323,59 @@ void minty::EntityRegistry::destroy(Entity const entity, String const& component
 	destroyComponent.components.emplace(componentName);
 }
 
-void minty::EntityRegistry::destroy_immediate(Entity const entity)
+void minty::EntityRegistry::destroy_immediate(Entity const entity, bool const includeChildren)
 {
-	// if has an OnDestroy script, call that
-	ScriptComponent const* script = try_get<ScriptComponent>(entity);
-	ScriptOnDestroyComponent const* ondestroy = try_get<ScriptOnDestroyComponent>(entity);
-	if (script && ondestroy)
+	// remove from parent, if any
+	set_parent(entity, NULL_ENTITY);
+
+	if (!includeChildren)
 	{
-		ondestroy->invoke(SCRIPT_METHOD_NAME_ONDESTROY, *script);
+		// trigger events
+		destroy_trigger_events(entity, get_scene().is_loaded());
+
+		// remove from lookups
+		remove_from_lookup(entity);
+
+		// destroy entity
+		entt::registry::destroy(entity);
+
+		return;
 	}
 
-	// remove from lookups
-	remove_from_lookup(entity);
+	std::vector<Entity> stack;
+	stack.push_back(entity);
 
-	// destroy entity
-	entt::registry::destroy(entity);
+	bool loaded = get_scene().is_loaded();
+
+	while (!stack.empty())
+	{
+		Entity e = stack.back();
+		stack.pop_back();
+
+		// trigger events
+		destroy_trigger_events(e, loaded);
+
+		// remove from lookups
+		remove_from_lookup(entity);
+
+		// destroy entity
+		entt::registry::destroy(entity);
+
+		// add children to stack
+		if (RelationshipComponent* component = try_get<RelationshipComponent>(e))
+		{
+			e = component->first;
+
+			while (e != NULL_ENTITY)
+			{
+				// add to stack
+				stack.push_back(e);
+
+				// move to next child
+				e = component->next;
+			}
+		}
+	}
 }
 
 void minty::EntityRegistry::destroy_queued()
@@ -206,12 +421,7 @@ void minty::EntityRegistry::destroy_queued()
 	for (auto [entity, destroy, script] : view<DestroyEntityComponent const, ScriptComponent>().each())
 	{
 		// call events
-		if (loaded)
-		{
-			if (ScriptOnDisableComponent* eventComp = try_get<ScriptOnDisableComponent>(entity)) eventComp->invoke(SCRIPT_METHOD_NAME_ONDISABLE, script);
-			if (ScriptOnUnloadComponent* eventComp = try_get<ScriptOnUnloadComponent>(entity)) eventComp->invoke(SCRIPT_METHOD_NAME_ONUNLOAD, script);
-		}
-		if (ScriptOnDestroyComponent* eventComp = try_get<ScriptOnDestroyComponent>(entity)) eventComp->invoke(SCRIPT_METHOD_NAME_ONDESTROY, script);
+		destroy_trigger_events(entity, loaded);
 
 		// remove from UUID lookup
 		remove_from_lookup(entity);
@@ -227,6 +437,24 @@ void minty::EntityRegistry::destroy_queued()
 	// get the entities that are ready for destruction, and destroy them all at once
 	auto destroyView = view<DestroyEntityComponent const>();
 	entt::registry::destroy(destroyView.begin(), destroyView.end());
+}
+
+void minty::EntityRegistry::destroy_trigger_events(Entity const entity, bool const sceneLoaded)
+{
+	if (ScriptComponent* scriptComponent = try_get<ScriptComponent>(entity))
+	{
+		if (sceneLoaded)
+		{
+			if (all_of<EnabledComponent>(entity))
+				if (ScriptOnDisableComponent* eventComp = try_get<ScriptOnDisableComponent>(entity)) 
+					eventComp->invoke(SCRIPT_METHOD_NAME_ONDISABLE, *scriptComponent);
+
+			if (ScriptOnUnloadComponent* eventComp = try_get<ScriptOnUnloadComponent>(entity)) 
+				eventComp->invoke(SCRIPT_METHOD_NAME_ONUNLOAD, *scriptComponent);
+		}
+		if (ScriptOnDestroyComponent* eventComp = try_get<ScriptOnDestroyComponent>(entity)) 
+			eventComp->invoke(SCRIPT_METHOD_NAME_ONDESTROY, *scriptComponent);
+	}
 }
 
 void minty::EntityRegistry::clear()
@@ -303,9 +531,14 @@ String minty::EntityRegistry::get_name(Entity const entity) const
 
 UUID minty::EntityRegistry::get_id(Entity const entity) const
 {
-	MINTY_ASSERT_FORMAT(_entityToId.contains(entity), "Entity {} is missing a UUID.", static_cast<uint32_t>(entity));
+	auto found = _entityToId.find(entity);
 
-	return _entityToId.at(entity);
+	if (found != _entityToId.end())
+	{
+		return found->second;
+	}
+
+	return UUID::create_empty();
 }
 
 void minty::EntityRegistry::set_name(Entity const entity, String const& name)
@@ -314,7 +547,7 @@ void minty::EntityRegistry::set_name(Entity const entity, String const& name)
 	if (name.empty())
 	{
 		// name is empty, remove the component if it exists
-		if(any_of<NameComponent>(entity))
+		if (any_of<NameComponent>(entity))
 		{
 			erase<NameComponent>(entity);
 		}
@@ -456,7 +689,7 @@ void minty::EntityRegistry::register_script(String const& name)
 
 	// TODO: this can be generic for each type of script, so this does not need to be copied per script. 
 	// Make this so it just uses the same ComponentFuncs
-	
+
 	// scripts work by adding/getting/removing from the ScriptComponent
 	// funcs
 	ComponentFuncs funcs = {
@@ -469,8 +702,8 @@ void minty::EntityRegistry::register_script(String const& name)
 			if (!component)
 			{
 				component = &registry.emplace<ScriptComponent>(entity);
-			} 
-			else if(component->scripts.contains(name))
+			}
+			else if (component->scripts.contains(name))
 			{
 				// if the script component exists, do nothing
 				return component;
@@ -480,7 +713,7 @@ void minty::EntityRegistry::register_script(String const& name)
 			ScriptEngine& engine = registry.get_runtime().get_script_engine();
 
 			// get the script based on the name
-			ScriptClass const* script = engine.find_class(name);
+			ScriptClass const* script = engine.search_for_class(name);
 
 			MINTY_ASSERT_FORMAT(script != nullptr, "No script with name {} found.", name);
 
@@ -489,7 +722,7 @@ void minty::EntityRegistry::register_script(String const& name)
 			ScriptObject& scriptObject = component->scripts.at(id);
 
 			// call OnCreate
-			scriptObject.invoke(SCRIPT_METHOD_NAME_ONCREATE);
+			scriptObject.try_invoke(SCRIPT_METHOD_NAME_ONCREATE);
 
 			// now add the helper components, if they are needed
 			if (script->has_method(SCRIPT_METHOD_NAME_ONLOAD))
@@ -633,7 +866,7 @@ void minty::EntityRegistry::serialize(Writer& writer) const
 void minty::EntityRegistry::deserialize(Reader const& reader)
 {
 	// read each entity, add name if it has one
-	
+
 	Node const& node = reader.get_node();
 	SerializationData data = *static_cast<SerializationData const*>(reader.get_data());
 
@@ -676,7 +909,7 @@ void minty::EntityRegistry::deserialize(Reader const& reader)
 
 		// create entity in registry
 		entity = create(name, id);
-		
+
 		// create it again for scripting
 		scriptEngine->create_object_entity(id);
 

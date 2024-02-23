@@ -16,6 +16,14 @@ struct MaterialBufferObject
 // called when the engine is initialized
 int init(Runtime& runtime)
 {
+    // TEMP:
+    // generate a bunch of UUIDs
+    for(size_t i = 0; i < 10; i++)
+    {
+        UUID id;
+        Console::log(to_string(id));
+    }
+
     try
     {
         Window &window = runtime.get_window();

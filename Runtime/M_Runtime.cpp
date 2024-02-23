@@ -55,7 +55,11 @@ Runtime::Runtime(Info const& info)
 
 Runtime::~Runtime()
 {
-	stop();
+	if (_state == State::Running)
+	{
+		stop();
+		cleanup();
+	}
 	destroy();
 }
 

@@ -25,6 +25,17 @@ namespace MintyEngine
             set => Runtime.Entity_SetEnabled(ID, value);
         }
 
+        public Entity Parent
+        {
+            get => Runtime.Entity_GetParent(ID) as Entity;
+            set => Runtime.Entity_SetParent(ID, value.ID);
+        }
+
+        public int ChildCount
+        {
+            get => Runtime.Entity_GetChildCount(ID);
+        }
+
         protected Entity()
         {
             ID = 0;
@@ -51,6 +62,11 @@ namespace MintyEngine
         public void RemoveComponent<T>() where T : Component
         {
             Runtime.Entity_RemoveComponent(ID, typeof(T));
+        }
+
+        public Entity GetChild(int index)
+        {
+            return Runtime.Entity_GetChild(ID, index) as Entity;
         }
 
         public override bool Equals(object obj)

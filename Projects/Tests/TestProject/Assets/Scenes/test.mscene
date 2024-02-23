@@ -52,14 +52,18 @@ entities
     Camera
         Enabled
         Transform
-            position: (0, 0, 0)
+            position: (0, 0, -4)
         Camera
             perspective: 0
             fov: 60
             near: 0.1
             far: 100.0
         AudioListener
-    Model Center
+        CameraController
+        PlayerController
+            moveSpeed: 1
+        Link
+    Model Center: 1
         Enabled
         Renderable
         Transform
@@ -73,6 +77,7 @@ entities
             animator: animator2
         TestScript
             time: 5
+        Relationship
     Model Negative Z
         Enabled
         Renderable
@@ -81,8 +86,8 @@ entities
         Mesh
             material: material1
             type: cube
-        TestScript
-            time: 5
+        Relationship
+            parent: 1
     Model Positive Z
         Enabled
         Renderable
@@ -91,8 +96,8 @@ entities
         Mesh
             material: material1
             type: cube
-        TestScript
-            time: 5
+        Relationship
+            parent: 1
     Model Negative X
         Enabled
         Renderable
@@ -101,8 +106,8 @@ entities
         Mesh
             material: material1
             type: cube
-        TestScript
-            time: 5
+        Relationship
+            parent: 1
     Model Positive X
         Enabled
         Renderable
@@ -111,5 +116,5 @@ entities
         Mesh
             material: material1
             type: cube
-        TestScript
-            time: 5
+        Relationship
+            parent: 1

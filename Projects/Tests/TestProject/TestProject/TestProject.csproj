@@ -64,6 +64,10 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="CameraController.cs" />
+    <Compile Include="Link.cs" />
+    <Compile Include="PlayerController.cs" />
+    <Compile Include="Session.cs" />
     <Compile Include="TestScript.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

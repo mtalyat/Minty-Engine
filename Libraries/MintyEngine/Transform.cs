@@ -37,5 +37,32 @@ namespace MintyEngine
             }
             set => Runtime.Transform_SetLocalScale(Entity.ID, value);
         }
+
+        public Vector3 Right
+        {
+            get
+            {
+                Runtime.Transform_GetRight(Entity.ID, out Vector3 right);
+                return right;
+            }
+        }
+
+        public Vector3 Up
+        {
+            get
+            {
+                Runtime.Transform_GetUp(Entity.ID, out Vector3 up);
+                return up;
+            }
+        }
+
+        public Vector3 Forward
+        {
+            get
+            {
+                Runtime.Transform_GetForward(Entity.ID, out Vector3 forward);
+                return forward;
+            }
+        }
     }
 }

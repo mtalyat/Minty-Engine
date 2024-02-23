@@ -219,9 +219,6 @@
     <ClInclude Include="M_UISystem.h">
       <Filter>Header Files\Systems</Filter>
     </ClInclude>
-    <ClInclude Include="M_UITransformComponent.h">
-      <Filter>Header Files\Components</Filter>
-    </ClInclude>
     <ClInclude Include="M_ShaderPass.h">
       <Filter>Header Files\Rendering</Filter>
     </ClInclude>
@@ -578,6 +575,9 @@
     </ClInclude>
     <ClInclude Include="M_EnabledComponent.h">
       <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="M_UITransformComponent.h">
+      <Filter>Header Files\Transform</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -20,6 +20,7 @@
 
 #include "M_TransformComponent.h"
 #include "M_EnabledComponent.h"
+#include "M_RelationshipComponent.h"
 
 using namespace minty;
 using namespace minty::Scripting;
@@ -885,7 +886,7 @@ static bool entity_get_enabled(UUID id)
 
 static MonoObject* entity_add_component(UUID id, MonoReflectionType* reflectionType)
 {
-	if (!id) return nullptr;
+	MINTY_ASSERT(id.valid());
 
 	Scene* scene = _data.get_scene();
 	MINTY_ASSERT(scene != nullptr);
@@ -922,7 +923,7 @@ static MonoObject* entity_add_component(UUID id, MonoReflectionType* reflectionT
 
 static MonoObject* entity_get_component(UUID id, MonoReflectionType* reflectionType)
 {
-	if (!id) return nullptr;
+	MINTY_ASSERT(id.valid());
 
 	Scene* scene = _data.get_scene();
 	MINTY_ASSERT(scene != nullptr);
@@ -960,7 +961,7 @@ static MonoObject* entity_get_component(UUID id, MonoReflectionType* reflectionT
 
 static void entity_remove_component(UUID id, MonoReflectionType* reflectionType)
 {
-	if (!id) return;
+	MINTY_ASSERT(id.valid());
 
 	Scene* scene = _data.get_scene();
 	MINTY_ASSERT(scene != nullptr);
@@ -984,6 +985,95 @@ static void entity_remove_component(UUID id, MonoReflectionType* reflectionType)
 
 	// destroy the component by name
 	registry.destroy(entity, scriptClass->get_name());
+}
+
+static MonoObject* entity_get_parent(UUID id)
+{
+	MINTY_ASSERT(id.valid());
+
+	Scene* scene = _data.get_scene();
+	MINTY_ASSERT(scene != nullptr);
+
+	EntityRegistry& registry = scene->get_entity_registry();
+
+	// get the entity
+	Entity entity = registry.find(id);
+	MINTY_ASSERT(entity != NULL_ENTITY);
+
+	// get the parent
+	Entity parent = registry.get_parent(entity);
+
+	// get the ID
+	UUID parentId = registry.get_id(parent);
+
+	if (!parentId.valid()) return nullptr;
+
+	MINTY_ASSERT(_data.engine != nullptr);
+	return _data.engine->get_or_create_entity(parentId).data();
+}
+
+static void entity_set_parent(UUID id, UUID parentId)
+{
+	MINTY_ASSERT(id.valid());
+
+	Scene* scene = _data.get_scene();
+	MINTY_ASSERT(scene != nullptr);
+
+	EntityRegistry& registry = scene->get_entity_registry();
+
+	// get the entity
+	Entity entity = registry.find(id);
+	MINTY_ASSERT(entity != NULL_ENTITY);
+
+	// get the parent
+	Entity parentEntity = registry.find(parentId);
+
+	// set the parent
+	registry.set_parent(entity, parentEntity);
+}
+
+static int entity_get_child_count(UUID id)
+{
+	MINTY_ASSERT(id.valid());
+
+	Scene* scene = _data.get_scene();
+	MINTY_ASSERT(scene != nullptr);
+
+	EntityRegistry& registry = scene->get_entity_registry();
+
+	// get the entity
+	Entity entity = registry.find(id);
+	MINTY_ASSERT(entity != NULL_ENTITY);
+
+	size_t childCount = registry.get_child_count(entity);
+
+	MINTY_ASSERT_MESSAGE(childCount <= INT_MAX, "Entity child count exceeded INT_MAX.");
+
+	return static_cast<int>(childCount);
+}
+
+static MonoObject* entity_get_child(UUID id, int index)
+{
+	MINTY_ASSERT(id.valid());
+
+	Scene* scene = _data.get_scene();
+	MINTY_ASSERT(scene != nullptr);
+
+	EntityRegistry& registry = scene->get_entity_registry();
+
+	// get the entity
+	Entity entity = registry.find(id);
+	MINTY_ASSERT(entity != NULL_ENTITY);
+
+	// get the child
+	Entity child = registry.get_child(entity, index);
+
+	UUID childId = registry.get_id(child);
+
+	if (!childId.valid()) return nullptr;
+
+	MINTY_ASSERT(_data.engine != nullptr);
+	return _data.engine->get_or_create_entity(childId).data();
 }
 
 #pragma endregion
@@ -1059,6 +1149,27 @@ static void transform_set_local_scale(UUID id, Vector3* scale)
 	component.localScale = *scale;
 }
 
+static void transform_get_right(UUID id, Vector3* direction)
+{
+	TransformComponent& component = util_get_transform_component(id, false);
+
+	*direction = component.get_right();
+}
+
+static void transform_get_up(UUID id, Vector3* direction)
+{
+	TransformComponent& component = util_get_transform_component(id, false);
+
+	*direction = component.get_up();
+}
+
+static void transform_get_forward(UUID id, Vector3* direction)
+{
+	TransformComponent& component = util_get_transform_component(id, false);
+
+	*direction = component.get_forward();
+}
+
 #pragma endregion
 
 #pragma endregion
@@ -1092,6 +1203,10 @@ void minty::ScriptEngine::link()
 	ADD_INTERNAL_CALL("Entity_AddComponent", entity_add_component);
 	ADD_INTERNAL_CALL("Entity_GetComponent", entity_get_component);
 	ADD_INTERNAL_CALL("Entity_RemoveComponent", entity_remove_component);
+	ADD_INTERNAL_CALL("Entity_GetParent", entity_get_parent);
+	ADD_INTERNAL_CALL("Entity_SetParent", entity_set_parent);
+	ADD_INTERNAL_CALL("Entity_GetChildCount", entity_get_child_count);
+	ADD_INTERNAL_CALL("Entity_GetChild", entity_get_child);
 #pragma endregion
 
 #pragma region Components
@@ -1103,6 +1218,9 @@ void minty::ScriptEngine::link()
 	ADD_INTERNAL_CALL("Transform_SetLocalRotation", transform_set_local_rotation);
 	ADD_INTERNAL_CALL("Transform_GetLocalScale", transform_get_local_scale);
 	ADD_INTERNAL_CALL("Transform_SetLocalScale", transform_set_local_scale);
+	ADD_INTERNAL_CALL("Transform_GetRight", transform_get_right);
+	ADD_INTERNAL_CALL("Transform_GetUp", transform_get_up);
+	ADD_INTERNAL_CALL("Transform_GetForward", transform_get_forward);
 #pragma endregion
 
 #pragma endregion

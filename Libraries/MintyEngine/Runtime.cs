@@ -36,6 +36,10 @@ namespace MintyEngine
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static object Entity_AddComponent(ulong id, Type type);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static object Entity_GetComponent(ulong id, Type type);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static bool Entity_RemoveComponent(ulong id, Type type);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static object Entity_GetParent(ulong id);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Entity_SetParent(ulong id, ulong parentId);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static int Entity_GetChildCount(ulong id);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static object Entity_GetChild(ulong id, int index);
         #endregion
 
         #region Components
@@ -47,6 +51,9 @@ namespace MintyEngine
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_SetLocalRotation(ulong id, in Quaternion position);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_GetLocalScale(ulong id, out Vector3 position);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_SetLocalScale(ulong id, in Vector3 position);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_GetRight(ulong id, out Vector3 position);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_GetUp(ulong id, out Vector3 position);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_GetForward(ulong id, out Vector3 position);
         #endregion
 
         #endregion

@@ -47,6 +47,10 @@ namespace minty
 
 		void invoke(String const& name, ScriptArguments& arguments) const;
 
+		bool try_invoke(String const& name) const;
+
+		bool try_invoke(String const& name, ScriptArguments& arguments) const;
+
 		ScriptObject create_object(UUID const id = UUID()) const;
 
 		bool has_method(String const& name) const;

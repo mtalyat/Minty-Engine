@@ -64,6 +64,11 @@ namespace MintyEngine
             return new Vector2(left._x * scalar, left._y * scalar);
         }
 
+        public static Vector2 operator *(float scalar, Vector2 right)
+        {
+            return new Vector2(scalar * right._x, scalar * right._y);
+        }
+
         public static Vector2 operator /(Vector2 left, Vector2 right)
         {
             return new Vector2(left._x / right._x, left._y / right._y);

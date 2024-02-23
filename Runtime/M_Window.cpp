@@ -207,7 +207,7 @@ void minty::Window::save_restore_info()
 
 void minty::Window::trigger_key(Key key, KeyAction action, KeyModifiers mods)
 {
-	if (_inputScript)
+	if (_inputScript && action <= KeyAction::Down)
 	{
 		ScriptArguments arguments({ &key, &action, &mods });
 		_inputScript->invoke(SCRIPT_INPUT_TRIGGER_KEY, arguments);
@@ -216,7 +216,7 @@ void minty::Window::trigger_key(Key key, KeyAction action, KeyModifiers mods)
 
 void minty::Window::trigger_mouse_click(MouseButton button, KeyAction action, KeyModifiers mods)
 {
-	if (_inputScript)
+	if (_inputScript && action <= KeyAction::Down)
 	{
 		ScriptArguments arguments({ &button, &action, &mods });
 		_inputScript->invoke(SCRIPT_INPUT_TRIGGER_MOUSE_CLICK, arguments);

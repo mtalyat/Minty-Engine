@@ -58,6 +58,8 @@ void minty::ScriptClass::invoke(String const& name) const
 	// find the method to invoke
 	MonoMethod* method = engine.get_method(_class, name);
 
+	MINTY_ASSERT(method != nullptr);
+
 	// invoke it
 	engine.invoke_method(nullptr, method);
 }
@@ -69,8 +71,40 @@ void minty::ScriptClass::invoke(String const& name, ScriptArguments& arguments) 
 	// find the method to invoke
 	MonoMethod* method = engine.get_method(_class, name, static_cast<int>(arguments.size()));
 
+	MINTY_ASSERT(method != nullptr);
+
 	// invoke it
 	engine.invoke_method(nullptr, method, arguments.get_values());
+}
+
+bool minty::ScriptClass::try_invoke(String const& name) const
+{
+	ScriptEngine& engine = get_assembly().get_engine();
+
+	// find the method to invoke
+	MonoMethod* method = engine.get_method(_class, name);
+
+	if (!method) return false;
+
+	// invoke it
+	engine.invoke_method(nullptr, method);
+
+	return true;
+}
+
+bool minty::ScriptClass::try_invoke(String const& name, ScriptArguments& arguments) const
+{
+	ScriptEngine& engine = get_assembly().get_engine();
+
+	// find the method to invoke
+	MonoMethod* method = engine.get_method(_class, name, static_cast<int>(arguments.size()));
+
+	if (!method) return false;
+
+	// invoke it
+	engine.invoke_method(nullptr, method, arguments.get_values());
+
+	return true;
 }
 
 ScriptObject minty::ScriptClass::create_object(UUID const id) const

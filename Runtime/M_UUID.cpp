@@ -50,19 +50,19 @@ UUID minty::UUID::create_empty()
 
 std::ostream& minty::operator<<(std::ostream& stream, UUID const& object)
 {
-	stream << Encoding::encode_base64<uint64_t>(object._uuid);
+	stream << std::hex << object._uuid << std::dec;
 	return stream;
 }
 
 std::istream& minty::operator>>(std::istream& stream, UUID& object)
 {
-	String text;
-	stream >> text;
-	object._uuid = Encoding::decode_base64<uint64_t>(text);
+	stream >> std::hex >> object._uuid >> std::dec;
 	return stream;
 }
 
 String minty::to_string(UUID const value)
 {
-	return Encoding::encode_base64(value._uuid);
+	std::stringstream stream;
+	stream << std::hex << value._uuid;
+	return stream.str();
 }

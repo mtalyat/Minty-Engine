@@ -79,11 +79,21 @@ namespace minty
 
 		void dirty(Entity const entity);
 
+		void set_parent(Entity const entity, Entity const parentEntity);
+
+		Entity get_parent(Entity const entity) const;
+
+		size_t get_child_count(Entity const entity) const;
+
+		Entity get_child(Entity const entity, size_t const index) const;
+
+		void detach_children(Entity const entity);
+
 		/// <summary>
 		/// Marks the given Entity for destruction.
 		/// </summary>
 		/// <param name="entity"></param>
-		void destroy(Entity const entity);
+		void destroy(Entity const entity, bool const includeChildren = true);
 
 		/// <summary>
 		/// Marks the Component with the given name on the given Entity for destruction.
@@ -96,12 +106,17 @@ namespace minty
 		/// Destroys the given Entity right now.
 		/// </summary>
 		/// <param name="entity"></param>
-		void destroy_immediate(Entity const entity);
+		void destroy_immediate(Entity const entity, bool const includeChildren = true);
 
 		/// <summary>
 		/// Destroys all Entities marked with the Destroy component.
 		/// </summary>
 		void destroy_queued();
+
+	private:
+		void destroy_trigger_events(Entity const entity, bool const sceneLoaded);
+
+	public:
 
 		/// <summary>
 		/// Destroys the given component from any Entity that has it.

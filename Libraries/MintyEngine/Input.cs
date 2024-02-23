@@ -296,6 +296,22 @@ namespace MintyEngine
             AddKey(key, ButtonAction.Up, handler);
         }
 
+        public void AddKeysDown(KeyPressEventHandler handler, params Key[] keys)
+        {
+            foreach(Key key in keys)
+            {
+                AddKeyDown(key, handler);
+            }
+        }
+
+        public void AddKeysUp(KeyPressEventHandler handler, params Key[] keys)
+        {
+            foreach(Key key in keys)
+            {
+                AddKeyUp(key, handler);
+            }
+        }
+
         #endregion
 
         #region Mouse
@@ -356,6 +372,7 @@ namespace MintyEngine
 
         internal void TriggerKey(KeyPressEventArgs e)
         {
+            Debug.Log("TriggerKey(): " + (int)e.Action);
             if (_keyEvents[(int)e.Action].TryGetValue(e.Key, out KeyPressEventHandler handler))
             {
                 handler.Invoke(this, e);
@@ -364,6 +381,7 @@ namespace MintyEngine
 
         internal void TriggerMouseClick(MouseClickEventArgs e)
         {
+            Debug.Log("TriggerMouseClick(): " + (int)e.Action);
             if (_mouseEvents[(int)e.Action].TryGetValue(e.Button, out MouseClickEventHandler handler))
             {
                 handler.Invoke(this, e);

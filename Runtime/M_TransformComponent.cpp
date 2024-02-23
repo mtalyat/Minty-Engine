@@ -29,17 +29,17 @@ Vector3 minty::TransformComponent::get_global_scale() const
 
 Vector3 minty::TransformComponent::get_forward() const
 {
-	return Vector3(globalMatrix * Vector4(0.0f, 0.0f, 1.0f, 1.0f));
+	return Vector3(globalMatrix * Vector4(0.0f, 0.0f, 1.0f, 0.0f));
 }
 
 Vector3 minty::TransformComponent::get_up() const
 {
-	return Vector3(globalMatrix * Vector4(0.0f, 1.0f, 0.0f, 1.0f));
+	return Vector3(globalMatrix * Vector4(0.0f, 1.0f, 0.0f, 0.0f));
 }
 
 Vector3 minty::TransformComponent::get_right() const
 {
-	return Vector3(globalMatrix * Vector4(1.0f, 0.0f, 0.0f, 1.0f));
+	return Vector3(globalMatrix * Vector4(1.0f, 0.0f, 0.0f, 0.0f));
 }
 
 void minty::TransformComponent::serialize(Writer& writer) const
