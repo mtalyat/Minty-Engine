@@ -220,5 +220,9 @@ namespace minty
 
 		// updates the given sound data using the given entity
 		void update_sound_data(SoundData& data, Entity const entity);
+
+	public:
+		void serialize(Writer& writer) const override;
+		void deserialize(Reader const& reader) override;
 	};
 }

@@ -5,6 +5,8 @@
 #include "M_Scene.h"
 #include "M_Runtime.h"
 #include "M_EntityRegistry.h"
+#include "M_Writer.h"
+#include "M_Reader.h"
 
 #include "M_AudioListenerComponent.h"
 #include "M_AudioSourceComponent.h"
@@ -316,4 +318,17 @@ void minty::AudioSystem::update_sound_data(SoundData& data, Entity const entity)
 		data.position = Vector3();
 		data.velocity = Vector3();
 	}
+}
+
+void minty::AudioSystem::serialize(Writer& writer) const
+{
+	Console::todo("AudioSystem::serialize()");
+}
+
+void minty::AudioSystem::deserialize(Reader const& reader)
+{
+	std::vector<Path> paths;
+	reader.read_vector("clips", paths);
+	for (Path const& path : paths)
+		load_clip(path);
 }
