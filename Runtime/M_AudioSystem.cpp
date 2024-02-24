@@ -17,7 +17,7 @@
 using namespace minty;
 
 minty::AudioSystem::AudioSystem(Runtime& engine, ID const sceneId)
-	: System::System(engine, sceneId)
+	: System::System("Audio", engine, sceneId)
 {}
 
 void minty::AudioSystem::update()

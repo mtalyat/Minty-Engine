@@ -52,7 +52,7 @@ Application::Application()
 	set_window_title("");
 	_window.maximize();
 
-	ApplicationRenderEngine* renderEngine = new ApplicationRenderEngine(*this);
+	ApplicationRenderEngine* renderEngine = new ApplicationRenderEngine(*this, *_runtime);
 
 	// init the runtime
 	RuntimeBuilder runtimeBuilder {
@@ -81,7 +81,7 @@ Application::Application()
 	ScriptEngine& scriptEngine = _runtime->get_script_engine();
 	scriptEngine.load_assembly("../Libraries/MintyEngine/bin/x64/Debug/MintyEngine.dll");
 	//scriptEngine.load_assembly("../Libraries/MintyEditor/bin/x64/Debug/MintyEditor.dll");
-	ScriptEngine::link();
+	_runtime->link();
 }
 
 mintye::Application::~Application()
@@ -229,10 +229,10 @@ void mintye::Application::load_project(minty::Path const& path)
 	_runtime->get_script_engine().load_assembly(std::format("{0}/bin/x64/Debug/{0}.dll", project->get_name()));
 
 	// load a scene, if any found
-	Path sceneName = project->find_asset(Project::CommonFileType::Scene);
-	if (!sceneName.empty())
+	Path scenePath = project->find_asset(Project::CommonFileType::Scene);
+	if (!scenePath.empty())
 	{
-		load_scene(sceneName.stem().string());
+		load_scene(scenePath);
 	}
 
 	// set window text to file name
@@ -736,7 +736,7 @@ void Application::generate_main(BuildInfo const& buildInfo)
 		"	runtime.init();" << std::endl <<
 		"	runtime.get_script_engine().load_assembly(\"" << projectInfo.get_application_name() << "/bin/x64/" << buildInfo.get_config() << "/MintyEngine.dll\");" << std::endl <<
 		"	runtime.get_script_engine().load_assembly(\"" << projectInfo.get_application_name() << "/bin/x64/" << buildInfo.get_config() << "/" << projectInfo.get_application_name() << ".dll\");" << std::endl <<
-		"	minty::Runtime::link();" << std::endl <<
+		"	runtime.link();" << std::endl <<
 		"	if(int code = init(runtime)) { minty::Console::error(std::format(\"Failed to init program with error code {}.\", code)); return code; }" << std::endl <<
 		"	runtime.start();" << std::endl <<
 		"	runtime.run();" << std::endl <<

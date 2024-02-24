@@ -5,6 +5,7 @@
 #include <map>
 #include <set>
 #include <functional>
+#include <vector>
 
 namespace minty
 {
@@ -22,8 +23,10 @@ namespace minty
 
 	private:
 		// the systems to manage
-		std::map<int, std::set<System*>> _orderedSystems;
-		std::map<String const, System*> _allSystems;
+		typedef size_t index_t;
+		std::vector<System*> _systems;
+		std::map<int, std::set<index_t>> _orderedSystems;
+		std::map<String const, index_t> _allSystems;
 
 		static std::map<String const, SystemFunc const> _systemTypes;
 	public:
@@ -46,7 +49,7 @@ namespace minty
 		/// </summary>
 		/// <param name="system">The system to add.</param>
 		/// <param name="priority">The priority in which to update this System in.</param>
-		System* emplace(String const& name, System* const system, int const priority = 0);
+		System* emplace(System* const system, int const priority = 0);
 
 	public:
 		/// <summary>
@@ -81,10 +84,10 @@ namespace minty
 		T* find() const;
 
 		/// <summary>
-		/// Removes the given System from the SystemRegistry.
+		/// Removes the System with the given name.
 		/// </summary>
-		/// <param name="system"></param>
-		void erase(System* const system);
+		/// <param name="name"></param>
+		void erase_by_name(String const& name);
 
 		/// <summary>
 		/// Gets the number of systems within the registry.
@@ -116,6 +119,14 @@ namespace minty
 		/// Clears the entire registry.
 		/// </summary>
 		void clear();
+
+	public:
+		std::vector<System*>::iterator begin();
+		std::vector<System*>::iterator end();
+		std::vector<System*>::const_iterator cbegin() const;
+		std::vector<System*>::const_iterator cend() const;
+		std::vector<System*>::const_iterator begin() const;
+		std::vector<System*>::const_iterator end() const;
 
 	public:
 		/// <summary>
@@ -160,10 +171,11 @@ namespace minty
 	{
 		for (auto const& pair : _allSystems)
 		{
-			if (typeid(*pair.second) == typeid(T))
+			System* const system = _systems.at(pair.second);
+			if (typeid(*system) == typeid(T))
 			{
 				// found, type matches
-				return static_cast<T*>(pair.second);
+				return static_cast<T*>(system);
 			}
 		}
 

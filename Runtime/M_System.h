@@ -18,15 +18,19 @@ namespace minty
 		// is this system enabled?
 		bool _enabled;
 
+		String _name;
+
 	public:
 		/// <summary>
 		/// Creates a new System.
 		/// </summary>
-		System(Runtime& runtime, ID const sceneId);
+		System(String const& name, Runtime& runtime, ID const sceneId);
 
 		virtual ~System();
 
 	public:
+		String const& get_name() const;
+
 		EntityRegistry& get_entity_registry() const;
 
 		SystemRegistry& get_system_registry() const;

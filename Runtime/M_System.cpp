@@ -8,13 +8,19 @@
 
 using namespace minty;
 
-minty::System::System(Runtime& engine, ID const sceneId)
+minty::System::System(String const& name, Runtime& engine, ID const sceneId)
 	: SceneObject(engine, sceneId)
 	, _enabled(true)
+	, _name(name)
 {}
 
 minty::System::~System()
 {}
+
+String const& minty::System::get_name() const
+{
+	return _name;
+}
 
 EntityRegistry& minty::System::get_entity_registry() const
 {

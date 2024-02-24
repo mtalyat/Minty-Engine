@@ -19,7 +19,7 @@
 using namespace minty;
 
 minty::AnimationSystem::AnimationSystem(Runtime& engine, ID const sceneId)
-	: System(engine, sceneId)
+	: System("Animation", engine, sceneId)
 	, _animators()
 	, _animations()
 {}

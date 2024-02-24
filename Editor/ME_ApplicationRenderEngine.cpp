@@ -5,8 +5,8 @@
 using namespace minty;
 using namespace mintye;
 
-mintye::ApplicationRenderEngine::ApplicationRenderEngine(Application& app)
-	: RenderEngine()
+mintye::ApplicationRenderEngine::ApplicationRenderEngine(Application& app, Runtime& runtime)
+	: RenderEngine(runtime)
 	, _application(&app)
 	, _descriptorPool()
 	, _clearColor()

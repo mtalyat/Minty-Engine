@@ -10,7 +10,7 @@
 using namespace minty;
 
 minty::ScriptSystem::ScriptSystem(Runtime& runtime, ID const sceneId)
-	: System(runtime, sceneId)
+	: System("Script", runtime, sceneId)
 {}
 
 void minty::ScriptSystem::load()

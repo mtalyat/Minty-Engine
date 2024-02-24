@@ -134,7 +134,6 @@ namespace mintye
 
 #pragma endregion
 
-
 #pragma region Building and Running
 
 	private:

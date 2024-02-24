@@ -168,7 +168,7 @@ void Project::collect_assets()
 	size_t count = 0;
 
 	// keep collecting while paths to collect has something in it
-	while (directoriesToCollect.size())
+	while (!directoriesToCollect.empty())
 	{
 		// get last element
 		directory = directoriesToCollect.back();
@@ -179,6 +179,7 @@ void Project::collect_assets()
 		// search the path
 		for (const auto& entry : std::filesystem::directory_iterator(directory))
 		{
+			// get the path, relative to the assets folder
 			Path path = entry.path();
 
 			if (entry.is_directory())
@@ -189,7 +190,8 @@ void Project::collect_assets()
 			else
 			{
 				// if a file, check the file type and add where necessary
-				minty::Path extension = path.extension();
+				Path relativePath = path.lexically_relative(assetsPath);
+				Path extension = path.extension();
 
 				// if header exists in files, add to that list
 				// otherwise add to new list
@@ -198,12 +200,12 @@ void Project::collect_assets()
 				{
 					// new list
 					_files.emplace(extension, std::vector<Path>());
-					_files.at(extension).push_back(path);
+					_files.at(extension).push_back(relativePath);
 				}
 				else
 				{
 					// existing list
-					found->second.push_back(path);
+					found->second.push_back(relativePath);
 				}
 
 				count++;

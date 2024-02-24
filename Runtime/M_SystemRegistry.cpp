@@ -16,6 +16,7 @@ namespace minty
 
 	SystemRegistry::SystemRegistry(Runtime& engine, ID const sceneId)
 		: SceneObject(engine, sceneId)
+		, _systems()
 		, _orderedSystems()
 		, _allSystems()
 	{}
@@ -23,14 +24,15 @@ namespace minty
 	SystemRegistry::~SystemRegistry()
 	{
 		// delete each system
-		for (auto& pair : _allSystems)
+		for (auto const system : _systems)
 		{
-			delete pair.second;
+			delete system;
 		}
 	}
 
 	SystemRegistry::SystemRegistry(SystemRegistry&& other) noexcept
 		: SceneObject(other)
+		, _systems(std::move(other._systems))
 		, _orderedSystems(std::move(other._orderedSystems))
 		, _allSystems(std::move(other._allSystems))
 	{}
@@ -40,6 +42,7 @@ namespace minty
 		if (this != &other)
 		{
 			SceneObject::operator=(std::move(other));
+			_systems = std::move(other._systems);
 			_orderedSystems = std::move(other._orderedSystems);
 			_allSystems = std::move(other._allSystems);
 		}
@@ -47,30 +50,28 @@ namespace minty
 		return *this;
 	}
 
-	System* SystemRegistry::emplace(String const& name, System* const system, int const priority)
+	System* SystemRegistry::emplace(System* const system, int const priority)
 	{
 		// if exists in all, do not add a duplicate
-		if (_allSystems.contains(name))
-		{
-			Console::error(std::format("SystemRegistry already contains a System with the name \"{}\". Returning NULL.", name));
-			return nullptr;
-		}
+		MINTY_ASSERT_FORMAT(!_allSystems.contains(system->get_name()), "SystemRegistry already contains a System with the name \"{}\". Returning NULL.", system->get_name());
 
 		// add to all systems
-		_allSystems.emplace(name, system);
+		index_t index = _systems.size();
+		_systems.push_back(system);
+		_allSystems.emplace(system->get_name(), index);
 
 		// add to ordered list for updating
 		auto found = _orderedSystems.find(priority);
 		if (found == _orderedSystems.end())
 		{
 			// new list
-			_orderedSystems.emplace(priority, std::set<System*>());
-			_orderedSystems.at(priority).emplace(system);
+			_orderedSystems.emplace(priority, std::set<index_t>());
+			_orderedSystems.at(priority).emplace(index);
 		}
 		else
 		{
 			// existing list
-			found->second.emplace(system);
+			found->second.emplace(index);
 		}
 
 		return system;
@@ -78,57 +79,61 @@ namespace minty
 
 	System* SystemRegistry::emplace_by_name(String const& name, int const priority)
 	{
-		auto found = _systemTypes.find(name);
-		if (found == _systemTypes.end())
-		{
-			// name not found
-			Console::error(std::format("Cannot emplace System \"{}\". It has not been registered with the SystemRegistry.", name));
-			return nullptr;
-		}
-		else
-		{
-			// name found
-			System* system = found->second(get_runtime(), get_scene_id());
-			this->emplace(name, system, priority);
-			return system;
-		}
+		MINTY_ASSERT_FORMAT(_systemTypes.contains(name), "Cannot emplace System \"{}\". It has not been registered with the SystemRegistry.", name);
+
+		// name found
+		System* system = _systemTypes.at(name)(get_runtime(), get_scene_id());
+		this->emplace(system, priority);
+		return system;
 	}
 
-	void SystemRegistry::erase(System* const system)
+	void SystemRegistry::erase_by_name(String const& name)
 	{
-		// find system, remove it from list
-		for (auto& pair : _orderedSystems)
+		auto found = _allSystems.find(name);
+
+		if (found != _allSystems.end())
 		{
-			if (pair.second.erase(system))
+			index_t index = found->second;
+
+			_systems.erase(_systems.begin() + index);
+			_allSystems.erase(name);
+			
+			for (auto& pair : _orderedSystems)
 			{
-				// found
-				return;
+				auto found2 = pair.second.find(index);
+
+				if (found2 != pair.second.end())
+				{
+					pair.second.erase(found2);
+				}
 			}
 		}
 	}
 
 	size_t SystemRegistry::size() const
 	{
-		return _allSystems.size();
+		return _systems.size();
 	}
 
 	void SystemRegistry::load()
 	{
 		for (auto& pair : _orderedSystems)
 		{
-			for (auto system : pair.second)
+			for (auto index : pair.second)
 			{
-				system->load();
+				_systems.at(index)->load();
 			}
 		}
 	}
 
 	void SystemRegistry::update()
 	{
+		System* system;
 		for (auto& pair : _orderedSystems)
 		{
-			for (auto system : pair.second)
+			for (auto index : pair.second)
 			{
+				system = _systems.at(index);
 				if (system->is_enabled())
 				{
 					system->update();
@@ -139,10 +144,12 @@ namespace minty
 
 	void SystemRegistry::fixed_update()
 	{
+		System* system;
 		for (auto& pair : _orderedSystems)
 		{
-			for (auto system : pair.second)
+			for (auto index : pair.second)
 			{
+				system = _systems.at(index);
 				if (system->is_enabled())
 				{
 					system->fixed_update();
@@ -155,9 +162,9 @@ namespace minty
 	{
 		for (auto& pair : _orderedSystems)
 		{
-			for (auto system : pair.second)
+			for (auto index : pair.second)
 			{
-				system->unload();
+				_systems.at(index)->unload();
 			}
 		}
 	}
@@ -165,13 +172,44 @@ namespace minty
 	void SystemRegistry::clear()
 	{
 		// delete all systems
-		for (auto& pair : _allSystems)
+		for (auto const system : _systems)
 		{
-			delete pair.second;
+			delete system;
 		}
 
+		_systems.clear();
 		_allSystems.clear();
 		_orderedSystems.clear();
+	}
+
+	std::vector<System*>::iterator SystemRegistry::begin()
+	{
+		return _systems.begin();
+	}
+
+	std::vector<System*>::iterator SystemRegistry::end()
+	{
+		return _systems.end();
+	}
+
+	std::vector<System*>::const_iterator SystemRegistry::cbegin() const
+	{
+		return _systems.cbegin();
+	}
+
+	std::vector<System*>::const_iterator SystemRegistry::cend() const
+	{
+		return _systems.cend();
+	}
+
+	std::vector<System*>::const_iterator SystemRegistry::begin() const
+	{
+		return _systems.begin();
+	}
+
+	std::vector<System*>::const_iterator SystemRegistry::end() const
+	{
+		return _systems.end();
 	}
 
 	void SystemRegistry::serialize(Writer& writer) const
@@ -181,7 +219,7 @@ namespace minty
 
 		for (auto const& pair : _allSystems)
 		{
-			lookup.emplace(pair.second, pair.first);
+			lookup.emplace(_systems.at(pair.second), pair.first);
 		}
 
 		// write all systems:
@@ -189,8 +227,9 @@ namespace minty
 
 		for (auto const& pair : _orderedSystems)
 		{
-			for (auto const system : pair.second)
+			for (auto const index : pair.second)
 			{
+				System* system = _systems.at(index);
 				String systemPriority = "";
 				if (pair.first)
 				{

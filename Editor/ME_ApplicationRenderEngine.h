@@ -15,7 +15,7 @@ namespace mintye
 		ImVec4 _clearColor;
 
 	public:
-		ApplicationRenderEngine(Application& app);
+		ApplicationRenderEngine(Application& app, minty::Runtime& runtime);
 
 	public:
 		void init(minty::RenderEngineBuilder const& builder) override;

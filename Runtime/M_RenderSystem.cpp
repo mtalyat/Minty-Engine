@@ -30,7 +30,7 @@ using namespace minty::vk;
 using namespace minty::Builtin;
 
 minty::RenderSystem::RenderSystem(Runtime& engine, ID const sceneId)
-	: System::System(engine, sceneId)
+	: System::System("Render", engine, sceneId)
 {}
 
 minty::RenderSystem::~RenderSystem()

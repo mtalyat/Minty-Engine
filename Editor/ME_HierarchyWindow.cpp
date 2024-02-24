@@ -26,8 +26,13 @@ void mintye::HierarchyWindow::draw()
 	SystemRegistry& systemRegistry = scene->get_system_registry();
 	if (ImGui::BeginChild("HierarchySystems", ImVec2(0, splitHeight), true))
 	{
-		ImGui::Text("Systems");
+		ImGui::Text(std::format("Systems ({})", systemRegistry.size()).c_str());
 		ImGui::Separator();
+
+		for (auto const system : systemRegistry)
+		{
+			ImGui::Text(system->get_name().c_str());
+		}
 	}
 	ImGui::EndChild();
 	
@@ -35,7 +40,7 @@ void mintye::HierarchyWindow::draw()
 	EntityRegistry* entityRegistry = &scene->get_entity_registry();
 	if (ImGui::BeginChild("HierarchyEntities", ImVec2(0.0f, 0.0f), true))
 	{
-		ImGui::Text("Entities");
+		ImGui::Text(std::format("Entities ({})", entityRegistry->size()).c_str());
 		ImGui::Separator();
 
 		for (auto [entity]: entityRegistry->storage<Entity>().each())

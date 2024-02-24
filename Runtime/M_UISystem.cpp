@@ -8,7 +8,7 @@
 using namespace minty;
 
 minty::UISystem::UISystem(Runtime& engine, ID const sceneId)
-	: System(engine, sceneId)
+	: System("UI", engine, sceneId)
 {
 	_onMouseMove = [this](MouseMoveEventArgs const& args)
 		{
