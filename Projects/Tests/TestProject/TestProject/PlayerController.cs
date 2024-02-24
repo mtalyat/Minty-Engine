@@ -83,6 +83,9 @@ namespace TestProject
                 movement * input.Z * transform.Forward;
 
             transform.LocalPosition += move;
+
+            // for shits and giggles
+            Window.Title = transform.LocalPosition.ToString();
         }
     }
 }

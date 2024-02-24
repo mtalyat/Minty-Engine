@@ -1105,6 +1105,49 @@ static MonoObject* entity_get_child(UUID id, int index)
 
 #pragma endregion
 
+#pragma region Window
+
+static MonoString* window_get_title()
+{
+	MINTY_ASSERT(_data.engine);
+
+	return _data.engine->to_mono_string(util_get_window().get_title());
+}
+
+static void window_set_title(MonoString* string)
+{
+	MINTY_ASSERT(_data.engine);
+
+	util_get_window().set_title(_data.engine->from_mono_string(string));
+}
+
+static bool window_is_open()
+{
+	return util_get_window().is_open();
+}
+
+static void window_close()
+{
+	util_get_window().close();
+}
+
+static void window_maximize()
+{
+	util_get_window().maximize();
+}
+
+static void window_minimize()
+{
+	util_get_window().minimize();
+}
+
+static void window_restore()
+{
+	util_get_window().restore();
+}
+
+#pragma endregion
+
 #pragma region Components
 
 #pragma region Transform
@@ -1239,6 +1282,16 @@ void minty::ScriptEngine::link()
 	ADD_INTERNAL_CALL("Entity_SetParent", entity_set_parent);
 	ADD_INTERNAL_CALL("Entity_GetChildCount", entity_get_child_count);
 	ADD_INTERNAL_CALL("Entity_GetChild", entity_get_child);
+#pragma endregion
+
+#pragma region Window
+	ADD_INTERNAL_CALL("Window_GetTitle", window_get_title);
+	ADD_INTERNAL_CALL("Window_SetTitle", window_set_title);
+	ADD_INTERNAL_CALL("Window_IsOpen", window_is_open);
+	ADD_INTERNAL_CALL("Window_Close", window_close);
+	ADD_INTERNAL_CALL("Window_Maximize", window_maximize);
+	ADD_INTERNAL_CALL("Window_Minimize", window_minimize);
+	ADD_INTERNAL_CALL("Window_Restore", window_restore);
 #pragma endregion
 
 #pragma region Components

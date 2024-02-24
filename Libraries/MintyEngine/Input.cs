@@ -223,17 +223,20 @@ namespace MintyEngine
 
     public class MouseMoveEventArgs : EventArgs
     {
-        private Vector2 _position;
-        public Vector2 NewPosition => _position;
+        private Vector2 _newPosition;
+        public Vector2 NewPosition => _newPosition;
 
-        private Vector2 _lastPosition;
-        public Vector2 OldPosition => _lastPosition;
+        private Vector2 _deltaPosition;
+        public Vector2 DeltaPosition => _deltaPosition;
 
-        public Vector2 DeltaPosition => _position - _lastPosition;
+        private Vector2 _oldPosition;
+        public Vector2 OldPosition => _oldPosition;
 
-        public MouseMoveEventArgs(Vector2 position)
+        public MouseMoveEventArgs(Vector2 newPosition, Vector2 oldPosition)
         {
-            _position = position;
+            _newPosition = newPosition;
+            _deltaPosition = _newPosition - _oldPosition;
+            _oldPosition = oldPosition;
         }
     }
 
@@ -471,11 +474,12 @@ namespace MintyEngine
 
         private static void TriggerMouseMove(float x, float y)
         {
-            _mousePosition = new Vector2(x, y);
+            Vector2 newPosition = new Vector2(x, y);
             if (_activeMap != null)
             {
-                _activeMap.TriggerMouseMove(new MouseMoveEventArgs(_mousePosition));
+                _activeMap.TriggerMouseMove(new MouseMoveEventArgs(newPosition, _mousePosition));
             }
+            _mousePosition = newPosition;
         }
 
         private static void TriggerMouseScroll(float dx, float dy)
