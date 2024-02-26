@@ -1121,6 +1121,13 @@ static void window_set_title(MonoString* string)
 	util_get_window().set_title(_data.engine->from_mono_string(string));
 }
 
+static void window_set_icon(MonoString* string)
+{
+	MINTY_ASSERT(_data.engine);
+
+	util_get_window().set_icon(_data.engine->from_mono_string(string));
+}
+
 static bool window_is_open()
 {
 	return util_get_window().is_open();
@@ -1287,6 +1294,7 @@ void minty::ScriptEngine::link()
 #pragma region Window
 	ADD_INTERNAL_CALL("Window_GetTitle", window_get_title);
 	ADD_INTERNAL_CALL("Window_SetTitle", window_set_title);
+	ADD_INTERNAL_CALL("Window_SetIcon", window_set_icon);
 	ADD_INTERNAL_CALL("Window_IsOpen", window_is_open);
 	ADD_INTERNAL_CALL("Window_Close", window_close);
 	ADD_INTERNAL_CALL("Window_Maximize", window_maximize);

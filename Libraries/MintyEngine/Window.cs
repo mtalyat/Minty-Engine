@@ -22,6 +22,11 @@ namespace MintyEngine
             get => Runtime.Window_IsOpen();
         }
 
+        public static void SetIcon(string path)
+        {
+            Runtime.Window_SetIcon(path);
+        }
+
         public static void Close()
         {
             Runtime.Window_Close();

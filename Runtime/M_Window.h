@@ -40,7 +40,7 @@ namespace minty
 		/// <param name="title">The title to be displayed on the Window.</param>
 		/// <param name="width">The width of the Window in pixels.</param>
 		/// <param name="height">The height of the Window in pixels.</param>
-		Window(String const& title, int const width, int const height);
+		Window(String const& title, int const width, int const height, Path const& iconPath = "");
 
 		/// <summary>
 		/// Creates a new Window.
@@ -48,8 +48,7 @@ namespace minty
 		/// <param name="title"></param>
 		/// <param name="width"></param>
 		/// <param name="height"></param>
-		/// <param name="globalInputMap"></param>
-		Window(String const& title, int const x, int const y, int const width, int const height);
+		Window(String const& title, int const x, int const y, int const width, int const height, Path const& iconPath = "");
 
 		~Window();
 
@@ -66,6 +65,12 @@ namespace minty
 		/// Gets the title text of this Window.
 		/// </summary>
 		String const& get_title() const;
+
+		/// <summary>
+		/// Sets the icon of this Window.
+		/// </summary>
+		/// <param name="path"></param>
+		void set_icon(Path const& path);
 
 		/// <summary>
 		/// Sets the cursor mode.

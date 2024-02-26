@@ -42,7 +42,7 @@ using namespace minty;
 Application::Application()
 	: _info(NAME, 0, 0, 0)
 	, _path(std::filesystem::current_path())
-	, _window("", 1280, 720)
+	, _window("", 1280, 720, "Icon.png")
 	, _runtime(new Runtime(_info, Runtime::Mode::Edit))
 	, _project()
 	, _sceneId(ERROR_ID)

@@ -5,6 +5,7 @@
 #include "M_ScriptEngine.h"
 #include "M_ScriptArguments.h"
 #include "M_GLFW.h"
+#include "stb_image.h"
 #include <format>
 #include <string>
 
@@ -12,11 +13,11 @@ using namespace minty;
 
 int Window::_windowCount = 0;
 
-Window::Window(String const& title, int const width, int const height)
-	: Window(title, -1, -1, width, height)
+Window::Window(String const& title, int const width, int const height, Path const& iconPath)
+	: Window(title, -1, -1, width, height, iconPath)
 {}
 
-minty::Window::Window(String const& title, int const x, int const y, int const width, int const height)
+minty::Window::Window(String const& title, int const x, int const y, int const width, int const height, Path const& iconPath)
 	: _title(title)
 	, _window()
 	, _width(width)
@@ -74,6 +75,8 @@ minty::Window::Window(String const& title, int const x, int const y, int const w
 
 	// might want this for engine:
 	// glfwSetDropCallback
+
+	set_icon(iconPath);
 }
 
 Window::~Window()
@@ -104,6 +107,16 @@ void minty::Window::set_title(String const& title)
 String const& minty::Window::get_title() const
 {
 	return _title;
+}
+
+void minty::Window::set_icon(Path const& path)
+{
+	// https://stackoverflow.com/questions/44321902/load-icon-function-for-glfwsetwindowicon
+
+	GLFWimage image;
+	image.pixels = stbi_load(path.string().c_str(), &image.width, &image.height, 0, 4);
+	glfwSetWindowIcon(_window, 1, &image);
+	stbi_image_free(image.pixels);
 }
 
 void minty::Window::set_cursor_mode(CursorMode const mode)

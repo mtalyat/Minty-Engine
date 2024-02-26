@@ -50,6 +50,7 @@ namespace MintyEngine
         #region Window
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static string Window_GetTitle();
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Window_SetTitle(string title);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Window_SetIcon(string path);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static bool Window_IsOpen();
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Window_Close();
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Window_Maximize();
