@@ -64,6 +64,7 @@
     <Compile Include="Cursor.cs" />
     <Compile Include="Debug.cs" />
     <Compile Include="Entity.cs" />
+    <Compile Include="EventHandlerCollection.cs" />
     <Compile Include="Input.cs" />
     <Compile Include="Math.cs" />
     <Compile Include="Object.cs" />

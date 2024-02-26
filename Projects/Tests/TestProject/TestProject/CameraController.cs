@@ -15,7 +15,8 @@ namespace TestProject
 
         private void OnCreate()
         {
-            Session.InputMap.AddMouseMove(OnMouseMove);
+            Session.InputMap.OnMouseMove += OnMouseMove;
+            Session.InputMap.OnMouseDown[MouseButton.Left] += OnMouseClick;
 
             transform = Entity.GetComponent<Transform>();
         }
@@ -27,6 +28,19 @@ namespace TestProject
             {
                 pitch -= e.DeltaPosition.Y;
                 yaw += e.DeltaPosition.X;
+            }
+        }
+
+        private void OnMouseClick(object sender, MouseClickEventArgs e)
+        {
+            // toggle mouse
+            if (Cursor.Mode == CursorMode.Normal)
+            {
+                Cursor.Mode = CursorMode.Disabled;
+            }
+            else
+            {
+                Cursor.Mode = CursorMode.Normal;
             }
         }
 

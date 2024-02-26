@@ -258,135 +258,43 @@ namespace MintyEngine
 
     public class InputMap
     {
-        private Dictionary<Key, KeyPressEventHandler>[] _keyEvents = new Dictionary<Key, KeyPressEventHandler>[] { new Dictionary<Key, KeyPressEventHandler>(), new Dictionary<Key, KeyPressEventHandler>() };
+        private EventHandlerCollection<Key, KeyPressEventHandler, KeyPressEventArgs>[] _keyEvents = new EventHandlerCollection<Key, KeyPressEventHandler, KeyPressEventArgs>[] { new EventHandlerCollection<Key, KeyPressEventHandler, KeyPressEventArgs>(), new EventHandlerCollection<Key, KeyPressEventHandler, KeyPressEventArgs>() };
+        public EventHandlerCollection<Key, KeyPressEventHandler, KeyPressEventArgs> OnKeyUp => _keyEvents[(int)ButtonAction.Up];
+        public EventHandlerCollection<Key, KeyPressEventHandler, KeyPressEventArgs> OnKeyDown => _keyEvents[(int)ButtonAction.Down];
 
-        private Dictionary<MouseButton, MouseClickEventHandler>[] _mouseEvents = new Dictionary<MouseButton, MouseClickEventHandler>[] { new Dictionary<MouseButton, MouseClickEventHandler>(), new Dictionary<MouseButton, MouseClickEventHandler>() };
+        private EventHandlerCollection<MouseButton, MouseClickEventHandler, MouseClickEventArgs>[] _mouseEvents = new EventHandlerCollection<MouseButton, MouseClickEventHandler, MouseClickEventArgs>[] { new EventHandlerCollection<MouseButton, MouseClickEventHandler, MouseClickEventArgs>(), new EventHandlerCollection<MouseButton, MouseClickEventHandler, MouseClickEventArgs>() };
+        public EventHandlerCollection<MouseButton, MouseClickEventHandler, MouseClickEventArgs> OnMouseUp => _mouseEvents[(int)ButtonAction.Up];
+        public EventHandlerCollection<MouseButton, MouseClickEventHandler, MouseClickEventArgs> OnMouseDown => _mouseEvents[(int)ButtonAction.Down];
 
-        private event MouseMoveEventHandler _mouseMove = null;
+        private event MouseMoveEventHandler _mouseMove;
+        public MouseMoveEventHandler OnMouseMove
+        {
+            get => _mouseMove;
+            set => _mouseMove = value;
+        }
 
         private event MouseScrollEventHandler _mouseScroll = null;
+        public MouseScrollEventHandler OnMouseScroll
+        {
+            get => _mouseScroll;
+            set => _mouseScroll = value;
+        }
 
         public InputMap()
         {
 
         }
 
-        #region Add
-
-        #region Key
-
-        private void AddKey(Key key, ButtonAction action, KeyPressEventHandler handler)
-        {
-            Dictionary<Key, KeyPressEventHandler> dict = _keyEvents[(int)action];
-
-            if (dict.ContainsKey(key))
-            {
-                dict[key] += handler;
-            }
-            else
-            {
-                dict.Add(key, handler);
-            }
-        }
-
-        public void AddKeyDown(Key key, KeyPressEventHandler handler)
-        {
-            AddKey(key, ButtonAction.Down, handler);
-        }
-
-        public void AddKeyUp(Key key, KeyPressEventHandler handler)
-        {
-            AddKey(key, ButtonAction.Up, handler);
-        }
-
-        public void AddKeysDown(KeyPressEventHandler handler, params Key[] keys)
-        {
-            foreach (Key key in keys)
-            {
-                AddKeyDown(key, handler);
-            }
-        }
-
-        public void AddKeysUp(KeyPressEventHandler handler, params Key[] keys)
-        {
-            foreach (Key key in keys)
-            {
-                AddKeyUp(key, handler);
-            }
-        }
-
-        #endregion
-
-        #region Mouse
-
-        private void AddMouse(MouseButton mouse, ButtonAction action, MouseClickEventHandler handler)
-        {
-            Dictionary<MouseButton, MouseClickEventHandler> dict = _mouseEvents[(int)action];
-
-            if (dict.ContainsKey(mouse))
-            {
-                dict[mouse] += handler;
-            }
-            else
-            {
-                dict.Add(mouse, handler);
-            }
-        }
-
-        public void AddMouseDown(MouseButton button, MouseClickEventHandler handler)
-        {
-            AddMouse(button, ButtonAction.Down, handler);
-        }
-
-        public void AddMouseUp(MouseButton button, MouseClickEventHandler handler)
-        {
-            AddMouse(button, ButtonAction.Up, handler);
-        }
-
-        public void AddMouseMove(MouseMoveEventHandler handler)
-        {
-            if (_mouseMove == null)
-            {
-                _mouseMove = handler;
-            }
-            else
-            {
-                _mouseMove += handler;
-            }
-        }
-
-        public void AddMouseScroll(MouseScrollEventHandler handler)
-        {
-            if (_mouseScroll == null)
-            {
-                _mouseScroll = handler;
-            }
-            else
-            {
-                _mouseScroll += handler;
-            }
-        }
-
-        #endregion
-
-        #endregion
-
         #region Trigger
 
         internal void TriggerKey(KeyPressEventArgs e)
         {
-            if (_keyEvents[(int)e.Action].TryGetValue(e.Key, out KeyPressEventHandler handler))
-            {
-                handler.Invoke(this, e);
-            }
+            _keyEvents[(int)e.Action]?.Invoke(e.Key, this, e);
         }
 
         internal void TriggerMouseClick(MouseClickEventArgs e)
         {
-            if (_mouseEvents[(int)e.Action].TryGetValue(e.Button, out MouseClickEventHandler handler))
-            {
-                handler.Invoke(this, e);
-            }
+            _mouseEvents[(int)e.Action]?.Invoke(e.Button, this, e);
         }
 
         internal void TriggerMouseMove(MouseMoveEventArgs e)
