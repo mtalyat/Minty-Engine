@@ -85,7 +85,7 @@ namespace TestProject
             transform.LocalPosition += move;
 
             // for shits and giggles
-            Window.Title = transform.LocalPosition.ToString();
+            Window.Title = transform.Forward.ToString();
         }
     }
 }

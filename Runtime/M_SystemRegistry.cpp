@@ -52,6 +52,8 @@ namespace minty
 
 	System* SystemRegistry::emplace(System* const system, int const priority)
 	{
+		MINTY_ASSERT(system != nullptr);
+
 		// if exists in all, do not add a duplicate
 		MINTY_ASSERT_FORMAT(!_allSystems.contains(system->get_name()), "SystemRegistry already contains a System with the name \"{}\". Returning NULL.", system->get_name());
 

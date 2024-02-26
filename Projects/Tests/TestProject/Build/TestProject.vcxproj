@@ -430,7 +430,6 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="C:\Users\mitch\source\repos\Minty-Engine\Projects\Tests\TestProject\Build\main.cpp" />
-    <ClCompile Include="C:\Users\mitch\source\repos\Minty-Engine\Projects\Tests\TestProject\Assets\init.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="C:\Users\mitch\source\repos\Minty-Engine\Projects\Tests\TestProject\Build\ZERO_CHECK.vcxproj">
