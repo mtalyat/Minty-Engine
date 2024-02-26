@@ -1191,18 +1191,18 @@ static void transform_set_local_position(UUID id, Vector3* position)
 	component.localPosition = *position;
 }
 
-static void transform_get_local_rotation(UUID id, Quaternion* rotation)
+static void transform_get_local_rotation(UUID id, Vector4* rotation)
 {
 	TransformComponent& component = util_get_transform_component(id, false);
 
-	*rotation = component.localRotation;
+	*rotation = Vector4(component.localRotation.y, component.localRotation.z, component.localRotation.x, component.localRotation.w);
 }
 
-static void transform_set_local_rotation(UUID id, Quaternion* rotation)
+static void transform_set_local_rotation(UUID id, Vector4* rotation)
 {
 	TransformComponent& component = util_get_transform_component(id, true);
 
-	component.localRotation = *rotation;
+	component.localRotation = Quaternion(rotation->w, rotation->y, rotation->z, rotation->x);
 }
 
 static void transform_get_local_scale(UUID id, Vector3* scale)

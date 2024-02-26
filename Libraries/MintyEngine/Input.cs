@@ -235,7 +235,7 @@ namespace MintyEngine
         public MouseMoveEventArgs(Vector2 newPosition, Vector2 oldPosition)
         {
             _newPosition = newPosition;
-            _deltaPosition = _newPosition - _oldPosition;
+            _deltaPosition = newPosition - oldPosition;
             _oldPosition = oldPosition;
         }
     }
@@ -301,7 +301,7 @@ namespace MintyEngine
 
         public void AddKeysDown(KeyPressEventHandler handler, params Key[] keys)
         {
-            foreach(Key key in keys)
+            foreach (Key key in keys)
             {
                 AddKeyDown(key, handler);
             }
@@ -309,7 +309,7 @@ namespace MintyEngine
 
         public void AddKeysUp(KeyPressEventHandler handler, params Key[] keys)
         {
-            foreach(Key key in keys)
+            foreach (Key key in keys)
             {
                 AddKeyUp(key, handler);
             }
@@ -345,7 +345,7 @@ namespace MintyEngine
 
         public void AddMouseMove(MouseMoveEventHandler handler)
         {
-            if(_mouseMove == null)
+            if (_mouseMove == null)
             {
                 _mouseMove = handler;
             }

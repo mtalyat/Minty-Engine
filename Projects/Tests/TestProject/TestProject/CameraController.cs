@@ -36,8 +36,7 @@ namespace TestProject
             {
                 // clamp pitch so camera cannot go upside down/backwards
                 pitch = Math.Min(Math.Max(pitch, -89.99f), 89.99f);
-
-                
+                yaw %= 360.0f;
 
                 // set new rotation to the values
                 transform.LocalRotation = Quaternion.FromEuler(pitch * Math.Deg2Rad, yaw * Math.Deg2Rad, 0.0f);

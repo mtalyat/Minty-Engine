@@ -15,7 +15,12 @@ namespace MintyEngine
     {
         private float _x, _y, _z, _w;
 
-        private Quaternion(float x, float y, float z, float w)
+        public float X => _x;
+        public float Y => _y;
+        public float Z => _z;
+        public float W => _w;
+
+        internal Quaternion(float x, float y, float z, float w)
         {
             _x = x;
             _y = y;
@@ -25,6 +30,8 @@ namespace MintyEngine
 
         public Vector3 ToEuler()
         {
+            // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
+
             float x, y, z;
 
             // Roll (Z-axis rotation)
@@ -35,7 +42,7 @@ namespace MintyEngine
             // Pitch (X-axis rotation)
             float sinp = 2 * (_w * _x - _z * _y);
             if (Math.Abs(sinp) >= 1)
-                x = (Math.PI / 2.0f * Math.Sign(sinp)); // use 90 degrees if out of range
+                x = (Math.PI / 2.0f * Math.Sign(sinp));
             else
                 x = Math.Asin(sinp);
 
@@ -56,19 +63,26 @@ namespace MintyEngine
 
         public static Quaternion FromEuler(float x, float y, float z)
         {
-            // convert euler angles to a quaternion and return that
-            float cy = Math.Cos(y * 0.5f);
-            float sy = Math.Sin(y * 0.5f);
-            float cp = Math.Cos(x * 0.5f);
-            float sp = Math.Sin(x * 0.5f);
+            // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
+
             float cr = Math.Cos(z * 0.5f);
             float sr = Math.Sin(z * 0.5f);
+            float cp = Math.Cos(x * 0.5f);
+            float sp = Math.Sin(x * 0.5f);
+            float cy = Math.Cos(y * 0.5f);
+            float sy = Math.Sin(y * 0.5f);
 
-            return new Quaternion(
-                sr * cp * cy - cr * sp * sy,
-                cr * sp * cy + sr * cp * sy,
-                cr * cp * sy - sr * sp * cy,
-                cr * cp * cy + sr * sp * sy);
+            float qw = cr * cp * cy + sr * sp * sy;
+            float qx = sr * cp * cy - cr * sp * sy;
+            float qy = cr * sp * cy + sr * cp * sy;
+            float qz = cr * cp * sy - sr * sp * cy;
+
+            return new Quaternion(qx, qy, qz, qw);
+        }
+
+        public override string ToString()
+        {
+            return $"({_x}, {_y}, {_z}, {_w})";
         }
     }
 }

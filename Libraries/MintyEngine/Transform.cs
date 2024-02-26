@@ -22,10 +22,10 @@ namespace MintyEngine
         {
             get
             {
-                Runtime.Transform_GetLocalRotation(Entity.ID, out Quaternion rotation);
-                return rotation;
+                Runtime.Transform_GetLocalRotation(Entity.ID, out Vector4 rotation);
+                return new Quaternion(rotation.X, rotation.Y, rotation.Z, rotation.W);
             }
-            set => Runtime.Transform_SetLocalRotation(Entity.ID, value);
+            set => Runtime.Transform_SetLocalRotation(Entity.ID, new Vector4(value.X, value.Y, value.Z, value.W));
         }
 
         public Vector3 LocalScale
