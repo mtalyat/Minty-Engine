@@ -43,7 +43,7 @@ Application::Application()
 	: _info(NAME, 0, 0, 0)
 	, _path(std::filesystem::current_path())
 	, _window("", 1280, 720)
-	, _runtime(new Runtime(_info))
+	, _runtime(new Runtime(_info, Runtime::Mode::Edit))
 	, _project()
 	, _sceneId(ERROR_ID)
 	, _editorWindows()
@@ -658,7 +658,7 @@ void Application::generate_cmake(BuildInfo const& buildInfo)
 	minty::Path buildPath = _project->get_build_path();
 	for (minty::Path const& path : _project->find_assets(Project::CommonFileType::Source))
 	{
-		pathsStream << " " << std::filesystem::relative(path, buildPath).generic_string();
+		pathsStream << " " << std::filesystem::relative(ASSETS_DIRECTORY_NAME / path, buildPath).generic_string();
 	}
 
 	file <<

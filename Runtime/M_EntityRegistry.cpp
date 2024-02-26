@@ -446,13 +446,13 @@ void minty::EntityRegistry::destroy_trigger_events(Entity const entity, bool con
 		if (sceneLoaded)
 		{
 			if (all_of<EnabledComponent>(entity))
-				if (ScriptOnDisableComponent* eventComp = try_get<ScriptOnDisableComponent>(entity)) 
+				if (ScriptOnDisableComponent* eventComp = try_get<ScriptOnDisableComponent>(entity))
 					eventComp->invoke(SCRIPT_METHOD_NAME_ONDISABLE, *scriptComponent);
 
-			if (ScriptOnUnloadComponent* eventComp = try_get<ScriptOnUnloadComponent>(entity)) 
+			if (ScriptOnUnloadComponent* eventComp = try_get<ScriptOnUnloadComponent>(entity))
 				eventComp->invoke(SCRIPT_METHOD_NAME_ONUNLOAD, *scriptComponent);
 		}
-		if (ScriptOnDestroyComponent* eventComp = try_get<ScriptOnDestroyComponent>(entity)) 
+		if (ScriptOnDestroyComponent* eventComp = try_get<ScriptOnDestroyComponent>(entity))
 			eventComp->invoke(SCRIPT_METHOD_NAME_ONDESTROY, *scriptComponent);
 	}
 }
@@ -721,39 +721,42 @@ void minty::EntityRegistry::register_script(String const& name)
 			ID id = component->scripts.emplace(name, engine.create_object_component(UUID(), registry.get_id(entity), *script));
 			ScriptObject& scriptObject = component->scripts.at(id);
 
-			// call OnCreate
-			scriptObject.try_invoke(SCRIPT_METHOD_NAME_ONCREATE);
+			if (registry.get_runtime().get_mode() == Runtime::Mode::Normal)
+			{
+				// call OnCreate
+				scriptObject.try_invoke(SCRIPT_METHOD_NAME_ONCREATE);
 
-			// now add the helper components, if they are needed
-			if (script->has_method(SCRIPT_METHOD_NAME_ONLOAD))
-			{
-				ScriptOnLoadComponent& eventComp = registry.get_or_emplace<ScriptOnLoadComponent>(entity);
-				eventComp.scriptIds.emplace(id);
-			}
-			if (script->has_method(SCRIPT_METHOD_NAME_ONENABLE))
-			{
-				ScriptOnEnableComponent& eventComp = registry.get_or_emplace<ScriptOnEnableComponent>(entity);
-				eventComp.scriptIds.emplace(id);
-			}
-			if (script->has_method(SCRIPT_METHOD_NAME_ONUPDATE))
-			{
-				ScriptOnUpdateComponent& eventComp = registry.get_or_emplace<ScriptOnUpdateComponent>(entity);
-				eventComp.scriptIds.emplace(id);
-			}
-			if (script->has_method(SCRIPT_METHOD_NAME_ONDISABLE))
-			{
-				ScriptOnDisableComponent& eventComp = registry.get_or_emplace<ScriptOnDisableComponent>(entity);
-				eventComp.scriptIds.emplace(id);
-			}
-			if (script->has_method(SCRIPT_METHOD_NAME_ONUNLOAD))
-			{
-				ScriptOnUnloadComponent& eventComp = registry.get_or_emplace<ScriptOnUnloadComponent>(entity);
-				eventComp.scriptIds.emplace(id);
-			}
-			if (script->has_method(SCRIPT_METHOD_NAME_ONDESTROY))
-			{
-				ScriptOnDestroyComponent& eventComp = registry.get_or_emplace<ScriptOnDestroyComponent>(entity);
-				eventComp.scriptIds.emplace(id);
+				// now add the helper components, if they are needed
+				if (script->has_method(SCRIPT_METHOD_NAME_ONLOAD))
+				{
+					ScriptOnLoadComponent& eventComp = registry.get_or_emplace<ScriptOnLoadComponent>(entity);
+					eventComp.scriptIds.emplace(id);
+				}
+				if (script->has_method(SCRIPT_METHOD_NAME_ONENABLE))
+				{
+					ScriptOnEnableComponent& eventComp = registry.get_or_emplace<ScriptOnEnableComponent>(entity);
+					eventComp.scriptIds.emplace(id);
+				}
+				if (script->has_method(SCRIPT_METHOD_NAME_ONUPDATE))
+				{
+					ScriptOnUpdateComponent& eventComp = registry.get_or_emplace<ScriptOnUpdateComponent>(entity);
+					eventComp.scriptIds.emplace(id);
+				}
+				if (script->has_method(SCRIPT_METHOD_NAME_ONDISABLE))
+				{
+					ScriptOnDisableComponent& eventComp = registry.get_or_emplace<ScriptOnDisableComponent>(entity);
+					eventComp.scriptIds.emplace(id);
+				}
+				if (script->has_method(SCRIPT_METHOD_NAME_ONUNLOAD))
+				{
+					ScriptOnUnloadComponent& eventComp = registry.get_or_emplace<ScriptOnUnloadComponent>(entity);
+					eventComp.scriptIds.emplace(id);
+				}
+				if (script->has_method(SCRIPT_METHOD_NAME_ONDESTROY))
+				{
+					ScriptOnDestroyComponent& eventComp = registry.get_or_emplace<ScriptOnDestroyComponent>(entity);
+					eventComp.scriptIds.emplace(id);
+				}
 			}
 
 			// return the script object

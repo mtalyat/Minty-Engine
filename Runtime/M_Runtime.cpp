@@ -42,8 +42,9 @@ using namespace minty;
 uint32_t const WIDTH = 800;
 uint32_t const HEIGHT = 600;
 
-Runtime::Runtime(Info const& info)
-	: _state(State::Uninitialized)
+Runtime::Runtime(Info const& info, Mode const mode)
+	: _mode(mode)
+	, _state(State::Uninitialized)
 	, _info(info)
 	, _window()
 	, _sceneManager()
@@ -61,6 +62,11 @@ Runtime::~Runtime()
 		cleanup();
 	}
 	destroy();
+}
+
+Runtime::Mode minty::Runtime::get_mode() const
+{
+	return _mode;
 }
 
 Info const& minty::Runtime::get_info() const

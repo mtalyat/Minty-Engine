@@ -28,6 +28,14 @@ namespace minty
 	{
 		friend class SceneManager;
 
+	public:
+		enum class Mode
+		{
+			Normal,
+
+			Edit,
+		};
+
 	private:
 		enum class State
 		{
@@ -63,6 +71,7 @@ namespace minty
 		constexpr static size_t SCRIPT_ENGINE_INDEX = 2;
 
 	private:
+		Mode _mode;
 		State _state;
 		Info _info;
 		Time _time;
@@ -78,13 +87,15 @@ namespace minty
 		/// Creates a new Engine.
 		/// </summary>
 		/// <param name="appInfo">The application info.</param>
-		Runtime(Info const& info);
+		Runtime(Info const& info, Mode const mode = Mode::Normal);
 
 		~Runtime();
 
 #pragma region Getters
 
 	public:
+		Mode get_mode() const;
+
 		Info const& get_info() const;
 
 		Time const& get_time() const;
