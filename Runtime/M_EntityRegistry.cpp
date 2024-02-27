@@ -821,6 +821,19 @@ void minty::EntityRegistry::register_script(String const& name)
 	Console::info(std::format("Registered script {}.", name));
 }
 
+std::vector<String> minty::EntityRegistry::get_registered_components()
+{
+	std::vector<String> result;
+	result.reserve(_components.size());
+
+	for (auto const& pair : _components)
+	{
+		result.push_back(pair.first);
+	}
+
+	return result;
+}
+
 void minty::EntityRegistry::serialize(Writer& writer) const
 {
 	// write each entity, and each component under it

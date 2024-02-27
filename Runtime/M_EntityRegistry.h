@@ -253,6 +253,12 @@ namespace minty
 		/// <param name="name">The name of the Script to register.</param>
 		static void register_script(String const& name);
 
+		/// <summary>
+		/// Returns a list of names of every Component/Script that have been registered.
+		/// </summary>
+		/// <returns></returns>
+		static std::vector<String> get_registered_components();
+
 	public:
 		void serialize(Writer& writer) const override;
 		void serialize_entity(Writer& writer, Entity const entity) const;

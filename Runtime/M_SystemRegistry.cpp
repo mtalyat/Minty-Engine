@@ -16,25 +16,25 @@ namespace minty
 
 	SystemRegistry::SystemRegistry(Runtime& engine, ID const sceneId)
 		: SceneObject(engine, sceneId)
-		, _systems()
 		, _orderedSystems()
 		, _allSystems()
+		, _typeLookup()
 	{}
 
 	SystemRegistry::~SystemRegistry()
 	{
 		// delete each system
-		for (auto const system : _systems)
+		for (auto const& pair : _allSystems)
 		{
-			delete system;
+			delete pair.second;
 		}
 	}
 
 	SystemRegistry::SystemRegistry(SystemRegistry&& other) noexcept
 		: SceneObject(other)
-		, _systems(std::move(other._systems))
 		, _orderedSystems(std::move(other._orderedSystems))
 		, _allSystems(std::move(other._allSystems))
+		, _typeLookup(std::move(other._typeLookup))
 	{}
 
 	SystemRegistry& SystemRegistry::operator=(SystemRegistry&& other) noexcept
@@ -42,9 +42,9 @@ namespace minty
 		if (this != &other)
 		{
 			SceneObject::operator=(std::move(other));
-			_systems = std::move(other._systems);
 			_orderedSystems = std::move(other._orderedSystems);
 			_allSystems = std::move(other._allSystems);
+			_typeLookup = std::move(other._typeLookup);
 		}
 
 		return *this;
@@ -58,22 +58,21 @@ namespace minty
 		MINTY_ASSERT_FORMAT(!_allSystems.contains(system->get_name()), "SystemRegistry already contains a System with the name \"{}\". Returning NULL.", system->get_name());
 
 		// add to all systems
-		index_t index = _systems.size();
-		_systems.push_back(system);
-		_allSystems.emplace(system->get_name(), index);
+		_allSystems.emplace(system->get_name(), system);
+		_typeLookup.emplace(typeid(*system), system);
 
 		// add to ordered list for updating
 		auto found = _orderedSystems.find(priority);
 		if (found == _orderedSystems.end())
 		{
 			// new list
-			_orderedSystems.emplace(priority, std::set<index_t>());
-			_orderedSystems.at(priority).emplace(index);
+			_orderedSystems.emplace(priority, std::set<System*>());
+			_orderedSystems.at(priority).emplace(system);
 		}
 		else
 		{
 			// existing list
-			found->second.emplace(index);
+			found->second.emplace(system);
 		}
 
 		return system;
@@ -95,67 +94,56 @@ namespace minty
 
 		if (found != _allSystems.end())
 		{
-			index_t index = found->second;
+			_typeLookup.erase(typeid(*found->second));
 
-			_systems.erase(_systems.begin() + index);
-			_allSystems.erase(name);
-			
 			for (auto& pair : _orderedSystems)
 			{
-				auto found2 = pair.second.find(index);
+				auto found2 = pair.second.find(found->second);
 
 				if (found2 != pair.second.end())
 				{
 					pair.second.erase(found2);
 				}
 			}
+
+			_allSystems.erase(name);
 		}
 	}
 
 	size_t SystemRegistry::size() const
 	{
-		return _systems.size();
+		return _allSystems.size();
 	}
 
 	void SystemRegistry::load()
 	{
 		for (auto& pair : _orderedSystems)
 		{
-			for (auto index : pair.second)
+			for (System* const system : pair.second)
 			{
-				_systems.at(index)->load();
+				system->load();
 			}
 		}
 	}
 
 	void SystemRegistry::update()
 	{
-		System* system;
 		for (auto& pair : _orderedSystems)
 		{
-			for (auto index : pair.second)
+			for (System* const system : pair.second)
 			{
-				system = _systems.at(index);
-				if (system->is_enabled())
-				{
-					system->update();
-				}
+				system->update();
 			}
 		}
 	}
 
 	void SystemRegistry::fixed_update()
 	{
-		System* system;
 		for (auto& pair : _orderedSystems)
 		{
-			for (auto index : pair.second)
+			for (System* const system : pair.second)
 			{
-				system = _systems.at(index);
-				if (system->is_enabled())
-				{
-					system->fixed_update();
-				}
+				system->fixed_update();
 			}
 		}
 	}
@@ -164,9 +152,9 @@ namespace minty
 	{
 		for (auto& pair : _orderedSystems)
 		{
-			for (auto index : pair.second)
+			for (System* const system : pair.second)
 			{
-				_systems.at(index)->unload();
+				system->unload();
 			}
 		}
 	}
@@ -174,44 +162,27 @@ namespace minty
 	void SystemRegistry::clear()
 	{
 		// delete all systems
-		for (auto const system : _systems)
+		for (auto const& pair : _allSystems)
 		{
-			delete system;
+			delete pair.second;
 		}
 
-		_systems.clear();
 		_allSystems.clear();
 		_orderedSystems.clear();
+		_typeLookup.clear();
 	}
 
-	std::vector<System*>::iterator SystemRegistry::begin()
+	std::vector<String> SystemRegistry::get_registered_systems()
 	{
-		return _systems.begin();
-	}
+		std::vector<String> result;
+		result.reserve(_systemTypes.size());
 
-	std::vector<System*>::iterator SystemRegistry::end()
-	{
-		return _systems.end();
-	}
+		for (auto const& pair : _systemTypes)
+		{
+			result.push_back(pair.first);
+		}
 
-	std::vector<System*>::const_iterator SystemRegistry::cbegin() const
-	{
-		return _systems.cbegin();
-	}
-
-	std::vector<System*>::const_iterator SystemRegistry::cend() const
-	{
-		return _systems.cend();
-	}
-
-	std::vector<System*>::const_iterator SystemRegistry::begin() const
-	{
-		return _systems.begin();
-	}
-
-	std::vector<System*>::const_iterator SystemRegistry::end() const
-	{
-		return _systems.end();
+		return result;
 	}
 
 	void SystemRegistry::serialize(Writer& writer) const
@@ -221,7 +192,7 @@ namespace minty
 
 		for (auto const& pair : _allSystems)
 		{
-			lookup.emplace(_systems.at(pair.second), pair.first);
+			lookup.emplace(pair.second, pair.first);
 		}
 
 		// write all systems:
@@ -229,9 +200,8 @@ namespace minty
 
 		for (auto const& pair : _orderedSystems)
 		{
-			for (auto const index : pair.second)
+			for (System* const system : pair.second)
 			{
-				System* system = _systems.at(index);
 				String systemPriority = "";
 				if (pair.first)
 				{

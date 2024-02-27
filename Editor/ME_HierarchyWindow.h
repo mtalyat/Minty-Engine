@@ -7,6 +7,7 @@ namespace mintye
 		: public EditorWindow
 	{
 	private:
+		std::vector<minty::String> _registeredSystems;
 
 	public:
 		HierarchyWindow(Application& application);
@@ -14,5 +15,7 @@ namespace mintye
 		void draw() override;
 
 		void reset() override;
+
+		void set_project(Project* const project) override;
 	};
 }

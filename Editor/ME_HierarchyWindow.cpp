@@ -8,6 +8,7 @@ using namespace minty;
 
 mintye::HierarchyWindow::HierarchyWindow(Application& application)
 	: EditorWindow(application)
+	, _registeredSystems()
 {}
 
 void mintye::HierarchyWindow::draw()
@@ -32,9 +33,27 @@ void mintye::HierarchyWindow::draw()
 		ImGui::Text(std::format("Systems ({})", systemRegistry.size()).c_str());
 		ImGui::Separator();
 
-		for (auto const system : systemRegistry)
+		// do a checkbox for each system
+		// if it has the system, check, if not, no check
+		// clicking the check will add/remove the system
+
+		for (auto const& systemName : _registeredSystems)
 		{
-			ImGui::Text(system->get_name().c_str());
+			bool checked = systemRegistry.find<System const>(systemName);
+
+			if (ImGui::Checkbox(systemName.c_str(), &checked))
+			{
+				if (checked)
+				{
+					// add system
+					systemRegistry.emplace_by_name(systemName);
+				}
+				else
+				{
+					// remove system
+					systemRegistry.erase_by_name(systemName);
+				}
+			}
 		}
 	}
 	ImGui::EndChild();
@@ -111,4 +130,11 @@ void mintye::HierarchyWindow::draw()
 void mintye::HierarchyWindow::reset()
 {
 
+}
+
+void mintye::HierarchyWindow::set_project(Project* const project)
+{
+	EditorWindow::set_project(project);
+
+	_registeredSystems = SystemRegistry::get_registered_systems();
 }

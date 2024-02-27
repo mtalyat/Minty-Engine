@@ -23,10 +23,9 @@ namespace minty
 
 	private:
 		// the systems to manage
-		typedef size_t index_t;
-		std::vector<System*> _systems;
-		std::map<int, std::set<index_t>> _orderedSystems;
-		std::map<String const, index_t> _allSystems;
+		std::map<int, std::set<System*>> _orderedSystems;
+		std::map<String const, System*> _allSystems;
+		std::unordered_map<TypeID, System*> _typeLookup;
 
 		static std::map<String const, SystemFunc const> _systemTypes;
 	public:
@@ -121,20 +120,18 @@ namespace minty
 		void clear();
 
 	public:
-		std::vector<System*>::iterator begin();
-		std::vector<System*>::iterator end();
-		std::vector<System*>::const_iterator cbegin() const;
-		std::vector<System*>::const_iterator cend() const;
-		std::vector<System*>::const_iterator begin() const;
-		std::vector<System*>::const_iterator end() const;
-
-	public:
 		/// <summary>
 		/// Registers the System, so the System can be dynamically created by name.
 		/// </summary>
 		/// <typeparam name="T">The System to be registered.</typeparam>
 		template <class T>
 		static void register_system(String const& name);
+
+		/// <summary>
+		/// Returns a list of names of every System that have been registered.
+		/// </summary>
+		/// <returns></returns>
+		static std::vector<String> get_registered_systems();
 
 	public:
 		void serialize(Writer& writer) const override;
@@ -153,33 +150,26 @@ namespace minty
 	template<class T>
 	T* SystemRegistry::find(String const& name) const
 	{
-		for (auto const& pair : _allSystems)
+		auto found = _allSystems.find(name);
+
+		if (found != _allSystems.end())
 		{
-			if (pair.first.compare(name) == 0)
-			{
-				// found name, return system
-				return static_cast<T*>(pair.second);
-			}
+			return static_cast<T*>(found->second);
 		}
 
-		// not found
 		return nullptr;
 	}
 
 	template<class T>
 	T* SystemRegistry::find() const
 	{
-		for (auto const& pair : _allSystems)
+		auto found = _typeLookup.find(typeid(T));
+
+		if (found != _typeLookup.end())
 		{
-			System* const system = _systems.at(pair.second);
-			if (typeid(*system) == typeid(T))
-			{
-				// found, type matches
-				return static_cast<T*>(system);
-			}
+			return static_cast<T*>(found->second);
 		}
 
-		// not found
 		return nullptr;
 	}
 
