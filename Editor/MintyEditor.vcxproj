@@ -199,6 +199,7 @@
     <ClCompile Include="ME_Project.cpp" />
     <ClCompile Include="ME_PropertiesWindow.cpp" />
     <ClCompile Include="ME_SceneWindow.cpp" />
+    <ClCompile Include="ME_Theme.cpp" />
     <ClCompile Include="Program.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -215,6 +216,7 @@
     <ClInclude Include="ME_Project.h" />
     <ClInclude Include="ME_PropertiesWindow.h" />
     <ClInclude Include="ME_SceneWindow.h" />
+    <ClInclude Include="ME_Theme.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

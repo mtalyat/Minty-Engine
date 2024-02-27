@@ -33,7 +33,7 @@ Color::Color(Byte const r, Byte const g, Byte const b)
 	: r(r)
 	, g(g)
 	, b(b)
-	, a(0)
+	, a(255)
 {}
 
 Color::Color(Byte const r, Byte const g, Byte const b, Byte const a)
@@ -41,6 +41,22 @@ Color::Color(Byte const r, Byte const g, Byte const b, Byte const a)
 	, g(g)
 	, b(b)
 	, a(a)
+{}
+
+minty::Color::Color(int const r, int const g, int const b)
+	: Color(static_cast<Byte>(r), static_cast<Byte>(g), static_cast<Byte>(b))
+{}
+
+minty::Color::Color(int const r, int const g, int const b, int const a)
+	: Color(static_cast<Byte>(r), static_cast<Byte>(g), static_cast<Byte>(b), static_cast<Byte>(a))
+{}
+
+minty::Color::Color(float const rf, float const gf, float const bf)
+	: Color(static_cast<Byte>(Math::floor_to_int(rf * 255.0f)), static_cast<Byte>(Math::floor_to_int(gf * 255.0f)), static_cast<Byte>(Math::floor_to_int(bf * 255.0f)))
+{}
+
+minty::Color::Color(float const rf, float const gf, float const bf, float const af)
+	: Color(static_cast<Byte>(Math::floor_to_int(rf * 255.0f)), static_cast<Byte>(Math::floor_to_int(gf * 255.0f)), static_cast<Byte>(Math::floor_to_int(bf * 255.0f)), static_cast<Byte>(Math::floor_to_int(af * 255.0f)))
 {}
 
 Color::Color(color_t const color)

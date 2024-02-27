@@ -10,6 +10,7 @@ mintye::ApplicationRenderEngine::ApplicationRenderEngine(Application& app, Runti
 	, _application(&app)
 	, _descriptorPool()
 	, _clearColor()
+	, _theme()
 {}
 
 void mintye::ApplicationRenderEngine::init(RenderEngineBuilder const& builder)
@@ -32,16 +33,7 @@ void mintye::ApplicationRenderEngine::init(RenderEngineBuilder const& builder)
 	//io.ConfigViewportsNoTaskBarIcon = true;
 
 	// Setup Dear ImGui style
-	ImGui::StyleColorsDark();
-	//ImGui::StyleColorsLight();
-
-	// When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
-	ImGuiStyle& style = ImGui::GetStyle();
-	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-	{
-		style.WindowRounding = 0.0f;
-		style.Colors[ImGuiCol_WindowBg].w = 1.0f;
-	}
+	init_theme();
 
 	// Setup Platform/Renderer backends
 	ImGui_ImplGlfw_InitForVulkan(_window->get_raw(), true);
@@ -128,6 +120,62 @@ void mintye::ApplicationRenderEngine::destroy()
 
 	// destroy normal stuff
 	RenderEngine::destroy();
+}
+
+void mintye::ApplicationRenderEngine::init_theme()
+{
+	ImGui::StyleColorsDark();
+	//ImGui::StyleColorsLight();
+
+	// When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
+	ImGuiStyle& style = ImGui::GetStyle();
+	if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+	{
+		style.WindowRounding = 0.0f;
+		style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+	}
+
+	_theme.copy(style);
+
+	// set to default colors
+	_theme[ImGuiCol_Text] = Color(255, 255, 255);
+	_theme[ImGuiCol_TextDisabled] = Color(200, 200, 200);
+
+	_theme[ImGuiCol_WindowBg] = Color(31, 31, 31);				// window background
+	_theme[ImGuiCol_ChildBg] = Color(40, 40, 40);				// child window background
+	_theme[ImGuiCol_PopupBg] = Color(35, 35, 35);				// popup window background
+	_theme[ImGuiCol_FrameBg] = Color(15, 15, 15);				// background of checkbox, radio button, plot, slider, text input
+	_theme[ImGuiCol_FrameBgHovered] = Color(18, 18, 18);
+	_theme[ImGuiCol_FrameBgActive] = Color(18, 27, 18);
+
+	_theme[ImGuiCol_TitleBg] = Color(10, 10, 10);				// the color of the title bars of unfocused windows
+	_theme[ImGuiCol_TitleBgActive] = Color(43, 118, 43);		// the color of the title bars of focused windows
+	//_theme[ImGuiCol_TitleBgCollapsed] = Color(255, 0, 255);		// the color of the title bars of collapsed windows
+
+	_theme[ImGuiCol_MenuBarBg] = Color(45, 55, 45);			// the background color of the main menu bar
+
+	_theme[ImGuiCol_CheckMark] = Color(76, 154, 76);
+
+	_theme[ImGuiCol_Button] = Color(55, 99, 55);
+	_theme[ImGuiCol_ButtonHovered] = Color(28, 54, 28);
+	_theme[ImGuiCol_ButtonActive] = Color(71, 127, 71);
+
+	_theme[ImGuiCol_Header] = Color(55, 99, 55);
+	_theme[ImGuiCol_HeaderHovered] = Color(38, 142, 38);
+	_theme[ImGuiCol_HeaderActive] = Color(48, 118, 48);
+
+	_theme[ImGuiCol_Tab] = Color(45, 83, 45);					// the color of the unselected tab in the focused window
+	_theme[ImGuiCol_TabHovered] = Color(63, 154, 63);			// the color of the tab being hovered over
+	_theme[ImGuiCol_TabActive] = Color(32, 83, 32);				// the color of the selected tab in the focused window
+	_theme[ImGuiCol_TabUnfocused] = Color(20, 28, 20);			// the color of the unselected tab in an unfocused window
+	_theme[ImGuiCol_TabUnfocusedActive] = Color(26, 66, 26);	// the color of the selected tab in an unfocused window
+
+	_theme[ImGuiCol_DockingPreview] = Color(94, 208, 94, 63);	// color when previewing a location to dock the window in
+	_theme[ImGuiCol_DockingEmptyBg] = Color(5, 5, 5);			// color when nothing in the docked area
+
+	_theme[ImGuiCol_DragDropTarget] = Color(94, 208, 94, 63);	// color when dragging and dropping something into an area
+
+	_theme.apply(style);
 }
 
 void mintye::ApplicationRenderEngine::draw(VkCommandBuffer commandBuffer)

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "ME_Minty.h"
+#include "ME_Theme.h"
 
 namespace mintye
 {
@@ -13,6 +14,7 @@ namespace mintye
 		Application* _application;
 		VkDescriptorPool _descriptorPool;
 		ImVec4 _clearColor;
+		Theme _theme;
 
 	public:
 		ApplicationRenderEngine(Application& app, minty::Runtime& runtime);
@@ -21,6 +23,9 @@ namespace mintye
 		void init(minty::RenderEngineBuilder const& builder) override;
 
 		void destroy() override;
+
+	private:
+		void init_theme();
 
 	protected:
 		void draw(VkCommandBuffer commandBuffer) override;
