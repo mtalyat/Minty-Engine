@@ -43,6 +43,18 @@ void mintye::PropertiesWindow::reset()
 {
 }
 
+void mintye::PropertiesWindow::set_scene(minty::Scene* const scene)
+{
+	if (get_scene() != scene)
+	{
+		// new scene
+		_targetMode = TargetMode::None;
+		_targetEntity = NULL_ENTITY;
+	}
+
+	EditorWindow::set_scene(scene);
+}
+
 void mintye::PropertiesWindow::draw_none() const
 {
 	ImGui::Text("--");
@@ -62,7 +74,7 @@ void mintye::PropertiesWindow::draw_entity() const
 
 	//		Entity
 
-	ImGui::Text("Entity");
+	ImGui::Text("Entity:");
 
 	// name
 	String text = registry.get_name(_targetEntity);
@@ -100,11 +112,11 @@ void mintye::PropertiesWindow::draw_entity() const
 
 	//		Components
 
-	ImGui::Text("Components");
+	ImGui::Text("Components:");
 
 	Node entityNode = registry.serialize_entity(_targetEntity);
 
-	ImGui::TextNode(entityNode);
+	ImGui::TextNode(entityNode, false);
 }
 
 void mintye::PropertiesWindow::set_target(minty::Entity const entity)

@@ -123,7 +123,7 @@ void mintye::HierarchyWindow::draw()
 			}
 
 			// print with indent
-			if (ImGui::Selectable(String(familyStack.size() << 1, ' ').append(entityRegistry->get_name(entity)).c_str(), entity == _selected))
+			if (ImGui::Selectable(String(familyStack.size() << 1, ' ').append(entityRegistry->get_name_safe(entity)).c_str(), entity == _selected))
 			{
 				// when selected, send Entity to properties window
 				if (PropertiesWindow* properties = get_application().find_editor_window<PropertiesWindow>("Properties"))
@@ -149,4 +149,15 @@ void mintye::HierarchyWindow::set_project(Project* const project)
 	EditorWindow::set_project(project);
 
 	_registeredSystems = SystemRegistry::get_registered_systems();
+}
+
+void mintye::HierarchyWindow::set_scene(minty::Scene* const scene)
+{
+	if (get_scene() != scene)
+	{
+		// new scene
+		_selected = NULL_ENTITY;
+	}
+
+	EditorWindow::set_scene(scene);
 }

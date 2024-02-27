@@ -24,6 +24,8 @@ namespace mintye
 
 		void reset() override;
 
+		void set_scene(minty::Scene* const scene) override;
+
 #pragma region Drawing
 
 	private:

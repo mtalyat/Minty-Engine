@@ -577,6 +577,15 @@ String minty::EntityRegistry::get_name(Entity const entity) const
 	}
 }
 
+String minty::EntityRegistry::get_name_safe(Entity const entity) const
+{
+	String name = get_name(entity);
+
+	if (name.empty()) return "_";
+
+	return name;
+}
+
 UUID minty::EntityRegistry::get_id(Entity const entity) const
 {
 	auto found = _entityToId.find(entity);

@@ -185,6 +185,13 @@ namespace minty
 		String get_name(Entity const entity) const;
 
 		/// <summary>
+		/// Gets the name of the Entity, or "_" if no name exists.
+		/// </summary>
+		/// <param name="entity"></param>
+		/// <returns></returns>
+		String get_name_safe(Entity const entity) const;
+
+		/// <summary>
 		/// Sets the NameComponent name of the Entity. Emplaces a NameComponent if needed. If no name is given, then the NameComponent is removed.
 		/// </summary>
 		/// <param name="entity">The Entity to name.</param>
