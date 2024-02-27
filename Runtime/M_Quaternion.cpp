@@ -45,25 +45,6 @@ Vector3 minty::Quaternion::to_euler_angles() const
     return glm::eulerAngles(*this);
 }
 
-void minty::Quaternion::serialize(Writer& writer) const
-{
-    Vector3 angles = glm::eulerAngles(*this);
-
-    writer.write("x", angles.x); // pitch
-    writer.write("y", angles.y); // yaw
-    writer.write("z", angles.z); // roll
-}
-
-void minty::Quaternion::deserialize(Reader const& reader)
-{
-    Quaternion quat = Quaternion::from_euler_angles(reader.read_float("x"), reader.read_float("y"), reader.read_float("z"));
-
-    x = quat.x;
-    y = quat.y;
-    z = quat.z;
-    w = quat.w;
-}
-
 Quaternion minty::Quaternion::from_euler_angles(float const x, float const y, float const z)
 {
     return Quaternion(Vector3(x, y, z));

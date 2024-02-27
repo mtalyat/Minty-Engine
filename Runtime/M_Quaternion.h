@@ -57,9 +57,6 @@ namespace minty
 		/// <returns></returns>
 		Vector3 to_euler_angles() const;
 
-		void serialize(Writer& writer) const override;
-		void deserialize(Reader const& reader) override;
-
 		friend std::istream& operator>>(std::istream& stream, Quaternion& vector);
 		friend std::ostream& operator<<(std::ostream& stream, const Quaternion& vector);
 
