@@ -90,7 +90,7 @@ void mintye::HierarchyWindow::draw()
 				if (familySet.contains(relationship->parent))
 				{
 					// the parent is part of this line
-					
+
 					// go back until we get to the parent
 					while (familyStack.back() != relationship->parent)
 					{
@@ -102,7 +102,7 @@ void mintye::HierarchyWindow::draw()
 					familyStack.push_back(entity);
 					familySet.emplace(entity);
 				}
-				else if(relationship->parent == NULL_ENTITY)
+				else if (relationship->parent == NULL_ENTITY)
 				{
 					// no parent, but possibly children
 					familyStack.clear();
@@ -119,7 +119,11 @@ void mintye::HierarchyWindow::draw()
 			}
 
 			// print with indent
-			ImGui::Text(String(familyStack.size() << 1, ' ').append(entityRegistry->get_name(entity)).c_str());
+			//ImGui::Text(String(familyStack.size() << 1, ' ').append(entityRegistry->get_name(entity)).c_str());
+			if (ImGui::Selectable(String(familyStack.size() << 1, ' ').append(entityRegistry->get_name(entity)).c_str()))
+			{
+
+			}
 		}
 	}
 	ImGui::EndChild();
