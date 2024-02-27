@@ -57,24 +57,6 @@ Scene& minty::Scene::operator=(Scene&& other) noexcept
 	return *this;
 }
 
-//minty::Scene::Scene(Scene const& other)
-//	: _engine(other._engine)
-//	, _entities(other._entities)
-//	, _systems(other._systems)
-//{}
-//
-//Scene& minty::Scene::operator=(Scene const& other)
-//{
-//	if (&other != this)
-//	{
-//		_engine = other._engine;
-//		_entities = other._entities;
-//		_systems = other._systems;
-//	}
-//
-//	return *this;
-//}
-
 Runtime& minty::Scene::get_runtime() const
 {
 	return *_engine;
@@ -110,83 +92,92 @@ void minty::Scene::update()
 	{
 		// update systems
 		_systems->update();
+	}
 
-		EntityRegistry const* er = _entities;
+	EntityRegistry const* er = _entities;
 
-		// TODO: move to fixed_update
-		// TODO: use group, only sort dirty components
-		_entities->sort<TransformComponent>([er](Entity const left, Entity const right)
+	// TODO: move to fixed_update
+	// TODO: use group, only sort dirty components
+
+	// sort the hierarchy
+	sort();
+
+	// update group
+	for (auto&& [entity, dirty, transform] : _entities->view<DirtyComponent const, TransformComponent>().each())
+	{
+		// get relationship, if there is one
+		RelationshipComponent const* relationshipComponent = er->try_get<RelationshipComponent>(entity);
+
+		// if parent, apply local to parent global for this global
+		// if no parent, set global to local
+		if (relationshipComponent && relationshipComponent->parent != NULL_ENTITY)
+		{
+			// parent
+
+			// get parent Transform
+			TransformComponent const* parentTransform = er->try_get<TransformComponent>(relationshipComponent->parent);
+
+			if (parentTransform)
 			{
-				// get relationships
-				RelationshipComponent const* leftRelationship = er->try_get<RelationshipComponent>(left);
-				RelationshipComponent const* rightRelationship = er->try_get<RelationshipComponent>(right);
+				transform.globalMatrix = parentTransform->globalMatrix * transform.get_local_matrix();
 
-				if (leftRelationship)
+				continue;
+			}
+
+			// if no transform on parent, treat as if no parent
+		}
+
+		// no parent
+		transform.globalMatrix = transform.get_local_matrix();
+	}
+}
+
+void minty::Scene::sort()
+{
+	EntityRegistry const* er = _entities;
+
+	_entities->sort<Entity>([er](Entity const left, Entity const right)
+		{
+			// get relationships
+			RelationshipComponent const* leftRelationship = er->try_get<RelationshipComponent>(left);
+			RelationshipComponent const* rightRelationship = er->try_get<RelationshipComponent>(right);
+
+			if (leftRelationship)
+			{
+				if (rightRelationship)
 				{
-					if (rightRelationship)
-					{
-						// both exist
-						return
-							rightRelationship->parent == left || // put parents on left of children
-							leftRelationship->next == right || // put siblings in order
-							// put in order based on parent sibling index
-							((leftRelationship->parent != right && rightRelationship->next != left) && (leftRelationship->parent < rightRelationship->parent || (leftRelationship->parent == rightRelationship->parent && left < right)));
-					}
-					else
-					{
-						// right dne
-						return
-							leftRelationship->next == right ||
-							(leftRelationship->parent != right && leftRelationship->parent == NULL_ENTITY && left < right);
-					}
+					// both exist
+					return
+						rightRelationship->parent == left || // put parents on left of children
+						leftRelationship->next == right || // put siblings in order
+						// put in order based on parent sibling index
+						((leftRelationship->parent != right && rightRelationship->next != left) && (leftRelationship->parent < rightRelationship->parent || (leftRelationship->parent == rightRelationship->parent && left < right)));
 				}
 				else
 				{
-					if (rightRelationship)
-					{
-						// left dne
-						return
-							rightRelationship->parent == left ||
-							(rightRelationship->next != left && (rightRelationship->parent != NULL_ENTITY || left < right));
-					}
-					else
-					{
-						// both dne
-						// compare entity ID values
-						return left < right;
-					}
+					// right dne
+					return
+						leftRelationship->next == right ||
+						(leftRelationship->parent != right && leftRelationship->parent == NULL_ENTITY && left < right);
 				}
-			});
-
-		// update group
-		for (auto&& [entity, dirty, transform] : _entities->view<DirtyComponent const, TransformComponent>().each())
-		{
-			// get relationship, if there is one
-			RelationshipComponent const* relationshipComponent = er->try_get<RelationshipComponent>(entity);
-
-			// if parent, apply local to parent global for this global
-			// if no parent, set global to local
-			if (relationshipComponent && relationshipComponent->parent != NULL_ENTITY)
-			{
-				// parent
-
-				// get parent Transform
-				TransformComponent const* parentTransform = er->try_get<TransformComponent>(relationshipComponent->parent);
-
-				if (parentTransform)
-				{
-					transform.globalMatrix = parentTransform->globalMatrix * transform.get_local_matrix();
-
-					continue;
-				}
-
-				// if no transform on parent, treat as if no parent
 			}
-
-			// no parent
-			transform.globalMatrix = transform.get_local_matrix();
-		}
-	}
+			else
+			{
+				if (rightRelationship)
+				{
+					// left dne
+					return
+						rightRelationship->parent == left ||
+						(rightRelationship->next != left && (rightRelationship->parent != NULL_ENTITY || left < right));
+				}
+				else
+				{
+					// both dne
+					// compare entity ID values
+					return left < right;
+				}
+			}
+		});
 }
 
 void minty::Scene::fixed_update()
@@ -205,7 +196,7 @@ void minty::Scene::unload()
 	_loaded = false;
 	if (get_runtime().get_mode() == Runtime::Mode::Normal)
 	{
-	_systems->unload();
+		_systems->unload();
 	}
 }
 
@@ -228,6 +219,9 @@ void minty::Scene::deserialize(Reader const& reader)
 {
 	reader.read_serializable("systems", *_systems);
 	reader.read_serializable("entities", *_entities);
+
+	// sort quick after deserialization in case entities are out of order, if the file was manually edited
+	sort();
 }
 
 String minty::to_string(Scene const& value)

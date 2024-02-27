@@ -856,7 +856,7 @@ void minty::EntityRegistry::serialize(Writer& writer) const
 		}
 
 		// serialize entity
-		Node entityNode(entityName);
+		Node entityNode(nodeName, nodeValue);
 		Writer entityWriter(entityNode, writer.get_data());
 
 		serialize_entity(entityWriter, entity);
@@ -992,7 +992,7 @@ void minty::EntityRegistry::serialize_entity(Writer& writer, Entity const entity
 
 Node minty::EntityRegistry::serialize_entity(Entity const entity) const
 {
-	Node node;
+	Node node(get_name(entity), to_string(get_id(entity)));
 	Writer writer(node);
 	serialize_entity(writer, entity);
 	return node;

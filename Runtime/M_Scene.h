@@ -71,6 +71,11 @@ namespace minty
 		void update();
 
 		/// <summary>
+		/// Sorts the Entities in this Scene based on hierarchy.
+		/// </summary>
+		void sort();
+
+		/// <summary>
 		/// Fixed updates this Scene.
 		/// </summary>
 		void fixed_update();
