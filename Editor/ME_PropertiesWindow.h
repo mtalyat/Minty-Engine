@@ -7,6 +7,15 @@ namespace mintye
 		: public EditorWindow
 	{
 	private:
+		enum class TargetMode
+		{
+			None,
+			Entity,
+		};
+
+	private:
+		TargetMode _targetMode;
+		minty::Entity _targetEntity;
 
 	public:
 		PropertiesWindow(Application& application);
@@ -14,5 +23,25 @@ namespace mintye
 		void draw() override;
 
 		void reset() override;
+
+#pragma region Drawing
+
+	private:
+		void draw_none() const;
+
+		void draw_entity() const;
+
+#pragma endregion
+
+#pragma region Target
+
+	public:
+		/// <summary>
+		/// Sets the target to show on the window.
+		/// </summary>
+		/// <param name="entity"></param>
+		void set_target(minty::Entity const entity);
+
+#pragma endregion
 	};
 }
