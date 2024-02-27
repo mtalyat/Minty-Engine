@@ -7,7 +7,7 @@ mintye::GameWindow::GameWindow(Application& application)
 void mintye::GameWindow::draw()
 {
 	ImGui::SetNextWindowSize(ImVec2(400, 400), ImGuiCond_FirstUseEver);
-	if (!ImGui::Begin("Game"))
+	if (!ImGui::Begin("Game", nullptr, ImGuiWindowFlags_NoBackground))
 	{
 		ImGui::End();
 		return;

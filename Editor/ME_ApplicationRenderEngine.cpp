@@ -171,7 +171,7 @@ void mintye::ApplicationRenderEngine::init_theme()
 	_theme[ImGuiCol_TabUnfocusedActive] = Color(26, 66, 26);	// the color of the selected tab in an unfocused window
 
 	_theme[ImGuiCol_DockingPreview] = Color(94, 208, 94, 63);	// color when previewing a location to dock the window in
-	_theme[ImGuiCol_DockingEmptyBg] = Color(5, 5, 5);			// color when nothing in the docked area
+	_theme[ImGuiCol_DockingEmptyBg] = Color(5, 5, 5, 0);		// color when nothing in the docked area
 
 	_theme[ImGuiCol_DragDropTarget] = Color(94, 208, 94, 63);	// color when dragging and dropping something into an area
 

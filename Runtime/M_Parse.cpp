@@ -164,15 +164,15 @@ bool minty::Parse::try_int(String const& string, int& value)
 
 UUID minty::Parse::to_uuid(String const& string)
 {
-    return Encoding::decode_base64(string).get<uint64_t>();
+    return Encoding::decode_base16<uint64_t>(string);
 }
 
 bool minty::Parse::try_uuid(String const& string, UUID& value)
 {
-    // UUIDs stored as base64
-    if (Encoding::is_base64(string))
+    // UUIDs stored as base16
+    if (Encoding::is_base16(string))
     {
-        value = Encoding::decode_base64(string).get<uint64_t>();
+        value = Encoding::decode_base16<uint64_t>(string);
         return true;
     }
 

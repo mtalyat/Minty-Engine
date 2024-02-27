@@ -11,8 +11,8 @@ namespace mintye
 	public:
 		PropertiesWindow(Application& application);
 
-		virtual void draw() override;
+		void draw() override;
 
-		virtual void reset() override;
+		void reset() override;
 	};
 }

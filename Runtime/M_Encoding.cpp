@@ -94,3 +94,54 @@ bool minty::Encoding::is_base64(String const& text)
 
     return true;
 }
+
+String minty::Encoding::encode_base16(Dynamic const& data)
+{
+    return encode_base16(data.data(), data.size());
+}
+
+String minty::Encoding::encode_base16(void const* const data, size_t const size)
+{
+    Byte const* bytes = reinterpret_cast<Byte const*>(data);
+
+    std::stringstream ss;
+
+    ss << std::hex << std::setfill('0');
+    for (size_t i = 0; i < size; i++)
+    {
+        ss << std::setw(2) << static_cast<int>(bytes[i]);
+    }
+
+    return ss.str();
+}
+
+Dynamic minty::Encoding::decode_base16(String const& text)
+{
+    std::vector<Byte> bytes;
+
+    std::stringstream ss(text);
+
+    ss >> std::hex;
+    Byte byte;
+    for (size_t i = 0; i < text.size(); i += 2)
+    {
+        ss >> std::setw(2) >> byte;
+        bytes.push_back(byte);
+    }
+
+    return Dynamic(bytes.data(), bytes.size());
+}
+
+bool minty::Encoding::is_base16(String const& text)
+{
+    for (char c : text)
+    {
+        if (!isdigit(c) && (c < 'a' || c > 'f') && (c < 'A' || c > 'F'))
+        {
+            // not a digit or a-f/A-F
+            return false;
+        }
+    }
+
+    return true;
+}

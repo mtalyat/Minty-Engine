@@ -42,9 +42,9 @@ namespace mintye
 	public:
 		ConsoleWindow(Application& application);
 
-		virtual void draw() override;
+		void draw() override;
 
-		virtual void reset() override;
+		void reset() override;
 
 		/// <summary>
 		/// Clears all text from the console.

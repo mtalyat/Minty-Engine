@@ -7,13 +7,11 @@ mintye::SceneWindow::SceneWindow(Application& application)
 void mintye::SceneWindow::draw()
 {
 	ImGui::SetNextWindowSize(ImVec2(400, 400), ImGuiCond_FirstUseEver);
-	if (!ImGui::Begin("Scene"))
+	if (!ImGui::Begin("Scene", nullptr, ImGuiWindowFlags_NoBackground))
 	{
 		ImGui::End();
 		return;
 	}
-
-
 
 	ImGui::End();
 }

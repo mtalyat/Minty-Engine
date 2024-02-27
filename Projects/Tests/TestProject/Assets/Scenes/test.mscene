@@ -63,7 +63,7 @@ entities
         PlayerController
             moveSpeed: 1
         Link
-    Model Center: 1
+    Model Center: 2400DE2C92F041ED
         Enabled
         Renderable
         Transform
@@ -87,7 +87,7 @@ entities
             material: material1
             type: cube
         Relationship
-            parent: 1
+            parent: 2400DE2C92F041ED
     Model Positive Z
         Enabled
         Renderable
@@ -97,7 +97,7 @@ entities
             material: material1
             type: cube
         Relationship
-            parent: 1
+            parent: 2400DE2C92F041ED
     Model Negative X
         Enabled
         Renderable
@@ -107,7 +107,7 @@ entities
             material: material1
             type: cube
         Relationship
-            parent: 1
+            parent: 2400DE2C92F041ED
     Model Positive X
         Enabled
         Renderable
@@ -117,4 +117,4 @@ entities
             material: material1
             type: cube
         Relationship
-            parent: 1
+            parent: 2400DE2C92F041ED
