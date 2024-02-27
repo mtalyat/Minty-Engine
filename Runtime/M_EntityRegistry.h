@@ -78,6 +78,10 @@ namespace minty
 
 		void disable(Entity const entity);
 
+		void set_enabled(Entity const entity, bool const enabled);
+
+		bool get_enabled(Entity const entity) const;
+
 		void dirty(Entity const entity);
 
 		void set_parent(Entity const entity, Entity const parentEntity);

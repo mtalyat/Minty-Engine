@@ -129,6 +129,23 @@ void minty::EntityRegistry::disable(Entity const entity)
 	}
 }
 
+void minty::EntityRegistry::set_enabled(Entity const entity, bool const enabled)
+{
+	if (enabled)
+	{
+		enable(entity);
+	}
+	else
+	{
+		disable(entity);
+	}
+}
+
+bool minty::EntityRegistry::get_enabled(Entity const entity) const
+{
+	return all_of<EnabledComponent>(entity);
+}
+
 void minty::EntityRegistry::dirty(Entity const entity)
 {
 	if (!all_of<DirtyComponent>(entity))
@@ -1093,7 +1110,12 @@ void minty::EntityRegistry::serialize_entity(Writer& writer, Entity const entity
 Node minty::EntityRegistry::serialize_entity(Entity const entity) const
 {
 	Node node(get_name(entity), to_string(get_id(entity)));
-	Writer writer(node);
+	SerializationData data
+	{
+		.scene = &get_scene(),
+		.entity = entity,
+	};
+	Writer writer(node, &data);
 	serialize_entity(writer, entity);
 	return node;
 }

@@ -8,6 +8,7 @@ namespace mintye
 	{
 	private:
 		std::vector<minty::String> _registeredSystems;
+		minty::Entity _selected;
 
 	public:
 		HierarchyWindow(Application& application);

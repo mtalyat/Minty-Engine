@@ -57,6 +57,9 @@
     <ClCompile Include="ME_Theme.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="ME_ImGuiHelper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ME_Application.h">
@@ -99,6 +102,9 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ME_Theme.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ME_ImGuiHelper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

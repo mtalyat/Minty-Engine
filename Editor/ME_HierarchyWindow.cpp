@@ -12,6 +12,7 @@ using namespace minty;
 mintye::HierarchyWindow::HierarchyWindow(Application& application)
 	: EditorWindow(application)
 	, _registeredSystems()
+	, _selected(NULL_ENTITY)
 {}
 
 void mintye::HierarchyWindow::draw()
@@ -122,11 +123,12 @@ void mintye::HierarchyWindow::draw()
 			}
 
 			// print with indent
-			if (ImGui::Selectable(String(familyStack.size() << 1, ' ').append(entityRegistry->get_name(entity)).c_str()))
+			if (ImGui::Selectable(String(familyStack.size() << 1, ' ').append(entityRegistry->get_name(entity)).c_str(), entity == _selected))
 			{
 				// when selected, send Entity to properties window
 				if (PropertiesWindow* properties = get_application().find_editor_window<PropertiesWindow>("Properties"))
 				{
+					_selected = entity;
 					properties->set_target(entity);
 				}
 			}

@@ -196,6 +196,7 @@
     <ClCompile Include="ME_EditorWindow.cpp" />
     <ClCompile Include="ME_GameWindow.cpp" />
     <ClCompile Include="ME_HierarchyWindow.cpp" />
+    <ClCompile Include="ME_ImGuiHelper.cpp" />
     <ClCompile Include="ME_Project.cpp" />
     <ClCompile Include="ME_PropertiesWindow.cpp" />
     <ClCompile Include="ME_SceneWindow.cpp" />
@@ -212,6 +213,7 @@
     <ClInclude Include="ME_EditorWindow.h" />
     <ClInclude Include="ME_GameWindow.h" />
     <ClInclude Include="ME_HierarchyWindow.h" />
+    <ClInclude Include="ME_ImGuiHelper.h" />
     <ClInclude Include="ME_Minty.h" />
     <ClInclude Include="ME_Project.h" />
     <ClInclude Include="ME_PropertiesWindow.h" />
