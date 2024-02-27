@@ -721,6 +721,16 @@ constexpr static char const* INTERNAL_CLASS_NAME = "Runtime";
 
 #define ADD_INTERNAL_CALL(csharpName, cppName) mono_add_internal_call(std::format("{}.{}::{}", ASSEMBLY_ENGINE_NAME, INTERNAL_CLASS_NAME, csharpName).c_str(), cppName)
 
+static EntityRegistry& util_get_entity_registry()
+{
+	MINTY_ASSERT(_data.engine);
+
+	Scene* scene = _data.get_scene();
+	MINTY_ASSERT(scene != nullptr);
+
+	return scene->get_entity_registry();
+}
+
 static Window& util_get_window()
 {
 	MINTY_ASSERT(_data.engine != nullptr);
@@ -803,7 +813,7 @@ static void object_destroy_entity(UUID id)
 
 	EntityRegistry& registry = scene->get_entity_registry();
 
-	Entity entity = registry.find(id);
+	Entity entity = registry.find_by_id(id);
 	MINTY_ASSERT(entity != NULL_ENTITY);
 
 	registry.destroy(entity);
@@ -818,7 +828,7 @@ static void object_destroy_immediate_entity(UUID id)
 
 	EntityRegistry& registry = scene->get_entity_registry();
 
-	Entity entity = registry.find(id);
+	Entity entity = registry.find_by_id(id);
 	MINTY_ASSERT(entity != NULL_ENTITY);
 
 	registry.destroy_immediate(entity);
@@ -830,21 +840,16 @@ static void object_destroy_immediate_entity(UUID id)
 
 static MonoString* entity_get_name(UUID id)
 {
-	MINTY_ASSERT(_data.engine);
-
 	if (!id) return _data.engine->to_mono_string("");
 
-	Scene* scene = _data.get_scene();
-	MINTY_ASSERT(scene != nullptr);
-
-	EntityRegistry& registry = scene->get_entity_registry();
+	EntityRegistry& registry = util_get_entity_registry();
 
 	// get the entity
-	Entity entity = registry.find(id);
+	Entity entity = registry.find_by_id(id);
 	MINTY_ASSERT(entity != NULL_ENTITY);
 
 	// get the name
-	String name = scene->get_entity_registry().get_name(entity);
+	String name = registry.get_name(entity);
 
 	// convert to mono string and return
 	return _data.engine->to_mono_string(name);
@@ -852,22 +857,49 @@ static MonoString* entity_get_name(UUID id)
 
 static void entity_set_name(UUID id, MonoString* string)
 {
-	MINTY_ASSERT(_data.engine);
-
 	if (!id) return;
 
-	Scene* scene = _data.get_scene();
-	MINTY_ASSERT(scene != nullptr);
-
-	EntityRegistry& registry = scene->get_entity_registry();
+	EntityRegistry& registry = util_get_entity_registry();
 
 	// get the entity
-	Entity entity = registry.find(id);
+	Entity entity = registry.find_by_id(id);
 	MINTY_ASSERT(entity != NULL_ENTITY);
 
 	// set the name
 	String name = ScriptEngine::from_mono_string(string);
-	scene->get_entity_registry().set_name(entity, name);
+	registry.set_name(entity, name);
+}
+
+static MonoString* entity_get_tag(UUID id)
+{
+	if (!id) return _data.engine->to_mono_string("");
+
+	EntityRegistry& registry = util_get_entity_registry();
+
+	// get the entity
+	Entity entity = registry.find_by_id(id);
+	MINTY_ASSERT(entity != NULL_ENTITY);
+
+	// get the name
+	String name = registry.get_tag(entity);
+
+	// convert to mono string and return
+	return _data.engine->to_mono_string(name);
+}
+
+static void entity_set_tag(UUID id, MonoString* string)
+{
+	if (!id) return;
+
+	EntityRegistry& registry = util_get_entity_registry();
+
+	// get the entity
+	Entity entity = registry.find_by_id(id);
+	MINTY_ASSERT(entity != NULL_ENTITY);
+
+	// set the name
+	String name = ScriptEngine::from_mono_string(string);
+	registry.set_tag(entity, name);
 }
 
 static void entity_set_enabled(UUID id, bool enabled)
@@ -881,7 +913,7 @@ static void entity_set_enabled(UUID id, bool enabled)
 	EntityRegistry& registry = scene->get_entity_registry();
 
 	// get the entity
-	Entity entity = registry.find(id);
+	Entity entity = registry.find_by_id(id);
 	MINTY_ASSERT(entity != NULL_ENTITY);
 
 	if (enabled)
@@ -905,7 +937,7 @@ static bool entity_get_enabled(UUID id)
 	EntityRegistry& registry = scene->get_entity_registry();
 
 	// get the entity
-	Entity entity = registry.find(id);
+	Entity entity = registry.find_by_id(id);
 	MINTY_ASSERT(entity != NULL_ENTITY);
 
 	return registry.all_of<EnabledComponent>(entity);
@@ -921,7 +953,7 @@ static MonoObject* entity_add_component(UUID id, MonoReflectionType* reflectionT
 	EntityRegistry& registry = scene->get_entity_registry();
 
 	// get the entity
-	Entity entity = registry.find(id);
+	Entity entity = registry.find_by_id(id);
 	MINTY_ASSERT(entity != NULL_ENTITY);
 
 	// get the component name
@@ -958,7 +990,7 @@ static MonoObject* entity_get_component(UUID id, MonoReflectionType* reflectionT
 	EntityRegistry& registry = scene->get_entity_registry();
 
 	// get the entity
-	Entity entity = registry.find(id);
+	Entity entity = registry.find_by_id(id);
 	MINTY_ASSERT(entity != NULL_ENTITY);
 
 	// get the component name
@@ -996,7 +1028,7 @@ static void entity_remove_component(UUID id, MonoReflectionType* reflectionType)
 	EntityRegistry& registry = scene->get_entity_registry();
 
 	// get the entity
-	Entity entity = registry.find(id);
+	Entity entity = registry.find_by_id(id);
 	MINTY_ASSERT(entity != NULL_ENTITY);
 
 	// get the component name
@@ -1024,7 +1056,7 @@ static MonoObject* entity_get_parent(UUID id)
 	EntityRegistry& registry = scene->get_entity_registry();
 
 	// get the entity
-	Entity entity = registry.find(id);
+	Entity entity = registry.find_by_id(id);
 	MINTY_ASSERT(entity != NULL_ENTITY);
 
 	// get the parent
@@ -1049,11 +1081,11 @@ static void entity_set_parent(UUID id, UUID parentId)
 	EntityRegistry& registry = scene->get_entity_registry();
 
 	// get the entity
-	Entity entity = registry.find(id);
+	Entity entity = registry.find_by_id(id);
 	MINTY_ASSERT(entity != NULL_ENTITY);
 
 	// get the parent
-	Entity parentEntity = registry.find(parentId);
+	Entity parentEntity = registry.find_by_id(parentId);
 
 	// set the parent
 	registry.set_parent(entity, parentEntity);
@@ -1069,7 +1101,7 @@ static int entity_get_child_count(UUID id)
 	EntityRegistry& registry = scene->get_entity_registry();
 
 	// get the entity
-	Entity entity = registry.find(id);
+	Entity entity = registry.find_by_id(id);
 	MINTY_ASSERT(entity != NULL_ENTITY);
 
 	size_t childCount = registry.get_child_count(entity);
@@ -1089,7 +1121,7 @@ static MonoObject* entity_get_child(UUID id, int index)
 	EntityRegistry& registry = scene->get_entity_registry();
 
 	// get the entity
-	Entity entity = registry.find(id);
+	Entity entity = registry.find_by_id(id);
 	MINTY_ASSERT(entity != NULL_ENTITY);
 
 	// get the child
@@ -1169,7 +1201,7 @@ TransformComponent& util_get_transform_component(UUID id, bool setDirty)
 
 	EntityRegistry& registry = scene->get_entity_registry();
 
-	Entity entity = registry.find(id);
+	Entity entity = registry.find_by_id(id);
 	MINTY_ASSERT(entity != NULL_ENTITY);
 
 	// if set dirty, do that
@@ -1280,6 +1312,8 @@ void minty::ScriptEngine::link()
 #pragma region Entity
 	ADD_INTERNAL_CALL("Entity_GetName", entity_get_name);
 	ADD_INTERNAL_CALL("Entity_SetName", entity_set_name);
+	ADD_INTERNAL_CALL("Entity_GetTag", entity_get_tag);
+	ADD_INTERNAL_CALL("Entity_SetTag", entity_set_tag);
 	ADD_INTERNAL_CALL("Entity_GetEnabled", entity_get_enabled);
 	ADD_INTERNAL_CALL("Entity_SetEnabled", entity_set_enabled);
 	ADD_INTERNAL_CALL("Entity_AddComponent", entity_add_component);

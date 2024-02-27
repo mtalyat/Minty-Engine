@@ -8,6 +8,7 @@
 #include "M_Scene.h"
 
 #include "M_NameComponent.h"
+#include "M_TagComponent.h"
 #include "M_RelationshipComponent.h"
 #include "M_TransformComponent.h"
 #include "M_DirtyComponent.h"
@@ -36,6 +37,7 @@ minty::EntityRegistry::EntityRegistry(Runtime& engine, ID const sceneId)
 	, entt::registry()
 	, _idToEntity()
 	, _entityToId()
+	, _tags()
 {
 	// TODO: this does not account for when somebody gets the component by reference and updates it that wey
 	// make it so whenever a transform is editied, it is marked as dirty
@@ -471,9 +473,12 @@ void minty::EntityRegistry::clear()
 	// clear the lookup list
 	_idToEntity.clear();
 	_entityToId.clear();
+
+	// clear tags
+	_tags.clear();
 }
 
-Entity minty::EntityRegistry::find(String const& string) const
+Entity minty::EntityRegistry::find_by_name(String const& string) const
 {
 	if (is_name_empty(string))
 	{
@@ -493,7 +498,33 @@ Entity minty::EntityRegistry::find(String const& string) const
 	return NULL_ENTITY;
 }
 
-Entity minty::EntityRegistry::find(UUID const uuid) const
+Entity minty::EntityRegistry::find_by_tag(String const& tag) const
+{
+	auto found = _tags.find(tag);
+
+	if (found != _tags.end())
+	{
+		return *found->second.begin();
+	}
+
+	// no entities with the given tag
+	return NULL_ENTITY;
+}
+
+std::unordered_set<Entity> minty::EntityRegistry::find_all_by_tag(String const& tag) const
+{
+	auto found = _tags.find(tag);
+
+	if (found != _tags.end())
+	{
+		return found->second;
+	}
+
+	// no entities with the given tag
+	return std::unordered_set<Entity>();
+}
+
+Entity minty::EntityRegistry::find_by_id(UUID const uuid) const
 {
 	auto found = _idToEntity.find(uuid);
 
@@ -557,6 +588,62 @@ void minty::EntityRegistry::set_name(Entity const entity, String const& name)
 		// name is occupied
 		NameComponent& nameComponent = get_or_emplace<NameComponent>(entity);
 		nameComponent.name = name;
+	}
+}
+
+String minty::EntityRegistry::get_tag(Entity const entity) const
+{
+	if (TagComponent const* tag = try_get<TagComponent const>(entity))
+	{
+		return tag->tag;
+	}
+
+	return Text::EMPTY;
+}
+
+void minty::EntityRegistry::set_tag(Entity const entity, String const& tag)
+{
+	// check if name is a real name, or empty
+	if (tag.empty())
+	{
+		// name is empty, remove the component if it exists
+		if (TagComponent* tagComponent = try_get<TagComponent>(entity))
+		{
+			// this should be in the tags lookup: if not, somebody meddled with the tag outside of this method
+			MINTY_ASSERT(_tags.contains(tagComponent->tag));
+
+			auto& set = _tags.at(tagComponent->tag);
+			set.erase(entity);
+
+			// if the set is now empty, remove tag from lookup
+			if (set.empty())
+			{
+				_tags.erase(tagComponent->tag);
+			}
+
+			// erase component
+			erase<TagComponent>(entity);
+		}
+	}
+	else
+	{
+		// add component
+		TagComponent& tagComponent = get_or_emplace<TagComponent>(entity);
+		tagComponent.tag = tag;
+
+		// add to tags lookup
+		auto found = _tags.find(tag);
+
+		if (found != _tags.end())
+		{
+			// existing
+			found->second.emplace(entity);
+		}
+		else
+		{
+			// new
+			_tags.emplace(tag, std::unordered_set<Entity> { entity });
+		}
 	}
 }
 

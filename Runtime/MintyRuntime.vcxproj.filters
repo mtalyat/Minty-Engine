@@ -579,6 +579,9 @@
     <ClInclude Include="M_UITransformComponent.h">
       <Filter>Header Files\Transform</Filter>
     </ClInclude>
+    <ClInclude Include="M_TagComponent.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -963,6 +966,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_ScriptArguments.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_TagComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

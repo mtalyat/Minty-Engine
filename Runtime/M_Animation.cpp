@@ -213,7 +213,7 @@ void minty::Animation::perform_step(Step const& step, Entity const thisEntity, S
 
 	// get the entity
 	// if entity index is 0xff (max ID), then it is referring to the argument Entity (this Entity, if you will)
-	Entity entity = step.entityIndex == MAX_ENTITY_INDEX ? thisEntity : registry.find(_entities.at(step.entityIndex));
+	Entity entity = step.entityIndex == MAX_ENTITY_INDEX ? thisEntity : registry.find_by_name(_entities.at(step.entityIndex));
 	if (entity == NULL_ENTITY) return; // no entity, do not continue
 
 	// get the component from the entity, if one was given

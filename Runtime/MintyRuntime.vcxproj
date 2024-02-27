@@ -270,6 +270,7 @@
     <ClInclude Include="M_ScriptSystem.h" />
     <ClInclude Include="M_SpritePushData.h" />
     <ClInclude Include="M_SpriteBuilder.h" />
+    <ClInclude Include="M_TagComponent.h" />
     <ClInclude Include="M_TextureAtlasBuilder.h" />
     <ClInclude Include="M_Time.h" />
     <ClInclude Include="M_TypeRegister.h" />
@@ -480,6 +481,7 @@
     <ClCompile Include="M_String.cpp" />
     <ClCompile Include="M_System.cpp" />
     <ClCompile Include="M_SystemRegistry.cpp" />
+    <ClCompile Include="M_TagComponent.cpp" />
     <ClCompile Include="M_Texture.cpp" />
     <ClCompile Include="M_Rect.cpp" />
     <ClCompile Include="M_RectF.cpp" />

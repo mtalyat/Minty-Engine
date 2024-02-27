@@ -31,6 +31,7 @@
 #include "M_RenderableComponent.h"
 #include "M_ScriptComponent.h"
 #include "M_SpriteComponent.h"
+#include "M_TagComponent.h"
 #include "M_TransformComponent.h"
 #include "M_UITransformComponent.h"
 

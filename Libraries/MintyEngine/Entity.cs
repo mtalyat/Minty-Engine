@@ -19,6 +19,12 @@ namespace MintyEngine
             set => Runtime.Entity_SetName(ID, value);
         }
 
+        public string Tag
+        {
+            get => Runtime.Entity_GetTag(ID);
+            set => Runtime.Entity_SetTag(ID, value);
+        }
+
         public bool Enabled
         {
             get => Runtime.Entity_GetEnabled(ID);

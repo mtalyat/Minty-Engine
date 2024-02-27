@@ -39,11 +39,8 @@ access to the entire engine without needing include each file.
 #include "M_Component.h"
 
 #include "M_CameraComponent.h"
-#include "M_DirtyComponent.h"
 #include "M_MeshComponent.h"
-#include "M_NameComponent.h"
 #include "M_RelationshipComponent.h"
-#include "M_UITransformComponent.h"
 
 // ENTITIES
 #include "M_EntityRegistry.h"
@@ -120,6 +117,7 @@ access to the entire engine without needing include each file.
 
 // TRANSFORM
 #include "M_TransformComponent.h"
+#include "M_UITransformComponent.h"
 
 // GENERAL
 #include "M_Base.h"

@@ -35,6 +35,7 @@ namespace minty
 		std::unordered_map<UUID, Entity> _idToEntity;
 		std::unordered_map<Entity, UUID> _entityToId;
 
+		std::unordered_map<String, std::unordered_set<Entity>> _tags;
 	public:
 		EntityRegistry(Runtime& engine, ID const sceneId);
 
@@ -140,14 +141,28 @@ namespace minty
 		/// </summary>
 		/// <param name="string"></param>
 		/// <returns>The Entity, or NULL_ENTITY if not found.</returns>
-		Entity find(String const& string) const;
+		Entity find_by_name(String const& string) const;
+
+		/// <summary>
+		/// Finds the first Entity with the given tag.
+		/// </summary>
+		/// <param name="tag"></param>
+		/// <returns>The Entity, or NULL_ENTITY if not found.</returns>
+		Entity find_by_tag(String const& tag) const;
+
+		/// <summary>
+		/// Finds all of the Entities with the given tag.
+		/// </summary>
+		/// <param name="tag"></param>
+		/// <returns></returns>
+		std::unordered_set<Entity> find_all_by_tag(String const& tag) const;
 
 		/// <summary>
 		/// Finds the Entity with the given UUID.
 		/// </summary>
 		/// <param name="uuid"></param>
 		/// <returns>The Entity, or NULL_ENTITY if not found.</returns>
-		Entity find(UUID const uuid) const;
+		Entity find_by_id(UUID const uuid) const;
 
 		/// <summary>
 		/// Finds the first Entity with the given Component type.
@@ -155,7 +170,7 @@ namespace minty
 		/// <typeparam name="T">The type of component.</typeparam>
 		/// <returns>The Entity, if found, otherwise NULL_ENTITY.</returns>
 		template<class T>
-		Entity find() const;
+		Entity find_by_type() const;
 
 		/// <summary>
 		/// Gets the name of the Entity, or an empty string if no name exists.
@@ -166,18 +181,27 @@ namespace minty
 		String get_name(Entity const entity) const;
 
 		/// <summary>
+		/// Sets the NameComponent name of the Entity. Emplaces a NameComponent if needed. If no name is given, then the NameComponent is removed.
+		/// </summary>
+		/// <param name="entity">The Entity to name.</param>
+		/// <param name="name">The new name of the Entity.</param>
+		void set_name(Entity const entity, String const& name);
+
+		String get_tag(Entity const entity) const;
+
+		/// <summary>
+		/// Sets the TagComponent tag of the Entity. Emplaces a TagComponent if needed. If no name is given, then the TagComponent is removed.
+		/// </summary>
+		/// <param name="entity"></param>
+		/// <param name="tag"></param>
+		void set_tag(Entity const entity, String const& tag);
+
+		/// <summary>
 		/// Gets the ID of the given Entity.
 		/// </summary>
 		/// <param name="entity">The Entity to get the ID from.</param>
 		/// <returns>The ID of the Entity, or 0 if no ID was found.</returns>
 		UUID get_id(Entity const entity) const;
-
-		/// <summary>
-		/// Sets the NameComponent name of the Entity. Emplaces a NameComponent if needed. If no name is given ("" or "_"), then the NameComponent is removed.
-		/// </summary>
-		/// <param name="entity">The Entity to name.</param>
-		/// <param name="name">The new name of the Entity.</param>
-		void set_name(Entity const entity, String const& name);
 
 		/// <summary>
 		/// Emplaces the Component onto the entity, by name.
@@ -273,7 +297,7 @@ namespace minty
 	};
 
 	template<class T>
-	Entity EntityRegistry::find() const
+	Entity EntityRegistry::find_by_type() const
 	{
 		// iterate through view
 		for (auto [entity, t] : this->view<T const>().each())
