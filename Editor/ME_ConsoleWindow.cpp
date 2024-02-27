@@ -47,9 +47,9 @@ void mintye::ConsoleWindow::draw()
 		return;
 	}
 
-	ImGui::Checkbox("Show Messages", &showNormal);
-	ImGui::Checkbox("Show Warnings", &showWarnings);
-	ImGui::Checkbox("Show Errors", &showErrors);
+	//ImGui::Checkbox("Show Messages", &showNormal);
+	//ImGui::Checkbox("Show Warnings", &showWarnings);
+	//ImGui::Checkbox("Show Errors", &showErrors);
 
 	_filter.Draw("Filter (\"incl,-excl\")", 180.0f);
 
