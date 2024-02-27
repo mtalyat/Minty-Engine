@@ -1,5 +1,8 @@
 #include "ME_HierarchyWindow.h"
 
+#include <vector>
+#include <unordered_set>
+
 using namespace mintye;
 using namespace minty;
 
@@ -35,7 +38,7 @@ void mintye::HierarchyWindow::draw()
 		}
 	}
 	ImGui::EndChild();
-	
+
 	// draw entities
 	EntityRegistry* entityRegistry = &scene->get_entity_registry();
 	if (ImGui::BeginChild("HierarchyEntities", ImVec2(0.0f, 0.0f), true))
@@ -43,9 +46,61 @@ void mintye::HierarchyWindow::draw()
 		ImGui::Text(std::format("Entities ({})", entityRegistry->size()).c_str());
 		ImGui::Separator();
 
-		for (auto [entity]: entityRegistry->storage<Entity>().each())
+		// keep track of the parents, keep indenting based on the number of parents
+		std::vector<Entity> familyStack;
+		std::unordered_set<Entity> familySet;
+
+		for (auto [entity] : entityRegistry->storage<Entity>().each())
 		{
-			ImGui::Text(entityRegistry->get_name(entity).c_str());
+			RelationshipComponent const* relationship = entityRegistry->try_get<RelationshipComponent>(entity);
+
+			if (!relationship)
+			{
+				// no more parents
+				if (!familyStack.empty())
+				{
+					familyStack.clear();
+					familySet.clear();
+				}
+			}
+			else
+			{
+				// family
+
+				// if not the same parent, determine what to do...
+				if (familySet.contains(relationship->parent))
+				{
+					// the parent is part of this line
+					
+					// go back until we get to the parent
+					while (familyStack.back() != relationship->parent)
+					{
+						familySet.erase(familyStack.back());
+						familyStack.pop_back();
+					}
+
+					// add self to stack
+					familyStack.push_back(entity);
+					familySet.emplace(entity);
+				}
+				else if(relationship->parent == NULL_ENTITY)
+				{
+					// no parent, but possibly children
+					familyStack.clear();
+					familySet.clear();
+
+					familyStack.push_back(entity);
+					familySet.emplace(entity);
+				}
+				else
+				{
+					// else, out of order
+					MINTY_WARN("Entity out of order.");
+				}
+			}
+
+			// print with indent
+			ImGui::Text(String(familyStack.size() << 1, ' ').append(entityRegistry->get_name(entity)).c_str());
 		}
 	}
 	ImGui::EndChild();
