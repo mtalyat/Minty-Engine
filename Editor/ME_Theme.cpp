@@ -9,7 +9,7 @@ mintye::Theme::Theme()
 
 mintye::Theme::~Theme()
 {
-	if (_colors) delete _colors;
+	if (_colors) delete[] _colors;
 }
 
 mintye::Theme::Theme(Theme const& other)
