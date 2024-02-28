@@ -231,6 +231,7 @@
     <ClInclude Include="M_DestroyComponentComponent.h" />
     <ClInclude Include="M_EnabledComponent.h" />
     <ClInclude Include="M_Engine.h" />
+    <ClInclude Include="M_EnTT.h" />
     <ClInclude Include="M_ImGui.h" />
     <ClInclude Include="libraries\imguifiledialog\ImGuiFileDialog.h" />
     <ClInclude Include="libraries\imguifiledialog\ImGuiFileDialogConfig.h" />

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "M_Base.h"
-#include "libraries/entt/entt.hpp"
+#include "M_EnTT.h"
 
 namespace minty
 {

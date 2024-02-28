@@ -201,7 +201,7 @@ void minty::EntityRegistry::set_parent(Entity const entity, Entity const parentE
 				if (entity == parentRelationship.last)
 				{
 					RelationshipComponent& siblingRelationship = get<RelationshipComponent>(relationship.prev);
-					siblingRelationship.prev = NULL_ENTITY;
+					siblingRelationship.next = NULL_ENTITY;
 
 					parentRelationship.last = relationship.prev;
 				}
@@ -359,10 +359,12 @@ void minty::EntityRegistry::destroy_immediate(Entity const entity, bool const in
 	// remove from parent, if any
 	set_parent(entity, NULL_ENTITY);
 
+	bool loaded = get_scene().is_loaded();
+
 	if (!includeChildren)
 	{
 		// trigger events
-		destroy_trigger_events(entity, get_scene().is_loaded());
+		destroy_trigger_events(entity, loaded);
 
 		// remove from lookups
 		remove_from_lookup(entity);
@@ -376,12 +378,28 @@ void minty::EntityRegistry::destroy_immediate(Entity const entity, bool const in
 	std::vector<Entity> stack;
 	stack.push_back(entity);
 
-	bool loaded = get_scene().is_loaded();
-
 	while (!stack.empty())
 	{
 		Entity e = stack.back();
 		stack.pop_back();
+
+		// add children to stack
+		if (RelationshipComponent* component = try_get<RelationshipComponent>(e))
+		{
+			Entity child = component->first;
+
+			while (child != NULL_ENTITY)
+			{
+				// add to stack
+				stack.push_back(child);
+
+				// update component
+				component = try_get<RelationshipComponent>(child);
+
+				// move to next child
+				child = component->next;
+			}
+		}
 
 		// trigger events
 		destroy_trigger_events(e, loaded);
@@ -391,21 +409,6 @@ void minty::EntityRegistry::destroy_immediate(Entity const entity, bool const in
 
 		// destroy entity
 		entt::registry::destroy(e);
-
-		// add children to stack
-		if (RelationshipComponent* component = try_get<RelationshipComponent>(e))
-		{
-			e = component->first;
-
-			while (e != NULL_ENTITY)
-			{
-				// add to stack
-				stack.push_back(e);
-
-				// move to next child
-				e = component->next;
-			}
-		}
 	}
 }
 

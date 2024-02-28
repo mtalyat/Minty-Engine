@@ -1,6 +1,7 @@
 #pragma once
 
 #include "M_Types.h"
+#include "M_Macros.h"
 #include <vector>
 #include <unordered_map>
 

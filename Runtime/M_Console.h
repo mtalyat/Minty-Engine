@@ -1,6 +1,6 @@
 #pragma once
 
-#include "M_Base.h"
+#include "M_Types.h"
 #include "M_Node.h"
 
 namespace minty::Console

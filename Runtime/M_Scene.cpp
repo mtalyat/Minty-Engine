@@ -136,49 +136,58 @@ void minty::Scene::sort()
 {
 	EntityRegistry const* er = _entities;
 
-	_entities->sort<Entity>([er](Entity const left, Entity const right)
+	_entities->sort<RelationshipComponent>([er](Entity const left, Entity const right)
 		{
-			// get relationships
-			RelationshipComponent const* leftRelationship = er->try_get<RelationshipComponent>(left);
-			RelationshipComponent const* rightRelationship = er->try_get<RelationshipComponent>(right);
+			RelationshipComponent const& leftRelationship = er->get<RelationshipComponent>(left);
+			RelationshipComponent const& rightRelationship = er->get<RelationshipComponent>(right);
 
-			if (leftRelationship)
-			{
-				if (rightRelationship)
-				{
-					// both exist
-					return
-						rightRelationship->parent == left || // put parents on left of children
-						leftRelationship->next == right || // put siblings in order
-						// put in order based on parent sibling index
-						((leftRelationship->parent != right && rightRelationship->next != left) && (leftRelationship->parent < rightRelationship->parent || (leftRelationship->parent == rightRelationship->parent && left < right)));
-				}
-				else
-				{
-					// right dne
-					return true;
-					//return
-					//	leftRelationship->next == right ||
-					//	(leftRelationship->parent != right && leftRelationship->parent == NULL_ENTITY && left < right);
-				}
-			}
-			else
-			{
-				if (rightRelationship)
-				{
-					// left dne
-					return false;
-					//return
-					//	rightRelationship->parent == left ||
-					//	(rightRelationship->next != left && (rightRelationship->parent != NULL_ENTITY || left < right));
-				}
-				else
-				{
-					// both dne
-					// compare entity ID values
-					return left < right;
-				}
-			}
+			return
+				rightRelationship.parent == left || // put parents on left of children
+				leftRelationship.next == right || // put siblings in order
+				// put in order based on parent sibling index
+				((leftRelationship.parent != right && rightRelationship.next != left) && (leftRelationship.parent < rightRelationship.parent || (leftRelationship.parent == rightRelationship.parent && left < right)));
+
+			//// get relationships
+			//RelationshipComponent const* leftRelationship = er->try_get<RelationshipComponent>(left);
+			//RelationshipComponent const* rightRelationship = er->try_get<RelationshipComponent>(right);
+
+			//if (leftRelationship)
+			//{
+			//	if (rightRelationship)
+			//	{
+			//		// both exist
+			//		return
+			//			rightRelationship->parent == left || // put parents on left of children
+			//			leftRelationship->next == right || // put siblings in order
+			//			// put in order based on parent sibling index
+			//			((leftRelationship->parent != right && rightRelationship->next != left) && (leftRelationship->parent < rightRelationship->parent || (leftRelationship->parent == rightRelationship->parent && left < right)));
+			//	}
+			//	else
+			//	{
+			//		// right dne
+			//		return true;
+			//		//return
+			//		//	leftRelationship->next == right ||
+			//		//	(leftRelationship->parent != right && leftRelationship->parent == NULL_ENTITY && left < right);
+			//	}
+			//}
+			//else
+			//{
+			//	if (rightRelationship)
+			//	{
+			//		// left dne
+			//		return false;
+			//		//return
+			//		//	rightRelationship->parent == left ||
+			//		//	(rightRelationship->next != left && (rightRelationship->parent != NULL_ENTITY || left < right));
+			//	}
+			//	else
+			//	{
+			//		// both dne
+			//		// compare entity ID values
+			//		return left < right;
+			//	}
+			//}
 		});
 }
 

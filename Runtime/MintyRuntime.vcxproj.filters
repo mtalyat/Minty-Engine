@@ -582,6 +582,9 @@
     <ClInclude Include="M_TagComponent.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
+    <ClInclude Include="M_EnTT.h">
+      <Filter>Header Files\Libraries</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
