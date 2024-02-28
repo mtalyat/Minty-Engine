@@ -387,10 +387,10 @@ void minty::EntityRegistry::destroy_immediate(Entity const entity, bool const in
 		destroy_trigger_events(e, loaded);
 
 		// remove from lookups
-		remove_from_lookup(entity);
+		remove_from_lookup(e);
 
 		// destroy entity
-		entt::registry::destroy(entity);
+		entt::registry::destroy(e);
 
 		// add children to stack
 		if (RelationshipComponent* component = try_get<RelationshipComponent>(e))
