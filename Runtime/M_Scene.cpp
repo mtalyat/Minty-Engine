@@ -156,9 +156,10 @@ void minty::Scene::sort()
 				else
 				{
 					// right dne
-					return
-						leftRelationship->next == right ||
-						(leftRelationship->parent != right && leftRelationship->parent == NULL_ENTITY && left < right);
+					return true;
+					//return
+					//	leftRelationship->next == right ||
+					//	(leftRelationship->parent != right && leftRelationship->parent == NULL_ENTITY && left < right);
 				}
 			}
 			else
@@ -166,9 +167,10 @@ void minty::Scene::sort()
 				if (rightRelationship)
 				{
 					// left dne
-					return
-						rightRelationship->parent == left ||
-						(rightRelationship->next != left && (rightRelationship->parent != NULL_ENTITY || left < right));
+					return false;
+					//return
+					//	rightRelationship->parent == left ||
+					//	(rightRelationship->next != left && (rightRelationship->parent != NULL_ENTITY || left < right));
 				}
 				else
 				{
