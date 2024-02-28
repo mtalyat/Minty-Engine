@@ -165,7 +165,7 @@ void minty::EntityRegistry::set_parent(Entity const entity, Entity const parentE
 	// get old parent if any, remove from children
 	if (relationship.parent != NULL_ENTITY)
 	{
-		RelationshipComponent& parentRelationship = get<RelationshipComponent>(parentEntity);
+		RelationshipComponent& parentRelationship = get<RelationshipComponent>(relationship.parent);
 
 		MINTY_ASSERT(parentRelationship.children >= 1);
 
@@ -217,7 +217,7 @@ void minty::EntityRegistry::set_parent(Entity const entity, Entity const parentE
 	if (relationship.parent != NULL_ENTITY)
 	{
 		// get or emplace here: the new parent could not have a relationship component
-		RelationshipComponent& parentRelationship = get_or_emplace<RelationshipComponent>(parentEntity);
+		RelationshipComponent& parentRelationship = get_or_emplace<RelationshipComponent>(relationship.parent);
 
 		// add new child to end of list
 
