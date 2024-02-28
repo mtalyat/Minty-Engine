@@ -177,22 +177,34 @@ void minty::EntityRegistry::set_parent(Entity const entity, Entity const parentE
 		}
 		else
 		{
-			// if this is the first child, set the first child to the next sibling
-			if (entity == parentRelationship.first)
+			if (entity != parentRelationship.first && entity != parentRelationship.last)
 			{
-				RelationshipComponent& siblingRelationship = get<RelationshipComponent>(relationship.next);
-				siblingRelationship.prev = NULL_ENTITY;
+				// middle child: mend the gap
+				RelationshipComponent& prevSiblingRelationship = get<RelationshipComponent>(relationship.prev);
+				RelationshipComponent& nextSiblingRelationship = get<RelationshipComponent>(relationship.next);
 
-				parentRelationship.first = relationship.next;
+				prevSiblingRelationship.next = relationship.next;
+				nextSiblingRelationship.prev = relationship.prev;
 			}
-
-			// if this is the last child, set the last child to the prev sibling
-			if (entity == parentRelationship.last)
+			else
 			{
-				RelationshipComponent& siblingRelationship = get<RelationshipComponent>(relationship.prev);
-				siblingRelationship.prev = NULL_ENTITY;
+				// if this is the first child, set the first child to the next sibling
+				if (entity == parentRelationship.first)
+				{
+					RelationshipComponent& siblingRelationship = get<RelationshipComponent>(relationship.next);
+					siblingRelationship.prev = NULL_ENTITY;
 
-				parentRelationship.last = relationship.prev;
+					parentRelationship.first = relationship.next;
+				}
+
+				// if this is the last child, set the last child to the prev sibling
+				if (entity == parentRelationship.last)
+				{
+					RelationshipComponent& siblingRelationship = get<RelationshipComponent>(relationship.prev);
+					siblingRelationship.prev = NULL_ENTITY;
+
+					parentRelationship.last = relationship.prev;
+				}
 			}
 		}
 
