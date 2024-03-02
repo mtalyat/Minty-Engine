@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "M_RenderEngine.h"
 
-#include "M_RenderEngineBuilder.h"
+#include "M_AssetEngine.h"
 #include "M_DrawCallObjectInfo.h"
 #include "M_SpritePushData.h"
 
@@ -25,6 +25,7 @@
 #include "M_EnabledComponent.h"
 
 #include "M_Asset.h"
+#include "M_Mesh.h"
 #include "M_Parse.h"
 #include "M_Text.h"
 
@@ -87,15 +88,15 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
 RenderEngine::RenderEngine(Runtime& runtime)
 	: Engine(runtime)
 	, _window()
-	, _boundIds()
+	, _bound()
 	, _view()
 	, _backgroundColor({ 250, 220, 192, 255 }) // light tan color
 	, _initialized()
 	, _frame(0)
 {
-	for (size_t i = 0; i < _boundIds.size(); i++)
+	for (size_t i = 0; i < _bound.size(); i++)
 	{
-		_boundIds[i] = ERROR_ID;
+		_bound[i] = nullptr;
 	}
 }
 
@@ -395,6 +396,38 @@ uint32_t minty::RenderEngine::get_frame() const
 float minty::RenderEngine::get_aspect_ratio() const
 {
 	return static_cast<float>(_swapChainExtent.width) / static_cast<float>(_swapChainExtent.height);
+}
+
+UUID minty::RenderEngine::get_or_create_mesh(MeshType const type)
+{
+	switch (type)
+	{
+	case MeshType::Empty:
+	case MeshType::Custom:
+		return UUID(INVALID_UUID);
+	}
+
+	auto found = _builtinMeshes.find(type);
+
+	if (found != _builtinMeshes.end())
+	{
+		// already exists
+		return found->second;
+	}
+
+	// create new
+	MeshBuilder builder
+	{};
+	Mesh* mesh = new Mesh(builder, get_runtime());
+
+	// add to assets
+	AssetEngine& assets = get_runtime().get_asset_engine();
+	assets.emplace(mesh);
+
+	// add to built in
+	_builtinMeshes.emplace(type, mesh->get_id());
+
+	return mesh->get_id();
 }
 
 VkImageView RenderEngine::create_image_view(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags) {
@@ -983,19 +1016,18 @@ void minty::RenderEngine::draw_scene(VkCommandBuffer commandBuffer)
 	}
 
 	// unbind any shaders used
-	bind(commandBuffer, ERROR_ID);
-	//bind_shader(commandBuffer, nullptr);
+	bind(commandBuffer, nullptr);
 }
 
 void minty::RenderEngine::draw_mesh(VkCommandBuffer commandBuffer, Matrix4 const& transformationMatrix, MeshComponent const& meshComponent)
 {
 	// do nothing if null mesh
-	if (meshComponent.meshId == ERROR_ID)
+	if (!meshComponent.mesh)
 	{
 		return;
 	}
 
-	Mesh& mesh = _renderSystem->get_mesh(meshComponent.meshId);
+	Mesh& mesh = *meshComponent.mesh;
 
 	// do nothing if empty mesh
 	if (mesh.empty())
@@ -1005,13 +1037,13 @@ void minty::RenderEngine::draw_mesh(VkCommandBuffer commandBuffer, Matrix4 const
 
 	// bind the material, which will bind the shader and update its values
 	//bind_shader(commandBuffer, &shader);
-	bind(commandBuffer, meshComponent.materialId);
+	bind(commandBuffer, meshComponent.material);
 
 	// bind vertex data
-	VkBuffer vertexBuffers[] = { get_buffer(mesh.get_vertex_buffer_id()) };
+	VkBuffer vertexBuffers[] = { mesh.get_vertex_buffer()->buffer };
 	VkDeviceSize offsets[] = { 0 };
 	vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
-	vkCmdBindIndexBuffer(commandBuffer, get_buffer(mesh.get_index_buffer_id()), 0, mesh.get_index_type());
+	vkCmdBindIndexBuffer(commandBuffer, mesh.get_index_buffer()->buffer, 0, mesh.get_index_type());
 
 	// send push constants so we know where to draw
 	Matrix4 tmatrix = transformationMatrix;
@@ -1019,8 +1051,9 @@ void minty::RenderEngine::draw_mesh(VkCommandBuffer commandBuffer, Matrix4 const
 	{
 		.transform = tmatrix,
 	};
-	Shader& shader = _renderSystem->get_shader_from_material_id(meshComponent.materialId);
-	shader.update_push_constant(commandBuffer, &info, sizeof(DrawCallObject3D));
+	// TODO: make safer
+	Shader* shader = meshComponent.material->get_template()->get_shader_passes().front()->get_shader();
+	shader->update_push_constant(commandBuffer, &info, sizeof(DrawCallObject3D));
 
 	// draw
 	vkCmdDrawIndexed(commandBuffer, mesh.get_index_count(), 1, 0, 0, 0);
@@ -1029,16 +1062,16 @@ void minty::RenderEngine::draw_mesh(VkCommandBuffer commandBuffer, Matrix4 const
 void minty::RenderEngine::draw_sprite(VkCommandBuffer commandBuffer, TransformComponent const& transformComponent, SpriteComponent const& spriteComponent)
 {
 	// if no sprite, skip and draw nothing
-	if(spriteComponent.spriteId == ERROR_ID)
+	if(!spriteComponent.sprite)
 	{
 		return;
 	}
 
 	// get the sprite
-	Sprite const& sprite = _renderSystem->get_sprite(spriteComponent.spriteId);
+	Sprite const& sprite = *spriteComponent.sprite;
 
 	// bind the material the sprite is using
-	bind(commandBuffer, sprite.get_material_id());
+	bind(commandBuffer, sprite.get_material());
 
 	// get the data
 	SpritePushData pushData
@@ -1051,8 +1084,9 @@ void minty::RenderEngine::draw_sprite(VkCommandBuffer commandBuffer, TransformCo
 	};
 
 	// push data to shader
-	Shader& shader = _renderSystem->get_shader_from_material_id(sprite.get_material_id());
-	shader.update_push_constant(commandBuffer, &pushData, sizeof(SpritePushData));
+	// TODO: fix, make this safe
+	Shader* shader = sprite.get_material()->get_template()->get_shader_passes().front()->get_shader();
+	shader->update_push_constant(commandBuffer, &pushData, sizeof(SpritePushData));
 
 	// draw
 	vkCmdDraw(commandBuffer, 6, 1, 0, 0);
@@ -1060,7 +1094,7 @@ void minty::RenderEngine::draw_sprite(VkCommandBuffer commandBuffer, TransformCo
 
 void minty::RenderEngine::draw_ui(VkCommandBuffer commandBuffer, UITransformComponent const& uiComponent, SpriteComponent const& spriteComponent)
 {
-	Console::todo("fix draw_ui");
+	Console::todo("fix RenderEngine::draw_ui");
 	//// get the sprite
 	//Sprite const& sprite = get_sprite(spriteComponent.spriteId);
 
@@ -1312,7 +1346,7 @@ void RenderEngine::create_framebuffers()
 	}
 }
 
-ID minty::RenderEngine::create_buffer(VkDeviceSize const size, VkBufferUsageFlags const usage, VkMemoryPropertyFlags const properties)
+Buffer const& minty::RenderEngine::create_buffer(VkDeviceSize const size, VkBufferUsageFlags const usage, VkMemoryPropertyFlags const properties)
 {
 	VkBuffer buffer;
 	VkDeviceMemory bufferMemory;
@@ -1337,32 +1371,25 @@ ID minty::RenderEngine::create_buffer(VkDeviceSize const size, VkBufferUsageFlag
 
 	VK_ASSERT(vkBindBufferMemory(_device, buffer, bufferMemory, 0), "Failed to bind buffer memory.");
 
-	return _buffers.emplace(Buffer(buffer, bufferMemory, size));
+	AssetEngine& assets = get_runtime().get_asset_engine();
+	BufferBuilder builder
+	{
+		.buffer = buffer,
+		.memory = bufferMemory,
+		.size = size
+	};
+	Buffer* b = new Buffer(builder, get_runtime());
+	assets.emplace(b);
+	return *b;
 }
 
-ID minty::RenderEngine::create_buffer_uniform(VkDeviceSize const size)
+Buffer const& minty::RenderEngine::create_buffer_uniform(VkDeviceSize const size)
 {
 	return create_buffer(size, VkBufferUsageFlagBits::VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 }
 
-void minty::RenderEngine::destroy_buffer(ID const id)
+void* minty::RenderEngine::map_buffer(Buffer const& buffer) const
 {
-	if (!_buffers.contains(id))
-	{
-		return;
-	}
-
-	// destroy the buffer with the id
-	destroy_buffer(_buffers.at(id));
-
-	// remove it from the list
-	_buffers.erase(id);
-}
-
-void* minty::RenderEngine::map_buffer(ID const id) const
-{
-	Buffer const& buffer = _buffers.at(id);
-
 	void* data = nullptr;
 
 	VK_ASSERT(vkMapMemory(_device, buffer.memory, 0, buffer.size, 0, &data), "Failed to map memory for new buffer.");
@@ -1370,27 +1397,21 @@ void* minty::RenderEngine::map_buffer(ID const id) const
 	return data;
 }
 
-void minty::RenderEngine::unmap_buffer(ID const id) const
+void minty::RenderEngine::unmap_buffer(Buffer const& buffer) const
 {
-	Buffer const& buffer = _buffers.at(id);
-
 	vkUnmapMemory(_device, buffer.memory);
 }
 
-void minty::RenderEngine::set_buffer(ID const id, void const* const data)
+void minty::RenderEngine::set_buffer(Buffer const& buffer, void const* const data)
 {
-	Buffer const& buffer = _buffers.at(id);
-
 	// set whole buffer
-	set_buffer(id, data, 0, buffer.size);
+	set_buffer(buffer, data, 0, buffer.size);
 }
 
-void minty::RenderEngine::set_buffer(ID const id, void const* const data, VkDeviceSize const size, VkDeviceSize const offset)
+void minty::RenderEngine::set_buffer(Buffer const& buffer, void const* const data, VkDeviceSize const size, VkDeviceSize const offset)
 {
-	Buffer const& buffer = _buffers.at(id);
-
 	// map data
-	void* mappedData = map_buffer(id);
+	void* mappedData = map_buffer(buffer);
 
 	// offset if needed
 	if (offset)
@@ -1406,44 +1427,28 @@ void minty::RenderEngine::set_buffer(ID const id, void const* const data, VkDevi
 	memcpy(mappedData, data, size);
 
 	// unmap data
-	unmap_buffer(id);
+	unmap_buffer(buffer);
 }
 
-VkBuffer minty::RenderEngine::get_buffer(ID const id) const
+void minty::RenderEngine::get_buffer_data(Buffer const& buffer, void* const out) const
 {
-	return _buffers.at(id).buffer;
-}
-
-void minty::RenderEngine::get_buffer_data(ID const id, void* const out) const
-{
-	// get buffer
-	Buffer const& buffer = _buffers.at(id);
-
 	// map data
-	void* data = map_buffer(id);
+	void* data = map_buffer(buffer);
 
 	// copy out data
 	memcpy(out, data, buffer.size);
 
 	// unmap
-	unmap_buffer(id);
+	unmap_buffer(buffer);
 }
 
-VkDeviceSize minty::RenderEngine::get_buffer_size(ID const id) const
+void minty::RenderEngine::copy_buffer(Buffer const& src, Buffer const& dst, VkDeviceSize const size)
 {
-	return _buffers.at(id).size;
-}
-
-void minty::RenderEngine::copy_buffer(ID const srcId, ID const dstId, VkDeviceSize const size)
-{
-	Buffer const& srcBuffer = _buffers.at(srcId);
-	Buffer const& dstBuffer = _buffers.at(dstId);
-
 	VkCommandBuffer commandBuffer = begin_single_time_commands(_commandPool);
 
 	VkBufferCopy copyRegion{};
 	copyRegion.size = size;
-	vkCmdCopyBuffer(commandBuffer, srcBuffer.buffer, dstBuffer.buffer, 1, &copyRegion);
+	vkCmdCopyBuffer(commandBuffer, src.buffer, dst.buffer, 1, &copyRegion);
 
 	end_single_time_commands(commandBuffer, _commandPool);
 }
@@ -1452,6 +1457,9 @@ void minty::RenderEngine::destroy_buffer(Buffer const& buffer)
 {
 	vkDestroyBuffer(_device, buffer.buffer, nullptr);
 	vkFreeMemory(_device, buffer.memory, nullptr);
+
+	AssetEngine& assets = get_runtime().get_asset_engine();
+	assets.unload(buffer);
 }
 
 uint32_t RenderEngine::find_memory_type(uint32_t typeFilter, VkMemoryPropertyFlags properties)
@@ -1624,12 +1632,6 @@ void RenderEngine::destroy()
 	// clean up vulkan
 	cleanup_swap_chain();
 
-	for (auto& buffer : _buffers)
-	{
-		destroy_buffer(buffer.second);
-	}
-	_buffers.clear();
-
 	// destroy renderer data
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
 		vkDestroySemaphore(_device, _renderFinishedSemaphores[i], nullptr);
@@ -1651,15 +1653,15 @@ void RenderEngine::destroy()
 void minty::RenderEngine::bind(VkCommandBuffer const commandBuffer)
 {
 	// bind using the bound ids
-	if (_boundIds.at(0) == ERROR_ID)
+	if (!_bound.at(0))
 	{
 		return;
 	}
 
 	// get references to grab descriptor sets from
-	Shader const& shader = _renderSystem->get_shader(_boundIds.at(BIND_SHADER));
-	ShaderPass const& shaderPass = _renderSystem->get_shader_pass(_boundIds.at(BIND_SHADER_PASS));
-	Material const& material = _renderSystem->get_material(_boundIds.at(BIND_MATERIAL));
+	Shader const& shader = *static_cast<Shader const*>(_bound.at(BIND_SHADER));
+	ShaderPass const& shaderPass = *static_cast<ShaderPass const*>(_bound.at(BIND_SHADER_PASS));
+	Material const& material = *static_cast<Material const*>(_bound.at(BIND_MATERIAL));
 
 	// set descriptor sets we actually care about
 	std::array<VkDescriptorSet, DESCRIPTOR_SET_COUNT> descriptorSets;
@@ -1672,54 +1674,52 @@ void minty::RenderEngine::bind(VkCommandBuffer const commandBuffer)
 	vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, shader.get_pipeline_layout(), 0, DESCRIPTOR_SET_COUNT, descriptorSets.data(), 0, nullptr);
 }
 
-void minty::RenderEngine::bind(VkCommandBuffer const commandBuffer, ID const materialId, uint32_t const pass)
+void minty::RenderEngine::bind(VkCommandBuffer const commandBuffer, Material const* const material, uint32_t const pass)
 {
 	// if ERROR_ID material, unbind all
-	if (materialId == ERROR_ID)
+	if (!material)
 	{
-		for (size_t i = 0; i < _boundIds.size(); i++)
+		for (size_t i = 0; i < _bound.size(); i++)
 		{
-			_boundIds[i] = ERROR_ID;
+			_bound[i] = nullptr;
 		}
 		return;
 	}
 
 	// if the same, do nothing
-	if (_boundIds.at(BIND_MATERIAL) == materialId)
+	if (_bound.at(BIND_MATERIAL) == material)
 	{
 		return;
 	}
 
 	// new material, so update bound ids and bind descriptor sets as needed
 
-	_boundIds[BIND_MATERIAL] = materialId;
+	_bound[BIND_MATERIAL] = material;
 
-	Material const& material = _renderSystem->get_material(materialId);
-	ID const materialTemplateId = material.get_template_id();
+	MaterialTemplate const* materialTemplate = material->get_template();
 
-	if (_boundIds.at(BIND_MATERIAL_TEMPLATE) == materialTemplateId)
+	if (_bound.at(BIND_MATERIAL_TEMPLATE) == materialTemplate)
 	{
 		// only update material
 		bind(commandBuffer);
 		return;
 	}
 
-	_boundIds[BIND_MATERIAL_TEMPLATE] = materialTemplateId;
-	MaterialTemplate const& materialTemplate = _renderSystem->get_material_template(materialTemplateId);
-	ID const shaderPassId = materialTemplate.get_shader_pass_ids().front();
+	_bound[BIND_MATERIAL_TEMPLATE] = materialTemplate;
+	// TODO: do all passes?
+	ShaderPass const* shaderPass = materialTemplate->get_shader_passes().front();
 
-	if (_boundIds.at(BIND_SHADER_PASS) == shaderPassId)
+	if (_bound.at(BIND_SHADER_PASS) == shaderPass)
 	{
 		// only update material and material template
 		bind(commandBuffer);
 		return;
 	}
 
-	_boundIds[BIND_SHADER_PASS] = shaderPassId;
-	ShaderPass const& shaderPass = _renderSystem->get_shader_pass(shaderPassId);
-	ID const shaderId = shaderPass.get_shader_id();
+	_bound[BIND_SHADER_PASS] = shaderPass;
+	Shader const* shader = shaderPass->get_shader();
 
-	if (_boundIds.at(BIND_SHADER) == shaderId)
+	if (_bound.at(BIND_SHADER) == shader)
 	{
 		// only update material, material template, and shader pass
 		bind(commandBuffer);
@@ -1727,7 +1727,7 @@ void minty::RenderEngine::bind(VkCommandBuffer const commandBuffer, ID const mat
 	}
 
 	// update everything
-	_boundIds[BIND_SHADER] = shaderId;
+	_bound[BIND_SHADER] = shader;
 	bind(commandBuffer);
 }
 

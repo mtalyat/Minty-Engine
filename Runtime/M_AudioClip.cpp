@@ -8,8 +8,13 @@
 
 minty::AudioClip::AudioClip()
 	: _clip()
-{
+{}
 
+minty::AudioClip::AudioClip(AudioClipBuilder const& builder, Runtime& runtime)
+	: Asset(builder.id, builder.path, runtime)
+	, _clip()
+{
+	load(builder.path);
 }
 
 void minty::AudioClip::load(Path const& path)
@@ -19,18 +24,9 @@ void minty::AudioClip::load(Path const& path)
 
 	if (result != SoLoud::SOLOUD_ERRORS::SO_NO_ERROR)
 	{
-		Console::error(std::format("Failed to load_animation AudioClip at path \"{}\". Error code {}.", Asset::absolute(path).string(), result));
+		MINTY_ERROR_FORMAT("Failed to load_animation AudioClip at path \"{}\". Error code {}.", Asset::absolute(path).string(), result);
 		return;
 	}
-
-	// load meta
-	Node meta = Asset::load_meta(path);
-	Reader reader(meta);
-
-	set_volume(reader.read_float("volume", 1.0f));
-	set_looping(reader.read_bool("looping", false));
-	set_loop_point(reader.read_float("loopPoint", 0.0f));
-	set_single_instance(reader.read_bool("singleInstance", false));
 }
 
 void minty::AudioClip::set_volume(float const value)

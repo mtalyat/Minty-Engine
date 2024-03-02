@@ -73,15 +73,18 @@
     <Filter Include="Header Files\Scripting">
       <UniqueIdentifier>{fe27c581-a0ec-4826-aa16-1b104d6661c6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Asset">
+      <UniqueIdentifier>{db48e676-d133-4b66-a198-a2ef1298c3f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Runtime">
+      <UniqueIdentifier>{cf883742-6da1-4840-b0ef-0dadd43d1df1}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="pch.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="M_Runtime.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Minty.h">
@@ -360,9 +363,6 @@
     <ClInclude Include="M_DirtyComponent.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
-    <ClInclude Include="M_Asset.h">
-      <Filter>Header Files\Files</Filter>
-    </ClInclude>
     <ClInclude Include="M_Builtin.h">
       <Filter>Header Files\Builtin</Filter>
     </ClInclude>
@@ -402,13 +402,7 @@
     <ClInclude Include="M_AnimationSystem.h">
       <Filter>Header Files\Animation</Filter>
     </ClInclude>
-    <ClInclude Include="M_AnimationBuilder.h">
-      <Filter>Header Files\Animation</Filter>
-    </ClInclude>
     <ClInclude Include="M_Animator.h">
-      <Filter>Header Files\Animation</Filter>
-    </ClInclude>
-    <ClInclude Include="M_AnimatorBuilder.h">
       <Filter>Header Files\Animation</Filter>
     </ClInclude>
     <ClInclude Include="M_RenderSystem.h">
@@ -432,9 +426,6 @@
     <ClInclude Include="M_SpriteComponent.h">
       <Filter>Header Files\Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="M_SceneObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="M_AudioObject.h">
       <Filter>Header Files\Audio</Filter>
     </ClInclude>
@@ -447,34 +438,10 @@
     <ClInclude Include="M_Entity.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
-    <ClInclude Include="M_MaterialTemplateBuilder.h">
-      <Filter>Header Files\Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="M_MaterialBuilder.h">
-      <Filter>Header Files\Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="M_ShaderPassBuilder.h">
-      <Filter>Header Files\Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="M_ShaderBuilder.h">
-      <Filter>Header Files\Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="M_RenderEngineBuilder.h">
-      <Filter>Header Files\Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="M_PushConstantInfo.h">
       <Filter>Header Files\Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="M_SpriteBuilder.h">
-      <Filter>Header Files\Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="M_SpritePushData.h">
-      <Filter>Header Files\Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="M_TextureAtlasBuilder.h">
-      <Filter>Header Files\Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="M_TextureBuilder.h">
       <Filter>Header Files\Rendering</Filter>
     </ClInclude>
     <ClInclude Include="M_UniformConstantInfo.h">
@@ -514,9 +481,6 @@
       <Filter>Libraries\imgui</Filter>
     </ClInclude>
     <ClInclude Include="M_Engine.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="M_RuntimeBuilder.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="M_GLM.hpp">
@@ -584,6 +548,21 @@
     </ClInclude>
     <ClInclude Include="M_EnTT.h">
       <Filter>Header Files\Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Asset.h">
+      <Filter>Header Files\Asset</Filter>
+    </ClInclude>
+    <ClInclude Include="M_AssetEngine.h">
+      <Filter>Header Files\Asset</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Runtime.h">
+      <Filter>Header Files\Runtime</Filter>
+    </ClInclude>
+    <ClInclude Include="M_RuntimeObject.h">
+      <Filter>Header Files\Runtime</Filter>
+    </ClInclude>
+    <ClInclude Include="M_SceneObject.h">
+      <Filter>Header Files\Scenes</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -881,7 +860,7 @@
     <ClCompile Include="M_AnimatorComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="M_SceneObject.cpp">
+    <ClCompile Include="M_RuntimeObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_AudioObject.cpp">
@@ -900,9 +879,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_PushConstantInfo.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="M_ShaderBuilder.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_Time.cpp">
@@ -972,6 +948,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_TagComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_AssetEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_SceneObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

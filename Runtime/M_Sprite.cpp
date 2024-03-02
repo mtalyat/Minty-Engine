@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "M_Sprite.h"
 
-#include "M_SpriteBuilder.h"
 #include "M_RenderEngine.h"
 #include "M_RenderSystem.h"
 #include "M_Texture.h"
@@ -11,24 +10,24 @@ using namespace minty;
 using namespace minty;
 
 minty::Sprite::Sprite()
-	: RenderObject::RenderObject()
-	, _textureId(ERROR_ID)
-	, _materialId(ERROR_ID)
+	: Asset()
+	, _texture(nullptr)
+	, _material(nullptr)
 	, _minCoords()
 	, _maxCoords()
 	, _pivot()
 {}
 
-minty::Sprite::Sprite(SpriteBuilder const& builder, Runtime& engine, ID const sceneId)
-	: RenderObject::RenderObject(engine, sceneId)
-	, _textureId(builder.textureId)
-	, _materialId(builder.materialId)
+minty::Sprite::Sprite(SpriteBuilder const& builder, Runtime& engine)
+	: Asset(builder.id, builder.path, engine)
+	, _texture(builder.texture)
+	, _material(builder.material)
 	, _minCoords()
 	, _maxCoords()
 	, _pivot()
 {
-	MINTY_ASSERT(builder.textureId != ERROR_ID);
-	MINTY_ASSERT(builder.materialId != ERROR_ID);
+	MINTY_ASSERT(builder.texture != nullptr);
+	MINTY_ASSERT(builder.material != nullptr);
 
 	// set values based on coordinate mode
 	// all values should be normalized inside of Sprite
@@ -40,9 +39,14 @@ minty::Sprite::Sprite(SpriteBuilder const& builder, Runtime& engine, ID const sc
 void minty::Sprite::destroy()
 {}
 
-ID minty::Sprite::get_material_id() const
+Texture* minty::Sprite::get_texture() const
 {
-	return _materialId;
+	return _texture;
+}
+
+Material* minty::Sprite::get_material() const
+{
+	return _material;
 }
 
 Vector2 minty::Sprite::get_min_coords() const
@@ -107,7 +111,5 @@ void minty::Sprite::set_pivot(Vector2 const pivot, CoordinateMode const coordina
 
 Vector2 minty::Sprite::normalize_coords(Vector2 const coords) const
 {
-	Texture const& tex = get_render_system()->get_texture(_textureId);
-
-	return Vector2(coords.x / static_cast<float>(tex.get_width()), coords.y / static_cast<float>(tex.get_height()));
+	return Vector2(coords.x / static_cast<float>(_texture->get_width()), coords.y / static_cast<float>(_texture->get_height()));
 }

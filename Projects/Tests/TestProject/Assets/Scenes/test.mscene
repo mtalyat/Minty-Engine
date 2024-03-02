@@ -1,3 +1,4 @@
+: ca92a9b8e0eda87b
 systems
     Render
         textures
@@ -49,7 +50,7 @@ systems
             - Animations/animator2.manimator
     Script
 entities
-    Camera
+    Camera: 389d6462e322993a
         Enabled
         Transform
             position: (0, 0, -4)
@@ -63,18 +64,18 @@ entities
         PlayerController
             moveSpeed: 1
         Link
-    Model Center: 2400DE2C92F041ED
+    Model Center: 2400de2c92f041ed
         Enabled
         Renderable
         Transform
             position: (0, 0, 0)
         Mesh
-            material: material1
+            material: decef49af1cbe3d9
             type: cube
         AudioSource
             clip: cow-bells
-        Animator
-            animator: animator2
+#        Animator
+#            animator: f4519e0c29f56efd
         TestScript
             time: 5
         Relationship
@@ -84,37 +85,37 @@ entities
         Transform
             position: (0, 0, -2)
         Mesh
-            material: material1
+            material: decef49af1cbe3d9
             type: cube
         Relationship
-            parent: 2400DE2C92F041ED
+            parent: 2400de2c92f041ed
     Model Positive Z
         Enabled
         Renderable
         Transform
             position: (0, 0, 2)
         Mesh
-            material: material1
+            material: decef49af1cbe3d9
             type: cube
         Relationship
-            parent: 2400DE2C92F041ED
+            parent: 2400de2c92f041ed
     Model Negative X
         Enabled
         Renderable
         Transform
             position: (-2, 0, 0)
         Mesh
-            material: material1
+            material: decef49af1cbe3d9
             type: cube
         Relationship
-            parent: 2400DE2C92F041ED
+            parent: 2400de2c92f041ed
     Model Positive X
         Enabled
         Renderable
         Transform
             position: (2, 0, 0)
         Mesh
-            material: material1
+            material: decef49af1cbe3d9
             type: cube
         Relationship
-            parent: 2400DE2C92F041ED
+            parent: 2400de2c92f041ed

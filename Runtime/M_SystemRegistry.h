@@ -19,7 +19,7 @@ namespace minty
 	{
 		friend class Scene;
 	public:
-		typedef std::function<System* (Runtime&, ID const)> SystemFunc;
+		typedef std::function<System* (Runtime&, Scene& scene)> SystemFunc;
 
 	private:
 		// the systems to manage
@@ -32,7 +32,7 @@ namespace minty
 		/// <summary>
 		/// Creates an empty SystemRegistry.
 		/// </summary>
-		SystemRegistry(Runtime& engine, ID const sceneId);
+		SystemRegistry(Runtime& engine, Scene& scene);
 
 		~SystemRegistry();
 
@@ -144,7 +144,7 @@ namespace minty
 	template<class T>
 	T* SystemRegistry::emplace(String const& name, int const priority)
 	{
-		return static_cast<T*>(this->emplace(name, new T(get_runtime(), get_scene_id()), priority));
+		return static_cast<T*>(this->emplace(name, new T(get_runtime()), priority));
 	}
 
 	template<class T>
@@ -182,7 +182,7 @@ namespace minty
 			return;
 		}
 
-		_systemTypes.emplace(name, [](Runtime& engine, ID const sceneId) { return new T(engine, sceneId); });
+		_systemTypes.emplace(name, [](Runtime& engine, Scene& scene) { return new T(engine, scene); });
 
 		Console::info(std::format("Registered system {}.", name));
 	}

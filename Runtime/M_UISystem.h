@@ -16,18 +16,7 @@ namespace minty
         : public System
     {
     private:
-        std::unordered_set<Entity> _hoverEntities;
-
-        InputMap::MoveEvent_t::func _onMouseMove;
-        InputMap::ClickEvent_t::func _onMouseClick;
-
     public:
-        UISystem(Runtime& engine, ID const sceneId);
-
-        void load() override;
-
-        void update() override;
-
-        void unload() override;
+        UISystem(Runtime& engine, Scene& scene);
     };
 }

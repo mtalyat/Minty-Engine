@@ -5,6 +5,8 @@
 
 namespace minty
 {
+	class AudioClip;
+
 	/// <summary>
 	/// Holds data for an Entity that can emit audio within the Scene.
 	/// </summary>
@@ -12,9 +14,9 @@ namespace minty
 		: public Component
 	{
 		/// <summary>
-		/// The ID of the clip to be played.
+		/// The clip to be played.
 		/// </summary>
-		ID clipId = ERROR_ID;
+		AudioClip* clip;
 
 		/// <summary>
 		/// The handle to the sound being played, if any.

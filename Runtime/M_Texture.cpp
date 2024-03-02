@@ -1,8 +1,8 @@
 #include "pch.h"
 #include "M_Texture.h"
 
+#include "M_Runtime.h"
 #include "M_RenderEngine.h"
-#include "M_TextureBuilder.h"
 #include "M_Asset.h"
 #include "M_File.h"
 #include "M_Console.h"
@@ -15,7 +15,7 @@ using namespace minty;
 using namespace minty;
 
 minty::Texture::Texture()
-	: RenderObject::RenderObject()
+	: Asset()
 	, _width()
 	, _height()
 	, _format()
@@ -25,8 +25,8 @@ minty::Texture::Texture()
 	, _sampler()
 {}
 
-Texture::Texture(TextureBuilder const& builder, Runtime& engine, ID const sceneId)
-	: RenderObject::RenderObject(engine, sceneId)
+Texture::Texture(TextureBuilder const& builder, Runtime& engine)
+	: Asset(builder.id, builder.path, engine)
 	, _width(builder.width)
 	, _height(builder.height)
 	, _format()
@@ -95,21 +95,21 @@ Texture::Texture(TextureBuilder const& builder, Runtime& engine, ID const sceneI
 	// get size needed to store the texture
 	VkDeviceSize imageSize = _width * _height * sizeof(Color::color_t);
 
-	RenderEngine& renderEngine = get_render_engine();
+	RenderEngine& renderEngine = get_runtime().get_render_engine();
 
 	// copy to device via a staging buffer
 
 	// create a buffer that can be used as the source of a transfer command
 	// the memory can be mapped, and specify that flush is not needed (we do not need to flush to make writes)
-	ID stagingBufferId = renderEngine.create_buffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+	Buffer const& stagingBuffer = renderEngine.create_buffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
 	VkDevice device = renderEngine.get_device();
 
 	// map memory and copy it to buffer memory
 
-	void* mappedData = renderEngine.map_buffer(stagingBufferId);
+	void* mappedData = renderEngine.map_buffer(stagingBuffer);
 	memcpy(mappedData, pixels, static_cast<size_t>(imageSize));
-	renderEngine.unmap_buffer(stagingBufferId);
+	renderEngine.unmap_buffer(stagingBuffer);
 
 	// done with the pixels from file
 	if (fromFilePathSize)
@@ -131,13 +131,13 @@ Texture::Texture(TextureBuilder const& builder, Runtime& engine, ID const sceneI
 	renderEngine.change_image_layout(_image, _format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
 	// copy pixel data to image
-	renderEngine.copy_buffer_to_image(renderEngine.get_buffer(stagingBufferId), _image, _width, _height);
+	renderEngine.copy_buffer_to_image(stagingBuffer.buffer, _image, _width, _height);
 
 	// prep texture for rendering
 	renderEngine.change_image_layout(_image, _format, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
 
 	// cleanup staging buffer, no longer needed
-	renderEngine.destroy_buffer(stagingBufferId);
+	renderEngine.destroy_buffer(stagingBuffer);
 
 	// create view, so the shaders can access the image data
 	_view = renderEngine.create_image_view(_image, _format, VK_IMAGE_ASPECT_COLOR_BIT);
@@ -182,7 +182,7 @@ Texture::Texture(TextureBuilder const& builder, Runtime& engine, ID const sceneI
 
 void minty::Texture::destroy()
 {
-	RenderEngine& renderer = get_render_engine();
+	RenderEngine& renderer = get_runtime().get_render_engine();
 
 	auto device = renderer.get_device();
 

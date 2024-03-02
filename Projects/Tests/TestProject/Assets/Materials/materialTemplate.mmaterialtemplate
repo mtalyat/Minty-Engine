@@ -1,4 +1,5 @@
-pass: shaderPass
+: a8574ae8aaa5edba
+pass: efa3aa1212115a84
 defaults
     material
         e 16
@@ -7,7 +8,7 @@ defaults
         f 1
         f 1
     textures
-        0: oak_planks
-        1: pattern
-        2: texture
-        3: pumpkin_tex
+        0: 8eb290cab116b7b3
+        1: f092fa6f48506986
+        2: 5182c9f35c98699
+        3: c14390517c9ed69d

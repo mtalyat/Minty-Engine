@@ -15,6 +15,7 @@ namespace minty
 {
 	class Node;
 	class Object;
+	class Asset;
 	class ISerializable;
 
 	/// <summary>

@@ -1,6 +1,5 @@
 #pragma once
 
-#include "M_RuntimeBuilder.h"
 #include "M_Window.h"
 #include "M_Info.h"
 #include "M_Time.h"
@@ -16,10 +15,26 @@ namespace minty
 {
 	class Engine;
 	class SceneManager;
+	class Assembly;
+
+	class Window;
+	class AssetEngine;
 	class RenderEngine;
 	class AudioEngine;
 	class ScriptEngine;
-	class Assembly;
+
+	struct RuntimeBuilder
+	{
+		Window* const window = nullptr;
+
+		AssetEngine* assetEngine = nullptr;
+
+		RenderEngine* renderEngine = nullptr;
+
+		AudioEngine* audioEngine = nullptr;
+
+		ScriptEngine* scriptEngine = nullptr;
+	};
 
 	/// <summary>
 	/// Handles the core part of the engine, which includes running a game.
@@ -66,9 +81,10 @@ namespace minty
 		};
 
 	private:
-		constexpr static size_t RENDER_ENGINE_INDEX = 0;
-		constexpr static size_t AUDIO_ENGINE_INDEX = 1;
-		constexpr static size_t SCRIPT_ENGINE_INDEX = 2;
+		constexpr static size_t ASSET_ENGINE_INDEX = 0;
+		constexpr static size_t RENDER_ENGINE_INDEX = 1;
+		constexpr static size_t AUDIO_ENGINE_INDEX = 2;
+		constexpr static size_t SCRIPT_ENGINE_INDEX = 3;
 
 	private:
 		Mode _mode;
@@ -134,6 +150,12 @@ namespace minty
 		/// <param name="engine"></param>
 		template<typename T>
 		void set_engine(T* const engine);
+
+		/// <summary>
+		/// Gets the AssetEngine for this Engine.
+		/// </summary>
+		/// <returns></returns>
+		AssetEngine& get_asset_engine() const;
 
 		/// <summary>
 		/// Gets the RenderEngine for this Engine.

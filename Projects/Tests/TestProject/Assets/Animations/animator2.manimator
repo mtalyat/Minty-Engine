@@ -1,3 +1,4 @@
+: 880168b0aafeb268
 name: animator2
 fsm
     start: idle
@@ -6,7 +7,7 @@ fsm
         flicker: 0
     states
         idle
-            value: i 0
+            value: ID 923eed2b7407acf1
             transitions
                 -
                     state: slide
@@ -17,7 +18,7 @@ fsm
                     conditions
                         - flicker != 0
         slide
-            value: i 3
+            value: ID cc8391965389164a
             transitions
                 -
                     state: idle
@@ -28,7 +29,7 @@ fsm
                     conditions
                         - flicker != 0
         flicker
-            value: i 2
+            value: ID b3d99ce55af7007f
             transitions
                 -
                     state: idle

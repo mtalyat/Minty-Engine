@@ -11,7 +11,7 @@ namespace minty
 	private:
 
 	public:
-		ScriptSystem(Runtime& runtime, ID const sceneId);
+		ScriptSystem(Runtime& runtime, Scene& scene);
 
 		void load() override;
 

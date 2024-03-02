@@ -43,7 +43,7 @@ namespace minty
 			/// <summary>
 			// IDs for buffers, textures, whatever is needed for this Descriptor.
 			/// </summary>
-			std::vector<ID> ids;
+			std::vector<UUID> ids;
 		};
 
 	private:
@@ -64,7 +64,7 @@ namespace minty
 		/// Creates a new DescriptorSet.
 		/// </summary>
 		/// <param name="renderer"></param>
-		DescriptorSet(Runtime& engine, ID const sceneId);
+		DescriptorSet(Runtime& engine);
 
 		/// <summary>
 		/// Creates a new DescriptorSet.
@@ -72,7 +72,7 @@ namespace minty
 		/// <param name="descriptorSets">The descriptor sets for one flight.</param>
 		/// <param name="buffers">The buffers associated with this DescriptorSet.</param>
 		/// <param name="renderer"></param>
-		DescriptorSet(std::array<VkDescriptorSet, MAX_FRAMES_IN_FLIGHT> const& descriptorSets, std::unordered_map<String, std::array<DescriptorData, MAX_FRAMES_IN_FLIGHT>> const& datas, Runtime& engine, ID const sceneId);
+		DescriptorSet(std::array<VkDescriptorSet, MAX_FRAMES_IN_FLIGHT> const& descriptorSets, std::unordered_map<String, std::array<DescriptorData, MAX_FRAMES_IN_FLIGHT>> const& datas, Runtime& engine);
 
 		// copy
 		DescriptorSet& operator=(DescriptorSet const& other);

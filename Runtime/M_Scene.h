@@ -1,21 +1,25 @@
 #pragma once
-#include "M_Object.h"
+#include "M_Asset.h"
 
 namespace minty
 {
-	class Runtime;
 	class EntityRegistry;
 	class SystemRegistry;
+
+	struct SceneBuilder
+	{
+		UUID id;
+
+		Path path;
+	};
 
 	/// <summary>
 	/// Holds a collection of systems and entities that can interact with one another.
 	/// </summary>
 	class Scene :
-		public Object
+		public Asset
 	{
 	private:
-		ID _id;
-		Runtime* _engine;
 		EntityRegistry* _entities;
 		SystemRegistry* _systems;
 		bool _loaded;
@@ -24,7 +28,7 @@ namespace minty
 		/// <summary>
 		/// Creates an empty Scene.
 		/// </summary>
-		Scene(Runtime& engine, ID const sceneId);
+		Scene(SceneBuilder const& builder, Runtime& engine);
 
 		~Scene();
 
@@ -39,8 +43,6 @@ namespace minty
 
 		//// copy
 		//Scene& operator=(Scene const& other);
-
-		Runtime& get_runtime() const;
 
 		/// <summary>
 		/// Gets the EntityRegistry used in the Scene.

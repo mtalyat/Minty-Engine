@@ -100,7 +100,7 @@ namespace minty
 
 		UUID to_uuid() const;
 
-		UUID read_uuid(String const& name) const;
+		UUID read_uuid(String const& name, UUID const defaultValue = UUID(INVALID_UUID)) const;
 
 		bool try_read_uuid(String const& name, UUID& value) const;
 

@@ -237,6 +237,7 @@ std::istream& minty::operator>>(std::istream& stream, Dynamic& object)
 		ul: unsigned long
 		e: empty bytes of size
 		S: String
+		ID: UUID
 		V2: Vector2
 		V3: Vector3
 		V4: Vector4
@@ -347,6 +348,12 @@ std::istream& minty::operator>>(std::istream& stream, Dynamic& object)
 		size_t temp;
 		stream >> temp;
 		object.set(nullptr, temp);
+	}
+	else if (type == "ID")
+	{
+		UUID temp(INVALID_UUID);
+		stream >> temp;
+		object.set(&temp);
 	}
 	else if (type == "V2")
 	{

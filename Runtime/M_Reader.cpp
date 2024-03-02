@@ -162,14 +162,14 @@ UUID minty::Reader::to_uuid() const
 	return _node->to_uuid();
 }
 
-UUID minty::Reader::read_uuid(String const& name) const
+UUID minty::Reader::read_uuid(String const& name, UUID const defaultValue) const
 {
 	if (Node const* child = _node->find(name))
 	{
 		return child->to_uuid();
 	}
 
-	return UUID();
+	return defaultValue;
 }
 
 bool minty::Reader::try_read_uuid(String const& name, UUID& value) const

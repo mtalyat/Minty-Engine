@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "M_MaterialTemplate.h"
 
-#include "M_MaterialTemplateBuilder.h"
 #include "M_Shader.h"
 
 #include "M_RenderEngine.h"
@@ -11,26 +10,26 @@ using namespace minty;
 using namespace minty;
 
 minty::MaterialTemplate::MaterialTemplate()
-	: RenderObject::RenderObject()
-	, _shaderPassIds()
+	: Asset()
+	, _shaderPasses()
 	, _defaultValues()
 {}
 
-minty::MaterialTemplate::MaterialTemplate(MaterialTemplateBuilder const& builder, Runtime& engine, ID const sceneId)
-	: RenderObject::RenderObject(engine, sceneId)
-	, _shaderPassIds(builder.shaderPassIds)
+minty::MaterialTemplate::MaterialTemplate(MaterialTemplateBuilder const& builder, Runtime& engine)
+	: Asset(builder.id, builder.path, engine)
+	, _shaderPasses(builder.shaderPasses)
 	, _defaultValues(builder.defaultValues)
 {}
 
 void minty::MaterialTemplate::destroy()
 {
-	_shaderPassIds.clear();
+	_shaderPasses.clear();
 	_defaultValues.clear();
 }
 
-std::vector<ID> const& minty::MaterialTemplate::get_shader_pass_ids() const
+std::vector<ShaderPass*> const& minty::MaterialTemplate::get_shader_passes() const
 {
-	return _shaderPassIds;
+	return _shaderPasses;
 }
 
 Dynamic minty::MaterialTemplate::get_defalt_value(String const& name) const

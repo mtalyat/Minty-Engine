@@ -9,12 +9,14 @@
 
 using namespace minty;
 
-minty::ScriptSystem::ScriptSystem(Runtime& runtime, ID const sceneId)
-	: System("Script", runtime, sceneId)
+minty::ScriptSystem::ScriptSystem(Runtime& runtime, Scene& scene)
+	: System("Script", runtime, scene)
 {}
 
 void minty::ScriptSystem::load()
 {
+	System::load();
+
 	EntityRegistry& registry = get_entity_registry();
 
 	for (auto [entity, script, onload, enabled] : registry.view<ScriptComponent const, ScriptOnLoadComponent const, EnabledComponent const>().each())
@@ -66,4 +68,6 @@ void minty::ScriptSystem::unload()
 			script.scripts.at(id).invoke(SCRIPT_METHOD_NAME_ONUNLOAD);
 		}
 	}
+
+	System::unload();
 }

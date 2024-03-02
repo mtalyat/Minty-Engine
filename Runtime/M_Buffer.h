@@ -1,22 +1,33 @@
 #pragma once
+#include "M_Asset.h"
 
-#include "M_Object.h"
 #include "M_Vulkan.h"
 
 namespace minty
 {
+	struct BufferBuilder
+	{
+		UUID id;
+		VkBuffer buffer;
+		VkDeviceMemory memory;
+		VkDeviceSize size;
+	};
+
 	/// <summary>
 	/// Holds data for a buffer on the GPU.
 	/// </summary>
-	struct Buffer
-		: public Object
+	class Buffer
+		: public Asset
 	{
+		// TODO: make private, move buffer functions to this class
+	public:
 		VkBuffer buffer;
 		VkDeviceMemory memory;
 		VkDeviceSize size;
 
+	public:
 		Buffer();
 
-		Buffer(VkBuffer const& buffer, VkDeviceMemory const& memory, VkDeviceSize const& size);
+		Buffer(BufferBuilder const& builder, Runtime& runtime);
 	};
 }

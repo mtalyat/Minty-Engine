@@ -22,27 +22,27 @@ namespace minty
 			Vector3 velocity;
 		};
 	private:
-		Register<AudioClip> _clips;
+		std::unordered_map<String, AudioClip*> _clips;
 		std::unordered_map<AudioHandle, Entity> _playing;
 
 		Entity _listener;
 		SoundData _listenerData;
 	public:
-		AudioSystem(Runtime& engine, ID const sceneId);
+		AudioSystem(Runtime& engine, Scene& scene);
 
 		void update() override;
 
 		void set_listener(Entity const entity);
 
 		/// <summary>
-		/// Plays the clip with the given ID.
+		/// Plays the clip with the given clip.
 		/// </summary>
-		/// <param name="id">The ID of the AudioClip to play.</param>
+		/// <param name="clip">The AudioClip to play.</param>
 		/// <param name="volume">The volume at which to play the AudioClip. If -1.0, the AudioClip volume is used.</param>
 		/// <param name="pan">The pan of the AudioClip. -1.0 is left, 0.0 is centered, and 1.0 is right.</param>
 		/// <param name="paused">The pause state of the AudioClip. If true, the clip starts paused.</param>
 		/// <returns>A handle to the instance of the AudioClip being played.</returns>
-		AudioHandle play(ID const id, float const volume = -1.0f, float const pan = 0.0f, bool const paused = false, unsigned int const bus = 0);
+		AudioHandle play(AudioClip& clip, float const volume = -1.0f, float const pan = 0.0f, bool const paused = false, unsigned int const bus = 0);
 
 		/// <summary>
 		/// Plays the clip with the given name.
@@ -64,14 +64,14 @@ namespace minty
 		AudioHandle play_spatial(Entity const entity, float const volume = -1.0f, bool const paused = false, unsigned int const bus = 0);
 
 		/// <summary>
-		/// Plays the AudioClip using the given ID on the Entity's AudioSource, in 3D space.
+		/// Plays the AudioClip using the given clip on the Entity's AudioSource, in 3D space.
 		/// </summary>
-		/// <param name="id">The ID of the AudioClip to play.</param>
+		/// <param name="clip">The AudioClip to play.</param>
 		/// <param name="entity">The entity to play the clip on. Must have an AudioSource component.</param>
 		/// <param name="volume">The volume at which to play the AudioClip. If -1.0, the AudioClip volume is used.</param>
 		/// <param name="paused">The pause state of the AudioClip. If true, the clip starts paused.</param>
 		/// <returns>A handle to the instance of the AudioClip being played.</returns>
-		AudioHandle play_spatial(ID const id, Entity const entity, float const volume = -1.0f, bool const paused = false, unsigned int const bus = 0);
+		AudioHandle play_spatial(AudioClip& clip, Entity const entity, float const volume = -1.0f, bool const paused = false, unsigned int const bus = 0);
 
 		/// <summary>
 		/// Plays the AudioClip using the given name on the Entity's AudioSource, in 3D space.
@@ -84,13 +84,13 @@ namespace minty
 		AudioHandle play_spatial(String const& name, Entity const entity, float const volume = -1.0f, bool const paused = false, unsigned int const bus = 0);
 
 		/// <summary>
-		/// Plays the AudioClip using the given ID in the background.
+		/// Plays the AudioClip using the given clip in the background.
 		/// </summary>
-		/// <param name="id">The ID of the AudioClip to play.</param>
+		/// <param name="clip">The AudioClip to play.</param>
 		/// <param name="volume">The volume at which to play the AudioClip. If -1.0, the AudioClip volume is used.</param>
 		/// <param name="paused">The pause state of the AudioClip. If true, the clip starts paused.</param>
 		/// <returns>A handle to the instance of the AudioClip being played.</returns>
-		AudioHandle play_background(ID const id, float const volume = -1.0f, bool const paused = false, unsigned int const bus = 0);
+		AudioHandle play_background(AudioClip& clip, float const volume = -1.0f, bool const paused = false, unsigned int const bus = 0);
 
 		/// <summary>
 		/// Plays the AudioClip using the given name in the background.
@@ -132,89 +132,6 @@ namespace minty
 		/// Stops all audio clips playing in this AudioEngine.
 		/// </summary>
 		void stop_all();
-
-		/// <summary>
-		/// Loads the AudioClip into this AudioEngine.
-		/// </summary>
-		/// <param name="name">The name of the AudioClip.</param>
-		/// <param name="path">The path to the AudioClip file.</param>
-		/// <returns>The ID of the AudioClip.</returns>
-		ID load_clip(String const& name, Path const& path);
-
-		/// <summary>
-		/// Loads the AudioClip into this AudioEngine. The name is the name of the given file at the path.
-		/// </summary>
-		/// <param name="path">The path to the AudioClip file.</param>
-		/// <returns>The ID of the AudioClip.</returns>
-		ID load_clip(Path const& path);
-
-		/// <summary>
-		/// Checks if an AudioClip with the given ID has been loaded.
-		/// </summary>
-		/// <param name="id">The ID to check.</param>
-		/// <returns>True if there is an AudioClip with the given ID loaded.</returns>
-		bool contains(ID const id) const;
-
-		/// <summary>
-		/// Checks if an AudioClip with the given name has been loaded.
-		/// </summary>
-		/// <param name="name">The name to check.</param>
-		/// <returns>True if there is an AudioClip with the given name loaded.</returns>
-		bool contains(String const& name) const;
-
-		/// <summary>
-		/// Gets the AudioClip with the given ID.
-		/// </summary>
-		/// <param name="id">The ID of the AudioClip.</param>
-		/// <returns>A reference to the AudioClip.</returns>
-		AudioClip& at(ID const id);
-
-		/// <summary>
-		/// Gets the AudioClip with the given ID.
-		/// </summary>
-		/// <param name="id">The ID of the AudioClip.</param>
-		/// <returns>A reference to the AudioClip.</returns>
-		AudioClip const& at(ID const id) const;
-
-		/// <summary>
-		/// Gets the AudioClip with the given name.
-		/// </summary>
-		/// <param name="name">The name of the AudioClip.</param>
-		/// <returns>A reference to the AudioClip.</returns>
-		AudioClip& at(String const& name);
-
-		/// <summary>
-		/// Gets the AudioClip with the given name.
-		/// </summary>
-		/// <param name="name">The name of the AudioClip.</param>
-		/// <returns>A reference to the AudioClip.</returns>
-		AudioClip const& at(String const& name) const;
-
-		/// <summary>
-		/// Gets the name of the loaded AudioClip with the given ID.
-		/// </summary>
-		/// <param name="id">The ID of the AudioClip.</param>
-		/// <returns>The name of the AudioClip.</returns>
-		String get_name(ID const id) const;
-
-		/// <summary>
-		/// Gets the ID of the loaded AudioClip with the given name.
-		/// </summary>
-		/// <param name="name">The name of the AudioClip.</param>
-		/// <returns>The ID of the AudioClip.</returns>
-		ID get_id(String const& name) const;
-
-		/// <summary>
-		/// Unloads the AudioClip with the given ID.
-		/// </summary>
-		/// <param name="id">The ID of the AudioClip to unload.</param>
-		void destroy_clip(ID const id);
-
-		/// <summary>
-		/// Unloads all loaded AudioClips.
-		/// </summary>
-		void destroy_all_clips();
-
 	private:
 		AudioEngine& get_audio_engine() const;
 

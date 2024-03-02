@@ -1,0 +1,157 @@
+#pragma once
+#include "M_Engine.h"
+
+#include "M_Asset.h"
+#include <unordered_map>
+
+namespace minty
+{
+	class Texture;
+	class Sprite;
+	class Shader;
+	class ShaderPass;
+	class MaterialTemplate;
+	class Material;
+	class Mesh;
+
+	class AudioClip;
+
+	class Animation;
+	class Animator;
+
+	class AssetEngine
+		: public Engine
+	{
+	private:
+		std::unordered_map<UUID, Asset*> _assets;
+
+	public:
+		AssetEngine(Runtime& runtime);
+
+#pragma region Loading
+
+#pragma region Render
+
+	public:
+		/// <summary>
+		/// Loads the Texture at the given Path and returns its ID.
+		/// </summary>
+		/// <param name="path">The path to the asset file.</param>
+		/// <returns>The UUID of the Texture, or 0 if the asset does not exist.</returns>
+		Texture* load_texture(Path const& path);
+
+		/// <summary>
+		/// Loads the Sprite at the given Path and returns its ID.
+		/// </summary>
+		/// <param name="path">The path to the asset file.</param>
+		/// <returns>The UUID of the Texture, or 0 if the asset does not exist.</returns>
+		Sprite* load_sprite(Path const& path);
+
+		Shader* load_shader(Path const& path);
+
+		ShaderPass* load_shader_pass(Path const& path);
+
+		MaterialTemplate* load_material_template(Path const& path);
+
+		Material* load_material(Path const& path);
+
+		Mesh* load_mesh(Path const& path);
+	private:
+		void load_mesh_obj(Path const& path, Mesh& mesh);
+
+#pragma endregion
+
+#pragma region Audio
+
+	public:
+		AudioClip* load_audio_clip(Path const& path);
+
+#pragma endregion
+
+#pragma region Animation
+
+	public:
+		Animation* load_animation(Path const& path);
+
+		Animator* load_animator(Path const& path);
+
+#pragma endregion
+
+
+#pragma endregion
+
+	public:
+		/// <summary>
+		/// Unloads the asset with the given ID.
+		/// </summary>
+		/// <param name="id"></param>
+		void unload(UUID const id);
+
+		/// <summary>
+		/// Unloads the given asset.
+		/// </summary>
+		/// <param name="asset"></param>
+		/// <returns></returns>
+		void unload(Asset const& asset);
+
+		/// <summary>
+		/// Unloads all assets in this AssetManager.
+		/// </summary>
+		void unload_all();
+
+		/// <summary>
+		/// Gets the asset with the given ID.
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="id"></param>
+		/// <returns></returns>
+		template<typename T>
+		T& at(UUID const id) const
+		{
+			MINTY_ASSERT(_assets.contains(id));
+
+			return *static_cast<T*>(_assets.at(id));
+		}
+
+		/// <summary>
+		/// Tries to get the asset with the given ID.
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="id"></param>
+		/// <returns>A pointer to the asset, or nullptr if no asset with the given ID exists.</returns>
+		template<typename T>
+		T* get(UUID const id) const
+		{
+			auto found = _assets.find(id);
+
+			if (found == _assets.end())
+			{
+				return nullptr;
+			}
+
+			return static_cast<T*>(found->second);
+		}
+
+		Asset* get_asset(UUID const id) const;
+
+		/// <summary>
+		/// Adds the given asset to this AssetEngine.
+		/// </summary>
+		/// <param name="asset"></param>
+		/// <returns></returns>
+		void emplace(Asset* const asset);
+
+		/// <summary>
+		/// Removes an asset from this AssetEngine. Does not delete the asset.
+		/// </summary>
+		/// <param name="id"></param>
+		void erase(UUID const id);
+
+		template<class T>
+		T* emplace_new(T* const asset)
+		{
+			emplace(asset);
+			return asset;
+		}
+	};
+}

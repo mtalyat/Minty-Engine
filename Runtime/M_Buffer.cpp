@@ -2,13 +2,15 @@
 #include "M_Buffer.h"
 
 minty::Buffer::Buffer()
-	: buffer()
+	: Asset()
+	, buffer()
 	, memory()
 	, size()
 {}
 
-minty::Buffer::Buffer(VkBuffer const& buffer, VkDeviceMemory const& memory, VkDeviceSize const& size)
-	: buffer(buffer)
-	, memory(memory)
-	, size(size)
+minty::Buffer::Buffer(BufferBuilder const& builder, Runtime& runtime)
+	: Asset(builder.id, "", runtime)
+	, buffer(builder.buffer)
+	, memory(builder.memory)
+	, size(builder.size)
 {}

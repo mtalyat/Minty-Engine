@@ -37,7 +37,7 @@ namespace minty
 
 		std::unordered_map<String, std::unordered_set<Entity>> _tags;
 	public:
-		EntityRegistry(Runtime& engine, ID const sceneId);
+		EntityRegistry(Runtime& engine, Scene& scene);
 
 		~EntityRegistry();
 

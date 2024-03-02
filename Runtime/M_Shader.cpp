@@ -1,8 +1,8 @@
 #include "pch.h"
 #include "M_Shader.h"
 
+#include "M_Runtime.h"
 #include "M_RenderEngine.h"
-#include "M_ShaderBuilder.h"
 
 #include "M_Math.h"
 #include "M_File.h"
@@ -11,14 +11,53 @@
 using namespace minty;
 using namespace minty;
 
+std::vector<VkDescriptorSetLayoutBinding> ShaderBuilder::get_descriptor_set_layout_bindings(uint32_t const set) const
+{
+	std::vector<VkDescriptorSetLayoutBinding> result;
+
+	for (auto const& constant : uniformConstantInfos)
+	{
+		if (constant.second.set != set)
+		{
+			continue;
+		}
+
+		result.push_back(VkDescriptorSetLayoutBinding
+			{
+				.binding = constant.second.binding,
+				.descriptorType = constant.second.type,
+				.descriptorCount = constant.second.count,
+				.stageFlags = constant.second.stageFlags,
+				.pImmutableSamplers = nullptr
+			});
+	}
+
+	return result;
+}
+
+uint32_t minty::ShaderBuilder::get_uniform_constant_count(uint32_t const set) const
+{
+	uint32_t count = 0;
+
+	for (auto const& constant : uniformConstantInfos)
+	{
+		if (constant.second.set == set)
+		{
+			count++;
+		}
+	}
+
+	return count;
+}
+
 minty::Shader::Shader()
-	: RenderObject::RenderObject()
+	: Asset()
 	, _descriptorSet()
 {}
 
-minty::Shader::Shader(ShaderBuilder const& builder, Runtime& engine, ID const sceneId)
-	: RenderObject::RenderObject(engine, sceneId)
-	, _descriptorSet(engine, sceneId)
+minty::Shader::Shader(ShaderBuilder const& builder, Runtime& engine)
+	: Asset(builder.id, builder.path, engine)
+	, _descriptorSet(engine)
 {
 	for (auto const& pair : builder.pushConstantInfos)
 	{
@@ -40,7 +79,7 @@ minty::Shader::Shader(ShaderBuilder const& builder, Runtime& engine, ID const sc
 
 void minty::Shader::destroy()
 {
-	RenderEngine& renderer = get_render_engine();
+	RenderEngine& renderer = get_runtime().get_render_engine();
 
 	auto device = renderer.get_device();
 
@@ -109,7 +148,7 @@ void minty::Shader::update_global_uniform_constant(String const& name, int const
 
 void minty::Shader::create_descriptor_set_layouts(ShaderBuilder const& builder)
 {
-	RenderEngine& renderer = get_render_engine();
+	RenderEngine& renderer = get_runtime().get_render_engine();
 
 	VkDevice device = renderer.get_device();
 
@@ -158,7 +197,7 @@ void minty::Shader::create_pipeline_layout(ShaderBuilder const& builder)
 		.pPushConstantRanges = pushConstants.data(),
 	};
 
-	RenderEngine& renderer = get_render_engine();
+	RenderEngine& renderer = get_runtime().get_render_engine();
 
 	// create the pipeline layout
 	if (vkCreatePipelineLayout(renderer.get_device(), &pipelineLayoutInfo, nullptr, &_pipelineLayout) != VK_SUCCESS) {
@@ -195,7 +234,7 @@ VkDescriptorPool minty::Shader::create_pool(uint32_t const set)
 	poolInfo.pPoolSizes = poolSizes.data();
 	poolInfo.maxSets = static_cast<uint32_t>(maxSets);
 
-	VK_ASSERT(vkCreateDescriptorPool(get_render_engine().get_device(), &poolInfo, nullptr, &descriptorPool), "Failed to create descriptor pool.");
+	VK_ASSERT(vkCreateDescriptorPool(get_runtime().get_render_engine().get_device(), &poolInfo, nullptr, &descriptorPool), "Failed to create descriptor pool.");
 
 	return descriptorPool;
 }
@@ -271,19 +310,19 @@ std::array<VkDescriptorSet, MAX_FRAMES_IN_FLIGHT> minty::Shader::create_descript
 	allocInfo.pSetLayouts = layouts.data();
 
 	// create the descriptor sets
-	VK_ASSERT(vkAllocateDescriptorSets(get_render_engine().get_device(), &allocInfo, descriptorSets.data()), std::format("Failed to allocate descriptor sets for descriptor set layout {}.", set));
+	VK_ASSERT(vkAllocateDescriptorSets(get_runtime().get_render_engine().get_device(), &allocInfo, descriptorSets.data()), std::format("Failed to allocate descriptor sets for descriptor set layout {}.", set));
 
 	return descriptorSets;
 }
 
 DescriptorSet minty::Shader::create_descriptor_set(uint32_t const set, bool const initialize)
 {
-	RenderEngine& renderer = get_render_engine();
+	RenderEngine& renderer = get_runtime().get_render_engine();
 
 	if (set == DESCRIPTOR_SET_INVALID)
 	{
 		// invalid set, so just create an empty descriptor
-		return DescriptorSet(get_runtime(), get_scene_id());
+		return DescriptorSet(get_runtime());
 	}
 
 	// create and allocate sets
@@ -332,10 +371,10 @@ DescriptorSet minty::Shader::create_descriptor_set(uint32_t const set, bool cons
 				data.ids.resize(1);
 
 				// create a buffer
-				ID bufferId = renderer.create_buffer_uniform(static_cast<VkDeviceSize>(info.size));
+				Buffer const& buffer = renderer.create_buffer_uniform(static_cast<VkDeviceSize>(info.size));
 
 				// add to buffers
-				data.ids[0] = bufferId;
+				data.ids[0] = buffer.get_id();
 
 				// not empty by default
 				data.empty = false;
@@ -360,7 +399,7 @@ DescriptorSet minty::Shader::create_descriptor_set(uint32_t const set, bool cons
 	}
 
 	// all done, create set
-	DescriptorSet descriptorSet(descriptorSets, datas, get_runtime(), get_scene_id());
+	DescriptorSet descriptorSet(descriptorSets, datas, get_runtime());
 
 	// "initialize" it if told to
 	if (initialize)

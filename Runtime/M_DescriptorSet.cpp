@@ -3,6 +3,7 @@
 
 #include "M_Dynamic.h"
 #include "M_RenderEngine.h"
+#include "M_AssetEngine.h"
 #include "M_Scene.h"
 #include "M_RenderSystem.h"
 
@@ -16,15 +17,15 @@ minty::DescriptorSet::DescriptorSet()
 	, _dirties()
 {}
 
-minty::DescriptorSet::DescriptorSet(Runtime& engine, ID const sceneId)
-	: RenderObject::RenderObject(engine, sceneId)
+minty::DescriptorSet::DescriptorSet(Runtime& engine)
+	: RenderObject::RenderObject(engine)
 	, _descriptorSets()
 	, _descriptors()
 	, _dirties()
 {}
 
-minty::DescriptorSet::DescriptorSet(std::array<VkDescriptorSet, MAX_FRAMES_IN_FLIGHT> const& descriptorSets, std::unordered_map<String, std::array<DescriptorData, MAX_FRAMES_IN_FLIGHT>> const& datas, Runtime& engine, ID const sceneId)
-	: RenderObject::RenderObject(engine, sceneId)
+minty::DescriptorSet::DescriptorSet(std::array<VkDescriptorSet, MAX_FRAMES_IN_FLIGHT> const& descriptorSets, std::unordered_map<String, std::array<DescriptorData, MAX_FRAMES_IN_FLIGHT>> const& datas, Runtime& engine)
+	: RenderObject::RenderObject(engine)
 	, _descriptorSets(descriptorSets)
 	, _descriptors(datas)
 	, _dirties()
@@ -50,6 +51,7 @@ DescriptorSet& minty::DescriptorSet::operator=(DescriptorSet const& other)
 void minty::DescriptorSet::destroy()
 {
 	RenderEngine& renderer = get_render_engine();
+	AssetEngine& assets = get_asset_engine();
 
 	// remove references to all VK descriptor sets, since they not need be destroyed
 	for (size_t i = 0; i < _descriptorSets.size(); i++)
@@ -63,7 +65,7 @@ void minty::DescriptorSet::destroy()
 		{
 			for (auto const id : data.second.at(i).ids)
 			{
-				renderer.destroy_buffer(id);
+				renderer.destroy_buffer(assets.at<Buffer>(id));
 			}
 		}
 	}
@@ -148,6 +150,7 @@ void minty::DescriptorSet::apply(int const frame)
 	std::vector<std::vector<VkDescriptorImageInfo>> imageInfos;
 
 	RenderEngine& renderer = get_render_engine();
+	AssetEngine& assets = get_asset_engine();
 	RenderSystem* renderSystem = get_render_system();
 
 	for (auto const& pair : _descriptors)
@@ -182,16 +185,17 @@ void minty::DescriptorSet::apply(int const frame)
 		case VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER:
 		{
 			// get buffer id
-			ID bufferId = data.ids.at(0);
+			UUID bufferId = data.ids.at(0);
 
 			// add buffer info(s)
 			bufferInfos.push_back(VkDescriptorBufferInfo());
 
 			// set buffer info
+			Buffer& buffer = assets.at<Buffer>(bufferId);
 			VkDescriptorBufferInfo& bufferInfo = bufferInfos.back();
-			bufferInfo.buffer = renderer.get_buffer(bufferId);
+			bufferInfo.buffer = buffer.buffer;
 			bufferInfo.offset = 0;
-			bufferInfo.range = renderer.get_buffer_size(bufferId);
+			bufferInfo.range = buffer.size;
 
 			// add buffer info to write
 			write.pBufferInfo = &bufferInfo;
@@ -207,9 +211,9 @@ void minty::DescriptorSet::apply(int const frame)
 			// populate with images based on ids
 			for (size_t i = 0; i < data.ids.size(); i++)
 			{
-				ID textureId = data.ids.at(i);
+				UUID textureId = data.ids.at(i);
 
-				Texture const& texture = renderSystem->get_texture(textureId);
+				Texture const& texture = assets.at<Texture>(textureId);
 
 				VkDescriptorImageInfo& info = infos.at(i);
 
@@ -265,25 +269,28 @@ DescriptorSet::DescriptorData* minty::DescriptorSet::find_descriptor(String cons
 
 void minty::DescriptorSet::set_descriptor(DescriptorData& data, int const frame, void const* const value, VkDeviceSize const size, VkDeviceSize const offset)
 {
+	AssetEngine& assets = get_asset_engine();
+
 	// do something based on type
 	switch (data.type)
 	{
 	case VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER:
 	{
 		// get buffer
-		ID bufferId = data.ids.front();
+		UUID bufferId = data.ids.front();
+		Buffer& buffer = assets.at<Buffer>(bufferId);
 
 		// set buffer
 		RenderEngine& renderer = get_render_engine();
-		renderer.set_buffer(bufferId, value, size, offset);
+		renderer.set_buffer(buffer, value, size, offset);
 
 		break;
 	}
 	case VkDescriptorType::VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER:
 	{
 		// assume the input for this was an array of IDs
-		ID const* ids = static_cast<ID const*>(value);
-		size_t count = size / sizeof(ID);
+		UUID const* ids = static_cast<UUID const*>(value);
+		size_t count = size / sizeof(UUID);
 
 		// apply those to ids in data
 		data.ids.resize(count);
@@ -305,6 +312,8 @@ void minty::DescriptorSet::set_descriptor(DescriptorData& data, int const frame,
 
 bool minty::DescriptorSet::get(String const& name, int const frame, void* const out) const
 {
+	AssetEngine& assets = get_asset_engine();
+
 	auto found = _descriptors.find(name);
 
 	if (found == _descriptors.end())
@@ -317,11 +326,12 @@ bool minty::DescriptorSet::get(String const& name, int const frame, void* const 
 	case VkDescriptorType::VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER:
 	{
 		// get buffer id
-		ID bufferId = found->second.at(frame).ids.front();
+		UUID bufferId = found->second.at(frame).ids.front();
+		Buffer& buffer = assets.at<Buffer>(bufferId);
 
 		// set the data
 		RenderEngine& renderer = get_render_engine();
-		renderer.get_buffer_data(bufferId, out);
+		renderer.get_buffer_data(buffer, out);
 
 		return true;
 	}

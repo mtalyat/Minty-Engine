@@ -227,6 +227,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="M_Accessibility.h" />
+    <ClInclude Include="M_AssetEngine.h" />
     <ClInclude Include="M_DestroyEntityComponent.h" />
     <ClInclude Include="M_DestroyComponentComponent.h" />
     <ClInclude Include="M_EnabledComponent.h" />
@@ -238,10 +239,8 @@
     <ClInclude Include="libraries\imgui\imgui.h" />
     <ClInclude Include="miniaudio.h" />
     <ClInclude Include="M_Animation.h" />
-    <ClInclude Include="M_AnimationBuilder.h" />
     <ClInclude Include="M_AnimationSystem.h" />
     <ClInclude Include="M_Animator.h" />
-    <ClInclude Include="M_AnimatorBuilder.h" />
     <ClInclude Include="M_AnimatorComponent.h" />
     <ClInclude Include="M_Asset.h" />
     <ClInclude Include="M_Audio.h" />
@@ -261,7 +260,7 @@
     <ClInclude Include="M_PhysicalFile.h" />
     <ClInclude Include="M_CoordinateMode.h" />
     <ClInclude Include="M_PixelFormat.h" />
-    <ClInclude Include="M_RuntimeBuilder.h" />
+    <ClInclude Include="M_SceneObject.h" />
     <ClInclude Include="M_ScriptArguments.h" />
     <ClInclude Include="M_ScriptClass.h" />
     <ClInclude Include="M_ScriptAssembly.h" />
@@ -270,14 +269,12 @@
     <ClInclude Include="M_ScriptObject.h" />
     <ClInclude Include="M_ScriptSystem.h" />
     <ClInclude Include="M_SpritePushData.h" />
-    <ClInclude Include="M_SpriteBuilder.h" />
     <ClInclude Include="M_TagComponent.h" />
-    <ClInclude Include="M_TextureAtlasBuilder.h" />
     <ClInclude Include="M_Time.h" />
     <ClInclude Include="M_TypeRegister.h" />
     <ClInclude Include="M_UIPushData.h" />
     <ClInclude Include="M_RenderSystem.h" />
-    <ClInclude Include="M_SceneObject.h" />
+    <ClInclude Include="M_RuntimeObject.h" />
     <ClInclude Include="M_SerializationData.h" />
     <ClInclude Include="M_Dynamic.h" />
     <ClInclude Include="framework.h" />
@@ -319,14 +316,8 @@
     <ClInclude Include="M_Parse.h" />
     <ClInclude Include="M_Reader.h" />
     <ClInclude Include="M_Register.h" />
-    <ClInclude Include="M_MaterialTemplateBuilder.h" />
-    <ClInclude Include="M_MaterialBuilder.h" />
     <ClInclude Include="M_RenderObject.h" />
     <ClInclude Include="M_PushConstantInfo.h" />
-    <ClInclude Include="M_RenderEngineBuilder.h" />
-    <ClInclude Include="M_ShaderBuilder.h" />
-    <ClInclude Include="M_ShaderPassBuilder.h" />
-    <ClInclude Include="M_TextureBuilder.h" />
     <ClInclude Include="M_UniformConstantInfo.h" />
     <ClInclude Include="M_Scene.h" />
     <ClInclude Include="M_SceneManager.h" />
@@ -415,6 +406,7 @@
     <ClCompile Include="M_Animator.cpp" />
     <ClCompile Include="M_AnimatorComponent.cpp" />
     <ClCompile Include="M_Asset.cpp" />
+    <ClCompile Include="M_AssetEngine.cpp" />
     <ClCompile Include="M_AudioClip.cpp" />
     <ClCompile Include="M_AudioEngine.cpp" />
     <ClCompile Include="M_AudioListenerComponent.cpp" />
@@ -463,6 +455,7 @@
     <ClCompile Include="M_DescriptorSet.cpp" />
     <ClCompile Include="M_RenderObject.cpp" />
     <ClCompile Include="M_PushConstantInfo.cpp" />
+    <ClCompile Include="M_SceneObject.cpp" />
     <ClCompile Include="M_ScriptArguments.cpp" />
     <ClCompile Include="M_ScriptAssembly.cpp" />
     <ClCompile Include="M_ScriptClass.cpp" />
@@ -470,12 +463,11 @@
     <ClCompile Include="M_ScriptEngine.cpp" />
     <ClCompile Include="M_ScriptObject.cpp" />
     <ClCompile Include="M_ScriptSystem.cpp" />
-    <ClCompile Include="M_ShaderBuilder.cpp" />
     <ClCompile Include="M_RenderSystem.cpp" />
     <ClCompile Include="M_Scene.cpp" />
     <ClCompile Include="M_SceneManager.cpp" />
     <ClCompile Include="M_Node.cpp" />
-    <ClCompile Include="M_SceneObject.cpp" />
+    <ClCompile Include="M_RuntimeObject.cpp" />
     <ClCompile Include="M_Shader.cpp" />
     <ClCompile Include="M_ShaderPass.cpp" />
     <ClCompile Include="M_Sprite.cpp" />

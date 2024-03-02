@@ -1,4 +1,5 @@
-shader: spriteShader
+: 90410feecc101867
+shader: 999530dea6d52f76
 primitiveTopology: TRIANGLE_LIST
 polygonMode: FILL
 cullMode: NONE

@@ -4,6 +4,9 @@
 
 namespace minty
 {
+	class Mesh;
+	class Material;
+
 	/// <summary>
 	/// Holds data for a Mesh to be drawn within the Scene.
 	/// </summary>
@@ -11,14 +14,14 @@ namespace minty
 		: public Component
 	{
 		/// <summary>
-		/// The ID of the Mesh to draw.
+		/// The Mesh to draw.
 		/// </summary>
-		ID meshId = ERROR_ID;
+		Mesh* mesh = nullptr;
 
 		/// <summary>
 		/// The ID of the Material to use to draw the Mesh.
 		/// </summary>
-		ID materialId = ERROR_ID;
+		Material* material = nullptr;
 
 		void serialize(Writer& writer) const override;
 		void deserialize(Reader const& reader) override;

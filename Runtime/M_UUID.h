@@ -4,6 +4,8 @@
 
 namespace minty
 {
+	constexpr static uint64_t INVALID_UUID = 0;
+
 	/// <summary>
 	/// A Universally Unique IDentifier.
 	/// Generates a random number to use as a unique ID for each asset/entity.
@@ -29,21 +31,21 @@ namespace minty
 		/// <param name="uuid"></param>
 		UUID(uint64_t const uuid);
 
-		bool empty() const;
-
 		bool valid() const;
+
+		uint64_t data() const;
 
 		operator uint64_t() const { return _uuid; }
 		bool operator==(UUID const other) const;
 		bool operator!=(UUID const other) const;
+		bool operator==(uint64_t const other) const;
+		bool operator!=(uint64_t const other) const;
 		bool operator!() const;
 
 		friend std::ostream& operator<<(std::ostream& stream, UUID const& object);
 		friend std::istream& operator>>(std::istream& stream, UUID& object);
 
 		friend String to_string(UUID const value);
-
-		static UUID create_empty();
 	};
 }
 

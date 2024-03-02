@@ -40,7 +40,7 @@ namespace mintye
 
 		// info needed for a loaded project:
 		Project* _project;
-		minty::ID _sceneId;
+		minty::UUID _sceneId;
 
 		// editor windows to be drawn
 		std::unordered_map<minty::String, EditorWindow*> _editorWindows;
@@ -68,7 +68,7 @@ namespace mintye
 	private:
 		void set_project(Project* const project);
 
-		void set_scene(minty::ID const sceneId);
+		void set_scene(minty::UUID const sceneId);
 
 		void set_window_title(minty::String const& subTitle);
 

@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "M_MeshComponent.h"
 
+#include "M_Runtime.h"
+#include "M_AssetEngine.h"
 #include "M_Mesh.h"
 #include "M_Console.h"
 #include "M_SerializationData.h"
@@ -16,22 +18,22 @@ using namespace minty;
 
 void minty::MeshComponent::serialize(Writer& writer) const
 {
-	Console::todo("MeshComponent::serialize");
+	writer.write("mesh", mesh ? mesh->get_id() : UUID(INVALID_UUID));
+	writer.write("material", material ? material->get_id() : UUID(INVALID_UUID));
 }
 
 void minty::MeshComponent::deserialize(Reader const& reader)
 {
 	SerializationData data = *static_cast<SerializationData const*>(reader.get_data());
 
-	RenderSystem* renderSystem = data.scene->get_system_registry().find<RenderSystem>();
-
-	MINTY_ASSERT(renderSystem != nullptr);
+	RenderEngine& renderer = data.scene->get_runtime().get_render_engine();
+	AssetEngine& assets = data.scene->get_runtime().get_asset_engine();
 
 	// load meta data
-	String materialName;
-	if (reader.try_read_string("material", materialName))
+	UUID id(INVALID_UUID);
+	if (reader.try_read_uuid("material", id))
 	{
-		materialId = renderSystem->find_material(materialName);
+		material = assets.get<Material>(id);
 	}
 
 	// load mesh data
@@ -40,39 +42,23 @@ void minty::MeshComponent::deserialize(Reader const& reader)
 	{
 		MeshType meshType = from_string_mesh_type(meshTypeName);
 
-		switch (meshType)
+		id = renderer.get_or_create_mesh(meshType);
+
+		if (id.valid())
 		{
-		case MeshType::Empty:
-		case MeshType::Custom:
-		{
-			// use the asset path to get the mesh ( or use the name if no path given )
-			String path = reader.read_string("path", reader.read_string("name"));
-
-			// check if mesh with name is loaded
-			String name = Path(path).stem().string();
-			meshId = renderSystem->find_mesh(name);
-
-			if (meshId == ERROR_ID)
-			{
-				// mesh is not loaded, so load it using the path
-				meshId = renderSystem->load_mesh(path);
-			}
-
-			if (meshId == ERROR_ID)
-			{
-				Console::error(std::format("Could not load_animation mesh with path \"{}\" and name \"{}\".", path, name));
-			}
-			break;
+			// had a built in type
+			mesh = assets.get<Mesh>(id);
 		}
-		default:
-			// if there was a type given, then use that type
-			meshId = renderSystem->get_or_create_mesh(meshType);
-			break;
-		}
+	}
+
+	// custom type or empty
+	if (reader.try_read_uuid("mesh", id))
+	{
+		mesh = assets.get<Mesh>(id);
 	}
 }
 
 String minty::to_string(MeshComponent const& value)
 {
-	return std::format("MeshComponent(meshId = {}, materialId = {})", value.meshId, value.materialId);
+	return std::format("MeshComponent()");
 }

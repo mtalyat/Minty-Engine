@@ -5,16 +5,15 @@
 
 namespace minty
 {
+	class Sprite;
+
 	/// <summary>
 	/// Holds data for a Sprite within the Scene.
 	/// </summary>
 	struct SpriteComponent
 		: public Component
 	{
-		/// <summary>
-		/// The ID of the Sprite to render.
-		/// </summary>
-		ID spriteId = ERROR_ID;
+		Sprite* sprite;
 
 		/// <summary>
 		/// The order in which to render the Sprite, when it has equal distance to the Camera as another Sprite.

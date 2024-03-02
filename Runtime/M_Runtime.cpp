@@ -2,11 +2,11 @@
 #include "M_Runtime.h"
 
 #include "M_InputMap.h"
-#include "M_RenderEngineBuilder.h"
 #include "M_SceneManager.h"
 #include "M_Info.h"
 #include "M_Console.h"
 
+#include "M_AssetEngine.h"
 #include "M_RenderEngine.h"
 #include "M_AudioEngine.h"
 #include "M_ScriptEngine.h"
@@ -92,6 +92,11 @@ Window& minty::Runtime::get_window() const
 	return *_window;
 }
 
+AssetEngine& minty::Runtime::get_asset_engine() const
+{
+	return *static_cast<AssetEngine*>(_engines.at(ASSET_ENGINE_INDEX));
+}
+
 RenderEngine& minty::Runtime::get_render_engine() const
 {
 	return *static_cast<RenderEngine*>(_engines.at(RENDER_ENGINE_INDEX));
@@ -163,6 +168,7 @@ bool minty::Runtime::init(RuntimeBuilder const* builder)
 	_window = _personalWindow ? new Window(_info.get_application_name(), WIDTH, HEIGHT) : builder->window;
 	_sceneManager = new SceneManager(*this);
 
+	set_engine<AssetEngine>(builder && builder->assetEngine ? builder->assetEngine : new AssetEngine(*this));
 	set_engine<RenderEngine>(builder && builder->renderEngine ? builder->renderEngine : new RenderEngine(*this));
 	set_engine<AudioEngine>(builder && builder->audioEngine ? builder->audioEngine : new AudioEngine(*this));
 	set_engine<ScriptEngine>(builder && builder->scriptEngine ? builder->scriptEngine : new ScriptEngine(*this));

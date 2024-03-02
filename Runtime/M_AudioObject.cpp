@@ -7,11 +7,11 @@
 using namespace minty;
 
 minty::AudioObject::AudioObject()
-	: SceneObject()
+	: RuntimeObject()
 {}
 
-minty::AudioObject::AudioObject(Runtime& engine, ID const sceneId)
-	: SceneObject(engine, sceneId)
+minty::AudioObject::AudioObject(Runtime& engine)
+	: RuntimeObject(engine)
 {}
 
 minty::AudioObject::~AudioObject()

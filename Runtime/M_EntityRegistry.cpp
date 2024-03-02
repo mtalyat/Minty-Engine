@@ -32,8 +32,8 @@ using namespace minty;
 std::map<String const, EntityRegistry::ComponentFuncs const> EntityRegistry::_components = std::map<String const, EntityRegistry::ComponentFuncs const>();
 std::map<uint32_t const, String const> EntityRegistry::_componentTypes = std::map<uint32_t const, String const>();
 
-minty::EntityRegistry::EntityRegistry(Runtime& engine, ID const sceneId)
-	: SceneObject(engine, sceneId)
+minty::EntityRegistry::EntityRegistry(Runtime& engine, Scene& scene)
+	: SceneObject(engine, scene)
 	, entt::registry()
 	, _idToEntity()
 	, _entityToId()
@@ -53,7 +53,8 @@ minty::EntityRegistry::~EntityRegistry()
 }
 
 minty::EntityRegistry::EntityRegistry(EntityRegistry&& other) noexcept
-	: entt::registry(std::move(other))
+	: SceneObject(std::move(other))
+	, entt::registry(std::move(other))
 {}
 
 EntityRegistry& minty::EntityRegistry::operator=(EntityRegistry&& other) noexcept
@@ -610,7 +611,7 @@ UUID minty::EntityRegistry::get_id(Entity const entity) const
 		return found->second;
 	}
 
-	return UUID::create_empty();
+	return INVALID_UUID;
 }
 
 void minty::EntityRegistry::set_name(Entity const entity, String const& name)
@@ -980,7 +981,7 @@ void minty::EntityRegistry::serialize(Writer& writer) const
 		entityId = get_id(entity);
 
 		// if id is empty, generate one
-		if (entityId.empty()) entityId = UUID();
+		if (!entityId) entityId = UUID();
 
 		// if no name, just print ID
 		if (entityName.empty())

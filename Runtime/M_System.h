@@ -1,10 +1,14 @@
 #pragma once
 #include "M_SceneObject.h"
 
+#include <unordered_set>
+#include <vector>
+#include <functional>
+
 namespace minty
 {
-	class Runtime;
-	class Scene;
+	class Asset;
+	class AssetEngine;
 	class EntityRegistry;
 	class SystemRegistry;
 
@@ -14,17 +18,22 @@ namespace minty
 	class System
 		: public SceneObject
 	{
+	protected:
+		typedef std::function<Asset*(AssetEngine& engine, Path const&)> RegisterFunc;
+
 	private:
 		// is this system enabled?
 		bool _enabled;
 
 		String _name;
 
+		std::vector<std::pair<std::vector<Path>, RegisterFunc>> _unloadedAssets;
+		std::unordered_set<UUID> _loadedAssets;
 	public:
 		/// <summary>
 		/// Creates a new System.
 		/// </summary>
-		System(String const& name, Runtime& runtime, ID const sceneId);
+		System(String const& name, Runtime& runtime, Scene& scene);
 
 		virtual ~System();
 
@@ -56,7 +65,7 @@ namespace minty
 		/// <summary>
 		/// Called when the Scene is being loaded.
 		/// </summary>
-		virtual void load() {}
+		virtual void load();
 
 		/// <summary>
 		/// Does one frame of work on the System.
@@ -71,7 +80,17 @@ namespace minty
 		/// <summary>
 		/// Called when the Scene is being unloaded.
 		/// </summary>
-		virtual void unload() {}
+		virtual void unload();
+
+	protected:
+		void register_assets(std::vector<Path> const& paths, RegisterFunc const& func);
+
+		void register_assets(Reader const& reader, String const& name, RegisterFunc const& func);
+
+		void load_registered_assets();
+
+		void unload_registered_assets();
+
 	public:
 		friend String to_string(System const& value);
 	};

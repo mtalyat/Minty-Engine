@@ -134,6 +134,8 @@ Dynamic minty::Encoding::decode_base16(String const& text)
 
 bool minty::Encoding::is_base16(String const& text)
 {
+    if (text.empty()) return false;
+
     for (char c : text)
     {
         if (!isdigit(c) && (c < 'a' || c > 'f') && (c < 'A' || c > 'F'))

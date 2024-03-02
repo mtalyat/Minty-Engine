@@ -13,11 +13,10 @@
 
 using namespace minty;
 
-minty::Scene::Scene(Runtime& engine, ID const sceneId)
-	: _id(sceneId)
-	, _engine(&engine)
-	, _entities(new EntityRegistry(engine, sceneId))
-	, _systems(new SystemRegistry(engine, sceneId))
+minty::Scene::Scene(SceneBuilder const& builder, Runtime& engine)
+	: Asset(builder.id, builder.path, engine)
+	, _entities(new EntityRegistry(engine, *this))
+	, _systems(new SystemRegistry(engine, *this))
 	, _loaded()
 {}
 
@@ -28,38 +27,22 @@ minty::Scene::~Scene()
 }
 
 minty::Scene::Scene(Scene&& other) noexcept
-	: _id(other._id)
-	, _engine(other._engine)
-	, _entities(other._entities)
-	, _systems(other._systems)
-{
-	other._id = ERROR_ID;
-	other._engine = nullptr;
-	other._entities = nullptr;
-	other._systems = nullptr;
-}
+	: Asset(std::move(other))
+	, _entities(std::move(other._entities))
+	, _systems(std::move(other._systems))
+	, _loaded(std::move(other._loaded))
+{}
 
 Scene& minty::Scene::operator=(Scene&& other) noexcept
 {
 	if (this != &other)
 	{
-		_id = other._id;
-		_engine = other._engine;
-		_entities = other._entities;
-		_systems = other._systems;
-
-		other._id = ERROR_ID;
-		other._engine = nullptr;
-		other._entities = nullptr;
-		other._systems = nullptr;
+		_entities = std::move(other._entities);
+		_systems = std::move(other._systems);
+		_loaded = std::move(other._loaded);
 	}
 
 	return *this;
-}
-
-Runtime& minty::Scene::get_runtime() const
-{
-	return *_engine;
 }
 
 EntityRegistry& minty::Scene::get_entity_registry() const

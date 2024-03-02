@@ -1,7 +1,7 @@
 #pragma once
-#include "M_Object.h"
+#include "M_RuntimeObject.h"
 
-#include "M_Register.h"
+#include <unordered_map>
 
 namespace minty
 {
@@ -9,16 +9,14 @@ namespace minty
 	class Scene;
 
 	class SceneManager
-		: public Object
+		: public RuntimeObject
 	{
 	private:
-		Runtime* _runtime;
-
 		// if the scene manager has been loaded or not
 		// if not, no scenes will receive events
 		bool _loaded;
 		// all scenes stored in memory
-		Register<Scene*> _scenes;
+		std::unordered_map<UUID, Scene*> _scenes;
 		// scene that is active, eg. receiving update, etc. events
 		Scene* _loadedScene;
 		Scene* _workingScene;
@@ -36,28 +34,20 @@ namespace minty
 		/// </summary>
 		/// <param name="path">The path to the .scene file.</param>
 		/// <returns>The ID of the new Scene.</returns>
-		ID create_scene(Path const& path);
-
-		/// <summary>
-		/// Loads a new Scene using the file data at the given path.
-		/// </summary>
-		/// <param name="name">The name to the new Scene.</param>
-		/// <param name="path">The path to the .scene file.</param>
-		/// <returns>The ID of the new Scene.</returns>
-		ID create_scene(String const& name, Path const& path);
+		Scene& create_scene(Path const& path);
 
 		/// <summary>
 		/// Destroys the Scene with the given ID.
 		/// </summary>
 		/// <param name="id">The ID of the Scene.</param>
-		bool destroy_scene(ID const id);
+		bool destroy_scene(UUID const id);
 
 		/// <summary>
 		/// Loads the Scene with the given ID. Unloads the current Scene first.
 		/// </summary>
 		/// <param name="id">The ID of the Scene to load.</param>
 		/// <param name="camera">The Entity with the CameraComponent to render to.</param>
-		void load_scene(ID const id);
+		void load_scene(UUID const id);
 
 		/// <summary>
 		/// Unloads the currently loaded Scene.
@@ -80,11 +70,18 @@ namespace minty
 		Scene* get_working_scene() const;
 
 		/// <summary>
-		/// Get the Scene based on its ID.
+		/// Gets the Scene with the given id.
+		/// </summary>
+		/// <param name="id">The ID of the Scene.</param>
+		/// <returns>A pointer to the Scene, or nullptr if none found.</returns>
+		Scene* get_scene(UUID const id);
+
+		/// <summary>
+		/// Gets the Scene with the given id.
 		/// </summary>
 		/// <param name="id">The ID of the Scene.</param>
 		/// <returns>A reference to the Scene.</returns>
-		Scene& get_scene(ID const id);
+		Scene& at_scene(UUID const id);
 
 		/// <summary>
 		/// Gets the number of Scenes in this SceneManager.

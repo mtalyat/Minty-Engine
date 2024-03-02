@@ -9,6 +9,7 @@
 #include "M_Buffer.h"
 #include "M_Entity.h"
 #include "M_Matrix.h"
+#include "M_Mesh.h"
 
 #include "M_GLM.hpp"
 #include "M_Vulkan.h"
@@ -54,8 +55,22 @@ namespace minty
 	struct UITransformComponent;
 	struct SpriteComponent;
 
-	struct RenderEngineBuilder;
 	struct TextureBuilder;
+
+	class Material;
+
+	class Info;
+	class Window;
+
+	/// <summary>
+	/// Holds data to create a new RenderEngine.
+	/// </summary>
+	struct RenderEngineBuilder
+	{
+		Info const* info;
+
+		Window* window;
+	};
 
 	/// <summary>
 	/// Handles rendering for the game engine.
@@ -66,10 +81,7 @@ namespace minty
 	protected:
 		Window* _window;
 
-		// assets
-		Register<Buffer> _buffers;
-
-		std::array<ID, BIND_COUNT> _boundIds;
+		std::array<void const*, BIND_COUNT> _bound;
 
 		Viewport _view;
 		Color _backgroundColor;
@@ -78,6 +90,8 @@ namespace minty
 		Scene const* _scene = nullptr;
 		RenderSystem* _renderSystem = nullptr;
 		EntityRegistry* _registry = nullptr;
+
+		std::unordered_map<MeshType, UUID> _builtinMeshes;
 
 		// (Vulkan) rendering components
 		VkDevice _device;
@@ -166,6 +180,8 @@ namespace minty
 		/// </summary>
 		/// <returns>The swap chain extent width / height.</returns>
 		float get_aspect_ratio() const;
+
+		UUID get_or_create_mesh(MeshType const type);
 
 #pragma endregion
 
@@ -260,7 +276,7 @@ namespace minty
 		/// <param name="commandBuffer">The buffer to use to bind.</param>
 		/// <param name="materialId">The ID of the Material to bind.</param>
 		/// <param name="pass">The ShaderPass index.</param>
-		void bind(VkCommandBuffer const commandBuffer, ID const materialId, uint32_t const pass = 0); // TODO: easier way to select shader pass?
+		void bind(VkCommandBuffer const commandBuffer, Material const* const material, uint32_t const pass = 0); // TODO: easier way to select shader pass?
 
 #pragma endregion
 
@@ -312,40 +328,40 @@ namespace minty
 		/// <param name="usage">How the buffer will be used.</param>
 		/// <param name="properties">The memory properties.</param>
 		/// <returns>The ID of the new buffer.</returns>
-		ID create_buffer(VkDeviceSize const size, VkBufferUsageFlags const usage, VkMemoryPropertyFlags const properties);
+		Buffer const& create_buffer(VkDeviceSize const size, VkBufferUsageFlags const usage, VkMemoryPropertyFlags const properties);
 
 		/// <summary>
 		/// Creates a uniform buffer.
 		/// </summary>
 		/// <param name="size">The size of the buffer.</param>
 		/// <returns>The ID of the new buffer.</returns>
-		ID create_buffer_uniform(VkDeviceSize const size);
+		Buffer const& create_buffer_uniform(VkDeviceSize const size);
 
 		/// <summary>
 		/// Destroys the buffer with the given ID.
 		/// </summary>
 		/// <param name="id"></param>
-		void destroy_buffer(ID const id);
+		void destroy_buffer(Buffer const& buffer);
 
 		/// <summary>
 		/// Maps the buffer data to a pointer in memory.
 		/// </summary>
 		/// <param name="id">The ID of the buffer to map.</param>
 		/// <returns>A pointer to the buffer data in memory.</returns>
-		void* map_buffer(ID const id) const;
+		void* map_buffer(Buffer const& buffer) const;
 
 		/// <summary>
 		/// Unmaps the buffer data from memory. The invalidates the pointer given from map_buffer for the same ID.
 		/// </summary>
 		/// <param name="id">The ID of the buffer to unmap.</param>
-		void unmap_buffer(ID const id) const;
+		void unmap_buffer(Buffer const& buffer) const;
 
 		/// <summary>
 		/// Sets the data for the buffer with the given ID.
 		/// </summary>
 		/// <param name="id">The ID of the buffer to modify.</param>
 		/// <param name="data">The data to set to the buffer.</param>
-		void set_buffer(ID const id, void const* const data);
+		void set_buffer(Buffer const& buffer, void const* const data);
 
 		/// <summary>
 		/// Sets the data for the buffer with the given ID.
@@ -354,28 +370,14 @@ namespace minty
 		/// <param name="data">The data to set to the buffer.</param>
 		/// <param name="size">The size of the data in bytes.</param>
 		/// <param name="offset">The offset of the data within the buffer in bytes.</param>
-		void set_buffer(ID const id, void const* const data, VkDeviceSize const size, VkDeviceSize const offset = 0);
-
-		/// <summary>
-		/// Gets the buffer with the given ID.
-		/// </summary>
-		/// <param name="id">The ID of the buffer.</param>
-		/// <returns>The buffer with the givne ID.</returns>
-		VkBuffer get_buffer(ID const id) const;
+		void set_buffer(Buffer const& buffer, void const* const data, VkDeviceSize const size, VkDeviceSize const offset = 0);
 
 		/// <summary>
 		/// Gets the data of the buffer with the given ID and stores it within the out pointer.
 		/// </summary>
 		/// <param name="id">The ID of the buffer to get the data from.</param>
 		/// <param name="out">The pointer to the location of the data to be set.</param>
-		void get_buffer_data(ID const id, void* const out) const; // TODO: test method
-
-		/// <summary>
-		/// Gets the size of the buffer with the given ID.
-		/// </summary>
-		/// <param name="id">The ID of the buffer to get the size of.</param>
-		/// <returns>The size of the buffer in bytes.</returns>
-		VkDeviceSize get_buffer_size(ID const id) const;
+		void get_buffer_data(Buffer const& buffer, void* const out) const; // TODO: test method
 
 		/// <summary>
 		/// Copies the buffer with the srcId to the buffer with the dstId.
@@ -383,11 +385,7 @@ namespace minty
 		/// <param name="srcId">The ID of the source buffer.</param>
 		/// <param name="dstId">The ID of the destination buffer.</param>
 		/// <param name="size">The number of bytes to copy.</param>
-		void copy_buffer(ID const srcId, ID const dstId, VkDeviceSize const size);
-
-	private:
-		// destroys the buffer data directly
-		void destroy_buffer(Buffer const& buffer);
+		void copy_buffer(Buffer const& src, Buffer const& dst, VkDeviceSize const size);
 
 #pragma endregion
 

@@ -14,8 +14,8 @@ namespace minty
 {
 	std::map<String const, SystemRegistry::SystemFunc const> SystemRegistry::_systemTypes = std::map<String const, SystemRegistry::SystemFunc const>();
 
-	SystemRegistry::SystemRegistry(Runtime& engine, ID const sceneId)
-		: SceneObject(engine, sceneId)
+	SystemRegistry::SystemRegistry(Runtime& engine, Scene& scene)
+		: SceneObject(engine, scene)
 		, _orderedSystems()
 		, _allSystems()
 		, _typeLookup()
@@ -31,7 +31,7 @@ namespace minty
 	}
 
 	SystemRegistry::SystemRegistry(SystemRegistry&& other) noexcept
-		: SceneObject(other)
+		: SceneObject(std::move(other))
 		, _orderedSystems(std::move(other._orderedSystems))
 		, _allSystems(std::move(other._allSystems))
 		, _typeLookup(std::move(other._typeLookup))
@@ -83,7 +83,7 @@ namespace minty
 		MINTY_ASSERT_FORMAT(_systemTypes.contains(name), "Cannot emplace System \"{}\". It has not been registered with the SystemRegistry.", name);
 
 		// name found
-		System* system = _systemTypes.at(name)(get_runtime(), get_scene_id());
+		System* system = _systemTypes.at(name)(get_runtime(), get_scene());
 		this->emplace(system, priority);
 		return system;
 	}

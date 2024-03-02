@@ -162,13 +162,13 @@ void mintye::Application::set_project(Project* const project)
 	}
 }
 
-void mintye::Application::set_scene(minty::ID const id)
+void mintye::Application::set_scene(minty::UUID const id)
 {
 	// set new scene
 	_sceneId = id;
 
 	// get the scene with the id, or null if empty id
-	Scene* scene = id == ERROR_ID ? nullptr : &_runtime->get_scene_manager().get_scene(id);
+	Scene* scene = _runtime->get_scene_manager().get_scene(id);
 
 	// set for all windows
 	for (auto const& pair : _editorWindows)
@@ -334,19 +334,19 @@ void mintye::Application::load_scene(minty::Path const& path)
 
 	// load new scene
 	SceneManager& sceneManager = _runtime->get_scene_manager();
-	set_scene(sceneManager.create_scene(path));
+	set_scene(sceneManager.create_scene(path).get_id());
 	sceneManager.load_scene(_sceneId);
 	sceneManager.load();
 }
 
 void mintye::Application::unload_scene()
 {
-	if (_sceneId != ERROR_ID)
+	if (_sceneId != INVALID_UUID)
 	{
 		SceneManager& sceneManager = _runtime->get_scene_manager();
 		sceneManager.unload();
 		sceneManager.destroy();
-		set_scene(ERROR_ID);
+		set_scene(INVALID_UUID);
 	}
 }
 

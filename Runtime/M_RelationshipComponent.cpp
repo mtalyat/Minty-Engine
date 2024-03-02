@@ -42,7 +42,7 @@ void minty::RelationshipComponent::deserialize(Reader const& reader)
 	//if (reader.try_read_string("first", name)) first = er.find(name);
 	//if (reader.try_read_string("prev", name)) prev = er.find(name);
 	//if (reader.try_read_string("next", name)) next = er.find(name);
-	UUID id(0);
+	UUID id(INVALID_UUID);
 	if (reader.try_read_uuid("parent", id))
 	{
 		er.set_parent(data->entity, er.find_by_id(id));

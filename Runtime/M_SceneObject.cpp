@@ -1,49 +1,30 @@
 #include "pch.h"
 #include "M_SceneObject.h"
-
-#include "M_Runtime.h"
-#include "M_SceneManager.h"
 #include "M_Scene.h"
 
 using namespace minty;
 
-minty::SceneObject::SceneObject()
-	: _runtime()
-	, _sceneId()
+minty::SceneObject::SceneObject(Runtime& runtime, Scene& scene)
+	: RuntimeObject(runtime)
+	, _scene(&scene)
 {}
-
-minty::SceneObject::SceneObject(Runtime& engine, ID const sceneId)
-	: _runtime(&engine)
-	, _sceneId(sceneId)
-{}
-
-minty::SceneObject::~SceneObject()
-{
-}
-
-Runtime& minty::SceneObject::get_runtime() const
-{
-	MINTY_ASSERT(_runtime != nullptr);
-
-	return *_runtime;
-}
-
-void minty::SceneObject::set_runtime(Runtime& engine)
-{
-	_runtime = &engine;
-}
 
 Scene& minty::SceneObject::get_scene() const
 {
-	return get_runtime().get_scene_manager().get_scene(_sceneId);
+	return *_scene;
 }
 
-ID minty::SceneObject::get_scene_id() const
+EntityRegistry& minty::SceneObject::get_entity_registry() const
 {
-	return _sceneId;
+	return _scene->get_entity_registry();
 }
 
-void minty::SceneObject::set_scene(ID const sceneId)
+SystemRegistry& minty::SceneObject::get_system_registry() const
 {
-	_sceneId = sceneId;
+	return _scene->get_system_registry();
+}
+
+void minty::SceneObject::set_scene(Scene& scene)
+{
+	_scene = &scene;
 }

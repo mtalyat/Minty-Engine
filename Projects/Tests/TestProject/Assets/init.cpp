@@ -43,8 +43,7 @@ int init(Runtime& runtime)
         }
         
         // load scene from disk
-        ID sceneId = sceneManager.create_scene("Scenes/test.mscene");
-        Scene &scene = sceneManager.get_scene(sceneId);
+        Scene& scene = sceneManager.create_scene("Scenes/test.mscene");
         EntityRegistry& er = scene.get_entity_registry();
         SystemRegistry& sr = scene.get_system_registry();
 

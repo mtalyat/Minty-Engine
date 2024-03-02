@@ -1,5 +1,5 @@
 #pragma once
-#include "M_RenderObject.h"
+#include "M_Asset.h"
 
 #include "M_Register.h"
 #include "M_PushConstantInfo.h"
@@ -13,13 +13,45 @@
 
 namespace minty
 {
-	struct ShaderBuilder;
+	/// <summary>
+	/// Holds data to create a new Shader.
+	/// </summary>
+	struct ShaderBuilder
+	{
+		UUID id;
+
+		Path path;
+
+		/// <summary>
+		/// The push constant infos.
+		/// </summary>
+		std::unordered_map<String, PushConstantInfo> pushConstantInfos;
+
+		/// <summary>
+		/// The uniform constant infos.
+		/// </summary>
+		std::unordered_map<String, UniformConstantInfo> uniformConstantInfos;
+
+		/// <summary>
+		/// Gets the descriptor set layout bindings for the given set.
+		/// </summary>
+		/// <param name="set"></param>
+		/// <returns></returns>
+		std::vector<VkDescriptorSetLayoutBinding> get_descriptor_set_layout_bindings(uint32_t const set) const;
+
+		/// <summary>
+		/// Gets the number of push constants for the given set.
+		/// </summary>
+		/// <param name="set"></param>
+		/// <returns></returns>
+		uint32_t get_uniform_constant_count(uint32_t const set) const;
+	};
 
 	/// <summary>
 	/// Holds data for a Shader.
 	/// </summary>
 	class Shader :
-		public RenderObject
+		public Asset
 	{
 	private:
 		VkPipelineLayout _pipelineLayout;
@@ -40,7 +72,7 @@ namespace minty
 		/// </summary>
 		/// <param name="layout"></param>
 		/// <param name="pipeline"></param>
-		Shader(ShaderBuilder const& builder, Runtime& engine, ID const sceneId);
+		Shader(ShaderBuilder const& builder, Runtime& engine);
 
 		/// <summary>
 		/// Destroys all of the resources associated with this Shader.

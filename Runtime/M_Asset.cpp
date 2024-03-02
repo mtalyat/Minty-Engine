@@ -5,7 +5,37 @@
 #include "M_Console.h"
 
 using namespace minty;
-using namespace minty::Asset;
+
+minty::Asset::Asset()
+	: RuntimeObject()
+	, _id()
+	, _path()
+{}
+
+minty::Asset::Asset(UUID const id, Path const& path, Runtime& runtime)
+	: RuntimeObject(runtime)
+	, _id(id != INVALID_UUID ? id : UUID())
+	, _path()
+{}
+
+minty::Asset::~Asset()
+{
+}
+
+UUID minty::Asset::get_id() const
+{
+	return _id;
+}
+
+Path const& minty::Asset::get_path() const
+{
+	return _path;
+}
+
+String minty::Asset::get_name() const
+{
+	return _path.stem().string();
+}
 
 Path get_assets_path(Path const& path)
 {
@@ -106,4 +136,14 @@ std::vector<String> minty::Asset::load_lines(Path const& path)
 #else
 	return File::read_all_lines(get_assets_path(path));
 #endif
+}
+
+bool minty::operator==(Asset const& left, Asset const& right)
+{
+	return left._id == right._id;
+}
+
+bool minty::operator!=(Asset const& left, Asset const& right)
+{
+	return left._id != right._id;
 }

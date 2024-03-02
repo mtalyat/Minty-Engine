@@ -159,7 +159,7 @@ ID minty::Node::to_id(ID const defaultValue) const
 
 UUID minty::Node::to_uuid() const
 {
-    UUID out;
+    UUID out = INVALID_UUID;
     Parse::try_uuid(_data, out);
     return out;
 }

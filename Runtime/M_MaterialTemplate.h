@@ -1,5 +1,5 @@
 #pragma once
-#include "M_RenderObject.h"
+#include "M_Asset.h"
 
 #include "M_Dynamic.h"
 #include <unordered_map>
@@ -8,17 +8,34 @@
 namespace minty
 {
 	class Shader;
-	struct MaterialTemplateBuilder;
+	class ShaderPass;
+
+	/// <summary>
+	/// Holds data to create a new MaterialTemplate.
+	/// </summary>
+	struct MaterialTemplateBuilder
+	{
+		UUID id;
+
+		Path path;
+
+		std::vector<ShaderPass*> shaderPasses;
+
+		/// <summary>
+		/// The default values.
+		/// </summary>
+		std::unordered_map<String, Dynamic> defaultValues;
+	};
 
 	/// <summary>
 	/// Holds the graphics information template data for a Material.
 	/// </summary>
 	class MaterialTemplate
-		: public RenderObject
+		: public Asset
 	{
 	private:
 		// the shader pass IDs for the material
-		std::vector<ID> _shaderPassIds;
+		std::vector<ShaderPass*> _shaderPasses;
 		// the default values for a new material
 		std::unordered_map<String, Dynamic> _defaultValues;
 
@@ -33,7 +50,7 @@ namespace minty
 		/// </summary>
 		/// <param name="builder"></param>
 		/// <param name="renderer"></param>
-		MaterialTemplate(MaterialTemplateBuilder const& builder, Runtime& engine, ID const sceneId);
+		MaterialTemplate(MaterialTemplateBuilder const& builder, Runtime& engine);
 
 		/// <summary>
 		/// Destroys all of the resources associated with this MaterialTemplate.
@@ -44,7 +61,7 @@ namespace minty
 		/// Gets the list of ShaderPass IDs.
 		/// </summary>
 		/// <returns></returns>
-		std::vector<ID> const& get_shader_pass_ids() const;
+		std::vector<ShaderPass*> const& get_shader_passes() const;
 
 		/// <summary>
 		/// Gets the default value for the value with the given name.

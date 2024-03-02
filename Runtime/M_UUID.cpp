@@ -18,14 +18,14 @@ minty::UUID::UUID(uint64_t const uuid)
 	: _uuid(uuid)
 {}
 
-bool minty::UUID::empty() const
-{
-	return _uuid == 0;
-}
-
 bool minty::UUID::valid() const
 {
 	return _uuid > 0;
+}
+
+uint64_t minty::UUID::data() const
+{
+	return _uuid;
 }
 
 bool minty::UUID::operator==(UUID const other) const
@@ -38,14 +38,19 @@ bool minty::UUID::operator!=(UUID const other) const
 	return _uuid != other._uuid;
 }
 
+bool minty::UUID::operator==(uint64_t const other) const
+{
+	return _uuid == other;
+}
+
+bool minty::UUID::operator!=(uint64_t const other) const
+{
+	return _uuid != other;
+}
+
 bool minty::UUID::operator!() const
 {
 	return !_uuid;
-}
-
-UUID minty::UUID::create_empty()
-{
-	return UUID(0);
 }
 
 std::ostream& minty::operator<<(std::ostream& stream, UUID const& object)

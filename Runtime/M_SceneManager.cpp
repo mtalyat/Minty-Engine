@@ -11,13 +11,14 @@
 #include "M_Scene.h"
 #include "M_Runtime.h"
 #include "M_RenderEngine.h"
+#include "M_AssetEngine.h"
 
 #include "M_NameComponent.h"
 
 using namespace minty;
 
 minty::SceneManager::SceneManager(Runtime& engine)
-	: _runtime(&engine)
+	: RuntimeObject(engine)
 	, _loaded()
 	, _scenes()
 	, _loadedScene()
@@ -29,25 +30,27 @@ bool minty::SceneManager::is_loaded() const
 	return _loaded;
 }
 
-ID minty::SceneManager::create_scene(Path const& path)
+Scene& minty::SceneManager::create_scene(Path const& path)
 {
-	return create_scene(path.stem().string(), path);
-}
+	// load the data from the disk
+	Node node = Asset::load_node(path);
 
-ID minty::SceneManager::create_scene(String const& name, Path const& path)
-{
-	// create the scene
-	ID id = _scenes.get_next();
-	Scene* scene = new Scene(*_runtime, id); // deleted in a destroy function
-	ID actualId = _scenes.emplace(name, scene);
+	SceneBuilder builder
+	{
+		.id = node.to_uuid(),
+		.path = path
+	};
 
-	// set active scene for creation
+	Scene* scene = new Scene(builder, get_runtime());
+	_scenes.emplace(scene->get_id(), scene);
+
+	AssetEngine& assets = get_runtime().get_asset_engine();
+	assets.emplace(scene);
+
+	// set to working scene for creation
 	set_working_scene(scene);
 
-	MINTY_ASSERT(id == actualId);
-
-	// load the data from the disk into the scene
-	Node node = Asset::load_node(path);
+	// deserialize
 	SerializationData data =
 	{
 		.scene = scene,
@@ -56,14 +59,14 @@ ID minty::SceneManager::create_scene(String const& name, Path const& path)
 	Reader reader(node, &data);
 	scene->deserialize(reader);
 
-	// all done, set active scene back to the loaded scene
+	// all done, set working scene back to the loaded scene
 	set_working_scene(_loadedScene);
 
 	// all done
-	return id;
+	return *scene;
 }
 
-bool minty::SceneManager::destroy_scene(ID const id)
+bool minty::SceneManager::destroy_scene(UUID const id)
 {
 	if (_scenes.contains(id))
 	{
@@ -91,9 +94,12 @@ bool minty::SceneManager::destroy_scene(ID const id)
 	return false;
 }
 
-void minty::SceneManager::load_scene(ID const id)
+void minty::SceneManager::load_scene(UUID const id)
 {
-	Scene* scene = _scenes.at(id);
+	// ID must be zero (null) or scenes must contain the id
+	MINTY_ASSERT(!id.valid() || _scenes.contains(id));
+
+	Scene* scene = get_scene(id);
 
 	// do nothing if already loaded
 	if (scene == _loadedScene)
@@ -137,8 +143,22 @@ Scene* minty::SceneManager::get_working_scene() const
 	return _workingScene;
 }
 
-Scene& minty::SceneManager::get_scene(ID const id)
+Scene* minty::SceneManager::get_scene(UUID const id)
 {
+	auto found = _scenes.find(id);
+
+	if (found != _scenes.end())
+	{
+		return found->second;
+	}
+
+	return nullptr;
+}
+
+Scene& minty::SceneManager::at_scene(UUID const id)
+{
+	MINTY_ASSERT(_scenes.contains(id));
+
 	return *_scenes.at(id);
 }
 
@@ -221,13 +241,13 @@ void minty::SceneManager::destroy()
 void minty::SceneManager::set_loaded_scene(Scene* const scene)
 {
 	_loadedScene = scene;
-	_runtime->set_loaded_scene(scene);
+	get_runtime().set_loaded_scene(scene);
 }
 
 void minty::SceneManager::set_working_scene(Scene* const scene)
 {
 	_workingScene = scene;
-	_runtime->set_working_scene(scene);
+	get_runtime().set_working_scene(scene);
 }
 
 String minty::to_string(SceneManager const& value)
