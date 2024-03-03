@@ -40,11 +40,7 @@ std::istream& minty::operator>>(std::istream& stream, Quaternion& quat)
 {
     Vector3 euler;
     stream >> euler;
-    Quaternion other = from_euler(euler);
-    quat.x = other.x;
-    quat.y = other.y;
-    quat.z = other.y;
-    quat.w = other.w;
+    quat = from_euler(euler);
     return stream;
 }
 
@@ -54,9 +50,31 @@ std::ostream& minty::operator<<(std::ostream& stream, Quaternion const& quat)
     return stream;
 }
 
+float fix_angle(float angle)
+{
+    if (angle == 0.0f)
+    {
+        // fix negative zero
+        return 0.0f;
+    }
+    else if(angle < 0.0f)
+    {
+        // fix negative angle
+        return angle += 360.0f;
+    }
+    else
+    {
+        // nothing to fix
+        return angle;
+    }
+}
+
 Vector3 minty::to_euler(Quaternion const& value)
 {
-    return glm::eulerAngles(value) * Math::RAD2DEG;
+    Vector3 euler = glm::eulerAngles(value) * Math::RAD2DEG;
+    euler = Vector3(fix_angle(euler.x), fix_angle(euler.y), fix_angle(euler.z));
+
+    return euler;
 }
 
 Quaternion minty::from_euler(Vector3 const& value)
