@@ -6,76 +6,20 @@
 
 namespace minty
 {
-	/// <summary>
-	/// A Quaternion.
-	/// </summary>
-	struct Quaternion
-		: public glm::quat, public Object
-	{
-		using glm::quat::qua;
-		Quaternion(glm::quat const& other);
+	typedef glm::quat Quaternion;
 
-		/// <summary>
-		/// Gets the forward vector from this Quaternion.
-		/// </summary>
-		/// <returns></returns>
-		Vector3 forward() const;
+	Vector3 forward(Quaternion const& value);
+	Vector3 backward(Quaternion const& value);
+	Vector3 right(Quaternion const& value);
+	Vector3 left(Quaternion const& value);
+	Vector3 up(Quaternion const& value);
+	Vector3 down(Quaternion const& value);
 
-		/// <summary>
-		/// Gets the backward vector from this Quaternion.
-		/// </summary>
-		/// <returns></returns>
-		Vector3 backward() const;
+	Vector3 to_euler(Quaternion const& value);
+	Quaternion from_euler(Vector3 const& value);
 
-		/// <summary>
-		/// Gets the right vector from this Quaternion.
-		/// </summary>
-		/// <returns></returns>
-		Vector3 right() const;
+	String to_string(Quaternion const& value);
 
-		/// <summary>
-		/// Gets the left vector from this Quaternion.
-		/// </summary>
-		/// <returns></returns>
-		Vector3 left() const;
-
-		/// <summary>
-		/// Gets the up vector from this Quaternion.
-		/// </summary>
-		/// <returns></returns>
-		Vector3 up() const;
-
-		/// <summary>
-		/// Gets the down vector from this Quaternion.
-		/// </summary>
-		/// <returns></returns>
-		Vector3 down() const;
-
-		/// <summary>
-		/// Gets the euler angles (x, y, z) from this Quaternion.
-		/// </summary>
-		/// <returns></returns>
-		Vector3 to_euler_angles() const;
-
-		friend std::istream& operator>>(std::istream& stream, Quaternion& vector);
-		friend std::ostream& operator<<(std::ostream& stream, const Quaternion& vector);
-
-		/// <summary>
-		/// Creates a Quaternion from the given euler angles.
-		/// </summary>
-		/// <param name="x">The rotation on the X axis.</param>
-		/// <param name="y">The rotation on the Y axis.</param>
-		/// <param name="z">The rotation on the Z axis.</param>
-		/// <returns>A Quaternion representing the same orientation.</returns>
-		static Quaternion from_euler_angles(float const x, float const y, float const z);
-
-		/// <summary>
-		/// Creates a Quaternion from the given euler angles.
-		/// </summary>
-		/// <param name="v">A Vector3 containing the X, Y and Z axes rotations.</param>
-		/// <returns>A Quaternion representing the same orientation.</returns>
-		static Quaternion from_euler_angles(Vector3 const v);
-
-		friend String to_string(Quaternion const& value);
-	};
+	std::istream& operator>>(std::istream& stream, Quaternion& vector);
+	std::ostream& operator<<(std::ostream& stream, const Quaternion& vector);
 }

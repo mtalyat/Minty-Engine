@@ -6,60 +6,41 @@
 
 using namespace minty;
 
-minty::Quaternion::Quaternion(glm::quat const& other)
-    : glm::quat(other)
-{}
-
-Vector3 minty::Quaternion::forward() const
+Vector3 minty::forward(Quaternion const& value)
 {
-    return glm::normalize(*this * Vector3(0.0f, 0.0f, 1.0f));
+    return glm::normalize(value * Vector3(0.0f, 0.0f, 1.0f));
 }
 
-Vector3 minty::Quaternion::backward() const
+Vector3 minty::backward(Quaternion const& value)
 {
-    return glm::normalize(*this * Vector3(0.0f, 0.0f, -1.0f));
+    return glm::normalize(value * Vector3(0.0f, 0.0f, -1.0f));
 }
 
-Vector3 minty::Quaternion::right() const
+Vector3 minty::right(glm::quat const& value)
 {
-    return glm::normalize(*this * Vector3(1.0f, 0.0f, 0.0f));
+    return glm::normalize(value * Vector3(1.0f, 0.0f, 0.0f));
 }
 
-Vector3 minty::Quaternion::left() const
+Vector3 minty::left(Quaternion const& value)
 {
-    return glm::normalize(*this * Vector3(-1.0f, 0.0f, 0.0f));
+    return glm::normalize(value * Vector3(-1.0f, 0.0f, 0.0f));
 }
 
-Vector3 minty::Quaternion::up() const
+Vector3 minty::up(Quaternion const& value)
 {
-    return glm::normalize(*this * Vector3(0.0f, 1.0f, 0.0f));
+    return glm::normalize(value * Vector3(0.0f, -1.0f, 0.0f));
 }
 
-Vector3 minty::Quaternion::down() const
+Vector3 minty::down(Quaternion const& value)
 {
-    return glm::normalize(*this * Vector3(0.0f, -1.0f, 0.0f));
-}
-
-Vector3 minty::Quaternion::to_euler_angles() const
-{
-    return glm::eulerAngles(*this);
-}
-
-Quaternion minty::Quaternion::from_euler_angles(float const x, float const y, float const z)
-{
-    return Quaternion(Vector3(x, y, z));
-}
-
-Quaternion minty::Quaternion::from_euler_angles(Vector3 const v)
-{
-    return Quaternion(v);
+    return glm::normalize(value * Vector3(0.0f, 1.0f, 0.0f));
 }
 
 std::istream& minty::operator>>(std::istream& stream, Quaternion& quat)
 {
     Vector3 euler;
     stream >> euler;
-    Quaternion other(euler);
+    Quaternion other = from_euler(euler);
     quat.x = other.x;
     quat.y = other.y;
     quat.z = other.y;
@@ -67,13 +48,23 @@ std::istream& minty::operator>>(std::istream& stream, Quaternion& quat)
     return stream;
 }
 
-std::ostream& minty::operator<<(std::ostream& stream, const Quaternion& quat)
+std::ostream& minty::operator<<(std::ostream& stream, Quaternion const& quat)
 {
-    stream << quat.to_euler_angles();
+    stream << to_euler(quat);
     return stream;
+}
+
+Vector3 minty::to_euler(Quaternion const& value)
+{
+    return glm::eulerAngles(value) * Math::RAD2DEG;
+}
+
+Quaternion minty::from_euler(Vector3 const& value)
+{
+    return Quaternion(value * Math::DEG2RAD);
 }
 
 String minty::to_string(Quaternion const& value)
 {
-    return std::format("Quaternion({})", to_string(value.to_euler_angles()));
+    return std::format("Quaternion({})", to_string(to_euler(value)));
 }

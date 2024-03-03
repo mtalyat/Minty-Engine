@@ -93,12 +93,12 @@ float minty::Math::mod(float const value, float const mod)
 
 float minty::Math::deg2rad(float const degree)
 {
-	return degree * PI / 180.0f;
+	return degree * DEG2RAD;
 }
 
 float minty::Math::rad2deg(float const rad)
 {
-	return rad * 180.0f / PI;
+	return rad * RAD2DEG;
 }
 
 float minty::Math::sin(float const rad)
