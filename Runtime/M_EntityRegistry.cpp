@@ -52,18 +52,6 @@ minty::EntityRegistry::~EntityRegistry()
 	clear();
 }
 
-minty::EntityRegistry::EntityRegistry(EntityRegistry&& other) noexcept
-	: SceneObject(std::move(other))
-	, entt::registry(std::move(other))
-{}
-
-EntityRegistry& minty::EntityRegistry::operator=(EntityRegistry&& other) noexcept
-{
-	entt::registry::operator=(std::move(other));
-
-	return *this;
-}
-
 Entity minty::EntityRegistry::create()
 {
 	return create(UUID());

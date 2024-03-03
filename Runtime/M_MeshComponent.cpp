@@ -18,7 +18,15 @@ using namespace minty;
 
 void minty::MeshComponent::serialize(Writer& writer) const
 {
-	writer.write("mesh", mesh ? mesh->get_id() : UUID(INVALID_UUID));
+	writer.write("type", to_string(type));
+	switch (type)
+	{
+		case MeshType::Custom:
+			writer.write("mesh", mesh ? mesh->get_id() : UUID(INVALID_UUID));
+			break;
+		default:
+			break;
+	}
 	writer.write("material", material ? material->get_id() : UUID(INVALID_UUID));
 }
 
@@ -40,14 +48,15 @@ void minty::MeshComponent::deserialize(Reader const& reader)
 	String meshTypeName;
 	if (reader.try_read_string("type", meshTypeName))
 	{
-		MeshType meshType = from_string_mesh_type(meshTypeName);
+		type = from_string_mesh_type(meshTypeName);
 
-		id = renderer.get_or_create_mesh(meshType);
+		id = renderer.get_or_create_mesh(type);
 
 		if (id.valid())
 		{
 			// had a built in type
 			mesh = assets.get<Mesh>(id);
+			return;
 		}
 	}
 

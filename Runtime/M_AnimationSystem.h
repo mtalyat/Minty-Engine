@@ -15,6 +15,7 @@ namespace minty
     {
     private:
 
+
     public:
         AnimationSystem(Runtime& engine, Scene& scene);
 

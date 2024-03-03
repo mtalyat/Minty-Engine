@@ -41,11 +41,6 @@ namespace minty
 
 		~EntityRegistry();
 
-		// move constructor
-		EntityRegistry(EntityRegistry&& other) noexcept;
-
-		EntityRegistry& operator=(EntityRegistry&& other) noexcept;
-
 		/// <summary>
 		/// Creates a new Entity with a new UUID.
 		/// </summary>

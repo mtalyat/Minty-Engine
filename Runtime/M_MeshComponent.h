@@ -1,10 +1,10 @@
 #pragma once
-
 #include "M_Component.h"
+
+#include "M_Mesh.h"
 
 namespace minty
 {
-	class Mesh;
 	class Material;
 
 	/// <summary>
@@ -13,6 +13,11 @@ namespace minty
 	struct MeshComponent
 		: public Component
 	{
+		/// <summary>
+		/// The type of mesh.
+		/// </summary>
+		MeshType type;
+
 		/// <summary>
 		/// The Mesh to draw.
 		/// </summary>
