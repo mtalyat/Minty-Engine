@@ -89,7 +89,14 @@ void mintye::PropertiesWindow::draw_entity() const
 	}
 
 	// id
-	ImGui::TextColored(ImVec4(0.5f, 0.5f, 0.5f, 1.0f), to_string(registry.get_id(_targetEntity)).c_str());
+	String idText = to_string(registry.get_id(_targetEntity));
+	ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.65f, 0.65f, 0.65f, 1.0f));
+	if (ImGui::Button(idText.c_str()))
+	{
+		// copy ID on click
+		ImGui::SetClipboardText(idText.c_str());
+	}
+	ImGui::PopStyleColor();
 
 	// enabled
 	bool enabled = registry.get_enabled(_targetEntity);
