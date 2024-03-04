@@ -15,7 +15,7 @@ minty::Asset::Asset()
 minty::Asset::Asset(UUID const id, Path const& path, Runtime& runtime)
 	: RuntimeObject(runtime)
 	, _id(id != INVALID_UUID ? id : UUID())
-	, _path()
+	, _path(path)
 {}
 
 minty::Asset::~Asset()
@@ -95,15 +95,16 @@ Node minty::Asset::load_node(Path const& path)
 
 Node minty::Asset::load_meta(Path const& path)
 {
-	Path metaPath = Path(path).replace_extension(META_EXTENSION);
+	Path metaPath = Path(std::format("{}{}", path.string(), META_EXTENSION));
 
-	if (std::filesystem::exists(metaPath))
+	if (Asset::exists(metaPath))
 	{
 		return load_node(metaPath);
 	}
 	else
 	{
 		// no meta file found
+		MINTY_WARN_FORMAT("No meta file found at: \"{}\", absolute path: \"{}\"", path.string(), std::filesystem::absolute(path).string());
 		return Node();
 	}
 }

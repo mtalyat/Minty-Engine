@@ -10,6 +10,7 @@
 #include "M_DirtyComponent.h"
 #include "M_Reader.h"
 #include "M_Writer.h"
+#include "M_SerializationData.h"
 
 using namespace minty;
 
@@ -63,10 +64,20 @@ bool minty::Scene::is_loaded() const
 void minty::Scene::load()
 {
 	_loaded = true;
-	if (get_runtime().get_mode() == Runtime::Mode::Normal)
+	_systems->load();
+	
+	// read scene data from disk
+	Node node = Asset::load_node(get_path());
+	SerializationData data =
 	{
-		_systems->load();
-	}
+		.scene = this,
+		.entity = NULL_ENTITY
+	};
+	Reader reader(node, &data);
+	reader.read_serializable("entities", *_entities);
+
+	// sort quick after loading in case entities are out of order, if the file was manually edited
+	sort();
 }
 
 void minty::Scene::update()
@@ -129,48 +140,6 @@ void minty::Scene::sort()
 				leftRelationship.next == right || // put siblings in order
 				// put in order based on parent sibling index
 				((leftRelationship.parent != right && rightRelationship.next != left) && (leftRelationship.parent < rightRelationship.parent || (leftRelationship.parent == rightRelationship.parent && left < right)));
-
-			//// get relationships
-			//RelationshipComponent const* leftRelationship = er->try_get<RelationshipComponent>(left);
-			//RelationshipComponent const* rightRelationship = er->try_get<RelationshipComponent>(right);
-
-			//if (leftRelationship)
-			//{
-			//	if (rightRelationship)
-			//	{
-			//		// both exist
-			//		return
-			//			rightRelationship->parent == left || // put parents on left of children
-			//			leftRelationship->next == right || // put siblings in order
-			//			// put in order based on parent sibling index
-			//			((leftRelationship->parent != right && rightRelationship->next != left) && (leftRelationship->parent < rightRelationship->parent || (leftRelationship->parent == rightRelationship->parent && left < right)));
-			//	}
-			//	else
-			//	{
-			//		// right dne
-			//		return true;
-			//		//return
-			//		//	leftRelationship->next == right ||
-			//		//	(leftRelationship->parent != right && leftRelationship->parent == NULL_ENTITY && left < right);
-			//	}
-			//}
-			//else
-			//{
-			//	if (rightRelationship)
-			//	{
-			//		// left dne
-			//		return false;
-			//		//return
-			//		//	rightRelationship->parent == left ||
-			//		//	(rightRelationship->next != left && (rightRelationship->parent != NULL_ENTITY || left < right));
-			//	}
-			//	else
-			//	{
-			//		// both dne
-			//		// compare entity ID values
-			//		return left < right;
-			//	}
-			//}
 		});
 }
 
@@ -188,10 +157,7 @@ void minty::Scene::fixed_update()
 void minty::Scene::unload()
 {
 	_loaded = false;
-	if (get_runtime().get_mode() == Runtime::Mode::Normal)
-	{
-		_systems->unload();
-	}
+	_systems->unload();
 }
 
 void minty::Scene::finalize()
@@ -212,10 +178,9 @@ void minty::Scene::serialize(Writer& writer) const
 void minty::Scene::deserialize(Reader const& reader)
 {
 	reader.read_serializable("systems", *_systems);
-	reader.read_serializable("entities", *_entities);
 
-	// sort quick after deserialization in case entities are out of order, if the file was manually edited
-	sort();
+	// this is done in the load function
+	//reader.read_serializable("entities", *_entities);
 }
 
 String minty::to_string(Scene const& value)

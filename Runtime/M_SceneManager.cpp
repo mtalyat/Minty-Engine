@@ -42,25 +42,12 @@ Scene& minty::SceneManager::create_scene(Path const& path)
 	};
 
 	Scene* scene = new Scene(builder, get_runtime());
+	Reader reader(node);
+	scene->deserialize(reader);
 	_scenes.emplace(scene->get_id(), scene);
 
 	AssetEngine& assets = get_runtime().get_asset_engine();
 	assets.emplace(scene);
-
-	// set to working scene for creation
-	set_working_scene(scene);
-
-	// deserialize
-	SerializationData data =
-	{
-		.scene = scene,
-		.entity = NULL_ENTITY
-	};
-	Reader reader(node, &data);
-	scene->deserialize(reader);
-
-	// all done, set working scene back to the loaded scene
-	set_working_scene(_loadedScene);
 
 	// all done
 	return *scene;

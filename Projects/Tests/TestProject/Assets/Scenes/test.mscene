@@ -74,8 +74,8 @@ entities
             type: cube
         AudioSource
             clip: cow-bells
-#        Animator
-#            animator: f4519e0c29f56efd
+        Animator
+            animator: f4519e0c29f56efd
         TestScript
             time: 5
         Relationship
