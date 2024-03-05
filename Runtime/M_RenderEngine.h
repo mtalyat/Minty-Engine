@@ -188,7 +188,19 @@ namespace minty
 
 		UUID get_or_create_mesh(MeshType const type);
 
+		Viewport& get_viewport();
+
+		Viewport const& get_viewport() const;
+
 #pragma endregion
+
+#pragma region Set
+
+	public:
+		void set_viewport(Viewport const& viewport);
+
+#pragma endregion
+
 
 #pragma region Init
 

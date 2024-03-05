@@ -16,7 +16,7 @@ Vector3 minty::backward(Quaternion const& value)
     return glm::normalize(value * Vector3(0.0f, 0.0f, -1.0f));
 }
 
-Vector3 minty::right(glm::quat const& value)
+Vector3 minty::right(Quaternion const& value)
 {
     return glm::normalize(value * Vector3(1.0f, 0.0f, 0.0f));
 }
@@ -57,11 +57,11 @@ float fix_angle(float angle)
         // fix negative zero
         return 0.0f;
     }
-    else if(angle < 0.0f)
-    {
-        // fix negative angle
-        return angle += 360.0f;
-    }
+    //else if(angle < 0.0f)
+    //{
+    //    // fix negative angle
+    //    return angle += 360.0f;
+    //}
     else
     {
         // nothing to fix

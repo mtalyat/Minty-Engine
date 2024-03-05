@@ -82,6 +82,7 @@ access to the entire engine without needing include each file.
 #include "M_SpriteComponent.h"
 #include "M_Texture.h"
 #include "M_TextureAtlas.h"
+#include "M_Viewport.h"
 
 // SCENES
 #include "M_Scene.h"

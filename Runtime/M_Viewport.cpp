@@ -1,11 +1,18 @@
 #include "pch.h"
 #include "M_Viewport.h"
 
+#include "M_Math.h"
+
 using namespace minty;
 
 minty::Viewport::Viewport()
 	: _view({0.0f, 0.0f, 0.0f, 0.0f, 0.0f, 1.0f})
 	, _scissor({{0, 0}, {0u, 0u}})
+{}
+
+minty::Viewport::Viewport(float const x, float const y, float const width, float const height, float const minDepth, float const maxDepth)
+	: _view({x, y, width, height, minDepth, maxDepth})
+	, _scissor({{Math::floor_to_int(x), Math::floor_to_int(y)}, {static_cast<unsigned int>(Math::floor_to_int(width)), static_cast<unsigned int>(Math::floor_to_int(height))}})
 {}
 
 minty::Viewport::Viewport(int const x, int const y, unsigned int const width, unsigned int const height, float const minDepth, float const maxDepth)

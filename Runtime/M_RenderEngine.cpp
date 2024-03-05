@@ -493,6 +493,21 @@ UUID minty::RenderEngine::get_or_create_mesh(MeshType const type)
 	return mesh->get_id();
 }
 
+Viewport& minty::RenderEngine::get_viewport()
+{
+	return _view;
+}
+
+Viewport const& minty::RenderEngine::get_viewport() const
+{
+	return _view;
+}
+
+void minty::RenderEngine::set_viewport(Viewport const& viewport)
+{
+	_view = viewport;
+}
+
 VkImageView RenderEngine::create_image_view(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags) {
 	VkImageViewCreateInfo viewInfo{};
 	viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
