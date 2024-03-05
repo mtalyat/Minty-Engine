@@ -110,3 +110,14 @@ void mintye::SceneWindow::draw()
 void mintye::SceneWindow::reset()
 {
 }
+
+void mintye::SceneWindow::focus(minty::Entity const entity)
+{
+	// move camera to entity - camera forward
+	EntityRegistry& registry = get_scene()->get_entity_registry();
+
+	if (TransformComponent* transformComponent = registry.try_get<TransformComponent>(entity))
+	{
+		_cameraPosition = transformComponent->get_global_position() - forward(_cameraRotation);
+	}
+}

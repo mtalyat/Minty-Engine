@@ -23,10 +23,22 @@ namespace mintye
 		void set_scene(minty::Scene* const scene) override;
 
 	private:
+		void copy_entity(minty::Entity const entity);
+
+		minty::Entity paste_entity();
+
+		void destroy_entity(minty::Entity const entity);
+
+		minty::Entity clone_entity(minty::Entity const entity);
+
+		void focus_entity(minty::Entity const entity);
+
 		void set_clicked(minty::Entity const entity);
 
 		void set_selected(minty::Entity const entity);
 
-		void draw_popup(minty::EntityRegistry& entityRegistry);
+		void draw_popup();
+
+		void run_shortcuts();
 	};
 }
