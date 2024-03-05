@@ -79,6 +79,9 @@
     <Filter Include="Header Files\Runtime">
       <UniqueIdentifier>{cf883742-6da1-4840-b0ef-0dadd43d1df1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Camera">
+      <UniqueIdentifier>{681223b2-489b-4248-b2b5-b9440d18606f}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -158,9 +161,6 @@
     </ClInclude>
     <ClInclude Include="M_Parse.h">
       <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="M_CameraComponent.h">
-      <Filter>Header Files\Components</Filter>
     </ClInclude>
     <ClInclude Include="M_Info.h">
       <Filter>Header Files</Filter>
@@ -564,6 +564,12 @@
     <ClInclude Include="M_MeshComponent.h">
       <Filter>Header Files\Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="M_CameraComponent.h">
+      <Filter>Header Files\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Camera.h">
+      <Filter>Header Files\Camera</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -954,6 +960,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_SceneObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_Camera.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

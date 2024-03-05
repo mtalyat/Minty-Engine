@@ -194,32 +194,34 @@ void mintye::ApplicationRenderEngine::draw(VkCommandBuffer commandBuffer)
 	//	//}
 	//}
 
-	// Start the Dear ImGui frame
-	ImGui_ImplVulkan_NewFrame();
-	ImGui_ImplGlfw_NewFrame();
-	ImGui::NewFrame();
+	//// Start the Dear ImGui frame
+	//ImGui_ImplVulkan_NewFrame();
+	//ImGui_ImplGlfw_NewFrame();
+	//ImGui::NewFrame();
 
 	//// 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
 	//ImGui::ShowDemoWindow(&show_demo_window);
+
+	set_camera(Vector3(0.0f, 0.0f, -10.0f), Quaternion(), Camera());
 
 	// draw normal stuff
 	RenderEngine::draw(commandBuffer);
 
 	// draw application
-	_application->draw();
+	//_application->draw();
 
-	// render ImGui
-	ImGui::Render();
-	ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), commandBuffer);
+	//// render ImGui
+	//ImGui::Render();
+	//ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), commandBuffer);
 
-	ImGuiIO& io = ImGui::GetIO();
+	//ImGuiIO& io = ImGui::GetIO();
 
-	// Update and Render additional Platform Windows
-	if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
-	{
-		ImGui::UpdatePlatformWindows();
-		ImGui::RenderPlatformWindowsDefault();
-	}
+	//// Update and Render additional Platform Windows
+	//if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+	//{
+	//	ImGui::UpdatePlatformWindows();
+	//	ImGui::RenderPlatformWindowsDefault();
+	//}
 }
 
 VkSurfaceFormatKHR mintye::ApplicationRenderEngine::choose_swap_surface_format(const std::vector<VkSurfaceFormatKHR>& availableFormats)

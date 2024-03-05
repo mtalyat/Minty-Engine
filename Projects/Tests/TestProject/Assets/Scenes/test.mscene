@@ -25,14 +25,14 @@ systems
         sprites
             - Sprites/x.msprite
             - Sprites/brian.msprite
-        atlases
-            -
-                texture: death
-                coordinateMode: PIXEL
-                slice: (90, 90)
-                pivot: (45, 45)
-                sprites
-                    all
+#        atlases
+#            -
+#                texture: death
+#                coordinateMode: PIXEL
+#                slice: (90, 90)
+#                pivot: (45, 45)
+#                sprites
+#                    all
     Audio
         clips
             - Audio/blinking-forest.wav

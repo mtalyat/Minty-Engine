@@ -5,6 +5,7 @@
 #include "M_DrawCallObjectInfo.h"
 #include "M_SpritePushData.h"
 
+#include "M_Camera.h"
 #include "M_Console.h"
 #include "M_Runtime.h"
 #include "M_File.h"
@@ -209,6 +210,43 @@ void RenderEngine::render_frame()
 	// move to next frame
 	_frame++;
 	if (_frame == MAX_FRAMES_IN_FLIGHT) _frame = 0;
+}
+
+void minty::RenderEngine::set_camera(Vector3 const position, Quaternion const rotation, Camera const& camera)
+{
+	Matrix4 view = glm::lookAt(position, position + forward(rotation), Vector3(0.0f, 1.0f, 0.0f));
+
+	// TODO: don't use lookat
+	// maybe invert global?
+
+	// get projection
+	Matrix4 proj;
+	switch (camera.get_perspective())
+	{
+	case Perspective::Perspective:
+		proj = glm::perspective(camera.get_fov(), get_aspect_ratio(), camera.get_near(), camera.get_far());
+		break;
+	default: // (orthographic)
+		proj = Matrix4(1.0f);
+		break;
+	}
+
+	// multiply together
+	Matrix4 transformMatrix = proj * view;
+
+	// update buffer object
+	CameraBufferObject obj =
+	{
+		.transform = transformMatrix,
+	};
+
+	AssetEngine& assets = get_runtime().get_asset_engine();
+
+	// update all shaders
+	for (auto const shader : assets.get_by_type<Shader>())
+	{
+		shader->update_global_uniform_constant("camera", get_frame(), &obj, sizeof(CameraBufferObject), 0);
+	}
 }
 
 bool minty::RenderEngine::is_initialized() const
@@ -417,8 +455,33 @@ UUID minty::RenderEngine::get_or_create_mesh(MeshType const type)
 
 	// create new
 	MeshBuilder builder
-	{};
+	{
+
+	};
 	Mesh* mesh = new Mesh(builder, get_runtime());
+
+	// create data
+	switch (type)
+	{
+	case MeshType::Quad:
+		Mesh::create_primitive_quad(*mesh);
+		break;
+	case MeshType::Cube:
+		Mesh::create_primitive_cube(*mesh);
+		break;
+	case MeshType::Pyramid:
+		Mesh::create_primitive_pyramid(*mesh);
+		break;
+	case MeshType::Sphere:
+		Mesh::create_primitive_sphere(*mesh);
+		break;
+	case MeshType::Cylinder:
+		Mesh::create_primitive_cylinder(*mesh);
+		break;
+	default:
+		Console::todo(std::format("RenderEngine::get_or_create_mesh(): Type: {}", static_cast<int>(type)));
+		break;
+	}
 
 	// add to assets
 	AssetEngine& assets = get_runtime().get_asset_engine();

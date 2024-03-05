@@ -33,10 +33,13 @@ access to the entire engine without needing include each file.
 // BUILTIN
 #include "M_Builtin.h"
 
+// CAMERA
+#include "M_Camera.h"
+#include "M_CameraComponent.h"
+
 // COMPONENTS
 #include "M_Component.h"
 
-#include "M_CameraComponent.h"
 #include "M_MeshComponent.h"
 #include "M_RelationshipComponent.h"
 

@@ -563,11 +563,13 @@ void minty::AssetEngine::unload(UUID const id)
 {
 	MINTY_ASSERT(_assets.contains(id));
 
-	// delete the data
-	delete _assets.at(id);
+	Asset* asset = _assets.at(id);
 
 	// remove the reference
 	erase(id);
+
+	// delete the data
+	delete asset;
 }
 
 void minty::AssetEngine::unload(Asset const& asset)
@@ -582,6 +584,7 @@ void minty::AssetEngine::unload_all()
 		delete pair.second;
 	}
 	_assets.clear();
+	_assetsByType.clear();
 }
 
 Asset* minty::AssetEngine::get_asset(UUID const id) const
@@ -603,11 +606,51 @@ void minty::AssetEngine::emplace(Asset* const asset)
 	MINTY_ASSERT(asset->get_id().valid());
 
 	_assets.emplace(asset->get_id(), asset);
+	emplace_by_type(*asset);
 }
 
 void minty::AssetEngine::erase(UUID const id)
 {
 	MINTY_ASSERT(_assets.contains(id));
 
+	erase_by_type(*_assets.at(id));
 	_assets.erase(id);
+}
+
+void minty::AssetEngine::emplace_by_type(Asset& asset)
+{
+	TypeID typeId = typeid(asset);
+
+	auto found = _assetsByType.find(typeId);
+
+	if (found != _assetsByType.end())
+	{
+		// add to existing set
+		found->second.emplace(&asset);
+	}
+	else
+	{
+		// create new set
+		_assetsByType.emplace(typeId, std::unordered_set<Asset*>());
+		_assetsByType.at(typeId).emplace(&asset);
+	}
+}
+
+void minty::AssetEngine::erase_by_type(Asset& asset)
+{
+	TypeID typeId = typeid(asset);
+
+	auto found = _assetsByType.find(typeId);
+
+	if (found != _assetsByType.end())
+	{
+		// erase from type set
+		found->second.erase(&asset);
+
+		// remove type set if empty
+		if (found->second.empty())
+		{
+			_assetsByType.erase(typeId);
+		}
+	}
 }

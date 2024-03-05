@@ -3,6 +3,8 @@
 
 #include "M_Asset.h"
 #include <unordered_map>
+#include <unordered_set>
+#include <vector>
 
 namespace minty
 {
@@ -24,6 +26,7 @@ namespace minty
 	{
 	private:
 		std::unordered_map<UUID, Asset*> _assets;
+		std::unordered_map<TypeID, std::unordered_set<Asset*>> _assetsByType;
 
 	public:
 		AssetEngine(Runtime& runtime);
@@ -153,5 +156,34 @@ namespace minty
 			emplace(asset);
 			return asset;
 		}
+
+		template<class T>
+		std::vector<T*> get_by_type()
+		{
+			std::vector<T*> result;
+
+			TypeID typeId = typeid(T);
+
+			auto found = _assetsByType.find(typeId);
+
+			if (found != _assetsByType.end())
+			{
+				// type exists, add all to result
+				result.reserve(found->second.size());
+
+				for (auto const asset : found->second)
+				{
+					result.push_back(static_cast<T*>(asset));
+				}
+			}
+
+			// no type, return empty
+			return result;
+		}
+
+	private:
+		void emplace_by_type(Asset& asset);
+
+		void erase_by_type(Asset& asset);
 	};
 }

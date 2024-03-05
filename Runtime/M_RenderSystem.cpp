@@ -31,9 +31,7 @@ minty::RenderSystem::~RenderSystem()
 {}
 
 void minty::RenderSystem::reset()
-{
-	_shaders.clear();
-}
+{ }
 
 void minty::RenderSystem::update()
 {
@@ -48,7 +46,7 @@ void minty::RenderSystem::update()
 	EntityRegistry& entityRegistry = get_entity_registry();
 
 	// update camera in renderer if it is enabled
-	if (entityRegistry.try_get<EnabledComponent>(_mainCamera))
+	if (entityRegistry.all_of<EnabledComponent>(_mainCamera))
 	{
 		CameraComponent const& camera = entityRegistry.get<CameraComponent>(_mainCamera);
 		TransformComponent const& transformComponent = entityRegistry.get<TransformComponent>(_mainCamera);
@@ -59,42 +57,8 @@ void minty::RenderSystem::update()
 
 void minty::RenderSystem::update_camera(CameraComponent const& camera, TransformComponent const& transform)
 {
-	Vector4 matPos = transform.globalMatrix[3];
-	Vector3 globalPos = Vector3(matPos.x, matPos.y, matPos.z);
-
-	Matrix4 view = glm::lookAt(globalPos, globalPos + forward(transform.localRotation), Vector3(0.0f, 1.0f, 0.0f));
-
-	// TODO: don't use lookat
-	// maybe invert global?
-
-	RenderEngine& renderEngine = get_runtime().get_render_engine();
-
-	// get projection
-	Matrix4 proj;
-	switch (camera.perspective)
-	{
-	case CameraComponent::Perspective::Perspective:
-		proj = glm::perspective(glm::radians(camera.fov), renderEngine.get_aspect_ratio(), camera.nearPlane, camera.farPlane);
-		break;
-	default:
-		proj = Matrix4(1.0f);
-		break;
-	}
-
-	// multiply together
-	Matrix4 transformMatrix = proj * view;
-
-	// update buffer object
-	CameraBufferObject obj =
-	{
-		.transform = transformMatrix,
-	};
-
-	// update all shaders
-	for (auto& shader : _shaders)
-	{
-		shader->update_global_uniform_constant("camera", renderEngine.get_frame(), &obj, sizeof(CameraBufferObject), 0);
-	}
+	RenderEngine& renderer = get_runtime().get_render_engine();
+	renderer.set_camera(transform.get_global_position(), transform.get_global_rotation(), camera.camera);
 }
 
 void minty::RenderSystem::set_main_camera(Entity const entity)
@@ -110,13 +74,7 @@ void minty::RenderSystem::serialize(Writer& writer) const
 void minty::RenderSystem::deserialize(Reader const& reader)
 {
 	register_assets(reader, "textures", [](AssetEngine& assets, Path const& path) { return assets.load_texture(path); });
-	register_assets(reader, "shaders", [this](AssetEngine& assets, Path const& path)
-		{
-			// load asset, also register with this system for other uses
-			Shader* shader = assets.load_shader(path);
-			if (shader) _shaders.emplace(shader);
-			return shader;
-		});
+	register_assets(reader, "shaders", [](AssetEngine& assets, Path const& path) { return assets.load_shader(path); });
 	register_assets(reader, "shaderPasses", [](AssetEngine& assets, Path const& path) { return assets.load_shader_pass(path); });
 	register_assets(reader, "materialTemplates", [](AssetEngine& assets, Path const& path) { return assets.load_material_template(path); });
 	register_assets(reader, "materials", [](AssetEngine& assets, Path const& path) { return assets.load_material(path); });

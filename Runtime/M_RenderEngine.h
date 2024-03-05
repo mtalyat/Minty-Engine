@@ -17,6 +17,7 @@
 #include <array>
 #include <vector>
 #include <set>
+#include <unordered_set>
 #include <optional>
 #include <string>
 #include <cstring>
@@ -58,6 +59,8 @@ namespace minty
 	struct TextureBuilder;
 
 	class Material;
+	class Shader;
+	class Camera;
 
 	class Info;
 	class Window;
@@ -145,6 +148,8 @@ namespace minty
 		/// Draws a frame to the screen.
 		/// </summary>
 		virtual void render_frame();
+
+		virtual void set_camera(Vector3 const position, Quaternion const rotation, Camera const& camera);
 
 #pragma endregion
 

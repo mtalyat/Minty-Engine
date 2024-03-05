@@ -16,7 +16,6 @@
 
 #include <unordered_map>
 #include <vector>
-#include <unordered_set>
 
 namespace minty
 {
@@ -29,8 +28,6 @@ namespace minty
 	{
 	private:
 		Entity _mainCamera = NULL_ENTITY;
-
-		std::unordered_set<Shader*> _shaders;
 
 	public:
 		RenderSystem(Runtime& engine, Scene& scene);

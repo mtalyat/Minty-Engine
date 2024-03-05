@@ -240,6 +240,21 @@ namespace minty
 			}
 		}
 
+		template<typename T>
+		void write_as(T const& value)
+		{
+			if (ISerializable const* serializable = try_cast<T, ISerializable const>(&value))
+			{
+				serializable->serialize(*this);
+			}
+			else
+			{
+				std::ostringstream stream;
+				stream << value;
+				_node->set_data(stream.str());
+			}
+		}
+
 #pragma endregion
 
 	public:

@@ -9,8 +9,4 @@ namespace minty
 	{
 		alignas(16) Matrix4 transform;
 	};
-
-	struct CameraBufferObject {
-		alignas (16) Matrix4 transform;
-	};
 }
