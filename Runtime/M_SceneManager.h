@@ -15,8 +15,6 @@ namespace minty
 		// if the scene manager has been loaded or not
 		// if not, no scenes will receive events
 		bool _loaded;
-		// all scenes stored in memory
-		std::unordered_map<UUID, Scene*> _scenes;
 		// scene that is active, eg. receiving update, etc. events
 		Scene* _loadedScene;
 		Scene* _workingScene;

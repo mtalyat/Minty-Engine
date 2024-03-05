@@ -109,6 +109,24 @@ Node minty::Asset::load_meta(Path const& path)
 	}
 }
 
+UUID minty::Asset::load_uuid(Path const& path)
+{
+#if MINTY_RELEASE
+	Console::error("Asset loading not implemented for release builds.");
+	return UUID(INVALID_UUID);
+#else
+	std::vector<String> lines = File::read_lines(get_assets_path(path), 1);
+
+	if (lines.empty()) return INVALID_UUID;
+
+	String line = lines.front();
+
+	if (!line.starts_with(": ")) return INVALID_UUID;
+
+	return Parse::to_uuid(line);
+#endif
+}
+
 std::vector<char> minty::Asset::load_chars(Path const& path)
 {
 #if MINTY_RELEASE

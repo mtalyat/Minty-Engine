@@ -561,9 +561,14 @@ Animator* minty::AssetEngine::load_animator(Path const& path)
 
 void minty::AssetEngine::unload(UUID const id)
 {
-	MINTY_ASSERT(_assets.contains(id));
+	auto found = _assets.find(id);
 
-	Asset* asset = _assets.at(id);
+	if (found == _assets.end())
+	{
+		return;
+	}
+
+	Asset* asset = found->second;
 
 	// remove the reference
 	erase(id);
@@ -597,6 +602,11 @@ Asset* minty::AssetEngine::get_asset(UUID const id) const
 	}
 
 	return nullptr;
+}
+
+bool minty::AssetEngine::contains(UUID const id) const
+{
+	return _assets.contains(id);
 }
 
 void minty::AssetEngine::emplace(Asset* const asset)

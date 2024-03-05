@@ -84,6 +84,13 @@ namespace minty
 		static Node load_meta(Path const& path);
 
 		/// <summary>
+		/// Gets the UUID from a Minty node file.
+		/// </summary>
+		/// <param name="path"></param>
+		/// <returns></returns>
+		static UUID load_uuid(Path const& path);
+
+		/// <summary>
 		/// Loads the given asset file into a vector of chars.
 		/// </summary>
 		/// <param name="path"></param>

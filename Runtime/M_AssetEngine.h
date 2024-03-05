@@ -137,6 +137,8 @@ namespace minty
 
 		Asset* get_asset(UUID const id) const;
 
+		bool contains(UUID const id) const;
+
 		/// <summary>
 		/// Adds the given asset to this AssetEngine.
 		/// </summary>

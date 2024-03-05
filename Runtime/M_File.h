@@ -199,6 +199,8 @@ namespace minty
 		/// <returns>The lines from the file.</returns>
 		static std::vector<String> read_all_lines(Path const& path);
 
+		static std::vector<String> read_lines(Path const& path, size_t const count);
+
 		/// <summary>
 		/// Parses a Node from the file at the given path.
 		/// </summary>

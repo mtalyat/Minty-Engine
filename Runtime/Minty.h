@@ -22,6 +22,10 @@ access to the entire engine without needing include each file.
 #include "M_Animator.h"
 #include "M_AnimatorComponent.h"
 
+// ASSET
+#include "M_Asset.h"
+#include "M_AssetEngine.h"
+
 // AUDIO
 #include "M_Audio.h"
 #include "M_AudioClip.h"
@@ -47,7 +51,6 @@ access to the entire engine without needing include each file.
 #include "M_EntityRegistry.h"
 
 // FILES
-#include "M_Asset.h"
 #include "M_File.h"
 #include "M_PhysicalFile.h"
 #include "M_VirtualFile.h"

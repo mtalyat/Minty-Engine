@@ -20,7 +20,6 @@ using namespace minty;
 minty::SceneManager::SceneManager(Runtime& engine)
 	: RuntimeObject(engine)
 	, _loaded()
-	, _scenes()
 	, _loadedScene()
 	, _workingScene()
 {}
@@ -44,8 +43,8 @@ Scene& minty::SceneManager::create_scene(Path const& path)
 	Scene* scene = new Scene(builder, get_runtime());
 	Reader reader(node);
 	scene->deserialize(reader);
-	_scenes.emplace(scene->get_id(), scene);
 
+	// add to assets
 	AssetEngine& assets = get_runtime().get_asset_engine();
 	assets.emplace(scene);
 
@@ -55,23 +54,24 @@ Scene& minty::SceneManager::create_scene(Path const& path)
 
 bool minty::SceneManager::destroy_scene(UUID const id)
 {
-	if (_scenes.contains(id))
+	AssetEngine& assets = get_runtime().get_asset_engine();
+
+	if (assets.contains(id))
 	{
 		// set active scene temporarily
-		Scene* scene = _scenes.at(id);
+		Scene& scene = assets.at<Scene>(id);
 
-		set_working_scene(scene);
+		set_working_scene(&scene);
 
 		// if this is the loaded scene, unload it first
-		if (_loadedScene == scene)
+		if (_loadedScene == &scene)
 		{
 			unload_scene();
 		}
 
-		// delete
-		delete _scenes.at(id);
-		// erase
-		_scenes.erase(id);
+		// remove from assets
+		AssetEngine& assets = get_runtime().get_asset_engine();
+		assets.unload(id);
 
 		set_working_scene(_loadedScene);
 
@@ -84,7 +84,8 @@ bool minty::SceneManager::destroy_scene(UUID const id)
 void minty::SceneManager::load_scene(UUID const id)
 {
 	// ID must be zero (null) or scenes must contain the id
-	MINTY_ASSERT(!id.valid() || _scenes.contains(id));
+	AssetEngine& assets = get_runtime().get_asset_engine();
+	MINTY_ASSERT(assets.contains(id));
 
 	Scene* scene = get_scene(id);
 
@@ -132,26 +133,21 @@ Scene* minty::SceneManager::get_working_scene() const
 
 Scene* minty::SceneManager::get_scene(UUID const id)
 {
-	auto found = _scenes.find(id);
-
-	if (found != _scenes.end())
-	{
-		return found->second;
-	}
-
-	return nullptr;
+	AssetEngine& assets = get_runtime().get_asset_engine();
+	return assets.get<Scene>(id);
 }
 
 Scene& minty::SceneManager::at_scene(UUID const id)
 {
-	MINTY_ASSERT(_scenes.contains(id));
-
-	return *_scenes.at(id);
+	AssetEngine& assets = get_runtime().get_asset_engine();
+	MINTY_ASSERT(assets.contains(id));
+	return assets.at<Scene>(id);
 }
 
 size_t minty::SceneManager::size() const
 {
-	return _scenes.size();
+	AssetEngine& assets = get_runtime().get_asset_engine();
+	return assets.get_by_type<Scene>().size();
 }
 
 void minty::SceneManager::load()
@@ -218,11 +214,15 @@ void minty::SceneManager::finalize()
 
 void minty::SceneManager::destroy()
 {
-	for (auto const& pair : _scenes)
+	unload();
+
+	AssetEngine& assets = get_runtime().get_asset_engine();
+	for (auto const scene : assets.get_by_type<Scene>())
 	{
-		delete pair.second;
+		destroy_scene(scene->get_id());
 	}
-	_scenes.clear();
+	set_working_scene(nullptr);
+	set_loaded_scene(nullptr);
 }
 
 void minty::SceneManager::set_loaded_scene(Scene* const scene)

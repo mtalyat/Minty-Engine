@@ -319,7 +319,7 @@ void mintye::Application::load_scene(minty::Path const& path)
 
 	if (!_runtime)
 	{
-		console->log_error(std::format("Cannot load scene \"{}\". No engine loaded.", path.string()));
+		console->log_error(std::format("Cannot load scene \"{}\". No runtime loaded.", path.string()));
 		return;
 	}
 
@@ -329,8 +329,12 @@ void mintye::Application::load_scene(minty::Path const& path)
 		console->log_error(std::format("Cannot load scene \"{}\". Project could not find the asset.", path.string()));
 	}
 
-	// unload existing scene
-	unload_scene();
+	// unload and destroy existing scene
+	if (_sceneId.valid())
+	{
+		unload_scene();
+		
+	}
 
 	// load new scene
 	SceneManager& sceneManager = _runtime->get_scene_manager();

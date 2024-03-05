@@ -113,6 +113,45 @@ std::vector<String> minty::File::read_all_lines(Path const& path)
     return lines;
 }
 
+std::vector<String> minty::File::read_lines(Path const& path, size_t const count)
+{
+    if (!std::filesystem::exists(path) || count <= 0)
+    {
+        Console::error(std::format("File not found at: {}", path.string()));
+        return std::vector<String>();
+    }
+
+    std::vector<String> lines;
+
+    // get the file to read from
+    std::fstream file(path, std::ios::in);
+
+    // if the file exists and is open
+    if (file.is_open())
+    {
+        String line;
+
+        size_t i = 0;
+
+        // while there are lines, add to output
+        while (i < count && std::getline(file, line)) {
+            lines.push_back(line);
+            i++;
+        }
+
+        // done with file, close it
+        file.close();
+    }
+    else
+    {
+        Console::error(std::format("File not opened at: ", path.string()));
+        return std::vector<String>();
+    }
+
+    // return list, regardless of size
+    return lines;
+}
+
 Node minty::File::read_node(Path const& path)
 {
     return Node::load_node(path);
