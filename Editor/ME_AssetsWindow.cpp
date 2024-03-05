@@ -43,7 +43,11 @@ void mintye::AssetsWindow::draw()
 
 	if (ImGui::Button("Refresh"))
 	{
+		// refresh the project files
 		get_project()->collect_assets();
+
+		// re-populate the editor files
+		set_path(_path);
 	}
 
 	ImGui::SameLine();
@@ -51,8 +55,7 @@ void mintye::AssetsWindow::draw()
 	if (ImGui::Button("Open Folder"))
 	{
 		// open the assets folder
-		Application& app = get_application();
-		app.open_asset(project->get_assets_path());
+		Operations::open(project->get_assets_path() / _path);
 	}
 
 	ImGui::Separator();
