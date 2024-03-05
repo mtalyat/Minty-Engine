@@ -35,8 +35,8 @@ void mintye::SceneWindow::draw()
 	// for now, move the render location to fake a scene window
 	ImVec2 windowPos = ImGui::GetWindowPos();
 
-	ImVec2 min = ImGui::GetWindowContentRegionMin();
-	ImVec2 max = ImGui::GetWindowContentRegionMax();
+	ImVec2 min = ImVec2(0.0f, 0.0f); //ImGui::GetWindowContentRegionMin();
+	ImVec2 max = ImGui::GetWindowSize(); //ImGui::GetWindowContentRegionMax();
 
 	ImVec2 pos = ImVec2(min.x + windowPos.x, min.y + windowPos.y);
 	ImVec2 size = ImVec2(max.x - min.x, max.y - min.y);
