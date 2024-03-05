@@ -92,38 +92,6 @@ void minty::Scene::update()
 
 	// TODO: move to fixed_update
 	// TODO: use group, only sort dirty components
-
-	// sort the hierarchy
-	sort();
-
-	// update group
-	for (auto&& [entity, dirty, transform] : _entities->view<DirtyComponent const, TransformComponent>().each())
-	{
-		// get relationship, if there is one
-		RelationshipComponent const* relationshipComponent = er->try_get<RelationshipComponent>(entity);
-
-		// if parent, apply local to parent global for this global
-		// if no parent, set global to local
-		if (relationshipComponent && relationshipComponent->parent != NULL_ENTITY)
-		{
-			// parent
-
-			// get parent Transform
-			TransformComponent const* parentTransform = er->try_get<TransformComponent>(relationshipComponent->parent);
-
-			if (parentTransform)
-			{
-				transform.globalMatrix = parentTransform->globalMatrix * transform.get_local_matrix();
-
-				continue;
-			}
-
-			// if no transform on parent, treat as if no parent
-		}
-
-		// no parent
-		transform.globalMatrix = transform.get_local_matrix();
-	}
 }
 
 void minty::Scene::sort()
@@ -162,6 +130,41 @@ void minty::Scene::unload()
 
 void minty::Scene::finalize()
 {
+	// update all the dirty tags
+	
+	// sort the hierarchy
+	sort();
+
+	// update dirty transform group with relationships
+	auto view = _entities->view<DirtyComponent const, TransformComponent, RelationshipComponent>();
+	view.use<RelationshipComponent const>();
+	for (auto [entity, dirty, transform, relationship] : view.each())
+	{
+		// if parent, apply local to parent global for this global
+		// if no parent, set global to local
+		if (relationship.parent != NULL_ENTITY)
+		{
+			// parent
+
+			// get parent Transform
+			TransformComponent& parentTransform = _entities->get<TransformComponent>(relationship.parent);
+
+			transform.globalMatrix = parentTransform.globalMatrix * transform.get_local_matrix();
+		}
+		else
+		{
+			// no parent
+			transform.globalMatrix = transform.get_local_matrix();
+		}
+	}
+	
+	// update dirty transform group with no relationships
+	for (auto [entity, dirty, transform] : _entities->view<DirtyComponent const, TransformComponent>(entt::exclude<RelationshipComponent>).each())
+	{
+		// no parent, set to self matrix
+		transform.globalMatrix = transform.get_local_matrix();
+	}
+
 	// remove all dirty tags
 	_entities->clear<DirtyComponent>();
 
