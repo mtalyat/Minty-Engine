@@ -16,13 +16,24 @@ namespace mintye
 		ImVec4 _clearColor;
 		Theme _theme;
 
+		//VkImage _sceneImage;
+		//VkImageView _sceneImageView;
+		//VkDeviceMemory _sceneImageMemory;
+		//VkSampler _sceneSampler;
+		//VkDescriptorSet _sceneDescriptorSet;
+
 	public:
 		ApplicationRenderEngine(Application& app, minty::Runtime& runtime);
+
+		~ApplicationRenderEngine();
 
 	public:
 		void init(minty::RenderEngineBuilder const& builder) override;
 
 		void destroy() override;
+
+	public:
+		//VkDescriptorSet get_scene_descriptor_set() const;
 
 	private:
 		void init_theme();

@@ -165,9 +165,9 @@ void minty::EntityRegistry::dirty(Entity const entity)
 	{
 		dirty(child);
 
-		RelationshipComponent& childRelationship = get<RelationshipComponent>(child);
+		RelationshipComponent const& childRelationship = get<RelationshipComponent const>(child);
 
-		child = relationship.next;
+		child = childRelationship.next;
 	}
 }
 

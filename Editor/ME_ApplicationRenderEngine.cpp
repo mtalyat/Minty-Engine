@@ -11,7 +11,10 @@ mintye::ApplicationRenderEngine::ApplicationRenderEngine(Application& app, Runti
 	, _descriptorPool()
 	, _clearColor()
 	, _theme()
-{}
+{ }
+
+mintye::ApplicationRenderEngine::~ApplicationRenderEngine()
+{ }
 
 void mintye::ApplicationRenderEngine::init(RenderEngineBuilder const& builder)
 {
@@ -109,10 +112,40 @@ void mintye::ApplicationRenderEngine::init(RenderEngineBuilder const& builder)
 	//// Our state
 	//bool show_demo_window = true;
 	_clearColor = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+
+	//VkSamplerCreateInfo samplerInfo{};
+	//samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
+	//samplerInfo.magFilter = VK_FILTER_LINEAR;
+	//samplerInfo.minFilter = VK_FILTER_LINEAR;
+	//samplerInfo.addressModeU = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+	//samplerInfo.addressModeV = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+	//samplerInfo.addressModeW = VK_SAMPLER_ADDRESS_MODE_REPEAT;
+	//samplerInfo.anisotropyEnable = VK_FALSE;
+	//samplerInfo.maxAnisotropy = 1.0f;
+	//samplerInfo.borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK;
+	//samplerInfo.unnormalizedCoordinates = VK_FALSE;
+	//samplerInfo.compareEnable = VK_FALSE;
+	//samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
+	//samplerInfo.mipmapMode = VK_SAMPLER_MIPMAP_MODE_LINEAR;
+	//samplerInfo.mipLodBias = 0.0f;
+	//samplerInfo.minLod = 0.0f;
+	//samplerInfo.maxLod = 0.0f;
+
+	//if (vkCreateSampler(_device, &samplerInfo, nullptr, &_sceneSampler) != VK_SUCCESS)
+	//{
+	//	MINTY_ABORT("Failed to create scene sampler.");
+	//}
+
+	//create_image(_swapChainExtent.width, _swapChainExtent.height, _swapChainImageFormat, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_TRANSFER_DST_BIT, VkMemoryPropertyFlagBits::VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT, _sceneImage, _sceneImageMemory);
+	//_sceneImageView = create_image_view(_sceneImage, _swapChainImageFormat, VK_IMAGE_ASPECT_COLOR_BIT);
+	//_sceneDescriptorSet = ImGui_ImplVulkan_AddTexture(_sceneSampler, _sceneImageView, VK_IMAGE_LAYOUT_ATTACHMENT_OPTIMAL);
 }
 
 void mintye::ApplicationRenderEngine::destroy()
 {
+	//vkDestroyImage(_device, _sceneImage, nullptr);
+	//vkFreeMemory(_device, _sceneImageMemory, nullptr);
+
 	// destroy ImGui
 	ImGui_ImplVulkan_Shutdown();
 	ImGui_ImplGlfw_Shutdown();
@@ -121,6 +154,11 @@ void mintye::ApplicationRenderEngine::destroy()
 	// destroy normal stuff
 	RenderEngine::destroy();
 }
+
+//VkDescriptorSet mintye::ApplicationRenderEngine::get_scene_descriptor_set() const
+//{
+//	return _sceneDescriptorSet;
+//}
 
 void mintye::ApplicationRenderEngine::init_theme()
 {
@@ -202,12 +240,25 @@ void mintye::ApplicationRenderEngine::draw(VkCommandBuffer commandBuffer)
 	//// 1. Show the big demo window (Most of the sample code is in ImGui::ShowDemoWindow()! You can browse its code to learn more about Dear ImGui!).
 	//ImGui::ShowDemoWindow(&show_demo_window);
 
+	// set to scene camera
 	set_camera(Vector3(0.0f, 0.0f, -10.0f), Quaternion(), Camera());
 
 	// draw normal stuff
 	RenderEngine::draw(commandBuffer);
+	
+	//// copy to scene image
+	//VkImageCopy copyRegion {};
+	//copyRegion.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	//copyRegion.srcSubresource.layerCount = 1;
+	//copyRegion.dstSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	//copyRegion.dstSubresource.layerCount = 1;
+	//copyRegion.extent.width = _swapChainExtent.width;
+	//copyRegion.extent.height = _swapChainExtent.height;
+	//copyRegion.extent.depth = 1;
 
-	 //draw application
+	//vkCmdCopyImage(commandBuffer, _swapChainImages[get_frame()], VK_IMAGE_LAYOUT_TRANSFER_SRC_OPTIMAL, _sceneImage, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, 1, &copyRegion);
+
+	//draw application
 	_application->draw();
 
 	// render ImGui

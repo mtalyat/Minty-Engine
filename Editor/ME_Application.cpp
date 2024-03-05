@@ -72,8 +72,8 @@ Application::Application()
 	// add to list so they get drawn and updated
 	_editorWindows.emplace("Console", new ConsoleWindow(*this));
 	_editorWindows.emplace("Hierarchy", new HierarchyWindow(*this));
-	_editorWindows.emplace("Scene", new SceneWindow(*this));
-	_editorWindows.emplace("Game", new GameWindow(*this));
+	//_editorWindows.emplace("Scene", new SceneWindow(*this));
+	//_editorWindows.emplace("Game", new GameWindow(*this));
 	_editorWindows.emplace("Properties", new PropertiesWindow(*this));
 	_editorWindows.emplace("Assets", new AssetsWindow(*this));
 

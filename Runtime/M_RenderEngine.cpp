@@ -1087,8 +1087,8 @@ void minty::RenderEngine::draw_scene(VkCommandBuffer commandBuffer)
 
 void minty::RenderEngine::draw_mesh(VkCommandBuffer commandBuffer, Matrix4 const& transformationMatrix, MeshComponent const& meshComponent)
 {
-	// do nothing if null mesh
-	if (!meshComponent.mesh)
+	// do nothing if null mesh or null material
+	if (!meshComponent.mesh || !meshComponent.material)
 	{
 		return;
 	}
