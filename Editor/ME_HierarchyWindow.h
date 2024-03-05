@@ -26,5 +26,7 @@ namespace mintye
 		void set_clicked(minty::Entity const entity);
 
 		void set_selected(minty::Entity const entity);
+
+		void draw_popup(minty::EntityRegistry& entityRegistry);
 	};
 }

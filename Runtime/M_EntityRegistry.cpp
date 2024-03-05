@@ -1029,69 +1029,74 @@ void minty::EntityRegistry::deserialize(Reader const& reader)
 	// read each entity, add name if it has one
 
 	Node const& node = reader.get_node();
-	SerializationData data = *static_cast<SerializationData const*>(reader.get_data());
 
-	ScriptEngine* scriptEngine = data.scene->get_runtime().get_engine<ScriptEngine>();
+	ScriptEngine& scriptEngine = get_runtime().get_script_engine();
 
-	MINTY_ASSERT(scriptEngine != nullptr);
+	// for each entity name given
+	for (Node const& entityNode : node.get_children())
+	{
+		deserialize_entity(entityNode);
+	}
+}
 
+Entity minty::EntityRegistry::deserialize_entity(Node const& entityNode)
+{
 	String name;
 	String value;
 	UUID id;
 
-	Entity entity;
-
-	// for each entity name given
-	for (auto const& entityNode : node.get_children())
+	// get the name and ID from the node
+	if (entityNode.has_data())
 	{
-		// get the name and ID from the node
-		if (entityNode.has_data())
+		name = entityNode.get_name();
+		value = entityNode.get_data();
+	}
+	else
+	{
+		// no data, so the "name" must be the ID, and there is no name
+		name = Text::EMPTY;
+		value = entityNode.get_name();
+	}
+
+	// convert value to ID, or generate a new one if needed
+	if (!Parse::try_uuid(value, id))
+	{
+		// the value must be the name instead
+		name = value;
+		value = Text::EMPTY;
+
+		// generate a new ID
+		id = UUID();
+	}
+
+	// create entity in registry
+	Entity entity = create(name, id);
+
+	// create it again for scripting
+	ScriptEngine& scriptEngine = get_runtime().get_script_engine();
+	scriptEngine.create_object_entity(id);
+
+	// set entity in data for deserialization
+	SerializationData data
+	{
+		.scene = &get_scene(),
+		.entity = entity
+	};
+
+	// cycle through each component on entity
+	for (auto const& compNode : entityNode.get_children())
+	{
+		// cannot have multiple of same component
+		if (get_by_name(compNode.get_name(), entity))
 		{
-			name = entityNode.get_name();
-			value = entityNode.get_data();
-		}
-		else
-		{
-			// no data, so the "name" must be the ID, and there is no name
-			name = Text::EMPTY;
-			value = entityNode.get_name();
+			Console::error(std::format("Attempting to deserialize entity \"{}\" with multiple instances of the \"{}\" component.", entityNode.get_name(), compNode.get_name()));
+			return entity;
 		}
 
-		// convert value to ID, or generate a new one if needed
-		if (!Parse::try_uuid(value, id))
-		{
-			// the value must be the name instead
-			name = value;
-			value = Text::EMPTY;
-
-			// generate a new ID
-			id = UUID();
-		}
-
-		// create entity in registry
-		entity = create(name, id);
-
-		// create it again for scripting
-		scriptEngine->create_object_entity(id);
-
-		// set entity in data for deserialization
-		data.entity = entity;
-
-		// cycle through each component on entity
-		for (auto const& compNode : entityNode.get_children())
-		{
-			// cannot have multiple of same component
-			if (get_by_name(compNode.get_name(), entity))
-			{
-				Console::error(std::format("Attempting to deserialize entity \"{}\" with multiple instances of the \"{}\" component.", entityNode.get_name(), compNode.get_name()));
-				return;
-			}
-
-			// add component
-			Component* comp = emplace_by_name(compNode.get_name(), entity);
-			Reader compReader(compNode, &data);
-			comp->deserialize(compReader);
-		}
+		// add component
+		Component* comp = emplace_by_name(compNode.get_name(), entity);
+		Reader compReader(compNode, &data);
+		comp->deserialize(compReader);
 	}
 }
 

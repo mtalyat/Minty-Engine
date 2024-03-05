@@ -294,6 +294,7 @@ namespace minty
 		void serialize_entity(Writer& writer, Entity const entity) const;
 		Node serialize_entity(Entity const entity) const;
 		void deserialize(Reader const& reader) override;
+		Entity deserialize_entity(Node const& entityNode);
 
 		static bool is_name_empty(String const& name);
 

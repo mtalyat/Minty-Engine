@@ -2,6 +2,7 @@
 #include "M_Encoding.h"
 
 #include <vector>
+#include <algorithm>
 
 using namespace minty;
 
@@ -107,7 +108,7 @@ String minty::Encoding::encode_base16(void const* const data, size_t const size)
     std::stringstream ss;
 
     ss << std::hex << std::setfill('0');
-    for (size_t i = 0; i < size; i++)
+    for (long long i = size - 1; i >= 0; i--)
     {
         ss << std::setw(2) << static_cast<int>(bytes[i]);
     }
@@ -119,13 +120,10 @@ Dynamic minty::Encoding::decode_base16(String const& text)
 {
     std::vector<Byte> bytes;
 
-    std::stringstream ss(text);
-
-    ss >> std::hex;
-    Byte byte;
     for (size_t i = 0; i < text.size(); i += 2)
     {
-        ss >> std::setw(2) >> byte;
+        String byteString = text.substr(i, 2);
+        Byte byte = static_cast<Byte>(std::stoul(byteString, nullptr, 16));
         bytes.push_back(byte);
     }
 

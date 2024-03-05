@@ -47,10 +47,18 @@ namespace minty
 		void set_data(String const& data);
 
 		/// <summary>
-		/// Gets the Node string as it were serialized.
+		/// Gets the Node string as if it were serialized.
 		/// </summary>
 		/// <returns></returns>
 		String get_node_string() const;
+
+		/// <summary>
+		/// Gets the Node string and its children as if it were serialized.
+		/// </summary>
+		/// <returns></returns>
+		std::vector<String> get_formatted() const;
+
+		String get_formatted_string() const;
 
 		std::vector<Node>& get_children();
 
@@ -146,6 +154,10 @@ namespace minty
 #pragma endregion
 
 	public:
+		static Node parse(String const& text);
+
+		static Node parse(std::vector<String> const& lines);
+
 		static Node load_node(Path const& path);
 
 	public:

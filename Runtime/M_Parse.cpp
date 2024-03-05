@@ -164,7 +164,10 @@ bool minty::Parse::try_int(String const& string, int& value)
 
 UUID minty::Parse::to_uuid(String const& string)
 {
-    return Encoding::decode_base16<uint64_t>(string);
+    std::stringstream ss(string);
+    UUID id(INVALID_UUID);
+    ss >> id;
+    return id;
 }
 
 bool minty::Parse::try_uuid(String const& string, UUID& value)
@@ -172,7 +175,7 @@ bool minty::Parse::try_uuid(String const& string, UUID& value)
     // UUIDs stored as base16
     if (Encoding::is_base16(string))
     {
-        value = Encoding::decode_base16<uint64_t>(string);
+        value = to_uuid(string);
         return true;
     }
 

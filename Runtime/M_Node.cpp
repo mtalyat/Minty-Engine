@@ -72,6 +72,31 @@ String minty::Node::get_node_string() const
     }
 }
 
+// TODO: make iterative
+static void get_formatted_recursive(std::vector<String>& list, int indent, Node const& node)
+{
+    list.push_back(String(static_cast<size_t>(indent), '\t').append(node.get_node_string()));
+
+    for (Node const& child : node.get_children())
+    {
+        get_formatted_recursive(list, indent + 1, child);
+    }
+}
+
+std::vector<String> minty::Node::get_formatted() const
+{
+    std::vector<String> result;
+
+    get_formatted_recursive(result, 0, *this);
+
+    return result;
+}
+
+String minty::Node::get_formatted_string() const
+{
+    return Text::join(get_formatted(), "\n");
+}
+
 std::vector<Node>& minty::Node::get_children()
 {
 	return _children;
@@ -251,10 +276,13 @@ std::vector<Node const*> minty::Node::find_all(String const& name) const
 	return list;
 }
 
-Node minty::Node::load_node(Path const& path)
+Node minty::Node::parse(String const& text)
 {
-    std::vector<String> lines = File::read_all_lines(path);
+    return parse(Text::split(text, '\n'));
+}
 
+Node minty::Node::parse(std::vector<String> const& lines)
+{
     int indent = 0;
     String key;
     String value;
@@ -282,21 +310,30 @@ Node minty::Node::load_node(Path const& path)
     for (String line : lines)
     {
         // skip empty/whitespace/comment lines
-        if (line.size() == 0 || line.find_first_not_of(" \t\n\v\f\r") == String::npos || line.front() == '#' || line.front() == ':')
+        size_t solidIndex = line.find_first_not_of(" \t\n\v\f\r");
+        if (line.size() == 0 || solidIndex == String::npos || line.front() == '#' || line.front() == ':')
         {
             continue;
         }
 
         // count number of tabs (indents)
+
         int spaces = 0;
         for (char const c : line)
         {
-            if (c == ' ' || c == '\t')
+            if (c == ' ')
             {
-                spaces++;
+                // add once space
+                spaces += 1;
+            }
+            else if(c == '\t')
+            {
+                // multiple sapces
+                spaces += SPACES_PER_TAB;
             }
             else
             {
+                // done
                 break;
             }
         }
@@ -341,7 +378,7 @@ Node minty::Node::load_node(Path const& path)
         // remove indents for parsing
         if (spaces > 0)
         {
-            line = line.substr(static_cast<size_t>(spaces), line.size() - spaces);
+            line = line.substr(solidIndex, line.size() - solidIndex);
         }
 
         Node newNode;
@@ -369,11 +406,12 @@ Node minty::Node::load_node(Path const& path)
                 key = line.substr(0, split);
                 // ignore ": "
                 size_t size = line.size() - split - 2;
-                if(split < line.size() - 2)
+                if (split < line.size() - 2)
                 {
                     // something on other side of ": "
                     value = line.substr(split + 2, size);
-                } else
+                }
+                else
                 {
                     // nothing on other side of the ": "
                     value = "";
@@ -408,6 +446,11 @@ Node minty::Node::load_node(Path const& path)
 
     // root node should contain everything
     return root;
+}
+
+Node minty::Node::load_node(Path const& path)
+{
+    return parse(File::read_all_lines(path));
 }
 
 String minty::to_string(Node const& value)

@@ -68,22 +68,24 @@ void mintye::HierarchyWindow::draw()
 	ImGui::EndChild();
 
 	// if clicked in window, reset the clicked Entity
-	if (ImGui::IsMouseClicked(ImGuiMouseButton_Right))
+	if (ImGui::IsWindowHovered())
 	{
-		set_clicked(NULL_ENTITY);
-		MINTY_LOG("Cleared clicked entity");
-	}
+		if (ImGui::IsMouseClicked(ImGuiMouseButton_Right))
+		{
+			set_clicked(NULL_ENTITY);
+		}
 
-	if (ImGui::IsMouseClicked(ImGuiMouseButton_Left) && ImGui::IsWindowHovered())
-	{
-		set_selected(NULL_ENTITY);
+		if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))
+		{
+			set_selected(NULL_ENTITY);
+		}
 	}
 
 	// draw entities
-	EntityRegistry* entityRegistry = &scene->get_entity_registry();
+	EntityRegistry& entityRegistry = scene->get_entity_registry();
 	if (ImGui::BeginChild("HierarchyEntities", ImVec2(0.0f, 0.0f), true))
 	{
-		ImGui::Text(std::format("Entities ({})", entityRegistry->size()).c_str());
+		ImGui::Text(std::format("Entities ({})", entityRegistry.size()).c_str());
 		ImGui::Separator();
 
 		// keep track of the parents, keep indenting based on the number of parents
@@ -92,7 +94,7 @@ void mintye::HierarchyWindow::draw()
 
 		size_t i = 0;
 
-		for (auto [entity, relationship] : entityRegistry->view<RelationshipComponent const>().each())
+		for (auto [entity, relationship] : entityRegistry.view<RelationshipComponent const>().each())
 		{
 			// family
 
@@ -129,7 +131,7 @@ void mintye::HierarchyWindow::draw()
 
 			// on left click, select
 			// print with indent
-			String name = std::format("{}##entity{}", String((familyStack.size() - 1) << 1, ' ').append(entityRegistry->get_name_safe(entity)), i);
+			String name = std::format("{}##entity{}", String((familyStack.size() - 1) << 1, ' ').append(entityRegistry.get_name_safe(entity)), i);
 			if (ImGui::Selectable(name.c_str(), entity == _selected))
 			{
 				set_selected(entity);
@@ -139,7 +141,7 @@ void mintye::HierarchyWindow::draw()
 			if (ImGui::IsItemClicked(ImGuiMouseButton_Right) && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem))
 			{
 				set_clicked(entity);
-				MINTY_LOG_FORMAT("Clicked entity: \"{}\"", entityRegistry->get_name_safe(entity));
+				MINTY_LOG_FORMAT("Clicked entity: \"{}\"", entityRegistry.get_name_safe(entity));
 
 				//ImGui::OpenPopup("ButtonContext");
 			}
@@ -147,14 +149,14 @@ void mintye::HierarchyWindow::draw()
 			i++;
 		}
 
-		for (auto [entity] : entityRegistry->view<Entity>().each())
+		for (auto [entity] : entityRegistry.view<Entity>().each())
 		{
-			if (!entityRegistry->valid(entity) || entityRegistry->all_of<RelationshipComponent>(entity)) continue;
+			if (!entityRegistry.valid(entity) || entityRegistry.all_of<RelationshipComponent>(entity)) continue;
 
 			// no parents, print at bottom
 
 			// on left click, select
-			String name = std::format("{}##entity{}", entityRegistry->get_name_safe(entity), i);
+			String name = std::format("{}##entity{}", entityRegistry.get_name_safe(entity), i);
 			if (ImGui::Selectable(name.c_str(), entity == _selected))
 			{
 				set_selected(entity);
@@ -164,7 +166,7 @@ void mintye::HierarchyWindow::draw()
 			if (ImGui::IsItemClicked(ImGuiMouseButton_Right) && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem))
 			{
 				set_clicked(entity);
-				MINTY_LOG_FORMAT("Clicked entity: \"{}\"", entityRegistry->get_name_safe(entity));
+				MINTY_LOG_FORMAT("Clicked entity: \"{}\"", entityRegistry.get_name_safe(entity));
 
 				//ImGui::OpenPopup("ButtonContext");
 			}
@@ -178,53 +180,7 @@ void mintye::HierarchyWindow::draw()
 	// Right-click on the button to open the context menu
 	if (ImGui::BeginPopupContextItem("ButtonContext"))
 	{
-		// TODO: cut, copy, paste
-		if (ImGui::MenuItem("Cut", nullptr, false, _clicked != NULL_ENTITY))
-		{
-
-		}
-		if (ImGui::MenuItem("Copy", nullptr, false, _clicked != NULL_ENTITY))
-		{
-
-		}
-		if (ImGui::MenuItem("Paste", nullptr, false, _clicked != NULL_ENTITY))
-		{
-			
-		}
-		if (ImGui::MenuItem("Paste as child", nullptr, false, _clicked != NULL_ENTITY))
-		{
-
-		}
-
-		ImGui::Separator();
-
-		if (ImGui::MenuItem("Rename", nullptr, false, _clicked != NULL_ENTITY))
-		{
-
-		}
-		if (ImGui::MenuItem("Duplicate", nullptr, false, _clicked != NULL_ENTITY))
-		{
-
-		}
-		if (ImGui::MenuItem("Delete", nullptr, false, _clicked != NULL_ENTITY))
-		{
-			if (_clicked == _selected)
-			{
-				set_selected(NULL_ENTITY);
-			}
-
-			entityRegistry->destroy_immediate(_clicked);
-			set_clicked(NULL_ENTITY);
-		}
-
-		ImGui::Separator();
-
-		if (ImGui::MenuItem("Create empty"))
-		{
-			// create and select
-			set_selected(entityRegistry->create());
-			scene->sort();
-		}
+		draw_popup(entityRegistry);
 
 		ImGui::EndPopup();
 	}
@@ -269,4 +225,121 @@ void mintye::HierarchyWindow::set_selected(minty::Entity const entity)
 		properties->set_target(entity);
 	}
 	_selected = entity;
+}
+
+void mintye::HierarchyWindow::draw_popup(minty::EntityRegistry& entityRegistry)
+{
+	if (ImGui::MenuItem("Cut", nullptr, false, _clicked != NULL_ENTITY))
+	{
+		// copy entity to clipboard
+		Node node = entityRegistry.serialize_entity(_clicked);
+		String text = node.get_formatted_string();
+		ImGui::SetClipboardText(text.c_str());
+
+		// delete entity
+		if (_clicked == _selected)
+		{
+			set_selected(NULL_ENTITY);
+		}
+
+		entityRegistry.destroy_immediate(_clicked);
+		set_clicked(NULL_ENTITY);
+
+		return;
+	}
+	if (ImGui::MenuItem("Copy", nullptr, false, _clicked != NULL_ENTITY))
+	{
+		// copy entity to clipboard
+		Node node = entityRegistry.serialize_entity(_clicked);
+		String text = node.get_formatted_string();
+		ImGui::SetClipboardText(text.c_str());
+
+		return;
+	}
+	if (ImGui::MenuItem("Paste", nullptr, false, ImGui::GetClipboardText() != nullptr && *ImGui::GetClipboardText() != '\0'))
+	{
+		// deserialize copied as entity
+		Node node = Node::parse(ImGui::GetClipboardText()).get_children().front();
+		UUID id(0);
+		if (Parse::try_uuid(node.get_data(), id) && entityRegistry.find_by_id(id) != NULL_ENTITY)
+		{
+			Console::test("paste");
+			String idText = to_string(id);
+			Console::test(idText + "/" + std::to_string(id.data()));
+			id = Parse::to_uuid(idText);
+			idText = to_string(id);
+			Console::test(idText + "/" + std::to_string(id.data()));
+			id = Parse::to_uuid(idText);
+			idText = to_string(id);
+			Console::test(idText + "/" + std::to_string(id.data()));
+
+			// already contains ID, so generate a new one
+			id = UUID();
+			node.set_data(to_string(id));
+		}
+		Entity entity = entityRegistry.deserialize_entity(node);
+
+		// select
+		set_selected(entity);
+
+		return;
+	}
+	if (ImGui::MenuItem("Paste as child", nullptr, false, ImGui::GetClipboardText() != nullptr && *ImGui::GetClipboardText() != '\0' && _clicked != NULL_ENTITY))
+	{
+		// deserialize copied as entity
+		Node node = Node::parse(ImGui::GetClipboardText()).get_children().front();
+		UUID id(0);
+		if (Parse::try_uuid(node.get_data(), id) && entityRegistry.find_by_id(id) != NULL_ENTITY)
+		{
+			// already contains ID, so generate a new one
+			id = UUID();
+			node.set_data(to_string(id));
+		}
+		Entity entity = entityRegistry.deserialize_entity(node);
+
+		// set parent
+		entityRegistry.set_parent(entity, _clicked);
+
+		// select
+		set_selected(entity);
+
+		return;
+	}
+
+	ImGui::Separator();
+
+	if (ImGui::MenuItem("Rename", nullptr, false, false/*_clicked != NULL_ENTITY*/))
+	{
+		return;
+	}
+	if (ImGui::MenuItem("Duplicate", nullptr, false, _clicked != NULL_ENTITY))
+	{
+		Entity clone = entityRegistry.clone(_clicked);
+		set_selected(clone);
+
+		return;
+	}
+	if (ImGui::MenuItem("Delete", nullptr, false, _clicked != NULL_ENTITY))
+	{
+		if (_clicked == _selected)
+		{
+			set_selected(NULL_ENTITY);
+		}
+
+		entityRegistry.destroy_immediate(_clicked);
+		set_clicked(NULL_ENTITY);
+
+		return;
+	}
+
+	ImGui::Separator();
+
+	if (ImGui::MenuItem("Create empty"))
+	{
+		// create and select
+		set_selected(entityRegistry.create());
+		get_scene()->sort();
+
+		return;
+	}
 }
