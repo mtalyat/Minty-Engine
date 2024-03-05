@@ -158,6 +158,14 @@ void mintye::PropertiesWindow::draw_entity() const
 			};
 			Reader reader(node, &data);
 			component->deserialize(reader);
+
+			// TODO: get rid of magic value:
+			// if Transform component was updated, dirty the entity, update, continue
+			if (node.get_name() == "Transform")
+			{
+				registry.dirty(_targetEntity);
+				scene->finalize();
+			}
 		}
 
 		// actions

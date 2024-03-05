@@ -106,7 +106,7 @@ entities
             position: (-2, 0, 0)
         Mesh
             material: decef49af1cbe3d9
-            type: cube
+            type: cylinder
         Relationship
             parent: 2400de2c92f041ed
     Model Positive X
@@ -116,6 +116,26 @@ entities
             position: (2, 0, 0)
         Mesh
             material: decef49af1cbe3d9
-            type: cube
+            type: cylinder
+        Relationship
+            parent: 2400de2c92f041ed
+    Model Negative Y
+        Enabled
+        Renderable
+        Transform
+            position: (0, -2, 0)
+        Mesh
+            material: decef49af1cbe3d9
+            type: sphere
+        Relationship
+            parent: 2400de2c92f041ed
+    Model Positive Y
+        Enabled
+        Renderable
+        Transform
+            position: (0, 2, 0)
+        Mesh
+            material: decef49af1cbe3d9
+            type: sphere
         Relationship
             parent: 2400de2c92f041ed

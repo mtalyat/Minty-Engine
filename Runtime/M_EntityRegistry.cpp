@@ -141,6 +141,34 @@ void minty::EntityRegistry::dirty(Entity const entity)
 	{
 		emplace<DirtyComponent>(entity);
 	}
+
+	if (!all_of<RelationshipComponent>(entity))
+	{
+		// no children
+		return;
+	}
+
+	RelationshipComponent& relationship = get<RelationshipComponent>(entity);
+
+	if (!relationship.children)
+	{
+		// no children
+		return;
+	}
+
+	// dirty all children
+
+	// TODO: make iterative
+	Entity child = relationship.first;
+
+	while (child != NULL_ENTITY)
+	{
+		dirty(child);
+
+		RelationshipComponent& childRelationship = get<RelationshipComponent>(child);
+
+		child = relationship.next;
+	}
 }
 
 void minty::EntityRegistry::set_parent(Entity const entity, Entity const parentEntity)

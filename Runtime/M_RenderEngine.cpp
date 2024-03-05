@@ -1048,6 +1048,9 @@ void minty::RenderEngine::draw_scene(VkCommandBuffer commandBuffer)
 	// draw all meshes in the scene
 	for (auto&& [entity, mesh, renderable, enabled] : _registry->view<MeshComponent, RenderableComponent const, EnabledComponent const>().each())
 	{
+		// skip empty meshes
+		if (mesh.type == MeshType::Empty) continue;
+
 		// get transform for entity
 		transformComponent = _registry->try_get<TransformComponent>(entity);
 
