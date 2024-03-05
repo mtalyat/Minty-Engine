@@ -1098,6 +1098,8 @@ Entity minty::EntityRegistry::deserialize_entity(Node const& entityNode)
 		Reader compReader(compNode, &data);
 		comp->deserialize(compReader);
 	}
+
+	return entity;
 }
 
 bool minty::EntityRegistry::is_name_empty(String const& name)

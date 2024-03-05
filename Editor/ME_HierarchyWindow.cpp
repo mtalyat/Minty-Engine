@@ -220,7 +220,7 @@ void mintye::HierarchyWindow::copy_entity(minty::Entity const entity)
 	EntityRegistry& registry = get_scene()->get_entity_registry();
 
 	// copy entity to clipboard
-	Node node = registry.serialize_entity(_clicked);
+	Node node = registry.serialize_entity(entity);
 	String text = node.get_formatted_string();
 	ImGui::SetClipboardText(text.c_str());
 }
@@ -408,7 +408,7 @@ void mintye::HierarchyWindow::run_shortcuts()
 				}
 			}
 
-			if (ImGui::IsKeyDown(ImGuiKey_V)) // paste
+			if (ImGui::IsKeyPressed(ImGuiKey_V)) // paste
 			{
 				Entity entity = paste_entity();
 				registry.set_parent(entity, registry.get_parent(_selected));
