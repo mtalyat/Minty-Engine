@@ -41,6 +41,13 @@ void mintye::AssetsWindow::draw()
 		return;
 	}
 
+	if (ImGui::Button("Refresh"))
+	{
+		get_project()->collect_assets();
+	}
+
+	ImGui::SameLine();
+
 	if (ImGui::Button("Open Folder"))
 	{
 		// open the assets folder

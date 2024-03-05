@@ -157,6 +157,9 @@ void Project::collect_assets()
 		return;
 	}
 
+	// clear old data
+	_files.clear();
+
 	// list of directories to collect from
 	std::vector<Path> directoriesToCollect;
 
