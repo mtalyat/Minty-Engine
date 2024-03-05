@@ -50,7 +50,7 @@ void mintye::SceneWindow::draw()
 
 	if (ImGui::IsWindowHovered())
 	{
-		if (!_isMouseMoving && !_isMouseRotating && ImGui::IsMouseDown(ImGuiMouseButton_Left))
+		if (!_isMouseMoving && !_isMouseRotating && ImGui::IsMouseDown(ImGuiMouseButton_Middle))
 		{
 			// first down
 			_isMouseMoving = true;
@@ -92,7 +92,7 @@ void mintye::SceneWindow::draw()
 		_cameraPosition += forward(_cameraRotation) * io.MouseWheel;
 	}
 
-	if (_isMouseMoving && !ImGui::IsMouseDown(ImGuiMouseButton_Left))
+	if (_isMouseMoving && !ImGui::IsMouseDown(ImGuiMouseButton_Middle))
 	{
 		// stop moving
 		_isMouseMoving = false;

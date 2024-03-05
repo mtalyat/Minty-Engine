@@ -41,6 +41,15 @@ void mintye::AssetsWindow::draw()
 		return;
 	}
 
+	if (ImGui::Button("Open Folder"))
+	{
+		// open the assets folder
+		Application& app = get_application();
+		app.open_asset(project->get_assets_path());
+	}
+
+	ImGui::Separator();
+
 	ImVec2 windowSize = ImGui::GetWindowSize();
 	ImVec2 itemSize(windowSize.x, 30.0f);
 
