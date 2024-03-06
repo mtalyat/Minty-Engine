@@ -9,7 +9,7 @@ namespace mintye
 	private:
 
 	public:
-		GameWindow(Application& application);
+		GameWindow(EditorApplication& application);
 
 		void draw() override;
 

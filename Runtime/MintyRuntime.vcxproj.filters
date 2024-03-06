@@ -82,6 +82,9 @@
     <Filter Include="Header Files\Camera">
       <UniqueIdentifier>{681223b2-489b-4248-b2b5-b9440d18606f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Application">
+      <UniqueIdentifier>{6be5e59a-d15e-4196-a795-3d2e6b9888b0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -570,6 +573,9 @@
     <ClInclude Include="M_Camera.h">
       <Filter>Header Files\Camera</Filter>
     </ClInclude>
+    <ClInclude Include="M_Application.h">
+      <Filter>Header Files\Application</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -963,6 +969,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_Camera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_Application.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

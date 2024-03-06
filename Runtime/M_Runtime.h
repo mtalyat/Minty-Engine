@@ -25,7 +25,7 @@ namespace minty
 
 	struct RuntimeBuilder
 	{
-		Window* const window = nullptr;
+		Window* window = nullptr;
 
 		AssetEngine* assetEngine = nullptr;
 

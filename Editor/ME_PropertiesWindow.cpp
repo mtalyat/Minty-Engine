@@ -1,13 +1,13 @@
 #include "ME_PropertiesWindow.h"
 
-#include "ME_Application.h"
+#include "ME_EditorApplication.h"
 #include "ME_ConsoleWindow.h"
 #include "ME_ImGuiHelper.h"
 
 using namespace minty;
 using namespace mintye;
 
-mintye::PropertiesWindow::PropertiesWindow(Application& application)
+mintye::PropertiesWindow::PropertiesWindow(EditorApplication& application)
 	: EditorWindow(application)
 	, _targetMode(TargetMode::None)
 	, _targetEntity(NULL_ENTITY)

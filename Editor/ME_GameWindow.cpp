@@ -1,6 +1,6 @@
 #include "ME_GameWindow.h"
 
-mintye::GameWindow::GameWindow(Application& application)
+mintye::GameWindow::GameWindow(EditorApplication& application)
 	: EditorWindow(application)
 {}
 

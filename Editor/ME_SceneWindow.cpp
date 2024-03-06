@@ -1,7 +1,7 @@
 #include "ME_SceneWindow.h"
 
-#include "ME_Application.h"
-#include "ME_ApplicationRenderEngine.h"
+#include "ME_EditorApplication.h"
+#include "ME_EditorApplicationRenderEngine.h"
 
 using namespace minty;
 using namespace mintye;
@@ -9,7 +9,7 @@ using namespace mintye;
 constexpr static float MOUSE_MOVE_SENSITIVITY = 0.02f;
 constexpr static float MOUSE_ROTATE_SENSITIVITY = 0.1f;
 
-mintye::SceneWindow::SceneWindow(Application& application)
+mintye::SceneWindow::SceneWindow(EditorApplication& application)
 	: EditorWindow(application)
 	, _cameraPosition()
 	, _cameraRotation()
@@ -28,7 +28,7 @@ void mintye::SceneWindow::draw()
 		return;
 	}
 
-	ApplicationRenderEngine& renderer = static_cast<ApplicationRenderEngine&>(get_application().get_runtime().get_render_engine());
+	EditorApplicationRenderEngine& renderer = static_cast<EditorApplicationRenderEngine&>(get_application().get_runtime().get_render_engine());
 
 	renderer.set_camera(_cameraPosition, _cameraRotation, _camera);
 

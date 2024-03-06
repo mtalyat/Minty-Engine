@@ -227,6 +227,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClInclude Include="M_Accessibility.h" />
+    <ClInclude Include="M_Application.h" />
     <ClInclude Include="M_AssetEngine.h" />
     <ClInclude Include="M_Camera.h" />
     <ClInclude Include="M_DestroyEntityComponent.h" />
@@ -406,6 +407,7 @@
     <ClCompile Include="M_AnimationSystem.cpp" />
     <ClCompile Include="M_Animator.cpp" />
     <ClCompile Include="M_AnimatorComponent.cpp" />
+    <ClCompile Include="M_Application.cpp" />
     <ClCompile Include="M_Asset.cpp" />
     <ClCompile Include="M_AssetEngine.cpp" />
     <ClCompile Include="M_AudioClip.cpp" />

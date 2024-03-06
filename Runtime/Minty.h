@@ -22,6 +22,9 @@ access to the entire engine without needing include each file.
 #include "M_Animator.h"
 #include "M_AnimatorComponent.h"
 
+// APPLICATION
+#include "M_Application.h"
+
 // ASSET
 #include "M_Asset.h"
 #include "M_AssetEngine.h"

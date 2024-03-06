@@ -4,7 +4,7 @@
 
 using namespace minty;
 
-mintye::ConsoleWindow::ConsoleWindow(Application& application)
+mintye::ConsoleWindow::ConsoleWindow(EditorApplication& application)
 	: EditorWindow(application)
 	, _scrollToBottom(true)
 	, _autoScroll(true)

@@ -1,6 +1,6 @@
 #include "ME_AssetsWindow.h"
 
-#include "ME_Application.h"
+#include "ME_EditorApplication.h"
 #include "ME_Project.h"
 #include "ME_ConsoleWindow.h"
 #include <filesystem>
@@ -9,7 +9,7 @@ using namespace minty;
 using namespace mintye;
 namespace fs = std::filesystem;
 
-mintye::AssetsWindow::AssetsWindow(Application& application)
+mintye::AssetsWindow::AssetsWindow(EditorApplication& application)
 	: EditorWindow(application)
 	, _path()
 	, _directories()
@@ -98,7 +98,7 @@ void mintye::AssetsWindow::draw()
 		// if clicked, open the file
 		if (ImGui::Button(path.string().c_str(), itemSize))
 		{
-			Application& app = get_application();
+			EditorApplication& app = get_application();
 			app.open_asset(project->get_assets_path() / _path / path);
 			//minty::Operations::open(project->get_assets_path() / _path / path);
 		}

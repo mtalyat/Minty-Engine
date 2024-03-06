@@ -4,25 +4,25 @@
 
 namespace mintye
 {
-	class Application;
+	class EditorApplication;
 	class Project;
 
 	class EditorWindow
 		: public minty::Object
 	{
 	private:
-		Application* _application;
+		EditorApplication* _application;
 		Project* _project;
 		minty::Engine* _engine;
 		minty::Scene* _scene;
 
 	public:
-		EditorWindow(Application& application);
+		EditorWindow(EditorApplication& application);
 
 		virtual ~EditorWindow();
 
 	protected:
-		Application& get_application() const;
+		EditorApplication& get_application() const;
 
 		minty::Runtime& get_runtime() const;
 

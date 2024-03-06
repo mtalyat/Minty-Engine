@@ -9,6 +9,8 @@ namespace minty
 	class Engine
 		: public Object
 	{
+		friend class Runtime;
+
 	private:
 		Runtime* _runtime;
 		Scene* _loadedScene;

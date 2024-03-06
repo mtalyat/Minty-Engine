@@ -5,13 +5,13 @@
 
 namespace mintye
 {
-	class Application;
+	class EditorApplication;
 
-	class ApplicationRenderEngine
+	class EditorApplicationRenderEngine
 		: public minty::RenderEngine
 	{
 	private:
-		Application* _application;
+		EditorApplication* _application;
 		VkDescriptorPool _descriptorPool;
 		ImVec4 _clearColor;
 		Theme _theme;
@@ -23,9 +23,9 @@ namespace mintye
 		//VkDescriptorSet _sceneDescriptorSet;
 
 	public:
-		ApplicationRenderEngine(Application& app, minty::Runtime& runtime);
+		EditorApplicationRenderEngine(EditorApplication& app, minty::Runtime& runtime);
 
-		~ApplicationRenderEngine();
+		~EditorApplicationRenderEngine();
 
 	public:
 		void init(minty::RenderEngineBuilder const& builder) override;

@@ -18,7 +18,7 @@ namespace mintye
 		minty::Entity _targetEntity;
 
 	public:
-		PropertiesWindow(Application& application);
+		PropertiesWindow(EditorApplication& application);
 
 		void draw() override;
 

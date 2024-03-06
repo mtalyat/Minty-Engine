@@ -15,7 +15,7 @@ namespace mintye
 		std::vector<minty::Path> _files;
 
 	public:
-		AssetsWindow(Application& application);
+		AssetsWindow(EditorApplication& application);
 
 		void set_project(Project* const project) override;
 

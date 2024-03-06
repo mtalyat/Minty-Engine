@@ -1,10 +1,10 @@
-#include "ME_Application.h"
+#include "ME_EditorApplication.h"
 
 #include "ME_Constants.h"
 #include "ME_Project.h"
 #include "ME_BuildInfo.h"
 
-#include "ME_ApplicationRenderEngine.h"
+#include "ME_EditorApplicationRenderEngine.h"
 
 #include "ME_ConsoleWindow.h"
 #include "ME_HierarchyWindow.h"
@@ -33,41 +33,18 @@
 namespace fs = std::filesystem;
 
 #define CMAKE_PATH "C:/Users/mitch/source/repos/Minty-Engine/Editor/cmake/bin/cmake.exe"
-#define APPLICATION_NAME "TestProject"
-#define EXE_NAME std::string(APPLICATION_NAME).append(".exe")
+#define EditorApplication_NAME "TestProject"
+#define EXE_NAME std::string(EditorApplication_NAME).append(".exe")
 
 using namespace mintye;
 using namespace minty;
 
-Application::Application()
-	: _info(NAME, 0, 0, 0)
-	, _path(std::filesystem::current_path())
-	, _window("", 1280, 720, "Icon.png")
-	, _runtime(new Runtime(_info, Runtime::Mode::Edit))
+EditorApplication::EditorApplication()
+	: Application(Info(NAME, 0, 0, 0), std::filesystem::current_path())
 	, _project()
 	, _sceneId(ERROR_ID)
 	, _editorWindows()
 {
-	// init the window
-	set_window_title("");
-	_window.maximize();
-
-	ApplicationRenderEngine* renderEngine = new ApplicationRenderEngine(*this, *_runtime);
-
-	// init the runtime
-	RuntimeBuilder runtimeBuilder {
-		.window = &_window,
-		.renderEngine = renderEngine,
-	};
-	_runtime->init(&runtimeBuilder);
-
-	// init the render engine
-	RenderEngineBuilder renderEngineBuilder{
-		.info = &_info,
-		.window = &_window
-	};
-	_runtime->get_render_engine().init(renderEngineBuilder);
-
 	// create all the editor windows
 	// add to list so they get drawn and updated
 	_editorWindows.emplace("Console", new ConsoleWindow(*this));
@@ -76,61 +53,56 @@ Application::Application()
 	//_editorWindows.emplace("Game", new GameWindow(*this));
 	_editorWindows.emplace("Properties", new PropertiesWindow(*this));
 	_editorWindows.emplace("Assets", new AssetsWindow(*this));
-
-	// load the engine and editor assemblies
-	ScriptEngine& scriptEngine = _runtime->get_script_engine();
-	scriptEngine.load_assembly("../Libraries/MintyEngine/bin/x64/Debug/MintyEngine.dll");
-	//scriptEngine.load_assembly("../Libraries/MintyEditor/bin/x64/Debug/MintyEditor.dll");
-	_runtime->link();
 }
 
-mintye::Application::~Application()
+mintye::EditorApplication::~EditorApplication()
 {
 	for(auto const& pair : _editorWindows)
 	{
 		delete pair.second;
 	}
-
-	if (_runtime)
-	{
-		// stop if needed
-		if (_runtime->is_running())
-		{
-			_runtime->stop();
-			_runtime->cleanup();
-		}
-
-		// cleanup and destroy
-		_runtime->destroy();
-		delete _runtime;
-	}
 }
 
-int Application::run(int argc, char const* argv[])
+void mintye::EditorApplication::init(RuntimeBuilder* b)
 {
+	RuntimeBuilder builder
+	{
+		.window = &get_window(),
+		.renderEngine = new EditorApplicationRenderEngine(*this, get_runtime()),
+	};
+
+	Application::init(&builder);
+
+	// init the window
+	set_window_title("");
+	Window& window = get_window();
+	window.maximize();
+
+	load_assemblies({ "../Libraries/MintyEngine/bin/x64/Debug/MintyEngine.dll" });
+
 	// TODO: remove this
 	// if the TestProject exists, open it by default
 	if (std::filesystem::exists("../Projects/Tests/TestProject"))
 	{
 		load_project("../Projects/Tests/TestProject");
 	}
-
-	_runtime->start();
-
-	_runtime->run();
-
-	_runtime->cleanup();
-	cleanup();
-
-	return 0;
 }
 
-minty::Runtime& mintye::Application::get_runtime() const
+void EditorApplication::loop()
 {
-	return *_runtime;
+	Application::loop();
 }
 
-void mintye::Application::draw()
+void mintye::EditorApplication::destroy()
+{
+	unload_project();
+
+	reset_editor_windows();
+
+	Application::destroy();
+}
+
+void mintye::EditorApplication::draw()
 {
 	BuildInfo buildInfo
 	{
@@ -143,14 +115,12 @@ void mintye::Application::draw()
 	draw_editor_windows();
 }
 
-void mintye::Application::cleanup()
+minty::Runtime* mintye::EditorApplication::create_runtime()
 {
-	unload_scene();
-	unload_project();
-	reset_editor_windows();
+	return new Runtime(get_info(), Runtime::Mode::Edit);
 }
 
-void mintye::Application::set_project(Project* const project)
+void mintye::EditorApplication::set_project(Project* const project)
 {
 	// set new project
 	_project = project;
@@ -162,13 +132,13 @@ void mintye::Application::set_project(Project* const project)
 	}
 }
 
-void mintye::Application::set_scene(minty::UUID const id)
+void mintye::EditorApplication::set_scene(minty::UUID const id)
 {
 	// set new scene
 	_sceneId = id;
 
 	// get the scene with the id, or null if empty id
-	Scene* scene = _runtime->get_scene_manager().get_scene(id);
+	Scene* scene = get_runtime().get_scene_manager().get_scene(id);
 
 	// set for all windows
 	for (auto const& pair : _editorWindows)
@@ -177,24 +147,26 @@ void mintye::Application::set_scene(minty::UUID const id)
 	}
 }
 
-void mintye::Application::set_window_title(minty::String const& subTitle)
+void mintye::EditorApplication::set_window_title(minty::String const& subTitle)
 {
+	Window& window = get_window();
+
 	if (subTitle.length())
 	{
-		_window.set_title(std::format("{}: {}", NAME, subTitle));
+		window.set_title(std::format("{}: {}", NAME, subTitle));
 	}
 	else
 	{
-		_window.set_title(NAME);
+		window.set_title(NAME);
 	}
 }
 
-void mintye::Application::new_project()
+void mintye::EditorApplication::new_project()
 {
 	ImGui::OpenPopup("Create New Project");
 }
 
-void mintye::Application::open_project()
+void mintye::EditorApplication::open_project()
 {
 	IGFD::FileDialogConfig config
 	{
@@ -203,7 +175,7 @@ void mintye::Application::open_project()
 	ImGuiFileDialog::Instance()->OpenDialog("open_project", "Choose project directory...", nullptr, config);
 }
 
-void mintye::Application::load_project(minty::Path const& path)
+void mintye::EditorApplication::load_project(minty::Path const& path)
 {
 	// if existing project, unload it
 	unload_project();
@@ -226,7 +198,7 @@ void mintye::Application::load_project(minty::Path const& path)
 
 	// load assemblies
 	// C:\Users\mitch\source\repos\Minty-Engine\Projects\Tests\TestProject\Assembly\bin\Debug
-	_runtime->get_script_engine().load_assembly(std::format("{0}/bin/x64/Debug/{0}.dll", project->get_name()));
+	get_runtime().get_script_engine().load_assembly(std::format("{0}/bin/x64/Debug/{0}.dll", project->get_name()));
 
 	// load a scene, if any found
 	Path scenePath = project->find_asset(Project::CommonFileType::Scene);
@@ -239,7 +211,7 @@ void mintye::Application::load_project(minty::Path const& path)
 	set_window_title(project->get_name());
 }
 
-void mintye::Application::unload_project()
+void mintye::EditorApplication::unload_project()
 {
 	unload_scene();
 
@@ -250,10 +222,10 @@ void mintye::Application::unload_project()
 	}
 
 	// reset path
-	std::filesystem::current_path(_path);
+	std::filesystem::current_path(get_path());
 }
 
-void mintye::Application::create_new_project(minty::String const& name, minty::Path const& path, NewProjectSetupType initType)
+void mintye::EditorApplication::create_new_project(minty::String const& name, minty::Path const& path, NewProjectSetupType initType)
 {
 	ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console");
 
@@ -307,19 +279,13 @@ void mintye::Application::create_new_project(minty::String const& name, minty::P
 	console->log(std::format("Created new project: {}", fullPath.string()));
 }
 
-void mintye::Application::load_scene(minty::Path const& path)
+void mintye::EditorApplication::load_scene(minty::Path const& path)
 {
 	ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console");
 
 	if (!_project)
 	{
 		console->log_error(std::format("Cannot load scene \"{}\". No project loaded.", path.string()));
-		return;
-	}
-
-	if (!_runtime)
-	{
-		console->log_error(std::format("Cannot load scene \"{}\". No runtime loaded.", path.string()));
 		return;
 	}
 
@@ -337,24 +303,24 @@ void mintye::Application::load_scene(minty::Path const& path)
 	}
 
 	// load new scene
-	SceneManager& sceneManager = _runtime->get_scene_manager();
+	SceneManager& sceneManager = get_runtime().get_scene_manager();
 	set_scene(sceneManager.create_scene(path).get_id());
 	sceneManager.load_scene(_sceneId);
 	sceneManager.load();
 }
 
-void mintye::Application::unload_scene()
+void mintye::EditorApplication::unload_scene()
 {
 	if (_sceneId != INVALID_UUID)
 	{
-		SceneManager& sceneManager = _runtime->get_scene_manager();
+		SceneManager& sceneManager = get_runtime().get_scene_manager();
 		sceneManager.unload();
 		sceneManager.destroy();
 		set_scene(INVALID_UUID);
 	}
 }
 
-void mintye::Application::open_asset(minty::Path const& path)
+void mintye::EditorApplication::open_asset(minty::Path const& path)
 {
 	Path extension = path.extension();
 
@@ -370,22 +336,22 @@ void mintye::Application::open_asset(minty::Path const& path)
 	}
 }
 
-void mintye::Application::save_project()
+void mintye::EditorApplication::save_project()
 {
-	minty::Console::todo("Application::save_project()");
+	minty::Console::todo("EditorEditorApplication::save_project()");
 }
 
-void mintye::Application::save_as_project()
+void mintye::EditorApplication::save_as_project()
 {
-	minty::Console::todo("Application::save_as_project()");
+	minty::Console::todo("EditorEditorApplication::save_as_project()");
 }
 
-void mintye::Application::close_project()
+void mintye::EditorApplication::close_project()
 {
 	unload_project();
 }
 
-void mintye::Application::draw_dock_space()
+void mintye::EditorApplication::draw_dock_space()
 {
 	static bool fullscreen = true;
 	static bool padding = false;
@@ -433,7 +399,7 @@ void mintye::Application::draw_dock_space()
 	ImGui::End();
 }
 
-void mintye::Application::draw_menu_bar()
+void mintye::EditorApplication::draw_menu_bar()
 {
 	// dumb work around: cannot open a popup in a menu bar
 	// https://github.com/ocornut/imgui/issues/331
@@ -556,7 +522,7 @@ void mintye::Application::draw_menu_bar()
 	}
 }
 
-void Application::draw_commands(BuildInfo& buildInfo)
+void EditorApplication::draw_commands(BuildInfo& buildInfo)
 {
 	ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console");
 
@@ -577,15 +543,15 @@ void Application::draw_commands(BuildInfo& buildInfo)
 
 	if (ImGui::Button("Clean"))
 	{
-		clean();
+		clean_project();
 	}
 	if (ImGui::Button("Build"))
 	{
-		build(buildInfo);
+		build_project(buildInfo);
 	}
 	if (ImGui::Button("Run"))
 	{
-		run(buildInfo);
+		run_project(buildInfo);
 	}
 
 	if (disabled)
@@ -596,7 +562,7 @@ void Application::draw_commands(BuildInfo& buildInfo)
 	ImGui::End();
 }
 
-void mintye::Application::draw_editor_windows()
+void mintye::EditorApplication::draw_editor_windows()
 {
 	for (auto const& pair : _editorWindows)
 	{
@@ -604,7 +570,7 @@ void mintye::Application::draw_editor_windows()
 	}
 }
 
-void mintye::Application::reset_editor_windows()
+void mintye::EditorApplication::reset_editor_windows()
 {
 	for (auto const& pair : _editorWindows)
 	{
@@ -612,7 +578,7 @@ void mintye::Application::reset_editor_windows()
 	}
 }
 
-void Application::generate_cmake(BuildInfo const& buildInfo)
+void EditorApplication::generate_cmake(BuildInfo const& buildInfo)
 {
 	ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console");
 
@@ -645,7 +611,7 @@ void Application::generate_cmake(BuildInfo const& buildInfo)
 		// cmake version requirement
 		"cmake_minimum_required(VERSION 3.16)" << std::endl <<
 		// project name, c++ settings
-		"project(" << APPLICATION_NAME << " LANGUAGES CXX)" << std::endl <<
+		"project(" << EditorApplication_NAME << " LANGUAGES CXX)" << std::endl <<
 		"find_package(Vulkan REQUIRED)" << std::endl <<
 		"set(CMAKE_CXX_STANDARD 20)" << std::endl <<
 		"set(CMAKE_CXX_STANDARD_REQUIRED ON)" << std::endl <<
@@ -689,7 +655,7 @@ void Application::generate_cmake(BuildInfo const& buildInfo)
 	file.close();
 }
 
-void Application::generate_main(BuildInfo const& buildInfo)
+void EditorApplication::generate_main(BuildInfo const& buildInfo)
 {
 	ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console");
 
@@ -743,7 +709,7 @@ void Application::generate_main(BuildInfo const& buildInfo)
 		"	runtime.link();" << std::endl <<
 		"	if(int code = init(runtime)) { minty::Console::error(std::format(\"Failed to init program with error code {}.\", code)); return code; }" << std::endl <<
 		"	runtime.start();" << std::endl <<
-		"	runtime.run();" << std::endl <<
+		"	runtime.run_project();" << std::endl <<
 		"	runtime.cleanup();" << std::endl <<
 		"	if(int code = destroy(runtime)) { minty::Console::error(std::format(\"Failed to destroy program with error code {}.\", code)); return code; }" << std::endl <<
 		"	runtime.destroy();" << std::endl;
@@ -760,7 +726,7 @@ void Application::generate_main(BuildInfo const& buildInfo)
 	file.close();
 }
 
-void mintye::Application::generate_vscode()
+void mintye::EditorApplication::generate_vscode()
 {
 	ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console");
 
@@ -946,7 +912,7 @@ void mintye::Application::generate_vscode()
 	file.close();
 }
 
-void mintye::Application::generate_init(minty::Path const& path)
+void mintye::EditorApplication::generate_init(minty::Path const& path)
 {
 	ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console");
 
@@ -1003,33 +969,33 @@ void mintye::Application::generate_init(minty::Path const& path)
 	file.close();
 }
 
-void Application::clean()
+void EditorApplication::clean_project()
 {
 	ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console");
 
 	if (!_project)
 	{
-		console->log_error("Cannot clean: no project loaded.");
+		console->log_error("Cannot clean_project: no project loaded.");
 		return;
 	}
 
-	console->log_important("clean");
+	console->log_important("clean_project");
 
 	// clean the build
-	console->run_command("cd " + _project->get_build_path().string() + " && " + std::filesystem::absolute(CMAKE_PATH).string() + " --build . --target clean");
+	console->run_command("cd " + _project->get_build_path().string() + " && " + std::filesystem::absolute(CMAKE_PATH).string() + " --build_project . --target clean_project");
 }
 
-void Application::build(BuildInfo const& buildInfo)
+void EditorApplication::build_project(BuildInfo const& buildInfo)
 {
 	ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console");
 
 	if (!_project)
 	{
-		console->log_error("Cannot build: no project loaded.");
+		console->log_error("Cannot build_project: no project loaded.");
 		return;
 	}
 
-	console->log_important("build");
+	console->log_important("build_project");
 
 	console->log_important("\tgenerating cmake");
 
@@ -1046,21 +1012,21 @@ void Application::build(BuildInfo const& buildInfo)
 		// // make cmake files if needed
 		command + " .",
 		// build program
-		command + " --build . --config " + buildInfo.get_config(),
+		command + " --build_project . --config " + buildInfo.get_config(),
 		});
 }
 
-void Application::run(BuildInfo const& buildInfo)
+void EditorApplication::run_project(BuildInfo const& buildInfo)
 {
 	ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console");
 
 	if (!_project)
 	{
-		console->log_error("Cannot run: no project loaded.");
+		console->log_error("Cannot run_project: no project loaded.");
 		return;
 	}
 
-	console->log_important("run");
+	console->log_important("run_project");
 
 	// call executable, pass in project path as argument for the runtime, so it knows what to run
 	console->run_command("cd " + _project->get_build_path().string() + " && cd " + buildInfo.get_config() + " && call " + EXE_NAME + " " + _project->get_base_path().string());

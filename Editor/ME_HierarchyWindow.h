@@ -12,7 +12,7 @@ namespace mintye
 		minty::Entity _clicked;
 
 	public:
-		HierarchyWindow(Application& application);
+		HierarchyWindow(EditorApplication& application);
 
 		void draw() override;
 

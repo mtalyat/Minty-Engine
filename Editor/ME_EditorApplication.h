@@ -12,7 +12,8 @@ namespace mintye
 	/// <summary>
 	/// Holds data and runs the game engine application.
 	/// </summary>
-	class Application
+	class EditorApplication
+		: public minty::Application
 	{
 	private:
 		constexpr static char const* NAME = "Minty Editor";
@@ -32,12 +33,6 @@ namespace mintye
 		};
 
 	private:
-		// info needed for the editor:
-		minty::Info _info;
-		minty::Path _path;
-		minty::Window _window;
-		minty::Runtime* _runtime;
-
 		// info needed for a loaded project:
 		Project* _project;
 		minty::UUID _sceneId;
@@ -45,23 +40,27 @@ namespace mintye
 		// editor windows to be drawn
 		std::unordered_map<minty::String, EditorWindow*> _editorWindows;
 	public:
-		Application();
+		EditorApplication();
 
-		~Application();
+		~EditorApplication();
+
+	protected:
+		void init(minty::RuntimeBuilder* builder = nullptr) override;
 
 		/// <summary>
 		/// Runs the game engine application.
 		/// </summary>
 		/// <param name="argc">The command line argument count.</param>
 		/// <param name="argv">The command line arguments.</param>
-		int run(int argc, char const* argv[]);
+		void loop() override;
 
-		minty::Runtime& get_runtime() const;
-		
+		void destroy() override;
+
+	public:
 		void draw();
 
-	private:
-		void cleanup();
+	protected:
+		minty::Runtime* create_runtime() override;
 
 #pragma region Set
 
@@ -141,19 +140,19 @@ namespace mintye
 		/// Cleans the target project.
 		/// </summary>
 		/// <param name="info">The target info.</param>
-		void clean();
+		void clean_project();
 
 		/// <summary>
 		/// Builds the target project.
 		/// </summary>
 		/// <param name="info">The target info.</param>
-		void build(BuildInfo const& buildInfo);
+		void build_project(BuildInfo const& buildInfo);
 
 		/// <summary>
 		/// Runs the target project.
 		/// </summary>
 		/// <param name="info">The target info.</param>
-		void run(BuildInfo const& buildInfo);
+		void run_project(BuildInfo const& buildInfo);
 
 #pragma region File Generation
 
@@ -186,7 +185,7 @@ namespace mintye
 	};
 
 	template<typename T>
-	T* Application::find_editor_window(minty::String const& name)
+	T* EditorApplication::find_editor_window(minty::String const& name)
 	{
 		auto found = _editorWindows.find(name);
 

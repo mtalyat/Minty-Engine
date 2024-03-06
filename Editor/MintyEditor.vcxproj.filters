@@ -21,7 +21,7 @@
     <ClCompile Include="Program.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ME_Application.cpp">
+    <ClCompile Include="ME_EditorApplication.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ME_ConsoleWindow.cpp">
@@ -51,7 +51,7 @@
     <ClCompile Include="ME_PropertiesWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ME_ApplicationRenderEngine.cpp">
+    <ClCompile Include="ME_EditorApplicationRenderEngine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="ME_Theme.cpp">
@@ -62,7 +62,7 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ME_Application.h">
+    <ClInclude Include="ME_EditorApplication.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ME_ConsoleWindow.h">
@@ -98,7 +98,7 @@
     <ClInclude Include="ME_Minty.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ME_ApplicationRenderEngine.h">
+    <ClInclude Include="ME_EditorApplicationRenderEngine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ME_Theme.h">

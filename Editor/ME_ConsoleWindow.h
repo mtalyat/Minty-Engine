@@ -40,7 +40,7 @@ namespace mintye
 		std::mutex _commandsLock;
 		bool _commandsThreadRunning;
 	public:
-		ConsoleWindow(Application& application);
+		ConsoleWindow(EditorApplication& application);
 
 		void draw() override;
 

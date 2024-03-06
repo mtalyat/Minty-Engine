@@ -1,6 +1,6 @@
 #include "ME_HierarchyWindow.h"
 
-#include "ME_Application.h"
+#include "ME_EditorApplication.h"
 #include "ME_PropertiesWindow.h"
 #include "ME_SceneWindow.h"
 
@@ -10,7 +10,7 @@
 using namespace mintye;
 using namespace minty;
 
-mintye::HierarchyWindow::HierarchyWindow(Application& application)
+mintye::HierarchyWindow::HierarchyWindow(EditorApplication& application)
 	: EditorWindow(application)
 	, _registeredSystems()
 	, _selected(NULL_ENTITY)
@@ -34,7 +34,7 @@ void mintye::HierarchyWindow::draw()
 
 	// draw systems
 	SystemRegistry& systemRegistry = scene->get_system_registry();
-	if (ImGui::BeginChild("HierarchySystems", ImVec2(0, splitHeight), true))
+	if (ImGui::BeginChild("HierarchySystems", ImVec2(0.0f, min(200.0f, splitHeight)), true))
 	{
 		ImGui::Text(std::format("Systems ({})", systemRegistry.size()).c_str());
 		ImGui::Separator();

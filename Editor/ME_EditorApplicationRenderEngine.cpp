@@ -1,11 +1,11 @@
-#include "ME_ApplicationRenderEngine.h"
+#include "ME_EditorApplicationRenderEngine.h"
 
-#include "ME_Application.h"
+#include "ME_EditorApplication.h"
 
 using namespace minty;
 using namespace mintye;
 
-mintye::ApplicationRenderEngine::ApplicationRenderEngine(Application& app, Runtime& runtime)
+mintye::EditorApplicationRenderEngine::EditorApplicationRenderEngine(EditorApplication& app, Runtime& runtime)
 	: RenderEngine(runtime)
 	, _application(&app)
 	, _descriptorPool()
@@ -13,10 +13,10 @@ mintye::ApplicationRenderEngine::ApplicationRenderEngine(Application& app, Runti
 	, _theme()
 { }
 
-mintye::ApplicationRenderEngine::~ApplicationRenderEngine()
+mintye::EditorApplicationRenderEngine::~EditorApplicationRenderEngine()
 { }
 
-void mintye::ApplicationRenderEngine::init(RenderEngineBuilder const& builder)
+void mintye::EditorApplicationRenderEngine::init(RenderEngineBuilder const& builder)
 {
 	// init normal stuff
 	RenderEngine::init(builder);
@@ -141,7 +141,7 @@ void mintye::ApplicationRenderEngine::init(RenderEngineBuilder const& builder)
 	//_sceneDescriptorSet = ImGui_ImplVulkan_AddTexture(_sceneSampler, _sceneImageView, VK_IMAGE_LAYOUT_ATTACHMENT_OPTIMAL);
 }
 
-void mintye::ApplicationRenderEngine::destroy()
+void mintye::EditorApplicationRenderEngine::destroy()
 {
 	//vkDestroyImage(_device, _sceneImage, nullptr);
 	//vkFreeMemory(_device, _sceneImageMemory, nullptr);
@@ -160,7 +160,7 @@ void mintye::ApplicationRenderEngine::destroy()
 //	return _sceneDescriptorSet;
 //}
 
-void mintye::ApplicationRenderEngine::init_theme()
+void mintye::EditorApplicationRenderEngine::init_theme()
 {
 	ImGui::StyleColorsDark();
 	//ImGui::StyleColorsLight();
@@ -216,7 +216,7 @@ void mintye::ApplicationRenderEngine::init_theme()
 	_theme.apply(style);
 }
 
-void mintye::ApplicationRenderEngine::draw(VkCommandBuffer commandBuffer)
+void mintye::EditorApplicationRenderEngine::draw(VkCommandBuffer commandBuffer)
 {
 	//// Resize swap chain?
 	//if (_window->is_resized())
@@ -275,7 +275,7 @@ void mintye::ApplicationRenderEngine::draw(VkCommandBuffer commandBuffer)
 	}
 }
 
-VkSurfaceFormatKHR mintye::ApplicationRenderEngine::choose_swap_surface_format(const std::vector<VkSurfaceFormatKHR>& availableFormats)
+VkSurfaceFormatKHR mintye::EditorApplicationRenderEngine::choose_swap_surface_format(const std::vector<VkSurfaceFormatKHR>& availableFormats)
 {
 	// same as overriden function, but we use UNORM
 
@@ -288,7 +288,7 @@ VkSurfaceFormatKHR mintye::ApplicationRenderEngine::choose_swap_surface_format(c
 	return availableFormats[0];
 }
 
-void mintye::ApplicationRenderEngine::create_descriptor_pool()
+void mintye::EditorApplicationRenderEngine::create_descriptor_pool()
 {
 	std::array<VkDescriptorPoolSize, 1> poolSizes{};
 	poolSizes[0].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;

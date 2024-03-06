@@ -19,7 +19,7 @@ namespace mintye
 		ImVec2 _mouseDragPos;
 
 	public:
-		SceneWindow(Application& application);
+		SceneWindow(EditorApplication& application);
 
 		void draw() override;
 

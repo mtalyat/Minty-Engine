@@ -1,10 +1,10 @@
 #include "ME_EditorWindow.h"
 
-#include "ME_Application.h"
+#include "ME_EditorApplication.h"
 
 using namespace mintye;
 
-mintye::EditorWindow::EditorWindow(Application& application)
+mintye::EditorWindow::EditorWindow(EditorApplication& application)
 	: _application(&application)
 {}
 
@@ -12,7 +12,7 @@ mintye::EditorWindow::~EditorWindow()
 {
 }
 
-Application& mintye::EditorWindow::get_application() const
+EditorApplication& mintye::EditorWindow::get_application() const
 {
 	return *_application;
 }
