@@ -33,3 +33,5 @@ The Minty Engine will use a multitude of advanced and new technologies to make t
 * [GLM](https://github.com/g-truc/glm), for linear mathematics.
 * [EnTT](https://github.com/skypjack/entt), for the entity component system.
 * [stb](https://github.com/nothings/stb), for stb_image.h, for loading images from the disk.
+* [SoLoud](https://github.com/jarikomppa/soloud), for loading and playing audio.
+* [Dear ImGui](https://github.com/ocornut/imgui), for the editor user iterface.
