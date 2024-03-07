@@ -98,3 +98,14 @@ bool minty::Wrapper::open(Path const& path, VirtualFile& file) const
 	// open file
 	return wrap->open(path, file);
 }
+
+std::vector<char> minty::Wrapper::read(Path const& path) const
+{
+	// find wrapper
+	Wrap const* wrap = find_by_path(path);
+
+	if (!wrap) return std::vector<char>();
+
+	// read file
+	return wrap->read(path);
+}

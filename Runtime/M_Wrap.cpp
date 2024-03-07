@@ -374,7 +374,7 @@ bool minty::Wrap::contains(Path const& path) const
 
 bool minty::Wrap::open(Path const& path, VirtualFile& file) const
 {
-    if (!exists(path))
+    if (!contains(path))
     {
         return false;
     }

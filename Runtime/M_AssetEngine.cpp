@@ -95,12 +95,9 @@ minty::AssetEngine::AssetEngine(Runtime& runtime)
 	{
 		Path path = entry.path();
 
-		MINTY_LOG_FORMAT("Checking file: \"{}\"", path.string());
-
 		if (path.has_extension() && path.extension() == WRAP_EXTENSION)
 		{
 			_wrapper.emplace(path);
-			MINTY_LOG_FORMAT("Found wrap file: \"{}\"", path.string());
 		}
 	}
 }
@@ -119,39 +116,6 @@ bool minty::AssetEngine::exists(Path const& path) const
 	}
 }
 
-File* minty::AssetEngine::open_new_file(Path const& path) const
-{
-	File* file;
-
-	switch (get_runtime().get_mode())
-	{
-	case RunMode::Normal:
-	{
-		// load virtual file
-		file = new VirtualFile();
-
-		if (!_wrapper.open(path, *static_cast<VirtualFile*>(file)))
-		{
-			// file not opened
-			MINTY_WARN_FORMAT("Asset not opened at path \"{}\".", path.string());
-			return nullptr;
-		}
-	}
-	break;
-	case RunMode::Edit:
-	{
-		// load physical file
-		file = new PhysicalFile(path, File::Flags::Binary | File::Flags::Read);
-	}
-	break;
-	default:
-		MINTY_ABORT("Unrecognized RunMode.");
-		return nullptr;
-	}
-
-	return file;
-}
-
 void minty::AssetEngine::check(Path const& path, char const* extension, bool const requiresMeta) const
 {
 	// can load if assets exists, and if no meta is required, or if a meta is required, it exists
@@ -165,16 +129,8 @@ void minty::AssetEngine::check(Path const& path, char const* extension, bool con
 
 Node minty::AssetEngine::read_file_node(Path const& path) const
 {
-	File* file = open_new_file(path);
-
-	if (!file) return Node();
-
 	// read file contents
-	std::vector<String> lines = file->read_all_lines();
-
-	// all done with file
-	file->close();
-	delete file;
+	std::vector<String> lines = read_file_lines(path);
 
 	// parse the lines
 	return Node::parse(lines);
@@ -187,53 +143,47 @@ Node minty::AssetEngine::read_file_meta(Path const& path) const
 
 std::vector<char> minty::AssetEngine::read_file(Path const& path) const
 {
-	File* file = open_new_file(path);
-
-	if (!file) std::vector<char>();
-
-	// read file contents
-	std::vector<char> data = file->read_all();
-
-	// all done with file
-	file->close();
-	delete file;
-
-	// parse the lines
-	return data;
+	switch (get_runtime().get_mode())
+	{
+	case RunMode::Normal:
+		return _wrapper.read(path);
+	case RunMode::Edit:
+		return File::read_all_chars(path);
+	default:
+		MINTY_ABORT("Unrecognized RunMode.");
+		return std::vector<char>();
+	}
 }
 
 std::vector<Byte> minty::AssetEngine::read_file_bytes(Path const& path) const
 {
-	File* file = open_new_file(path);
+	std::vector<char> data = read_file(path);
 
-	if (!file) std::vector<Byte>();
+	std::vector<Byte> result(data.size());
 
-	// read file contents
-	std::vector<Byte> data = file->read_all_bytes();
+	memcpy(result.data(), data.data(), sizeof(char) * data.size());
 
-	// all done with file
-	file->close();
-	delete file;
-
-	// parse the lines
-	return data;
+	return result;
 }
 
 std::vector<String> minty::AssetEngine::read_file_lines(Path const& path) const
 {
-	File* file = open_new_file(path);
+	std::vector<char> data = read_file(path);
 
-	if (!file) std::vector<String>();
+	std::vector<String> result;
 
-	// read file contents
-	std::vector<String> data = file->read_all_lines();
+	std::istringstream ss(String(data.data(), sizeof(char) * data.size()));
 
-	// all done with file
-	file->close();
-	delete file;
+	String line;
+	while (std::getline(ss, line))
+	{
+		// remove the \r
+		line.erase(std::remove(line.begin(), line.end(), '\r'), line.end());
 
-	// parse the lines
-	return data;
+		result.push_back(line);
+	}
+	
+	return result;
 }
 
 Texture* minty::AssetEngine::load_texture(Path const& path)

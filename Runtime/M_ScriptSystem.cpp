@@ -27,9 +27,9 @@ void minty::ScriptSystem::load()
 		}
 	}
 
-	for (auto [entity, script, onload, enabled] : registry.view<ScriptComponent const, ScriptOnEnableComponent const, EnabledComponent const>().each())
+	for (auto [entity, script, onenable, enabled] : registry.view<ScriptComponent const, ScriptOnEnableComponent const, EnabledComponent const>().each())
 	{
-		for (auto const id : onload.scriptIds)
+		for (auto const id : onenable.scriptIds)
 		{
 			script.scripts.at(id).invoke(SCRIPT_METHOD_NAME_ONENABLE);
 		}

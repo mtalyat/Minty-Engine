@@ -74,5 +74,7 @@ namespace minty
 		/// <param name="file">The file object to use to open the file at the given path.</param>
 		/// <returns>True if the file was opened, otherwise false.</returns>
 		bool open(Path const& path, VirtualFile& file) const;
+
+		std::vector<char> read(Path const& path) const;
 	};
 }

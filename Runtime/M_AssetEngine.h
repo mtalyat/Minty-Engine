@@ -41,13 +41,13 @@ namespace minty
 	public:
 		bool exists(Path const& path) const;
 
+		std::vector<char> read_file(Path const& path) const;
+
 		// reads the file at the given path as a node
 		Node read_file_node(Path const& path) const;
 
 		// reads the file at the given path + .mmeta as a node
 		Node read_file_meta(Path const& path) const;
-
-		std::vector<char> read_file(Path const& path) const;
 
 		std::vector<Byte> read_file_bytes(Path const& path) const;
 

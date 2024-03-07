@@ -871,16 +871,29 @@ void minty::EntityRegistry::register_script(String const& name)
 				// call OnCreate
 				scriptObject.try_invoke(SCRIPT_METHOD_NAME_ONCREATE);
 
+				// call load and enable right now if the scene is already loaded, otherwise do it later
+				bool isLoaded = registry.get_scene().is_loaded();
+
 				// now add the helper components, if they are needed
 				if (script->has_method(SCRIPT_METHOD_NAME_ONLOAD))
 				{
 					ScriptOnLoadComponent& eventComp = registry.get_or_emplace<ScriptOnLoadComponent>(entity);
 					eventComp.scriptIds.emplace(id);
+
+					if (isLoaded)
+					{
+						scriptObject.invoke(SCRIPT_METHOD_NAME_ONLOAD);
+					}
 				}
 				if (script->has_method(SCRIPT_METHOD_NAME_ONENABLE))
 				{
 					ScriptOnEnableComponent& eventComp = registry.get_or_emplace<ScriptOnEnableComponent>(entity);
 					eventComp.scriptIds.emplace(id);
+
+					if (isLoaded)
+					{
+						scriptObject.invoke(SCRIPT_METHOD_NAME_ONENABLE);
+					}
 				}
 				if (script->has_method(SCRIPT_METHOD_NAME_ONUPDATE))
 				{

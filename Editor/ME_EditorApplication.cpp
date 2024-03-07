@@ -692,6 +692,8 @@ void mintye::EditorApplication::generate_application_data(BuildInfo const& build
 
 	Info const& projectInfo = _project->get_info();
 
+	// TODO: use Writer, save the node
+
 	// write contents
 	file <<
 		"scenes" << std::endl;
@@ -701,6 +703,21 @@ void mintye::EditorApplication::generate_application_data(BuildInfo const& build
 	for (Path const& scenePath : scenes)
 	{
 		file << "\t- " << scenePath.string() << std::endl;
+	}
+
+	file <<
+		"assemblies" << std::endl;
+
+	// TODO: make generic, for other projects
+	std::vector<String> assemblies =
+	{
+		"../../TestProject/bin/x64/Debug/MintyEngine.dll",
+		"../../TestProject/bin/x64/Debug/TestProject.dll"
+	};
+
+	for (auto const& str : assemblies)
+	{
+		file << "\t- " << str << std::endl;
 	}
 
 	file.close();
@@ -716,7 +733,7 @@ void EditorApplication::clean_project()
 		return;
 	}
 
-	console->log_important("clean_project");
+	console->log_important("clean project");
 
 	// clean the build
 	console->run_command("cd " + _project->get_build_path().string() + " && " + std::filesystem::absolute(CMAKE_PATH).string() + " --build_project . --target clean_project");
@@ -728,11 +745,11 @@ void EditorApplication::build_project(BuildInfo const& buildInfo)
 
 	if (!_project)
 	{
-		console->log_error("Cannot build_project: no project loaded.");
+		console->log_error("Cannot build project: no project loaded.");
 		return;
 	}
 
-	console->log_important("build_project");
+	console->log_important("build project");
 
 	generate_directories();
 
@@ -773,7 +790,7 @@ void EditorApplication::run_project(BuildInfo const& buildInfo)
 		return;
 	}
 
-	console->log_important("run_project");
+	console->log_important("run project");
 
 	// call executable, pass in project path as argument for the runtime, so it knows what to run
 	console->run_command("cd " + _project->get_build_path().string() + " && cd " + buildInfo.get_config() + " && call " + EXE_NAME);
