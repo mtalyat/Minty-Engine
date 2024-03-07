@@ -2,12 +2,15 @@
 #include "M_Engine.h"
 
 #include "M_Asset.h"
+#include "M_Wrapper.h"
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
 
 namespace minty
 {
+	class File;
+
 	class Texture;
 	class Sprite;
 	class Shader;
@@ -28,10 +31,35 @@ namespace minty
 		std::unordered_map<UUID, Asset*> _assets;
 		std::unordered_map<TypeID, std::unordered_set<Asset*>> _assetsByType;
 
+		Wrapper _wrapper;
+
 	public:
 		AssetEngine(Runtime& runtime);
 
 #pragma region Loading
+
+	public:
+		bool exists(Path const& path) const;
+
+		// reads the file at the given path as a node
+		Node read_file_node(Path const& path) const;
+
+		// reads the file at the given path + .mmeta as a node
+		Node read_file_meta(Path const& path) const;
+
+		std::vector<char> read_file(Path const& path) const;
+
+		std::vector<Byte> read_file_bytes(Path const& path) const;
+
+		std::vector<String> read_file_lines(Path const& path) const;
+
+	private:
+		Path fix_path(Path const& path) const;
+
+		// opens a physical OR virtual file based on the RunMode of the file at the given path
+		File* open_new_file(Path const& path) const;
+
+		void check(Path const& path, char const* extension, bool const requiresMeta) const;
 
 #pragma region Render
 

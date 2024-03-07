@@ -14,9 +14,6 @@ namespace minty
 		// all wraps
 		std::vector<Wrap> _wraps;
 
-		// open virtual files
-		std::unordered_map<ID, std::pair<Wrap*, ID>> _files;
-
 	public:
 		/// <summary>
 		/// Creates an empty Wrapper.
@@ -62,6 +59,13 @@ namespace minty
 		/// <param name="name">The name of the Wrap file.</param>
 		/// <returns>A pointer to the found Wrap file, or nullptr if no file was found.</returns>
 		Wrap const* find_by_name(String const& name) const;
+
+		/// <summary>
+		/// Checks if any of the Wrap files in this Wrapper contain a file with the given path.
+		/// </summary>
+		/// <param name="path"></param>
+		/// <returns></returns>
+		bool contains(Path const& path) const;
 
 		/// <summary>
 		/// Opens the file at the given path.

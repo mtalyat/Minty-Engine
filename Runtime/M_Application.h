@@ -1,6 +1,7 @@
 #pragma once
 #include "M_Object.h"
 
+#include "M_RunMode.h"
 #include "M_Info.h"
 
 namespace minty
@@ -14,12 +15,12 @@ namespace minty
 	{
 	private:
 		Info _info;
-		Path _path;
+		RunMode _mode;
 		Window* _window;
 		Runtime* _runtime;
 
 	public:
-		Application(Info const& info, Path const& path);
+		Application(RunMode const mode = RunMode::Normal);
 
 		virtual ~Application();
 
@@ -39,8 +40,6 @@ namespace minty
 	public:
 		virtual int run();
 
-		int get_exit_code() const;
-
 	protected:
 		virtual Window* create_window();
 
@@ -49,11 +48,11 @@ namespace minty
 	public:
 		void load_assemblies(std::vector<Path> const& paths);
 
+		RunMode get_mode() const;
+
 		Window& get_window() const;
 
 		Runtime& get_runtime() const;
-
-		Path const& get_path() const;
 
 		Info const& get_info() const;
 	};

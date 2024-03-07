@@ -14000,7 +14000,7 @@ ma_bool32 ma_device_read_and_send_to_client__alsa(ma_device* pDevice)
 
                     framesRead = ((ma_snd_pcm_readi_proc)pDevice->pContext->alsa.snd_pcm_readi)((ma_snd_pcm_t*)pDevice->alsa.pPCM, pDevice->alsa.pIntermediaryBuffer, framesAvailable);
                     if (framesRead < 0) {
-                        ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[ALSA] Failed to read data from the internal device.", MA_FAILED_TO_READ_DATA_FROM_DEVICE);
+                        ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[ALSA] Failed to read_file data from the internal device.", MA_FAILED_TO_READ_DATA_FROM_DEVICE);
                         return MA_FALSE;
                     }
 
@@ -14574,7 +14574,7 @@ ma_result ma_device_read__alsa(ma_device* pDevice, void* pFramesOut, ma_uint32 f
 
                 resultALSA = ((ma_snd_pcm_readi_proc)pDevice->pContext->alsa.snd_pcm_readi)((ma_snd_pcm_t*)pDevice->alsa.pPCMCapture, pFramesOut, frameCount);
                 if (resultALSA < 0) {
-                    return ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[ALSA] Failed to read data from the internal device.", MA_FAILED_TO_READ_DATA_FROM_DEVICE);
+                    return ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[ALSA] Failed to read_file data from the internal device.", MA_FAILED_TO_READ_DATA_FROM_DEVICE);
                 }
             }
         }
@@ -21740,7 +21740,7 @@ ma_result ma_device_read__sndio(ma_device* pDevice, void* pPCMFrames, ma_uint32 
 
     result = ((ma_sio_read_proc)pDevice->pContext->sndio.sio_read)((struct ma_sio_hdl*)pDevice->sndio.handleCapture, pPCMFrames, frameCount * ma_get_bytes_per_frame(pDevice->capture.internalFormat, pDevice->capture.internalChannels));
     if (result == 0) {
-        return ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[sndio] Failed to read data from the device to be sent to the device.", MA_FAILED_TO_SEND_DATA_TO_DEVICE);
+        return ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[sndio] Failed to read_file data from the device to be sent to the device.", MA_FAILED_TO_SEND_DATA_TO_DEVICE);
     }
 
     if (pFramesRead != NULL) {
@@ -22697,7 +22697,7 @@ ma_result ma_device_read__audio4(ma_device* pDevice, void* pPCMFrames, ma_uint32
 
     result = read(pDevice->audio4.fdCapture, pPCMFrames, frameCount * ma_get_bytes_per_frame(pDevice->capture.internalFormat, pDevice->capture.internalChannels));
     if (result < 0) {
-        return ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[audio4] Failed to read data from the device.", MA_FAILED_TO_READ_DATA_FROM_DEVICE);
+        return ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[audio4] Failed to read_file data from the device.", MA_FAILED_TO_READ_DATA_FROM_DEVICE);
     }
 
     if (pFramesRead != NULL) {
@@ -23405,7 +23405,7 @@ ma_result ma_device_read__oss(ma_device* pDevice, void* pPCMFrames, ma_uint32 fr
 
     resultOSS = read(pDevice->oss.fdCapture, pPCMFrames, frameCount * ma_get_bytes_per_frame(pDevice->capture.internalFormat, pDevice->capture.internalChannels));
     if (resultOSS < 0) {
-        return ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[OSS] Failed to read data from the device to be sent to the client.", MA_FAILED_TO_READ_DATA_FROM_DEVICE);
+        return ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[OSS] Failed to read_file data from the device to be sent to the client.", MA_FAILED_TO_READ_DATA_FROM_DEVICE);
     }
     
     if (pFramesRead != NULL) {

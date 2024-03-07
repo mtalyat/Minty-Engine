@@ -17,21 +17,6 @@ namespace mintye
 	{
 	private:
 		constexpr static char const* NAME = "Minty Editor";
-
-	private:
-		enum class NewProjectSetupType
-		{
-			/// <summary>
-			/// Do nothing special.
-			/// </summary>
-			Default,
-
-			/// <summary>
-			/// Add .vscode folder, set up for debugging.
-			/// </summary>
-			VSCode,
-		};
-
 	private:
 		// info needed for a loaded project:
 		Project* _project;
@@ -61,6 +46,8 @@ namespace mintye
 
 	protected:
 		minty::Runtime* create_runtime() override;
+
+		minty::Window* create_window() override;
 
 #pragma region Set
 
@@ -109,7 +96,7 @@ namespace mintye
 
 		void unload_project();
 
-		void create_new_project(minty::String const& name, minty::Path const& path, NewProjectSetupType initType = NewProjectSetupType::Default);
+		void create_new_project(minty::String const& name, minty::Path const& path);
 
 #pragma endregion
 
@@ -157,6 +144,12 @@ namespace mintye
 #pragma region File Generation
 
 	private:
+		void generate_directories();
+
+		void generate_application_data(BuildInfo const& buildInfo);
+
+		void generate_wraps(BuildInfo const& buildInfo);
+
 		/// <summary>
 		/// Generates and updates the cmake file for the target project.
 		/// </summary>
@@ -168,16 +161,6 @@ namespace mintye
 		/// </summary>
 		/// <param name="info"></param>
 		void generate_main(BuildInfo const& buildInfo);
-
-		/// <summary>
-		/// Generates all of the files for a vscode project setup.
-		/// </summary>
-		void generate_vscode();
-
-		/// <summary>
-		/// Generates all of the init.h and init.cpp files for a project.
-		/// </summary>
-		void generate_init(minty::Path const& path);
 
 #pragma endregion
 

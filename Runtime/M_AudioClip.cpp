@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "M_AudioClip.h"
 
+#include "M_Runtime.h"
+#include "M_AssetEngine.h"
 #include "M_Asset.h"
 #include "M_Console.h"
 #include "M_Reader.h"
@@ -19,12 +21,15 @@ minty::AudioClip::AudioClip(AudioClipBuilder const& builder, Runtime& runtime)
 
 void minty::AudioClip::load(Path const& path)
 {
+	AssetEngine& assets = get_runtime().get_asset_engine();
+	std::vector<Byte> fileData = assets.read_file_bytes(path);
+
 	// load clip
-	SoLoud::result result = _clip.load(Asset::absolute(path).string().c_str());
+	SoLoud::result result = _clip.loadMem(fileData.data(), static_cast<unsigned int>(fileData.size()), true, false);
 
 	if (result != SoLoud::SOLOUD_ERRORS::SO_NO_ERROR)
 	{
-		MINTY_ERROR_FORMAT("Failed to load_animation AudioClip at path \"{}\". Error code {}.", Asset::absolute(path).string(), result);
+		MINTY_ERROR_FORMAT("Failed to load AudioClip at path \"{}\". Error code {}.", path.string(), result);
 		return;
 	}
 }

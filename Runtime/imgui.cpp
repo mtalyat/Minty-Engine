@@ -10218,7 +10218,7 @@ bool ImGui::ItemAdd(const ImRect& bb, ImGuiID id, const ImRect* nav_bb_arg, ImGu
         // [DEBUG] People keep stumbling on this problem and using "" as identifier in the root of a window instead of "##something".
         // Empty identifier are valid and useful in a small amount of cases, but 99.9% of the time you want to use "##something".
         // READ THE FAQ: https://dearimgui.com/faq
-        IM_ASSERT(id != window->ID && "Cannot have an empty ID at the root of a window. If you need an empty label, use ## and read the FAQ about how the ID Stack works!");
+        IM_ASSERT(id != window->ID && "Cannot have an empty ID at the root of a window. If you need an empty label, use ## and read_file the FAQ about how the ID Stack works!");
     }
     g.NextItemData.Flags = ImGuiNextItemDataFlags_None;
     g.NextItemData.ItemFlags = ImGuiItemFlags_None;

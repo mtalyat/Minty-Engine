@@ -43,7 +43,7 @@ using namespace minty;
 uint32_t const WIDTH = 800;
 uint32_t const HEIGHT = 600;
 
-Runtime::Runtime(Info const& info, Mode const mode)
+Runtime::Runtime(Info const& info, RunMode const mode)
 	: _mode(mode)
 	, _state(State::Uninitialized)
 	, _info(info)
@@ -52,7 +52,6 @@ Runtime::Runtime(Info const& info, Mode const mode)
 	, _engines()
 	, _frameCount()
 	, _exitCode()
-	, _personalWindow()
 {}
 
 Runtime::~Runtime()
@@ -65,7 +64,7 @@ Runtime::~Runtime()
 	destroy();
 }
 
-Runtime::Mode minty::Runtime::get_mode() const
+RunMode minty::Runtime::get_mode() const
 {
 	return _mode;
 }
@@ -156,7 +155,7 @@ void minty::Runtime::exit(int const code)
 	if (_state == State::Running) _state = State::Stopped;
 }
 
-bool minty::Runtime::init(RuntimeBuilder const* builder)
+bool minty::Runtime::init(Window& window, RuntimeBuilder const* builder)
 {
 	// already initialized
 	if (_state > State::Uninitialized) return true;
@@ -164,8 +163,7 @@ bool minty::Runtime::init(RuntimeBuilder const* builder)
 	_state = State::Initialized;
 
 	// create necessary components
-	_personalWindow = !builder || !builder->window;
-	_window = _personalWindow ? new Window(_info.get_application_name(), WIDTH, HEIGHT) : builder->window;
+	_window = &window;
 	_sceneManager = new SceneManager(*this);
 
 	set_engine<AssetEngine>(builder && builder->assetEngine ? builder->assetEngine : new AssetEngine(*this));
@@ -269,8 +267,6 @@ void minty::Runtime::destroy()
 		delete engine;
 	}
 	_engines.clear();
-
-	MINTY_DELETE_COND(_window, _personalWindow);
 }
 
 void minty::Runtime::register_script(String const& namespaceName, String const& className)

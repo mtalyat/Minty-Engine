@@ -24,6 +24,7 @@ access to the entire engine without needing include each file.
 
 // APPLICATION
 #include "M_Application.h"
+#include "M_RunMode.h"
 
 // ASSET
 #include "M_Asset.h"

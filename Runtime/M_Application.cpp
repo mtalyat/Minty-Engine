@@ -7,14 +7,12 @@
 
 using namespace minty;
 
-minty::Application::Application(Info const& info, Path const& path)
-	: _info(info)
-	, _path(path)
+minty::Application::Application(RunMode const mode)
+	: _info("Minty", 0, 0, 0)
+	, _mode(mode)
 	, _window()
 	, _runtime()
-{
-	std::filesystem::current_path(path);
-}
+{}
 
 minty::Application::~Application()
 {}
@@ -24,14 +22,16 @@ void minty::Application::create()
 	if (_runtime) return;
 
 	_window = create_window();
+	MINTY_ASSERT(_window != nullptr);
 	_runtime = create_runtime();
+	MINTY_ASSERT(_runtime != nullptr);
 }
 
 void minty::Application::init(RuntimeBuilder* builder)
 {
 	if (!_runtime) return;
 
-	_runtime->init(builder);
+	_runtime->init(*_window, builder);
 
 	// init the render engine
 	RenderEngineBuilder renderEngineBuilder{
@@ -58,6 +58,13 @@ void minty::Application::loop()
 
 void minty::Application::stop()
 {
+	if (!_runtime) return;
+
+	if (_runtime->is_running())
+	{
+		_runtime->stop();
+		_runtime->cleanup();
+	}
 }
 
 void minty::Application::destroy()
@@ -65,14 +72,13 @@ void minty::Application::destroy()
 	if (!_runtime) return;
 
 	// stop if needed
-	if (_runtime->is_running())
-	{
-		_runtime->stop();
-		_runtime->cleanup();
-	}
+	stop();
+
+	_window->close();
+	MINTY_DELETE(_window);
 
 	_runtime->destroy();
-	delete _runtime;
+	MINTY_DELETE(_runtime);
 }
 
 int minty::Application::run()
@@ -82,24 +88,22 @@ int minty::Application::run()
 	start();
 	loop();
 	stop();
+
+	int code = _runtime->get_exit_code();
+
 	destroy();
 
-	return get_exit_code();
-}
-
-int minty::Application::get_exit_code() const
-{
-	return _runtime->get_exit_code();
+	return code;
 }
 
 Window* minty::Application::create_window()
 {
-	return new Window("", 1280, 720, "Icon.png");
+	return new Window("", 1280, 720);
 }
 
 Runtime* minty::Application::create_runtime()
 {
-	return new Runtime(_info);
+	return new Runtime(_info, _mode);
 }
 
 void minty::Application::load_assemblies(std::vector<Path> const& paths)
@@ -112,6 +116,11 @@ void minty::Application::load_assemblies(std::vector<Path> const& paths)
 	_runtime->link();
 }
 
+RunMode minty::Application::get_mode() const
+{
+	return _mode;
+}
+
 Window& minty::Application::get_window() const
 {
 	return *_window;
@@ -120,11 +129,6 @@ Window& minty::Application::get_window() const
 Runtime& minty::Application::get_runtime() const
 {
 	return *_runtime;
-}
-
-Path const& minty::Application::get_path() const
-{
-	return _path;
 }
 
 Info const& minty::Application::get_info() const

@@ -32,7 +32,8 @@ bool minty::SceneManager::is_loaded() const
 Scene& minty::SceneManager::create_scene(Path const& path)
 {
 	// load the data from the disk
-	Node node = Asset::load_node(path);
+	AssetEngine& assets = get_runtime().get_asset_engine();
+	Node node = assets.read_file_node(path);
 
 	SceneBuilder builder
 	{
@@ -45,7 +46,6 @@ Scene& minty::SceneManager::create_scene(Path const& path)
 	scene->deserialize(reader);
 
 	// add to assets
-	AssetEngine& assets = get_runtime().get_asset_engine();
 	assets.emplace(scene);
 
 	// all done

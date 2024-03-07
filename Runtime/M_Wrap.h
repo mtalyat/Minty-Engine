@@ -150,7 +150,12 @@ namespace minty
 		std::unordered_set<uint32_t> _empties;
 		// virtual paths indexed to entry indices
 		std::unordered_map<Path, size_t> _indexed;
+
 	public:
+		/// <summary>
+		/// Creates an empty Wrap.
+		/// </summary>
+		/// <param name="path">The path to the Wrap file on the disk.</param>
 		Wrap();
 
 		/// <summary>
@@ -168,10 +173,11 @@ namespace minty
 		/// <param name="contentVersion">The version of the content within the Wrap file.</param>
 		Wrap(Path const& path, String const& name, uint32_t const entryCount, Path const& base = "", uint32_t const contentVersion = 0);
 
-	private:
+	public:
 		// loads the Wrap file using the _path
-		void load();
+		void load(Path const& path);
 
+	private:
 		// writes the header to the file
 		void write_header(PhysicalFile& wrapFile) const;
 
@@ -183,6 +189,13 @@ namespace minty
 
 #pragma region Files
 
+	private:
+		// forces the given path to include the base path if it doesn't already
+		Path fix_path(Path const& path) const;
+
+		// forces the given path to be relative to the base path
+		Path relative_path(Path const& path) const;
+
 	public:
 		/// <summary>
 		/// Adds the file at the given physicalPath to the Wrap at the given virtualPath.
@@ -192,13 +205,6 @@ namespace minty
 		/// <param name="compression">The level of compression for the given file.</param>
 		/// <param name="reservedSize">The reserved size of the chunk to store the file within. If the reservedSize is 0, it will default to the size of the file at the physicalPath.</param>
 		void emplace(Path const& physicalPath, Path const& virtualPath, CompressionLevel const compression = CompressionLevel::Default, uint32_t const reservedSize = 0);
-
-		/// <summary>
-		/// Checks if the Wrap contains a file with the given path.
-		/// </summary>
-		/// <param name="path">The path to check.</param>
-		/// <returns></returns>
-		bool exists(Path const& path) const;
 
 		/// <summary>
 		/// Checks if the Wrap contains a file with the given path.
@@ -295,5 +301,16 @@ namespace minty
 		void set_type(Type const type);
 
 #pragma endregion
+
+		/// <summary>
+		/// Loads or creates a new Wrap if none exists.
+		/// </summary>
+		/// <param name="path"></param>
+		/// <param name="name"></param>
+		/// <param name="entryCount"></param>
+		/// <param name="base"></param>
+		/// <param name="contentVersion"></param>
+		/// <returns></returns>
+		static Wrap load_or_create(Path const& path, String const& name, uint32_t const entryCount, Path const& base = "", uint32_t const contentVersion = 0);
 	};
 }

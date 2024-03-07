@@ -12,6 +12,7 @@ using namespace mintye;
 Project::Project(minty::Path const& path)
 	: _info(path.stem().string(), 0, 0, 0)
 	, _base(std::filesystem::absolute(path))
+	, _fileCount()
 	, _files()
 {}
 
@@ -158,6 +159,7 @@ void Project::collect_assets()
 	}
 
 	// clear old data
+	_fileCount = 0;
 	_files.clear();
 
 	// list of directories to collect from
@@ -167,8 +169,6 @@ void Project::collect_assets()
 	directoriesToCollect.push_back(assetsPath);
 
 	Path directory;
-
-	size_t count = 0;
 
 	// keep collecting while paths to collect has something in it
 	while (!directoriesToCollect.empty())
@@ -193,7 +193,7 @@ void Project::collect_assets()
 			else
 			{
 				// if a file, check the file type and add where necessary
-				Path relativePath = path.lexically_relative(assetsPath);
+				Path relativePath = path.lexically_relative(_base);
 				Path extension = path.extension();
 
 				// if header exists in files, add to that list
@@ -211,8 +211,24 @@ void Project::collect_assets()
 					found->second.push_back(relativePath);
 				}
 
-				count++;
+				_fileCount++;
 			}
+		}
+	}
+}
+
+size_t mintye::Project::get_asset_count() const
+{
+	return _fileCount;
+}
+
+void mintye::Project::wrap_assets(Wrap& wrap) const
+{
+	for (auto const& [extension, paths] : _files)
+	{
+		for (auto const& path : paths)
+		{
+			wrap.emplace(path, path);
 		}
 	}
 }
@@ -224,6 +240,7 @@ std::unordered_set<minty::Path> mintye::Project::get_extensions(CommonFileType c
 	{
 	case CommonFileType::Header: return { ".h" };
 	case CommonFileType::Source: return { ".cpp", ".c" };
+	case CommonFileType::Script: return { minty::SCRIPT_EXTENSION };
 	case CommonFileType::Scene: return { minty::SCENE_EXTENSION };
 	case CommonFileType::Text: return { ".txt" };
 	case CommonFileType::CSV: return { ".csv" };

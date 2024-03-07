@@ -4,6 +4,7 @@
 #include "M_Runtime.h"
 #include "M_RenderEngine.h"
 #include "M_Asset.h"
+#include "M_AssetEngine.h"
 #include "M_File.h"
 #include "M_Console.h"
 #include <format>
@@ -44,12 +45,6 @@ Texture::Texture(TextureBuilder const& builder, Runtime& engine)
 
 	if (fromFilePathSize)
 	{
-		if (!Asset::exists(path))
-		{
-			Console::error(std::format("Cannot load_animation texture. File not found at: {}", path.string()));
-			return;
-		}
-
 		if (builder.pixelFormat == PixelFormat::None)
 		{
 			Console::error("Attempting to load_animation texture with a pixelFormat of None.");
@@ -59,8 +54,10 @@ Texture::Texture(TextureBuilder const& builder, Runtime& engine)
 		// get data from file: pixels, width, height, color channels
 		int channels;
 
-		String absPath = Asset::absolute(path).string();
-		pixels = stbi_load(absPath.c_str(), &_width, &_height, &channels, static_cast<int>(builder.pixelFormat));
+		AssetEngine& assets = get_runtime().get_asset_engine();
+		std::vector<Byte> fileData = assets.read_file_bytes(path);
+		//pixels = stbi_load(absPath.c_str(), &_width, &_height, &channels, static_cast<int>(builder.pixelFormat));
+		pixels = stbi_load_from_memory(fileData.data(), static_cast<int>(fileData.size()), &_width, &_height, &channels, static_cast<int>(builder.pixelFormat));
 
 		// if no pixels, error
 		if (!pixels)

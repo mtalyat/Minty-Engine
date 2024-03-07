@@ -10,12 +10,6 @@
 
 namespace minty
 {
-#ifdef MINTY_RELEASE
-	static Path const BASE_PATH = Path("");
-#else
-	static Path const BASE_PATH = Path("Assets/");
-#endif
-
 	class Asset
 		: public RuntimeObject
 	{
@@ -42,74 +36,11 @@ namespace minty
 #pragma region Static
 
 		/// <summary>
-		/// Checks the given asset path, and ensures it exists.
+		/// Gets the meta path of the given asset path.
 		/// </summary>
-		/// <param name="path">The path</param>
-		/// <returns>0 on success, 1 when the asset at the path does not exist, 2 when requiresMeta is true and the meta file does not exist.</returns>
-		static int check(Path const& path, char const* const extension, bool const requiresMeta);
-
-		/// <summary>
-		/// Checks if the asset at the given path exists.
-		/// </summary>
-		/// <param name="path"></param>
+		/// <param name="assetPath"></param>
 		/// <returns></returns>
-		static bool exists(Path const& path);
-
-		/// <summary>
-		/// Checks if the meta file for the asset at the given path exists.
-		/// </summary>
-		/// <param name="path"></param>
-		/// <returns></returns>
-		static bool exists_meta(Path const& path);
-
-		/// <summary>
-		/// Returns the absolute path of the given asset path.
-		/// </summary>
-		/// <param name="path"></param>
-		/// <returns></returns>
-		static Path absolute(Path const& path);
-
-		/// <summary>
-		/// Loads the given asset file into a Node.
-		/// </summary>
-		/// <param name="path">The path to the asset, relative to the project's Assets folder.</param>
-		/// <returns>A node with the file contents.</returns>
-		static Node load_node(Path const& path);
-
-		/// <summary>
-		/// Loads the given asset file's meta into a Node.
-		/// </summary>
-		/// <param name="path">The path to the asset, relative to the project's Assets folder.</param>
-		/// <returns>A node with the meta file contents.</returns>
-		static Node load_meta(Path const& path);
-
-		/// <summary>
-		/// Gets the UUID from a Minty node file.
-		/// </summary>
-		/// <param name="path"></param>
-		/// <returns></returns>
-		static UUID load_uuid(Path const& path);
-
-		/// <summary>
-		/// Loads the given asset file into a vector of chars.
-		/// </summary>
-		/// <param name="path"></param>
-		/// <returns></returns>
-		static std::vector<char> load_chars(Path const& path);
-
-		/// <summary>
-		/// Loads the given asset file into a string.
-		/// </summary>
-		/// <param name="path"></param>
-		/// <returns></returns>
-		static String load_text(Path const& path);
-
-		/// <summary>
-		/// Loads the given asset file into a vector of line strings.
-		/// </summary>
-		/// <param name="path"></param>
-		/// <returns></returns>
-		static std::vector<String> load_lines(Path const& path);
+		static Path get_meta_path(Path const& assetPath);
 
 #pragma endregion
 	};

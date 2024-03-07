@@ -118,9 +118,17 @@ void minty::PhysicalFile::read(void* const buffer, Size const size)
     _stream.read(static_cast<char*>(buffer), size);
 }
 
-bool minty::PhysicalFile::read_line(String& line, char const delimiter)
+bool minty::PhysicalFile::read_line(String& line)
 {
-    return static_cast<bool>(std::getline(_stream, line, delimiter));
+    // get the line
+    if (std::getline(_stream, line))
+    {
+        // remove the \r
+        line.erase(std::remove(line.begin(), line.end(), '\r'), line.end());
+        return true;
+    }
+
+    return false;
 }
 
 void minty::PhysicalFile::write(void const* const buffer, Size const size)

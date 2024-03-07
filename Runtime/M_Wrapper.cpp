@@ -6,8 +6,8 @@
 using namespace minty;
 
 Wrapper::Wrapper()
-{
-}
+	: _wraps()
+{}
 
 void minty::Wrapper::emplace(Wrap const& wrap)
 {
@@ -23,7 +23,7 @@ Wrap* minty::Wrapper::find_by_path(Path const& path)
 {
 	for (Wrap& wrap : _wraps)
 	{
-		if (wrap.exists(path))
+		if (wrap.contains(path))
 		{
 			return &wrap;
 		}
@@ -37,7 +37,7 @@ Wrap const* minty::Wrapper::find_by_path(Path const& path) const
 {
 	for (Wrap const& wrap : _wraps)
 	{
-		if (wrap.exists(path))
+		if (wrap.contains(path))
 		{
 			return &wrap;
 		}
@@ -73,6 +73,19 @@ Wrap const* minty::Wrapper::find_by_name(String const& name) const
 
 	// not found
 	return nullptr;
+}
+
+bool minty::Wrapper::contains(Path const& path) const
+{
+	for (Wrap const& wrap : _wraps)
+	{
+		if (wrap.contains(path))
+		{
+			return true;
+		}
+	}
+
+	return false;
 }
 
 bool minty::Wrapper::open(Path const& path, VirtualFile& file) const

@@ -111,6 +111,8 @@ String const& minty::Window::get_title() const
 
 void minty::Window::set_icon(Path const& path)
 {
+	if (path.empty()) return;
+
 	// https://stackoverflow.com/questions/44321902/load-icon-function-for-glfwsetwindowicon
 
 	GLFWimage image;

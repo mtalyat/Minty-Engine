@@ -228,6 +228,7 @@
   <ItemGroup>
     <ClInclude Include="M_Accessibility.h" />
     <ClInclude Include="M_Application.h" />
+    <ClInclude Include="M_RunMode.h" />
     <ClInclude Include="M_AssetEngine.h" />
     <ClInclude Include="M_Camera.h" />
     <ClInclude Include="M_DestroyEntityComponent.h" />

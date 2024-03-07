@@ -1,5 +1,6 @@
 #pragma once
 
+#include "M_RunMode.h"
 #include "M_Window.h"
 #include "M_Info.h"
 #include "M_Time.h"
@@ -25,8 +26,6 @@ namespace minty
 
 	struct RuntimeBuilder
 	{
-		Window* window = nullptr;
-
 		AssetEngine* assetEngine = nullptr;
 
 		RenderEngine* renderEngine = nullptr;
@@ -42,14 +41,6 @@ namespace minty
 	class Runtime
 	{
 		friend class SceneManager;
-
-	public:
-		enum class Mode
-		{
-			Normal,
-
-			Edit,
-		};
 
 	private:
 		enum class State
@@ -87,7 +78,7 @@ namespace minty
 		constexpr static size_t SCRIPT_ENGINE_INDEX = 3;
 
 	private:
-		Mode _mode;
+		RunMode _mode;
 		State _state;
 		Info _info;
 		Time _time;
@@ -97,20 +88,19 @@ namespace minty
 
 		size_t _frameCount;
 		int _exitCode;
-		bool _personalWindow;
 	public:
 		/// <summary>
 		/// Creates a new Engine.
 		/// </summary>
 		/// <param name="appInfo">The application info.</param>
-		Runtime(Info const& info, Mode const mode = Mode::Normal);
+		Runtime(Info const& info, RunMode const mode = RunMode::Normal);
 
 		~Runtime();
 
 #pragma region Getters
 
 	public:
-		Mode get_mode() const;
+		RunMode get_mode() const;
 
 		Info const& get_info() const;
 
@@ -212,7 +202,7 @@ namespace minty
 		/// <summary>
 		/// Initializes the engine using the given window, or creates a new one if none given.
 		/// </summary>
-		bool init(RuntimeBuilder const* builder = nullptr);
+		bool init(Window& window, RuntimeBuilder const* builder = nullptr);
 
 		/// <summary>
 		/// Starts the engine, if it is not already running.

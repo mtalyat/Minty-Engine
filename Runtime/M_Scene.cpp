@@ -2,12 +2,15 @@
 #include "M_Scene.h"
 
 #include "M_Runtime.h"
+#include "M_AssetEngine.h"
 #include "M_EntityRegistry.h"
 #include "M_SystemRegistry.h"
 
 #include "M_TransformComponent.h"
 #include "M_RelationshipComponent.h"
 #include "M_DirtyComponent.h"
+#include "M_CameraComponent.h"
+#include "M_RenderSystem.h"
 #include "M_Reader.h"
 #include "M_Writer.h"
 #include "M_SerializationData.h"
@@ -65,9 +68,11 @@ void minty::Scene::load()
 {
 	_loaded = true;
 	_systems->load();
+
+	AssetEngine& assets = get_runtime().get_asset_engine();
 	
 	// read scene data from disk
-	Node node = Asset::load_node(get_path());
+	Node node = assets.read_file_node(get_path());
 	SerializationData data =
 	{
 		.scene = this,
@@ -78,11 +83,17 @@ void minty::Scene::load()
 
 	// sort quick after loading in case entities are out of order, if the file was manually edited
 	sort();
+
+	// select camera if needed
+	if (RenderSystem* renderSystem = _systems->find<RenderSystem>())
+	{
+		renderSystem->set_main_camera(_entities->find_by_type<CameraComponent>());
+	}
 }
 
 void minty::Scene::update()
 {
-	if (get_runtime().get_mode() == Runtime::Mode::Normal)
+	if (get_runtime().get_mode() == RunMode::Normal)
 	{
 		// update systems
 		_systems->update();
@@ -113,7 +124,7 @@ void minty::Scene::sort()
 
 void minty::Scene::fixed_update()
 {
-	if (get_runtime().get_mode() == Runtime::Mode::Normal)
+	if (get_runtime().get_mode() == RunMode::Normal)
 	{
 		// update systems
 		_systems->fixed_update();

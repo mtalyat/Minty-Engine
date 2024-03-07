@@ -866,7 +866,7 @@ void minty::EntityRegistry::register_script(String const& name)
 			ID id = component->scripts.emplace(name, engine.create_object_component(UUID(), registry.get_id(entity), *script));
 			ScriptObject& scriptObject = component->scripts.at(id);
 
-			if (registry.get_runtime().get_mode() == Runtime::Mode::Normal)
+			if (registry.get_runtime().get_mode() == RunMode::Normal)
 			{
 				// call OnCreate
 				scriptObject.try_invoke(SCRIPT_METHOD_NAME_ONCREATE);

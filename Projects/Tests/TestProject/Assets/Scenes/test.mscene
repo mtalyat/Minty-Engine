@@ -2,29 +2,29 @@
 systems
     Render
         textures
-            - Textures/oak_planks.png
-            - Textures/pattern.png
-            - Textures/texture.jpg
-            - Textures/brian.png
-            - Textures/x.png
-            - Textures/death.png
-            - Resources/Models/pumpkin_tex.jpg
+            - Assets/Textures/oak_planks.png
+            - Assets/Textures/pattern.png
+            - Assets/Textures/texture.jpg
+            - Assets/Textures/brian.png
+            - Assets/Textures/x.png
+            - Assets/Textures/death.png
+            - Assets/Resources/Models/pumpkin_tex.jpg
         shaders
-            - Shaders/shader.mshader
-            - Shaders/spriteShader.mshader
+            - Assets/Shaders/shader.mshader
+            - Assets/Shaders/spriteShader.mshader
         shaderPasses
-            - Shaders/shaderPass.mshaderpass
-            - Shaders/spriteShaderPass.mshaderpass
+            - Assets/Shaders/shaderPass.mshaderpass
+            - Assets/Shaders/spriteShaderPass.mshaderpass
         materialTemplates
-            - Materials/materialTemplate.mmaterialtemplate
-            - Materials/spriteMaterialTemplate.mmaterialtemplate
+            - Assets/Materials/materialTemplate.mmaterialtemplate
+            - Assets/Materials/spriteMaterialTemplate.mmaterialtemplate
         materials
-            - Materials/material1.mmaterial
-            - Materials/spriteMaterial.mmaterial
-            - Materials/xSpriteMaterial.mmaterial
+            - Assets/Materials/material1.mmaterial
+            - Assets/Materials/spriteMaterial.mmaterial
+            - Assets/Materials/xSpriteMaterial.mmaterial
         sprites
-            - Sprites/x.msprite
-            - Sprites/brian.msprite
+            - Assets/Sprites/x.msprite
+            - Assets/Sprites/brian.msprite
 #        atlases
 #            -
 #                texture: death
@@ -35,19 +35,19 @@ systems
 #                    all
     Audio
         clips
-            - Audio/blinking-forest.wav
-            - Audio/cow-bells.wav
-            - Audio/ding.wav
-            - Audio/dong.wav
+            - Assets/Audio/blinking-forest.wav
+            - Assets/Audio/cow-bells.wav
+            - Assets/Audio/ding.wav
+            - Assets/Audio/dong.wav
     Animation
         animations
-            - Animations/idle.manimation
-            - Animations/moving.manimation
-            - Animations/flicker.manimation
-            - Animations/slide.manimation
+            - Assets/Animations/idle.manimation
+            - Assets/Animations/moving.manimation
+            - Assets/Animations/flicker.manimation
+            - Assets/Animations/slide.manimation
         animators
-            - Animations/animator.manimator
-            - Animations/animator2.manimator
+            - Assets/Animations/animator.manimator
+            - Assets/Animations/animator2.manimator
     Script
 entities
     Camera: 389d6462e322993a

@@ -19,12 +19,12 @@ minty::Wrap::Wrap()
 {}
 
 minty::Wrap::Wrap(Path const& path)
-    : _path(path)
+    : _path()
     , _header()
     , _entries()
     , _indexed()
 {
-    load();
+    load(path);
 }
 
 minty::Wrap::Wrap(Path const& path, String const& name, uint32_t const entryCount, Path const& base, uint32_t const contentVersion)
@@ -62,27 +62,29 @@ minty::Wrap::Wrap(Path const& path, String const& name, uint32_t const entryCoun
     file.close();
 }
 
-void minty::Wrap::load()
+void minty::Wrap::load(Path const& path)
 {
     // check if file exists and is valid
-    if (!std::filesystem::exists(_path))
+    if (!std::filesystem::exists(path))
     {
         // file does not exist
-        Console::error(std::format("Cannot load_animation \"{}\" Wrap file: file does not exist.", _path.string()));
+        Console::error(std::format("Cannot load \"{}\" Wrap file: file does not exist.", path.string()));
         return;
     }
-    else if (!std::filesystem::is_regular_file(_path))
+    else if (!std::filesystem::is_regular_file(path))
     {
         // not a file
-        Console::error(std::format("Cannot load_animation \"{}\" Wrap file: not a regular file.", _path.string()));
+        Console::error(std::format("Cannot load \"{}\" Wrap file: not a regular file.", path.string()));
         return;
     }
-    else if (_path.extension() != WRAP_EXTENSION)
+    else if (path.extension() != WRAP_EXTENSION)
     {
         // not a .wrap file
-        Console::error(std::format("Cannot load_animation \"{}\" Wrap file: missing .wrap file extension.", _path.string()));
+        Console::error(std::format("Cannot load \"{}\" Wrap file: missing .wrap file extension.", path.string()));
         return;
     }
+
+    _path = path;
 
     // open the file
     PhysicalFile file(_path, File::Flags::Read | File::Flags::Binary);
@@ -109,7 +111,7 @@ void minty::Wrap::load()
         Entry& entry = _entries.at(i);
         file.read(&entry, sizeof(Entry));
         // add path and index
-        _indexed.emplace(basePath / entry.path, i);
+        _indexed.emplace(fix_path(entry.path), i);
         // add to empties if empty
         if (entry.empty())
         {
@@ -176,7 +178,7 @@ uint32_t minty::Wrap::emplace_entry(Entry& newEntry)
         _empties.erase(index);
 
         // replace old indexed path
-        _indexed.erase(Path(_header.basePath) / _entries[index].path);
+        _indexed.erase(fix_path(_entries[index].path));
 
         // move some data to new entry (pos, size, etc.)
         Entry const& oldEntry = _entries.at(index);
@@ -200,6 +202,34 @@ uint32_t minty::Wrap::emplace_entry(Entry& newEntry)
     Console::error("Cannot emplace entry to Wrap file. Entry count surpassed.");
 
     return -1;
+}
+
+Path minty::Wrap::fix_path(Path const& path) const
+{
+    if (path.empty() || _header.basePath[0] == '\0' || *path.begin() == _header.basePath)
+    {
+        // all good
+        return path;
+    }
+    else
+    {
+        // missing base path
+        return _header.basePath / path;
+    }
+}
+
+Path minty::Wrap::relative_path(Path const& path) const
+{
+    if (path.empty() || _header.basePath[0] == '\0' || *path.begin() != _header.basePath)
+    {
+        // all good
+        return path;
+    }
+    else
+    {
+        // remove base path
+        return path.lexically_relative(_header.basePath);
+    }
 }
 
 char const* minty::Wrap::get_base_path() const
@@ -282,7 +312,7 @@ void minty::Wrap::emplace(Path const& physicalPath, Path const& virtualPath, Com
 
     // create an entry for the new file
     Entry entry;
-    memcpy(entry.path, virtualPath.string().c_str(), WRAP_ENTRY_PATH_SIZE);
+    memcpy(entry.path, relative_path(virtualPath).string().c_str(), WRAP_ENTRY_PATH_SIZE);
     entry.path[WRAP_ENTRY_PATH_SIZE - 1] = '\0';
     entry.compressionLevel = static_cast<Byte>(compressionLevel);
     entry.uncompressedSize = static_cast<uint32_t>(fileSize);
@@ -300,7 +330,7 @@ void minty::Wrap::emplace(Path const& physicalPath, Path const& virtualPath, Com
         // compress it
         if (compress(compressedData, destSize, fileData, sourceSize, compressionLevel))
         {
-            Console::error(std::format("Cannot emplace \"{}\" into Wrap file: failed to compress file with compression level {}.", physicalPath.string(), static_cast<int>(compressionLevel)));
+            MINTY_ERROR_FORMAT("Cannot emplace \"{}\" into Wrap file: failed to compress file with compression level {}.", physicalPath.string(), static_cast<int>(compressionLevel));
             return;
         }
 
@@ -309,7 +339,7 @@ void minty::Wrap::emplace(Path const& physicalPath, Path const& virtualPath, Com
         fileData = compressedData;
         fileSize = static_cast<File::Size>(destSize);
 
-        Console::log(std::format("Compressed {} from {} bytes to {} bytes.", physicalPath.string(), std::to_string(sourceSize), std::to_string(destSize)));
+        //MINTY_LOG_FORMAT("Compressed{} from{} bytes to{} bytes.", physicalPath.string(), std::to_string(sourceSize), std::to_string(destSize));
     }
 
     // set size and offset
@@ -337,14 +367,9 @@ void minty::Wrap::emplace(Path const& physicalPath, Path const& virtualPath, Com
     wrapFile.close();
 }
 
-bool minty::Wrap::exists(Path const& path) const
-{
-    return _indexed.contains(path);
-}
-
 bool minty::Wrap::contains(Path const& path) const
 {
-    return exists(path);
+    return _indexed.contains(path);
 }
 
 bool minty::Wrap::open(Path const& path, VirtualFile& file) const
@@ -385,7 +410,7 @@ std::vector<char> minty::Wrap::read(Path const& path) const
     Byte* data = new Byte[size];
     if (uncompress(data, size, fileData, sourceSize))
     {
-        Console::error(std::format("Failed to uncompress file \"{}\" in Wrap file.", path.string()));
+        MINTY_ERROR_FORMAT("Failed to uncompress file \"{}\" in Wrap file.", path.string());
         return std::vector<char>();
     }
 
@@ -420,6 +445,18 @@ Wrap::Type minty::Wrap::get_type() const
 void minty::Wrap::set_type(Type const type)
 {
     _header.type = type;
+}
+
+Wrap minty::Wrap::load_or_create(Path const& path, String const& name, uint32_t const entryCount, Path const& base, uint32_t const contentVersion)
+{
+    if (std::filesystem::exists(path))
+    {
+        return Wrap(path);
+    }
+    else
+    {
+        return Wrap(path, name, entryCount, base, contentVersion);
+    }
 }
 
 minty::Wrap::Header::Header()

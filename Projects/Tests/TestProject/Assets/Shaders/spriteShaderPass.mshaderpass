@@ -6,6 +6,6 @@ cullMode: NONE
 frontFace: CLOCKWISE
 lineWidth: 1
 stage: VERTEX_BIT
-    path: Shaders/sprite_vert.spv
+    path: Assets/Shaders/sprite_vert.spv
 stage: FRAGMENT_BIT
-    path: Shaders/sprite_frag.spv
+    path: Assets/Shaders/sprite_frag.spv

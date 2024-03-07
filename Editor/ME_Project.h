@@ -20,6 +20,7 @@ namespace mintye
 		{
 			Header,				// .h
 			Source,				// .cpp .c
+			Script,				// minty::SCRIPT_EXTENSION (.cs)
 			Scene,				// minty::SCENE_EXTENSION
 			Text,				// .txt
 			CSV,				// .csv
@@ -43,6 +44,8 @@ namespace mintye
 		// the base minty::Path of the project
 		minty::Path _base;
 
+		// files, organized by extension type
+		size_t _fileCount;
 		std::unordered_map<minty::Path, std::vector<minty::Path>> _files;
 	public:
 		/// <summary>
@@ -136,6 +139,17 @@ namespace mintye
 		/// </summary>
 		void collect_assets();
 
+		/// <summary>
+		/// Returns the number of collected assets.
+		/// </summary>
+		/// <returns></returns>
+		size_t get_asset_count() const;
+
+		/// <summary>
+		/// Adds all of the assets in this Project to the given wrap file.
+		/// </summary>
+		/// <param name="wrap"></param>
+		void wrap_assets(minty::Wrap& wrap) const;
 	private:
 		std::unordered_set<minty::Path> get_extensions(CommonFileType const commonFileTypes) const;
 	};

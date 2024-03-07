@@ -40,7 +40,7 @@ using namespace mintye;
 using namespace minty;
 
 EditorApplication::EditorApplication()
-	: Application(Info(NAME, 0, 0, 0), std::filesystem::current_path())
+	: Application()
 	, _project()
 	, _sceneId(ERROR_ID)
 	, _editorWindows()
@@ -67,7 +67,6 @@ void mintye::EditorApplication::init(RuntimeBuilder* b)
 {
 	RuntimeBuilder builder
 	{
-		.window = &get_window(),
 		.renderEngine = new EditorApplicationRenderEngine(*this, get_runtime()),
 	};
 
@@ -117,7 +116,12 @@ void mintye::EditorApplication::draw()
 
 minty::Runtime* mintye::EditorApplication::create_runtime()
 {
-	return new Runtime(get_info(), Runtime::Mode::Edit);
+	return new Runtime(get_info(), RunMode::Edit);
+}
+
+minty::Window* mintye::EditorApplication::create_window()
+{
+	return new Window("", 1280, 720, "Icon.png");
 }
 
 void mintye::EditorApplication::set_project(Project* const project)
@@ -220,12 +224,9 @@ void mintye::EditorApplication::unload_project()
 		delete _project;
 		set_project(nullptr);
 	}
-
-	// reset path
-	std::filesystem::current_path(get_path());
 }
 
-void mintye::EditorApplication::create_new_project(minty::String const& name, minty::Path const& path, NewProjectSetupType initType)
+void mintye::EditorApplication::create_new_project(minty::String const& name, minty::Path const& path)
 {
 	ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console");
 
@@ -252,29 +253,6 @@ void mintye::EditorApplication::create_new_project(minty::String const& name, mi
 		return;
 	}
 
-	// create all default project necessary files
-	generate_init(fullPath);
-
-	// init other folders/files if needed
-	switch (initType)
-	{
-	case NewProjectSetupType::Default:
-		break;
-	case NewProjectSetupType::VSCode:
-	{
-		// create directory
-		if (!fs::create_directory(fullPath / VSCODE_DIRECTORY_NAME))
-		{
-			console->log_error(std::format("Failed to create .vscode folder in project path: {}", fullPath.string()));
-			return;
-		}
-
-		// create files
-		generate_vscode();
-	}
-		break;
-	}
-
 	// done
 	console->log(std::format("Created new project: {}", fullPath.string()));
 }
@@ -299,7 +277,6 @@ void mintye::EditorApplication::load_scene(minty::Path const& path)
 	if (_sceneId.valid())
 	{
 		unload_scene();
-		
 	}
 
 	// load new scene
@@ -450,22 +427,12 @@ void mintye::EditorApplication::draw_menu_bar()
 	}
 
 	static char newProjectTitle[64] = "";
-	static NewProjectSetupType newProjectSetupType = NewProjectSetupType::Default;
 
 	if (ImGui::BeginPopupModal("Create New Project"))
 	{
 		ImGui::Text("Create New Project");
 
 		ImGui::InputText("Project Name", newProjectTitle, IM_ARRAYSIZE(newProjectTitle));
-
-		static int currentItem = 0;
-		char const* const items[] = { "Default", "VSCode" };
-		int itemsCount = sizeof(items) / sizeof(*items);
-
-		if (ImGui::Combo("Setup Type", &currentItem, items, itemsCount))
-		{
-			newProjectSetupType = static_cast<NewProjectSetupType>(currentItem);
-		}
 
 		if (ImGui::Button("Create"))
 		{
@@ -497,7 +464,7 @@ void mintye::EditorApplication::draw_menu_bar()
 			Path filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
 
 			// create project
-			create_new_project(newProjectTitle, filePath, newProjectSetupType);
+			create_new_project(newProjectTitle, filePath);
 
 			// load it also
 			load_project(filePath / newProjectTitle);
@@ -687,284 +654,54 @@ void EditorApplication::generate_main(BuildInfo const& buildInfo)
 	file <<
 		"// " << std::format("{:%Y-%m-%d %H:%M:%OS}", now) << std::endl <<
 		"#include <Minty.h>" << std::endl <<
-		"#include <string>" << std::endl <<
-		"#include <format>" << std::endl <<
-		"#include <filesystem>" << std::endl <<
-		"#include \"../Assets/init.h\"" << std::endl <<
 		"int main(int argc, char const* argv[]) {" << std::endl <<
-		"	std::filesystem::current_path(\"" << _project->get_base_path().generic_string() << "\");" << std::endl << // move out of Build/Debug or Build/Release folder, into base folder
-		"	minty::Console::log(std::filesystem::current_path().string());" << std::endl <<
-		"	minty::Info info(\"" << projectInfo.get_application_name() << "\", " << projectInfo.get_application_major() << ", " << projectInfo.get_application_minor() << ", " << projectInfo.get_application_patch() << ");" << std::endl <<
-		"	minty::Runtime runtime(info);" << std::endl;
-	
-	if (buildInfo.debug)
-	{
-		file << "	try {" << std::endl;
-	}
-
-	file <<
-		"	runtime.init();" << std::endl <<
-		"	runtime.get_script_engine().load_assembly(\"" << projectInfo.get_application_name() << "/bin/x64/" << buildInfo.get_config() << "/MintyEngine.dll\");" << std::endl <<
-		"	runtime.get_script_engine().load_assembly(\"" << projectInfo.get_application_name() << "/bin/x64/" << buildInfo.get_config() << "/" << projectInfo.get_application_name() << ".dll\");" << std::endl <<
-		"	runtime.link();" << std::endl <<
-		"	if(int code = init(runtime)) { minty::Console::error(std::format(\"Failed to init program with error code {}.\", code)); return code; }" << std::endl <<
-		"	runtime.start();" << std::endl <<
-		"	runtime.run_project();" << std::endl <<
-		"	runtime.cleanup();" << std::endl <<
-		"	if(int code = destroy(runtime)) { minty::Console::error(std::format(\"Failed to destroy program with error code {}.\", code)); return code; }" << std::endl <<
-		"	runtime.destroy();" << std::endl;
-
-	if (buildInfo.debug)
-	{
-		file << "	} catch (std::exception const& e) { minty::Console::error(std::format(\"Crash: \\\"{}\\\"\", e.what())); }" << std::endl;
-	}
-
-	file << 
-		"	return runtime.get_exit_code();" << std::endl <<
+		"\tminty::Application app;" << std::endl <<
+		"\treturn app.run();" << std::endl <<
 		"}";
 
 	file.close();
 }
 
-void mintye::EditorApplication::generate_vscode()
+void mintye::EditorApplication::generate_directories()
+{
+
+}
+
+void mintye::EditorApplication::generate_application_data(BuildInfo const& buildInfo)
 {
 	ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console");
 
 	if (!_project)
 	{
-		console->log_error("Cannot generate vscode: no project loaded.");
+		console->log_error("Cannot generate main: no project loaded.");
 		return;
 	}
 
-	// get path to files file
-	Path vsCodePath = _project->get_sub_path(VSCODE_DIRECTORY_NAME);
-	String cppPropertiesPath = (vsCodePath / "c_cpp_properties.json").string();
-	String launchPath = (vsCodePath / "launch.json").string();
-	String settingsPath = (vsCodePath / "settings.json").string();
+	// get path to cmake file
+	Path path = _project->get_build_path() / String("game").append(APPLICATION_EXTENSION);
 
 	// open file to overwrite
-	std::ofstream file(cppPropertiesPath, std::ios::trunc);
+	std::ofstream file(path, std::ios::trunc);
 
 	// if not open, error
 	if (!file.is_open())
 	{
-		console->log_error(std::format("Could not open c_cpp_properties.json file: {}", cppPropertiesPath));
+		minty::Console::error(std::format("Could not open main file: {}", path.string()));
 		return;
 	}
-	
-	file
-		<< "{" << std::endl
-		<< "    \"configurations\": [" << std::endl
-		<< "        {" << std::endl
-		<< "            \"name\": \"Win32\"," << std::endl
-		<< "            \"includePath\": [" << std::endl
-		<< "                \"${workspaceFolder}/**\"," << std::endl
-		<< "                \"C:\\\\Users\\\\mitch\\\\source\\\\repos\\\\Minty-Engine\\\\Runtime\"," << std::endl
-		<< "                \"${Vulkan_INCLUDE_DIR}\"" << std::endl
-		<< "            ]," << std::endl
-		<< "            \"defines\": [" << std::endl
-		<< "                \"_DEBUG\"," << std::endl
-		<< "                \"UNICODE\"," << std::endl
-		<< "                \"_UNICODE\"" << std::endl
-		<< "            ]," << std::endl
-		<< "            \"windowsSdkVersion\": \"10.0.22621.0\"," << std::endl
-		<< "            \"compilerPath\": \"cl.exe\"," << std::endl
-		<< "            \"cStandard\": \"c17\"," << std::endl
-		<< "            \"cppStandard\": \"c++20\"," << std::endl
-		<< "            \"intelliSenseMode\": \"windows-msvc-x64\"" << std::endl
-		<< "        }" << std::endl
-		<< "    ]," << std::endl
-		<< "    \"version\": 4" << std::endl
-		<< "}" << std::endl;
 
-	console->log_warning("c_cpp_properties.json: hard coded cmake.sourceDirectory");
+	Info const& projectInfo = _project->get_info();
 
-	file.close();
+	// write contents
+	file <<
+		"scenes" << std::endl;
 
-	file = std::ofstream(launchPath, std::ios::trunc);
-
-	if (!file.is_open())
+	// write all scenes
+	std::set<Path> scenes = _project->find_assets(Project::CommonFileType::Scene);
+	for (Path const& scenePath : scenes)
 	{
-		console->log_error(std::format("Could not open launch.json file: {}", launchPath));
-		return;
+		file << "\t- " << scenePath.string() << std::endl;
 	}
-
-	file
-		<< "{" << std::endl
-		<< "    \"version\": \"0.2.0\"," << std::endl
-		<< "    \"configurations\": [" << std::endl
-		<< "        {" << std::endl
-		<< "            \"name\": \"(msvc) Launch\"," << std::endl
-		<< "            \"type\": \"cppvsdbg\"," << std::endl
-		<< "            \"request\": \"launch\"," << std::endl
-		<< "            // Resolved by CMake Tools:" << std::endl
-		<< "            \"program\": \"${command:cmake.launchTargetPath}\"," << std::endl
-		<< "            \"args\": []," << std::endl
-		<< "            \"stopAtEntry\": false," << std::endl
-		<< "            \"cwd\": \"${workspaceFolder}\"," << std::endl
-		<< "            \"environment\": [" << std::endl
-		<< "                {" << std::endl
-		<< "                    // add the directory where our target was built to the PATHs" << std::endl
-		<< "                    // it gets resolved by CMake Tools:" << std::endl
-		<< "                    \"name\": \"PATH\"," << std::endl
-		<< "                    \"value\": \"${env:PATH}:${command:cmake.getLaunchTargetDirectory}\"" << std::endl
-		<< "                }" << std::endl
-		<< "            ]," << std::endl
-		<< "            \"console\": \"internalConsole\"" << std::endl
-		<< "        }" << std::endl
-		<< "    ]" << std::endl
-		<< "}" << std::endl;
-
-	file.close();
-
-	file = std::ofstream(settingsPath, std::ios::trunc);
-
-	if (!file.is_open())
-	{
-		console->log_error(std::format("Could not open settings.json file: {}", settingsPath));
-		return;
-	}
-
-	file
-		<< "{" << std::endl
-		<< "    \"files.associations\": {" << std::endl
-		<< "        \"ostream\": \"cpp\"," << std::endl
-		<< "        \"algorithm\": \"cpp\"," << std::endl
-		<< "        \"array\": \"cpp\"," << std::endl
-		<< "        \"atomic\": \"cpp\"," << std::endl
-		<< "        \"bit\": \"cpp\"," << std::endl
-		<< "        \"cctype\": \"cpp\"," << std::endl
-		<< "        \"charconv\": \"cpp\"," << std::endl
-		<< "        \"chrono\": \"cpp\"," << std::endl
-		<< "        \"clocale\": \"cpp\"," << std::endl
-		<< "        \"cmath\": \"cpp\"," << std::endl
-		<< "        \"compare\": \"cpp\"," << std::endl
-		<< "        \"concepts\": \"cpp\"," << std::endl
-		<< "        \"cstddef\": \"cpp\"," << std::endl
-		<< "        \"cstdint\": \"cpp\"," << std::endl
-		<< "        \"cstdio\": \"cpp\"," << std::endl
-		<< "        \"cstdlib\": \"cpp\"," << std::endl
-		<< "        \"cstring\": \"cpp\"," << std::endl
-		<< "        \"ctime\": \"cpp\"," << std::endl
-		<< "        \"cwchar\": \"cpp\"," << std::endl
-		<< "        \"deque\": \"cpp\"," << std::endl
-		<< "        \"exception\": \"cpp\"," << std::endl
-		<< "        \"filesystem\": \"cpp\"," << std::endl
-		<< "        \"format\": \"cpp\"," << std::endl
-		<< "        \"forward_list\": \"cpp\"," << std::endl
-		<< "        \"fstream\": \"cpp\"," << std::endl
-		<< "        \"functional\": \"cpp\"," << std::endl
-		<< "        \"initializer_list\": \"cpp\"," << std::endl
-		<< "        \"iomanip\": \"cpp\"," << std::endl
-		<< "        \"ios\": \"cpp\"," << std::endl
-		<< "        \"iosfwd\": \"cpp\"," << std::endl
-		<< "        \"iostream\": \"cpp\"," << std::endl
-		<< "        \"istream\": \"cpp\"," << std::endl
-		<< "        \"iterator\": \"cpp\"," << std::endl
-		<< "        \"limits\": \"cpp\"," << std::endl
-		<< "        \"list\": \"cpp\"," << std::endl
-		<< "        \"locale\": \"cpp\"," << std::endl
-		<< "        \"map\": \"cpp\"," << std::endl
-		<< "        \"memory\": \"cpp\"," << std::endl
-		<< "        \"mutex\": \"cpp\"," << std::endl
-		<< "        \"new\": \"cpp\"," << std::endl
-		<< "        \"optional\": \"cpp\"," << std::endl
-		<< "        \"ratio\": \"cpp\"," << std::endl
-		<< "        \"set\": \"cpp\"," << std::endl
-		<< "        \"sstream\": \"cpp\"," << std::endl
-		<< "        \"stdexcept\": \"cpp\"," << std::endl
-		<< "        \"stop_token\": \"cpp\"," << std::endl
-		<< "        \"streambuf\": \"cpp\"," << std::endl
-		<< "        \"string\": \"cpp\"," << std::endl
-		<< "        \"system_error\": \"cpp\"," << std::endl
-		<< "        \"thread\": \"cpp\"," << std::endl
-		<< "        \"tuple\": \"cpp\"," << std::endl
-		<< "        \"type_traits\": \"cpp\"," << std::endl
-		<< "        \"typeinfo\": \"cpp\"," << std::endl
-		<< "        \"unordered_map\": \"cpp\"," << std::endl
-		<< "        \"unordered_set\": \"cpp\"," << std::endl
-		<< "        \"utility\": \"cpp\"," << std::endl
-		<< "        \"vector\": \"cpp\"," << std::endl
-		<< "        \"xfacet\": \"cpp\"," << std::endl
-		<< "        \"xhash\": \"cpp\"," << std::endl
-		<< "        \"xiosbase\": \"cpp\"," << std::endl
-		<< "        \"xlocale\": \"cpp\"," << std::endl
-		<< "        \"xlocbuf\": \"cpp\"," << std::endl
-		<< "        \"xlocinfo\": \"cpp\"," << std::endl
-		<< "        \"xlocmes\": \"cpp\"," << std::endl
-		<< "        \"xlocmon\": \"cpp\"," << std::endl
-		<< "        \"xlocnum\": \"cpp\"," << std::endl
-		<< "        \"xloctime\": \"cpp\"," << std::endl
-		<< "        \"xmemory\": \"cpp\"," << std::endl
-		<< "        \"xstring\": \"cpp\"," << std::endl
-		<< "        \"xtr1common\": \"cpp\"," << std::endl
-		<< "        \"xtree\": \"cpp\"," << std::endl
-		<< "        \"xutility\": \"cpp\"," << std::endl
-		<< "        \"regex\": \"cpp\"" << std::endl
-		<< "    }," << std::endl
-		<< "    \"liveServer.settings.port\": 5501," << std::endl
-		<< "    \"cmake.sourceDirectory\": \"C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build\"," << std::endl
-		<< "    \"cmake.loggingLevel\": \"debug\"," << std::endl
-		<< "}" << std::endl;
-
-	console->log_warning("settings.json: hard coded cmake.sourceDirectory");
-
-	file.close();
-}
-
-void mintye::EditorApplication::generate_init(minty::Path const& path)
-{
-	ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console");
-
-	// get path to files file
-	Path assetsPath = path / ASSETS_DIRECTORY_NAME;
-	Path hPath = assetsPath / INIT_H_NAME;
-	Path cppPath = assetsPath / INIT_CPP_NAME;
-
-	// open file to overwrite
-	std::ofstream file(hPath, std::ios::trunc);
-
-	// if not open, error
-	if (!file.is_open())
-	{
-		console->log_error(std::format("Could not open {} file: {}", INIT_H_NAME, hPath.string()));
-		return;
-	}
-
-	file
-		<< "#pragma once" << std::endl
-		<< "" << std::endl
-		<< "#include <Minty.h>" << std::endl
-		<< "" << std::endl
-		<< "int init(minty::Engine& engine);" << std::endl
-		<< "int destroy(minty::Engine& engine);" << std::endl;
-
-	file.close();
-
-	// open file to overwrite
-	file = std::ofstream(cppPath, std::ios::trunc);
-
-	// if not open, error
-	if (!file.is_open())
-	{
-		console->log_error(std::format("Could not open {} file: {}", INIT_CPP_NAME, cppPath.string()));
-		return;
-	}
-
-	file
-		<< "#include \"init.h\"" << std::endl
-		<< "" << std::endl
-		<< "using namespace minty;" << std::endl
-		<< "" << std::endl
-		<< "int init(Engine &engine)" << std::endl
-		<< "{" << std::endl
-		<< "    return 0;" << std::endl
-		<< "}" << std::endl
-		<< "" << std::endl
-		<< "int destroy(Engine& engine)" << std::endl
-		<< "{" << std::endl
-		<< "    return 0;" << std::endl
-		<< "}" << std::endl;
 
 	file.close();
 }
@@ -997,22 +734,32 @@ void EditorApplication::build_project(BuildInfo const& buildInfo)
 
 	console->log_important("build_project");
 
-	console->log_important("\tgenerating cmake");
+	generate_directories();
+
+	console->log_important("\tgenerating cmake...");
 
 	generate_cmake(buildInfo);
 
-	console->log_important("\tgenerating main");
+	console->log_important("\tgenerating main...");
 
 	generate_main(buildInfo);
 
-	console->log_important("\tbuilding program");
+	console->log_important("\tgenerating application data...");
+
+	generate_application_data(buildInfo);
+
+	console->log_important("\tgenerating wrap files...");
+
+	generate_wraps(buildInfo);
+
+	console->log_important("\tbuilding program...");
 
 	std::string command = "cd " + _project->get_build_path().string() + " && " + std::filesystem::absolute(CMAKE_PATH).string();
 	console->run_commands({
-		// // make cmake files if needed
+		// make cmake files if needed
 		command + " .",
 		// build program
-		command + " --build_project . --config " + buildInfo.get_config(),
+		command + " --build . --config " + buildInfo.get_config(),
 		});
 }
 
@@ -1029,5 +776,25 @@ void EditorApplication::run_project(BuildInfo const& buildInfo)
 	console->log_important("run_project");
 
 	// call executable, pass in project path as argument for the runtime, so it knows what to run
-	console->run_command("cd " + _project->get_build_path().string() + " && cd " + buildInfo.get_config() + " && call " + EXE_NAME + " " + _project->get_base_path().string());
+	console->run_command("cd " + _project->get_build_path().string() + " && cd " + buildInfo.get_config() + " && call " + EXE_NAME);
+}
+
+void mintye::EditorApplication::generate_wraps(BuildInfo const& buildInfo)
+{
+	// TODO: split into multile wrap files if needed
+
+	Path output = _project->get_build_path() / buildInfo.get_config();
+
+	// for now:
+	// compile all game files/assets into two wrap files
+
+	// game data
+	Wrap gameWrap(output / String("game").append(WRAP_EXTENSION), "Game", 1);
+	String appFileName = String("game").append(APPLICATION_EXTENSION);
+	Path appPath = _project->get_build_path() / appFileName;
+	gameWrap.emplace(appPath, appFileName);
+
+	// game assets
+	Wrap assetWrap(output / String("assets").append(WRAP_EXTENSION), ASSETS_DIRECTORY_NAME, static_cast<uint32_t>(_project->get_asset_count()), ASSETS_DIRECTORY_NAME);
+	_project->wrap_assets(assetWrap);
 }

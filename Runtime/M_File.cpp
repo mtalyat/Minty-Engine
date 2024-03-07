@@ -7,6 +7,63 @@
 
 using namespace minty;
 
+std::vector<char> minty::File::read_all()
+{
+    // goto beginning
+    seek_read(0, Direction::Begin);
+
+    // get the size of the file
+    File::Size fileSize = size();
+
+    // read all "bytes"
+    std::vector<char> result(fileSize);
+    read(result.data(), fileSize);
+
+    return result;
+}
+
+std::vector<Byte> minty::File::read_all_bytes()
+{
+    // goto beginning
+    seek_read(0, Direction::Begin);
+
+    // get the size of the file
+    File::Size fileSize = size();
+
+    // read all bytes
+    std::vector<Byte> result(fileSize);
+    read(result.data(), fileSize);
+
+    return result;
+}
+
+std::vector<String> minty::File::read_lines(size_t const count)
+{
+    std::vector<String> result;
+    if (count > 0) result.reserve(count);
+
+    String line;
+    for (size_t i = 0; i < count && !end_of_file() && read_line(line); i++)
+    {
+        result.push_back(line);
+    }
+
+    return result;
+}
+
+std::vector<String> minty::File::read_all_lines()
+{
+    std::vector<String> result;
+
+    String line;
+    while(!end_of_file() && read_line(line))
+    {
+        result.push_back(line);
+    }
+
+    return result;
+}
+
 std::vector<char> minty::File::read_all_chars(Path const& path)
 {
     if (!std::filesystem::exists(path))

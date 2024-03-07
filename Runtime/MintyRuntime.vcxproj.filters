@@ -576,6 +576,9 @@
     <ClInclude Include="M_Application.h">
       <Filter>Header Files\Application</Filter>
     </ClInclude>
+    <ClInclude Include="M_RunMode.h">
+      <Filter>Header Files\Application</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

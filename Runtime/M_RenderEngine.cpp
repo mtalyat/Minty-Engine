@@ -530,7 +530,8 @@ VkImageView RenderEngine::create_image_view(VkImage image, VkFormat format, VkIm
 
 VkShaderModule minty::RenderEngine::load_shader_module(String const& path) const
 {
-	return create_shader_module(Asset::load_chars(path));
+	AssetEngine& assets = get_runtime().get_asset_engine();
+	return create_shader_module(assets.read_file(path));
 }
 
 VkShaderModule minty::RenderEngine::create_shader_module(std::vector<char> const& code) const
