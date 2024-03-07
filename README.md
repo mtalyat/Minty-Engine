@@ -3,6 +3,16 @@ A 3D game engine.
 
 NOTE: This project is in development. More info on how to use, etc. will come in due time. Please check out the development branch for the most recent features that have been added.
 
+## Features
+
+### Runtime
+
+The Minty Runtime is a static C++ library that provides any and all functionality needed to run a game. Everything from the application, to rendering, to scene loading and sounds, it has it all.
+
+### Editor
+
+The Minty Editor provides an intuitive and easy way to create, edit and build a Minty game project.
+
 ## About
 
 ### Motivation
