@@ -1,4 +1,4 @@
-# 2024-03-07 09:14:25
+# 2024-03-08 03:07:52
 cmake_minimum_required(VERSION 3.16)
 project(TestProject LANGUAGES CXX)
 find_package(Vulkan REQUIRED)
@@ -14,6 +14,8 @@ target_include_directories(${PROJECT_NAME} PRIVATE C:/Users/mitch/source/repos/M
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy C:/Libraries/Mono/lib/mono-2.0-sgen.dll ${CMAKE_CURRENT_BINARY_DIR}/Debug/mono-2.0-sgen.dll)
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy C:/Libraries/Mono/lib/MonoPosixHelper.dll ${CMAKE_CURRENT_BINARY_DIR}/Debug/MonoPosixHelper.dll)
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy C:/Libraries/Mono/lib/mscorlib.dll ${CMAKE_CURRENT_BINARY_DIR}/Debug/mscorlib.dll)
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ../TestProject/bin/x64/Debug/MintyEngine.dll ${CMAKE_CURRENT_BINARY_DIR}/Debug/MintyEngine.dll)
+add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ../TestProject/bin/x64/Debug/TestProject.dll ${CMAKE_CURRENT_BINARY_DIR}/Debug/TestProject.dll)
 include_directories(${Vulkan_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} C:/Users/mitch/source/repos/Minty-Engine/Runtime/x64/Debug/MintyRuntime.lib)
 target_link_libraries(${PROJECT_NAME} ${Vulkan_LIBRARIES})

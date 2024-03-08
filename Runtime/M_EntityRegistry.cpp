@@ -342,24 +342,26 @@ void minty::EntityRegistry::destroy(Entity const entity, bool const includeChild
 	while (!stack.empty())
 	{
 		// get the entity
-		Entity e = stack.back();
+		Entity child = stack.back();
 		stack.pop_back();
 
 		// add
-		emplace_or_replace<DestroyEntityComponent>(e);
+		emplace_or_replace<DestroyEntityComponent>(child);
 
 		// add children to stack
-		if (RelationshipComponent* component = try_get<RelationshipComponent>(e))
+		if (RelationshipComponent* component = try_get<RelationshipComponent>(child))
 		{
-			e = component->first;
+			child = component->first;
 
-			while (e != NULL_ENTITY)
+			while (child != NULL_ENTITY)
 			{
 				// add to stack
-				stack.push_back(e);
+				stack.push_back(child);
+
+				component = try_get<RelationshipComponent>(child);
 
 				// move to next child
-				e = component->next;
+				child = component->next;
 			}
 		}
 	}

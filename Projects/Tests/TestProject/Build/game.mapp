@@ -1,5 +1,5 @@
 scenes
 	- Assets\Scenes\test.mscene
 assemblies
-	- ../../TestProject/bin/x64/Debug/MintyEngine.dll
-	- ../../TestProject/bin/x64/Debug/TestProject.dll
+	- MintyEngine.dll
+	- TestProject.dll
