@@ -158,8 +158,6 @@ namespace minty
 
 		static Node parse(std::vector<String> const& lines);
 
-		static Node load_node(Path const& path);
-
 	public:
 		friend String to_string(Node const& value);
 	};

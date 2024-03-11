@@ -236,6 +236,14 @@ namespace minty
 		/// <returns>True if the lines were successfully written.</returns>
 		static bool write_all_lines(Path const& path, std::vector<String> const& lines);
 
+		/// <summary>
+		/// Writes the given Node to the file at the given path.
+		/// </summary>
+		/// <param name="path"></param>
+		/// <param name="node"></param>
+		/// <returns></returns>
+		static bool write_node(Path const& path, Node const& node);
+
 #pragma endregion
 	};
 }

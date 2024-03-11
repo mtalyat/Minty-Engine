@@ -42,7 +42,7 @@ using namespace minty;
 EditorApplication::EditorApplication()
 	: Application()
 	, _project()
-	, _sceneId(ERROR_ID)
+	, _sceneId(INVALID_UUID)
 	, _editorWindows()
 {
 	// create all the editor windows
@@ -257,9 +257,48 @@ void mintye::EditorApplication::create_new_project(minty::String const& name, mi
 	console->log(std::format("Created new project: {}", fullPath.string()));
 }
 
+void mintye::EditorApplication::open_scene()
+{
+	IGFD::FileDialogConfig config
+	{
+		.path = "."
+	};
+	ImGuiFileDialog::Instance()->OpenDialog("open_scene", "Choose scene...", SCENE_EXTENSION, config);
+}
+
+void mintye::EditorApplication::save_scene()
+{
+	MINTY_ASSERT(_sceneId.valid());
+
+	// get and serialize scene
+	Scene& scene = get_runtime().get_scene_manager().at_scene(_sceneId);
+	Node node("", to_string(_sceneId));
+	SerializationData data
+	{
+		.scene = &scene,
+		.entity = NULL_ENTITY,
+	};
+	Writer writer(node, &data);
+	scene.serialize(writer);
+	if (!File::write_node(scene.get_path(), node))
+	{
+		ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console");
+		console->log_error("Failed to save scene.");
+	}
+}
+
+void mintye::EditorApplication::close_scene()
+{
+	MINTY_ASSERT(_sceneId.valid());
+
+	unload_scene();
+}
+
 void mintye::EditorApplication::load_scene(minty::Path const& path)
 {
 	ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console");
+
+	console->log(std::format("Loading scene at path: \"{}\"", path.string()));
 
 	if (!_project)
 	{
@@ -315,12 +354,7 @@ void mintye::EditorApplication::open_asset(minty::Path const& path)
 
 void mintye::EditorApplication::save_project()
 {
-	minty::Console::todo("EditorEditorApplication::save_project()");
-}
-
-void mintye::EditorApplication::save_as_project()
-{
-	minty::Console::todo("EditorEditorApplication::save_as_project()");
+	
 }
 
 void mintye::EditorApplication::close_project()
@@ -395,17 +429,28 @@ void mintye::EditorApplication::draw_menu_bar()
 			{
 				open_project();
 			}
-			if (ImGui::MenuItem("Save Project", nullptr, false, false)) // "Ctrl+S", disabled for now
+			if (ImGui::MenuItem("Save Project", nullptr, nullptr, _project)) 
 			{
 				save_project();
-			}
-			if (ImGui::MenuItem("Save Project as...", nullptr, false, false)) // disabled for now
-			{
-				save_as_project();
 			}
 			if (ImGui::MenuItem("Close Project", nullptr, false, _project))
 			{
 				close_project();
+			}
+
+			ImGui::Separator();
+
+			if (ImGui::MenuItem("Open Scene"))
+			{
+				open_scene();
+			}
+			if (ImGui::MenuItem("Save Scene", nullptr, nullptr, _sceneId.valid()))
+			{
+				save_scene();
+			}
+			if (ImGui::MenuItem("Close Scene", nullptr, nullptr, _sceneId.valid()))
+			{
+				close_scene();
 			}
 
 			ImGui::Separator();
@@ -482,6 +527,19 @@ void mintye::EditorApplication::draw_menu_bar()
 			Path filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
 
 			load_project(filePath);
+		}
+
+		// close
+		ImGuiFileDialog::Instance()->Close();
+	}
+	if (ImGuiFileDialog::Instance()->Display("open_scene"))
+	{
+		if (ImGuiFileDialog::Instance()->IsOk())
+		{
+			Path filePath = ImGuiFileDialog::Instance()->GetCurrentPath();
+			filePath /= ImGuiFileDialog::Instance()->GetCurrentFileName();
+
+			load_scene(filePath);
 		}
 
 		// close

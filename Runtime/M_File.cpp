@@ -211,7 +211,7 @@ std::vector<String> minty::File::read_lines(Path const& path, size_t const count
 
 Node minty::File::read_node(Path const& path)
 {
-    return Node::load_node(path);
+    return Node::parse(File::read_all_lines(path));
 }
 
 bool minty::File::write_all_text(Path const& path, String const& text)
@@ -253,6 +253,11 @@ bool minty::File::write_all_lines(Path const& path, std::vector<String> const& l
     file.close();
 
     return true;
+}
+
+bool minty::File::write_node(Path const& path, Node const& node)
+{
+    return File::write_all_lines(path, node.get_formatted());
 }
 
 minty::File::File()

@@ -448,11 +448,6 @@ Node minty::Node::parse(std::vector<String> const& lines)
     return root;
 }
 
-Node minty::Node::load_node(Path const& path)
-{
-    return parse(File::read_all_lines(path));
-}
-
 String minty::to_string(Node const& value)
 {
     return value.get_node_string();

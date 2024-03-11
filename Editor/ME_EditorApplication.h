@@ -88,8 +88,6 @@ namespace mintye
 
 		void save_project();
 
-		void save_as_project();
-
 		void close_project();
 
 		void load_project(minty::Path const& path);
@@ -103,6 +101,12 @@ namespace mintye
 #pragma region Scene
 
 	private:
+		void open_scene();
+
+		void save_scene();
+
+		void close_scene();
+
 		void load_scene(minty::Path const& path);
 
 		void unload_scene();
