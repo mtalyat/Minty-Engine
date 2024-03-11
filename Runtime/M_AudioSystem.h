@@ -139,7 +139,6 @@ namespace minty
 		void update_sound_data(SoundData& data, Entity const entity);
 
 	public:
-		void serialize(Writer& writer) const override;
 		void deserialize(Reader const& reader) override;
 	};
 }

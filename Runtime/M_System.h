@@ -21,13 +21,20 @@ namespace minty
 	protected:
 		typedef std::function<Asset*(AssetEngine& engine, Path const&)> RegisterFunc;
 
+		struct RegisteredAsset
+		{
+			String keyword;
+			std::vector<Path> paths;
+			RegisterFunc func;
+		};
+
 	private:
 		// is this system enabled?
 		bool _enabled;
 
 		String _name;
 
-		std::vector<std::pair<std::vector<Path>, RegisterFunc>> _unloadedAssets;
+		std::vector<RegisteredAsset> _unloadedAssets;
 		std::unordered_set<UUID> _loadedAssets;
 	public:
 		/// <summary>
@@ -83,13 +90,17 @@ namespace minty
 		virtual void unload();
 
 	protected:
-		void register_assets(std::vector<Path> const& paths, RegisterFunc const& func);
+		void register_assets(String const& keyword, std::vector<Path> const& paths, RegisterFunc const& func);
 
-		void register_assets(Reader const& reader, String const& name, RegisterFunc const& func);
+		void register_assets(String const& name, Reader const& reader, RegisterFunc const& func);
 
 		void load_registered_assets();
 
 		void unload_registered_assets();
+
+	public:
+		virtual void serialize(Writer& writer) const override;
+		virtual void deserialize(Reader const& reader) override;
 
 	public:
 		friend String to_string(System const& value);

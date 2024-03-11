@@ -71,3 +71,8 @@ void minty::ScriptSystem::unload()
 
 	System::unload();
 }
+
+void minty::ScriptSystem::deserialize(Reader const& reader)
+{
+
+}

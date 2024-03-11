@@ -44,30 +44,30 @@ void minty::Node::set_data(String const& data)
 
 String minty::Node::get_node_string() const
 {
-    if (has_name())
+    if (has_data())
     {
-        if (has_data())
+        if (has_name())
         {
-            // both name and data
+            // name and data
             return std::format("{}: {}", get_name(), get_data());
         }
         else
         {
-            // only name
-            return get_name();
+            // only data
+            return std::format("- {}", get_data());
         }
     }
     else
     {
-        if (has_data())
+        if (has_name())
         {
-            // only data
-            return get_data();
+            // only name
+            return get_name();
         }
         else
         {
-            // neither
-            return "";
+            // none
+            return Text::EMPTY;
         }
     }
 }
@@ -75,7 +75,7 @@ String minty::Node::get_node_string() const
 // TODO: make iterative
 static void get_formatted_recursive(std::vector<String>& list, int indent, Node const& node)
 {
-    list.push_back(String(static_cast<size_t>(indent), '\t').append(node.get_node_string()));
+    list.push_back(String(static_cast<size_t>(max(0, indent)), '\t').append(node.get_node_string()));
 
     for (Node const& child : node.get_children())
     {
@@ -87,7 +87,13 @@ std::vector<String> minty::Node::get_formatted() const
 {
     std::vector<String> result;
 
-    get_formatted_recursive(result, 0, *this);
+    get_formatted_recursive(result, -1, *this);
+
+    // if the first line is a value only (ex. "- value"), switch to ": value" to signify an ID or whatever
+    if (!result.empty() && !has_name() && has_data())
+    {
+        result[0] = std::format(": {}", get_data());
+    }
 
     return result;
 }
@@ -290,7 +296,7 @@ Node minty::Node::parse(std::vector<String> const& lines)
     Node root;
 
     // if no lines, node is empty
-    if (!lines.size())
+    if (lines.empty())
     {
         return root;
     }
@@ -351,7 +357,6 @@ Node minty::Node::parse(std::vector<String> const& lines)
         // check change in index
         if (indentChange > 0)
         {
-            // add last child to node stack
             nodeStack.push_back(&node->_children.back());
 
             // start using that as active node

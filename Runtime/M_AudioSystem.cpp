@@ -234,12 +234,7 @@ void minty::AudioSystem::update_sound_data(SoundData& data, Entity const entity)
 	}
 }
 
-void minty::AudioSystem::serialize(Writer& writer) const
-{
-	Console::todo("AudioSystem::serialize()");
-}
-
 void minty::AudioSystem::deserialize(Reader const& reader)
 {
-	register_assets(reader, "clips", [](AssetEngine& assets, Path const& path) { return assets.load_audio_clip(path); });
+	register_assets("clips", reader, [](AssetEngine& assets, Path const& path) { return assets.load_audio_clip(path); });
 }

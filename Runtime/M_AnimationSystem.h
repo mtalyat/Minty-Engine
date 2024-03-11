@@ -23,7 +23,6 @@ namespace minty
 
         void reset() override;
     public:
-        void serialize(Writer& writer) const override;
         void deserialize(Reader const& reader) override;
     };
 }

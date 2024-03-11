@@ -85,6 +85,9 @@
     <Filter Include="Header Files\Application">
       <UniqueIdentifier>{6be5e59a-d15e-4196-a795-3d2e6b9888b0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\UserInterface">
+      <UniqueIdentifier>{6d87d6d6-95f1-4db3-a6ae-bfeebc8f3f99}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -218,9 +221,6 @@
     </ClInclude>
     <ClInclude Include="M_Sprite.h">
       <Filter>Header Files\Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="M_UISystem.h">
-      <Filter>Header Files\Systems</Filter>
     </ClInclude>
     <ClInclude Include="M_ShaderPass.h">
       <Filter>Header Files\Rendering</Filter>
@@ -447,9 +447,6 @@
     <ClInclude Include="M_UniformConstantInfo.h">
       <Filter>Header Files\Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="M_UIPushData.h">
-      <Filter>Header Files\Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="M_Viewport.h">
       <Filter>Header Files\Rendering</Filter>
     </ClInclude>
@@ -578,6 +575,12 @@
     </ClInclude>
     <ClInclude Include="M_RunMode.h">
       <Filter>Header Files\Application</Filter>
+    </ClInclude>
+    <ClInclude Include="M_UIPushData.h">
+      <Filter>Header Files\UserInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="M_UISystem.h">
+      <Filter>Header Files\UserInterface</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

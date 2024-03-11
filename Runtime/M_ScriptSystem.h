@@ -20,5 +20,8 @@ namespace minty
 		//void fixed_update() override;
 
 		void unload() override;
+
+	public:
+		void deserialize(Reader const& reader) override;
 	};
 }

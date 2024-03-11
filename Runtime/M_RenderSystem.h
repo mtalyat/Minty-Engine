@@ -54,7 +54,6 @@ namespace minty
 
 #pragma endregion
 	public:
-		void serialize(Writer& writer) const override;
 		void deserialize(Reader const& reader) override;
 	};
 }

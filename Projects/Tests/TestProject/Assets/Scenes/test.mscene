@@ -1,113 +1,148 @@
-ca92a9b8e0eda87b
-	systems
-		Render
-		Animation
-		Script
-		Audio
-	entities
-		Test Guy: 7c4a2ef57a3f76e9
-			Enabled
-		Model Positive Y: b56e4d3dd9058b60
-			Transform
-				position: (0, 2, 0)
-				rotation: (0, 0, 0)
-				scale: (1, 1, 1)
-			Enabled
-			Renderable
-			Mesh
-				type: SPHERE
-				material: decef49af1cbe3d9
-			Relationship
-				parent: 2400de2c92f041ed
-		Model Negative Y: e543caa47f2a1e49
-			Transform
-				position: (0, -2, 0)
-				rotation: (0, 0, 0)
-				scale: (1, 1, 1)
-			Enabled
-			Renderable
-			Mesh
-				type: SPHERE
-				material: decef49af1cbe3d9
-			Relationship
-				parent: 2400de2c92f041ed
-		Model Positive X: 264fc072d2853b0f
-			Transform
-				position: (2, 0, 0)
-				rotation: (0, 0, 0)
-				scale: (1, 1, 1)
-			Enabled
-			Renderable
-			Mesh
-				type: CYLINDER
-				material: decef49af1cbe3d9
-			Relationship
-				parent: 2400de2c92f041ed
-		Model Negative X: a553bc3dbd687a6a
-			Transform
-				position: (-2, 0, 0)
-				rotation: (0, 0, 0)
-				scale: (1, 1, 1)
-			Enabled
-			Renderable
-			Mesh
-				type: CYLINDER
-				material: decef49af1cbe3d9
-			Relationship
-				parent: 2400de2c92f041ed
-		Model Positive Z: 6d4332141aa43677
-			Transform
-				position: (0, 0, 2)
-				rotation: (0, 0, 0)
-				scale: (1, 1, 1)
-			Enabled
-			Renderable
-			Mesh
-				type: CUBE
-				material: decef49af1cbe3d9
-			Relationship
-				parent: 2400de2c92f041ed
-		Model Negative Z: ff4435853a112035
-			Transform
-				position: (0, 0, -2)
-				rotation: (0, 0, 0)
-				scale: (1, 1, 1)
-			Enabled
-			Renderable
-			Mesh
-				type: CUBE
-				material: decef49af1cbe3d9
-			Relationship
-				parent: 2400de2c92f041ed
-		Model Center: 2400de2c92f041ed
-			Transform
-				position: (0, 0, 0)
-				rotation: (0, 0, 0)
-				scale: (1, 1, 1)
-			Enabled
-			Renderable
-			Mesh
-				type: CUBE
-				material: decef49af1cbe3d9
-			AudioSource
-				volume: 1
-				clip: 0
-				attenuation: 1
-				near: 1
-				far: 100
-			Animator
-				animator: f4519e0c29f56efd
-			Relationship
-				parent: 0
-		Camera: 389d6462e322993a
-			Transform
-				position: (0, 0, -4)
-				rotation: (0, 0, 0)
-				scale: (1, 1, 1)
-			Enabled
-			Camera
-				perspective: PERSPECTIVE
-				fov: 60
-				near: 0.1
-				far: 100
-			AudioListener
+: ca92a9b8e0eda87b
+systems
+	Render
+		textures
+			_: "Assets/Textures/oak_planks.png"
+			_: "Assets/Textures/pattern.png"
+			_: "Assets/Textures/texture.jpg"
+			_: "Assets/Textures/brian.png"
+			_: "Assets/Textures/x.png"
+			_: "Assets/Textures/death.png"
+			_: "Assets/Resources/Models/pumpkin_tex.jpg"
+		shaders
+			_: "Assets/Shaders/shader.mshader"
+			_: "Assets/Shaders/spriteShader.mshader"
+		shaderPasses
+			_: "Assets/Shaders/shaderPass.mshaderpass"
+			_: "Assets/Shaders/spriteShaderPass.mshaderpass"
+		materialTemplates
+			_: "Assets/Materials/materialTemplate.mmaterialtemplate"
+			_: "Assets/Materials/spriteMaterialTemplate.mmaterialtemplate"
+		materials
+			_: "Assets/Materials/material1.mmaterial"
+			_: "Assets/Materials/spriteMaterial.mmaterial"
+			_: "Assets/Materials/xSpriteMaterial.mmaterial"
+		sprites
+			_: "Assets/Sprites/x.msprite"
+			_: "Assets/Sprites/brian.msprite"
+	Script
+	Animation
+		animations
+			_: "Assets/Animations/idle.manimation"
+			_: "Assets/Animations/moving.manimation"
+			_: "Assets/Animations/flicker.manimation"
+			_: "Assets/Animations/slide.manimation"
+		animators
+			_: "Assets/Animations/animator.manimator"
+			_: "Assets/Animations/animator2.manimator"
+	Audio
+		clips
+			_: "Assets/Audio/blinking-forest.wav"
+			_: "Assets/Audio/cow-bells.wav"
+			_: "Assets/Audio/ding.wav"
+			_: "Assets/Audio/dong.wav"
+entities
+	Model Center: 2400de2c92f041ed
+		Transform
+			position: (0, 0, 0)
+			rotation: (0, 0, 0)
+			scale: (1, 1, 1)
+		Enabled
+		Renderable
+		Mesh
+			type: CUBE
+			material: decef49af1cbe3d9
+		AudioSource
+			volume: 1
+			clip: 0
+			attenuation: 1
+			near: 1
+			far: 100
+		Animator
+			animator: f4519e0c29f56efd
+		Relationship
+			parent: 0
+	Model Negative Z: c4f4d4fe682f0d64
+		Transform
+			position: (0, 0, -2)
+			rotation: (0, 0, 0)
+			scale: (1, 1, 1)
+		Enabled
+		Renderable
+		Mesh
+			type: CUBE
+			material: decef49af1cbe3d9
+		Relationship
+			parent: 2400de2c92f041ed
+	Model Positive Z: 7fbaa46deceeb2b5
+		Transform
+			position: (0, 0, 2)
+			rotation: (0, 0, 0)
+			scale: (1, 1, 1)
+		Enabled
+		Renderable
+		Mesh
+			type: CUBE
+			material: decef49af1cbe3d9
+		Relationship
+			parent: 2400de2c92f041ed
+	Model Negative X: 46985c6913d94cb5
+		Transform
+			position: (-2, 0, 0)
+			rotation: (0, 0, 0)
+			scale: (1, 1, 1)
+		Enabled
+		Renderable
+		Mesh
+			type: CYLINDER
+			material: decef49af1cbe3d9
+		Relationship
+			parent: 2400de2c92f041ed
+	Model Positive X: d2d21b1dbd0dc426
+		Transform
+			position: (2, 0, 0)
+			rotation: (0, 0, 0)
+			scale: (1, 1, 1)
+		Enabled
+		Renderable
+		Mesh
+			type: CYLINDER
+			material: decef49af1cbe3d9
+		Relationship
+			parent: 2400de2c92f041ed
+	Model Negative Y: 929aa3c41974fc4c
+		Transform
+			position: (0, -2, 0)
+			rotation: (0, 0, 0)
+			scale: (1, 1, 1)
+		Enabled
+		Renderable
+		Mesh
+			type: SPHERE
+			material: decef49af1cbe3d9
+		Relationship
+			parent: 2400de2c92f041ed
+	Model Positive Y: af00215d6e2a1fcd
+		Transform
+			position: (0, 2, 0)
+			rotation: (0, 0, 0)
+			scale: (1, 1, 1)
+		Enabled
+		Renderable
+		Mesh
+			type: SPHERE
+			material: decef49af1cbe3d9
+		Relationship
+			parent: 2400de2c92f041ed
+	Camera: 389d6462e322993a
+		Transform
+			position: (0, 0, -4)
+			rotation: (0, 0, 0)
+			scale: (1, 1, 1)
+		Enabled
+		Camera
+			perspective: PERSPECTIVE
+			fov: 60
+			near: 0.1
+			far: 100
+		AudioListener

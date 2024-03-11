@@ -1003,7 +1003,44 @@ void minty::EntityRegistry::serialize(Writer& writer) const
 	String nodeName;
 	String nodeValue;
 
-	for (auto [entity] : this->storage<Entity>()->each())
+	// serialize all with relationship, then others
+	for (auto [entity, relationship] : this->view<RelationshipComponent>().each())
+	{
+		// get name
+		entityName = get_name(entity);
+
+		// get ID
+		entityId = get_id(entity);
+
+		// if id is empty, generate one
+		if (!entityId) entityId = UUID();
+
+		// if no name, just print ID
+		if (entityName.empty())
+		{
+			// ID
+			nodeName = to_string(entityId);
+			nodeValue = Text::EMPTY;
+		}
+		else
+		{
+			// name: ID
+			nodeName = entityName;
+			nodeValue = to_string(entityId);
+		}
+
+		// serialize entity
+		Node entityNode(nodeName, nodeValue);
+		Writer entityWriter(entityNode, writer.get_data());
+
+		serialize_entity(entityWriter, entity);
+
+		// write entity node
+		writer.write(entityNode);
+	}
+
+	// serialize all without relationship
+	for (auto [entity] : view<Entity>(entt::exclude<RelationshipComponent>).each())
 	{
 		// get name
 		entityName = get_name(entity);

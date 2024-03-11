@@ -66,21 +66,16 @@ void minty::RenderSystem::set_main_camera(Entity const entity)
 	_mainCamera = entity;
 }
 
-void minty::RenderSystem::serialize(Writer& writer) const
-{
-	Console::todo("RenderSystem::serialize()");
-}
-
 void minty::RenderSystem::deserialize(Reader const& reader)
 {
-	register_assets(reader, "textures", [](AssetEngine& assets, Path const& path) { return assets.load_texture(path); });
-	register_assets(reader, "shaders", [](AssetEngine& assets, Path const& path) { return assets.load_shader(path); });
-	register_assets(reader, "shaderPasses", [](AssetEngine& assets, Path const& path) { return assets.load_shader_pass(path); });
-	register_assets(reader, "materialTemplates", [](AssetEngine& assets, Path const& path) { return assets.load_material_template(path); });
-	register_assets(reader, "materials", [](AssetEngine& assets, Path const& path) { return assets.load_material(path); });
+	register_assets("textures", reader, [](AssetEngine& assets, Path const& path) { return assets.load_texture(path); });
+	register_assets("shaders", reader, [](AssetEngine& assets, Path const& path) { return assets.load_shader(path); });
+	register_assets("shaderPasses", reader, [](AssetEngine& assets, Path const& path) { return assets.load_shader_pass(path); });
+	register_assets("materialTemplates", reader, [](AssetEngine& assets, Path const& path) { return assets.load_material_template(path); });
+	register_assets("materials", reader, [](AssetEngine& assets, Path const& path) { return assets.load_material(path); });
 
-	register_assets(reader, "meshes", [](AssetEngine& assets, Path const& path) { return assets.load_mesh(path); });
-	register_assets(reader, "sprites", [](AssetEngine& assets, Path const& path) { return assets.load_sprite(path); });
+	register_assets("meshes", reader, [](AssetEngine& assets, Path const& path) { return assets.load_mesh(path); });
+	register_assets("sprites", reader, [](AssetEngine& assets, Path const& path) { return assets.load_sprite(path); });
 
 	Console::todo("RenderSystem::deserialize(): TextureAtlases.");
 	// load as atlas type in case user wants to use it dynamically in code

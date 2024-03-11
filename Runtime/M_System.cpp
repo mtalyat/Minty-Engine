@@ -8,6 +8,9 @@
 #include "M_SystemRegistry.h"
 
 #include "M_Reader.h"
+#include "M_Writer.h"
+
+#include "M_Reader.h"
 
 using namespace minty;
 
@@ -15,6 +18,8 @@ minty::System::System(String const& name, Runtime& engine, Scene& scene)
 	: SceneObject(engine, scene)
 	, _enabled(true)
 	, _name(name)
+	, _unloadedAssets()
+	, _loadedAssets()
 {}
 
 minty::System::~System()
@@ -58,18 +63,23 @@ void minty::System::unload()
 	unload_registered_assets();
 }
 
-void minty::System::register_assets(std::vector<Path> const& paths, RegisterFunc const& func)
+void minty::System::register_assets(String const& keyword, std::vector<Path> const& paths, RegisterFunc const& func)
 {
 	// add to unloaded
-	_unloadedAssets.push_back({ paths, func });
+	_unloadedAssets.push_back(RegisteredAsset
+		{
+			.keyword = keyword,
+			.paths = paths,
+			.func = func
+		});
 }
 
-void minty::System::register_assets(Reader const& reader, String const& name, RegisterFunc const& func)
+void minty::System::register_assets(String const& name, Reader const& reader, RegisterFunc const& func)
 {
 	std::vector<Path> paths;
 	if (reader.try_read_vector<Path>(name, paths))
 	{
-		register_assets(paths, func);
+		register_assets(name, paths, func);
 	}
 }
 
@@ -78,11 +88,11 @@ void minty::System::load_registered_assets()
 	// load each asset into the engine and save its ID so it can be unloaded later
 	AssetEngine& assets = get_runtime().get_asset_engine();
 
-	for (auto const& [paths, func] : _unloadedAssets)
+	for (auto const& registeredAsset : _unloadedAssets)
 	{
-		for (auto const& path : paths)
+		for (auto const& path : registeredAsset.paths)
 		{
-			if (Asset* asset = func(assets, path))
+			if (Asset* asset = registeredAsset.func(assets, path))
 			{
 				_loadedAssets.emplace(asset->get_id());
 			}
@@ -99,6 +109,21 @@ void minty::System::unload_registered_assets()
 	{
 		assets.unload(id);
 	}
+}
+
+void minty::System::serialize(Writer& writer) const
+{
+	// write all registered assets
+	for (auto const& registeredAsset : _unloadedAssets)
+	{
+		writer.write(registeredAsset.keyword, registeredAsset.paths);
+	}
+}
+
+void minty::System::deserialize(Reader const& reader)
+{
+	// must implement deserialize within the child class
+	Console::todo("Override System::deserialize()");
 }
 
 String minty::to_string(System const& value)
