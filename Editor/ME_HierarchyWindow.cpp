@@ -164,12 +164,14 @@ void mintye::HierarchyWindow::draw()
 			}
 
 			// on right click, set clicked
-			if (ImGui::IsItemClicked(ImGuiMouseButton_Right) && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem))
+			// on double click, focus
+			if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem))
 			{
-				set_clicked(entity);
-				MINTY_LOG_FORMAT("Clicked entity: \"{}\"", entityRegistry.get_name_safe(entity));
 
-				//ImGui::OpenPopup("ButtonContext");
+				if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
+				{
+					set_clicked(entity);
+				}
 			}
 
 			i++;
