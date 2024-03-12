@@ -118,6 +118,6 @@ void mintye::SceneWindow::focus(minty::Entity const entity)
 
 	if (TransformComponent* transformComponent = registry.try_get<TransformComponent>(entity))
 	{
-		_cameraPosition = transformComponent->get_global_position() - forward(_cameraRotation);
+		_cameraPosition = transformComponent->get_global_position() - forward(_cameraRotation) * transformComponent->get_global_scale().z;
 	}
 }
