@@ -298,8 +298,6 @@ void mintye::EditorApplication::load_scene(minty::Path const& path)
 {
 	ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console");
 
-	console->log(std::format("Loading scene at path: \"{}\"", path.string()));
-
 	if (!_project)
 	{
 		console->log_error(std::format("Cannot load scene \"{}\". No project loaded.", path.string()));
@@ -334,6 +332,46 @@ void mintye::EditorApplication::unload_scene()
 		sceneManager.destroy();
 		set_scene(INVALID_UUID);
 	}
+}
+
+void mintye::EditorApplication::copy_asset(UUID const id) const
+{
+	if (_sceneId.valid())
+	{
+		Scene const* scene = get_runtime().get_scene_manager().get_scene(_sceneId);
+
+		MINTY_ASSERT(scene != nullptr);
+
+		Entity entity = scene->get_entity_registry().find_by_id(id);
+
+		if (entity != NULL_ENTITY)
+		{
+			// ID belongs to entity
+			EntityRegistry& registry = scene->get_entity_registry();
+
+			// copy entity to clipboard
+			Node node = registry.serialize_entity(entity);
+			String text = node.get_formatted_string();
+			ImGui::SetClipboardText(std::format("Minty Entity\n{}", text).c_str());
+			return;
+		}
+	}
+
+	// not set up yet
+	Console::todo("copy_asset for some asset");
+}
+
+bool mintye::EditorApplication::is_asset_copied(minty::String const& name) const
+{
+	if (!ImGui::GetClipboardText()) return false;
+
+	String clipboard = ImGui::GetClipboardText();
+
+	if (clipboard.empty() || !clipboard.starts_with("Minty ")) return false;
+
+	String type = clipboard.substr(6, clipboard.find_first_of("\n\0", 6) - 6);
+
+	return type == name;
 }
 
 void mintye::EditorApplication::open_asset(minty::Path const& path)

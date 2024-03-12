@@ -56,7 +56,7 @@ namespace minty
 		/// Gets the Node string and its children as if it were serialized.
 		/// </summary>
 		/// <returns></returns>
-		std::vector<String> get_formatted() const;
+		std::vector<String> get_formatted(bool const toplevel = false) const;
 
 		String get_formatted_string() const;
 

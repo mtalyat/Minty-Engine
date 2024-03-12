@@ -116,6 +116,10 @@ namespace mintye
 #pragma region Assets
 
 	public:
+		void copy_asset(minty::UUID const id) const;
+
+		bool is_asset_copied(minty::String const& name) const;
+
 		/// <summary>
 		/// Opens the asset in the editor, or in the system if the editor does not support it
 		/// </summary>

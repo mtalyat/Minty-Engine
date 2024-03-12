@@ -83,11 +83,11 @@ static void get_formatted_recursive(std::vector<String>& list, int indent, Node 
     }
 }
 
-std::vector<String> minty::Node::get_formatted() const
+std::vector<String> minty::Node::get_formatted(bool const toplevel) const
 {
     std::vector<String> result;
 
-    get_formatted_recursive(result, -1, *this);
+    get_formatted_recursive(result, toplevel ? -1 : 0, *this);
 
     // if the first line is a value only (ex. "- value"), switch to ": value" to signify an ID or whatever
     if (!result.empty() && !has_name() && has_data())

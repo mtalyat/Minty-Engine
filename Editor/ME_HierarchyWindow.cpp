@@ -167,7 +167,6 @@ void mintye::HierarchyWindow::draw()
 			// on double click, focus
 			if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem))
 			{
-
 				if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
 				{
 					set_clicked(entity);
@@ -219,20 +218,20 @@ void mintye::HierarchyWindow::set_scene(minty::Scene* const scene)
 
 void mintye::HierarchyWindow::copy_entity(minty::Entity const entity)
 {
-	EntityRegistry& registry = get_scene()->get_entity_registry();
-
-	// copy entity to clipboard
-	Node node = registry.serialize_entity(entity);
-	String text = node.get_formatted_string();
-	ImGui::SetClipboardText(text.c_str());
+	get_application().copy_asset(get_scene()->get_entity_registry().get_id(entity));
 }
 
 minty::Entity mintye::HierarchyWindow::paste_entity()
 {
+	if (!get_application().is_asset_copied("Entity")) return NULL_ENTITY;
+
+	std::vector<String> lines = Text::split(ImGui::GetClipboardText(), '\n');
+	lines.erase(lines.begin()); // remove the meta text line
+
 	EntityRegistry& registry = get_scene()->get_entity_registry();
 
 	// deserialize copied as entity
-	Node node = Node::parse(ImGui::GetClipboardText()).get_children().front();
+	Node node = Node::parse(lines).get_children().front();
 	UUID id(0);
 	if (Parse::try_uuid(node.get_data(), id) && registry.find_by_id(id) != NULL_ENTITY)
 	{
@@ -316,7 +315,8 @@ void mintye::HierarchyWindow::draw_popup()
 
 		return;
 	}
-	if (ImGui::MenuItem("Paste", nullptr, false, ImGui::GetClipboardText() != nullptr && *ImGui::GetClipboardText() != '\0'))
+	String clipboardText = ImGui::GetClipboardText() ? ImGui::GetClipboardText() : "";
+	if (ImGui::MenuItem("Paste", nullptr, false, clipboardText.starts_with("Minty Entity")))
 	{
 		Entity entity = paste_entity();
 
@@ -329,7 +329,7 @@ void mintye::HierarchyWindow::draw_popup()
 
 		return;
 	}
-	if (ImGui::MenuItem("Paste as child", nullptr, false, ImGui::GetClipboardText() != nullptr && *ImGui::GetClipboardText() != '\0' && _clicked != NULL_ENTITY))
+	if (ImGui::MenuItem("Paste as child", nullptr, false, clipboardText.starts_with("Minty Entity") && _clicked != NULL_ENTITY))
 	{
 		Entity entity = paste_entity();
 

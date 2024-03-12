@@ -257,7 +257,7 @@ bool minty::File::write_all_lines(Path const& path, std::vector<String> const& l
 
 bool minty::File::write_node(Path const& path, Node const& node)
 {
-    return File::write_all_lines(path, node.get_formatted());
+    return File::write_all_lines(path, node.get_formatted(true));
 }
 
 minty::File::File()

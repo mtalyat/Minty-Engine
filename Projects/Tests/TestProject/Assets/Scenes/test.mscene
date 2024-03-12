@@ -25,7 +25,6 @@ systems
 		sprites
 			_: "Assets/Sprites/x.msprite"
 			_: "Assets/Sprites/brian.msprite"
-	Script
 	Animation
 		animations
 			_: "Assets/Animations/idle.manimation"
@@ -35,6 +34,7 @@ systems
 		animators
 			_: "Assets/Animations/animator.manimator"
 			_: "Assets/Animations/animator2.manimator"
+	Script
 	Audio
 		clips
 			_: "Assets/Audio/blinking-forest.wav"
@@ -134,6 +134,18 @@ entities
 			material: decef49af1cbe3d9
 		Relationship
 			parent: 2400de2c92f041ed
+	Big Ball: b620841e2d57dd79
+		Transform
+			position: (0, -4, 0)
+			rotation: (0, 0, 0)
+			scale: (2, 2, 2)
+		Enabled
+		Renderable
+		Mesh
+			type: SPHERE
+			material: decef49af1cbe3d9
+		Relationship
+			parent: 0
 	Camera: 389d6462e322993a
 		Transform
 			position: (0, 0, -4)
