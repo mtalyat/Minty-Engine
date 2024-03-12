@@ -144,7 +144,7 @@ namespace minty
 				// unordered
 				for (auto const& v : value)
 				{
-					writer.write(BLANK, v);
+					writer.write("", v);
 				}
 			}
 

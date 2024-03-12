@@ -95,19 +95,13 @@ void minty::Application::stop()
 {
 	if (!_runtime) return;
 
-	if (_runtime->is_running())
-	{
-		_runtime->stop();
-		_runtime->cleanup();
-	}
+	_runtime->stop();
+	_runtime->cleanup();
 }
 
 void minty::Application::destroy()
 {
 	if (!_runtime) return;
-
-	// stop if needed
-	stop();
 
 	_window->close();
 	MINTY_DELETE(_window);
