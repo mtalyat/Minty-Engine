@@ -455,6 +455,17 @@ void mintye::EditorApplication::draw_menu_bar()
 
 	bool createNewProject = false;
 
+	bool ctrl = ImGui::GetIO().KeyCtrl;
+
+	if (ctrl && ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_S), false))
+	{
+		save_scene();
+	}
+	if (ctrl && ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_O), false))
+	{
+		open_scene();
+	}
+
 	if (ImGui::BeginMainMenuBar())
 	{
 		if (ImGui::BeginMenu("File"))
@@ -463,26 +474,26 @@ void mintye::EditorApplication::draw_menu_bar()
 			{
 				createNewProject = true;
 			}
-			if (ImGui::MenuItem("Open Project")) // "Ctrl+O"
+			if (ImGui::MenuItem("Open Project"))
 			{
 				open_project();
 			}
-			if (ImGui::MenuItem("Save Project", nullptr, nullptr, _project)) 
+			if (ImGui::MenuItem("Save Project", nullptr, nullptr, _project))
 			{
 				save_project();
 			}
-			if (ImGui::MenuItem("Close Project", nullptr, false, _project))
+			if (ImGui::MenuItem("Close Project", nullptr, nullptr, _project))
 			{
 				close_project();
 			}
 
 			ImGui::Separator();
 
-			if (ImGui::MenuItem("Open Scene"))
+			if (ImGui::MenuItem("Open Scene", "Ctrl+O"))
 			{
 				open_scene();
 			}
-			if (ImGui::MenuItem("Save Scene", nullptr, nullptr, _sceneId.valid()))
+			if (ImGui::MenuItem("Save Scene", "Ctrl+S", nullptr, _sceneId.valid()))
 			{
 				save_scene();
 			}

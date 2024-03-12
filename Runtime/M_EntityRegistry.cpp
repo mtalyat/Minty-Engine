@@ -1040,8 +1040,11 @@ void minty::EntityRegistry::serialize(Writer& writer) const
 	}
 
 	// serialize all without relationship
-	for (auto [entity] : view<Entity>(entt::exclude<RelationshipComponent>).each())
+	for (auto [entity] : view<Entity>().each())
 	{
+		// ignore invalid or entities we have already written
+		if (!valid(entity) || all_of<RelationshipComponent>(entity)) continue;
+
 		// get name
 		entityName = get_name(entity);
 
