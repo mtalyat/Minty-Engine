@@ -244,9 +244,9 @@ namespace minty
 		static void register_system(String const& name);
 
 		template<class T>
-		static void register_component(String const& namespaceName, String const& className, bool const link = true);
+		static void register_component(String const& fullName, bool const link = true);
 
-		static void register_script(String const& namespaceName, String const& className);
+		static void register_script(String const& fullName);
 
 		/// <summary>
 		/// Links the C++ and C# together.
@@ -297,12 +297,12 @@ namespace minty
 	}
 
 	template<class T>
-	void Runtime::register_component(String const& namespaceName, String const& className, bool const link)
+	void Runtime::register_component(String const& fullName, bool const link)
 	{
-		EntityRegistry::register_component<T>(className);
+		EntityRegistry::register_component<T>(fullName);
 		if (link)
 		{
-			ScriptEngine::link_script(namespaceName, className);
+			ScriptEngine::link_script(fullName);
 		}
 	}
 }

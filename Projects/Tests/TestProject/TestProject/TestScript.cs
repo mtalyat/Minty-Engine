@@ -1,60 +1,63 @@
 ﻿using MintyEngine;
 
-class TestScript : Script
+namespace TestProject
 {
-    public float time;
-
-    private Transform transform;
-
-    void OnCreate()
+    class TestScript : Script
     {
-        Debug.Log("TestClass.OnCreate()");
-        Debug.Log($"Entity is {Entity}");
-    }
+        public float time;
 
-    void OnLoad()
-    {
-        Debug.Log("TestClass.OnLoad()");
+        private Transform transform;
 
-        transform = Entity.GetComponent<Transform>();
-    }
-
-    void OnEnable()
-    {
-        Debug.Log("TestClass.OnEnable()");
-    }
-
-    void OnUpdate()
-    {
-        Debug.Log($"Time: {time:0.00}s");
-        time -= Time.ElapsedTime;
-
-        if (time <= 0.0f)
+        void OnCreate()
         {
-            Destroy(Entity);
+            Debug.Log("TestClass.OnCreate()");
+            Debug.Log($"Entity is {Entity}");
         }
 
-        //Vector3 pos = transform.LocalPosition;
-        //pos.Z += Time.ElapsedTime;
-        //transform.LocalPosition = pos;
+        void OnLoad()
+        {
+            Debug.Log("TestClass.OnLoad()");
 
-        //transform.LocalScale /= 1.0f + Time.ElapsedTime * 0.1f;
+            transform = Entity.GetComponent<Transform>();
+        }
 
-        //Debug.Log(transform.LocalPosition);
-    }
+        void OnEnable()
+        {
+            Debug.Log("TestClass.OnEnable()");
+        }
 
-    void OnDisable()
-    {
-        Debug.Log("TestClass.OnDisable()");
-    }
+        void OnUpdate()
+        {
+            Debug.Log($"Time: {time:0.00}s");
+            time -= Time.ElapsedTime;
 
-    void OnUnload()
-    {
-        Debug.Log("TestClass.OnUnload()");
-    }
+            if (time <= 0.0f)
+            {
+                Destroy(Entity);
+            }
 
-    void OnDestroy()
-    {
-        Debug.Log("TestClass.OnDestroy()");
+            //Vector3 pos = transform.LocalPosition;
+            //pos.Z += Time.ElapsedTime;
+            //transform.LocalPosition = pos;
+
+            //transform.LocalScale /= 1.0f + Time.ElapsedTime * 0.1f;
+
+            //Debug.Log(transform.LocalPosition);
+        }
+
+        void OnDisable()
+        {
+            Debug.Log("TestClass.OnDisable()");
+        }
+
+        void OnUnload()
+        {
+            Debug.Log("TestClass.OnUnload()");
+        }
+
+        void OnDestroy()
+        {
+            Debug.Log("TestClass.OnDestroy()");
+        }
     }
 }

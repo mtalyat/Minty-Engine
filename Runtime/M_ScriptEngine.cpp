@@ -134,7 +134,7 @@ bool minty::ScriptEngine::load_assembly(Path const& path, bool const referenceOn
 		{
 			if (script->is_derived_from(*scriptScriptClass))
 			{
-				Runtime::register_script(script->get_namespace(), script->get_name());
+				Runtime::register_script(script->get_full_name());
 			}
 		}
 	}
@@ -687,14 +687,14 @@ void minty::ScriptEngine::destroy_object(UUID id)
 	}
 }
 
-void minty::ScriptEngine::link_script(String const& namespaceName, String const& className)
+void minty::ScriptEngine::link_script(String const& fullName)
 {
 	ScriptEngine* engine = _data.engine;
 
 	MINTY_ASSERT(engine != nullptr);
 
 	// find ScriptClass with the given name
-	ScriptClass const* script = engine->find_class(namespaceName, className);
+	ScriptClass const* script = engine->find_class(fullName);
 
 	// if found, register it
 	if (!script) return;

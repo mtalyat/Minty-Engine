@@ -178,7 +178,7 @@ namespace minty
 		void destroy_object(UUID id);
 
 	public:
-		static void link_script(String const& namespaceName, String const& className);
+		static void link_script(String const& fullName);
 
 		static void link_script(ScriptClass const& script);
 

@@ -33,6 +33,8 @@ namespace mintye
 
 		void draw_entity() const;
 
+		void draw_component(minty::Node& node, size_t const i, minty::Scene* const scene, minty::EntityRegistry& registry) const;
+
 #pragma endregion
 
 #pragma region Target

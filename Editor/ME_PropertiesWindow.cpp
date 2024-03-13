@@ -144,37 +144,16 @@ void mintye::PropertiesWindow::draw_entity() const
 			continue;
 		}
 
-		ImGui::BeginGroupBox();
-
-		// list components
-		if (ImGui::InputNode(node, true, i))
+		// if the node is a script component, list all of the scripts instead
+		if (node.get_name() == "Script")
 		{
-			// component changed, update it in the registy
-			Component* component = registry.get_by_name(node.get_name(), _targetEntity);
-			SerializationData data
-			{
-				.scene = get_scene(),
-				.entity = _targetEntity,
-			};
-			Reader reader(node, &data);
-			component->deserialize(reader);
-
-			// TODO: get rid of magic value:
-			// if Transform component was updated, dirty the entity, update, continue
-			if (node.get_name() == "Transform")
-			{
-				registry.dirty(_targetEntity);
-				scene->finalize();
-			}
+			ImGui::Text(std::format("ScriptComponent##{}", i).c_str());
 		}
-
-		// actions
-		if (ImGui::Button(std::format("Remove##{}", i).c_str()))
+		else
 		{
-			registry.erase_by_name(node.get_name(), _targetEntity);
+			// just use the straight up component
+			draw_component(node, i, scene, registry);
 		}
-
-		ImGui::EndGroupBox(Vector2(width, 0.0f), Vector2(xMargin, yMargin));
 
 		i += OFFSET;
 	}
@@ -209,6 +188,45 @@ void mintye::PropertiesWindow::draw_entity() const
 
 		ImGui::EndPopup();
 	}
+}
+
+void mintye::PropertiesWindow::draw_component(minty::Node& node, size_t const i, minty::Scene* const scene, minty::EntityRegistry& registry) const
+{
+	static float const xMargin = 2.0f;
+	static float const yMargin = 2.0f;
+	float const width = ImGui::GetContentRegionAvail().x - 2.0f * xMargin;
+
+	ImGui::BeginGroupBox();
+
+	// list components
+	if (ImGui::InputNode(node, true, i))
+	{
+		// component changed, update it in the registy
+		Component* component = registry.get_by_name(node.get_name(), _targetEntity);
+		SerializationData data
+		{
+			.scene = get_scene(),
+			.entity = _targetEntity,
+		};
+		Reader reader(node, &data);
+		component->deserialize(reader);
+
+		// TODO: get rid of magic value:
+		// if Transform component was updated, dirty the entity, update, continue
+		if (node.get_name() == "Transform")
+		{
+			registry.dirty(_targetEntity);
+			scene->finalize();
+		}
+	}
+
+	// actions
+	if (ImGui::Button(std::format("Remove##{}", i).c_str()))
+	{
+		registry.erase_by_name(node.get_name(), _targetEntity);
+	}
+
+	ImGui::EndGroupBox(Vector2(width, 0.0f), Vector2(xMargin, yMargin));
 }
 
 void mintye::PropertiesWindow::set_target(minty::Entity const entity)

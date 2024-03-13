@@ -860,7 +860,7 @@ void minty::EntityRegistry::register_script(String const& name)
 			ScriptEngine& engine = registry.get_runtime().get_script_engine();
 
 			// get the script based on the name
-			ScriptClass const* script = engine.search_for_class(name);
+			ScriptClass const* script = engine.find_class(name);
 
 			MINTY_ASSERT_FORMAT(script != nullptr, "No script with name {} found.", name);
 
@@ -1192,20 +1192,34 @@ void minty::EntityRegistry::serialize_entity(Writer& writer, Entity const entity
 			auto found = _componentTypes.find(ctype.index());
 			if (found == _componentTypes.end())
 			{
-				Console::error(std::format("Cannot find_animation component type with id: {}, name: {}", ctype.index(), ctype.name().data()));
+				Console::error(std::format("Cannot find component type with id: {}, name: {}", ctype.index(), ctype.name().data()));
+				continue;
+			}
+
+			if (ctype == entt::type_id<NameComponent>())
+			{
 				continue;
 			}
 
 			String name = found->second;
 
-			// ignore NameComponent and IDComponent, those are used when writing the entity node
-			if (name.compare("Name") == 0 || name.compare("ID") == 0)
+			// if this is a script component, serialize each script
+			if (ctype == entt::type_id<ScriptComponent>())
 			{
-				continue;
-			}
+				ScriptComponent const* scriptComponent = static_cast<ScriptComponent const*>(get_by_name(name, entity));
 
-			// write component with its name and serialized values
-			tempWriter.write(name, this->get_by_name(name, entity));
+				for (auto const& [id, obj] : scriptComponent->scripts)
+				{
+					// write the script object with its full name and serialized values
+					tempWriter.write(obj.get_class().get_full_name(), obj);
+				}
+			}
+			else
+			{
+
+				// write component with its name and serialized values
+				tempWriter.write(name, this->get_by_name(name, entity));
+			}
 		}
 	}
 }

@@ -269,10 +269,10 @@ void minty::Runtime::destroy()
 	_engines.clear();
 }
 
-void minty::Runtime::register_script(String const& namespaceName, String const& className)
+void minty::Runtime::register_script(String const& fullName)
 {
-	EntityRegistry::register_script(className);
-	ScriptEngine::link_script(namespaceName, className);
+	EntityRegistry::register_script(fullName);
+	ScriptEngine::link_script(fullName);
 }
 
 void minty::Runtime::link()
@@ -287,21 +287,21 @@ void minty::Runtime::link()
 	register_system<UISystem>("UI");
 
 	// components
-	register_component<AnimatorComponent>(ASSEMBLY_ENGINE_NAME, "Animator");
-	register_component<AudioListenerComponent>(ASSEMBLY_ENGINE_NAME, "AudioListener");
-	register_component<AudioSourceComponent>(ASSEMBLY_ENGINE_NAME, "AudioSource");
-	register_component<CameraComponent>(ASSEMBLY_ENGINE_NAME, "Camera");
-	//register_component<DestroyComponent>(ASSEMBLY_ENGINE_NAME, "Destroy");
-	//register_component<DirtyComponent>(ASSEMBLY_ENGINE_NAME, "Dirty");
-	register_component<EnabledComponent>(ASSEMBLY_ENGINE_NAME, "Enabled", false);
-	register_component<MeshComponent>(ASSEMBLY_ENGINE_NAME, "Mesh");
-	register_component<NameComponent>(ASSEMBLY_ENGINE_NAME, "Name");
-	register_component<RelationshipComponent>(ASSEMBLY_ENGINE_NAME, "Relationship");
-	register_component<RenderableComponent>(ASSEMBLY_ENGINE_NAME, "Renderable");
-	//register_component<ScriptComponent>(ASSEMBLY_ENGINE_NAME, "Script");
-	register_component<SpriteComponent>(ASSEMBLY_ENGINE_NAME, "Sprite");
-	register_component<TransformComponent>(ASSEMBLY_ENGINE_NAME, "Transform");
-	register_component<UITransformComponent>(ASSEMBLY_ENGINE_NAME, "UITransform");
+	register_component<AnimatorComponent>(ScriptEngine::get_full_name(ASSEMBLY_ENGINE_NAME, "Animator"));
+	register_component<AudioListenerComponent>(ScriptEngine::get_full_name(ASSEMBLY_ENGINE_NAME, "AudioListener"));
+	register_component<AudioSourceComponent>(ScriptEngine::get_full_name(ASSEMBLY_ENGINE_NAME, "AudioSource"));
+	register_component<CameraComponent>(ScriptEngine::get_full_name(ASSEMBLY_ENGINE_NAME, "Camera"));
+	//register_component<DestroyComponent>(ScriptEngine::get_full_name(ASSEMBLY_ENGINE_NAME, "Destroy"));
+	//register_component<DirtyComponent>(ScriptEngine::get_full_name(ASSEMBLY_ENGINE_NAME, "Dirty"));
+	register_component<EnabledComponent>(ScriptEngine::get_full_name(ASSEMBLY_ENGINE_NAME, "Enabled"), false);
+	register_component<MeshComponent>(ScriptEngine::get_full_name(ASSEMBLY_ENGINE_NAME, "Mesh"));
+	register_component<NameComponent>(ScriptEngine::get_full_name(ASSEMBLY_ENGINE_NAME, "Name"));
+	register_component<RelationshipComponent>(ScriptEngine::get_full_name(ASSEMBLY_ENGINE_NAME, "Relationship"));
+	register_component<RenderableComponent>(ScriptEngine::get_full_name(ASSEMBLY_ENGINE_NAME, "Renderable"));
+	//register_component<ScriptComponent>(ScriptEngine::get_full_name(ASSEMBLY_ENGINE_NAME, "Script"));
+	register_component<SpriteComponent>(ScriptEngine::get_full_name(ASSEMBLY_ENGINE_NAME, "Sprite"));
+	register_component<TransformComponent>(ScriptEngine::get_full_name(ASSEMBLY_ENGINE_NAME, "Transform"));
+	register_component<UITransformComponent>(ScriptEngine::get_full_name(ASSEMBLY_ENGINE_NAME, "UITransform"));
 
 	// link to C#
 	ScriptEngine::link();
