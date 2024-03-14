@@ -45,3 +45,5 @@ The Minty Engine will use a multitude of advanced and new technologies to make t
 * [stb](https://github.com/nothings/stb), for loading images from the disk.
 * [SoLoud](https://github.com/jarikomppa/soloud), for loading and playing audio.
 * [Dear ImGui](https://github.com/ocornut/imgui), for the editor user iterface.
+* [Mono](https://www.mono-project.com), for C# scripting.
+* [TinyXML-2](https://github.com/leethomason/tinyxml2), for writing and reading XML files.
