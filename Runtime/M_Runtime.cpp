@@ -264,13 +264,15 @@ void minty::Runtime::destroy()
 
 	// destroy asset engine, then others
 	AssetEngine* assets = _engines.at<AssetEngine>();
-	_engines.erase<AssetEngine>();
 	delete assets;
+
+	// set to null so it is not deleted later
+	_engines.erase<AssetEngine>();
 
 	// delete others
 	for (auto const engine : _engines)
 	{
-		delete engine;
+		if(engine) delete engine;
 	}
 	_engines.clear();
 }

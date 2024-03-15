@@ -135,8 +135,8 @@ void mintye::AssetsWindow::set_path(minty::Path const& path)
 		{
 			_directories.push_back(entry.path().stem());
 		}
-		// add all regular files
-		else if (fs::is_regular_file(entry.status()))
+		// add all regular files that aren't meta
+		else if (fs::is_regular_file(entry.status()) && entry.path().extension() != META_EXTENSION)
 		{
 			_files.push_back(entry.path().filename());
 		}

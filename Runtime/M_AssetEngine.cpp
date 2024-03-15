@@ -102,6 +102,11 @@ minty::AssetEngine::AssetEngine(Runtime& runtime)
 	}
 }
 
+minty::AssetEngine::~AssetEngine()
+{
+	unload_all();
+}
+
 bool minty::AssetEngine::exists(Path const& path) const
 {
 	switch (get_runtime().get_mode())

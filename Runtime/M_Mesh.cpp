@@ -4,6 +4,7 @@
 #include "M_Runtime.h"
 #include "M_Builtin.h"
 #include "M_RenderEngine.h"
+#include "M_AssetEngine.h"
 #include "M_Text.h"
 #include "M_GLM.hpp"
 
@@ -15,9 +16,11 @@ minty::Mesh::Mesh()
 	: Asset()
 	, _vertexCount()
 	, _vertexSize()
+	, _vertexBufferId(INVALID_UUID)
 	, _vertexBuffer()
 	, _indexCount()
 	, _indexSize()
+	, _indexBufferId(INVALID_UUID)
 	, _indexBuffer()
 	, _indexType()
 {}
@@ -26,9 +29,11 @@ minty::Mesh::Mesh(MeshBuilder const& builder, Runtime& engine)
 	: Asset(builder.id, builder.path, engine)
 	, _vertexCount()
 	, _vertexSize()
+	, _vertexBufferId(INVALID_UUID)
 	, _vertexBuffer()
 	, _indexCount()
 	, _indexSize()
+	, _indexBufferId(INVALID_UUID)
 	, _indexBuffer()
 	, _indexType()
 {}
@@ -481,6 +486,7 @@ void minty::Mesh::set_vertices(void const* const vertices, size_t const count, s
 
 	// copy into device memory
 	Buffer const& vertexBuffer = renderer.create_buffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+	_vertexBufferId = vertexBuffer.get_id();
 	_vertexBuffer = &vertexBuffer;
 
 	renderer.copy_buffer(stagingBuffer, vertexBuffer, bufferSize);
@@ -521,6 +527,7 @@ void minty::Mesh::set_indices(void const* const indices, size_t const count, siz
 
 	// copy into device memory
 	Buffer const& indexBuffer = renderer.create_buffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+	_indexBufferId = indexBuffer.get_id();
 	_indexBuffer = &indexBuffer;
 
 	renderer.copy_buffer(stagingBuffer, indexBuffer, bufferSize);
@@ -531,7 +538,10 @@ void minty::Mesh::set_indices(void const* const indices, size_t const count, siz
 
 void minty::Mesh::dispose_vertices()
 {
-	if (!_vertexCount)
+	AssetEngine& assets = get_runtime().get_asset_engine();
+
+	// if buffer not loaded, ignore, it was already disposed
+	if (!assets.contains(_vertexBufferId))
 	{
 		return;
 	}
@@ -539,13 +549,18 @@ void minty::Mesh::dispose_vertices()
 	RenderEngine& renderer = get_runtime().get_render_engine();
 
 	renderer.destroy_buffer(*_vertexBuffer);
+	_vertexBufferId = INVALID_UUID;
+	_vertexBuffer = nullptr;
 	_vertexCount = 0;
 	_vertexSize = 0;
 }
 
 void minty::Mesh::dispose_indices()
 {
-	if (!_indexCount)
+	AssetEngine& assets = get_runtime().get_asset_engine();
+
+	// if buffer not loaded, ignore, it was already disposed
+	if (!assets.contains(_indexBufferId))
 	{
 		return;
 	}
@@ -553,6 +568,8 @@ void minty::Mesh::dispose_indices()
 	RenderEngine& renderer = get_runtime().get_render_engine();
 
 	renderer.destroy_buffer(*_indexBuffer);
+	_indexBufferId = INVALID_UUID;
+	_indexBuffer = nullptr;
 	_indexCount = 0;
 	_indexSize = 0;
 }

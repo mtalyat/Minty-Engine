@@ -155,7 +155,10 @@ namespace minty
 	{
 		MINTY_ASSERT_MESSAGE((is_type<U, T>()), std::format("Type U ({1}) must be derived from type T ({0}).", typeid(T).name(), typeid(U).name()));
 
-		return false;
+		// remove from values
+		_values[_lookup.at(typeid(U))] = nullptr;
+
+		return true;
 	}
 
 	template<class T>

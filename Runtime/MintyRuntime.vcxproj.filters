@@ -435,9 +435,6 @@
     <ClInclude Include="M_TransformComponent.h">
       <Filter>Header Files\Transform</Filter>
     </ClInclude>
-    <ClInclude Include="M_Buffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="M_Entity.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
@@ -590,6 +587,9 @@
     </ClInclude>
     <ClInclude Include="M_TinyXML.h">
       <Filter>Header Files\Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Buffer.h">
+      <Filter>Header Files\Rendering</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -68,10 +68,12 @@ namespace minty
 	private:
 		uint32_t _vertexCount;
 		uint32_t _vertexSize;
+		UUID _vertexBufferId;
 		Buffer const* _vertexBuffer;
 
 		uint32_t _indexCount;
 		uint32_t _indexSize;
+		UUID _indexBufferId;
 		Buffer const* _indexBuffer;
 		VkIndexType _indexType;
 	public:
