@@ -152,7 +152,9 @@ namespace mintye
 #pragma region File Generation
 
 	private:
-		void generate_directories();
+		void generate_directory(minty::Path const& path) const;
+
+		void generate_directories(minty::Path const& basePath) const;
 
 		void generate_application_data(BuildInfo const& buildInfo);
 

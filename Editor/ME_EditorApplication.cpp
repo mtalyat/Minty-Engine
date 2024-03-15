@@ -233,49 +233,7 @@ void mintye::EditorApplication::create_new_project(minty::String const& name, mi
 	// make a new directory with the name
 	Path fullPath = path / name;
 
-	// create new project directory
-	if (!fs::create_directory(fullPath))
-	{
-		console->log_error(std::format("Failed to create project at path: {}", fullPath.string()));
-		return;
-	}
-
-	// create all default project necessary directories
-
-	if (!fs::create_directory(fullPath / ASSETS_DIRECTORY_NAME))
-	{
-		console->log_error(std::format("Failed to create Assets folder in project path: {}", fullPath.string()));
-		return;
-	}
-	if (!fs::create_directory(fullPath / BUILD_DIRECTORY_NAME))
-	{
-		console->log_error(std::format("Failed to create Build folder in project path: {}", fullPath.string()));
-		return;
-	}
-	if (!fs::create_directory(fullPath / ASSEMBLY_DIRECTORY_NAME))
-	{
-		console->log_error(std::format("Failed to create Assembly folder in project path: {}", fullPath.string()));
-		return;
-	}
-
-	// create the C# project
-	console->run_command(std::format("cd {} && dotnet new classlib", (fullPath / ASSEMBLY_DIRECTORY_NAME).string()), true);
-
-	// modify it so it works with mono
-	String csprojPath = (fullPath / ASSEMBLY_DIRECTORY_NAME / std::format("{}.csproj", ASSEMBLY_DIRECTORY_NAME)).string();
-	XMLDocument csproj;
-	csproj.LoadFile(csprojPath.c_str());
-
-	XMLElement* projectNode = csproj.FirstChildElement("Project");
-
-	XMLNode* targetFrameworkVersion = projectNode->FirstChildElement("PropertyGroup")->FirstChild();
-
-	targetFrameworkVersion->SetValue("v4.7.2");
-
-	csproj.SaveFile(csprojPath.c_str());
-
-	// build it quick
-	console->run_command(std::format("cd {} && dotnet build", (fullPath / ASSEMBLY_DIRECTORY_NAME).string()), true);
+	generate_directories(fullPath);
 
 	// done
 	console->log(std::format("Created new project: {}", fullPath.string()));
@@ -795,9 +753,22 @@ void EditorApplication::generate_main(BuildInfo const& buildInfo)
 	file.close();
 }
 
-void mintye::EditorApplication::generate_directories()
+void mintye::EditorApplication::generate_directory(minty::Path const& path) const
 {
+	fs::create_directories(path);
+}
 
+void mintye::EditorApplication::generate_directories(Path const& basePath) const
+{
+	// create all default project necessary directories
+	generate_directory(basePath);
+
+	generate_directory(basePath / ASSETS_DIRECTORY_NAME);
+	generate_directory(basePath / BUILD_DIRECTORY_NAME);
+	generate_directory(basePath / ASSEMBLY_DIRECTORY_NAME);
+
+	generate_directory(basePath / BUILD_DIRECTORY_NAME / "Debug");
+	generate_directory(basePath / BUILD_DIRECTORY_NAME / "Release");
 }
 
 void mintye::EditorApplication::generate_application_data(BuildInfo const& buildInfo)
@@ -1004,7 +975,7 @@ void EditorApplication::build_project(BuildInfo const& buildInfo)
 
 	console->log_important("build project");
 
-	generate_directories();
+	generate_directories(_project->get_base_path());
 
 	console->log_important("\tgenerating cmake...");
 
