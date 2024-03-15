@@ -141,9 +141,9 @@ namespace mintye
 		minty::Path find_asset(minty::String const& name, CommonFileType const commonFileType) const;
 
 		/// <summary>
-		/// Searches the disk for all files and updates their internal states. Use this to "refresh" the project.
+		/// Searches the disk for all files and updates their internal states.
 		/// </summary>
-		void collect_assets();
+		void refresh();
 
 		/// <summary>
 		/// Returns the number of collected assets.

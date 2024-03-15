@@ -147,7 +147,7 @@ minty::Path mintye::Project::find_asset(minty::String const& name, CommonFileTyp
 	return Path();
 }
 
-void Project::collect_assets()
+void Project::refresh()
 {
 	if (!std::filesystem::exists(_base.string()))
 	{
@@ -214,6 +214,15 @@ void Project::collect_assets()
 				{
 					// existing list
 					found->second.push_back(relativePath);
+				}
+
+				// if the file needs a meta, create one with a new ID quick
+				if (extension != META_EXTENSION && !AssetEngine::check_if_no_meta(extension.string().c_str()) && !std::filesystem::exists(Asset::get_meta_path(relativePath)))
+				{
+					// create a new meta with a random ID, the rest can be populated later
+					// (ID is the most important for asset loading)
+					Node node("", to_string(UUID()));
+					File::write_node(Asset::get_meta_path(relativePath), node);
 				}
 
 				_fileCount++;

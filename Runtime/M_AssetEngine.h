@@ -53,8 +53,15 @@ namespace minty
 
 		std::vector<String> read_file_lines(Path const& path) const;
 
+		/// <summary>
+		/// Checks if the given extensions requires a corresponding .mmeta file with it.
+		/// </summary>
+		/// <param name="extension"></param>
+		/// <returns></returns>
+		static bool check_if_no_meta(char const* extension);
+
 	private:
-		void check(Path const& path, char const* extension, bool const requiresMeta) const;
+		void check(Path const& path, char const* extension) const;
 
 #pragma region Render
 
@@ -141,7 +148,7 @@ namespace minty
 		template<typename T>
 		T& at(UUID const id) const
 		{
-			MINTY_ASSERT(_assets.contains(id));
+			MINTY_ASSERT_FORMAT(_assets.contains(id), "{}", to_string(id));
 
 			return *static_cast<T*>(_assets.at(id));
 		}

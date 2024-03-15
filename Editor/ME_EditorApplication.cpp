@@ -195,7 +195,7 @@ void mintye::EditorApplication::load_project(minty::Path const& path)
 
 	// create new project
 	Project* project = new Project(path);
-	project->collect_assets();
+	project->refresh();
 	std::filesystem::current_path(path);
 
 	// set new types

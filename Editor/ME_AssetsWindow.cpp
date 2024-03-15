@@ -44,7 +44,7 @@ void mintye::AssetsWindow::draw()
 	if (ImGui::Button("Refresh"))
 	{
 		// refresh the project files
-		get_project()->collect_assets();
+		get_project()->refresh();
 
 		// re-populate the editor files
 		set_path(_path);
