@@ -116,6 +116,13 @@ minty::ScriptEngine::~ScriptEngine()
 
 bool minty::ScriptEngine::load_assembly(Path const& path, bool const referenceOnly)
 {
+	// if not found at path, do nothing
+	if (!std::filesystem::exists(path))
+	{
+		MINTY_ERROR_FORMAT("Assembly not found at \"{}\".", path.string());
+		return false;
+	}
+
 	String name = path.stem().string();
 
 	// delete old assembly if there is one
@@ -132,9 +139,9 @@ bool minty::ScriptEngine::load_assembly(Path const& path, bool const referenceOn
 		// register all Scripts with the EntityRegistry
 		for (auto const script : scriptAssembly->get_classes(scriptScriptClass))
 		{
-			if (script->is_derived_from(*scriptScriptClass))
+			if (script->is_derived_from(*scriptScriptClass) && script != scriptScriptClass)
 			{
-				Runtime::register_script(script->get_full_name());
+				Runtime::register_script(script->get_name());
 			}
 		}
 	}
@@ -570,17 +577,17 @@ ScriptClass const* minty::ScriptEngine::search_for_class(String const& name) con
 	return nullptr;
 }
 
-ScriptObject const& minty::ScriptEngine::create_object(ScriptClass const& script, UUID id) const
+ScriptObject& minty::ScriptEngine::create_object(ScriptClass const& script, UUID id)
 {
 	return _data.objects.emplace(id, ScriptObject(id, script)).first->second;
 }
 
-ScriptObject const& minty::ScriptEngine::create_object(ScriptClass const& script, UUID id, ScriptArguments& scriptArguments) const
+ScriptObject& minty::ScriptEngine::create_object(ScriptClass const& script, UUID id, ScriptArguments& scriptArguments)
 {
 	return _data.objects.emplace(id, ScriptObject(id, script, scriptArguments)).first->second;
 }
 
-ScriptObject const* minty::ScriptEngine::get_object(UUID id) const
+ScriptObject* minty::ScriptEngine::get_object(UUID id) const
 {
 	auto found = _data.objects.find(id);
 
@@ -592,28 +599,28 @@ ScriptObject const* minty::ScriptEngine::get_object(UUID id) const
 	return nullptr;
 }
 
-ScriptObject const& minty::ScriptEngine::get_or_create_object(UUID id, ScriptClass const& script) const
+ScriptObject& minty::ScriptEngine::get_or_create_object(UUID id, ScriptClass const& script)
 {
-	ScriptObject const* object = get_object(id);
+	ScriptObject* object = get_object(id);
 
 	if (object) return *object;
 
 	return create_object(script, id);
 }
 
-ScriptObject const& minty::ScriptEngine::get_or_create_object(UUID id, ScriptClass const& script, ScriptArguments& scriptArguments) const
+ScriptObject& minty::ScriptEngine::get_or_create_object(UUID id, ScriptClass const& script, ScriptArguments& scriptArguments)
 {
-	ScriptObject const* object = get_object(id);
+	ScriptObject* object = get_object(id);
 
 	if (object) return *object;
 
 	return create_object(script, id, scriptArguments);
 }
 
-ScriptObject const& minty::ScriptEngine::get_or_create_entity(UUID id) const
+ScriptObject& minty::ScriptEngine::get_or_create_entity(UUID id)
 {
 	// try get
-	ScriptObject const* entityObject = get_object(id);
+	ScriptObject* entityObject = get_object(id);
 
 	// if found, return this
 	if (entityObject) return *entityObject;
@@ -622,10 +629,10 @@ ScriptObject const& minty::ScriptEngine::get_or_create_entity(UUID id) const
 	return create_object_entity(id);
 }
 
-ScriptObject const& minty::ScriptEngine::get_or_create_component(UUID id, UUID const entityId, ScriptClass const& script) const
+ScriptObject& minty::ScriptEngine::get_or_create_component(UUID id, UUID const entityId, ScriptClass const& script)
 {
 	// try get
-	ScriptObject const* compObject = get_object(id);
+	ScriptObject* compObject = get_object(id);
 
 	if (compObject) return *compObject;
 
@@ -633,7 +640,7 @@ ScriptObject const& minty::ScriptEngine::get_or_create_component(UUID id, UUID c
 	return create_object_component(id, entityId, script);
 }
 
-ScriptObject const& minty::ScriptEngine::create_object_entity(UUID id) const
+ScriptObject& minty::ScriptEngine::create_object_entity(UUID id)
 {
 	// get the entity class
 	ScriptAssembly const* engineAssembly = get_assembly(ASSEMBLY_ENGINE_NAME);
@@ -645,12 +652,12 @@ ScriptObject const& minty::ScriptEngine::create_object_entity(UUID id) const
 	// create an instance of it
 	uint64_t rawId = static_cast<uint64_t>(id);
 	ScriptArguments args({ &rawId });
-	ScriptObject const& object = create_object(*entityClass, id, args);
+	ScriptObject& object = create_object(*entityClass, id, args);
 
 	return object;
 }
 
-ScriptObject const& minty::ScriptEngine::create_object_component(UUID id, UUID const entityId, ScriptClass const& script) const
+ScriptObject& minty::ScriptEngine::create_object_component(UUID id, UUID const entityId, ScriptClass const& script)
 {
 	// get the component class
 	ScriptAssembly const* engineAssembly = get_assembly(ASSEMBLY_ENGINE_NAME);
@@ -669,7 +676,7 @@ ScriptObject const& minty::ScriptEngine::create_object_component(UUID id, UUID c
 	MINTY_ASSERT(entityObject != nullptr);
 
 	// spawn the object and save the entity to it
-	ScriptObject const& object = create_object(script, id);
+	ScriptObject& object = create_object(script, id);
 	object.set_property("Entity", entityObject);
 
 	return object;
@@ -711,6 +718,36 @@ void minty::ScriptEngine::link_script(ScriptClass const& script)
 	_data.types[type] = &script;
 
 	Console::info(std::format("Linked {}.", script.get_full_name()));
+}
+
+void minty::ScriptEngine::register_script_id(UUID const id, String const& name)
+{
+	_idToName[id] = name;
+	_nameToId[name] = id;
+}
+
+String minty::ScriptEngine::get_name_from_script_id(UUID const id) const
+{
+	auto found = _idToName.find(id);
+
+	if (found == _idToName.end())
+	{
+		return Text::EMPTY;
+	}
+
+	return found->second;
+}
+
+UUID minty::ScriptEngine::get_id_from_script_name(String const& name) const
+{
+	auto found = _nameToId.find(name);
+
+	if (found == _nameToId.end())
+	{
+		return INVALID_UUID;
+	}
+
+	return found->second;
 }
 
 //

@@ -5,10 +5,10 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace TestProject
+public class Link : Script
 {
-    internal static class Session
+    private void OnLoad()
     {
-        public static InputMap InputMap { get; set; } = new InputMap();
+        Input.SetInputMap(Session.InputMap);
     }
 }

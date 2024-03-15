@@ -2,14 +2,13 @@
 #include "M_System.h"
 
 #include "M_Types.h"
+#include <unordered_map>
 
 namespace minty
 {
 	class ScriptSystem
 		: public System
 	{
-	private:
-
 	public:
 		ScriptSystem(Runtime& runtime, Scene& scene);
 

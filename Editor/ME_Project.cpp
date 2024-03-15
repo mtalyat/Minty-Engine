@@ -46,6 +46,11 @@ Path Project::get_build_path() const
 	return (_base / BUILD_DIRECTORY_NAME);
 }
 
+minty::Path mintye::Project::get_assembly_path() const
+{
+	return (_base / ASSEMBLY_DIRECTORY_NAME);
+}
+
 std::set<Path> mintye::Project::find_assets(std::unordered_set<minty::Path> const& extensions) const
 {
 	// output files

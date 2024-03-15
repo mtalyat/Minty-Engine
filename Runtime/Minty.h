@@ -15,6 +15,7 @@ access to the entire engine without needing include each file.
 #ifdef MINTY_IMGUI
 #include "M_ImGui.h"
 #endif
+#include "M_TinyXML.h"
 
 // ANIMATION
 #include "M_Animation.h"

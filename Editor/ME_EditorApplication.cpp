@@ -30,14 +30,15 @@
 //#include <string>
 #include <array>
 
-namespace fs = std::filesystem;
-
 #define CMAKE_PATH "C:/Users/mitch/source/repos/Minty-Engine/Editor/cmake/bin/cmake.exe"
 #define EditorApplication_NAME "TestProject"
 #define EXE_NAME std::string(EditorApplication_NAME).append(".exe")
 
+
+namespace fs = std::filesystem;
 using namespace mintye;
 using namespace minty;
+using namespace tinyxml2;
 
 EditorApplication::EditorApplication()
 	: Application()
@@ -77,7 +78,7 @@ void mintye::EditorApplication::init(RuntimeBuilder* b)
 	Window& window = get_window();
 	window.maximize();
 
-	load_assemblies({ "../Libraries/MintyEngine/bin/x64/Debug/MintyEngine.dll" });
+	load_assemblies({ "../Libraries/MintyEngine/bin/Debug/MintyEngine.dll" });
 
 	// TODO: remove this
 	// if the TestProject exists, open it by default
@@ -201,8 +202,7 @@ void mintye::EditorApplication::load_project(minty::Path const& path)
 	set_project(project);
 
 	// load assemblies
-	// C:\Users\mitch\source\repos\Minty-Engine\Projects\Tests\TestProject\Assembly\bin\Debug
-	get_runtime().get_script_engine().load_assembly(std::format("{0}/bin/x64/Debug/{0}.dll", project->get_name()));
+	get_runtime().get_script_engine().load_assembly(std::format("{}/bin/x64/Debug/{}.dll", ASSEMBLY_DIRECTORY_NAME, project->get_name()));
 
 	// load a scene, if any found
 	Path scenePath = project->find_asset(Project::CommonFileType::Scene);
@@ -252,6 +252,30 @@ void mintye::EditorApplication::create_new_project(minty::String const& name, mi
 		console->log_error(std::format("Failed to create Build folder in project path: {}", fullPath.string()));
 		return;
 	}
+	if (!fs::create_directory(fullPath / ASSEMBLY_DIRECTORY_NAME))
+	{
+		console->log_error(std::format("Failed to create Assembly folder in project path: {}", fullPath.string()));
+		return;
+	}
+
+	// create the C# project
+	console->run_command(std::format("cd {} && dotnet new classlib", (fullPath / ASSEMBLY_DIRECTORY_NAME).string()), true);
+
+	// modify it so it works with mono
+	String csprojPath = (fullPath / ASSEMBLY_DIRECTORY_NAME / std::format("{}.csproj", ASSEMBLY_DIRECTORY_NAME)).string();
+	XMLDocument csproj;
+	csproj.LoadFile(csprojPath.c_str());
+
+	XMLElement* projectNode = csproj.FirstChildElement("Project");
+
+	XMLNode* targetFrameworkVersion = projectNode->FirstChildElement("PropertyGroup")->FirstChild();
+
+	targetFrameworkVersion->SetValue("v4.7.2");
+
+	csproj.SaveFile(csprojPath.c_str());
+
+	// build it quick
+	console->run_command(std::format("cd {} && dotnet build", (fullPath / ASSEMBLY_DIRECTORY_NAME).string()), true);
 
 	// done
 	console->log(std::format("Created new project: {}", fullPath.string()));
@@ -719,8 +743,8 @@ void EditorApplication::generate_cmake(BuildInfo const& buildInfo)
 		"add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy C:/Libraries/Mono/lib/mono-2.0-sgen.dll ${CMAKE_CURRENT_BINARY_DIR}/" << buildInfo.get_config() << "/mono-2.0-sgen.dll)" << std::endl <<
 		"add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy C:/Libraries/Mono/lib/MonoPosixHelper.dll ${CMAKE_CURRENT_BINARY_DIR}/" << buildInfo.get_config() << "/MonoPosixHelper.dll)" << std::endl <<
 		"add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy C:/Libraries/Mono/lib/mscorlib.dll ${CMAKE_CURRENT_BINARY_DIR}/" << buildInfo.get_config() << "/mscorlib.dll)" << std::endl <<
-		"add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ../" << _project->get_name() << "/bin/x64/" << buildInfo.get_config() << "/MintyEngine.dll ${CMAKE_CURRENT_BINARY_DIR}/" << buildInfo.get_config() << "/MintyEngine.dll)" << std::endl <<
-		"add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ../" << _project->get_name() << "/bin/x64/" << buildInfo.get_config() << "/" << _project->get_name() << ".dll ${CMAKE_CURRENT_BINARY_DIR}/" << buildInfo.get_config() << "/" << _project->get_name() << ".dll)" << std::endl <<
+		"add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ../" << ASSEMBLY_DIRECTORY_NAME << "/bin/" << buildInfo.get_config() << "/MintyEngine.dll ${CMAKE_CURRENT_BINARY_DIR}/" << buildInfo.get_config() << "/MintyEngine.dll)" << std::endl <<
+		"add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ../" << ASSEMBLY_DIRECTORY_NAME << "/bin/" << buildInfo.get_config() << "/" << _project->get_name() << ".dll ${CMAKE_CURRENT_BINARY_DIR}/" << buildInfo.get_config() << "/" << _project->get_name() << ".dll)" << std::endl <<
 		// include and link Vulkan
 		"include_directories(${Vulkan_INCLUDE_DIRS})" << std::endl <<
 		// target and link the MintyRuntime.lib
@@ -832,6 +856,126 @@ void mintye::EditorApplication::generate_application_data(BuildInfo const& build
 	file.close();
 }
 
+void mintye::EditorApplication::generate_wraps(BuildInfo const& buildInfo)
+{
+	// TODO: split into multile wrap files if needed
+
+	Path output = _project->get_build_path() / buildInfo.get_config();
+
+	// for now:
+	// compile all game files/assets into two wrap files
+
+	// game data
+	Wrap gameWrap(output / String("game").append(WRAP_EXTENSION), "Game", 1);
+	String appFileName = String("game").append(APPLICATION_EXTENSION);
+	Path appPath = _project->get_build_path() / appFileName;
+	gameWrap.emplace(appPath, appFileName);
+
+	// game assets
+	Wrap assetWrap(output / String("assets").append(WRAP_EXTENSION), ASSETS_DIRECTORY_NAME, static_cast<uint32_t>(_project->get_asset_count()), ASSETS_DIRECTORY_NAME);
+	_project->wrap_assets(assetWrap);
+}
+
+void mintye::EditorApplication::generate_assembly(BuildInfo const& buildInfo)
+{
+	ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console");
+
+	if (!_project)
+	{
+		console->log_error("Cannot generate main: no project loaded.");
+		return;
+	}
+
+	// get path to cmake file
+	std::string path = (std::filesystem::path(_project->get_assembly_path()) / "Assembly.csproj").string();
+
+	// open file to overwrite
+	std::ofstream file(path, std::ios::trunc);
+
+	// if not open, error
+	if (!file.is_open())
+	{
+		minty::Console::error(std::string("Could not open assembly csproj file: ") + path);
+		return;
+	}
+
+	// get timestamp
+	const auto now = std::chrono::system_clock::now();
+
+	Info const& projectInfo = _project->get_info();
+
+	// write contents
+	file
+		<< "<?xml version=\"1.0\" encoding=\"utf-8\"?>" << std::endl
+		<< "<Project ToolsVersion=\"15.0\" xmlns=\"http://schemas.microsoft.com/developer/msbuild/2003\">" << std::endl
+		<< "  <Import Project=\"$(MSBuildExtensionsPath)\\$(MSBuildToolsVersion)\\Microsoft.Common.props\" Condition=\"Exists('$(MSBuildExtensionsPath)\\$(MSBuildToolsVersion)\\Microsoft.Common.props')\" />" << std::endl
+		<< "  <PropertyGroup>" << std::endl
+		<< "    <Configuration Condition=\" '$(Configuration)' == '' \">Debug</Configuration>" << std::endl
+		<< "    <Platform Condition=\" '$(Platform)' == '' \">AnyCPU</Platform>" << std::endl
+		<< "    <ProjectGuid>{9586B4AD-3861-4962-A65A-9E0C1E5D164B}</ProjectGuid>" << std::endl
+		<< "    <OutputType>Library</OutputType>" << std::endl
+		<< "    <AppDesignerFolder>Properties</AppDesignerFolder>" << std::endl
+		<< "    <RootNamespace></RootNamespace>" << std::endl
+		<< "    <AssemblyName>" << _project->get_name() << "</AssemblyName>" << std::endl
+		<< "    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>" << std::endl
+		<< "    <FileAlignment>512</FileAlignment>" << std::endl
+		<< "    <Deterministic>true</Deterministic>" << std::endl
+		<< "    <TargetFrameworkProfile />" << std::endl
+		<< "  </PropertyGroup>" << std::endl
+		<< "  <PropertyGroup Condition=\"'$(Configuration)|$(Platform)' == 'Debug|x64'\">" << std::endl
+		<< "    <DebugSymbols>true</DebugSymbols>" << std::endl
+		<< "    <OutputPath>bin\\Debug\\</OutputPath>" << std::endl
+		<< "    <DefineConstants>DEBUG;TRACE</DefineConstants>" << std::endl
+		<< "    <DebugType>full</DebugType>" << std::endl
+		<< "    <PlatformTarget>x64</PlatformTarget>" << std::endl
+		<< "    <LangVersion>7.3</LangVersion>" << std::endl
+		<< "    <ErrorReport>prompt</ErrorReport>" << std::endl
+		<< "  </PropertyGroup>" << std::endl
+		<< "  <PropertyGroup Condition=\"'$(Configuration)|$(Platform)' == 'Release|x64'\">" << std::endl
+		<< "    <OutputPath>bin\\Release\\</OutputPath>" << std::endl
+		<< "    <DefineConstants>TRACE</DefineConstants>" << std::endl
+		<< "    <Optimize>true</Optimize>" << std::endl
+		<< "    <DebugType>pdbonly</DebugType>" << std::endl
+		<< "    <PlatformTarget>x64</PlatformTarget>" << std::endl
+		<< "    <LangVersion>7.3</LangVersion>" << std::endl
+		<< "    <ErrorReport>prompt</ErrorReport>" << std::endl
+		<< "  </PropertyGroup>" << std::endl
+		<< "  <ItemGroup>" << std::endl
+		<< "    <Reference Include=\"MintyEngine, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL\">" << std::endl
+		<< "      <SpecificVersion>False</SpecificVersion>" << std::endl
+		<< "      <HintPath>..\\..\\..\\..\\Libraries\\MintyEngine\\bin\\Debug\\MintyEngine.dll</HintPath>" << std::endl
+		<< "    </Reference>" << std::endl
+		<< "    <Reference Include=\"System\" />" << std::endl
+		<< "    <Reference Include=\"System.Core\" />" << std::endl
+		<< "    <Reference Include=\"System.Xml.Linq\" />" << std::endl
+		<< "    <Reference Include=\"System.Data.DataSetExtensions\" />" << std::endl
+		<< "    <Reference Include=\"Microsoft.CSharp\" />" << std::endl
+		<< "    <Reference Include=\"System.Data\" />" << std::endl
+		<< "    <Reference Include=\"System.Net.Http\" />" << std::endl
+		<< "    <Reference Include=\"System.Xml\" />" << std::endl
+		<< "  </ItemGroup>" << std::endl
+		<< "  <ItemGroup>" << std::endl;
+		//<< "    <Compile Include=\"..\Assets\Scripts\CameraController.cs\" />" << std::endl
+		//<< "    <Compile Include=\"..\Assets\Scripts\Link.cs\" />" << std::endl
+		//<< "    <Compile Include=\"..\Assets\Scripts\PlayerController.cs\" />" << std::endl
+		//<< "    <Compile Include=\"..\Assets\Scripts\Session.cs\" />" << std::endl
+		//<< "    <Compile Include=\"..\Assets\Scripts\TestScript.cs\" />" << std::endl
+		//<< "    <Compile Include=\"Properties\AssemblyInfo.cs\" />" << std::endl
+
+	// write all c# file paths
+	for (auto const& path : _project->find_assets(Project::CommonFileType::Script))
+	{
+		file << "    <Compile Include=\"..\\" << path.string() << "\" />" << std::endl;
+	}
+
+	file
+		<< "  </ItemGroup>" << std::endl
+		<< "  <Import Project=\"$(MSBuildToolsPath)\\Microsoft.CSharp.targets\" />" << std::endl
+		<< "</Project>" << std::endl;
+
+	file.close();
+}
+
 void EditorApplication::clean_project()
 {
 	ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console");
@@ -874,6 +1018,10 @@ void EditorApplication::build_project(BuildInfo const& buildInfo)
 
 	generate_application_data(buildInfo);
 
+	console->log_important("\tgenerating assembly...");
+
+	generate_assembly(buildInfo);
+
 	console->log_important("\tgenerating wrap files...");
 
 	generate_wraps(buildInfo);
@@ -882,9 +1030,12 @@ void EditorApplication::build_project(BuildInfo const& buildInfo)
 
 	std::string command = "cd " + _project->get_build_path().string() + " && " + std::filesystem::absolute(CMAKE_PATH).string();
 	console->run_commands({
-		// make cmake files if needed
+		// build C# assembly
+		// https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-build
+		"cd " + _project->get_assembly_path().string() + " && dotnet build -c " + buildInfo.get_config() + " /p:Platform=x64",
+		// create cmake files if needed
 		command + " .",
-		// build program
+		// build program with cmake
 		command + " --build . --config " + buildInfo.get_config(),
 		});
 }
@@ -903,24 +1054,4 @@ void EditorApplication::run_project(BuildInfo const& buildInfo)
 
 	// call executable, pass in project path as argument for the runtime, so it knows what to run
 	console->run_command("cd " + _project->get_build_path().string() + " && cd " + buildInfo.get_config() + " && call " + EXE_NAME);
-}
-
-void mintye::EditorApplication::generate_wraps(BuildInfo const& buildInfo)
-{
-	// TODO: split into multile wrap files if needed
-
-	Path output = _project->get_build_path() / buildInfo.get_config();
-
-	// for now:
-	// compile all game files/assets into two wrap files
-
-	// game data
-	Wrap gameWrap(output / String("game").append(WRAP_EXTENSION), "Game", 1);
-	String appFileName = String("game").append(APPLICATION_EXTENSION);
-	Path appPath = _project->get_build_path() / appFileName;
-	gameWrap.emplace(appPath, appFileName);
-
-	// game assets
-	Wrap assetWrap(output / String("assets").append(WRAP_EXTENSION), ASSETS_DIRECTORY_NAME, static_cast<uint32_t>(_project->get_asset_count()), ASSETS_DIRECTORY_NAME);
-	_project->wrap_assets(assetWrap);
 }

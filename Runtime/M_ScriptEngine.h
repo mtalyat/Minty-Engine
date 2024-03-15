@@ -39,6 +39,9 @@ namespace minty
 		MonoDomain* _rootDomain;
 		MonoDomain* _appDomain;
 		std::unordered_map<String, ScriptAssembly*> _assemblies;
+
+		std::unordered_map<UUID, String> _idToName;
+		std::unordered_map<String, UUID> _nameToId;
 	public:
 		ScriptEngine(Runtime& runtime);
 
@@ -157,23 +160,23 @@ namespace minty
 
 		ScriptClass const* search_for_class(String const& name) const;
 
-		ScriptObject const& create_object(ScriptClass const& script, UUID id) const;
+		ScriptObject& create_object(ScriptClass const& script, UUID id);
 
-		ScriptObject const& create_object(ScriptClass const& script, UUID id, ScriptArguments& scriptArguments) const;
+		ScriptObject& create_object(ScriptClass const& script, UUID id, ScriptArguments& scriptArguments);
 
-		ScriptObject const* get_object(UUID id) const;
+		ScriptObject* get_object(UUID id) const;
 
-		ScriptObject const& get_or_create_object(UUID id, ScriptClass const& script) const;
+		ScriptObject& get_or_create_object(UUID id, ScriptClass const& script);
 
-		ScriptObject const& get_or_create_object(UUID id, ScriptClass const& script, ScriptArguments& scriptArguments) const;
+		ScriptObject& get_or_create_object(UUID id, ScriptClass const& script, ScriptArguments& scriptArguments);
 
-		ScriptObject const& get_or_create_entity(UUID id) const;
+		ScriptObject& get_or_create_entity(UUID id);
 
-		ScriptObject const& get_or_create_component(UUID id, UUID const entityId, ScriptClass const& script) const;
+		ScriptObject& get_or_create_component(UUID id, UUID const entityId, ScriptClass const& script);
 
-		ScriptObject const& create_object_entity(UUID id) const;
+		ScriptObject& create_object_entity(UUID id);
 
-		ScriptObject const& create_object_component(UUID id, UUID const entityId, ScriptClass const& script) const;
+		ScriptObject& create_object_component(UUID id, UUID const entityId, ScriptClass const& script);
 
 		void destroy_object(UUID id);
 
@@ -181,6 +184,17 @@ namespace minty
 		static void link_script(String const& fullName);
 
 		static void link_script(ScriptClass const& script);
+
+#pragma endregion
+
+#pragma region IDs
+
+	public:
+		void register_script_id(UUID const id, String const& name);
+
+		String get_name_from_script_id(UUID const id) const;
+
+		UUID get_id_from_script_name(String const& name) const;
 
 #pragma endregion
 

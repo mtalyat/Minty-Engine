@@ -51,9 +51,9 @@ namespace mintye
 		/// </summary>
 		void clear();
 
-		void run_command(std::string const& command);
+		void run_command(std::string const& command, bool const wait = false);
 
-		void run_commands(std::vector<std::string> const& commands);
+		void run_commands(std::vector<std::string> const& commands, bool const wait = false);
 
 		/// <summary>
 		/// Checks if a command is running in the Console.

@@ -274,6 +274,7 @@
     <ClInclude Include="M_SpritePushData.h" />
     <ClInclude Include="M_TagComponent.h" />
     <ClInclude Include="M_Time.h" />
+    <ClInclude Include="M_TinyXML.h" />
     <ClInclude Include="M_TypeRegister.h" />
     <ClInclude Include="M_UIPushData.h" />
     <ClInclude Include="M_RenderSystem.h" />
@@ -390,6 +391,7 @@
     <ClInclude Include="soloud_wavstream.h" />
     <ClInclude Include="stb_vorbis.h" />
     <ClInclude Include="M_Vulkan.h" />
+    <ClInclude Include="tinyxml2.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp" />
@@ -528,6 +530,7 @@
     <ClCompile Include="soloud_wav.cpp" />
     <ClCompile Include="soloud_wavstream.cpp" />
     <ClCompile Include="stb_vorbis.cpp" />
+    <ClCompile Include="tinyxml2.cpp" />
     <ClCompile Include="vulkan.cpp" />
   </ItemGroup>
   <ItemGroup>

@@ -6,6 +6,10 @@
 #include "M_EnabledComponent.h"
 #include "M_ScriptObject.h"
 #include "M_EntityRegistry.h"
+#include "M_Runtime.h"
+#include "M_ScriptEngine.h"
+#include "M_AssetEngine.h"
+#include "M_Reader.h"
 
 using namespace minty;
 
@@ -74,5 +78,18 @@ void minty::ScriptSystem::unload()
 
 void minty::ScriptSystem::deserialize(Reader const& reader)
 {
+	// load all of the scripts and their ids
+	std::vector<Path> paths;
+	reader.read_vector("scripts", paths);
 
+	ScriptEngine& scripts = get_runtime().get_script_engine();
+	AssetEngine& assets = get_runtime().get_asset_engine();
+	
+	for (Path const& path : paths)
+	{
+		// get meta, id
+		Node meta = assets.read_file_meta(path);
+		UUID id = meta.to_uuid();
+		scripts.register_script_id(id, path.stem().string());
+	}
 }

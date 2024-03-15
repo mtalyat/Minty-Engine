@@ -92,6 +92,12 @@ namespace mintye
 		minty::Path get_build_path() const;
 
 		/// <summary>
+		/// Gets the Assembly folder path for this project.
+		/// </summary>
+		/// <returns></returns>
+		minty::Path get_assembly_path() const;
+
+		/// <summary>
 		/// Finds all assets within this Project that have the extensions.
 		/// </summary>
 		/// <param name="extensions">The extensions for the asset type.</param>

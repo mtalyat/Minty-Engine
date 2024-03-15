@@ -17,6 +17,9 @@ namespace minty
 		: public Component
 	{
 		Register<ScriptObject> scripts;
+
+		void serialize(Writer& writer) const override;
+		void deserialize(Reader const& reader) override;
 	};
 
 	/// <summary>

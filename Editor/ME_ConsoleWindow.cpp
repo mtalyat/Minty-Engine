@@ -135,7 +135,7 @@ void mintye::ConsoleWindow::clear()
 	_lines.clear();
 }
 
-void mintye::ConsoleWindow::run_command(std::string const& command)
+void mintye::ConsoleWindow::run_command(std::string const& command, bool const wait)
 {
 	// check if editor command
 	auto found = _editorCommands.find(command);
@@ -147,10 +147,10 @@ void mintye::ConsoleWindow::run_command(std::string const& command)
 	}
 	
 	// run command on system instead
-	run_commands({ command });
+	run_commands({ command }, wait);
 }
 
-void mintye::ConsoleWindow::run_commands(std::vector<std::string> const& commands)
+void mintye::ConsoleWindow::run_commands(std::vector<std::string> const& commands, bool const wait)
 {
 	// lock and add to queue
 	_commandsLock.lock();
@@ -162,8 +162,8 @@ void mintye::ConsoleWindow::run_commands(std::vector<std::string> const& command
 		_commandsThreadRunning = true;
 		std::thread thread(&ConsoleWindow::execute_commands, this);
 		_commandsLock.unlock();
-		//thread.join();
-		thread.detach();
+		if(wait) thread.join();
+		else thread.detach();
 	}
 	else
 	{

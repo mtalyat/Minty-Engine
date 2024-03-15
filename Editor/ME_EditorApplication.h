@@ -158,6 +158,8 @@ namespace mintye
 
 		void generate_wraps(BuildInfo const& buildInfo);
 
+		void generate_assembly(BuildInfo const& buildInfo);
+
 		/// <summary>
 		/// Generates and updates the cmake file for the target project.
 		/// </summary>

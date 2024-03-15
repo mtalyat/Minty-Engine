@@ -41,119 +41,131 @@ systems
 			- "Assets/Animations/animator.manimator"
 			- "Assets/Animations/animator2.manimator"
 	Script
+		scripts
+			- "Assets/Scripts/CameraController.cs"
+			- "Assets/Scripts/Link.cs"
+			- "Assets/Scripts/PlayerController.cs"
+			- "Assets/Scripts/Session.cs"
+			- "Assets/Scripts/TestScript.cs"
 entities
 	Model Center: 2400de2c92f041ed
-		MintyEngine.Transform
+		Transform
 			position: (0, 0, 0)
 			rotation: (0, 0, 0)
 			scale: (1, 1, 1)
-		MintyEngine.Enabled
-		MintyEngine.Renderable
-		MintyEngine.Mesh
+		Enabled
+		Renderable
+		Mesh
 			type: CUBE
 			material: decef49af1cbe3d9
-		MintyEngine.AudioSource
+		AudioSource
 			volume: 1
 			clip: 0
 			attenuation: 1
 			near: 1
 			far: 100
-		MintyEngine.Relationship
+		Relationship
 			parent: 0
-		TestProject.TestScript
+		Script
+			- c5bbd244d3aafdbf
+				time: 5.0
 	Model Negative Z: c4f4d4fe682f0d64
-		MintyEngine.Transform
+		Transform
 			position: (0, 0, -2)
 			rotation: (0, 0, 0)
 			scale: (1, 1, 1)
-		MintyEngine.Enabled
-		MintyEngine.Renderable
-		MintyEngine.Mesh
+		Enabled
+		Renderable
+		Mesh
 			type: CUBE
 			material: decef49af1cbe3d9
-		MintyEngine.Relationship
+		Relationship
 			parent: 2400de2c92f041ed
 	Model Positive Z: 7fbaa46deceeb2b5
-		MintyEngine.Transform
+		Transform
 			position: (0, 0, 2)
 			rotation: (0, 0, 0)
 			scale: (1, 1, 1)
-		MintyEngine.Enabled
-		MintyEngine.Renderable
-		MintyEngine.Mesh
+		Enabled
+		Renderable
+		Mesh
 			type: CUBE
 			material: decef49af1cbe3d9
-		MintyEngine.Relationship
+		Relationship
 			parent: 2400de2c92f041ed
 	Model Negative X: 46985c6913d94cb5
-		MintyEngine.Transform
+		Transform
 			position: (-2, 0, 0)
 			rotation: (0, 0, 0)
 			scale: (1, 1, 1)
-		MintyEngine.Enabled
-		MintyEngine.Renderable
-		MintyEngine.Mesh
+		Enabled
+		Renderable
+		Mesh
 			type: CYLINDER
 			material: decef49af1cbe3d9
-		MintyEngine.Relationship
+		Relationship
 			parent: 2400de2c92f041ed
 	Model Positive X: d2d21b1dbd0dc426
-		MintyEngine.Transform
+		Transform
 			position: (2, 0, 0)
 			rotation: (0, 0, 0)
 			scale: (1, 1, 1)
-		MintyEngine.Enabled
-		MintyEngine.Renderable
-		MintyEngine.Mesh
+		Enabled
+		Renderable
+		Mesh
 			type: CYLINDER
 			material: decef49af1cbe3d9
-		MintyEngine.Relationship
+		Relationship
 			parent: 2400de2c92f041ed
 	Model Negative Y: 929aa3c41974fc4c
-		MintyEngine.Transform
+		Transform
 			position: (0, -2, 0)
 			rotation: (0, 0, 0)
 			scale: (1, 1, 1)
-		MintyEngine.Enabled
-		MintyEngine.Renderable
-		MintyEngine.Mesh
+		Enabled
+		Renderable
+		Mesh
 			type: SPHERE
 			material: decef49af1cbe3d9
-		MintyEngine.Relationship
+		Relationship
 			parent: 2400de2c92f041ed
 	Model Positive Y: af00215d6e2a1fcd
-		MintyEngine.Transform
+		Transform
 			position: (0, 2, 0)
 			rotation: (0, 0, 0)
 			scale: (1, 1, 1)
-		MintyEngine.Enabled
-		MintyEngine.Renderable
-		MintyEngine.Mesh
+		Enabled
+		Renderable
+		Mesh
 			type: SPHERE
 			material: decef49af1cbe3d9
-		MintyEngine.Relationship
+		Relationship
 			parent: 2400de2c92f041ed
 	Big Ball: b620841e2d57dd79
-		MintyEngine.Transform
+		Transform
 			position: (0, -4, 0)
 			rotation: (0, 0, 0)
 			scale: (2, 2, 2)
-		MintyEngine.Enabled
-		MintyEngine.Renderable
-		MintyEngine.Mesh
+		Enabled
+		Renderable
+		Mesh
 			type: SPHERE
 			material: decef49af1cbe3d9
-		MintyEngine.Relationship
+		Relationship
 			parent: 0
 	Camera: 389d6462e322993a
-		MintyEngine.Transform
+		Transform
 			position: (0, 0, -4)
 			rotation: (0, 0, 0)
 			scale: (1, 1, 1)
-		MintyEngine.Enabled
-		MintyEngine.Camera
+		Enabled
+		Camera
 			perspective: PERSPECTIVE
 			fov: 60
 			near: 0.1
 			far: 100
-		MintyEngine.AudioListener
+		AudioListener
+		Script
+			- 8c21d2f1b8204371
+			- fd69c69ed1cb722
+			- 1c9f55f034939420
