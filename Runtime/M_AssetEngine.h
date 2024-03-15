@@ -54,11 +54,6 @@ namespace minty
 		std::vector<String> read_file_lines(Path const& path) const;
 
 	private:
-		Path fix_path(Path const& path) const;
-
-		// opens a physical OR virtual file based on the RunMode of the file at the given path
-		File* open_new_file(Path const& path) const;
-
 		void check(Path const& path, char const* extension, bool const requiresMeta) const;
 
 #pragma region Render
@@ -105,6 +100,13 @@ namespace minty
 		Animation* load_animation(Path const& path);
 
 		Animator* load_animator(Path const& path);
+
+#pragma endregion
+
+#pragma region Script
+
+	public:
+		Asset* load_script(Path const& path);
 
 #pragma endregion
 

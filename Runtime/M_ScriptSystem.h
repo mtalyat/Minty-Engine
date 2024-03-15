@@ -2,13 +2,16 @@
 #include "M_System.h"
 
 #include "M_Types.h"
-#include <unordered_map>
+#include <unordered_set>
 
 namespace minty
 {
 	class ScriptSystem
 		: public System
 	{
+	private:
+		std::unordered_set<UUID> _ids;
+
 	public:
 		ScriptSystem(Runtime& runtime, Scene& scene);
 

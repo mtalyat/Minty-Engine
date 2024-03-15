@@ -1203,23 +1203,8 @@ void minty::EntityRegistry::serialize_entity(Writer& writer, Entity const entity
 
 			String name = found->second;
 
-			// if this is a script component, serialize each script
-			if (ctype == entt::type_id<ScriptComponent>())
-			{
-				ScriptComponent const* scriptComponent = static_cast<ScriptComponent const*>(get_by_name(name, entity));
-
-				for (auto const& [id, obj] : scriptComponent->scripts)
-				{
-					// write the script object with its full name and serialized values
-					tempWriter.write(obj.get_class().get_full_name(), obj);
-				}
-			}
-			else
-			{
-
-				// write component with its name and serialized values
-				tempWriter.write(name, this->get_by_name(name, entity));
-			}
+			// write component with its name and serialized values
+			tempWriter.write(name, this->get_by_name(name, entity));
 		}
 	}
 }

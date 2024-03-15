@@ -10,11 +10,13 @@
 #include "M_ScriptEngine.h"
 #include "M_AssetEngine.h"
 #include "M_Reader.h"
+#include "M_Writer.h"
 
 using namespace minty;
 
 minty::ScriptSystem::ScriptSystem(Runtime& runtime, Scene& scene)
 	: System("Script", runtime, scene)
+	, _ids()
 {}
 
 void minty::ScriptSystem::load()
@@ -79,17 +81,13 @@ void minty::ScriptSystem::unload()
 void minty::ScriptSystem::deserialize(Reader const& reader)
 {
 	// load all of the scripts and their ids
-	std::vector<Path> paths;
-	reader.read_vector("scripts", paths);
+	register_assets("scripts", reader, [this](AssetEngine& engine, Path const& path)
+		{
+			Asset* asset = engine.load_script(path);
 
-	ScriptEngine& scripts = get_runtime().get_script_engine();
-	AssetEngine& assets = get_runtime().get_asset_engine();
-	
-	for (Path const& path : paths)
-	{
-		// get meta, id
-		Node meta = assets.read_file_meta(path);
-		UUID id = meta.to_uuid();
-		scripts.register_script_id(id, path.stem().string());
-	}
+			_ids.emplace(asset->get_id());
+			get_runtime().get_script_engine().register_script_id(asset->get_id(), path.stem().string());
+
+			return asset;
+		});
 }

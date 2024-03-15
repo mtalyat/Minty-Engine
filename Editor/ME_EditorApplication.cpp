@@ -202,7 +202,7 @@ void mintye::EditorApplication::load_project(minty::Path const& path)
 	set_project(project);
 
 	// load assemblies
-	get_runtime().get_script_engine().load_assembly(std::format("{}/bin/x64/Debug/{}.dll", ASSEMBLY_DIRECTORY_NAME, project->get_name()));
+	get_runtime().get_script_engine().load_assembly(std::format("{}/bin/Debug/{}.dll", ASSEMBLY_DIRECTORY_NAME, project->get_name()));
 
 	// load a scene, if any found
 	Path scenePath = project->find_asset(Project::CommonFileType::Scene);

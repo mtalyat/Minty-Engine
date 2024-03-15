@@ -629,6 +629,16 @@ Animator* minty::AssetEngine::load_animator(Path const& path)
 	return emplace_new(new Animator(builder, get_runtime()));
 }
 
+Asset* minty::AssetEngine::load_script(Path const& path)
+{
+	// load meta, get its id, that's it
+	check(path, SCRIPT_EXTENSION, true);
+
+	Node meta = read_file_meta(path);
+	
+	return emplace_new(new Asset(meta.to_uuid(), path, get_runtime()));
+}
+
 void minty::AssetEngine::unload(UUID const id)
 {
 	auto found = _assets.find(id);

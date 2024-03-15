@@ -147,7 +147,20 @@ void mintye::PropertiesWindow::draw_entity() const
 		// if the node is a script component, list all of the scripts instead
 		if (node.get_name() == "Script")
 		{
-			ImGui::Text(std::format("ScriptComponent##{}", i).c_str());
+			ScriptEngine& scriptEngine = get_runtime().get_script_engine();
+
+			// treat each script as a component
+			for (auto childNode : node.get_children())
+			{
+				// replace ID with script name
+				childNode.set_name(scriptEngine.get_name_from_script_id(childNode.to_uuid()));
+				childNode.set_data(Text::EMPTY);
+
+				// treat as normal component
+				draw_component(childNode, i, scene, registry);
+
+				i += OFFSET;
+			}
 		}
 		else
 		{

@@ -43,6 +43,7 @@ void minty::ScriptComponent::serialize(Writer& writer) const
 		Node node("", to_string(scriptEngine.get_id_from_script_name(object.get_class().get_name())));
 		Writer scriptWriter(node, data);
 		object.serialize(scriptWriter);
+		writer.write(node);
 	}
 }
 

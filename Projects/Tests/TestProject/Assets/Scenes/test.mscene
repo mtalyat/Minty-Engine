@@ -1,11 +1,5 @@
 : ca92a9b8e0eda87b
 systems
-	Audio
-		clips
-			- "Assets/Audio/blinking-forest.wav"
-			- "Assets/Audio/cow-bells.wav"
-			- "Assets/Audio/ding.wav"
-			- "Assets/Audio/dong.wav"
 	Render
 		textures
 			- "Assets/Textures/oak_planks.png"
@@ -47,12 +41,21 @@ systems
 			- "Assets/Scripts/PlayerController.cs"
 			- "Assets/Scripts/Session.cs"
 			- "Assets/Scripts/TestScript.cs"
+	Audio
+		clips
+			- "Assets/Audio/blinking-forest.wav"
+			- "Assets/Audio/cow-bells.wav"
+			- "Assets/Audio/ding.wav"
+			- "Assets/Audio/dong.wav"
 entities
 	Model Center: 2400de2c92f041ed
 		Transform
 			position: (0, 0, 0)
 			rotation: (0, 0, 0)
 			scale: (1, 1, 1)
+		Script
+			- c5bbd244d3aafdbf
+				time: 5
 		Enabled
 		Renderable
 		Mesh
@@ -66,9 +69,6 @@ entities
 			far: 100
 		Relationship
 			parent: 0
-		Script
-			- c5bbd244d3aafdbf
-				time: 5.0
 	Model Negative Z: c4f4d4fe682f0d64
 		Transform
 			position: (0, 0, -2)
@@ -158,6 +158,9 @@ entities
 			position: (0, 0, -4)
 			rotation: (0, 0, 0)
 			scale: (1, 1, 1)
+		Script
+			- 8c21d2f1b8204371
+			- 1c9f55f034939420
 		Enabled
 		Camera
 			perspective: PERSPECTIVE
@@ -165,7 +168,3 @@ entities
 			near: 0.1
 			far: 100
 		AudioListener
-		Script
-			- 8c21d2f1b8204371
-			- fd69c69ed1cb722
-			- 1c9f55f034939420

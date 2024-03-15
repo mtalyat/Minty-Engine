@@ -19,7 +19,7 @@ namespace minty
 		: public SceneObject
 	{
 	protected:
-		typedef std::function<Asset*(AssetEngine& engine, Path const&)> RegisterFunc;
+		typedef std::function<Asset*(AssetEngine& engine, Path const& path)> RegisterFunc;
 
 		struct RegisteredAsset
 		{
