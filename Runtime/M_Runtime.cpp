@@ -262,6 +262,12 @@ void minty::Runtime::destroy()
 
 	MINTY_DELETE(_sceneManager);
 
+	// destroy asset engine, then others
+	AssetEngine* assets = _engines.at<AssetEngine>();
+	_engines.erase<AssetEngine>();
+	delete assets;
+
+	// delete others
 	for (auto const engine : _engines)
 	{
 		delete engine;

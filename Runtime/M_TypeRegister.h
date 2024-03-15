@@ -162,7 +162,7 @@ namespace minty
 	template<class U>
 	U* TypeRegister<T>::at() const
 	{
-		MINTY_ASSERT_MESSAGE(contains(), std::format("Type U ({1}) is not part of this TypeRegister.", typeid(T).name(), typeid(U).name()));
+		MINTY_ASSERT_MESSAGE(contains<U>(), std::format("Type U ({1}) is not part of this TypeRegister.", typeid(T).name(), typeid(U).name()));
 
 		return static_cast<U*>(_values.at(_lookup.at(typeid(U))));
 	}
