@@ -92,6 +92,8 @@ namespace minty
 		/// <param name="renderer"></param>
 		ShaderPass(ShaderPassBuilder const& builder, Runtime& engine);
 
+		~ShaderPass();
+
 		/// <summary>
 		/// Destroys all of the resources associated with this ShaderPass.
 		/// </summary>

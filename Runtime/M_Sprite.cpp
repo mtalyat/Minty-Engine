@@ -36,6 +36,11 @@ minty::Sprite::Sprite(SpriteBuilder const& builder, Runtime& engine)
 	set_pivot(builder.pivot, builder.coordinateMode);
 }
 
+minty::Sprite::~Sprite()
+{
+	destroy();
+}
+
 void minty::Sprite::destroy()
 {}
 

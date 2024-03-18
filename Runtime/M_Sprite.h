@@ -70,6 +70,8 @@ namespace minty
 
 		Sprite(SpriteBuilder const& builder, Runtime& engine);
 
+		~Sprite();
+
 		/// <summary>
 		/// Destroys all of the resources associated with this Sprite.
 		/// </summary>

@@ -36,7 +36,7 @@ namespace minty
 	public:
 		AssetEngine(Runtime& runtime);
 
-		~AssetEngine();
+		virtual ~AssetEngine();
 
 #pragma region Loading
 

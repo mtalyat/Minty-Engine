@@ -130,7 +130,7 @@ namespace minty
 		/// </summary>
 		RenderEngine(Runtime& runtime);
 
-		~RenderEngine();
+		virtual ~RenderEngine();
 
 		/// <summary>
 		/// Checks if this RenderEngine has been initialized.
@@ -200,7 +200,6 @@ namespace minty
 		void set_viewport(Viewport const& viewport);
 
 #pragma endregion
-
 
 #pragma region Init
 

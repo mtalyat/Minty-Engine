@@ -80,6 +80,8 @@ namespace minty
 		/// <param name="renderer"></param>
 		Texture(TextureBuilder const& builder, Runtime& engine);
 
+		~Texture();
+
 		/// <summary>
 		/// Destroys all of the resources associated with this Texture.
 		/// </summary>

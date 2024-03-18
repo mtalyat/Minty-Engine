@@ -23,7 +23,7 @@ namespace minty
 		/// </summary>
 		AudioEngine(Runtime& runtime);
 
-		~AudioEngine();
+		virtual ~AudioEngine();
 
 		void set_listener_parameters(Vector3 const position, Vector3 const forward, Vector3 const up, Vector3 const velocity);
 

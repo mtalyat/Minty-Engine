@@ -57,9 +57,18 @@ minty::Material::Material(MaterialBuilder const& builder, Runtime& engine)
 	}
 }
 
+minty::Material::~Material()
+{
+	destroy();
+}
+
 void minty::Material::destroy()
 {
 	_template = nullptr;
+	for (auto& set : _passDescriptorSets)
+	{
+		set.destroy();
+	}
 	_passDescriptorSets.clear();
 }
 

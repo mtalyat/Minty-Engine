@@ -128,7 +128,7 @@ Texture::Texture(TextureBuilder const& builder, Runtime& engine)
 	renderEngine.change_image_layout(_image, _format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
 	// copy pixel data to image
-	renderEngine.copy_buffer_to_image(stagingBuffer.buffer, _image, _width, _height);
+	renderEngine.copy_buffer_to_image(stagingBuffer.get_buffer(), _image, _width, _height);
 
 	// prep texture for rendering
 	renderEngine.change_image_layout(_image, _format, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);
@@ -177,16 +177,31 @@ Texture::Texture(TextureBuilder const& builder, Runtime& engine)
 	}
 }
 
+minty::Texture::~Texture()
+{
+	destroy();
+}
+
 void minty::Texture::destroy()
 {
+	if (!_width && !_height) return; // already destroyed
+
 	RenderEngine& renderer = get_runtime().get_render_engine();
 
-	auto device = renderer.get_device();
+	VkDevice device = renderer.get_device();
 
 	vkDestroySampler(device, _sampler, nullptr);
 	vkDestroyImageView(device, _view, nullptr);
 	vkDestroyImage(device, _image, nullptr);
 	vkFreeMemory(device, _memory, nullptr);
+
+	_width = 0;
+	_height = 0;
+	_format = VK_FORMAT_UNDEFINED;
+	_sampler = VK_NULL_HANDLE;
+	_view = VK_NULL_HANDLE;
+	_image = VK_NULL_HANDLE;
+	_memory = VK_NULL_HANDLE;
 }
 
 int minty::Texture::get_width() const

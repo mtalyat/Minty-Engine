@@ -65,7 +65,10 @@ void minty::DescriptorSet::destroy()
 		{
 			for (auto const id : data.second.at(i).ids)
 			{
-				renderer.destroy_buffer(assets.at<Buffer>(id));
+				if (Buffer* buffer = assets.get<Buffer>(id))
+				{
+					renderer.destroy_buffer(*buffer);
+				}
 			}
 		}
 	}
@@ -193,9 +196,9 @@ void minty::DescriptorSet::apply(int const frame)
 			// set buffer info
 			Buffer& buffer = assets.at<Buffer>(bufferId);
 			VkDescriptorBufferInfo& bufferInfo = bufferInfos.back();
-			bufferInfo.buffer = buffer.buffer;
+			bufferInfo.buffer = buffer.get_buffer();
 			bufferInfo.offset = 0;
-			bufferInfo.range = buffer.size;
+			bufferInfo.range = buffer.get_size();
 
 			// add buffer info to write
 			write.pBufferInfo = &bufferInfo;

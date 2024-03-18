@@ -21,6 +21,11 @@ minty::MaterialTemplate::MaterialTemplate(MaterialTemplateBuilder const& builder
 	, _defaultValues(builder.defaultValues)
 {}
 
+minty::MaterialTemplate::~MaterialTemplate()
+{
+	destroy();
+}
+
 void minty::MaterialTemplate::destroy()
 {
 	_shaderPasses.clear();

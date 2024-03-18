@@ -14,7 +14,9 @@ mintye::EditorApplicationRenderEngine::EditorApplicationRenderEngine(EditorAppli
 { }
 
 mintye::EditorApplicationRenderEngine::~EditorApplicationRenderEngine()
-{ }
+{
+	destroy();
+}
 
 void mintye::EditorApplicationRenderEngine::init(RenderEngineBuilder const& builder)
 {
@@ -148,7 +150,7 @@ void mintye::EditorApplicationRenderEngine::destroy()
 
 	// destroy ImGui
 	ImGui_ImplVulkan_Shutdown();
-	ImGui_ImplGlfw_Shutdown();
+	//ImGui_ImplGlfw_Shutdown();
 	ImGui::DestroyContext();
 
 	// destroy normal stuff

@@ -74,6 +74,8 @@ namespace minty
 		/// <param name="pipeline"></param>
 		Shader(ShaderBuilder const& builder, Runtime& engine);
 
+		~Shader();
+
 		/// <summary>
 		/// Destroys all of the resources associated with this Shader.
 		/// </summary>

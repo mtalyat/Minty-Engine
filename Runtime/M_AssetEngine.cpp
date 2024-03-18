@@ -687,10 +687,25 @@ void minty::AssetEngine::unload(Asset const& asset)
 
 void minty::AssetEngine::unload_all()
 {
-	for (auto const& pair : _assets)
+	// get all IDs into a vector that can be iterated over
+	std::vector<UUID> ids;
+	ids.reserve(_assets.size());
+	for (auto const& [uuid, asset] : _assets)
 	{
-		delete pair.second;
+		ids.push_back(uuid);
 	}
+
+	// iterate each id: erase and delete each asset
+	Asset* asset;
+	for (auto const id : ids)
+	{
+		if (asset = get_asset(id))
+		{
+			erase(id);
+			delete asset;
+		}
+	}
+
 	_assets.clear();
 	_assetsByType.clear();
 }

@@ -52,6 +52,8 @@ namespace minty
 		/// <param name="renderer"></param>
 		MaterialTemplate(MaterialTemplateBuilder const& builder, Runtime& engine);
 
+		~MaterialTemplate();
+
 		/// <summary>
 		/// Destroys all of the resources associated with this MaterialTemplate.
 		/// </summary>

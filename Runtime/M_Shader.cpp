@@ -77,11 +77,16 @@ minty::Shader::Shader(ShaderBuilder const& builder, Runtime& engine)
 	_descriptorSet = create_descriptor_set(DESCRIPTOR_SET_SHADER, true);
 }
 
+minty::Shader::~Shader()
+{
+	destroy();
+}
+
 void minty::Shader::destroy()
 {
 	RenderEngine& renderer = get_runtime().get_render_engine();
 
-	auto device = renderer.get_device();
+	VkDevice device = renderer.get_device();
 
 	_descriptorSet.destroy();
 	for (size_t i = 0; i < _descriptorSetLayouts.size(); i++)

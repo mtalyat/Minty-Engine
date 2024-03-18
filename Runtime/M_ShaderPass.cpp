@@ -4,6 +4,7 @@
 #include "M_Runtime.h"
 #include "M_RenderEngine.h"
 #include "M_RenderSystem.h"
+#include "M_AssetEngine.h"
 
 using namespace minty;
 using namespace minty;
@@ -28,10 +29,16 @@ minty::ShaderPass::ShaderPass(ShaderPassBuilder const& builder, Runtime& engine)
 	_descriptorSet = _shader->create_descriptor_set(DESCRIPTOR_SET_SHADER_PASS, true);
 }
 
+minty::ShaderPass::~ShaderPass()
+{
+	destroy();
+}
+
 void minty::ShaderPass::destroy()
 {
 	_shader = nullptr;
 	vkDestroyPipeline(get_runtime().get_render_engine().get_device(), _pipeline, nullptr);
+	_descriptorSet.destroy();
 }
 
 Shader* minty::ShaderPass::get_shader() const
