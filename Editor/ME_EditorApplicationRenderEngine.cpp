@@ -246,9 +246,6 @@ void mintye::EditorApplicationRenderEngine::draw(VkCommandBuffer commandBuffer)
 
 	// set to scene camera
 	set_camera(Vector3(0.0f, 0.0f, -10.0f), Quaternion(), Camera());
-
-	// draw normal stuff
-	RenderEngine::draw(commandBuffer);
 	
 	//// copy to scene image
 	//VkImageCopy copyRegion {};
@@ -264,6 +261,9 @@ void mintye::EditorApplicationRenderEngine::draw(VkCommandBuffer commandBuffer)
 
 	//draw application
 	_application->draw();
+
+	// draw normal stuff: will not draw if scene was closed automatically
+	RenderEngine::draw(commandBuffer);
 
 	// render ImGui
 	ImGui::Render();
