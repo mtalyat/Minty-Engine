@@ -148,6 +148,8 @@ void mintye::EditorApplicationRenderEngine::destroy()
 	//vkDestroyImage(_device, _sceneImage, nullptr);
 	//vkFreeMemory(_device, _sceneImageMemory, nullptr);
 
+	vkDestroyDescriptorPool(_device, _descriptorPool, nullptr);
+
 	// destroy ImGui
 	ImGui_ImplVulkan_Shutdown();
 	//ImGui_ImplGlfw_Shutdown();
