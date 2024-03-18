@@ -452,11 +452,11 @@ void mintye::EditorApplication::draw_menu_bar()
 
 	bool ctrl = ImGui::GetIO().KeyCtrl;
 
-	if (ctrl && ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_S), false))
+	if (_project && _sceneId.valid() && ctrl && ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_S), false))
 	{
 		save_scene();
 	}
-	if (ctrl && ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_O), false))
+	if (_project && ctrl && ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_O), false))
 	{
 		open_scene();
 	}
@@ -484,15 +484,15 @@ void mintye::EditorApplication::draw_menu_bar()
 
 			ImGui::Separator();
 
-			if (ImGui::MenuItem("Open Scene", "Ctrl+O"))
+			if (ImGui::MenuItem("Open Scene", "Ctrl+O", nullptr, _project))
 			{
 				open_scene();
 			}
-			if (ImGui::MenuItem("Save Scene", "Ctrl+S", nullptr, _sceneId.valid()))
+			if (ImGui::MenuItem("Save Scene", "Ctrl+S", nullptr, _project && _sceneId.valid()))
 			{
 				save_scene();
 			}
-			if (ImGui::MenuItem("Close Scene", nullptr, nullptr, _sceneId.valid()))
+			if (ImGui::MenuItem("Close Scene", nullptr, nullptr, _project && _sceneId.valid()))
 			{
 				close_scene();
 			}
