@@ -11,11 +11,13 @@ namespace mintye
 		{
 			None,
 			Entity,
+			Asset,
 		};
 
 	private:
 		TargetMode _targetMode;
 		minty::Entity _targetEntity;
+		minty::Asset* _targetAsset;
 
 	public:
 		PropertiesWindow(EditorApplication& application);
@@ -35,16 +37,29 @@ namespace mintye
 
 		void draw_component(minty::Node& node, size_t const i, minty::Scene* const scene, minty::EntityRegistry& registry) const;
 
+		void draw_asset() const;
+
 #pragma endregion
 
 #pragma region Target
 
 	public:
 		/// <summary>
+		/// Removes the target shown on the window.
+		/// </summary>
+		void clear_target();
+
+		/// <summary>
 		/// Sets the target to show on the window.
 		/// </summary>
 		/// <param name="entity"></param>
 		void set_target(minty::Entity const entity);
+
+		/// <summary>
+		/// Sets the target to show on the window.
+		/// </summary>
+		/// <param name="asset"></param>
+		void set_target(minty::Asset* const asset);
 
 #pragma endregion
 	};

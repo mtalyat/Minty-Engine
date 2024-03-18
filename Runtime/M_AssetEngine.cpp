@@ -139,6 +139,43 @@ bool minty::AssetEngine::check_if_no_meta(char const* extension)
 	return extension && ignore.contains(extension);
 }
 
+Asset* minty::AssetEngine::load_asset(Path const& path)
+{
+	Node node;
+
+	// if no meta, load direct file
+	// if meta, load that instead
+	if (check_if_no_meta(path.extension().string().c_str()))
+	{
+		node = read_file_node(path);
+	}
+	else
+	{
+		node = read_file_meta(path);
+	}
+
+	// read ID, create generic asset
+	return emplace_new(new Asset(node.to_uuid(), path, get_runtime()));
+}
+
+UUID minty::AssetEngine::load_id(Path const& path)
+{
+	Node node;
+
+	// if no meta, load direct file
+	// if meta, load that instead
+	if (check_if_no_meta(path.extension().string().c_str()))
+	{
+		node = read_file_node(path);
+	}
+	else
+	{
+		node = read_file_meta(path);
+	}
+
+	return node.to_uuid();
+}
+
 void minty::AssetEngine::check(Path const& path, char const* extension) const
 {
 	// can load if assets exists, and if no meta is required, or if a meta is required, it exists

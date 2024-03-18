@@ -62,6 +62,20 @@ namespace minty
 		/// <returns></returns>
 		static bool check_if_no_meta(char const* extension);
 
+		/// <summary>
+		/// Loads a generic Asset.
+		/// </summary>
+		/// <param name="path"></param>
+		/// <returns></returns>
+		Asset* load_asset(Path const& path);
+
+		/// <summary>
+		/// Loads just the UUID from the asset at the given path.
+		/// </summary>
+		/// <param name="path"></param>
+		/// <returns></returns>
+		UUID load_id(Path const& path);
+
 	private:
 		void check(Path const& path, char const* extension) const;
 

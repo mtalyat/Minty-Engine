@@ -367,8 +367,21 @@ void mintye::EditorApplication::open_asset(minty::Path const& path)
 	}
 	else
 	{
-		// cannot open in the editor, open on the OS
-		minty::Operations::open(path);
+		// open in properties
+		if (PropertiesWindow* properties = find_editor_window<PropertiesWindow>("Properties"))
+		{
+			// get the ID of the asset at the path
+			AssetEngine& assets = get_runtime().get_asset_engine();
+			UUID id = assets.load_id(path);
+			if (id.valid())
+			{
+				properties->set_target(assets.get_asset(id));
+			}
+			else
+			{
+				properties->clear_target();
+			}
+		}
 	}
 }
 

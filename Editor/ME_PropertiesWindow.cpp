@@ -31,6 +31,9 @@ void mintye::PropertiesWindow::draw()
 	case TargetMode::Entity:
 		draw_entity();
 		break;
+	case TargetMode::Asset:
+		draw_asset();
+		break;
 	default:
 		ImGui::Text(std::format("Error: Unknown target mode: {}", static_cast<int>(_targetMode)).c_str());
 		break;
@@ -242,8 +245,55 @@ void mintye::PropertiesWindow::draw_component(minty::Node& node, size_t const i,
 	ImGui::EndGroupBox(Vector2(width, 0.0f), Vector2(xMargin, yMargin));
 }
 
+void mintye::PropertiesWindow::draw_asset() const
+{
+	// TODO: do differently for specific asset types
+
+	// print name
+	ImGui::Text(_targetAsset->get_name().c_str());
+
+	ImGui::Separator();
+
+	// button ID to copy it
+	if (ImGui::Button(to_string(_targetAsset->get_id()).c_str()))
+	{
+		ImGui::SetClipboardText(to_string(_targetAsset->get_id()).c_str());
+	}
+
+	ImGui::SameLine();
+
+	// button to open the file
+	if (ImGui::Button("Open"))
+	{
+
+	}
+}
+
+void mintye::PropertiesWindow::clear_target()
+{
+	_targetMode = TargetMode::None;
+	_targetEntity = NULL_ENTITY;
+	_targetAsset = nullptr;
+}
+
 void mintye::PropertiesWindow::set_target(minty::Entity const entity)
 {
-	_targetMode = TargetMode::Entity;
-	_targetEntity = entity;
+	clear_target();
+
+	if (entity != NULL_ENTITY)
+	{
+		_targetMode = TargetMode::Entity;
+		_targetEntity = entity;
+	}
+}
+
+void mintye::PropertiesWindow::set_target(minty::Asset* const asset)
+{
+	clear_target();
+
+	if (asset)
+	{
+		_targetMode = TargetMode::Asset;
+		_targetAsset = asset;
+	}
 }
