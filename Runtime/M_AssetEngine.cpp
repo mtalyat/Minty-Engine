@@ -159,20 +159,7 @@ Asset* minty::AssetEngine::load_asset(Path const& path)
 
 UUID minty::AssetEngine::load_id(Path const& path)
 {
-	Node node;
-
-	// if no meta, load direct file
-	// if meta, load that instead
-	if (Asset::requires_meta(path.extension().string().c_str()))
-	{
-		node = read_file_meta(path);
-	}
-	else
-	{
-		node = read_file_node(path);
-	}
-
-	return node.to_uuid();
+	return read_file_meta(path).to_uuid();
 }
 
 void minty::AssetEngine::check(Path const& path) const
@@ -181,7 +168,7 @@ void minty::AssetEngine::check(Path const& path) const
 	// also needs to have the correct extension, if one was provided
 	MINTY_ASSERT(!path.empty());
 	MINTY_ASSERT_FORMAT(exists(path), "Path does not exist: {}", std::filesystem::absolute(path).string());
-	MINTY_ASSERT_FORMAT(!Asset::requires_meta(path) || exists(Asset::get_meta_path(path)), "Missing appropriate meta path for path: {}, missing meta path: {}", std::filesystem::absolute(path).string(), std::filesystem::absolute(Asset::get_meta_path(path)).string());
+	MINTY_ASSERT_FORMAT(exists(Asset::get_meta_path(path)), "Missing meta file for path: {}, missing meta path: {}", std::filesystem::absolute(path).string(), std::filesystem::absolute(Asset::get_meta_path(path)).string());
 }
 
 Node minty::AssetEngine::read_file_node(Path const& path) const
@@ -272,8 +259,9 @@ Sprite* minty::AssetEngine::load_sprite(Path const& path)
 {
 	check(path);
 
-	Node meta = read_file_node(path);
-	Reader reader(meta);
+	Node node = read_file_node(path);
+	Node meta = read_file_meta(path);
+	Reader reader(node);
 
 	SpriteBuilder builder
 	{
@@ -294,7 +282,8 @@ Shader* minty::AssetEngine::load_shader(Path const& path)
 {
 	check(path);
 
-	Node meta = read_file_node(path);
+	Node node = read_file_node(path);
+	Node meta = read_file_meta(path);
 
 	ShaderBuilder builder
 	{
@@ -302,7 +291,7 @@ Shader* minty::AssetEngine::load_shader(Path const& path)
 		.path = path,
 	};
 
-	std::vector<Node const*> nodes = meta.find_all("push");
+	std::vector<Node const*> nodes = node.find_all("push");
 	for (Node const* child : nodes)
 	{
 		PushConstantInfo pushConstantInfo;
@@ -316,7 +305,7 @@ Shader* minty::AssetEngine::load_shader(Path const& path)
 		builder.pushConstantInfos.emplace(pushConstantInfo.name, pushConstantInfo);
 	}
 
-	nodes = meta.find_all("uniform");
+	nodes = node.find_all("uniform");
 	for (Node const* child : nodes)
 	{
 		UniformConstantInfo uniformConstantInfo;
@@ -340,8 +329,9 @@ ShaderPass* minty::AssetEngine::load_shader_pass(Path const& path)
 {
 	check(path);
 
-	Node meta = read_file_node(path);
-	Reader reader(meta);
+	Node node = read_file_node(path);
+	Node meta = read_file_meta(path);
+	Reader reader(node);
 
 	ShaderPassBuilder builder
 	{
@@ -355,7 +345,7 @@ ShaderPass* minty::AssetEngine::load_shader_pass(Path const& path)
 	builder.frontFace = from_string_vk_front_face(reader.read_string("frontFace"));
 	builder.lineWidth = reader.read_float("lineWidth", 1.0f);
 
-	std::vector<Node const*> nodes = meta.find_all("binding");
+	std::vector<Node const*> nodes = node.find_all("binding");
 	for (auto const* child : nodes)
 	{
 		VkVertexInputBindingDescription binding = {};
@@ -367,7 +357,7 @@ ShaderPass* minty::AssetEngine::load_shader_pass(Path const& path)
 
 		builder.vertexBindings.push_back(binding);
 	}
-	nodes = meta.find_all("attribute");
+	nodes = node.find_all("attribute");
 	for (auto const* child : nodes)
 	{
 		VkVertexInputAttributeDescription attribute = {};
@@ -380,7 +370,7 @@ ShaderPass* minty::AssetEngine::load_shader_pass(Path const& path)
 
 		builder.vertexAttributes.push_back(attribute);
 	}
-	nodes = meta.find_all("stage");
+	nodes = node.find_all("stage");
 	for (auto const* child : nodes)
 	{
 		ShaderPassBuilder::ShaderStageInfo info;
@@ -401,7 +391,8 @@ MaterialTemplate* minty::AssetEngine::load_material_template(Path const& path)
 {
 	check(path);
 
-	Node meta = read_file_node(path);
+	Node node = read_file_node(path);
+	Node meta = read_file_meta(path);
 
 	MaterialTemplateBuilder builder
 	{
@@ -409,19 +400,19 @@ MaterialTemplate* minty::AssetEngine::load_material_template(Path const& path)
 		.path = path,
 	};
 
-	std::vector<Node const*> nodes = meta.find_all("pass");
+	std::vector<Node const*> nodes = node.find_all("pass");
 	for (auto const* child : nodes)
 	{
 		builder.shaderPasses.push_back(get<ShaderPass>(child->to_uuid()));
 	}
 
-	if (Node const* node = meta.find("defaults"))
+	if (Node const* child = node.find("defaults"))
 	{
 		// get shader uniform constant values so we know how to interpret the values in the materials
 		ShaderPass const* shaderPass = builder.shaderPasses.front();
 		Shader const* shader = shaderPass->get_shader();
 
-		load_descriptor_values(*this, builder.defaultValues, *node, shader->get_uniform_constant_infos(DESCRIPTOR_SET_MATERIAL));
+		load_descriptor_values(*this, builder.defaultValues, *child, shader->get_uniform_constant_infos(DESCRIPTOR_SET_MATERIAL));
 	}
 
 	return emplace_new(new MaterialTemplate(builder, get_runtime()));
@@ -431,8 +422,9 @@ Material* minty::AssetEngine::load_material(Path const& path)
 {
 	check(path);
 
-	Node meta = read_file_node(path);
-	Reader reader(meta);
+	Node node = read_file_node(path);
+	Node meta = read_file_meta(path);
+	Reader reader(node);
 
 	MaterialBuilder builder
 	{
@@ -442,7 +434,7 @@ Material* minty::AssetEngine::load_material(Path const& path)
 
 	builder.materialTemplate = get<MaterialTemplate>(reader.read_uuid("template"));
 
-	if (Node const* node = meta.find("values"))
+	if (Node const* child = node.find("values"))
 	{
 		// get shader uniform constant values so we know how to interpret the values in the materials
 		MINTY_ASSERT(builder.materialTemplate != nullptr);
@@ -451,7 +443,7 @@ Material* minty::AssetEngine::load_material(Path const& path)
 		Shader const* shader = shaderPass->get_shader();
 		MINTY_ASSERT(shader != nullptr);
 
-		load_descriptor_values(*this, builder.values, *node, shader->get_uniform_constant_infos(DESCRIPTOR_SET_MATERIAL));
+		load_descriptor_values(*this, builder.values, *child, shader->get_uniform_constant_infos(DESCRIPTOR_SET_MATERIAL));
 	}
 
 	return emplace_new(new Material(builder, get_runtime()));
@@ -616,8 +608,9 @@ Animation* minty::AssetEngine::load_animation(Path const& path)
 {
 	check(path);
 
-	Node meta = read_file_node(path);
-	Reader reader(meta);
+	Node node = read_file_node(path);
+	Node meta = read_file_meta(path);
+	Reader reader(node);
 
 	// read basic values
 	AnimationBuilder builder
@@ -673,8 +666,9 @@ Animator* minty::AssetEngine::load_animator(Path const& path)
 {
 	check(path);
 
-	Node meta = read_file_node(path);
-	Reader reader(meta);
+	Node node = read_file_node(path);
+	Node meta = read_file_meta(path);
+	Reader reader(node);
 
 	AnimatorBuilder builder
 	{

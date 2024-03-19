@@ -51,6 +51,8 @@ namespace minty
 
 		Path const& get_path() const;
 
+		AssetType get_type() const;
+
 		virtual String get_name() const;
 
 		friend bool operator==(Asset const& left, Asset const& right);
@@ -74,9 +76,19 @@ namespace minty
 
 		static std::vector<Path> const& get_extensions(AssetType const type);
 
-		static bool requires_meta(Path const& extension);
+		/// <summary>
+		/// Checks if the given asset type's file is text readable or not.
+		/// </summary>
+		/// <param name="type"></param>
+		/// <returns></returns>
+		static bool is_readable(Path const& assetPath);
 
-		static bool requires_meta(char const* const extension);
+		/// <summary>
+		/// Checks if the given asset type's file is text readable or not.
+		/// </summary>
+		/// <param name="type"></param>
+		/// <returns></returns>
+		static bool is_readable(AssetType const type);
 
 		static bool check_type(Path const& path, AssetType const type);
 

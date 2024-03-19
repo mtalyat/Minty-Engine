@@ -217,7 +217,7 @@ void Project::refresh()
 				}
 
 				// if the file needs a meta, create one with a new ID quick
-				if (extension != EXTENSION_META && Asset::requires_meta(extension.string().c_str()) && !std::filesystem::exists(Asset::get_meta_path(path)))
+				if (extension != EXTENSION_META && !std::filesystem::exists(Asset::get_meta_path(path)))
 				{
 					// create a new meta with a random ID, the rest can be populated later
 					// (ID is the most important for asset loading)

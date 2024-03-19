@@ -11,6 +11,7 @@ mintye::PropertiesWindow::PropertiesWindow(EditorApplication& application)
 	: EditorWindow(application)
 	, _targetMode(TargetMode::None)
 	, _targetEntity(NULL_ENTITY)
+	, _texts()
 {}
 
 void mintye::PropertiesWindow::draw()
@@ -265,15 +266,26 @@ void mintye::PropertiesWindow::draw_asset() const
 	// button to open the file
 	if (ImGui::Button("Open"))
 	{
+		Operations::open(_targetAsset->get_path());
+	}
 
+	// show all texts
+	for (auto const& text : _texts)
+	{
+		ImGui::Separator();
+
+		ImGui::TextWrapped(text.c_str());
 	}
 }
 
 void mintye::PropertiesWindow::clear_target()
 {
 	_targetMode = TargetMode::None;
+	
 	_targetEntity = NULL_ENTITY;
 	_targetAsset = nullptr;
+
+	_texts.clear();
 }
 
 void mintye::PropertiesWindow::set_target(minty::Entity const entity)
@@ -295,5 +307,17 @@ void mintye::PropertiesWindow::set_target(minty::Asset* const asset)
 	{
 		_targetMode = TargetMode::Asset;
 		_targetAsset = asset;
+
+		// add file itself to be drawn, if it is readable
+		if (Asset::is_readable(asset->get_type()))
+		{
+			_texts.push_back(File::read_all_text(asset->get_path()));
+		}
+		else
+		{
+			_texts.push_back("...");
+		}
+
+		_texts.push_back(File::read_all_text(Asset::get_meta_path(asset->get_path())));
 	}
 }

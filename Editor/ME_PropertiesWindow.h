@@ -16,9 +16,11 @@ namespace mintye
 
 	private:
 		TargetMode _targetMode;
+
 		minty::Entity _targetEntity;
 		minty::Asset* _targetAsset;
 
+		std::vector<minty::String> _texts;
 	public:
 		PropertiesWindow(EditorApplication& application);
 

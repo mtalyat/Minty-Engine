@@ -35,6 +35,11 @@ Path const& minty::Asset::get_path() const
 	return _path;
 }
 
+AssetType minty::Asset::get_type() const
+{
+	return Asset::get_type(_path);
+}
+
 String minty::Asset::get_name() const
 {
 	return _path.stem().string();
@@ -151,27 +156,29 @@ std::vector<Path> const& minty::Asset::get_extensions(AssetType const type)
 	return found->second;
 }
 
-bool minty::Asset::requires_meta(Path const& extension)
+bool minty::Asset::is_readable(Path const& assetPath)
 {
-	return requires_meta(extension.extension().string().c_str());
+	return is_readable(get_type(assetPath));
 }
 
-bool minty::Asset::requires_meta(char const* const extension)
+bool minty::Asset::is_readable(AssetType const type)
 {
-	// specific extensions that do not need a meta
-	static std::unordered_set<String> noMeta =
+	static std::unordered_set<AssetType> readables
 	{
-		".sprite",
-		".shader",
-		".shaderpass",
-		".materialtemplate",
-		".material",
-		".animation",
-		".animator",
+		AssetType::Text,
+		AssetType::Script,
+		AssetType::Sprite,
+		AssetType::Material,
+		AssetType::MaterialTemplate,
+		AssetType::ShaderPass,
+		AssetType::Shader,
+		AssetType::ShaderCode,
+		AssetType::Scene,
+		AssetType::Animation,
+		AssetType::Animator,
 	};
 
-	// check if extension needs a meta
-	return !extension || !noMeta.contains(extension);
+	return readables.contains(type);
 }
 
 bool minty::Asset::check_type(Path const& path, AssetType const type)

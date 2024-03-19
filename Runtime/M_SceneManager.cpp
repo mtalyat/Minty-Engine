@@ -34,10 +34,11 @@ Scene& minty::SceneManager::create_scene(Path const& path)
 	// load the data from the disk
 	AssetEngine& assets = get_runtime().get_asset_engine();
 	Node node = assets.read_file_node(path);
+	Node meta = assets.read_file_meta(path);
 
 	SceneBuilder builder
 	{
-		.id = node.to_uuid(),
+		.id = meta.to_uuid(),
 		.path = path
 	};
 

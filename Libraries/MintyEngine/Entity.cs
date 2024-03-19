@@ -45,14 +45,11 @@ namespace MintyEngine
         protected Entity()
         {
             ID = 0;
-            Console.WriteLine("Empty Entity");
         }
 
         internal Entity(ulong id)
         {
             ID = id;
-            Console.WriteLine(id);
-            Console.WriteLine($"{this}");
         }
 
         public T AddComponent<T>() where T : Component

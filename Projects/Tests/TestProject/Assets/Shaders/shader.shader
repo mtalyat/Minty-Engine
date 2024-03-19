@@ -1,4 +1,3 @@
-: 279e2c5cb4625c3c
 push: object
     stageFlags: VERTEX_BIT
     offset: 0
