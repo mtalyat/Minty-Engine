@@ -11,7 +11,9 @@ using namespace mintye;
 mintye::PropertiesWindow::PropertiesWindow(EditorApplication& application)
 	: EditorWindow(application)
 	, _targetMode(TargetMode::None)
+	, _targetId(INVALID_UUID)
 	, _targetEntity(NULL_ENTITY)
+	, _targetPath()
 	, _texts()
 {}
 
@@ -94,7 +96,7 @@ void mintye::PropertiesWindow::draw_entity()
 	}
 
 	// id
-	String idText = to_string(registry.get_id(_targetEntity));
+	String idText = to_string(_targetId);
 	ImGui::PushStyleColor(ImGuiCol_Text, ImVec4(0.65f, 0.65f, 0.65f, 1.0f));
 	if (ImGui::Button(idText.c_str()))
 	{
@@ -252,22 +254,35 @@ void mintye::PropertiesWindow::draw_asset()
 	// TODO: do differently for specific asset types
 
 	// print name
-	ImGui::Text(_targetAsset->get_name().c_str());
+	ImGui::Text(_targetPath.stem().string().c_str());
 
 	ImGui::Separator();
 
 	// button ID to copy it
-	if (ImGui::Button(to_string(_targetAsset->get_id()).c_str()))
+	if (ImGui::Button(to_string(_targetId).c_str()))
 	{
-		ImGui::SetClipboardText(to_string(_targetAsset->get_id()).c_str());
+		ImGui::SetClipboardText(to_string(_targetId).c_str());
 	}
 
 	ImGui::Separator();
 
+	// button to refresh the contents
+	if (ImGui::Button("Refresh"))
+	{
+		Path path = _targetPath;
+		set_target(path);
+
+		return;
+	}
+
+	// gap
+	ImGui::SameLine();
+	ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 20.0f);
+
 	// button to open the directory
 	if (ImGui::Button("Open Folder"))
 	{
-		Operations::open_directory(get_project()->get_base_path() / _targetAsset->get_path());
+		Operations::open_directory(get_project()->get_base_path() / _targetPath);
 	}
 
 	ImGui::SameLine();
@@ -275,7 +290,7 @@ void mintye::PropertiesWindow::draw_asset()
 	// button to open the file
 	if (ImGui::Button("Open File"))
 	{
-		Operations::open(get_project()->get_base_path() / _targetAsset->get_path());
+		Operations::open(get_project()->get_base_path() / _targetPath);
 	}
 
 	ImGui::SameLine();
@@ -283,7 +298,22 @@ void mintye::PropertiesWindow::draw_asset()
 	// button to open the meta file
 	if (ImGui::Button("Open Meta"))
 	{
-		Operations::open(get_project()->get_base_path() / Asset::get_meta_path(_targetAsset->get_path()));
+		Operations::open(get_project()->get_base_path() / Asset::get_meta_path(_targetPath));
+	}
+
+	// gap
+	ImGui::SameLine();
+	ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 20.0f);
+
+	if (ImGui::Button("Delete File"))
+	{
+		// delete file and its corresponding .meta file
+		std::filesystem::remove(get_project()->get_base_path() / _targetPath);
+		std::filesystem::remove(get_project()->get_base_path() / Asset::get_meta_path(_targetPath));
+
+		clear_target();
+
+		return;
 	}
 
 	// show all texts
@@ -298,9 +328,10 @@ void mintye::PropertiesWindow::draw_asset()
 void mintye::PropertiesWindow::clear_target()
 {
 	_targetMode = TargetMode::None;
-	
+	_targetId = INVALID_UUID;
+
 	_targetEntity = NULL_ENTITY;
-	_targetAsset = nullptr;
+	_targetPath = Text::EMPTY;
 
 	_texts.clear();
 }
@@ -313,26 +344,29 @@ void mintye::PropertiesWindow::set_target(minty::Entity const entity)
 	{
 		_targetMode = TargetMode::Entity;
 		_targetEntity = entity;
+		EntityRegistry& registry = get_scene()->get_entity_registry();
+		_targetId = registry.get_id(entity);
 	}
 }
 
-void mintye::PropertiesWindow::set_target(minty::Asset* const asset)
+void mintye::PropertiesWindow::set_target(minty::Path const& path)
 {
 	clear_target();
 
-	if (asset)
+	if (std::filesystem::exists(path))
 	{
 		_targetMode = TargetMode::Asset;
-		_targetAsset = asset;
+		_targetPath = path;
 
 		AssetEngine& assets = get_runtime().get_asset_engine();
+		_targetId = assets.read_id(path);
 
 		// add file itself to be drawn, if it is readable
-		if (Asset::is_readable(asset->get_type()))
+		if (Asset::is_readable(path))
 		{
-			_texts.push_back(File::read_all_text(asset->get_path()));
+			_texts.push_back(File::read_all_text(path));
 		}
 
-		_texts.push_back(File::read_all_text(Asset::get_meta_path(asset->get_path())));
+		_texts.push_back(File::read_all_text(Asset::get_meta_path(path)));
 	}
 }

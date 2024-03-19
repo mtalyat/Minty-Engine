@@ -17,8 +17,9 @@ namespace mintye
 	private:
 		TargetMode _targetMode;
 
+		minty::UUID _targetId;
 		minty::Entity _targetEntity;
-		minty::Asset* _targetAsset;
+		minty::Path _targetPath;
 
 		std::vector<minty::String> _texts;
 	public:
@@ -61,7 +62,7 @@ namespace mintye
 		/// Sets the target to show on the window.
 		/// </summary>
 		/// <param name="asset"></param>
-		void set_target(minty::Asset* const asset);
+		void set_target(minty::Path const& path);
 
 #pragma endregion
 	};

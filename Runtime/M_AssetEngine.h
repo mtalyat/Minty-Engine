@@ -67,7 +67,7 @@ namespace minty
 		/// </summary>
 		/// <param name="path"></param>
 		/// <returns></returns>
-		UUID load_id(Path const& path);
+		UUID read_id(Path const& path);
 
 		/// <summary>
 		/// Loads the asset of the given type from the path.

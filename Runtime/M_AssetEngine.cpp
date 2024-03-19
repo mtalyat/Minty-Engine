@@ -157,7 +157,7 @@ Asset* minty::AssetEngine::load_asset(Path const& path)
 	}
 }
 
-UUID minty::AssetEngine::load_id(Path const& path)
+UUID minty::AssetEngine::read_id(Path const& path)
 {
 	return read_file_meta(path).to_uuid();
 }

@@ -43,11 +43,7 @@ void mintye::AssetsWindow::draw()
 
 	if (ImGui::Button("Refresh"))
 	{
-		// refresh the project files
-		get_project()->refresh();
-
-		// re-populate the editor files
-		set_path(_path);
+		refresh();
 	}
 
 	ImGui::SameLine();
@@ -69,14 +65,16 @@ void mintye::AssetsWindow::draw()
 		if (ImGui::Button("Create"))
 		{
 			// create new file in the currently selected folder, if it does not exist
-			Path path = Path(newAssetName);
+			Path path = get_project()->get_assets_path() / _path / newAssetName;
 			
 			AssetEngine& assets = get_runtime().get_asset_engine();
 
 			if (!assets.exists(path))
 			{
 				// creating new asset
-
+				File::write_all_text(path, "");
+				
+				refresh();
 			}
 
 			ImGui::CloseCurrentPopup();
@@ -151,6 +149,15 @@ void mintye::AssetsWindow::draw()
 
 void mintye::AssetsWindow::reset()
 {
+}
+
+void mintye::AssetsWindow::refresh()
+{
+	// refresh the project files
+	get_project()->refresh();
+
+	// re-populate the editor files
+	set_path(_path);
 }
 
 void mintye::AssetsWindow::set_path(minty::Path const& path)
