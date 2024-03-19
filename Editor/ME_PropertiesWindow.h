@@ -33,13 +33,13 @@ namespace mintye
 #pragma region Drawing
 
 	private:
-		void draw_none() const;
+		void draw_none();
 
-		void draw_entity() const;
+		void draw_entity();
 
-		void draw_component(minty::Node& node, size_t const i, minty::Scene* const scene, minty::EntityRegistry& registry) const;
+		void draw_component(minty::Node& node, size_t const i, minty::Scene* const scene, minty::EntityRegistry& registry);
 
-		void draw_asset() const;
+		void draw_asset();
 
 #pragma endregion
 

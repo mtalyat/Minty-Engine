@@ -49,6 +49,9 @@ bool ImGui::InputNode(minty::Node& rootNode, bool const printRoot, size_t const 
 		std::pair<Node*, int> pair = nodes.back();
 		nodes.pop_back();
 
+		// ignore < 0 indents
+		if (pair.second < 0) continue;
+
 		String indentString = String(static_cast<size_t>(pair.second << 1), ' ');
 
 		// print, if indent is >= 0

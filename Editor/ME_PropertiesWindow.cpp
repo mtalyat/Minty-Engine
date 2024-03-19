@@ -3,6 +3,7 @@
 #include "ME_EditorApplication.h"
 #include "ME_ConsoleWindow.h"
 #include "ME_ImGuiHelper.h"
+#include "ME_Project.h"
 
 using namespace minty;
 using namespace mintye;
@@ -59,12 +60,12 @@ void mintye::PropertiesWindow::set_scene(minty::Scene* const scene)
 	EditorWindow::set_scene(scene);
 }
 
-void mintye::PropertiesWindow::draw_none() const
+void mintye::PropertiesWindow::draw_none()
 {
 	ImGui::Text("--");
 }
 
-void mintye::PropertiesWindow::draw_entity() const
+void mintye::PropertiesWindow::draw_entity()
 {
 	Scene* scene = get_scene();
 
@@ -207,7 +208,7 @@ void mintye::PropertiesWindow::draw_entity() const
 	}
 }
 
-void mintye::PropertiesWindow::draw_component(minty::Node& node, size_t const i, minty::Scene* const scene, minty::EntityRegistry& registry) const
+void mintye::PropertiesWindow::draw_component(minty::Node& node, size_t const i, minty::Scene* const scene, minty::EntityRegistry& registry)
 {
 	static float const xMargin = 2.0f;
 	static float const yMargin = 2.0f;
@@ -246,7 +247,7 @@ void mintye::PropertiesWindow::draw_component(minty::Node& node, size_t const i,
 	ImGui::EndGroupBox(Vector2(width, 0.0f), Vector2(xMargin, yMargin));
 }
 
-void mintye::PropertiesWindow::draw_asset() const
+void mintye::PropertiesWindow::draw_asset()
 {
 	// TODO: do differently for specific asset types
 
@@ -266,7 +267,7 @@ void mintye::PropertiesWindow::draw_asset() const
 	// button to open the file
 	if (ImGui::Button("Open"))
 	{
-		Operations::open(_targetAsset->get_path());
+		Operations::open(get_project()->get_base_path() / _targetAsset->get_path());
 	}
 
 	// show all texts
@@ -308,14 +309,12 @@ void mintye::PropertiesWindow::set_target(minty::Asset* const asset)
 		_targetMode = TargetMode::Asset;
 		_targetAsset = asset;
 
+		AssetEngine& assets = get_runtime().get_asset_engine();
+
 		// add file itself to be drawn, if it is readable
 		if (Asset::is_readable(asset->get_type()))
 		{
 			_texts.push_back(File::read_all_text(asset->get_path()));
-		}
-		else
-		{
-			_texts.push_back("...");
 		}
 
 		_texts.push_back(File::read_all_text(Asset::get_meta_path(asset->get_path())));

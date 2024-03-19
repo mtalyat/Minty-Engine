@@ -44,22 +44,30 @@ void minty::Operations::open_directory(Path const& path)
 {
 	Path directory = get_directory(path);
 
+	String pathString = directory.string();
 #ifdef MINTY_WINDOWS
-	system(std::format("start explorer \"{}\"", directory.string()).c_str());
+	std::replace(pathString.begin(), pathString.end(), '/', '\\');
+	system(std::format("start explorer \"{}\"", pathString).c_str());
 #elif defined(MINTY_APPLE)
-	system(std::format("xdg-open \"{}\"", directory.string()).c_str());
+	std::replace(pathString.begin(), pathString.end(), '\\', '/');
+	system(std::format("xdg-open \"{}\"", pathString).c_str());
 #elif defined(MINTY_LINUX)
-	system(std::format("open \"{}\"", directory.string()).c_str());
+	std::replace(pathString.begin(), pathString.end(), '\\', '/');
+	system(std::format("open \"{}\"", pathString).c_str());
 #endif
 }
 
 void minty::Operations::open(Path const& path)
 {
+	String pathString = path.string();
 #ifdef MINTY_WINDOWS
-	system(std::format("start explorer \"{}\"", path.string()).c_str());
+	std::replace(pathString.begin(), pathString.end(), '/', '\\');
+	system(std::format("start explorer \"{}\"", pathString).c_str());
 #elif defined(MINTY_APPLE)
-	system(std::format("xdg-open \"{}\"", path.string()).c_str());
+	std::replace(pathString.begin(), pathString.end(), '\\', '/');
+	system(std::format("xdg-open \"{}\"", pathString).c_str());
 #elif defined(MINTY_LINUX)
-	system(std::format("open \"{}\"", path.string()).c_str());
+	std::replace(pathString.begin(), pathString.end(), '\\', '/');
+	system(std::format("open \"{}\"", pathString).c_str());
 #endif
 }
