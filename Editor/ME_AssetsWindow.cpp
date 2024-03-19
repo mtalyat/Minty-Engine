@@ -79,6 +79,7 @@ void mintye::AssetsWindow::draw()
 				get_application().refresh();
 			}
 
+			memset(newAssetName, 0, IM_ARRAYSIZE(newAssetName));
 			ImGui::CloseCurrentPopup();
 		}
 
@@ -86,6 +87,7 @@ void mintye::AssetsWindow::draw()
 
 		if (ImGui::Button("Cancel") || ImGui::IsKeyPressed(ImGuiKey_Escape))
 		{
+			memset(newAssetName, 0, IM_ARRAYSIZE(newAssetName));
 			ImGui::CloseCurrentPopup();
 		}
 

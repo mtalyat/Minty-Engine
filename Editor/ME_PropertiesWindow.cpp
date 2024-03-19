@@ -198,17 +198,20 @@ void mintye::PropertiesWindow::draw_entity()
 	{
 		ImGui::Text("Enter the name of the component to add:");
 
+		ImGui::SetKeyboardFocusHere();
 		ImGui::InputText("##addComponentText", popupBuffer, INPUT_SIZE);
 
-		if (ImGui::Button("Done"))
+		if (ImGui::Button("Done") || ImGui::IsKeyPressed(ImGuiKey_Enter))
 		{
 			registry.emplace_by_name(popupBuffer, _targetEntity);
 
+			memset(popupBuffer, 0, IM_ARRAYSIZE(popupBuffer));
 			ImGui::CloseCurrentPopup();
 		}
 		ImGui::SameLine();
-		if (ImGui::Button("Cancel"))
+		if (ImGui::Button("Cancel") || ImGui::IsKeyPressed(ImGuiKey_Escape))
 		{
+			memset(popupBuffer, 0, IM_ARRAYSIZE(popupBuffer));
 			ImGui::CloseCurrentPopup();
 		}
 

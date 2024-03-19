@@ -522,9 +522,10 @@ void mintye::EditorApplication::draw_menu_bar()
 	{
 		ImGui::Text("Create New Project");
 
+		ImGui::SetKeyboardFocusHere();
 		ImGui::InputText("Project Name", newProjectTitle, IM_ARRAYSIZE(newProjectTitle));
 
-		if (ImGui::Button("Create"))
+		if (ImGui::Button("Create") || ImGui::IsKeyPressed(ImGuiKey_Enter))
 		{
 			IGFD::FileDialogConfig config
 			{
@@ -532,13 +533,15 @@ void mintye::EditorApplication::draw_menu_bar()
 			};
 			ImGuiFileDialog::Instance()->OpenDialog("new_project", "Choose directory to create project in...", nullptr, config);
 
+			memset(newProjectTitle, 0, IM_ARRAYSIZE(newProjectTitle));
 			ImGui::CloseCurrentPopup();
 		}
 
 		ImGui::SameLine();
 
-		if (ImGui::Button("Cancel"))
+		if (ImGui::Button("Cancel") || ImGui::IsKeyPressed(ImGuiKey_Escape))
 		{
+			memset(newProjectTitle, 0, IM_ARRAYSIZE(newProjectTitle));
 			ImGui::CloseCurrentPopup();
 		}
 
