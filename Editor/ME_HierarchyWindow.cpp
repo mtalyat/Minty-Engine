@@ -198,6 +198,10 @@ void mintye::HierarchyWindow::reset()
 	_clicked = NULL_ENTITY;
 }
 
+void mintye::HierarchyWindow::refresh()
+{
+}
+
 void mintye::HierarchyWindow::set_project(Project* const project)
 {
 	EditorWindow::set_project(project);

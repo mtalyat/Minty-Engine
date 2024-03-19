@@ -25,6 +25,8 @@ namespace mintye
 
 		void reset() override;
 
+		void refresh() override;
+
 	public:
 		void focus(minty::Entity const entity);
 	};

@@ -115,6 +115,19 @@ void mintye::EditorApplication::draw()
 	draw_editor_windows();
 }
 
+void mintye::EditorApplication::refresh()
+{
+	if (_project)
+	{
+		_project->refresh();
+	}
+
+	for (auto const& [name, window] : _editorWindows)
+	{
+		window->refresh();
+	}
+}
+
 minty::Runtime* mintye::EditorApplication::create_runtime()
 {
 	return new Runtime(get_info(), RunMode::Edit);

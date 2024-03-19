@@ -44,5 +44,10 @@ namespace mintye
 		/// Clears all existing data and sets back to defaults.
 		/// </summary>
 		virtual void reset() = 0;
+
+		/// <summary>
+		/// Refreshes the data loaded in memory when something changes on the disc.
+		/// </summary>
+		virtual void refresh() = 0;
 	};
 }

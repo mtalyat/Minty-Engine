@@ -43,7 +43,7 @@ void mintye::AssetsWindow::draw()
 
 	if (ImGui::Button("Refresh"))
 	{
-		refresh();
+		get_application().refresh();
 	}
 
 	ImGui::SameLine();
@@ -73,8 +73,8 @@ void mintye::AssetsWindow::draw()
 			{
 				// creating new asset
 				File::write_all_text(path, "");
-				
-				refresh();
+
+				get_application().refresh();
 			}
 
 			ImGui::CloseCurrentPopup();
@@ -153,9 +153,6 @@ void mintye::AssetsWindow::reset()
 
 void mintye::AssetsWindow::refresh()
 {
-	// refresh the project files
-	get_project()->refresh();
-
 	// re-populate the editor files
 	set_path(_path);
 }

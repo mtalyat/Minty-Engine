@@ -130,6 +130,10 @@ void mintye::ConsoleWindow::reset()
 	clear();
 }
 
+void mintye::ConsoleWindow::refresh()
+{
+}
+
 void mintye::ConsoleWindow::clear()
 {
 	_lines.clear();

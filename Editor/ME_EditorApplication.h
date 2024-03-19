@@ -44,6 +44,8 @@ namespace mintye
 	public:
 		void draw();
 
+		void refresh();
+
 	protected:
 		minty::Runtime* create_runtime() override;
 

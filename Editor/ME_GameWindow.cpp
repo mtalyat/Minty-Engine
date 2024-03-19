@@ -21,3 +21,7 @@ void mintye::GameWindow::draw()
 void mintye::GameWindow::reset()
 {
 }
+
+void mintye::GameWindow::refresh()
+{
+}

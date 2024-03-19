@@ -50,6 +50,12 @@ void mintye::PropertiesWindow::reset()
 {
 }
 
+void mintye::PropertiesWindow::refresh()
+{
+	Path path = _targetPath;
+	set_target(path);
+}
+
 void mintye::PropertiesWindow::set_scene(minty::Scene* const scene)
 {
 	if (get_scene() != scene)
@@ -269,23 +275,13 @@ void mintye::PropertiesWindow::draw_asset()
 	// button to refresh the contents
 	if (ImGui::Button("Refresh"))
 	{
-		Path path = _targetPath;
-		set_target(path);
-
+		get_application().refresh();
 		return;
 	}
 
 	// gap
 	ImGui::SameLine();
 	ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 20.0f);
-
-	// button to open the directory
-	if (ImGui::Button("Open Folder"))
-	{
-		Operations::open_directory(get_project()->get_base_path() / _targetPath);
-	}
-
-	ImGui::SameLine();
 
 	// button to open the file
 	if (ImGui::Button("Open File"))
@@ -301,6 +297,14 @@ void mintye::PropertiesWindow::draw_asset()
 		Operations::open(get_project()->get_base_path() / Asset::get_meta_path(_targetPath));
 	}
 
+	ImGui::SameLine();
+
+	// button to open the directory
+	if (ImGui::Button("Open Folder"))
+	{
+		Operations::open_directory(get_project()->get_base_path() / _targetPath);
+	}
+
 	// gap
 	ImGui::SameLine();
 	ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 20.0f);
@@ -312,6 +316,8 @@ void mintye::PropertiesWindow::draw_asset()
 		std::filesystem::remove(get_project()->get_base_path() / Asset::get_meta_path(_targetPath));
 
 		clear_target();
+
+		get_application().refresh();
 
 		return;
 	}

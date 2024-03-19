@@ -16,6 +16,9 @@
     <Filter Include="Libraries">
       <UniqueIdentifier>{c0f650f8-da6b-48af-b7a0-12d7a3ea03a1}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Windows">
+      <UniqueIdentifier>{3b7383a3-c70b-4f24-a341-b876c4588969}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Program.cpp">
@@ -65,9 +68,6 @@
     <ClInclude Include="ME_EditorApplication.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ME_ConsoleWindow.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="ME_Project.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -75,24 +75,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ME_Constants.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ME_EditorWindow.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ME_HierarchyWindow.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ME_SceneWindow.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ME_GameWindow.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ME_PropertiesWindow.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="ME_AssetsWindow.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="ME_Minty.h">
@@ -106,6 +88,27 @@
     </ClInclude>
     <ClInclude Include="ME_ImGuiHelper.h">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ME_AssetsWindow.h">
+      <Filter>Header Files\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="ME_ConsoleWindow.h">
+      <Filter>Header Files\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="ME_EditorWindow.h">
+      <Filter>Header Files\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="ME_HierarchyWindow.h">
+      <Filter>Header Files\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="ME_GameWindow.h">
+      <Filter>Header Files\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="ME_PropertiesWindow.h">
+      <Filter>Header Files\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="ME_SceneWindow.h">
+      <Filter>Header Files\Windows</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

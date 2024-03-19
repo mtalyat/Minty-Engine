@@ -14,5 +14,7 @@ namespace mintye
 		void draw() override;
 
 		void reset() override;
+
+		void refresh() override;
 	};
 }

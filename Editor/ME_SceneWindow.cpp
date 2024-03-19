@@ -111,6 +111,10 @@ void mintye::SceneWindow::reset()
 {
 }
 
+void mintye::SceneWindow::refresh()
+{
+}
+
 void mintye::SceneWindow::focus(minty::Entity const entity)
 {
 	// move camera to entity - camera forward

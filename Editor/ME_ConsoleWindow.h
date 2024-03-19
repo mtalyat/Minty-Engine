@@ -46,6 +46,8 @@ namespace mintye
 
 		void reset() override;
 
+		void refresh() override;
+
 		/// <summary>
 		/// Clears all text from the console.
 		/// </summary>

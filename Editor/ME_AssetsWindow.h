@@ -23,9 +23,9 @@ namespace mintye
 
 		void reset() override;
 
-	private:
-		void refresh();
+		void refresh() override;
 
+	private:
 		void set_path(minty::Path const& path);
 	};
 }
