@@ -262,12 +262,28 @@ void mintye::PropertiesWindow::draw_asset()
 		ImGui::SetClipboardText(to_string(_targetAsset->get_id()).c_str());
 	}
 
+	ImGui::Separator();
+
+	// button to open the directory
+	if (ImGui::Button("Open Folder"))
+	{
+		Operations::open_directory(get_project()->get_base_path() / _targetAsset->get_path());
+	}
+
 	ImGui::SameLine();
 
 	// button to open the file
-	if (ImGui::Button("Open"))
+	if (ImGui::Button("Open File"))
 	{
 		Operations::open(get_project()->get_base_path() / _targetAsset->get_path());
+	}
+
+	ImGui::SameLine();
+
+	// button to open the meta file
+	if (ImGui::Button("Open Meta"))
+	{
+		Operations::open(get_project()->get_base_path() / Asset::get_meta_path(_targetAsset->get_path()));
 	}
 
 	// show all texts
