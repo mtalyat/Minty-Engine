@@ -60,9 +60,11 @@ void mintye::AssetsWindow::draw()
 
 		ImGui::Text("Create New Asset File");
 
+		ImGui::SetKeyboardFocusHere();
+
 		ImGui::InputText("Asset Name", newAssetName, IM_ARRAYSIZE(newAssetName));
 
-		if (ImGui::Button("Create"))
+		if (ImGui::Button("Create") || ImGui::IsKeyPressed(ImGuiKey_Enter))
 		{
 			// create new file in the currently selected folder, if it does not exist
 			Path path = get_project()->get_assets_path() / _path / newAssetName;
@@ -82,7 +84,7 @@ void mintye::AssetsWindow::draw()
 
 		ImGui::SameLine();
 
-		if (ImGui::Button("Cancel"))
+		if (ImGui::Button("Cancel") || ImGui::IsKeyPressed(ImGuiKey_Escape))
 		{
 			ImGui::CloseCurrentPopup();
 		}
