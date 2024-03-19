@@ -1,4 +1,4 @@
-: ca92a9b8e0eda87b
+: aa8e61c9f518cbc2
 assets
 	- "Assets/Audio/blinking-forest.wav"
 	- "Assets/Audio/cow-bells.wav"
@@ -34,10 +34,10 @@ assets
 	- "Assets/Scripts/Session.cs"
 	- "Assets/Scripts/TestScript.cs"
 systems
-	Audio
-	Render
 	Animation
 	Script
+	Render
+	Audio
 entities
 	Model Center: 2400de2c92f041ed
 		Transform
