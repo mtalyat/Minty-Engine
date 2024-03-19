@@ -22,7 +22,5 @@ namespace minty
         void update() override;
 
         void reset() override;
-    public:
-        void deserialize(Reader const& reader) override;
     };
 }

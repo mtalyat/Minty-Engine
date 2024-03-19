@@ -16,7 +16,6 @@ using namespace minty;
 
 minty::ScriptSystem::ScriptSystem(Runtime& runtime, Scene& scene)
 	: System("Script", runtime, scene)
-	, _ids()
 {}
 
 void minty::ScriptSystem::load()
@@ -76,18 +75,4 @@ void minty::ScriptSystem::unload()
 	}
 
 	System::unload();
-}
-
-void minty::ScriptSystem::deserialize(Reader const& reader)
-{
-	// load all of the scripts and their ids
-	register_assets("scripts", reader, [this](AssetEngine& engine, Path const& path)
-		{
-			Asset* asset = engine.load_script(path);
-
-			_ids.emplace(asset->get_id());
-			get_runtime().get_script_engine().register_script_id(asset->get_id(), path.stem().string());
-
-			return asset;
-		});
 }

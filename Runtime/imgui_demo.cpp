@@ -5112,8 +5112,8 @@ static void ShowDemoWindowTables()
                 { "Music",                        "Folder",       -1,       4, 2    }, // 1
                 { "Textures",                     "Folder",       -1,       6, 3    }, // 2
                 { "desktop.ini",                  "System file",  1024,    -1,-1    }, // 3
-                { "File1_a.wav",                  "Audio file",   123000,  -1,-1    }, // 4
-                { "File1_b.wav",                  "Audio file",   456000,  -1,-1    }, // 5
+                { "File1_a.wav",                  "AudioClip file",   123000,  -1,-1    }, // 4
+                { "File1_b.wav",                  "AudioClip file",   456000,  -1,-1    }, // 5
                 { "Image001.png",                 "Image file",   203128,  -1,-1    }, // 6
                 { "Copy of Image001.png",         "Image file",   203256,  -1,-1    }, // 7
                 { "Copy of Image001 (Final2).png","Image file",   203512,  -1,-1    }, // 8

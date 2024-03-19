@@ -205,7 +205,7 @@ void mintye::EditorApplication::load_project(minty::Path const& path)
 	get_runtime().get_script_engine().load_assembly(std::format("{}/bin/Debug/{}.dll", ASSEMBLY_DIRECTORY_NAME, project->get_name()));
 
 	// load a scene, if any found
-	Path scenePath = project->find_asset(Project::CommonFileType::Scene);
+	Path scenePath = project->find_asset(AssetType::Scene);
 	if (!scenePath.empty())
 	{
 		load_scene(scenePath);
@@ -245,7 +245,7 @@ void mintye::EditorApplication::open_scene()
 	{
 		.path = "."
 	};
-	ImGuiFileDialog::Instance()->OpenDialog("open_scene", "Choose scene...", SCENE_EXTENSION, config);
+	ImGuiFileDialog::Instance()->OpenDialog("open_scene", "Choose scene...", ".scene", config);
 }
 
 void mintye::EditorApplication::save_scene()
@@ -358,9 +358,7 @@ bool mintye::EditorApplication::is_asset_copied(minty::String const& name) const
 
 void mintye::EditorApplication::open_asset(minty::Path const& path)
 {
-	Path extension = path.extension();
-
-	if (extension == SCENE_EXTENSION)
+	if (Asset::get_type(path) == AssetType::Scene)
 	{
 		// open the scene
 		load_scene(path);
@@ -692,17 +690,9 @@ void EditorApplication::generate_cmake(BuildInfo const& buildInfo)
 		file << "set(CMAKE_EXE_LINKER_FLAGS /NODEFAULTLIB:\\\"LIBCMT\\\")" << std::endl;
 	}
 
-	// get all local paths for source files
-	std::stringstream pathsStream;
-	minty::Path buildPath = _project->get_build_path();
-	for (minty::Path const& path : _project->find_assets(Project::CommonFileType::Source))
-	{
-		pathsStream << " " << std::filesystem::relative(ASSETS_DIRECTORY_NAME / path, buildPath).generic_string();
-	}
-
 	file <<
 		// add source files for project
-		"set(SOURCES main.cpp" << pathsStream.str() << ")" << std::endl <<
+		"set(SOURCES main.cpp)" << std::endl <<
 		// make executable with the source files
 		"add_executable(${PROJECT_NAME} ${SOURCES})" << std::endl <<
 		// set to MT building so it works with the static runtime library
@@ -795,7 +785,7 @@ void mintye::EditorApplication::generate_application_data(BuildInfo const& build
 	}
 
 	// get path to cmake file
-	Path path = _project->get_build_path() / String("game").append(APPLICATION_EXTENSION);
+	Path path = _project->get_build_path() / String("game").append(EXTENSION_APPLICATION_DATA);
 
 	// open file to overwrite
 	std::ofstream file(path, std::ios::trunc);
@@ -816,7 +806,7 @@ void mintye::EditorApplication::generate_application_data(BuildInfo const& build
 		"scenes" << std::endl;
 
 	// write all scenes
-	std::set<Path> scenes = _project->find_assets(Project::CommonFileType::Scene);
+	std::set<Path> scenes = _project->find_assets(AssetType::Scene);
 	for (Path const& scenePath : scenes)
 	{
 		file << "\t- " << scenePath.string() << std::endl;
@@ -850,13 +840,13 @@ void mintye::EditorApplication::generate_wraps(BuildInfo const& buildInfo)
 	// compile all game files/assets into two wrap files
 
 	// game data
-	Wrap gameWrap(output / String("game").append(WRAP_EXTENSION), "Game", 1);
-	String appFileName = String("game").append(APPLICATION_EXTENSION);
+	Wrap gameWrap(output / String("game").append(EXTENSION_WRAP), "Game", 1);
+	String appFileName = String("game").append(EXTENSION_APPLICATION_DATA);
 	Path appPath = _project->get_build_path() / appFileName;
 	gameWrap.emplace(appPath, appFileName);
 
 	// game assets
-	Wrap assetWrap(output / String("assets").append(WRAP_EXTENSION), ASSETS_DIRECTORY_NAME, static_cast<uint32_t>(_project->get_asset_count()), ASSETS_DIRECTORY_NAME);
+	Wrap assetWrap(output / String("assets").append(EXTENSION_WRAP), ASSETS_DIRECTORY_NAME, static_cast<uint32_t>(_project->get_asset_count()), ASSETS_DIRECTORY_NAME);
 	_project->wrap_assets(assetWrap);
 }
 
@@ -947,7 +937,7 @@ void mintye::EditorApplication::generate_assembly(BuildInfo const& buildInfo)
 		//<< "    <Compile Include=\"Properties\AssemblyInfo.cs\" />" << std::endl
 
 	// write all c# file paths
-	for (auto const& path : _project->find_assets(Project::CommonFileType::Script))
+	for (auto const& path : _project->find_assets(AssetType::Script))
 	{
 		file << "    <Compile Include=\"..\\" << path.string() << "\" />" << std::endl;
 	}

@@ -7,9 +7,32 @@
 
 #include <filesystem>
 #include <array>
+#include <vector>
 
 namespace minty
 {
+	enum class AssetType
+	{
+		None,
+		Meta,
+		Text,
+		Script,
+		Texture,
+		Sprite,
+		Material,
+		MaterialTemplate,
+		ShaderPass,
+		Shader,
+		ShaderModule,
+		ShaderCode,
+		Scene,
+		Mesh,
+		AudioClip,
+		Animation,
+		Animator,
+		Wrap,
+	};
+
 	class Asset
 		: public RuntimeObject
 	{
@@ -41,6 +64,21 @@ namespace minty
 		/// <param name="assetPath"></param>
 		/// <returns></returns>
 		static Path get_meta_path(Path const& assetPath);
+
+		/// <summary>
+		/// Gets the AssetType based on the given path extension.
+		/// </summary>
+		/// <param name="assetPath"></param>
+		/// <returns></returns>
+		static AssetType get_type(Path const& assetPath);
+
+		static std::vector<Path> const& get_extensions(AssetType const type);
+
+		static bool requires_meta(Path const& extension);
+
+		static bool requires_meta(char const* const extension);
+
+		static bool check_type(Path const& path, AssetType const type);
 
 #pragma endregion
 	};

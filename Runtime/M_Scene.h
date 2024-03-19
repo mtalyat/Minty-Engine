@@ -1,10 +1,15 @@
 #pragma once
 #include "M_Asset.h"
 
+#include <vector>
+#include <unordered_set>
+#include <functional>
+
 namespace minty
 {
 	class EntityRegistry;
 	class SystemRegistry;
+	class AssetEngine;
 
 	struct SceneBuilder
 	{
@@ -24,6 +29,9 @@ namespace minty
 		SystemRegistry* _systems;
 		bool _loaded;
 
+		std::vector<Path> _unloadedAssets;
+		std::unordered_set<UUID> _loadedAssets;
+
 	public:
 		/// <summary>
 		/// Creates an empty Scene.
@@ -37,12 +45,6 @@ namespace minty
 
 		// move
 		Scene& operator=(Scene&& other) noexcept;
-
-		//// copy
-		//Scene(Scene const& other);
-
-		//// copy
-		//Scene& operator=(Scene const& other);
 
 		/// <summary>
 		/// Gets the EntityRegistry used in the Scene.
@@ -92,6 +94,16 @@ namespace minty
 		/// </summary>
 		void finalize();
 
+#pragma region Asset Loading
+
+	private:
+		void load_registered_assets();
+
+		void unload_registered_assets();
+
+#pragma endregion
+
+	public:
 		void serialize(Writer& writer) const override;
 		void deserialize(Reader const& reader) override;
 

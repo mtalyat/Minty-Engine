@@ -77,7 +77,7 @@ void minty::Wrap::load(Path const& path)
         Console::error(std::format("Cannot load \"{}\" Wrap file: not a regular file.", path.string()));
         return;
     }
-    else if (path.extension() != WRAP_EXTENSION)
+    else if (path.extension() != EXTENSION_WRAP)
     {
         // not a .wrap file
         Console::error(std::format("Cannot load \"{}\" Wrap file: missing .wrap file extension.", path.string()));

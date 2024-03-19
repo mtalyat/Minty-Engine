@@ -22,6 +22,8 @@ minty::Scene::Scene(SceneBuilder const& builder, Runtime& engine)
 	, _entities(new EntityRegistry(engine, *this))
 	, _systems(new SystemRegistry(engine, *this))
 	, _loaded()
+	, _unloadedAssets()
+	, _loadedAssets()
 {}
 
 minty::Scene::~Scene()
@@ -67,6 +69,7 @@ bool minty::Scene::is_loaded() const
 void minty::Scene::load()
 {
 	_loaded = true;
+	load_registered_assets();
 	_systems->load();
 
 	AssetEngine& assets = get_runtime().get_asset_engine();
@@ -98,11 +101,6 @@ void minty::Scene::update()
 		// update systems
 		_systems->update();
 	}
-
-	EntityRegistry const* er = _entities;
-
-	// TODO: move to fixed_update
-	// TODO: use group, only sort dirty components
 }
 
 void minty::Scene::sort()
@@ -129,7 +127,7 @@ void minty::Scene::fixed_update()
 		// update systems
 		_systems->fixed_update();
 
-		// update transforms
+		// TODO: update transforms...
 	}
 }
 
@@ -137,6 +135,7 @@ void minty::Scene::unload()
 {
 	_loaded = false;
 	_systems->unload();
+	unload_registered_assets();
 }
 
 void minty::Scene::finalize()
@@ -183,14 +182,43 @@ void minty::Scene::finalize()
 	_entities->destroy_queued();
 }
 
+void minty::Scene::load_registered_assets()
+{
+	// load each asset into the engine and save its ID so it can be unloaded later
+	AssetEngine& assets = get_runtime().get_asset_engine();
+
+	for (auto const& path : _unloadedAssets)
+	{
+		if (Asset* asset = assets.load_asset(path))
+		{
+			_loadedAssets.emplace(asset->get_id());
+		}
+	}
+}
+
+void minty::Scene::unload_registered_assets()
+{
+	// unload each asset from the engine
+	AssetEngine& assets = get_runtime().get_asset_engine();
+
+	for (auto const id : _loadedAssets)
+	{
+		assets.unload(id);
+	}
+}
+
 void minty::Scene::serialize(Writer& writer) const
 {
+	writer.write("assets", _unloadedAssets);
 	writer.write("systems", *_systems);
 	writer.write("entities", *_entities);
 }
 
 void minty::Scene::deserialize(Reader const& reader)
 {
+	_unloadedAssets.clear();
+
+	reader.read_vector("assets", _unloadedAssets);
 	reader.read_serializable("systems", *_systems);
 
 	// this is done in the load function

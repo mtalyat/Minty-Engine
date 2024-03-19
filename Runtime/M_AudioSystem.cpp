@@ -18,7 +18,7 @@
 using namespace minty;
 
 minty::AudioSystem::AudioSystem(Runtime& engine, Scene& scene)
-	: System::System("Audio", engine, scene)
+	: System::System("AudioClip", engine, scene)
 {}
 
 void minty::AudioSystem::update()
@@ -232,9 +232,4 @@ void minty::AudioSystem::update_sound_data(SoundData& data, Entity const entity)
 		data.position = Vector3();
 		data.velocity = Vector3();
 	}
-}
-
-void minty::AudioSystem::deserialize(Reader const& reader)
-{
-	register_assets("clips", reader, [](AssetEngine& assets, Path const& path) { return assets.load_audio_clip(path); });
 }

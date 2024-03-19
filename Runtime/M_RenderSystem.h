@@ -53,7 +53,5 @@ namespace minty
 		void set_main_camera(Entity const entity);
 
 #pragma endregion
-	public:
-		void deserialize(Reader const& reader) override;
 	};
 }

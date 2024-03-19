@@ -52,6 +52,48 @@ void mintye::AssetsWindow::draw()
 
 	ImGui::SameLine();
 
+	if (ImGui::Button("New File"))
+	{
+		// new file popup
+		ImGui::OpenPopup("Create New Asset File");
+	}
+
+	if (ImGui::BeginPopupModal("Create New Asset File"))
+	{
+		static char newAssetName[255];
+
+		ImGui::Text("Create New Asset File");
+
+		ImGui::InputText("Asset Name", newAssetName, IM_ARRAYSIZE(newAssetName));
+
+		if (ImGui::Button("Create"))
+		{
+			// create new file in the currently selected folder, if it does not exist
+			Path path = Path(newAssetName);
+			
+			AssetEngine& assets = get_runtime().get_asset_engine();
+
+			if (!assets.exists(path))
+			{
+				// creating new asset
+
+			}
+
+			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::SameLine();
+
+		if (ImGui::Button("Cancel"))
+		{
+			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::EndPopup();
+	}
+
+	ImGui::SameLine();
+
 	if (ImGui::Button("Open Folder"))
 	{
 		// open the assets folder
@@ -136,7 +178,7 @@ void mintye::AssetsWindow::set_path(minty::Path const& path)
 			_directories.push_back(entry.path().stem());
 		}
 		// add all regular files that aren't meta
-		else if (fs::is_regular_file(entry.status()) && entry.path().extension() != META_EXTENSION)
+		else if (fs::is_regular_file(entry.status()) && Asset::get_type(entry.path()) != AssetType::Meta)
 		{
 			_files.push_back(entry.path().filename());
 		}

@@ -15,29 +15,6 @@ namespace mintye
 	/// </summary>
 	class Project
 	{
-	public:
-		enum class CommonFileType
-		{
-			Header,				// .h
-			Source,				// .cpp .c
-			Script,				// minty::SCRIPT_EXTENSION (.cs)
-			Scene,				// minty::SCENE_EXTENSION
-			Text,				// .txt
-			CSV,				// .csv
-			Texture,			// .png, .jpg, .jpeg, .bmp
-			Sprite,				// minty::SPRITE_EXTENSION
-			Material,			// minty::MATERIAL_EXTENSION
-			MaterialTemplate,	// minty::MATERIAL_TEMPLATE_EXTENSION
-			ShaderPass,			// minty::SHADER_PASS_EXTENSION
-			Shader,				// minty::SHADER_EXTENSION
-			ShaderModule,		// .spv
-			Audio,				// .wav, .mp3
-			Animator,			// minty::ANIMATOR_EXTENSION
-			Animation,			// minty::ANIMATION_EXTENSION
-			Model,				// .obj
-			Wrap,				// minty::WRAP_EXTENSION
-		};
-
 	private:
 		minty::Info _info;
 
@@ -102,14 +79,14 @@ namespace mintye
 		/// </summary>
 		/// <param name="extensions">The extensions for the asset type.</param>
 		/// <returns>The filepaths to the assets with one of the given extensions.</returns>
-		std::set<minty::Path> find_assets(std::unordered_set<minty::Path> const& extensions) const;
+		std::set<minty::Path> find_assets(std::vector<minty::Path> const& extensions) const;
 
 		/// <summary>
 		/// Finds all assets within the Project that have the common file type extensions.
 		/// </summary>
 		/// <param name="commonFileTypes">The common file types.</param>
 		/// <returns>The filepaths to the assets with one of the given extensions.</returns>
-		std::set<minty::Path> find_assets(CommonFileType const commonFileTypes) const;
+		std::set<minty::Path> find_assets(minty::AssetType const assetType) const;
 
 		/// <summary>
 		/// Finds the first asset that has the given name and file extension.
@@ -123,14 +100,14 @@ namespace mintye
 		/// </summary>
 		/// <param name="commonFileTypes"></param>
 		/// <returns></returns>
-		minty::Path find_asset(CommonFileType const commonFileTypes) const;
+		minty::Path find_asset(minty::AssetType const assetType) const;
 
 		/// <summary>
 		/// Finds the first asset that has any of the given file extensions.
 		/// </summary>
 		/// <param name="extensions"></param>
 		/// <returns></returns>
-		minty::Path find_asset(std::unordered_set<minty::Path> const& extensions) const;
+		minty::Path find_asset(std::vector<minty::Path> const& extensions) const;
 
 		/// <summary>
 		/// Finds the asset with the given name and given file type.
@@ -138,7 +115,7 @@ namespace mintye
 		/// <param name="name"></param>
 		/// <param name="commonFileType"></param>
 		/// <returns></returns>
-		minty::Path find_asset(minty::String const& name, CommonFileType const commonFileType) const;
+		minty::Path find_asset(minty::String const& name, minty::AssetType const assetType) const;
 
 		/// <summary>
 		/// Searches the disk for all files and updates their internal states.
@@ -156,7 +133,5 @@ namespace mintye
 		/// </summary>
 		/// <param name="wrap"></param>
 		void wrap_assets(minty::Wrap& wrap) const;
-	private:
-		std::unordered_set<minty::Path> get_extensions(CommonFileType const commonFileTypes) const;
 	};
 }

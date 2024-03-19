@@ -51,33 +51,42 @@ void minty::Application::start()
 	// load the first scene
 	// TODO: make this... not so janky
 	AssetEngine& assets = _runtime->get_asset_engine();
-	Node node = assets.read_file_node("game.mapp");
+	Path applicationDataPath = String("game").append(EXTENSION_APPLICATION_DATA);
 
-	// load assemblies
-	if (Node const* assemblies = node.find("assemblies"))
+	if (std::filesystem::exists(applicationDataPath))
 	{
-		// get paths to assemblies
-		std::vector<Path> paths;
-		paths.reserve(assemblies->get_children().size());
+		Node node = assets.read_file_node(applicationDataPath);
 
-		for (auto const& assembly : assemblies->get_children())
+		// load assemblies
+		if (Node const* assemblies = node.find("assemblies"))
 		{
-			paths.push_back(assembly.to_string());
+			// get paths to assemblies
+			std::vector<Path> paths;
+			paths.reserve(assemblies->get_children().size());
+
+			for (auto const& assembly : assemblies->get_children())
+			{
+				paths.push_back(assembly.to_string());
+			}
+
+			// load these
+			load_assemblies(paths);
+		}
+		else
+		{
+			load_assemblies({});
 		}
 
-		// load these
-		load_assemblies(paths);
+		if (Node const* scenes = node.find("scenes"))
+		{
+			SceneManager& sceneManager = _runtime->get_scene_manager();
+			Scene& scene = sceneManager.create_scene(scenes->get_children().front().get_data());
+			sceneManager.load_scene(scene.get_id());
+		}
 	}
 	else
 	{
-		load_assemblies({});
-	}
-
-	if (Node const* scenes = node.find("scenes"))
-	{
-		SceneManager& sceneManager = _runtime->get_scene_manager();
-		Scene& scene = sceneManager.create_scene(scenes->get_children().front().get_data());
-		sceneManager.load_scene(scene.get_id());
+		MINTY_WARN("No application data found.");
 	}
 
 	_runtime->start();

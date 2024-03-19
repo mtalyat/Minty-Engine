@@ -56,13 +56,6 @@ namespace minty
 		std::vector<String> read_file_lines(Path const& path) const;
 
 		/// <summary>
-		/// Checks if the given extensions requires a corresponding .mmeta file with it.
-		/// </summary>
-		/// <param name="extension"></param>
-		/// <returns></returns>
-		static bool check_if_no_meta(char const* extension);
-
-		/// <summary>
 		/// Loads a generic Asset.
 		/// </summary>
 		/// <param name="path"></param>
@@ -76,12 +69,21 @@ namespace minty
 		/// <returns></returns>
 		UUID load_id(Path const& path);
 
+		/// <summary>
+		/// Loads the asset of the given type from the path.
+		/// </summary>
+		/// <typeparam name="T"></typeparam>
+		/// <param name="path"></param>
+		/// <returns></returns>
+		template<typename T>
+		T* load(Path const& path);
+
 	private:
-		void check(Path const& path, char const* extension) const;
+		void check(Path const& path) const;
 
 #pragma region Render
 
-	public:
+	private:
 		/// <summary>
 		/// Loads the Texture at the given Path and returns its ID.
 		/// </summary>
@@ -105,21 +107,21 @@ namespace minty
 		Material* load_material(Path const& path);
 
 		Mesh* load_mesh(Path const& path);
-	private:
+
 		void load_mesh_obj(Path const& path, Mesh& mesh);
 
 #pragma endregion
 
 #pragma region Audio
 
-	public:
+	private:
 		AudioClip* load_audio_clip(Path const& path);
 
 #pragma endregion
 
 #pragma region Animation
 
-	public:
+	private:
 		Animation* load_animation(Path const& path);
 
 		Animator* load_animator(Path const& path);
@@ -128,11 +130,10 @@ namespace minty
 
 #pragma region Script
 
-	public:
+	private:
 		Asset* load_script(Path const& path);
 
 #pragma endregion
-
 
 #pragma endregion
 
@@ -241,4 +242,10 @@ namespace minty
 
 		void erase_by_type(Asset& asset);
 	};
+
+	template<typename T>
+	T* AssetEngine::load(Path const& path)
+	{
+		return static_cast<T*>(load_asset(path));
+	}
 }

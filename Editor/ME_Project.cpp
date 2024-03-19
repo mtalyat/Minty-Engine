@@ -51,7 +51,7 @@ minty::Path mintye::Project::get_assembly_path() const
 	return (_base / ASSEMBLY_DIRECTORY_NAME);
 }
 
-std::set<Path> mintye::Project::find_assets(std::unordered_set<minty::Path> const& extensions) const
+std::set<Path> mintye::Project::find_assets(std::vector<minty::Path> const& extensions) const
 {
 	// output files
 	std::set<Path> result;
@@ -70,9 +70,9 @@ std::set<Path> mintye::Project::find_assets(std::unordered_set<minty::Path> cons
 	return result;
 }
 
-std::set<Path> mintye::Project::find_assets(CommonFileType const commonFileTypes) const
+std::set<Path> mintye::Project::find_assets(AssetType const assetType) const
 {
-	return find_assets(get_extensions(commonFileTypes));
+	return find_assets(Asset::get_extensions(assetType));
 }
 
 Path mintye::Project::find_asset(std::string name) const
@@ -105,12 +105,12 @@ Path mintye::Project::find_asset(std::string name) const
 	return Path();
 }
 
-minty::Path mintye::Project::find_asset(CommonFileType const commonFileType) const
+minty::Path mintye::Project::find_asset(AssetType const assetType) const
 {
-	return find_asset(get_extensions(commonFileType));
+	return find_asset(Asset::get_extensions(assetType));
 }
 
-minty::Path mintye::Project::find_asset(std::unordered_set<minty::Path> const& extensions) const
+minty::Path mintye::Project::find_asset(std::vector<minty::Path> const& extensions) const
 {
 	// check each extension, if it exists
 	for (auto const& extension : extensions)
@@ -130,9 +130,9 @@ minty::Path mintye::Project::find_asset(std::unordered_set<minty::Path> const& e
 	return Path();
 }
 
-minty::Path mintye::Project::find_asset(minty::String const& name, CommonFileType const commonFileType) const
+minty::Path mintye::Project::find_asset(minty::String const& name, AssetType const assetType) const
 {
-	for (auto const& extension : get_extensions(commonFileType))
+	for (auto const& extension : Asset::get_extensions(assetType))
 	{
 		Path path = find_asset(std::format("{}{}", name, extension.string()));
 
@@ -217,12 +217,12 @@ void Project::refresh()
 				}
 
 				// if the file needs a meta, create one with a new ID quick
-				if (extension != META_EXTENSION && !AssetEngine::check_if_no_meta(extension.string().c_str()) && !std::filesystem::exists(Asset::get_meta_path(relativePath)))
+				if (extension != EXTENSION_META && Asset::requires_meta(extension.string().c_str()) && !std::filesystem::exists(Asset::get_meta_path(path)))
 				{
 					// create a new meta with a random ID, the rest can be populated later
 					// (ID is the most important for asset loading)
 					Node node("", to_string(UUID()));
-					File::write_node(Asset::get_meta_path(relativePath), node);
+					File::write_node(Asset::get_meta_path(path), node);
 				}
 
 				_fileCount++;
@@ -244,32 +244,5 @@ void mintye::Project::wrap_assets(Wrap& wrap) const
 		{
 			wrap.emplace(path, path);
 		}
-	}
-}
-
-std::unordered_set<minty::Path> mintye::Project::get_extensions(CommonFileType const commonFileType) const
-{
-	// switch based on common file types
-	switch (commonFileType)
-	{
-	case CommonFileType::Header: return { ".h" };
-	case CommonFileType::Source: return { ".cpp", ".c" };
-	case CommonFileType::Script: return { minty::SCRIPT_EXTENSION };
-	case CommonFileType::Scene: return { minty::SCENE_EXTENSION };
-	case CommonFileType::Text: return { ".txt" };
-	case CommonFileType::CSV: return { ".csv" };
-	case CommonFileType::Texture: return { ".png", ".jpg", ".jpeg", ".bmp" };
-	case CommonFileType::Sprite: return { minty::SPRITE_EXTENSION };
-	case CommonFileType::Material: return { minty::MATERIAL_EXTENSION };
-	case CommonFileType::MaterialTemplate: return { minty::MATERIAL_TEMPLATE_EXTENSION };
-	case CommonFileType::ShaderPass: return { minty::SHADER_PASS_EXTENSION };
-	case CommonFileType::Shader: return { minty::SHADER_EXTENSION };
-	case CommonFileType::ShaderModule: return { ".spv" };
-	case CommonFileType::Audio: return { ".wav", ".mp3" };
-	case CommonFileType::Animator: return { minty::ANIMATOR_EXTENSION };
-	case CommonFileType::Animation: return { minty::ANIMATION_EXTENSION };
-	case CommonFileType::Model: return { ".obj" };
-	case CommonFileType::Wrap: return { minty::WRAP_EXTENSION };
-	default: return {}; // not a valid common file type
 	}
 }

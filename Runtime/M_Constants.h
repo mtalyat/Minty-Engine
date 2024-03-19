@@ -28,19 +28,6 @@ namespace minty
 
 	constexpr static char const* BLANK = "_";
 
-	constexpr static char const* META_EXTENSION = ".mmeta";
-	constexpr static char const* APPLICATION_EXTENSION = ".mapp";
-	constexpr static char const* ANIMATION_EXTENSION = ".manimation";
-	constexpr static char const* ANIMATOR_EXTENSION = ".manimator";
-	constexpr static char const* SCENE_EXTENSION = ".mscene";
-	constexpr static char const* SPRITE_EXTENSION = ".msprite";
-	constexpr static char const* MATERIAL_EXTENSION = ".mmaterial";
-	constexpr static char const* MATERIAL_TEMPLATE_EXTENSION = ".mmaterialtemplate";
-	constexpr static char const* SHADER_PASS_EXTENSION = ".mshaderpass";
-	constexpr static char const* SHADER_EXTENSION = ".mshader";
-	constexpr static char const* WRAP_EXTENSION = ".wrap";
-	constexpr static char const* SCRIPT_EXTENSION = ".cs";
-
 	constexpr static char const* SCRIPT_METHOD_NAME_ONCREATE = "OnCreate";
 	constexpr static char const* SCRIPT_METHOD_NAME_ONLOAD = "OnLoad";
 	constexpr static char const* SCRIPT_METHOD_NAME_ONENABLE = "OnEnable";
@@ -53,4 +40,8 @@ namespace minty
 	constexpr static char const* SCRIPT_INPUT_TRIGGER_MOUSE_CLICK = "TriggerMouseClick";
 	constexpr static char const* SCRIPT_INPUT_TRIGGER_MOUSE_MOVE = "TriggerMouseMove";
 	constexpr static char const* SCRIPT_INPUT_TRIGGER_MOUSE_SCROLL = "TriggerMouseScroll";
+
+	constexpr static char const* EXTENSION_APPLICATION_DATA = ".appdata";
+	constexpr static char const* EXTENSION_META = ".meta";
+	constexpr static char const* EXTENSION_WRAP = ".wrap";
 }

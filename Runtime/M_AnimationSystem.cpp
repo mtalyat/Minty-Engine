@@ -79,9 +79,3 @@ void minty::AnimationSystem::update()
 
 void minty::AnimationSystem::reset()
 {}
-
-void minty::AnimationSystem::deserialize(Reader const& reader)
-{
-	register_assets("animations", reader, [](AssetEngine& assets, Path const& path) { return assets.load_animation(path); });
-	register_assets("animators", reader, [](AssetEngine& assets, Path const& path) { return assets.load_animator(path); });
-}

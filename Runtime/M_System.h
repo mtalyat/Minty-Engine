@@ -18,24 +18,11 @@ namespace minty
 	class System
 		: public SceneObject
 	{
-	protected:
-		typedef std::function<Asset*(AssetEngine& engine, Path const& path)> RegisterFunc;
-
-		struct RegisteredAsset
-		{
-			String keyword;
-			std::vector<Path> paths;
-			RegisterFunc func;
-		};
-
 	private:
 		// is this system enabled?
 		bool _enabled;
 
 		String _name;
-
-		std::vector<RegisteredAsset> _unloadedAssets;
-		std::unordered_set<UUID> _loadedAssets;
 	public:
 		/// <summary>
 		/// Creates a new System.
@@ -88,16 +75,6 @@ namespace minty
 		/// Called when the Scene is being unloaded.
 		/// </summary>
 		virtual void unload();
-
-	protected:
-		void register_assets(String const& keyword, std::vector<Path> const& paths, RegisterFunc const& func);
-
-		void register_assets(String const& name, Reader const& reader, RegisterFunc const& func);
-
-		void load_registered_assets();
-
-		void unload_registered_assets();
-
 	public:
 		virtual void serialize(Writer& writer) const override;
 		virtual void deserialize(Reader const& reader) override;
