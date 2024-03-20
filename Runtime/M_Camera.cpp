@@ -4,6 +4,7 @@
 #include "M_Math.h"
 #include "M_Writer.h"
 #include "M_Reader.h"
+#include "M_Text.h"
 
 using namespace minty;
 

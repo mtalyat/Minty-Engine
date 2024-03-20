@@ -9,6 +9,6 @@ String minty::to_string(KeyAction const value)
     case KeyAction::Up: return "Up";
     case KeyAction::Down: return "Down";
     case KeyAction::Hold: return "Hold";
-    default: return Text::EMPTY;
+    default: return "";
     }
 }

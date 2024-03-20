@@ -7,6 +7,16 @@
 
 using namespace minty;
 
+minty::Text::Text(TextBuilder const& builder, Runtime& runtime)
+	: Asset(builder.id, builder.path, runtime)
+	, _text(builder.text)
+{}
+
+String const& minty::Text::get_text() const
+{
+	return _text;
+}
+
 String minty::Text::to_lower(String const& string)
 {
 	std::vector<char> data(string.size());

@@ -25,10 +25,18 @@ namespace minty
 		public Asset
 	{
 	private:
+		struct AssetData
+		{
+			size_t index;
+			UUID id;
+		};
+
+	private:
 		EntityRegistry* _entities;
 		SystemRegistry* _systems;
 		bool _loaded;
 
+		std::unordered_map<Path, AssetData> _registeredAssets;
 		std::vector<Path> _unloadedAssets;
 		std::unordered_set<UUID> _loadedAssets;
 
@@ -96,10 +104,19 @@ namespace minty
 
 #pragma region Asset Loading
 
+	public:
+		void register_asset(Path const& path);
+
+		void unregister_asset(Path const& path);
+
+		bool is_registered(Path const& assetPath);
+
 	private:
 		void load_registered_assets();
 
 		void unload_registered_assets();
+
+		void sort_registered_assets();
 
 #pragma endregion
 

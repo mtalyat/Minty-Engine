@@ -68,7 +68,7 @@ void mintye::AssetsWindow::draw()
 		{
 			// create new file in the currently selected folder, if it does not exist
 			Path path = get_project()->get_assets_path() / _path / newAssetName;
-			
+
 			AssetEngine& assets = get_runtime().get_asset_engine();
 
 			if (!assets.exists(path))
@@ -128,7 +128,7 @@ void mintye::AssetsWindow::draw()
 	for (auto const& path : _directories)
 	{
 		// if clicked, move to new directory
-		if (ImGui::Button(path.string().c_str(), itemSize))
+		if (ImGui::Button(path.string().append("/").c_str(), itemSize))
 		{
 			// move to new folder
 			set_path(_path / path);
@@ -136,15 +136,50 @@ void mintye::AssetsWindow::draw()
 		}
 	}
 
+	Scene* scene = get_scene();
+
 	// draw files
-	for (auto const& path : _files)
+	for (auto const& fileData : _files)
 	{
+		String name = fileData.path.string();
+
+		if (scene && fileData.canIncludeInScene)
+		{
+			if (fileData.includedInScene)
+			{
+				name += " [X]";
+			}
+			else
+			{
+				name += " [ ]";
+			}
+		}
+
 		// if clicked, open the file
-		if (ImGui::Button(path.string().c_str(), itemSize))
+		if (ImGui::Button(name.c_str(), itemSize))
 		{
 			EditorApplication& app = get_application();
-			app.open_asset(project->get_assets_path() / _path / path);
-			//minty::Operations::open(project->get_assets_path() / _path / path);
+			app.open_asset(project->get_assets_path() / _path / fileData.path);
+		}
+
+		if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
+		{
+			// inverse selection
+			Scene* scene = get_scene();
+
+			Path projectPath = get_path(fileData.path).lexically_relative(project->get_base_path());
+
+			if (scene->is_registered(projectPath))
+			{
+				scene->unregister_asset(projectPath);
+			}
+			else
+			{
+				scene->register_asset(projectPath);
+			}
+
+			// refresh
+			get_application().refresh();
 		}
 	}
 	
@@ -177,6 +212,8 @@ void mintye::AssetsWindow::set_path(minty::Path const& path)
 
 	Path fullPath = project->get_assets_path() / _path;
 
+	Scene* scene = get_scene();
+
 	// update directories and paths
 	for (auto const& entry : fs::directory_iterator(fullPath))
 	{
@@ -188,7 +225,18 @@ void mintye::AssetsWindow::set_path(minty::Path const& path)
 		// add all regular files that aren't meta
 		else if (fs::is_regular_file(entry.status()) && Asset::get_type(entry.path()) != AssetType::Meta)
 		{
-			_files.push_back(entry.path().filename());
+			_files.push_back(FileData{
+				.path = entry.path().filename(),
+				.canIncludeInScene = Asset::get_type(entry.path()) != AssetType::Scene,
+				.includedInScene = scene && scene->is_registered(get_path(entry.path()).lexically_relative(project->get_base_path())),
+				});
 		}
 	}
+
+	int i = 0;
+}
+
+minty::Path mintye::AssetsWindow::get_path(minty::Path const& path) const
+{
+	return get_project()->get_assets_path() / _path / path;
 }

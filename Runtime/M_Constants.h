@@ -26,7 +26,7 @@ namespace minty
 	constexpr static unsigned int DESCRIPTOR_SET_SHADER_PASS = 1;
 	constexpr static unsigned int DESCRIPTOR_SET_MATERIAL = 2;
 
-	constexpr static char const* BLANK = "_";
+	constexpr static char const* BLANK = "";
 
 	constexpr static char const* SCRIPT_METHOD_NAME_ONCREATE = "OnCreate";
 	constexpr static char const* SCRIPT_METHOD_NAME_ONLOAD = "OnLoad";

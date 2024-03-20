@@ -40,7 +40,7 @@ String minty::Console::to_string(Color const value)
 	case Color::BrightMagenta: return "Bright Magenta";
 	case Color::BrightCyan: return "Bright Cyan";
 	case Color::BrightWhite: return "Bright White";
-	default: return Text::EMPTY;
+	default: return "";
 	}
 }
 

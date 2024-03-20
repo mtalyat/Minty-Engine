@@ -226,6 +226,8 @@ void mintye::EditorApplication::load_project(minty::Path const& path)
 
 	// set window text to file name
 	set_window_title(project->get_name());
+
+	refresh();
 }
 
 void mintye::EditorApplication::unload_project()
@@ -236,6 +238,8 @@ void mintye::EditorApplication::unload_project()
 	{
 		delete _project;
 		set_project(nullptr);
+
+		refresh();
 	}
 }
 
@@ -316,6 +320,8 @@ void mintye::EditorApplication::load_scene(minty::Path const& path)
 	set_scene(sceneManager.create_scene(path).get_id());
 	sceneManager.load_scene(_sceneId);
 	sceneManager.load();
+
+	refresh();
 }
 
 void mintye::EditorApplication::unload_scene()
@@ -326,6 +332,8 @@ void mintye::EditorApplication::unload_scene()
 		sceneManager.unload();
 		sceneManager.destroy();
 		set_scene(INVALID_UUID);
+
+		refresh();
 	}
 }
 

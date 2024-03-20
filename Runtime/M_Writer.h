@@ -144,7 +144,7 @@ namespace minty
 				// unordered
 				for (auto const& v : value)
 				{
-					writer.write("", v);
+					writer.write(BLANK, v);
 				}
 			}
 
@@ -159,15 +159,15 @@ namespace minty
 				return;
 			}
 
-			Node node;
-			Writer writer(node);
+			Node node(name);
+			Writer writer(node, _data);
 
 			for (auto const& v : value)
 			{
 				writer.write(BLANK, v);
 			}
 
-			write(name, node);
+			write(node);
 		}
 
 		template<typename T>
@@ -178,15 +178,15 @@ namespace minty
 				return;
 			}
 
-			Node node;
-			Writer writer(node);
+			Node node(name);
+			Writer writer(node, _data);
 
 			for (auto const& v : value)
 			{
 				writer.write(BLANK, v);
 			}
 
-			write(name, node);
+			write(node);
 		}
 
 		template<typename T, typename U>
@@ -197,8 +197,8 @@ namespace minty
 				return;
 			}
 
-			Node node;
-			Writer writer(node);
+			Node node(name);
+			Writer writer(node, _data);
 
 			for (auto const& pair : value)
 			{
@@ -207,7 +207,7 @@ namespace minty
 				writer.write(stream.str(), pair.second);
 			}
 
-			write(name, node);
+			write(node);
 		}
 
 		template<typename T, typename U>
@@ -218,8 +218,8 @@ namespace minty
 				return;
 			}
 
-			Node node;
-			Writer writer(node);
+			Node node(name);
+			Writer writer(node, _data);
 
 			for (auto const& pair : value)
 			{
@@ -228,7 +228,7 @@ namespace minty
 				writer.write(stream.str(), pair.second);
 			}
 
-			write(name, node);
+			write(node);
 		}
 
 		template<typename T>

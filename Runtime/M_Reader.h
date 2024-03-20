@@ -483,16 +483,14 @@ namespace minty
 		{
 			value.clear();
 
-			if (auto const* list = node.find_all(BLANK))
-			{
-				value.reserve(list->size());
+			auto const list = node.find_all(BLANK);
+			value.reserve(list.size());
 
-				for (Node const& node : *list)
-				{
-					T t;
-					parse_object(node, t);
-					value.push_back(t);
-				}
+			for (Node const* node : list)
+			{
+				T t;
+				parse_object(*node, t);
+				value.push_back(t);
 			}
 		}
 
@@ -501,16 +499,14 @@ namespace minty
 		{
 			value.clear();
 
-			if (auto const* list = node.find_all(BLANK))
-			{
-				value.reserve(list->size());
+			auto const list = node.find_all(BLANK);
+			value.reserve(list.size());
 
-				for (Node const& node : *list)
-				{
-					T t;
-					parse_object(node, t);
-					value.push_back(t);
-				}
+			for (Node const* node : list)
+			{
+				T t;
+				parse_object(*node, t);
+				value.emplace(t);
 			}
 		}
 
@@ -521,7 +517,7 @@ namespace minty
 
 			Reader reader(node, _data);
 
-			for (auto const& child : node->children)
+			for (auto const& child : node.get_children())
 			{
 				// parse T
 				T t{};
@@ -541,7 +537,7 @@ namespace minty
 
 			Reader reader(node, _data);
 
-			for (auto const& child : node->children)
+			for (auto const& child : node.get_children())
 			{
 				// parse T
 				T t{};

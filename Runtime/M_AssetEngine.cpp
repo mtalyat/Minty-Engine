@@ -22,6 +22,7 @@
 #include "M_AudioClip.h"
 #include "M_Animation.h"
 #include "M_Animator.h"
+#include "M_Text.h"
 
 using namespace minty;
 using namespace minty::vk;
@@ -129,6 +130,8 @@ Asset* minty::AssetEngine::load_asset(Path const& path)
 	// load based on the type
 	switch (type)
 	{
+	case AssetType::Text:
+		return load_text(path);
 	case AssetType::Script:
 		return load_script(path);
 	case AssetType::Texture:
@@ -152,7 +155,7 @@ Asset* minty::AssetEngine::load_asset(Path const& path)
 	case AssetType::Animator:
 		return load_animator(path);
 	default:
-		MINTY_ABORT(std::format("load_asset not implemented for asset type: {}", path.extension().string()));
+		MINTY_ERROR_FORMAT("load_asset not implemented for asset type: {}", path.extension().string());
 		return nullptr;
 	}
 }
@@ -692,6 +695,29 @@ Asset* minty::AssetEngine::load_script(Path const& path)
 	scriptEngine.register_script_id(meta.to_uuid(), path.stem().string());
 	
 	return emplace_new(new Asset(meta.to_uuid(), path, get_runtime()));
+}
+
+Asset* minty::AssetEngine::load_text(Path const& path)
+{
+	check(path);
+
+	Node meta = read_file_meta(path);
+
+	std::vector<char> fileData = read_file(path);
+
+	if (fileData.empty() || fileData.back() != '\0')
+	{
+		fileData.push_back('\0');
+	}
+
+	TextBuilder builder
+	{
+		.id = meta.to_uuid(),
+		.path = path,
+		.text = String(fileData.data()),
+	};
+
+	return emplace_new(new Text(builder, get_runtime()));
 }
 
 void minty::AssetEngine::unload(UUID const id)

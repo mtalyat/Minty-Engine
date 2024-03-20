@@ -4,6 +4,7 @@
 #include "M_Console.h"
 #include "M_File.h"
 #include "M_Parse.h"
+#include "M_Text.h"
 #include <vector>
 
 using namespace minty;
@@ -67,7 +68,7 @@ String minty::Node::get_node_string() const
         else
         {
             // none
-            return Text::EMPTY;
+            return "";
         }
     }
 }

@@ -658,7 +658,7 @@ String minty::EntityRegistry::get_tag(Entity const entity) const
 		return tag->tag;
 	}
 
-	return Text::EMPTY;
+	return "";
 }
 
 void minty::EntityRegistry::set_tag(Entity const entity, String const& tag)
@@ -1020,7 +1020,7 @@ void minty::EntityRegistry::serialize(Writer& writer) const
 		{
 			// ID
 			nodeName = to_string(entityId);
-			nodeValue = Text::EMPTY;
+			nodeValue = "";
 		}
 		else
 		{
@@ -1059,7 +1059,7 @@ void minty::EntityRegistry::serialize(Writer& writer) const
 		{
 			// ID
 			nodeName = to_string(entityId);
-			nodeValue = Text::EMPTY;
+			nodeValue = "";
 		}
 		else
 		{
@@ -1109,7 +1109,7 @@ Entity minty::EntityRegistry::deserialize_entity(Node const& entityNode)
 	else
 	{
 		// no data, so the "name" must be the ID, and there is no name
-		name = Text::EMPTY;
+		name = "";
 		value = entityNode.get_name();
 	}
 
@@ -1118,7 +1118,7 @@ Entity minty::EntityRegistry::deserialize_entity(Node const& entityNode)
 	{
 		// the value must be the name instead
 		name = value;
-		value = Text::EMPTY;
+		value = "";
 
 		// generate a new ID
 		id = UUID();

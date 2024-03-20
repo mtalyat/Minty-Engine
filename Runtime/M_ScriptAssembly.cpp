@@ -66,7 +66,7 @@ minty::ScriptAssembly::~ScriptAssembly()
 {
 	//mono_assembly_close(_assembly);
 
-	_path = Text::EMPTY;
+	_path = "";
 	_engine = nullptr;
 	_assembly = nullptr;
 	_classes.clear();

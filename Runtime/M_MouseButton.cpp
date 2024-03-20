@@ -23,6 +23,6 @@ String minty::to_string(MouseButton const value)
     case MouseButton::Button8:
         return "Mouse Button 8";
     default:
-        return Text::EMPTY;
+        return "";
     }
 }

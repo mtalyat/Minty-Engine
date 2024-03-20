@@ -11,26 +11,31 @@
 
 namespace minty
 {
+	/// <summary>
+	/// All of the types of assets that can be loaded into the engine.
+	/// 
+	/// This determines the loading order of the assets when loading the scene.
+	/// </summary>
 	enum class AssetType
 	{
 		None,
 		Meta,
+		Wrap,
 		Text,
 		Script,
-		Texture,
-		Sprite,
-		Material,
-		MaterialTemplate,
-		ShaderPass,
-		Shader,
-		ShaderModule,
-		ShaderCode,
-		Scene,
-		Mesh,
 		AudioClip,
 		Animation,
 		Animator,
-		Wrap,
+		Texture,
+		ShaderCode,
+		ShaderModule,
+		Shader,
+		ShaderPass,
+		MaterialTemplate,
+		Material,
+		Sprite,
+		Mesh,
+		Scene,
 	};
 
 	class Asset

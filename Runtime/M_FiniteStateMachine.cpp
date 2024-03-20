@@ -3,6 +3,7 @@
 
 #include "M_Reader.h"
 #include "M_Writer.h"
+#include "M_Text.h"
 
 using namespace minty;
 
@@ -55,7 +56,7 @@ String minty::FSM::Scope::get_name(ID const key) const
 		}
 	}
 
-	return Text::EMPTY;
+	return "";
 }
 
 ID minty::FSM::Scope::find(String const& key) const

@@ -473,7 +473,7 @@ String minty::ScriptEngine::get_exception_message(MonoObject* const exception) c
 		return "";
 	}
 
-	String out = Text::EMPTY;
+	String out = "";
 
 	if (result) {
 		char* str = mono_string_to_utf8((MonoString*)result);
@@ -732,7 +732,7 @@ String minty::ScriptEngine::get_name_from_script_id(UUID const id) const
 
 	if (found == _idToName.end())
 	{
-		return Text::EMPTY;
+		return "";
 	}
 
 	return found->second;

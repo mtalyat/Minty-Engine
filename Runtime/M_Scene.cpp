@@ -22,6 +22,7 @@ minty::Scene::Scene(SceneBuilder const& builder, Runtime& engine)
 	, _entities(new EntityRegistry(engine, *this))
 	, _systems(new SystemRegistry(engine, *this))
 	, _loaded()
+	, _registeredAssets()
 	, _unloadedAssets()
 	, _loadedAssets()
 {}
@@ -37,6 +38,9 @@ minty::Scene::Scene(Scene&& other) noexcept
 	, _entities(std::move(other._entities))
 	, _systems(std::move(other._systems))
 	, _loaded(std::move(other._loaded))
+	, _registeredAssets(std::move(other._registeredAssets))
+	, _unloadedAssets(std::move(other._unloadedAssets))
+	, _loadedAssets(std::move(other._loadedAssets))
 {}
 
 Scene& minty::Scene::operator=(Scene&& other) noexcept
@@ -46,6 +50,9 @@ Scene& minty::Scene::operator=(Scene&& other) noexcept
 		_entities = std::move(other._entities);
 		_systems = std::move(other._systems);
 		_loaded = std::move(other._loaded);
+		_registeredAssets = std::move(other._registeredAssets);
+		_unloadedAssets = std::move(other._unloadedAssets);
+		_loadedAssets = std::move(other._loadedAssets);
 	}
 
 	return *this;
@@ -182,6 +189,62 @@ void minty::Scene::finalize()
 	_entities->destroy_queued();
 }
 
+void minty::Scene::register_asset(Path const& path)
+{
+	MINTY_ASSERT(!_registeredAssets.contains(path));
+
+	AssetData data
+	{
+		.index = _unloadedAssets.size(),
+		.id = INVALID_UUID,
+	};
+
+	_unloadedAssets.push_back(path);
+
+	// load asset if needed
+	if (_loaded)
+	{
+		AssetEngine& assets = get_runtime().get_asset_engine();
+
+		if (Asset* asset = assets.load_asset(path))
+		{
+			_loadedAssets.emplace(asset->get_id());
+			data.id = asset->get_id();
+		}
+	}
+
+	_registeredAssets.emplace(path, data);
+
+	sort_registered_assets();
+}
+
+void minty::Scene::unregister_asset(Path const& path)
+{
+	MINTY_ASSERT(_registeredAssets.contains(path));
+
+	AssetEngine& assets = get_runtime().get_asset_engine();
+
+	AssetData& data = _registeredAssets.at(path);
+
+	// unload asset if needed
+	if (_loaded)
+	{
+		if (data.id.valid())
+		{
+			assets.unload(data.id);
+			_loadedAssets.erase(data.id);
+		}
+	}
+	
+	_unloadedAssets.erase(_unloadedAssets.begin() + data.index);
+	_registeredAssets.erase(path);
+}
+
+bool minty::Scene::is_registered(Path const& assetPath)
+{
+	return _registeredAssets.contains(assetPath);
+}
+
 void minty::Scene::load_registered_assets()
 {
 	// load each asset into the engine and save its ID so it can be unloaded later
@@ -207,6 +270,35 @@ void minty::Scene::unload_registered_assets()
 	}
 }
 
+bool registered_assets_sort(const Path& a, const Path& b) {
+	// sort based on AssetType
+	AssetType aType = Asset::get_type(a);
+	AssetType bType = Asset::get_type(b);
+
+	if (aType == bType)
+	{
+		// if the same type, sort alphabetically
+		return a < b;
+	}
+	else
+	{
+		// if different types, sort by type
+		return aType < bType;
+	}
+}
+
+void minty::Scene::sort_registered_assets()
+{
+	// sort the paths
+	std::sort(_unloadedAssets.begin(), _unloadedAssets.end(), registered_assets_sort);
+
+	// update registered assets indices
+	for (size_t i = 0; i < _unloadedAssets.size(); i++)
+	{
+		_registeredAssets.at(_unloadedAssets.at(i)).index = i;
+	}
+}
+
 void minty::Scene::serialize(Writer& writer) const
 {
 	writer.write("assets", _unloadedAssets);
@@ -217,9 +309,23 @@ void minty::Scene::serialize(Writer& writer) const
 void minty::Scene::deserialize(Reader const& reader)
 {
 	_unloadedAssets.clear();
+	_registeredAssets.clear();
 
 	reader.read_vector("assets", _unloadedAssets);
 	reader.read_serializable("systems", *_systems);
+
+	// add all assets to registered list
+	_registeredAssets.reserve(_unloadedAssets.size());
+	for (size_t i = 0; i < _unloadedAssets.size(); i++)
+	{
+		_registeredAssets.emplace(_unloadedAssets.at(i), AssetData{
+			.index = i,
+			.id = INVALID_UUID,
+			});
+	}
+
+	// sort for good measure
+	sort_registered_assets();
 
 	// this is done in the load function
 	//reader.read_serializable("entities", *_entities);

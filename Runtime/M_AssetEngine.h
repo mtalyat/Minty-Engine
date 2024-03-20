@@ -110,28 +110,15 @@ namespace minty
 
 		void load_mesh_obj(Path const& path, Mesh& mesh);
 
-#pragma endregion
-
-#pragma region Audio
-
-	private:
 		AudioClip* load_audio_clip(Path const& path);
 
-#pragma endregion
-
-#pragma region Animation
-
-	private:
 		Animation* load_animation(Path const& path);
 
 		Animator* load_animator(Path const& path);
 
-#pragma endregion
-
-#pragma region Script
-
-	private:
 		Asset* load_script(Path const& path);
+
+		Asset* load_text(Path const& path);
 
 #pragma endregion
 
