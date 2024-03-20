@@ -118,6 +118,8 @@ namespace minty
 
 		void sort_registered_assets();
 
+		void update_registered_indices();
+
 #pragma endregion
 
 	public:

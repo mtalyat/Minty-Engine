@@ -162,7 +162,8 @@ void mintye::AssetsWindow::draw()
 			app.open_asset(project->get_assets_path() / _path / fileData.path);
 		}
 
-		if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
+		// if right clicked, toggle inclusion in the scene
+		if (scene && fileData.canIncludeInScene && ImGui::IsItemClicked(ImGuiMouseButton_Right))
 		{
 			// inverse selection
 			Scene* scene = get_scene();

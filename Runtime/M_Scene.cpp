@@ -215,6 +215,7 @@ void minty::Scene::register_asset(Path const& path)
 
 	_registeredAssets.emplace(path, data);
 
+	// sort all since a new thing was added
 	sort_registered_assets();
 }
 
@@ -238,6 +239,9 @@ void minty::Scene::unregister_asset(Path const& path)
 	
 	_unloadedAssets.erase(_unloadedAssets.begin() + data.index);
 	_registeredAssets.erase(path);
+
+	// update indices since an asset was removed in the middle
+	update_registered_indices();
 }
 
 bool minty::Scene::is_registered(Path const& assetPath)
@@ -254,7 +258,10 @@ void minty::Scene::load_registered_assets()
 	{
 		if (Asset* asset = assets.load_asset(path))
 		{
+			AssetData& data = _registeredAssets.at(path);
+
 			_loadedAssets.emplace(asset->get_id());
+			data.id = asset->get_id();
 		}
 	}
 }
@@ -267,6 +274,11 @@ void minty::Scene::unload_registered_assets()
 	for (auto const id : _loadedAssets)
 	{
 		assets.unload(id);
+	}
+
+	for (auto& [path, data] : _registeredAssets)
+	{
+		data.id = INVALID_UUID;
 	}
 }
 
@@ -293,6 +305,11 @@ void minty::Scene::sort_registered_assets()
 	std::sort(_unloadedAssets.begin(), _unloadedAssets.end(), registered_assets_sort);
 
 	// update registered assets indices
+	update_registered_indices();
+}
+
+void minty::Scene::update_registered_indices()
+{
 	for (size_t i = 0; i < _unloadedAssets.size(); i++)
 	{
 		_registeredAssets.at(_unloadedAssets.at(i)).index = i;
