@@ -53,7 +53,7 @@ void minty::Application::start()
 	AssetEngine& assets = _runtime->get_asset_engine();
 	Path applicationDataPath = String("game").append(EXTENSION_APPLICATION_DATA);
 
-	if (std::filesystem::exists(applicationDataPath))
+	if (assets.exists(applicationDataPath))
 	{
 		Node node = assets.read_file_node(applicationDataPath);
 
