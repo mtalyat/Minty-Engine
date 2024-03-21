@@ -5,6 +5,8 @@
 
 namespace minty
 {
+	class AudioClip;
+
 	/// <summary>
 	/// Holds data for an Entity that can emit audio within the Scene.
 	/// </summary>
@@ -12,14 +14,19 @@ namespace minty
 		: public Component
 	{
 		/// <summary>
-		/// The ID of the clip to be played.
+		/// The clip to be played.
 		/// </summary>
-		ID clipId;
+		AudioClip* clip;
+
+		/// <summary>
+		/// The handle to the sound being played, if any.
+		/// </summary>
+		AudioHandle handle = ERROR_AUDIO_HANDLE;
 
 		/// <summary>
 		/// The volume of this source.
 		/// </summary>
-		float volume;
+		float volume = 1.0f;
 		/// <summary>
 		/// The attenuation of this source.
 		/// </summary>
@@ -36,6 +43,6 @@ namespace minty
 		void serialize(Writer& writer) const override;
 		void deserialize(Reader const& reader) override;
 
-		friend std::string to_string(AudioSourceComponent const& value);
+		friend String to_string(AudioSourceComponent const& value);
 	};
 }

@@ -1,38 +1,97 @@
 #pragma once
 
 #include "M_Types.h"
-#include <string>
+#include "M_UUID.h"
 #include <vector>
-#include <map>
+#include <unordered_map>
 
 namespace minty
 {
 	/// <summary>
 	/// Holds a bit of serialized data.
 	/// </summary>
-	struct Node
+	class Node
 	{
+	private:
+		/// <summary>
+		/// The name of this Node.
+		/// </summary>
+		String _name;
+
 		/// <summary>
 		/// The data stored within this Node.
 		/// </summary>
-		std::string data;
+		String _data;
 
 		/// <summary>
-		/// The child nodes. Organized by name and a list of each node with that name.
+		/// A list of all child nodes on this Node.
 		/// </summary>
-		std::map<std::string, std::vector<Node>> children;
+		std::vector<Node> _children;
+
+		/// <summary>
+		/// A map of all names to child nodes for quick lookup.
+		/// </summary>
+		std::unordered_map<String, std::vector<size_t>> _lookup;
+
+	public:
+		Node();
+
+		Node(String const& name, String const& data = "");
+
+		String const& get_name() const;
+
+		void set_name(String const& name);
+
+		String const& get_data() const;
+
+		void set_data(String const& data);
+
+		/// <summary>
+		/// Gets the Node string as if it were serialized.
+		/// </summary>
+		/// <returns></returns>
+		String get_node_string() const;
+
+		/// <summary>
+		/// Gets the Node string and its children as if it were serialized.
+		/// </summary>
+		/// <returns></returns>
+		std::vector<String> get_formatted(bool const toplevel = false) const;
+
+		String get_formatted_string() const;
+
+		std::vector<Node>& get_children();
+
+		std::vector<Node> const& get_children() const;
+
+		bool has_name() const;
+
+		/// <summary>
+		/// Checks if this Node has any data.
+		/// </summary>
+		/// <returns>True if data is not empty.</returns>
+		bool has_data() const;
+
+		/// <summary>
+		/// Checks if this Node has any children.
+		/// </summary>
+		/// <returns>True if children is not empty.</returns>
+		bool has_children() const;
+
+		void add_child(Node const& node);
 
 #pragma region To
 
+	public:
 		/// <summary>
 		/// Converts this Node's data to a string.
 		/// </summary>
-		std::string const& to_string() const;
+		String const& to_string() const;
 
 		/// <summary>
 		/// Converts this Node's data to a byte.
 		/// </summary>
-		byte to_byte(byte const defaultValue = 0) const;
+		Byte to_byte(Byte const defaultValue = 0) const;
 
 		/// <summary>
 		/// Converts this Node's data to an int.
@@ -43,6 +102,8 @@ namespace minty
 		/// Converts this Node's data to an ID.
 		/// </summary>
 		ID to_id(ID const defaultValue = 0) const;
+
+		UUID to_uuid() const;
 
 		/// <summary>
 		/// Converts this Node's data to an unsigned int.
@@ -68,111 +129,36 @@ namespace minty
 
 #pragma region Find
 
+	public:
 		/// <summary>
 		/// Searches for a child node with the given name.
 		/// </summary>
 		/// <param name="name">The name of the child node.</param>
 		/// <returns>A pointer to the first child node with the given name, or nullptr if none found.</returns>
-		Node* find(std::string const& name);
+		Node* find(String const& name);
 
 		/// <summary>
 		/// Searches for a child node with the given name.
 		/// </summary>
 		/// <param name="name">The name of the child node.</param>
 		/// <returns>A pointer to the first child node with the given name, or nullptr if none found.</returns>
-		Node const* find(std::string const& name) const;
+		Node const* find(String const& name) const;
 
 		/// <summary>
 		/// Finds a list of all the nodes with the given name.
 		/// </summary>
 		/// <param name="name">The name of the children nodes.</param>
 		/// <returns>A pointer to the vector of child nodes with the given name, or nullptr if none found.</returns>
-		std::vector<Node>* find_all(std::string const& name);
-
-		/// <summary>
-		/// Finds a list of all the nodes with the given name.
-		/// </summary>
-		/// <param name="name">The name of the children nodes.</param>
-		/// <returns>A pointer to the vector of child nodes with the given name, or nullptr if none found.</returns>
-		std::vector<Node> const* find_all(std::string const& name) const;
+		std::vector<Node const*> find_all(String const& name) const;
 
 #pragma endregion
-
-#pragma region Get
-
-		/// <summary>
-		/// Gets the value of a child node with the given name as a string, or returns the default value if no child found.
-		/// </summary>
-		/// <param name="name">The name of the child node.</param>
-		/// <param name="defaultValue">The default value to use if no child found.</param>
-		/// <returns>The value found within the child node.</returns>
-		std::string const& get_string(std::string const& name, std::string const& defaultValue = "") const;
-
-		/// <summary>
-		/// Gets the value of a child node with the given name as a byte, or returns the default value if no child found.
-		/// </summary>
-		/// <param name="name">The name of the child node.</param>
-		/// <param name="defaultValue">The default value to use if no child found.</param>
-		/// <returns>The value found within the child node.</returns>
-		byte get_byte(std::string const& name, byte const defaultValue = 0) const;
-
-		/// <summary>
-		/// Gets the value of a child node with the given name as an int, or returns the default value if no child found.
-		/// </summary>
-		/// <param name="name">The name of the child node.</param>
-		/// <param name="defaultValue">The default value to use if no child found.</param>
-		/// <returns>The value found within the child node.</returns>
-		int get_int(std::string const& name, int const defaultValue = 0) const;
-
-		/// <summary>
-		/// Gets the value of a child node with the given name as an ID, or returns the default value if no child found.
-		/// </summary>
-		/// <param name="name">The name of the child node.</param>
-		/// <param name="defaultValue">The default value to use if no child found.</param>
-		/// <returns>The value found within the child node.</returns>
-		ID get_id(std::string const& name, ID const defaultValue = 0) const;
-
-		/// <summary>
-		/// Gets the value of a child node with the given name as an unsigned int, or returns the default value if no child found.
-		/// </summary>
-		/// <param name="name">The name of the child node.</param>
-		/// <param name="defaultValue">The default value to use if no child found.</param>
-		/// <returns>The value found within the child node.</returns>
-		unsigned int get_uint(std::string const& name, unsigned int const defaultValue = 0) const;
-
-		/// <summary>
-		/// Gets the value of a child node with the given name as a size, or returns the default value if no child found.
-		/// </summary>
-		/// <param name="name">The name of the child node.</param>
-		/// <param name="defaultValue">The default value to use if no child found.</param>
-		/// <returns>The value found within the child node.</returns>
-		size_t get_size(std::string const& name, size_t const defaultValue = 0) const;
-
-		/// <summary>
-		/// Gets the value of a child node with the given name as a float, or returns the default value if no child found.
-		/// </summary>
-		/// <param name="name">The name of the child node.</param>
-		/// <param name="defaultValue">The default value to use if no child found.</param>
-		/// <returns>The value found within the child node.</returns>
-		float get_float(std::string const& name, float const defaultValue = 0.0f) const;
-
-		/// <summary>
-		/// Gets the value of a child node with the given name as a bool, or returns the default value if no child found.
-		/// </summary>
-		/// <param name="name">The name of the child node.</param>
-		/// <param name="defaultValue">The default value to use if no child found.</param>
-		/// <returns>The value found within the child node.</returns>
-		bool get_bool(std::string const& name, bool const defaultValue = false) const;
-
-#pragma endregion
-
-		/// <summary>
-		/// console::logs this Node tree.
-		/// </summary>
-		/// <param name="indent">The base indent for this Node.</param>
-		void print(int const indent = 0) const;
 
 	public:
-		friend std::string to_string(Node const& value);
+		static Node parse(String const& text);
+
+		static Node parse(std::vector<String> const& lines);
+
+	public:
+		friend String to_string(Node const& value);
 	};
 }

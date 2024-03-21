@@ -4,13 +4,13 @@
 using namespace minty;
 
 minty::InputMap::InputMap()
-	: _keyDownEvents(new std::map<Key, KeyEvent_t>())
-	, _keyUpEvents(new std::map<Key, KeyEvent_t>())
-	, _keyEvents(new std::map<Key, KeyEvent_t>())
+	: _keyDownEvents(new std::unordered_map<Key, KeyEvent_t>())
+	, _keyUpEvents(new std::unordered_map<Key, KeyEvent_t>())
+	, _keyEvents(new std::unordered_map<Key, KeyEvent_t>())
 	, _keys(new std::unordered_set<Key>())
-	, _mouseDownEvents(new std::map<MouseButton, ClickEvent_t>())
-	, _mouseUpEvents(new std::map<MouseButton, ClickEvent_t>())
-	, _mouseEvents(new std::map<MouseButton, ClickEvent_t>())
+	, _mouseDownEvents(new std::unordered_map<MouseButton, ClickEvent_t>())
+	, _mouseUpEvents(new std::unordered_map<MouseButton, ClickEvent_t>())
+	, _mouseEvents(new std::unordered_map<MouseButton, ClickEvent_t>())
 	, _buttons(new std::unordered_set<MouseButton>())
 	, _mouseMoveEvent(new MoveEvent_t())
 	, _mouseScrollEvent(new ScrollEvent_t())
@@ -222,27 +222,27 @@ bool minty::InputMap::is_button_pressed(MouseButton const button) const
 	return _buttons->contains(button);
 }
 
-std::string minty::to_string(KeyPressEventArgs const& value)
+String minty::to_string(KeyPressEventArgs const& value)
 {
 	return std::format("KeyPressEventArgs(key = {}, action = {}, mods = {})", to_string(value.key), to_string(value.action), to_string(value.mods));
 }
 
-std::string minty::to_string(MouseClickEventArgs const& value)
+String minty::to_string(MouseClickEventArgs const& value)
 {
 	return std::format("MouseClickEventArgs(button = {}, action = {}, mods = {}, x = {}, y = {})", to_string(value.button), to_string(value.action), to_string(value.mods), value.x, value.y);
 }
 
-std::string minty::to_string(MouseMoveEventArgs const& value)
+String minty::to_string(MouseMoveEventArgs const& value)
 {
 	return std::format("MouseMoveEventArgs(x = {}, y = {}, dx = {}, dy = {})", value.x, value.y, value.dx, value.dy);
 }
 
-std::string minty::to_string(MouseScrollEventArgs const& value)
+String minty::to_string(MouseScrollEventArgs const& value)
 {
 	return std::format("MouseScrollEventArgs(dx = {}, dy = {})", value.dx, value.dy);
 }
 
-std::string minty::to_string(InputMap const& value)
+String minty::to_string(InputMap const& value)
 {
 	return std::format("InputMap()");
 }

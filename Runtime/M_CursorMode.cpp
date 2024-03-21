@@ -1,7 +1,9 @@
 #include "pch.h"
 #include "M_CursorMode.h"
 
-std::string minty::to_string(CursorMode const mode)
+using namespace minty;
+
+String minty::to_string(CursorMode const mode)
 {
     switch (mode)
     {
@@ -12,6 +14,6 @@ std::string minty::to_string(CursorMode const mode)
     case CursorMode::Disabled:
         return "Disabled";
     default:
-        return minty::error::ERROR_TEXT;
+        return "";
     }
 }

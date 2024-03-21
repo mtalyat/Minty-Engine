@@ -1,8 +1,7 @@
 #pragma once
 
 #include "M_Component.h"
-#include "M_EntityRegistry.h"
-#include <unordered_set>
+#include "M_Entity.h"
 
 namespace minty
 {
@@ -21,6 +20,11 @@ namespace minty
 		/// The first child this Entity has.
 		/// </summary>
 		Entity first = NULL_ENTITY;
+		
+		/// <summary>
+		/// The last child this Entity has.
+		/// </summary>
+		Entity last = NULL_ENTITY;
 
 		/// <summary>
 		/// The previous sibling this Entity has.
@@ -40,6 +44,6 @@ namespace minty
 		void serialize(Writer& writer) const override;
 		void deserialize(Reader const& reader) override;
 
-		friend std::string to_string(RelationshipComponent const& value);
+		friend String to_string(RelationshipComponent const& value);
 	};
 }

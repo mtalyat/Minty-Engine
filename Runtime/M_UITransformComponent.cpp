@@ -1,12 +1,15 @@
 #include "pch.h"
 #include "M_UITransformComponent.h"
 
+#include "M_Reader.h"
+#include "M_Writer.h"
+
 using namespace minty;
 
-std::string minty::to_string(AnchorMode const anchor)
+String minty::to_string(AnchorMode const anchor)
 {
 	int mode = static_cast<int>(anchor);
-	std::string result;
+	String result;
 
 	if (mode & static_cast<int>(AnchorMode::Top))
 	{
@@ -42,32 +45,32 @@ std::string minty::to_string(AnchorMode const anchor)
 	return result;
 }
 
-AnchorMode minty::from_string_anchor_mode(std::string const& string)
+AnchorMode minty::from_string_anchor_mode(String const& string)
 {
 	int mode = 0;
 
-	if (string.find("Top") != std::string::npos)
+	if (string.find("Top") != String::npos)
 	{
 		mode |= static_cast<int>(AnchorMode::Top);
 	}
-	if (string.find("Middle") != std::string::npos)
+	if (string.find("Middle") != String::npos)
 	{
 		mode |= static_cast<int>(AnchorMode::Middle);
 	}
-	if (string.find("Bottom") != std::string::npos)
+	if (string.find("Bottom") != String::npos)
 	{
 		mode |= static_cast<int>(AnchorMode::Bottom);
 	}
 
-	if (string.find("Left") != std::string::npos)
+	if (string.find("Left") != String::npos)
 	{
 		mode |= static_cast<int>(AnchorMode::Left);
 	}
-	if (string.find("Center") != std::string::npos)
+	if (string.find("Center") != String::npos)
 	{
 		mode |= static_cast<int>(AnchorMode::Center);
 	}
-	if (string.find("Right") != std::string::npos)
+	if (string.find("Right") != String::npos)
 	{
 		mode |= static_cast<int>(AnchorMode::Right);
 	}
@@ -75,29 +78,30 @@ AnchorMode minty::from_string_anchor_mode(std::string const& string)
 	return static_cast<AnchorMode>(mode);
 }
 
-std::string minty::to_string(UITransformComponent const& value)
+String minty::to_string(UITransformComponent const& value)
 {
-	return std::format("SpriteComponent(anchor = {}, x/left = {}, y/top = {}, width/right = {}, height/bottom = {})", static_cast<byte>(value.anchorMode), value.x, value.y, value.width, value.height);
+	return std::format("SpriteComponent(anchor = {}, x/left = {}, y/top = {}, width/right = {}, height/bottom = {})", static_cast<Byte>(value.anchorMode), value.x, value.y, value.width, value.height);
 }
 
 void minty::UITransformComponent::serialize(Writer& writer) const
 {
 	writer.write("anchor", to_string(anchorMode));
-	writer.write("x", x, 0.0f);
-	writer.write("y", y, 0.0f);
-	writer.write("width", width, 0.0f);
-	writer.write("height", height, 0.0f);
+	writer.write("x", x);
+	writer.write("y", y);
+	writer.write("width", width);
+	writer.write("height", height);
 }
 
 void minty::UITransformComponent::deserialize(Reader const& reader)
 {
-	anchorMode = from_string_anchor_mode(reader.read_string("anchor"));
-	x = reader.read_float("x");
-	if (x == 0.0f) x = reader.read_float("left");
-	y = reader.read_float("y");
-	if (y == 0.0f) y = reader.read_float("top");
-	width = reader.read_float("width");
-	if (width == 0.0f) width = reader.read_float("right");
-	height = reader.read_float("height");
-	if (height == 0.0f) height = reader.read_float("bottom");
+	String name;
+	if (reader.try_read_string("anchor", name))anchorMode = from_string_anchor_mode(name);
+	reader.try_read_float("x", x);
+	reader.try_read_float("left", left);
+	reader.try_read_float("y", y);
+	reader.try_read_float("top", top);
+	reader.try_read_float("width", width);
+	reader.try_read_float("right", right);
+	reader.try_read_float("height", height);
+	reader.try_read_float("bottom", bottom);
 }

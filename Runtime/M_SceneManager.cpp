@@ -3,56 +3,92 @@
 
 #include "M_Asset.h"
 #include "M_Runtime.h"
-#include "M_Engine.h"
+#include "M_Runtime.h"
 #include "M_Node.h"
 #include "M_Reader.h"
 #include "M_Console.h"
 #include "M_SerializationData.h"
 #include "M_Scene.h"
-#include "M_Engine.h"
+#include "M_Runtime.h"
 #include "M_RenderEngine.h"
+#include "M_AssetEngine.h"
 
 #include "M_NameComponent.h"
 
 using namespace minty;
 
-minty::SceneManager::SceneManager(Engine* const engine)
-	: _engine(engine)
+minty::SceneManager::SceneManager(Runtime& engine)
+	: RuntimeObject(engine)
 	, _loaded()
-	, _scenes()
 	, _loadedScene()
+	, _workingScene()
 {}
 
-ID minty::SceneManager::create_scene()
+bool minty::SceneManager::is_loaded() const
 {
-	ID id = static_cast<ID>(_scenes.size());
-	_scenes.push_back(Scene(_engine));
-	return id;
+	return _loaded;
 }
 
-ID minty::SceneManager::create_scene(std::string const& path)
+Scene& minty::SceneManager::create_scene(Path const& path)
 {
-	// create the scene
-	ID id = create_scene();
-	Scene& scene = _scenes.at(id);
+	// load the data from the disk
+	AssetEngine& assets = get_runtime().get_asset_engine();
+	Node node = assets.read_file_node(path);
+	Node meta = assets.read_file_meta(path);
 
-	// load the data from the disk into the scene
-	Node node = asset::load_node(path);
-	SerializationData data =
+	SceneBuilder builder
 	{
-		.scene = &scene,
-		.entity = NULL_ENTITY
+		.id = meta.to_uuid(),
+		.path = path
 	};
-	Reader reader(node, &data);
-	scene.deserialize(reader);
+
+	Scene* scene = new Scene(builder, get_runtime());
+	Reader reader(node);
+	scene->deserialize(reader);
+
+	// add to assets
+	assets.emplace(scene);
 
 	// all done
-	return id;
+	return *scene;
 }
 
-void minty::SceneManager::load_scene(ID const id)
+bool minty::SceneManager::destroy_scene(UUID const id)
 {
-	Scene* scene = &_scenes.at(id);
+	AssetEngine& assets = get_runtime().get_asset_engine();
+
+	if (assets.contains(id))
+	{
+		// set active scene temporarily
+		Scene& scene = assets.at<Scene>(id);
+
+		set_working_scene(&scene);
+
+		// if this is the loaded scene, unload it first
+		if (_loadedScene == &scene)
+		{
+			unload_scene();
+		}
+
+		// remove from assets
+		AssetEngine& assets = get_runtime().get_asset_engine();
+		assets.unload(id);
+
+		set_working_scene(_loadedScene);
+
+		return true;
+	}
+
+	return false;
+}
+
+void minty::SceneManager::load_scene(UUID const id)
+{
+	// ID must be zero (null) or scenes must contain the id
+	AssetEngine& assets = get_runtime().get_asset_engine();
+	MINTY_ASSERT(assets.contains(id));
+
+	Scene* scene = get_scene(id);
 
 	// do nothing if already loaded
 	if (scene == _loadedScene)
@@ -66,12 +102,9 @@ void minty::SceneManager::load_scene(ID const id)
 		_loadedScene->unload();
 	}
 
-	// set value
-	_loadedScene = scene;
-
-	// set renderer to use this new scene
-	_engine->get_render_engine().set_scene(_loadedScene);
-	_engine->get_audio_engine().set_scene(_loadedScene);
+	// set scene values
+	set_loaded_scene(scene);
+	set_working_scene(scene);
 
 	// load event
 	if (_loaded && _loadedScene)
@@ -80,19 +113,42 @@ void minty::SceneManager::load_scene(ID const id)
 	}
 }
 
-Scene* minty::SceneManager::get_loaded_scene()
+void minty::SceneManager::unload_scene()
+{
+	if (_loadedScene)
+	{
+		_loadedScene->unload();
+		set_loaded_scene(nullptr);
+	}
+}
+
+Scene* minty::SceneManager::get_loaded_scene() const
 {
 	return _loadedScene;
 }
 
-Scene& minty::SceneManager::get_scene(ID const id)
+Scene* minty::SceneManager::get_working_scene() const
 {
-	return _scenes.at(id);
+	return _workingScene;
+}
+
+Scene* minty::SceneManager::get_scene(UUID const id)
+{
+	AssetEngine& assets = get_runtime().get_asset_engine();
+	return assets.get<Scene>(id);
+}
+
+Scene& minty::SceneManager::at_scene(UUID const id)
+{
+	AssetEngine& assets = get_runtime().get_asset_engine();
+	MINTY_ASSERT(assets.contains(id));
+	return assets.at<Scene>(id);
 }
 
 size_t minty::SceneManager::size() const
 {
-	return _scenes.size();
+	AssetEngine& assets = get_runtime().get_asset_engine();
+	return assets.get_by_type<Scene>().size();
 }
 
 void minty::SceneManager::load()
@@ -157,7 +213,32 @@ void minty::SceneManager::finalize()
 	}
 }
 
-std::string minty::to_string(SceneManager const& value)
+void minty::SceneManager::destroy()
+{
+	unload();
+
+	AssetEngine& assets = get_runtime().get_asset_engine();
+	for (auto const scene : assets.get_by_type<Scene>())
+	{
+		destroy_scene(scene->get_id());
+	}
+	set_working_scene(nullptr);
+	set_loaded_scene(nullptr);
+}
+
+void minty::SceneManager::set_loaded_scene(Scene* const scene)
+{
+	_loadedScene = scene;
+	get_runtime().set_loaded_scene(scene);
+}
+
+void minty::SceneManager::set_working_scene(Scene* const scene)
+{
+	_workingScene = scene;
+	get_runtime().set_working_scene(scene);
+}
+
+String minty::to_string(SceneManager const& value)
 {
 	return std::format("SceneManager(scenes size = {})", value.size());
 }

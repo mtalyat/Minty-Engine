@@ -131,5 +131,5 @@ namespace minty
 		Menu = 348,
 	};
 
-	std::string to_string(Key const value);
+	String to_string(Key const value);
 }

@@ -1,35 +1,88 @@
 #pragma once
+#include "M_Asset.h"
 
-#include "M_Object.h"
+#include "M_CoordinateMode.h"
 #include "M_Vector.h"
 
 namespace minty
 {
+	class Texture;
+	class Material;
+
+	/// <summary>
+	/// Holds data to create a new Sprite.
+	/// </summary>
+	struct SpriteBuilder
+	{
+		UUID id;
+
+		Path path;
+
+		/// <summary>
+		/// The Texture that is being used.
+		/// </summary>
+		Texture* texture = nullptr;
+
+		/// <summary>
+		/// The Material to use.
+		/// </summary>
+		Material* material = nullptr;
+
+		/// <summary>
+		/// The type of input of the data within minimum, maximum and pivot.
+		/// </summary>
+		CoordinateMode coordinateMode = CoordinateMode::Normalized;
+
+		/// <summary>
+		/// The minimum position of the Sprite within the Texture.
+		/// </summary>
+		Vector2 minCoords = Vector2(0.0f, 0.0f);
+
+		/// <summary>
+		/// The maximum position of the Sprite within the Texture.
+		/// </summary>
+		Vector2 maxCoords = Vector2(1.0f, 1.0f);
+
+		/// <summary>
+		/// The offset to the center of the Sprite when rendered.
+		/// </summary>
+		Vector2 pivot = Vector2(0.5f, 0.5f);
+	};
+
 	/// <summary>
 	/// Holds the data for a slice of a texture.
 	/// </summary>
 	class Sprite
-		: public Object
+		: public Asset
 	{
 	private:
-		ID _materialId;
+		Texture* _texture;
+		Material* _material;
 
-		Vector2 _min;
-		Vector2 _max;
+		Vector2 _minCoords;
+		Vector2 _maxCoords;
 		Vector2 _pivot;
-
 	public:
-		Sprite(ID const materialId);
+		/// <summary>
+		/// Creates an empty Sprite.
+		/// </summary>
+		Sprite();
 
-		Sprite(ID const materialId, Vector2 const pivot);
+		Sprite(SpriteBuilder const& builder, Runtime& engine);
 
-		Sprite(ID const materialId, Vector2 const minCoords, Vector2 const maxCoords);
+		~Sprite();
 
-		Sprite(ID const materialId, Vector2 const minCoords, Vector2 const maxCoords, Vector2 const pivot);
+		/// <summary>
+		/// Destroys all of the resources associated with this Sprite.
+		/// </summary>
+		void destroy();
 
 #pragma region Get
 
-		ID get_material_id() const;
+	public:
+		Texture* get_texture() const;
+
+		Material* get_material() const;
 
 		Vector2 get_min_coords() const;
 
@@ -41,11 +94,15 @@ namespace minty
 
 #pragma region Set
 
-		void set_min_coords(Vector2 const coords);
+	public:
+		void set_min_coords(Vector2 const coords, CoordinateMode const coordinateMode = CoordinateMode::Normalized);
 
-		void set_max_coords(Vector2 const coords);
+		void set_max_coords(Vector2 const coords, CoordinateMode const coordinateMode = CoordinateMode::Normalized);
 
-		void set_pivot(Vector2 const pivot);
+		void set_pivot(Vector2 const pivot, CoordinateMode const coordinateMode = CoordinateMode::Normalized);
+
+	private:
+		Vector2 normalize_coords(Vector2 const coords) const;
 
 #pragma endregion
 	};

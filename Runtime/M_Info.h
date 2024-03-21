@@ -1,12 +1,7 @@
 #pragma once
 
 #include "M_Object.h"
-#include "M_ISerializable.h"
-#include <vulkan/vulkan.h>
-
-//#define MINTY_NAME "Minty Engine"
-//#define MINTY_VERSION VK_MAKE_VERSION(1, 0, 0)
-//#define MINTY_API_VERSION VK_API_VERSION_1_2
+#include "M_Vulkan.h"
 
 namespace minty
 {
@@ -15,10 +10,10 @@ namespace minty
 	constexpr uint32_t const MINTY_API_VERSION = VK_API_VERSION_1_2;
 
 	class Info
-		: public Object, public ISerializable
+		: public Object
 	{
 	private:
-		std::string _applicationName;
+		String _applicationName;
 		uint32_t _applicationMajor;
 		uint32_t _applicationMinor;
 		uint32_t _applicationPatch;
@@ -36,13 +31,19 @@ namespace minty
 		/// <param name="major">The application major update.</param>
 		/// <param name="minor">The application minor update.</param>
 		/// <param name="patch">The application patch update.</param>
-		Info(std::string const& name, uint32_t const major, uint32_t const minor, uint32_t const patch);
+		Info(String const& name, uint32_t const major, uint32_t const minor, uint32_t const patch);
 
 		/// <summary>
 		/// Gets the name of the application.
 		/// </summary>
 		/// <returns>The name of the application.</returns>
-		std::string const& get_application_name() const;
+		String const& get_application_name() const;
+
+		uint32_t get_application_major() const;
+
+		uint32_t get_application_minor() const;
+		
+		uint32_t get_application_patch() const;
 
 		/// <summary>
 		/// Gets the application verson.
@@ -60,6 +61,6 @@ namespace minty
 		virtual void deserialize(Reader const& reader);
 
 	public:
-		friend std::string to_string(Info const& value);
+		friend String to_string(Info const& value);
 	};
 }

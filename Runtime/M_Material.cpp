@@ -2,37 +2,41 @@
 #include "M_Material.h"
 
 #include "M_RenderEngine.h"
+#include "M_RenderSystem.h"
+#include "M_Scene.h"
 
 using namespace minty;
-using namespace minty::rendering;
+using namespace minty;
 
-minty::Material::Material(rendering::MaterialBuilder const& builder, RenderEngine& renderer)
-	: rendering::RenderObject(renderer)
-	, _templateId(builder.templateId)
+minty::Material::Material()
+	: Asset()
+	, _template()
+	, _passDescriptorSets()
+{}
+
+minty::Material::Material(MaterialBuilder const& builder, Runtime& engine)
+	: Asset(builder.id, builder.path, engine)
+	, _template(builder.materialTemplate)
 	, _passDescriptorSets()
 {
 	// use template to generate descriptor sets
-	auto const& materialTemplate = _renderer.get_material_template(_templateId);
-	auto const& passIds = materialTemplate.get_shader_pass_ids();
+	auto const& materialTemplate = _template;
+	auto const& passes = materialTemplate->get_shader_passes();
 
-	auto const& defaultValues = materialTemplate.get_default_values();
+	auto const& defaultValues = materialTemplate->get_default_values();
 
-	for (auto const passId : passIds)
+	for (auto const pass : passes)
 	{
-		// get the shader pass
-		auto const& shaderPass = _renderer.get_shader_pass(passId);
-
 		// get the shader that the pass belongs to
-		auto const shaderId = shaderPass.get_shader_id();
-		auto& shader = _renderer.get_shader(shaderId);
+		auto const shader = pass->get_shader();
 
 		// get the descriptor set for the pass
-		DescriptorSet descriptorSet = shader.create_descriptor_set(DESCRIPTOR_SET_MATERIAL);
+		DescriptorSet descriptorSet = shader->create_descriptor_set(DESCRIPTOR_SET_MATERIAL, false);
 		
 		// set all values
 		for (auto const& defaultValue : defaultValues)
 		{
-			auto const& found = builder.values.find(defaultValue.first);
+			auto found = builder.values.find(defaultValue.first);
 			if (found == builder.values.end())
 			{
 				// if no value exists, use a default value
@@ -45,20 +49,32 @@ minty::Material::Material(rendering::MaterialBuilder const& builder, RenderEngin
 			}
 		}
 
+		// apply changes
+		descriptorSet.apply();
+
 		// add to pass descriptor sets
 		_passDescriptorSets.push_back(descriptorSet);
 	}
 }
 
+minty::Material::~Material()
+{
+	destroy();
+}
+
 void minty::Material::destroy()
 {
-	_templateId = ERROR_ID;
+	_template = nullptr;
+	for (auto& set : _passDescriptorSets)
+	{
+		set.destroy();
+	}
 	_passDescriptorSets.clear();
 }
 
-ID minty::Material::get_template_id() const
+MaterialTemplate* minty::Material::get_template() const
 {
-	return _templateId;
+	return _template;
 }
 
 DescriptorSet const& minty::Material::get_descriptor_set(uint32_t const pass) const
@@ -66,7 +82,7 @@ DescriptorSet const& minty::Material::get_descriptor_set(uint32_t const pass) co
 	return _passDescriptorSets.at(pass);
 }
 
-std::string minty::to_string(Material const& value)
+String minty::to_string(Material const& value)
 {
 	return std::format("Material()");
 }

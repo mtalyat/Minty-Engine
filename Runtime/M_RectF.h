@@ -200,6 +200,6 @@ namespace minty
 		static Rect ceil(RectF const& rect);
 
 	public:
-		friend std::string to_string(RectF const& value);
+		friend String to_string(RectF const& value);
 	};
 }

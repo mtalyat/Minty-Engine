@@ -20,7 +20,7 @@ namespace minty
 
 	private:
 		// the list of functions to be called
-		std::vector<func>* _functions;
+		std::vector<func> _functions;
 
 	public:
 
@@ -28,13 +28,11 @@ namespace minty
 		/// Creates a new Event.
 		/// </summary>
 		Event()
-			: _functions(new std::vector<func>())
+			: _functions(std::vector<func>())
 		{}
 
 		~Event()
-		{
-			delete _functions;
-		}
+		{}
 
 		// () operator
 		void operator()(T const arg) const
@@ -60,7 +58,7 @@ namespace minty
 		/// <param name="f"></param>
 		void emplace(func const& f)
 		{
-			_functions->push_back(f);
+			_functions.push_back(f);
 		}
 
 		/// <summary>
@@ -69,12 +67,12 @@ namespace minty
 		/// <param name="f"></param>
 		void erase(func const& f)
 		{
-			for (size_t i = 0; i < _functions->size(); i++)
+			for (size_t i = 0; i < _functions.size(); i++)
 			{
 				// probably not the best way to check if equal
-				if (&_functions->at(i) == &f)
+				if (&_functions.at(i) == &f)
 				{
-					_functions->erase(_functions->begin() + i);
+					_functions.erase(_functions.begin() + i);
 				}
 			}
 		}
@@ -85,7 +83,7 @@ namespace minty
 		/// <param name="arg"></param>
 		void invoke(T const arg) const
 		{
-			for (func f : *_functions)
+			for (func f : _functions)
 			{
 				f(arg);
 			}

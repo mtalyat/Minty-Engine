@@ -1,7 +1,9 @@
 #include "pch.h"
 #include "M_MouseButton.h"
 
-std::string minty::to_string(MouseButton const value)
+using namespace minty;
+
+String minty::to_string(MouseButton const value)
 {
     switch (value) {
     case MouseButton::Button1:
@@ -21,6 +23,6 @@ std::string minty::to_string(MouseButton const value)
     case MouseButton::Button8:
         return "Mouse Button 8";
     default:
-        return minty::error::ERROR_TEXT;
+        return "";
     }
 }

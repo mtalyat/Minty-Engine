@@ -1,7 +1,6 @@
 #pragma once
 
 #include "M_Object.h"
-#include "M_ISerializable.h"
 
 namespace minty
 {
@@ -9,8 +8,16 @@ namespace minty
 	/// The base class for all Components.
 	/// </summary>
 	struct Component
-		: public Object, public ISerializable
+		: public Object
 	{
+		UUID id;
+
+	public:
+		Component() {}
+		Component(UUID const id)
+			: id(id)
+		{}
+
 		virtual ~Component() {}
 
 		virtual void serialize(Writer& writer) const override {}

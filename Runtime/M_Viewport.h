@@ -1,7 +1,7 @@
 #pragma once
 #include "M_Object.h"
 
-#include <vulkan/vulkan.h>
+#include "M_Vulkan.h"
 
 namespace minty
 {
@@ -17,6 +17,8 @@ namespace minty
 		/// Creates an empty Viewport.
 		/// </summary>
 		Viewport();
+
+		Viewport(float const x, float const y, float const width, float const height, float const minDepth, float const maxDepth);
 
 		/// <summary>
 		/// Creates a Viewport using the given position, size and depth.
@@ -82,7 +84,7 @@ namespace minty
 		VkRect2D get_scissor() const;
 
 	public:
-		friend std::string to_string(Viewport const& value);
+		friend String to_string(Viewport const& value);
 	};
 }
 

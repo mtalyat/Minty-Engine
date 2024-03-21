@@ -1,10 +1,23 @@
 
+DESCRIPTOR TYPES:
+	VK_DESCRIPTOR_TYPE_UNIFORM_BUFFER
+Data consists of the bytes of the uniform buffer object struct.
+
+	VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER
+Data consists of an array of IDs to each texture to be loaded.
+
 SETS:
 
 0. Global data set once a frame
-
 1. Reserved for future usage.
-
 2. Material template data.
-
 3. Material data.
+
+ASSETS:
+create
+get_or_create
+find
+get_
+get_name
+load
+destroy

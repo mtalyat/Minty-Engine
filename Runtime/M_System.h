@@ -1,41 +1,48 @@
 #pragma once
+#include "M_SceneObject.h"
 
-#include "M_Object.h"
-#include "M_EntityRegistry.h"
-#include <set>
+#include <unordered_set>
+#include <vector>
+#include <functional>
 
 namespace minty
 {
-	class Engine;
+	class Asset;
+	class AssetEngine;
+	class EntityRegistry;
+	class SystemRegistry;
 
 	/// <summary>
 	/// The base class for systems, which provide functionality and conduct the behavior of the ECS engine.
 	/// </summary>
 	class System
-		: public Object
+		: public SceneObject
 	{
 	private:
 		// is this system enabled?
 		bool _enabled;
 
-	protected:
-		/// <summary>
-		/// The Engine that this System belongs to.
-		/// </summary>
-		Engine* _engine;
-
-		/// <summary>
-		/// The registry that this System is part of.
-		/// </summary>
-		EntityRegistry* _registry;
-
+		String _name;
 	public:
 		/// <summary>
 		/// Creates a new System.
 		/// </summary>
-		System(Engine* const engine, EntityRegistry* const registry);
+		System(String const& name, Runtime& runtime, Scene& scene);
 
-		virtual ~System() {}
+		virtual ~System();
+
+	public:
+		String const& get_name() const;
+
+		EntityRegistry& get_entity_registry() const;
+
+		SystemRegistry& get_system_registry() const;
+
+	public:
+		/// <summary>
+		/// Resets the entire system.
+		/// </summary>
+		virtual void reset();
 
 		/// <summary>
 		/// Sets the enabled state of this System.
@@ -52,7 +59,7 @@ namespace minty
 		/// <summary>
 		/// Called when the Scene is being loaded.
 		/// </summary>
-		virtual void load() {}
+		virtual void load();
 
 		/// <summary>
 		/// Does one frame of work on the System.
@@ -67,9 +74,12 @@ namespace minty
 		/// <summary>
 		/// Called when the Scene is being unloaded.
 		/// </summary>
-		virtual void unload() {}
+		virtual void unload();
+	public:
+		virtual void serialize(Writer& writer) const override;
+		virtual void deserialize(Reader const& reader) override;
 
 	public:
-		friend std::string to_string(System const& value);
+		friend String to_string(System const& value);
 	};
 }

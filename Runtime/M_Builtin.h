@@ -1,12 +1,12 @@
 #pragma once
 
-#include "M_Base.h"
 #include "M_Matrix.h"
 #include "M_Vector.h"
 
-namespace minty::builtin
+namespace minty::Builtin
 {
-	struct GlobalData
+	// global uniform buffer object
+	struct GlobalUBO
 	{
 		alignas(16) float time;
 		float deltaTime;

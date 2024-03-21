@@ -64,11 +64,11 @@ bool RectF::overlaps(RectF const& other) const
 
 RectF RectF::overlap(RectF const& other) const
 {
-	float xMin = math::clamp(other.x - x, 0.0f, width);
-	float yMin = math::clamp(other.y - y, 0.0f, height);
+	float xMin = Math::clamp(other.x - x, 0.0f, width);
+	float yMin = Math::clamp(other.y - y, 0.0f, height);
 
-	float xMax = math::clamp(other.x + other.width - x, 0.0f, width);
-	float yMax = math::clamp(other.y + other.height - y, 0.0f, height);
+	float xMax = Math::clamp(other.x + other.width - x, 0.0f, width);
+	float yMax = Math::clamp(other.y + other.height - y, 0.0f, height);
 
 	return RectF(xMin, yMin, xMax - xMin, yMax - yMin);
 }
@@ -85,20 +85,20 @@ RectF RectF::bounds(float const left, float const right, float const top, float 
 
 Rect RectF::floor(RectF const& rect)
 {
-	return Rect(math::floor_to_int(rect.x), math::floor_to_int(rect.y), math::floor_to_int(rect.width), math::floor_to_int(rect.height));
+	return Rect(Math::floor_to_int(rect.x), Math::floor_to_int(rect.y), Math::floor_to_int(rect.width), Math::floor_to_int(rect.height));
 }
 
 Rect RectF::round(RectF const& rect)
 {
-	return Rect(math::round_to_int(rect.x), math::round_to_int(rect.y), math::round_to_int(rect.width), math::round_to_int(rect.height));
+	return Rect(Math::round_to_int(rect.x), Math::round_to_int(rect.y), Math::round_to_int(rect.width), Math::round_to_int(rect.height));
 }
 
 Rect RectF::ceil(RectF const& rect)
 {
-	return Rect(math::ceil_to_int(rect.x), math::ceil_to_int(rect.y), math::ceil_to_int(rect.width), math::ceil_to_int(rect.height));
+	return Rect(Math::ceil_to_int(rect.x), Math::ceil_to_int(rect.y), Math::ceil_to_int(rect.width), Math::ceil_to_int(rect.height));
 }
 
-std::string minty::to_string(RectF const& value)
+String minty::to_string(RectF const& value)
 {
 	return std::format("RectF({0}, {1}, {2}, {3})", value.x, value.y, value.width, value.height);
 }

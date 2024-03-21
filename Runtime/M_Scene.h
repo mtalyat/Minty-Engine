@@ -1,30 +1,50 @@
 #pragma once
-#include "M_Object.h"
+#include "M_Asset.h"
 
-#include "M_EntityRegistry.h"
-#include "M_SystemRegistry.h"
-#include "M_ISerializable.h"
+#include <vector>
+#include <unordered_set>
+#include <functional>
 
 namespace minty
 {
-	class Engine;
+	class EntityRegistry;
+	class SystemRegistry;
+	class AssetEngine;
+
+	struct SceneBuilder
+	{
+		UUID id;
+
+		Path path;
+	};
 
 	/// <summary>
 	/// Holds a collection of systems and entities that can interact with one another.
 	/// </summary>
 	class Scene :
-		public Object, public ISerializable
+		public Asset
 	{
 	private:
-		Engine* _engine;
+		struct AssetData
+		{
+			size_t index;
+			UUID id;
+		};
+
+	private:
 		EntityRegistry* _entities;
 		SystemRegistry* _systems;
+		bool _loaded;
+
+		std::unordered_map<Path, AssetData> _registeredAssets;
+		std::vector<Path> _unloadedAssets;
+		std::unordered_set<UUID> _loadedAssets;
 
 	public:
 		/// <summary>
 		/// Creates an empty Scene.
 		/// </summary>
-		Scene(Engine* const engine);
+		Scene(SceneBuilder const& builder, Runtime& engine);
 
 		~Scene();
 
@@ -34,19 +54,23 @@ namespace minty
 		// move
 		Scene& operator=(Scene&& other) noexcept;
 
-		Engine* get_engine() const;
-
 		/// <summary>
 		/// Gets the EntityRegistry used in the Scene.
 		/// </summary>
 		/// <returns></returns>
-		EntityRegistry* get_entity_registry() const;
+		EntityRegistry& get_entity_registry() const;
 
 		/// <summary>
 		/// Gets the SystemRegistry used in the Scene.
 		/// </summary>
 		/// <returns></returns>
-		SystemRegistry* get_system_registry() const;
+		SystemRegistry& get_system_registry() const;
+
+		/// <summary>
+		/// Checks if this Scene is loaded or not.
+		/// </summary>
+		/// <returns></returns>
+		bool is_loaded() const;
 
 		/// <summary>
 		/// Loads this Scene.
@@ -57,6 +81,11 @@ namespace minty
 		/// Updates this Scene.
 		/// </summary>
 		void update();
+
+		/// <summary>
+		/// Sorts the Entities in this Scene based on hierarchy.
+		/// </summary>
+		void sort();
 
 		/// <summary>
 		/// Fixed updates this Scene.
@@ -73,10 +102,31 @@ namespace minty
 		/// </summary>
 		void finalize();
 
+#pragma region Asset Loading
+
+	public:
+		void register_asset(Path const& path);
+
+		void unregister_asset(Path const& path);
+
+		bool is_registered(Path const& assetPath);
+
+	private:
+		void load_registered_assets();
+
+		void unload_registered_assets();
+
+		void sort_registered_assets();
+
+		void update_registered_indices();
+
+#pragma endregion
+
+	public:
 		void serialize(Writer& writer) const override;
 		void deserialize(Reader const& reader) override;
 
 	public:
-		friend std::string to_string(Scene const& value);
+		friend String to_string(Scene const& value);
 	};
 }

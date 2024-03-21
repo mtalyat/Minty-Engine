@@ -1,17 +1,62 @@
 #pragma once
-#include "M_Rendering_Object.h"
+#include "M_Asset.h"
 
-#include "M_Rendering_TextureBuilder.h"
-#include "M_Rendering_PixelFormat.h"
-#include <vulkan/vulkan.h>
+#include "M_Color.h"
+#include "M_PixelFormat.h"
+#include "M_Vulkan.h"
 
 namespace minty
 {
 	/// <summary>
+	/// Holds data to create a new Texture.
+	/// </summary>
+	struct TextureBuilder
+	{
+		UUID id;
+
+		/// <summary>
+		/// The path to the Texture on the disk.
+		/// </summary>
+		Path path;
+		/// <summary>
+		/// The raw pixel data for the Texture.
+		/// </summary>
+		Color* pixelData;
+		/// <summary>
+		/// The width of the Texture in pixels.
+		/// </summary>
+		int width;
+		/// <summary>
+		/// The height of the Texture in pixels.
+		/// </summary>
+		int height;
+		/// <summary>
+		/// The format to read the pixels in.
+		/// </summary>
+		PixelFormat pixelFormat;
+		/// <summary>
+		/// The filter for the Texture. How to get the color when between pixels.
+		/// </summary>
+		VkFilter filter;
+		/// <summary>
+		/// The format for the Texture. How the pixels are interpreted.
+		/// </summary>
+		VkFormat format;
+		/// <summary>
+		/// The address mode for the Texture. What to do when the texcoord is outside of [0.0, 1.0].
+		/// </summary>
+		VkSamplerAddressMode addressMode;
+		/// <summary>
+		/// The mipmap mode for the Texture. 
+		/// </summary>
+		VkSamplerMipmapMode mipmapMode;
+	};
+
+	/// <summary>
 	/// Holds data for an image on the GPU.
 	/// </summary>
 	class Texture :
-		public rendering::RenderObject
+		public Asset
 	{
 	private:
 		int _width;
@@ -24,11 +69,18 @@ namespace minty
 
 	public:
 		/// <summary>
+		/// Creates an empty Texture.
+		/// </summary>
+		Texture();
+
+		/// <summary>
 		/// Creates a new Texture.
 		/// </summary>
 		/// <param name="builder"></param>
 		/// <param name="renderer"></param>
-		Texture(rendering::TextureBuilder const& builder, RenderEngine& renderer);
+		Texture(TextureBuilder const& builder, Runtime& engine);
+
+		~Texture();
 
 		/// <summary>
 		/// Destroys all of the resources associated with this Texture.
@@ -78,7 +130,7 @@ namespace minty
 		VkSampler get_sampler() const;
 		
 	public:
-		friend std::string to_string(Texture const& value);
+		friend String to_string(Texture const& value);
 	};
 }
 

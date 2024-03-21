@@ -4,80 +4,194 @@
 #include "M_File.h"
 #include "M_Console.h"
 
+#include <unordered_map>
+#include <unordered_set>
+
 using namespace minty;
-using namespace minty::asset;
 
-std::string get_assets_path(std::string const& path)
+minty::Asset::Asset()
+	: RuntimeObject()
+	, _id()
+	, _path()
+{}
+
+minty::Asset::Asset(UUID const id, Path const& path, Runtime& runtime)
+	: RuntimeObject(runtime)
+	, _id(id != INVALID_UUID ? id : UUID())
+	, _path(path)
+{}
+
+minty::Asset::~Asset()
 {
-	return (BASE_PATH / path).string();
 }
 
-bool minty::asset::exists(std::string const& path)
+UUID minty::Asset::get_id() const
 {
-	return file::exists(get_assets_path(path));
+	return _id;
 }
 
-bool minty::asset::exists_meta(std::string const& path)
+Path const& minty::Asset::get_path() const
 {
-	return exists(path + ".meta");
+	return _path;
 }
 
-std::string minty::asset::absolute(std::string const& path)
+AssetType minty::Asset::get_type() const
 {
-	return file::absolute(get_assets_path(path));
+	return Asset::get_type(_path);
 }
 
-Node minty::asset::load_node(std::string const& path)
+String minty::Asset::get_name() const
 {
-#if N_DEBUG
-	console::error("Asset loading not implemented for release builds.");
-	return std::string();
-#else
-	return file::read_node(get_assets_path(path));
-#endif
+	return _path.stem().string();
 }
 
-Node minty::asset::load_meta(std::string const& path)
+Path minty::Asset::get_meta_path(Path const& assetPath)
 {
-	std::string metaPath = path + ".meta";
+	return Path(assetPath.string() + EXTENSION_META);
+}
 
-	if (exists(metaPath))
+AssetType minty::Asset::get_type(Path const& assetPath)
+{
+	if (!assetPath.has_extension())
 	{
-		return load_node(metaPath);
+		return AssetType::None;
 	}
-	else
+
+	static std::unordered_map<Path, AssetType> types
 	{
-		// no meta file found
-		return Node();
-	}
+		{ ".txt", AssetType::Text },
+		{ ".csv", AssetType::Text },
+
+		{ EXTENSION_META, AssetType::Meta },
+
+		{ ".cs", AssetType::Script},
+
+		{ ".bmp", AssetType::Texture },
+		{ ".jpg", AssetType::Texture },
+		{ ".jpeg", AssetType::Texture },
+		{ ".png", AssetType::Texture },
+
+		{ ".sprite", AssetType::Sprite },
+
+		{ ".material", AssetType::Material },
+
+		{ ".materialtemplate", AssetType::MaterialTemplate },
+
+		{ ".shaderpass", AssetType::ShaderPass },
+		
+		{ ".shader", AssetType::Shader },
+
+		{ ".spv", AssetType::ShaderModule },
+		
+		{ ".glsl", AssetType::ShaderCode },
+		{ ".frag", AssetType::ShaderCode },
+		{ ".vert", AssetType::ShaderCode },
+
+		{ ".scene", AssetType::Scene },
+
+		{ ".obj", AssetType::Mesh },
+
+		{ ".wav", AssetType::AudioClip },
+		{ ".mp3", AssetType::AudioClip },
+
+		{ ".animation", AssetType::Animation },
+
+		{ ".animator", AssetType::Animator },
+
+		{ EXTENSION_WRAP, AssetType::Wrap },
+	};
+
+	auto found = types.find(assetPath.extension());
+
+	if (found == types.end()) return AssetType::None;
+
+	return found->second;
 }
 
-std::vector<char> minty::asset::load_chars(std::string const& path)
+std::vector<Path> const& minty::Asset::get_extensions(AssetType const type)
 {
-#if N_DEBUG
-	console::error("Asset loading not implemented for release builds.");
-	return std::string();
-#else
-	return file::read_all_chars(get_assets_path(path));
-#endif
+	static std::unordered_map<AssetType, std::vector<Path>> extensions
+	{
+		{ AssetType::None, { } },
+
+		{ AssetType::Meta, { EXTENSION_META } },
+
+		{ AssetType::Text, { ".txt", ".csv" } },
+
+		{ AssetType::Script, { ".cs" }},
+
+		{ AssetType::Texture, { ".bmp", ".jpg", ".jpeg", ".png" }},
+
+		{ AssetType::Sprite, { ".sprite" }},
+
+		{ AssetType::Material, { ".material" }},
+
+		{ AssetType::MaterialTemplate, { ".materialtemplate"}},
+
+		{ AssetType::ShaderPass, { ".shaderpass" }},
+
+		{ AssetType::Shader, { ".shader" }},
+
+		{ AssetType::ShaderModule, { ".spv" }},
+
+		{ AssetType::ShaderCode, { ".glsl", ".frag", ".vert" }},
+
+		{ AssetType::Scene, { ".scene" }},
+
+		{ AssetType::Mesh, { ".obj" }},
+
+		{ AssetType::AudioClip, { ".wav", ".mp3" }},
+
+		{ AssetType::Animation, { ".animation" }},
+
+		{ AssetType::Animator, { ".animator" }},
+
+		{ AssetType::Wrap, { EXTENSION_WRAP } },
+	};
+
+	auto found = extensions.find(type);
+
+	if (found == extensions.end()) MINTY_ABORT("Unknown asset type.");
+
+	return found->second;
 }
 
-std::string minty::asset::load_text(std::string const& path)
+bool minty::Asset::is_readable(Path const& assetPath)
 {
-#if N_DEBUG
-	console::error("Asset loading not implemented for release builds.");
-	return std::string();
-#else
-	return file::read_all_text(get_assets_path(path));
-#endif
+	return is_readable(get_type(assetPath));
 }
 
-std::vector<std::string> minty::asset::load_lines(std::string const& path)
+bool minty::Asset::is_readable(AssetType const type)
 {
-#if N_DEBUG
-	console::error("Asset loading not implemented for release builds.");
-	return std::vector<std::string>();
-#else
-	return file::read_all_lines(get_assets_path(path));
-#endif
+	static std::unordered_set<AssetType> readables
+	{
+		AssetType::Text,
+		AssetType::Script,
+		AssetType::Sprite,
+		AssetType::Material,
+		AssetType::MaterialTemplate,
+		AssetType::ShaderPass,
+		AssetType::Shader,
+		AssetType::ShaderCode,
+		AssetType::Scene,
+		AssetType::Animation,
+		AssetType::Animator,
+	};
+
+	return readables.contains(type);
+}
+
+bool minty::Asset::check_type(Path const& path, AssetType const type)
+{
+	return get_type(path) == type;
+}
+
+bool minty::operator==(Asset const& left, Asset const& right)
+{
+	return left._id == right._id;
+}
+
+bool minty::operator!=(Asset const& left, Asset const& right)
+{
+	return left._id != right._id;
 }

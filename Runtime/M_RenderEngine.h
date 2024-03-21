@@ -1,46 +1,27 @@
 #pragma once
-#include "M_Object.h"
+#include "M_Engine.h"
 
-#include "M_Constants.h"
 #include "M_Register.h"
 #include "M_Color.h"
 #include "M_Info.h"
 #include "M_Window.h"
 #include "M_Viewport.h"
-
-#include "M_EntityRegistry.h"
-#include "M_CameraComponent.h"
-#include "M_MeshComponent.h"
-#include "M_TransformComponent.h"
-#include "M_UITransformComponent.h"
-#include "M_SpriteComponent.h"
-
-#include "M_Texture.h"
-#include "M_Sprite.h"
-#include "M_Shader.h"
-#include "M_ShaderPass.h"
-#include "M_MaterialTemplate.h"
-#include "M_Material.h"
+#include "M_Buffer.h"
+#include "M_Entity.h"
+#include "M_Matrix.h"
 #include "M_Mesh.h"
 
-#include "M_Rendering_Buffer.h"
-#include "M_Rendering_TextureBuilder.h"
-#include "M_Rendering_ShaderBuilder.h"
-#include "M_Rendering_ShaderPassBuilder.h"
-#include "M_Rendering_MaterialTemplateBuilder.h"
-#include "M_Rendering_MaterialBuilder.h"
-#include "M_Rendering_DescriptorSet.h"
-
-#include "M_Error.h"
-
-#include "glm.hpp"
+#include "M_GLM.hpp"
+#include "M_Vulkan.h"
 
 #include <array>
 #include <vector>
 #include <set>
+#include <unordered_set>
 #include <optional>
 #include <string>
 #include <cstring>
+#include <filesystem>
 
 namespace minty
 {
@@ -67,47 +48,57 @@ namespace minty
 	constexpr uint32_t const BIND_MATERIAL = 3;
 
 	class Scene;
+	class RenderSystem;
+	class EntityRegistry;
 
-	namespace rendering
+	struct MeshComponent;
+	struct TransformComponent;
+	struct UITransformComponent;
+	struct SpriteComponent;
+
+	struct TextureBuilder;
+
+	class Material;
+	class Shader;
+	class Camera;
+
+	class Info;
+	class Window;
+
+	/// <summary>
+	/// Holds data to create a new RenderEngine.
+	/// </summary>
+	struct RenderEngineBuilder
 	{
-		struct RenderEngineBuilder;
-		struct TextureBuilder;
-	}
+		Info const* info;
+
+		Window* window;
+	};
 
 	/// <summary>
 	/// Handles rendering for the game engine.
 	/// </summary>
 	class RenderEngine
-		: public Object
+		: public Engine
 	{
-	private:
-		rendering::RenderEngineBuilder const* _builder;
+	protected:
 		Window* _window;
 
-		// assets
-
-		Register<Texture> _textures;
-		Register<Sprite> _sprites;
-		Register<Material> _materials;
-		Register<MaterialTemplate> _materialTemplates;
-		Register<ShaderPass> _shaderPasses;
-		Register<Shader> _shaders;
-		Register<rendering::Buffer> _buffers;
-		Register<Mesh> _meshes;
-
-		std::array<ID, BIND_COUNT> _boundIds;
+		std::array<void const*, BIND_COUNT> _bound;
 
 		Viewport _view;
 		Color _backgroundColor;
 		bool _initialized;
 
 		Scene const* _scene = nullptr;
+		RenderSystem* _renderSystem = nullptr;
 		EntityRegistry* _registry = nullptr;
-		Entity _mainCamera = NULL_ENTITY;
+
+		std::unordered_map<MeshType, UUID> _builtinMeshes;
 
 		// (Vulkan) rendering components
 		VkDevice _device;
-		VkInstance instance;
+		VkInstance _instance;
 		VkPhysicalDevice _physicalDevice = nullptr;
 
 		VkDebugUtilsMessengerEXT _debugMessenger;
@@ -137,20 +128,9 @@ namespace minty
 		/// <summary>
 		/// Creates a new RenderEngine that will render to the given Window.
 		/// </summary>
-		RenderEngine(Window* const window);
+		RenderEngine(Runtime& runtime);
 
-		~RenderEngine();
-
-		/// <summary>
-		/// Draws a frame to the screen.
-		/// </summary>
-		void render_frame();
-
-		/// <summary>
-		/// Checks if the render engine is still running.
-		/// </summary>
-		/// <returns>True if the engine is still running.</returns>
-		bool is_running() const;
+		virtual ~RenderEngine();
 
 		/// <summary>
 		/// Checks if this RenderEngine has been initialized.
@@ -158,8 +138,24 @@ namespace minty
 		/// <returns>True if the engine is initialized.</returns>
 		bool is_initialized() const;
 
+	public:
+		void set_loaded_scene(Scene* const scene) override;
+
+#pragma region Frame
+
+	public:
+		/// <summary>
+		/// Draws a frame to the screen.
+		/// </summary>
+		virtual void render_frame();
+
+		virtual void set_camera(Vector3 const position, Quaternion const rotation, Camera const& camera);
+
+#pragma endregion
+
 #pragma region Get
 
+	public:
 		/// <summary>
 		/// Gets the device that this RenderEngine is rendering to.
 		/// </summary>
@@ -184,6 +180,25 @@ namespace minty
 		/// <returns>The current frame index.</returns>
 		uint32_t get_frame() const;
 
+		/// <summary>
+		/// Gets the aspect ratio of the view being rendered to.
+		/// </summary>
+		/// <returns>The swap chain extent width / height.</returns>
+		float get_aspect_ratio() const;
+
+		UUID get_or_create_mesh(MeshType const type);
+
+		Viewport& get_viewport();
+
+		Viewport const& get_viewport() const;
+
+#pragma endregion
+
+#pragma region Set
+
+	public:
+		void set_viewport(Viewport const& viewport);
+
 #pragma endregion
 
 #pragma region Init
@@ -192,13 +207,13 @@ namespace minty
 		/// <summary>
 		/// Initializes the RenderEngine.
 		/// </summary>
-		void init(rendering::RenderEngineBuilder const& builder);
+		virtual void init(RenderEngineBuilder const& builder);
 
 	private:
 		/// <summary>
 		/// Creates a Vulkan instance.
 		/// </summary>
-		void create_instance();
+		void create_instance(RenderEngineBuilder const& builder);
 
 		/// <summary>
 		/// Initializes the debug messenger.
@@ -262,21 +277,6 @@ namespace minty
 
 #pragma endregion
 
-#pragma region Update
-
-	public:
-		/// <summary>
-		/// Updates the Renderable components within the Scene.
-		/// </summary>
-		void update();
-
-		/// <summary>
-		/// Updates the Camera uniform buffer with the Camera info.
-		/// </summary>
-		void update_camera(CameraComponent const& camera, TransformComponent const& transform);
-
-#pragma endregion
-
 #pragma region Binding
 
 	private:
@@ -292,7 +292,7 @@ namespace minty
 		/// <param name="commandBuffer">The buffer to use to bind.</param>
 		/// <param name="materialId">The ID of the Material to bind.</param>
 		/// <param name="pass">The ShaderPass index.</param>
-		void bind(VkCommandBuffer const commandBuffer, ID const materialId, uint32_t const pass = 0); // TODO: easier way to select shader pass?
+		void bind(VkCommandBuffer const commandBuffer, Material const* const material, uint32_t const pass = 0); // TODO: easier way to select shader pass?
 
 #pragma endregion
 
@@ -307,19 +307,13 @@ namespace minty
 		/// <summary>
 		/// Cleans up all of the render engine resources.
 		/// </summary>
-		void destroy();
+		virtual void destroy();
 
 #pragma endregion
 
 #pragma region Data
 
 	public:
-		/// <summary>
-		/// Sets the Camera that this RenderEngine is rendering from.
-		/// </summary>
-		/// <param name="entity">The entity to render from.</param>
-		void set_main_camera(Entity const entity);
-
 		/// <summary>
 		/// Sets the Scene that this RenderEngine is rendering.
 		/// </summary>
@@ -340,344 +334,6 @@ namespace minty
 
 #pragma endregion
 
-#pragma region Assets
-
-	public:
-		/// <summary>
-		/// Creates a new Texture using the given builder, then returns its ID.
-		/// </summary>
-		/// <param name="builder">The rendering builder to use.</param>
-		/// <returns>The ID of the newly created asset.</returns>
-		ID create_texture(rendering::TextureBuilder const& builder);
-
-		/// <summary>
-		/// Creates a new Shader using the given builder, then returns its ID.
-		/// </summary>
-		/// <param name="builder">The rendering builder to use.</param>
-		/// <returns>The ID of the newly created asset.</returns>
-		ID create_shader(rendering::ShaderBuilder const& builder);
-
-		/// <summary>
-		/// Creates a new ShaderPass using the given builder, then returns its ID.
-		/// </summary>
-		/// <param name="builder">The rendering builder to use.</param>
-		/// <returns>The ID of the newly created asset.</returns>
-		ID create_shader_pass(rendering::ShaderPassBuilder const& builder);
-
-		/// <summary>
-		/// Creates a new MaterialTemplate using the given builder, then returns its ID.
-		/// </summary>
-		/// <param name="builder">The rendering builder to use.</param>
-		/// <returns>The ID of the newly created asset.</returns>
-		ID create_material_template(rendering::MaterialTemplateBuilder const& builder);
-
-		/// <summary>
-		/// Creates a new Material using the given builder, then returns its ID.
-		/// </summary>
-		/// <param name="builder">The rendering builder to use.</param>
-		/// <returns>The ID of the newly created asset.</returns>
-		ID create_material(rendering::MaterialBuilder const& builder);
-
-		/// <summary>
-		/// Creates a new Mesh using the given builder, then returns its ID.
-		/// </summary>
-		/// <param name="builder">The rendering builder to use.</param>
-		/// <returns>The ID of the newly created asset.</returns>
-		ID create_mesh();
-
-		/// <summary>
-		/// Finds a loaded mesh with the given name, or creates an empty Mesh with the given name if no Mesh exists.
-		/// </summary>
-		/// <param name="name">The name of the Mesh to get or create.</param>
-		/// <returns>The ID of the existing Mesh, or the ID of the new Mesh.</returns>
-		ID get_or_create_mesh(std::string const& name);
-
-		/// <summary>
-		/// Finds a loaded mesh with the given type, or creates a mesh of that type if no Mesh exists.
-		/// </summary>
-		/// <param name="name">The type of the Mesh to get or create.</param>
-		/// <returns>The ID of the existing Mesh, or the ID of the new Mesh.</returns>
-		ID get_or_create_mesh(MeshType const type);
-
-		/// <summary>
-		/// Finds the ID of the loaded Texture with the given name.
-		/// </summary>
-		/// <param name="name">The name of the asset to find.</param>
-		/// <returns>The ID of the asset, or ERROR_ID if none was found with the given name.</returns>
-		ID find_texture(std::string const& name);
-
-		/// <summary>
-		/// Finds the ID of the loaded Shader with the given name.
-		/// </summary>
-		/// <param name="name">The name of the asset to find.</param>
-		/// <returns>The ID of the asset, or ERROR_ID if none was found with the given name.</returns>
-		ID find_shader(std::string const& name);
-
-		/// <summary>
-		/// Finds the ID of the loaded ShaderPass with the given name.
-		/// </summary>
-		/// <param name="name">The name of the asset to find.</param>
-		/// <returns>The ID of the asset, or ERROR_ID if none was found with the given name.</returns>
-		ID find_shader_pass(std::string const& name);
-
-		/// <summary>
-		/// Finds the ID of the loaded MaterialTemplate with the given name.
-		/// </summary>
-		/// <param name="name">The name of the asset to find.</param>
-		/// <returns>The ID of the asset, or ERROR_ID if none was found with the given name.</returns>
-		ID find_material_template(std::string const& name);
-
-		/// <summary>
-		/// Finds the ID of the loaded Material with the given name.
-		/// </summary>
-		/// <param name="name">The name of the asset to find.</param>
-		/// <returns>The ID of the asset, or ERROR_ID if none was found with the given name.</returns>
-		ID find_material(std::string const& name);
-
-		/// <summary>
-		/// Finds the ID of the loaded Mesh with the given name.
-		/// </summary>
-		/// <param name="name">The name of the asset to find.</param>
-		/// <returns>The ID of the asset, or ERROR_ID if none was found with the given name.</returns>
-		ID find_mesh(std::string const& name);
-
-		/// <summary>
-		/// Loads the Texture at the given asset path into this RenderEngine.
-		/// </summary>
-		/// <param name="path">The path relative to the Assets folder.</param>
-		/// <returns>The ID of the newly loaded asset.</returns>
-		ID load_texture(std::string const& path);
-
-		/// <summary>
-		/// Loads the Shader at the given asset path into this RenderEngine.
-		/// </summary>
-		/// <param name="path">The path relative to the Assets folder.</param>
-		/// <returns>The ID of the newly loaded asset.</returns>
-		ID load_shader(std::string const& path);
-
-		/// <summary>
-		/// Loads the ShaderPass at the given asset path into this RenderEngine.
-		/// </summary>
-		/// <param name="path">The path relative to the Assets folder.</param>
-		/// <returns>The ID of the newly loaded asset.</returns>
-		ID load_shader_pass(std::string const& path);
-
-		/// <summary>
-		/// Loads the MaterialTemplate at the given asset path into this RenderEngine.
-		/// </summary>
-		/// <param name="path">The path relative to the Assets folder.</param>
-		/// <returns>The ID of the newly loaded asset.</returns>
-		ID load_material_template(std::string const& path);
-
-		/// <summary>
-		/// Loads the Material at the given asset path into this RenderEngine.
-		/// </summary>
-		/// <param name="path">The path relative to the Assets folder.</param>
-		/// <returns>The ID of the newly loaded asset.</returns>
-		ID load_material(std::string const& path);
-
-		/// <summary>
-		/// Loads the Mesh at the given asset path into this RenderEngine.
-		/// </summary>
-		/// <param name="path">The path relative to the Assets folder.</param>
-		/// <returns>The ID of the newly loaded asset.</returns>
-		ID load_mesh(std::string const& path);
-
-		/// <summary>
-		/// Destroys the Texture with the given ID.
-		/// </summary>
-		/// <param name="id">The ID of the asset to destroy.</param>
-		void destroy_texture(ID const id);
-
-		/// <summary>
-		/// Destroys the Shader with the given ID.
-		/// </summary>
-		/// <param name="id">The ID of the asset to destroy.</param>
-		void destroy_shader(ID const id);
-
-		/// <summary>
-		/// Destroys the ShaderPass with the given ID.
-		/// </summary>
-		/// <param name="id">The ID of the asset to destroy.</param>
-		void destroy_shader_pass(ID const id);
-
-		/// <summary>
-		/// Destroys the MaterialTemplate with the given ID.
-		/// </summary>
-		/// <param name="id">The ID of the asset to destroy.</param>
-		void destroy_material_template(ID const id);
-
-		/// <summary>
-		/// Destroys the Material with the given ID.
-		/// </summary>
-		/// <param name="id">The ID of the asset to destroy.</param>
-		void destroy_material(ID const id);
-
-		/// <summary>
-		/// Destroys the Mesh with the given ID.
-		/// </summary>
-		/// <param name="id">The ID of the asset to destroy.</param>
-		void destroy_mesh(ID const id);
-
-		/// <summary>
-		/// Destroys the all of the assets.
-		/// </summary>
-		void destroy_assets();
-	private:
-		/// <summary>
-		/// Checks if the asset at the given path can be loaded.
-		/// </summary>
-		/// <param name="path">The path to the asset.</param>
-		/// <param name="requiresMeta">If true, the meta file will also be checked.</param>
-		/// <returns>0 if the asset can be loaded, 1 if there was a problem with the main file, or 2 if there was a problem with the meta file.</returns>
-		int check_asset(std::string const& path, bool const requiresMeta) const;
-
-		// loads a .obj file
-		void load_mesh_obj(std::string const& path, ID const meshId);
-
-	public:
-		/// <summary>
-		/// Gets the Texture with the given ID.
-		/// </summary>
-		/// <param name="id"></param>
-		/// <returns></returns>
-		Texture& get_texture(ID const id);
-
-		/// <summary>
-		/// Gets the Texture with the given ID.
-		/// </summary>
-		/// <param name="id"></param>
-		/// <returns></returns>
-		Texture const& get_texture(ID const id) const;
-
-		/// <summary>
-		/// Gets the Sprite with the given ID.
-		/// </summary>
-		/// <param name="id"></param>
-		/// <returns></returns>
-		Sprite& get_sprite(ID const id);
-
-		/// <summary>
-		/// Gets the Sprite with the given ID.
-		/// </summary>
-		/// <param name="id"></param>
-		/// <returns></returns>
-		Sprite const& get_sprite(ID const id) const;
-
-		/// <summary>
-		/// Gets the Shader with the given ID.
-		/// </summary>
-		/// <param name="id"></param>
-		/// <returns></returns>
-		Shader& get_shader(ID const id);
-
-		/// <summary>
-		/// Gets the Shader with the given ID.
-		/// </summary>
-		/// <param name="id"></param>
-		/// <returns></returns>
-		Shader const& get_shader(ID const id) const;
-
-		/// <summary>
-		/// Gets the Shader with the given Material ID.
-		/// </summary>
-		/// <param name="id"></param>
-		/// <returns></returns>
-		Shader& get_shader_from_material_id(ID const id);
-
-		/// <summary>
-		/// Gets the Shader with the given Material ID.
-		/// </summary>
-		/// <param name="id"></param>
-		/// <returns></returns>
-		Shader const& get_shader_from_material_id(ID const id) const;
-
-		/// <summary>
-		/// Gets the ShaderPass with the given ID.
-		/// </summary>
-		/// <param name="id"></param>
-		/// <returns></returns>
-		ShaderPass& get_shader_pass(ID const id);
-
-		/// <summary>
-		/// Gets the ShaderPass with the given ID.
-		/// </summary>
-		/// <param name="id"></param>
-		/// <returns></returns>
-		ShaderPass const& get_shader_pass(ID const id) const;
-
-		/// <summary>
-		/// Gets the ShaderPass with the given Material ID.
-		/// </summary>
-		/// <param name="id"></param>
-		/// <returns></returns>
-		ShaderPass& get_shader_pass_from_material_id(ID const id);
-
-		/// <summary>
-		/// Gets the ShaderPass with the given Material ID.
-		/// </summary>
-		/// <param name="id"></param>
-		/// <returns></returns>
-		ShaderPass const& get_shader_pass_from_material_id(ID const id) const;
-
-		/// <summary>
-		/// Gets the MaterialTemplate with the given ID.
-		/// </summary>
-		/// <param name="id"></param>
-		/// <returns></returns>
-		MaterialTemplate& get_material_template(ID const id);
-
-		/// <summary>
-		/// Gets the MaterialTemplate with the given ID.
-		/// </summary>
-		/// <param name="id"></param>
-		/// <returns></returns>
-		MaterialTemplate const& get_material_template(ID const id) const;
-
-		/// <summary>
-		/// Gets the MaterialTemplate with the given Material ID.
-		/// </summary>
-		/// <param name="id"></param>
-		/// <returns></returns>
-		MaterialTemplate& get_material_template_from_material_id(ID const id);
-
-		/// <summary>
-		/// Gets the MaterialTemplate with the given Material ID.
-		/// </summary>
-		/// <param name="id"></param>
-		/// <returns></returns>
-		MaterialTemplate const& get_material_template_from_material_id(ID const id) const;
-
-		/// <summary>
-		/// Gets the Material with the given ID.
-		/// </summary>
-		/// <param name="id"></param>
-		/// <returns></returns>
-		Material& get_material(ID const id);
-
-		/// <summary>
-		/// Gets the Material with the given ID.
-		/// </summary>
-		/// <param name="id"></param>
-		/// <returns></returns>
-		Material const& get_material(ID const id) const;
-
-		/// <summary>
-		/// Gets the Mesh with the given ID.
-		/// </summary>
-		/// <param name="id"></param>
-		/// <returns></returns>
-		Mesh& get_mesh(ID const id);
-
-		/// <summary>
-		/// Gets the Mesh with the given ID.
-		/// </summary>
-		/// <param name="id"></param>
-		/// <returns></returns>
-		Mesh const& get_mesh(ID const id) const;
-
-#pragma endregion
-
 #pragma region Buffers
 
 	public:
@@ -688,40 +344,40 @@ namespace minty
 		/// <param name="usage">How the buffer will be used.</param>
 		/// <param name="properties">The memory properties.</param>
 		/// <returns>The ID of the new buffer.</returns>
-		ID create_buffer(VkDeviceSize const size, VkBufferUsageFlags const usage, VkMemoryPropertyFlags const properties);
+		Buffer const& create_buffer(VkDeviceSize const size, VkBufferUsageFlags const usage, VkMemoryPropertyFlags const properties);
 
 		/// <summary>
 		/// Creates a uniform buffer.
 		/// </summary>
 		/// <param name="size">The size of the buffer.</param>
 		/// <returns>The ID of the new buffer.</returns>
-		ID create_buffer_uniform(VkDeviceSize const size);
+		Buffer const& create_buffer_uniform(VkDeviceSize const size);
 
 		/// <summary>
 		/// Destroys the buffer with the given ID.
 		/// </summary>
 		/// <param name="id"></param>
-		void destroy_buffer(ID const id);
+		void destroy_buffer(Buffer const& buffer);
 
 		/// <summary>
 		/// Maps the buffer data to a pointer in memory.
 		/// </summary>
 		/// <param name="id">The ID of the buffer to map.</param>
 		/// <returns>A pointer to the buffer data in memory.</returns>
-		void* map_buffer(ID const id) const;
+		void* map_buffer(Buffer const& buffer) const;
 
 		/// <summary>
 		/// Unmaps the buffer data from memory. The invalidates the pointer given from map_buffer for the same ID.
 		/// </summary>
 		/// <param name="id">The ID of the buffer to unmap.</param>
-		void unmap_buffer(ID const id) const;
+		void unmap_buffer(Buffer const& buffer) const;
 
 		/// <summary>
 		/// Sets the data for the buffer with the given ID.
 		/// </summary>
 		/// <param name="id">The ID of the buffer to modify.</param>
 		/// <param name="data">The data to set to the buffer.</param>
-		void set_buffer(ID const id, void* const data);
+		void set_buffer(Buffer const& buffer, void const* const data);
 
 		/// <summary>
 		/// Sets the data for the buffer with the given ID.
@@ -730,28 +386,14 @@ namespace minty
 		/// <param name="data">The data to set to the buffer.</param>
 		/// <param name="size">The size of the data in bytes.</param>
 		/// <param name="offset">The offset of the data within the buffer in bytes.</param>
-		void set_buffer(ID const id, void* const data, VkDeviceSize const size, VkDeviceSize const offset = 0);
-
-		/// <summary>
-		/// Gets the buffer with the given ID.
-		/// </summary>
-		/// <param name="id">The ID of the buffer.</param>
-		/// <returns>The buffer with the givne ID.</returns>
-		VkBuffer get_buffer(ID const id) const;
+		void set_buffer(Buffer const& buffer, void const* const data, VkDeviceSize const size, VkDeviceSize const offset = 0);
 
 		/// <summary>
 		/// Gets the data of the buffer with the given ID and stores it within the out pointer.
 		/// </summary>
 		/// <param name="id">The ID of the buffer to get the data from.</param>
 		/// <param name="out">The pointer to the location of the data to be set.</param>
-		void get_buffer_data(ID const id, void* const out) const; // TODO: test method
-
-		/// <summary>
-		/// Gets the size of the buffer with the given ID.
-		/// </summary>
-		/// <param name="id">The ID of the buffer to get the size of.</param>
-		/// <returns>The size of the buffer in bytes.</returns>
-		VkDeviceSize get_buffer_size(ID const id) const;
+		void get_buffer_data(Buffer const& buffer, void* const out) const; // TODO: test method
 
 		/// <summary>
 		/// Copies the buffer with the srcId to the buffer with the dstId.
@@ -759,20 +401,21 @@ namespace minty
 		/// <param name="srcId">The ID of the source buffer.</param>
 		/// <param name="dstId">The ID of the destination buffer.</param>
 		/// <param name="size">The number of bytes to copy.</param>
-		void copy_buffer(ID const srcId, ID const dstId, VkDeviceSize const size);
-
-	private:
-		// destroys the buffer data directly
-		void destroy_buffer(rendering::Buffer const& buffer);
+		void copy_buffer(Buffer const& src, Buffer const& dst, VkDeviceSize const size);
 
 #pragma endregion
 
 #pragma region Drawing
 
+	protected:
+		virtual void draw(VkCommandBuffer commandBuffer);
+
 	private:
+		void draw_scene(VkCommandBuffer commandBuffer);
+
 		void draw_mesh(VkCommandBuffer commandBuffer, Matrix4 const& transformationMatrix, MeshComponent const& meshComponent);
 
-		void draw_scene(VkCommandBuffer commandBuffer);
+		void draw_sprite(VkCommandBuffer commandBuffer, TransformComponent const& transformComponent, SpriteComponent const& spriteComponent);
 
 		void draw_ui(VkCommandBuffer commandBuffer, UITransformComponent const& uiComponent, SpriteComponent const& spriteComponent);
 
@@ -827,7 +470,7 @@ namespace minty
 		/// </summary>
 		/// <param name="path">The path to the shader code (.spv).</param>
 		/// <returns>The shader module.</returns>
-		VkShaderModule load_shader_module(std::string const& path) const;
+		VkShaderModule load_shader_module(String const& path) const;
 
 		/// <summary>
 		/// Creates a shader module from the given code.
@@ -838,7 +481,7 @@ namespace minty
 
 #pragma endregion
 
-	private:
+	protected:
 		/// <summary>
 		/// Finds the depth rendering format that can be used.
 		/// </summary>
@@ -909,7 +552,7 @@ namespace minty
 		/// </summary>
 		/// <param name="availableFormats">The available surface formats.</param>
 		/// <returns>The chosen format.</returns>
-		VkSurfaceFormatKHR choose_swap_surface_format(const std::vector<VkSurfaceFormatKHR>& availableFormats);
+		virtual VkSurfaceFormatKHR choose_swap_surface_format(const std::vector<VkSurfaceFormatKHR>& availableFormats);
 
 		/// <summary>
 		/// Checks if the given device supports a swap chain.
@@ -971,6 +614,6 @@ namespace minty
 
 	public:
 
-		friend std::string to_string(RenderEngine const& value);
+		friend String to_string(RenderEngine const& value);
 	};
 }

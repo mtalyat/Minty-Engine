@@ -1,0 +1,36 @@
+name: animator
+fsm
+    start: idle
+    scope
+        move: 0
+        flicker: 0
+    states
+        idle
+            value: ID 923eed2b7407acf1
+            transitions
+                -
+                    state: moving
+                    conditions
+                        - move != 0
+                -
+                    state: flicker
+                    conditions
+                        - flicker != 0
+        moving
+            value: ID 6b94ffa6f8694d71
+            transitions
+                -
+                    state: idle
+                    conditions
+                        - move == 0
+                -
+                    state: flicker
+                    conditions
+                        - flicker != 0
+        flicker
+            value: ID b3d99ce55af7007f
+            transitions
+                -
+                    state: idle
+                    conditions
+                        - flicker == 0

@@ -5,32 +5,41 @@
 
 #include "M_RenderEngine.h"
 #include "M_Console.h"
-#include "M_Color.h"
-#include "M_Error.h"
 
 using namespace minty;
-using namespace minty::rendering;
+using namespace minty;
 
-minty::MaterialTemplate::MaterialTemplate(rendering::MaterialTemplateBuilder const& builder, RenderEngine& renderer)
-	: RenderObject::RenderObject(renderer)
-	, _shaderPassIds(builder.shaderPassIds)
+minty::MaterialTemplate::MaterialTemplate()
+	: Asset()
+	, _shaderPasses()
+	, _defaultValues()
+{}
+
+minty::MaterialTemplate::MaterialTemplate(MaterialTemplateBuilder const& builder, Runtime& engine)
+	: Asset(builder.id, builder.path, engine)
+	, _shaderPasses(builder.shaderPasses)
 	, _defaultValues(builder.defaultValues)
 {}
 
+minty::MaterialTemplate::~MaterialTemplate()
+{
+	destroy();
+}
+
 void minty::MaterialTemplate::destroy()
 {
-	_shaderPassIds.clear();
+	_shaderPasses.clear();
 	_defaultValues.clear();
 }
 
-std::vector<ID> const& minty::MaterialTemplate::get_shader_pass_ids() const
+std::vector<ShaderPass*> const& minty::MaterialTemplate::get_shader_passes() const
 {
-	return _shaderPassIds;
+	return _shaderPasses;
 }
 
-Dynamic minty::MaterialTemplate::get_defalt_value(std::string const& name) const
+Dynamic minty::MaterialTemplate::get_defalt_value(String const& name) const
 {
-	auto const& found = _defaultValues.find(name);
+	auto found = _defaultValues.find(name);
 
 	if (found != _defaultValues.end())
 	{
@@ -42,12 +51,12 @@ Dynamic minty::MaterialTemplate::get_defalt_value(std::string const& name) const
 	return Dynamic();
 }
 
-std::unordered_map<std::string, Dynamic> const& minty::MaterialTemplate::get_default_values() const
+std::unordered_map<String, Dynamic> const& minty::MaterialTemplate::get_default_values() const
 {
 	return _defaultValues;
 }
 
-std::string minty::to_string(MaterialTemplate const& value)
+String minty::to_string(MaterialTemplate const& value)
 {
 	return std::format("MaterialTemplate()");
 }

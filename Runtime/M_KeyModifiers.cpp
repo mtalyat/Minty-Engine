@@ -1,7 +1,9 @@
 #include "pch.h"
 #include "M_KeyModifiers.h"
 
-std::string minty::to_string(KeyModifiers const value)
+using namespace minty;
+
+String minty::to_string(KeyModifiers const value)
 {
     switch (value) {
     case KeyModifiers::Shift: return "Shift";
@@ -10,6 +12,6 @@ std::string minty::to_string(KeyModifiers const value)
     case KeyModifiers::Super: return "Super";
     case KeyModifiers::CapsLock: return "CapsLock";
     case KeyModifiers::NumLock: return "NumLock";
-    default: return minty::error::ERROR_TEXT;
+    default: return "";
     }
 }

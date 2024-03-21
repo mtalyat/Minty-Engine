@@ -4636,7 +4636,7 @@ const char* ma_get_backend_name(ma_backend backend)
         case ma_backend_wasapi:     return "WASAPI";
         case ma_backend_dsound:     return "DirectSound";
         case ma_backend_winmm:      return "WinMM";
-        case ma_backend_coreaudio:  return "Core Audio";
+        case ma_backend_coreaudio:  return "Core AudioClip";
         case ma_backend_sndio:      return "sndio";
         case ma_backend_audio4:     return "audio(4)";
         case ma_backend_oss:        return "OSS";
@@ -4645,7 +4645,7 @@ const char* ma_get_backend_name(ma_backend backend)
         case ma_backend_jack:       return "JACK";
         case ma_backend_aaudio:     return "AAudio";
         case ma_backend_opensl:     return "OpenSL|ES";
-        case ma_backend_webaudio:   return "Web Audio";
+        case ma_backend_webaudio:   return "Web AudioClip";
         case ma_backend_null:       return "Null";
         default:                    return "Unknown";
     }
@@ -4920,7 +4920,7 @@ ma_handle ma_dlopen(ma_context* pContext, const char* filename)
 #if MA_LOG_LEVEL >= MA_LOG_LEVEL_INFO
     if (handle == NULL) {
         char message[256];
-        ma_strappend(message, sizeof(message), "Failed to load library: ", filename);
+        ma_strappend(message, sizeof(message), "Failed to load_animation library: ", filename);
         ma_log(pContext, NULL, MA_LOG_LEVEL_INFO, message);
     }
 #endif
@@ -4968,7 +4968,7 @@ ma_proc ma_dlsym(ma_context* pContext, ma_handle handle, const char* symbol)
 #if MA_LOG_LEVEL >= MA_LOG_LEVEL_WARNING
     if (handle == NULL) {
         char message[256];
-        ma_strappend(message, sizeof(message), "Failed to load symbol: ", symbol);
+        ma_strappend(message, sizeof(message), "Failed to load_animation symbol: ", symbol);
         ma_log(pContext, NULL, MA_LOG_LEVEL_WARNING, message);
     }
 #endif
@@ -8022,7 +8022,7 @@ ma_result ma_context_get_device_info_from_IAudioClient__wasapi(ma_context* pCont
 
                     if (!found) {
                         ma_IPropertyStore_Release(pProperties);
-                        return ma_context_post_error(pContext, NULL, MA_LOG_LEVEL_ERROR, "[WASAPI] Failed to find suitable device format for device info retrieval.", MA_FAILED_TO_OPEN_BACKEND_DEVICE);
+                        return ma_context_post_error(pContext, NULL, MA_LOG_LEVEL_ERROR, "[WASAPI] Failed to find_animation suitable device format for device info retrieval.", MA_FAILED_TO_OPEN_BACKEND_DEVICE);
                     }
                 }
             } else {
@@ -8574,7 +8574,7 @@ ma_result ma_device_init_internal__wasapi(ma_context* pContext, ma_device_type d
 
     /* Return an error if we still haven't found a format. */
     if (result != MA_SUCCESS) {
-        errorMsg = "[WASAPI] Failed to find best device mix format.";
+        errorMsg = "[WASAPI] Failed to find_animation best device mix format.";
         goto done;
     }
 
@@ -8656,11 +8656,11 @@ ma_result ma_device_init_internal__wasapi(ma_context* pContext, ma_device_type d
         if (FAILED(hr)) {
             /* Failed to initialize in exclusive mode. Don't fall back to shared mode - instead tell the client about it. They can reinitialize in shared mode if they want. */
             if (hr == E_ACCESSDENIED) {
-                errorMsg = "[WASAPI] Failed to initialize device in exclusive mode. Access denied.", result = MA_ACCESS_DENIED;
+                errorMsg = "[WASAPI] Failed to initialize device in exclusive coordinateMode. Access denied.", result = MA_ACCESS_DENIED;
             } else if (hr == MA_AUDCLNT_E_DEVICE_IN_USE) {
-                errorMsg = "[WASAPI] Failed to initialize device in exclusive mode. Device in use.", result = MA_DEVICE_BUSY;
+                errorMsg = "[WASAPI] Failed to initialize device in exclusive coordinateMode. Device in use.", result = MA_DEVICE_BUSY;
             } else {
-                errorMsg = "[WASAPI] Failed to initialize device in exclusive mode."; result = MA_SHARE_MODE_NOT_SUPPORTED;
+                errorMsg = "[WASAPI] Failed to initialize device in exclusive coordinateMode."; result = MA_SHARE_MODE_NOT_SUPPORTED;
             }
             goto done;
         }
@@ -12156,7 +12156,7 @@ ma_result ma_device_init__winmm(ma_context* pContext, const ma_device_config* pC
 
         result = ma_formats_flags_to_WAVEFORMATEX__winmm(caps.dwFormats, caps.wChannels, &wf);
         if (result != MA_SUCCESS) {
-            errorMsg = "[WinMM] Could not find appropriate format for internal device.", errorCode = result;
+            errorMsg = "[WinMM] Could not find_animation appropriate format for internal device.", errorCode = result;
             goto on_error;
         }
 
@@ -12194,7 +12194,7 @@ ma_result ma_device_init__winmm(ma_context* pContext, const ma_device_config* pC
 
         result = ma_formats_flags_to_WAVEFORMATEX__winmm(caps.dwFormats, caps.wChannels, &wf);
         if (result != MA_SUCCESS) {
-            errorMsg = "[WinMM] Could not find appropriate format for internal device.", errorCode = result;
+            errorMsg = "[WinMM] Could not find_animation appropriate format for internal device.", errorCode = result;
             goto on_error;
         }
 
@@ -14000,7 +14000,7 @@ ma_bool32 ma_device_read_and_send_to_client__alsa(ma_device* pDevice)
 
                     framesRead = ((ma_snd_pcm_readi_proc)pDevice->pContext->alsa.snd_pcm_readi)((ma_snd_pcm_t*)pDevice->alsa.pPCM, pDevice->alsa.pIntermediaryBuffer, framesAvailable);
                     if (framesRead < 0) {
-                        ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[ALSA] Failed to read data from the internal device.", MA_FAILED_TO_READ_DATA_FROM_DEVICE);
+                        ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[ALSA] Failed to read_file data from the internal device.", MA_FAILED_TO_READ_DATA_FROM_DEVICE);
                         return MA_FALSE;
                     }
 
@@ -14157,7 +14157,7 @@ ma_result ma_device_init_by_type__alsa(ma_context* pContext, const ma_device_con
         if (((ma_snd_pcm_hw_params_set_access_proc)pContext->alsa.snd_pcm_hw_params_set_access)(pPCM, pHWParams, MA_SND_PCM_ACCESS_RW_INTERLEAVED) < 0) {
             ma_free(pHWParams);
             ((ma_snd_pcm_close_proc)pDevice->pContext->alsa.snd_pcm_close)(pPCM);
-            return ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[ALSA] Failed to set access mode to neither SND_PCM_ACCESS_MMAP_INTERLEAVED nor SND_PCM_ACCESS_RW_INTERLEAVED. snd_pcm_hw_params_set_access() failed.", MA_FORMAT_NOT_SUPPORTED);
+            return ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[ALSA] Failed to set access coordinateMode to neither SND_PCM_ACCESS_MMAP_INTERLEAVED nor SND_PCM_ACCESS_RW_INTERLEAVED. snd_pcm_hw_params_set_access() failed.", MA_FORMAT_NOT_SUPPORTED);
         }
     }
 
@@ -14574,7 +14574,7 @@ ma_result ma_device_read__alsa(ma_device* pDevice, void* pFramesOut, ma_uint32 f
 
                 resultALSA = ((ma_snd_pcm_readi_proc)pDevice->pContext->alsa.snd_pcm_readi)((ma_snd_pcm_t*)pDevice->alsa.pPCMCapture, pFramesOut, frameCount);
                 if (resultALSA < 0) {
-                    return ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[ALSA] Failed to read data from the internal device.", MA_FAILED_TO_READ_DATA_FROM_DEVICE);
+                    return ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[ALSA] Failed to read_file data from the internal device.", MA_FAILED_TO_READ_DATA_FROM_DEVICE);
                 }
             }
         }
@@ -19981,42 +19981,42 @@ static ma_result ma_device__untrack__coreaudio(ma_device* pDevice)
         case AVAudioSessionRouteChangeReasonOldDeviceUnavailable:
         {
         #if defined(MA_DEBUG_OUTPUT)
-            printf("[Core Audio] Route Changed: AVAudioSessionRouteChangeReasonOldDeviceUnavailable\n");
+            printf("[Core AudioClip] Route Changed: AVAudioSessionRouteChangeReasonOldDeviceUnavailable\n");
         #endif
         } break;
 
         case AVAudioSessionRouteChangeReasonNewDeviceAvailable:
         {
         #if defined(MA_DEBUG_OUTPUT)
-            printf("[Core Audio] Route Changed: AVAudioSessionRouteChangeReasonNewDeviceAvailable\n");
+            printf("[Core AudioClip] Route Changed: AVAudioSessionRouteChangeReasonNewDeviceAvailable\n");
         #endif
         } break;
 
         case AVAudioSessionRouteChangeReasonNoSuitableRouteForCategory:
         {
         #if defined(MA_DEBUG_OUTPUT)
-            printf("[Core Audio] Route Changed: AVAudioSessionRouteChangeReasonNoSuitableRouteForCategory\n");
+            printf("[Core AudioClip] Route Changed: AVAudioSessionRouteChangeReasonNoSuitableRouteForCategory\n");
         #endif
         } break;
 
         case AVAudioSessionRouteChangeReasonWakeFromSleep:
         {
         #if defined(MA_DEBUG_OUTPUT)
-            printf("[Core Audio] Route Changed: AVAudioSessionRouteChangeReasonWakeFromSleep\n");
+            printf("[Core AudioClip] Route Changed: AVAudioSessionRouteChangeReasonWakeFromSleep\n");
         #endif
         } break;
 
         case AVAudioSessionRouteChangeReasonOverride:
         {
         #if defined(MA_DEBUG_OUTPUT)
-            printf("[Core Audio] Route Changed: AVAudioSessionRouteChangeReasonOverride\n");
+            printf("[Core AudioClip] Route Changed: AVAudioSessionRouteChangeReasonOverride\n");
         #endif
         } break;
 
         case AVAudioSessionRouteChangeReasonCategoryChange:
         {
         #if defined(MA_DEBUG_OUTPUT)
-            printf("[Core Audio] Route Changed: AVAudioSessionRouteChangeReasonCategoryChange\n");
+            printf("[Core AudioClip] Route Changed: AVAudioSessionRouteChangeReasonCategoryChange\n");
         #endif
         } break;
 
@@ -20024,7 +20024,7 @@ static ma_result ma_device__untrack__coreaudio(ma_device* pDevice)
         default:
         {
         #if defined(MA_DEBUG_OUTPUT)
-            printf("[Core Audio] Route Changed: AVAudioSessionRouteChangeReasonUnknown\n");
+            printf("[Core AudioClip] Route Changed: AVAudioSessionRouteChangeReasonUnknown\n");
         #endif
         } break;
     }
@@ -20694,7 +20694,7 @@ ma_result ma_device_init__coreaudio(ma_context* pContext, const ma_device_config
         ma_uint32 rbSizeInFrames = (ma_uint32)ma_calculate_frame_count_after_src(pDevice->sampleRate, pDevice->capture.internalSampleRate, pDevice->capture.internalBufferSizeInFrames);
         ma_result result = ma_pcm_rb_init(pDevice->capture.format, pDevice->capture.channels, rbSizeInFrames, NULL, &pDevice->coreaudio.duplexRB);
         if (result != MA_SUCCESS) {
-            return ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[Core Audio] Failed to initialize ring buffer.", result);
+            return ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[Core AudioClip] Failed to initialize ring buffer.", result);
         }
 
         /* We need a period to act as a buffer for cases where the playback and capture device's end up desyncing. */
@@ -21740,7 +21740,7 @@ ma_result ma_device_read__sndio(ma_device* pDevice, void* pPCMFrames, ma_uint32 
 
     result = ((ma_sio_read_proc)pDevice->pContext->sndio.sio_read)((struct ma_sio_hdl*)pDevice->sndio.handleCapture, pPCMFrames, frameCount * ma_get_bytes_per_frame(pDevice->capture.internalFormat, pDevice->capture.internalChannels));
     if (result == 0) {
-        return ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[sndio] Failed to read data from the device to be sent to the device.", MA_FAILED_TO_SEND_DATA_TO_DEVICE);
+        return ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[sndio] Failed to read_file data from the device to be sent to the device.", MA_FAILED_TO_SEND_DATA_TO_DEVICE);
     }
 
     if (pFramesRead != NULL) {
@@ -22697,7 +22697,7 @@ ma_result ma_device_read__audio4(ma_device* pDevice, void* pPCMFrames, ma_uint32
 
     result = read(pDevice->audio4.fdCapture, pPCMFrames, frameCount * ma_get_bytes_per_frame(pDevice->capture.internalFormat, pDevice->capture.internalChannels));
     if (result < 0) {
-        return ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[audio4] Failed to read data from the device.", MA_FAILED_TO_READ_DATA_FROM_DEVICE);
+        return ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[audio4] Failed to read_file data from the device.", MA_FAILED_TO_READ_DATA_FROM_DEVICE);
     }
 
     if (pFramesRead != NULL) {
@@ -23405,7 +23405,7 @@ ma_result ma_device_read__oss(ma_device* pDevice, void* pPCMFrames, ma_uint32 fr
 
     resultOSS = read(pDevice->oss.fdCapture, pPCMFrames, frameCount * ma_get_bytes_per_frame(pDevice->capture.internalFormat, pDevice->capture.internalChannels));
     if (resultOSS < 0) {
-        return ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[OSS] Failed to read data from the device to be sent to the client.", MA_FAILED_TO_READ_DATA_FROM_DEVICE);
+        return ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[OSS] Failed to read_file data from the device to be sent to the client.", MA_FAILED_TO_READ_DATA_FROM_DEVICE);
     }
     
     if (pFramesRead != NULL) {

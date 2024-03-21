@@ -1,11 +1,23 @@
 #include "pch.h"
-#include "M_String.h"
+#include "M_Text.h"
 
 #include "M_Console.h"
 
 #include <sstream>
 
-std::string minty::string::to_lower(std::string const& string)
+using namespace minty;
+
+minty::Text::Text(TextBuilder const& builder, Runtime& runtime)
+	: Asset(builder.id, builder.path, runtime)
+	, _text(builder.text)
+{}
+
+String const& minty::Text::get_text() const
+{
+	return _text;
+}
+
+String minty::Text::to_lower(String const& string)
 {
 	std::vector<char> data(string.size());
 
@@ -16,10 +28,10 @@ std::string minty::string::to_lower(std::string const& string)
 
 	data.push_back('\0');
 
-	return std::string(data.data());
+	return String(data.data());
 }
 
-std::string minty::string::to_upper(std::string const& string)
+String minty::Text::to_upper(String const& string)
 {
 	std::vector<char> data(string.size());
 
@@ -30,14 +42,14 @@ std::string minty::string::to_upper(std::string const& string)
 
 	data.push_back('\0');
 
-	return std::string(data.data());
+	return String(data.data());
 }
 
-std::string minty::string::to_bytes(void* const data, size_t const size)
+String minty::Text::to_bytes(void const* const data, size_t const size)
 {
-	std::string result = "";
+	String result = "";
 
-	byte* bytes = static_cast<byte*>(data);
+	Byte const* bytes = static_cast<Byte const*>(data);
 
 	for (size_t i = size; i-- > 0;)
 	{
@@ -52,11 +64,11 @@ std::string minty::string::to_bytes(void* const data, size_t const size)
 	return result;
 }
 
-std::string minty::string::to_bits(void* const data, size_t const size)
+String minty::Text::to_bits(void const* const data, size_t const size)
 {
-	std::string result = "";
+	String result = "";
 
-	byte* bytes = static_cast<byte*>(data);
+	Byte const* bytes = static_cast<Byte const*>(data);
 
 	for (size_t i = size; i-- > 0;)
 	{
@@ -74,7 +86,7 @@ std::string minty::string::to_bits(void* const data, size_t const size)
 	return result;
 }
 
-bool minty::string::equal_insensitive(std::string const& left, std::string const& right)
+bool minty::Text::equal_insensitive(String const& left, String const& right)
 {
 	// check if not equal lengths
 	if (left.size() != right.size())
@@ -96,12 +108,12 @@ bool minty::string::equal_insensitive(std::string const& left, std::string const
 	return true;
 }
 
-std::vector<std::string> minty::string::split(std::string const& string)
+std::vector<String> minty::Text::split(String const& string)
 {
 	std::stringstream ss(string);
 
-	std::vector<std::string> results;
-	std::string token;
+	std::vector<String> results;
+	String token;
 
 	while (ss >> token)
 	{
@@ -111,12 +123,12 @@ std::vector<std::string> minty::string::split(std::string const& string)
 	return results;
 }
 
-std::vector<std::string> minty::string::split(std::string const& string, char const delimiter)
+std::vector<String> minty::Text::split(String const& string, char const delimiter)
 {
 	std::stringstream ss(string);
 
-	std::vector<std::string> results;
-	std::string token;
+	std::vector<String> results;
+	String token;
 
 	while (std::getline(ss, token, delimiter))
 	{
@@ -126,8 +138,32 @@ std::vector<std::string> minty::string::split(std::string const& string, char co
 	return results;
 }
 
-std::vector<std::string> minty::string::split(std::string const& string, std::string const& delimiter)
+std::vector<String> minty::Text::split(String const& string, String const& delimiter)
 {
-	console::todo("string::split() (string delimiter)");
+	Console::todo("string::split() (string delimiter)");
 	return {};
+}
+
+String minty::Text::join(std::vector<String> const& list, String const& separator)
+{
+	return join(list, 0, list.size(), separator);
+}
+
+String minty::Text::join(std::vector<String> const& list, size_t const start, size_t const count, String const& separator)
+{
+	String out;
+
+	size_t end = start + count;
+
+	for (size_t i = start; i < end; i++)
+	{
+		out += list.at(i);
+
+		if (i < end - 1)
+		{
+			out += separator;
+		}
+	}
+
+	return out;
 }

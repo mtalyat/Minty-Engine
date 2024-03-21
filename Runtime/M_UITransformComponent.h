@@ -1,7 +1,6 @@
 #pragma once
 
 #include "M_Component.h"
-#include "M_Transform.h"
 
 namespace minty
 {
@@ -16,9 +15,9 @@ namespace minty
 		Right = 0b00100000,
 	};
 
-	std::string to_string(AnchorMode const anchor);
+	String to_string(AnchorMode const anchor);
 
-	AnchorMode from_string_anchor_mode(std::string const& string);
+	AnchorMode from_string_anchor_mode(String const& string);
 
 	struct UITransformComponent
 		: public Component
@@ -33,6 +32,6 @@ namespace minty
 		void serialize(Writer& writer) const override;
 		void deserialize(Reader const& reader) override;
 
-		friend std::string to_string(UITransformComponent const& value);
+		friend String to_string(UITransformComponent const& value);
 	};
 }

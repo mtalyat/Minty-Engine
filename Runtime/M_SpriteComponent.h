@@ -1,29 +1,33 @@
 #pragma once
 
 #include "M_Component.h"
-#include "M_Transform.h"
+#include "M_Vector.h"
 
 namespace minty
 {
+	class Sprite;
+
 	/// <summary>
 	/// Holds data for a Sprite within the Scene.
 	/// </summary>
 	struct SpriteComponent
 		: public Component
 	{
-		/// <summary>
-		/// The ID of the Sprite to render.
-		/// </summary>
-		ID id;
+		Sprite* sprite;
 
 		/// <summary>
-		/// The layer on which to render the Sprite.
+		/// The order in which to render the Sprite, when it has equal distance to the Camera as another Sprite.
 		/// </summary>
-		int layer;
+		int order = 0;
+
+		/// <summary>
+		/// The size of the Sprite in world space.
+		/// </summary>
+		Vector2 size = Vector2(1.0f, 1.0f);
 
 		void serialize(Writer& writer) const override;
 		void deserialize(Reader const& reader) override;
 
-		friend std::string to_string(SpriteComponent const& value);
+		friend String to_string(SpriteComponent const& value);
 	};
 }

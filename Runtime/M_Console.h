@@ -1,11 +1,12 @@
 #pragma once
 
-#include "M_Base.h"
+#include "M_Types.h"
+#include "M_Node.h"
 
-namespace minty::console
+namespace minty::Console
 {
 	/// <summary>
-	/// Defines a color that can be printed to the console.
+	/// Defines a color that can be printed to the Console.
 	/// </summary>
 	enum Color
 	{
@@ -28,61 +29,69 @@ namespace minty::console
 		BrightWhite = 15
 	};
 
-	std::string to_string(Color const value);
+	String to_string(Color const value);
 
 	/// <summary>
-	/// Prints the string to the console.
+	/// Prints the String to the Console.
 	/// </summary>
-	/// <param name="message">The string to print.</param>
-	void print(std::string const& message);
+	/// <param name="message">The String to print.</param>
+	void print(String const& message);
 
 	/// <summary>
-	/// Prints the string to the console in the given color.
+	/// Prints the Node to the Console.
+	/// </summary>
+	/// <param name="node">The Node to print.</param>
+	void print(Node const& node);
+
+	/// <summary>
+	/// Prints the string to the Console in the given color.
 	/// </summary>
 	/// <param name="message">The string to print.</param>
 	/// <param name="color">The color to print the message.</param>
-	void print(std::string const& message, Color const color);
+	void print(String const& message, Color const color);
 
 	/// <summary>
 	/// Waits until the user presses the enter key.
 	/// </summary>
 	void wait();
 
+	void log_color(String const& message, Color const color = Color::White);
+
 	/// <summary>
 	/// Debug log prints the given message to the screen.
 	/// </summary>
 	/// <param name="message">The string to print.</param>
-	void log(std::string const& message, Color const color = Color::White);
+	void log(String const& message);
 
 	/// <summary>
 	/// Debug log prints the given message to the screen, in cyan.
 	/// </summary>
 	/// <param name="message">The string to print.</param>
-	void todo(std::string const& message);
+	void todo(String const& message);
 
 	/// <summary>
 	/// Debug log prints the given message to the screen, in blue.
 	/// </summary>
 	/// <param name="message">The string to print.</param>
-	void test(std::string const& message, Color const color = Color::Blue);
+	void test(String const& message);
 
 	/// <summary>
 	/// Debug info prints the given message to the screen, in gray.
 	/// </summary>
 	/// <param name="message">The string to print.</param>
-	void info(std::string const& message);
+	void info(String const& message);
 
 	/// <summary>
 	/// Debug warn prints the given message to the screen, in yellow.
 	/// </summary>
 	/// <param name="message">The string to print.</param>
-	void warn(std::string const& message);
+	void warn(String const& message);
 
 	/// <summary>
 	/// Debug error prints the given message to the screen, in red.
 	/// </summary>
 	/// <param name="message">The string to print.</param>
-	void error(std::string const& message);
+	void error(String const& message);
 
 	/// <summary>
 	/// Prints an error message if the given condition is false.
@@ -91,5 +100,5 @@ namespace minty::console
 	/// <param name="value">The value to check.</param>
 	/// <param name="errorMessage">The error message.</param>
 	/// <return>True if the value passed, or if not in debug mode.</return>
-	bool ass(bool const value, std::string const& errorMessage);
+	bool ass(bool const value, String const& errorMessage);
 }

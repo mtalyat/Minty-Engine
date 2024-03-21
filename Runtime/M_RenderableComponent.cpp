@@ -3,7 +3,7 @@
 
 using namespace minty;
 
-std::string minty::to_string(RenderableComponent const& value)
+String minty::to_string(RenderableComponent const& value)
 {
 	return std::format("Renderable()");
 }

@@ -1,12 +1,8 @@
 #pragma once
-
-#include "M_Types.h"
 #include "M_Object.h"
 
 namespace minty
 {
-	typedef int color_t;
-
 	/// <summary>
 	/// Holds data for a RGBA Color.
 	/// </summary>
@@ -14,25 +10,30 @@ namespace minty
 		: public Object
 	{
 	public:
+		typedef int color_t;
+		constexpr static Byte MAX_CHANNEL = 255;
+		constexpr static Byte MIN_CHANNEL = 0;
+
+	public:
 		/// <summary>
 		/// The red component.
 		/// </summary>
-		byte r;
+		Byte r;
 		
 		/// <summary>
 		/// The green component.
 		/// </summary>
-		byte g;
+		Byte g;
 
 		/// <summary>
 		/// The blue component.
 		/// </summary>
-		byte b;
+		Byte b;
 
 		/// <summary>
 		/// The alpha component.
 		/// </summary>
-		byte a;
+		Byte a;
 
 	public:
 		/// <summary>
@@ -41,21 +42,55 @@ namespace minty
 		Color();
 
 		/// <summary>
-		/// Creates a color using the given red, green, and blue values.
+		/// Creates a color using the given red, green, and blue values. [0, 256)
 		/// </summary>
 		/// <param name="r"></param>
 		/// <param name="g"></param>
 		/// <param name="b"></param>
-		Color(byte const r, byte const g, byte const b);
+		Color(Byte const r, Byte const g, Byte const b);
 
 		/// <summary>
-		/// Creates a color using the given red, green, blue and alpha values.
+		/// Creates a color using the given red, green, blue and alpha values. [0, 256)
 		/// </summary>
 		/// <param name="r"></param>
 		/// <param name="g"></param>
 		/// <param name="b"></param>
 		/// <param name="a"></param>
-		Color(byte const r, byte const g, byte const b, byte const a);
+		Color(Byte const r, Byte const g, Byte const b, Byte const a);
+
+		/// <summary>
+		/// Creates a color using the given red, green, and blue values. [0, 256)
+		/// </summary>
+		/// <param name="r"></param>
+		/// <param name="g"></param>
+		/// <param name="b"></param>
+		Color(int const r, int const g, int const b);
+
+		/// <summary>
+		/// Creates a color using the given red, green, blue and alpha values. [0, 256)
+		/// </summary>
+		/// <param name="r"></param>
+		/// <param name="g"></param>
+		/// <param name="b"></param>
+		/// <param name="a"></param>
+		Color(int const r, int const g, int const b, int const a);
+
+		/// <summary>
+		/// Creates a color using the given red, green and blue float values. [0.0, 1.0]
+		/// </summary>
+		/// <param name="rf"></param>
+		/// <param name="gf"></param>
+		/// <param name="bf"></param>
+		Color(float const rf, float const gf, float const bf);
+
+		/// <summary>
+		/// Creates a color using the given red, green, blue and alpha float values. [0.0, 1.0]
+		/// </summary>
+		/// <param name="rf"></param>
+		/// <param name="gf"></param>
+		/// <param name="bf"></param>
+		/// <param name="af"></param>
+		Color(float const rf, float const gf, float const bf, float const af);
 
 		/// <summary>
 		/// Creates a color using the given packed color value.
@@ -73,7 +108,10 @@ namespace minty
 		operator color_t() const;
 
 		// assignment operator
-		Color& operator=(const Color& color);
+		Color& operator=(Color const& color);
+
+		friend std::ostream& operator<<(std::ostream& stream, Color const& color);
+		friend std::istream& operator>>(std::istream& stream, Color& color);
 
 		/// <summary>
 		/// Gets the red value as a scale from 0.0f to 1.0f.
@@ -112,6 +150,10 @@ namespace minty
 		/// <param name="percent">The percentage to lighten the color by.</param>
 		/// <returns>A new lightened color.</returns>
 		Color lighten(float const percent) const;
+
+		String toHex() const;
+
+		static Color fromHex(String const& string);
 
 		/// <summary>
 		/// Lerps two colors using the red, green and blue. The alpha value is set to the left argument alpha.
@@ -186,7 +228,7 @@ namespace minty
 		inline static Color error() { return Color(255, 0, 255, 255); }
 
 	public:
-		friend std::string to_string(Color const color);
+		friend String to_string(Color const color);
 	};
 }
 

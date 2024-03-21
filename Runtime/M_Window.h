@@ -1,8 +1,10 @@
 #pragma once
-
 #include "M_Object.h"
-#include "M_Event.h"
-#include "M_InputMap.h"
+
+#include "M_Key.h"
+#include "M_KeyAction.h"
+#include "M_KeyModifiers.h"
+#include "M_MouseButton.h"
 #include "M_CursorMode.h"
 #include <map>
 
@@ -10,6 +12,9 @@ struct GLFWwindow;
 
 namespace minty
 {
+	class ScriptClass;
+	class ScriptEngine;
+
 	/// <summary>
 	/// A window on the screen.
 	/// </summary>
@@ -19,16 +24,15 @@ namespace minty
 	private:
 		static int _windowCount;
 
-		std::string _title;
+		String _title;
 		GLFWwindow* _window;
 		int _frameWidth, _frameHeight;
 		int _width, _height;
+		int _restoreX, _restoreY;
 		bool _resized;
-		InputMap const* _activeInputMap;
-		InputMap const* _globalInputMap;
-		float _lastMouseX, _lastMouseY;
-		bool _mouseOutOfBounds;
 
+		ScriptClass const* _windowScript;
+		ScriptClass const* _inputScript;
 	public:
 		/// <summary>
 		/// Creates a new Window.
@@ -36,25 +40,64 @@ namespace minty
 		/// <param name="title">The title to be displayed on the Window.</param>
 		/// <param name="width">The width of the Window in pixels.</param>
 		/// <param name="height">The height of the Window in pixels.</param>
-		Window(std::string const& title, int const width, int const height, InputMap const* const globalInputMap = nullptr);
+		Window(String const& title, int const width, int const height, Path const& iconPath = "");
+
+		/// <summary>
+		/// Creates a new Window.
+		/// </summary>
+		/// <param name="title"></param>
+		/// <param name="width"></param>
+		/// <param name="height"></param>
+		Window(String const& title, int const x, int const y, int const width, int const height, Path const& iconPath = "");
 
 		~Window();
 
+	public:
+		void on_link(ScriptEngine& engine);
+
+	public:
 		/// <summary>
 		/// Sets the title text of this Window.
 		/// </summary>
-		void set_title(std::string const& title);
+		void set_title(String const& title);
 
 		/// <summary>
 		/// Gets the title text of this Window.
 		/// </summary>
-		std::string const& get_title() const;
+		String const& get_title() const;
+
+		/// <summary>
+		/// Sets the icon of this Window.
+		/// </summary>
+		/// <param name="path"></param>
+		void set_icon(Path const& path);
 
 		/// <summary>
 		/// Sets the cursor mode.
 		/// </summary>
 		/// <param name="mode"></param>
 		void set_cursor_mode(CursorMode const mode);
+
+		/// <summary>
+		/// Gets the cursor mode.
+		/// </summary>
+		/// <returns></returns>
+		CursorMode get_cursor_mode() const;
+
+		/// <summary>
+		/// Maximizes the Window.
+		/// </summary>
+		void maximize();
+
+		/// <summary>
+		/// Minimizes the Window.
+		/// </summary>
+		void minimize();
+
+		/// <summary>
+		/// Restores the maximized or minimized window to its normal state.
+		/// </summary>
+		void restore();
 
 		/// <summary>
 		/// Checks if the Window has resized since the last time this method was called.
@@ -109,28 +152,23 @@ namespace minty
 		GLFWwindow* get_raw() const;
 
 		/// <summary>
-		/// Sets the currently active InputMap for this Window.
+		/// Processes all pending Window events.
 		/// </summary>
-		/// <param name="inputMap"></param>
-		void set_input(InputMap const* const inputMap);
-
-		/// <summary>
-		/// Gets the currently active InputMap for this Window.
-		/// </summary>
-		/// <returns></returns>
-		InputMap const* get_input() const;
+		static void poll_events();
 	private:
+		void save_restore_info();
+
 		// triggers a key in the input map
-		void trigger_key(Key const key, KeyAction const action, KeyModifiers const mods);
+		void trigger_key(Key key, KeyAction action, KeyModifiers mods);
 
 		// triggers a button in the input map
-		void trigger_button(MouseButton const button, KeyAction const action, KeyModifiers const mods);
+		void trigger_mouse_click(MouseButton button, KeyAction action, KeyModifiers mods);
 
 		// triggers a scroll in the input map
-		void trigger_scroll(float dx, float dy);
+		void trigger_mouse_scroll(float dx, float dy);
 
 		// triggers a move in the input map
-		void trigger_cursor(float x, float y);
+		void trigger_mouse_move(float x, float y);
 
 		// window resize
 		static void resize_callback(GLFWwindow* const window, int const width, int const height);
@@ -147,8 +185,11 @@ namespace minty
 		// cursor position
 		static void cursor_callback(GLFWwindow* window, double xpos, double ypos);
 
+		// error reporting
+		static void error_callback(int const error, char const* description);
+
 	public:
-		friend std::string to_string(Window const& value);
+		friend String to_string(Window const& value);
 	};
 }
 

@@ -1,32 +1,49 @@
 #include "pch.h"
 #include "M_ShaderPass.h"
 
+#include "M_Runtime.h"
 #include "M_RenderEngine.h"
+#include "M_RenderSystem.h"
+#include "M_AssetEngine.h"
 
 using namespace minty;
-using namespace minty::rendering;
+using namespace minty;
 
-minty::ShaderPass::ShaderPass(ShaderPassBuilder const& builder, RenderEngine& renderer)
-	: rendering::RenderObject(renderer)
-	, _shaderId(builder.shaderId)
+minty::ShaderPass::ShaderPass()
+	: Asset()
+	, _shader()
 	, _pipeline()
-	, _descriptorSet(renderer)
+	, _descriptorSet()
+{}
+
+minty::ShaderPass::ShaderPass(ShaderPassBuilder const& builder, Runtime& engine)
+	: Asset(builder.id, builder.path, engine)
+	, _shader(builder.shader)
+	, _pipeline()
+	, _descriptorSet(DescriptorSetBuilder(), engine)
 {
+	MINTY_ASSERT(builder.shader != nullptr);
+
 	create_pipeline(builder);
 
-	Shader& shader = renderer.get_shader(_shaderId);
-	_descriptorSet = shader.create_descriptor_set(DESCRIPTOR_SET_SHADER_PASS);
+	_descriptorSet = _shader->create_descriptor_set(DESCRIPTOR_SET_SHADER_PASS, true);
+}
+
+minty::ShaderPass::~ShaderPass()
+{
+	destroy();
 }
 
 void minty::ShaderPass::destroy()
 {
-	_shaderId = ERROR_ID;
-	vkDestroyPipeline(_renderer.get_device(), _pipeline, nullptr);
+	_shader = nullptr;
+	vkDestroyPipeline(get_runtime().get_render_engine().get_device(), _pipeline, nullptr);
+	_descriptorSet.destroy();
 }
 
-ID minty::ShaderPass::get_shader_id() const
+Shader* minty::ShaderPass::get_shader() const
 {
-	return _shaderId;
+	return _shader;
 }
 
 VkPipeline minty::ShaderPass::get_pipeline() const
@@ -42,7 +59,8 @@ DescriptorSet const& minty::ShaderPass::get_descriptor_set() const
 void minty::ShaderPass::create_pipeline(ShaderPassBuilder const& builder)
 {
 	// create 
-	VkDevice device = _renderer.get_device();
+	RenderEngine& renderer = get_runtime().get_render_engine();
+	VkDevice device = renderer.get_device();
 
 	// load shader stages
 	auto const& shaderStageInfos = builder.stages;
@@ -53,7 +71,7 @@ void minty::ShaderPass::create_pipeline(ShaderPassBuilder const& builder)
 		VkPipelineShaderStageCreateInfo& stage = shaderStages.at(i);
 		ShaderPassBuilder::ShaderStageInfo const& info = shaderStageInfos.at(i);
 		stage.sType = VK_STRUCTURE_TYPE_PIPELINE_SHADER_STAGE_CREATE_INFO;
-		stage.module = _renderer.create_shader_module(info.code);
+		stage.module = renderer.create_shader_module(info.code);
 		stage.pName = info.entry.c_str();
 		stage.stage = info.stage;
 		stage.pNext = VK_NULL_HANDLE;
@@ -185,7 +203,6 @@ void minty::ShaderPass::create_pipeline(ShaderPassBuilder const& builder)
 	//};
 
 	// get layout from shader
-	Shader const& shader = _renderer.get_shader(_shaderId);
 
 	// compile all of the information to create the pipeline
 	VkGraphicsPipelineCreateInfo pipelineInfo
@@ -201,17 +218,15 @@ void minty::ShaderPass::create_pipeline(ShaderPassBuilder const& builder)
 		.pDepthStencilState = &depthStencil,
 		.pColorBlendState = &colorBlending,
 		.pDynamicState = &dynamicState,
-		.layout = shader.get_pipeline_layout(),
-		.renderPass = _renderer.get_render_pass(),
+		.layout = _shader->get_pipeline_layout(),
+		.renderPass = renderer.get_render_pass(),
 		.subpass = 0,
 		.basePipelineHandle = VK_NULL_HANDLE, // Optional, derive from another existing pipeline
 		.basePipelineIndex = -1, // Optional
 	};
 
 	// create the pipeline
-	if (vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &_pipeline) != VK_SUCCESS) {
-		error::abort("Failed to create graphics pipeline.");
-	}
+	VK_ASSERT(vkCreateGraphicsPipelines(device, VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &_pipeline), "Failed to create graphics pipeline.");
 
 	// cleanup
 	for (size_t i = 0; i < shaderStages.size(); i++)

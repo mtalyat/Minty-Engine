@@ -1,12 +1,13 @@
 #include "pch.h"
 #include "M_Parse.h"
 
-#include "M_String.h"
+#include "M_Text.h"
+#include "M_Encoding.h"
 
 using namespace minty;
-using namespace minty::parse;
+using namespace minty::Parse;
 
-bool is_unsigned_integer(std::string const& string)
+bool is_unsigned_integer(String const& string)
 {
     if (!string.length()) return false; // nothing in string
 
@@ -19,7 +20,7 @@ bool is_unsigned_integer(std::string const& string)
     return true;
 }
 
-bool is_signed_integer(std::string const& string)
+bool is_signed_integer(String const& string)
 {
     if (!string.length()) return false; // nothing in string
 
@@ -42,7 +43,7 @@ bool is_signed_integer(std::string const& string)
     return true;
 }
 
-bool is_float(std::string const& string)
+bool is_float(String const& string)
 {
     if (!string.length()) return false; // nothing in string
 
@@ -73,10 +74,10 @@ bool is_float(std::string const& string)
     return digit;
 }
 
-bool minty::parse::to_bool(std::string const& string)
+bool minty::Parse::to_bool(String const& string)
 {
     // check for "true" or "false" as well
-    std::string upper = string::to_upper(string);
+    String upper = Text::to_upper(string);
     if (upper == "TRUE")
     {
         return true;
@@ -90,10 +91,10 @@ bool minty::parse::to_bool(std::string const& string)
     return static_cast<bool>(std::stoi(string));
 }
 
-bool minty::parse::try_bool(std::string const& string, bool& value)
+bool minty::Parse::try_bool(String const& string, bool& value)
 {
     // check for "true" or "false" as well
-    std::string upper = string::to_upper(string);
+    String upper = Text::to_upper(string);
     if (upper == "TRUE")
     {
         return true;
@@ -113,28 +114,28 @@ bool minty::parse::try_bool(std::string const& string, bool& value)
     return false;
 }
 
-byte minty::parse::to_byte(std::string const& string)
+Byte minty::Parse::to_byte(String const& string)
 {
-    return static_cast<byte>(std::stoi(string));
+    return static_cast<Byte>(std::stoi(string));
 }
 
-bool minty::parse::try_byte(std::string const& string, byte& value)
+bool minty::Parse::try_byte(String const& string, Byte& value)
 {
     if (is_unsigned_integer(string))
     {
-        value = static_cast<byte>(std::stoi(string));
+        value = static_cast<Byte>(std::stoi(string));
         return true;
     }
 
     return false;
 }
 
-short minty::parse::to_short(std::string const& string)
+short minty::Parse::to_short(String const& string)
 {
     return static_cast<short>(std::stoi(string));
 }
 
-bool minty::parse::try_short(std::string const& string, short& value)
+bool minty::Parse::try_short(String const& string, short& value)
 {
     if (is_signed_integer(string))
     {
@@ -145,12 +146,12 @@ bool minty::parse::try_short(std::string const& string, short& value)
     return false;
 }
 
-int minty::parse::to_int(std::string const& string)
+int minty::Parse::to_int(String const& string)
 {
     return std::stoi(string);
 }
 
-bool minty::parse::try_int(std::string const& string, int& value)
+bool minty::Parse::try_int(String const& string, int& value)
 {
     if (is_signed_integer(string))
     {
@@ -161,22 +162,42 @@ bool minty::parse::try_int(std::string const& string, int& value)
     return false;
 }
 
-ID minty::parse::to_id(std::string const& string)
+UUID minty::Parse::to_uuid(String const& string)
+{
+    std::stringstream ss(string);
+    UUID id(INVALID_UUID);
+    ss >> id;
+    return id;
+}
+
+bool minty::Parse::try_uuid(String const& string, UUID& value)
+{
+    // UUIDs stored as base16
+    if (Encoding::is_base16(string))
+    {
+        value = to_uuid(string);
+        return true;
+    }
+
+    return false;
+}
+
+ID minty::Parse::to_id(String const& string)
 {
     return to_int(string);
 }
 
-bool minty::parse::try_id(std::string const& string, ID& value)
+bool minty::Parse::try_id(String const& string, ID& value)
 {
     return try_int(string, value);
 }
 
-unsigned int minty::parse::to_uint(std::string const& string)
+unsigned int minty::Parse::to_uint(String const& string)
 {
     return static_cast<unsigned int>(std::stoul(string));
 }
 
-bool minty::parse::try_uint(std::string const& string, unsigned int& value)
+bool minty::Parse::try_uint(String const& string, unsigned int& value)
 {
     if (is_unsigned_integer(string))
     {
@@ -187,12 +208,12 @@ bool minty::parse::try_uint(std::string const& string, unsigned int& value)
     return false;
 }
 
-long minty::parse::to_long(std::string const& string)
+long minty::Parse::to_long(String const& string)
 {
     return std::stol(string);
 }
 
-bool minty::parse::try_long(std::string const& string, int& value)
+bool minty::Parse::try_long(String const& string, int& value)
 {
     if (is_signed_integer(string))
     {
@@ -203,12 +224,12 @@ bool minty::parse::try_long(std::string const& string, int& value)
     return false;
 }
 
-float minty::parse::to_float(std::string const& string)
+float minty::Parse::to_float(String const& string)
 {
     return std::stof(string);
 }
 
-bool minty::parse::try_float(std::string const& string, float& value)
+bool minty::Parse::try_float(String const& string, float& value)
 {
     if (is_float(string))
     {
@@ -219,12 +240,12 @@ bool minty::parse::try_float(std::string const& string, float& value)
     return false;
 }
 
-double minty::parse::to_double(std::string const& string)
+double minty::Parse::to_double(String const& string)
 {
     return std::stod(string);
 }
 
-bool minty::parse::try_double(std::string const& string, double& value)
+bool minty::Parse::try_double(String const& string, double& value)
 {
     if (is_float(string))
     {
@@ -235,12 +256,12 @@ bool minty::parse::try_double(std::string const& string, double& value)
     return false;
 }
 
-size_t minty::parse::to_size(std::string const& string)
+size_t minty::Parse::to_size(String const& string)
 {
     return std::stoull(string);
 }
 
-bool minty::parse::try_size(std::string const& string, size_t& value)
+bool minty::Parse::try_size(String const& string, size_t& value)
 {
     if (is_unsigned_integer(string))
     {
