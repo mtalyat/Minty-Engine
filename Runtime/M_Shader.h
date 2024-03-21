@@ -56,7 +56,7 @@ namespace minty
 	private:
 		VkPipelineLayout _pipelineLayout;
 		std::array<VkDescriptorSetLayout, DESCRIPTOR_SET_COUNT> _descriptorSetLayouts;
-		std::unordered_map<uint32_t, std::vector<std::pair<VkDescriptorPool, uint32_t>>> _descriptorPools;
+		std::unordered_map<uint32_t, std::unordered_map<VkDescriptorPool, uint32_t>> _descriptorPools;
 
 		Register<PushConstantInfo> _pushConstantInfos;
 		Register<UniformConstantInfo> _uniformConstantInfos;
@@ -139,6 +139,12 @@ namespace minty
 		DescriptorSet create_descriptor_set(uint32_t const set, bool const initialize);
 
 		/// <summary>
+		/// Destroys the given descriptor set.
+		/// </summary>
+		/// <param name="set"></param>
+		void free_descriptor_set(DescriptorSet const& set);
+
+		/// <summary>
 		/// Gets the uniform constant infos for the given set index.
 		/// </summary>
 		/// <param name="set"></param>
@@ -151,9 +157,11 @@ namespace minty
 
 		VkDescriptorPool create_pool(uint32_t const set);
 
-		VkDescriptorPool get_pool(uint32_t const set, uint32_t const amount = MAX_FRAMES_IN_FLIGHT);
+		VkDescriptorPool take_pool(uint32_t const set, uint32_t const amount = MAX_FRAMES_IN_FLIGHT);
 
-		std::array<VkDescriptorSet, MAX_FRAMES_IN_FLIGHT> create_descriptor_sets(uint32_t const set);
+		void give_pool(uint32_t const set, VkDescriptorPool const& pool, uint32_t const amount = MAX_FRAMES_IN_FLIGHT);
+
+		std::array<VkDescriptorSet, MAX_FRAMES_IN_FLIGHT> create_descriptor_sets(VkDescriptorPool const& pool, uint32_t const set);
 
 	public:
 		friend String to_string(Shader const& shader);

@@ -20,7 +20,7 @@ minty::ShaderPass::ShaderPass(ShaderPassBuilder const& builder, Runtime& engine)
 	: Asset(builder.id, builder.path, engine)
 	, _shader(builder.shader)
 	, _pipeline()
-	, _descriptorSet(engine)
+	, _descriptorSet(DescriptorSetBuilder(), engine)
 {
 	MINTY_ASSERT(builder.shader != nullptr);
 

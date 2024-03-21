@@ -10,6 +10,44 @@
 namespace minty
 {
 	class Dynamic;
+	class Shader;
+
+	struct DescriptorData
+	{
+		/// <summary>
+		/// Is this descriptor empty or not?
+		/// </summary>
+		bool empty;
+
+		/// <summary>
+		/// The type of this descriptor.
+		/// </summary>
+		VkDescriptorType type;
+
+		/// <summary>
+		/// The binding for this descriptor, within its set.
+		/// </summary>
+		uint32_t binding;
+
+		/// <summary>
+		/// The number of descriptors, if an array.
+		/// </summary>
+		uint32_t count;
+
+		/// <summary>
+		// IDs for buffers, textures, whatever is needed for this Descriptor.
+		/// </summary>
+		std::vector<UUID> ids;
+	};
+
+	struct DescriptorSetBuilder
+	{
+		Shader* shader;
+		VkDescriptorPool pool;
+		uint32_t set;
+		std::array<VkDescriptorSet, MAX_FRAMES_IN_FLIGHT> descriptorSets;
+		std::unordered_map<String, std::array<DescriptorData, MAX_FRAMES_IN_FLIGHT>> datas;
+	};
 
 	/// <summary>
 	/// Holds data for a descriptor set within a shader.
@@ -17,36 +55,17 @@ namespace minty
 	class DescriptorSet
 		: public RenderObject
 	{
-	public:
-		struct DescriptorData
-		{
-			/// <summary>
-			/// Is this descriptor empty or not?
-			/// </summary>
-			bool empty;
-
-			/// <summary>
-			/// The type of this descriptor.
-			/// </summary>
-			VkDescriptorType type;
-
-			/// <summary>
-			/// The binding for this descriptor, within its set.
-			/// </summary>
-			uint32_t binding;
-
-			/// <summary>
-			/// The number of descriptors, if an array.
-			/// </summary>
-			uint32_t count;
-
-			/// <summary>
-			// IDs for buffers, textures, whatever is needed for this Descriptor.
-			/// </summary>
-			std::vector<UUID> ids;
-		};
+		friend class Shader;
 
 	private:
+		// the shader this descriptor set came from
+		Shader* _shader;
+
+		// the pool these descriptor sets came from
+		VkDescriptorPool _descriptorPool;
+
+		uint32_t _set;
+
 		std::array<VkDescriptorSet, MAX_FRAMES_IN_FLIGHT> _descriptorSets;
 
 		std::unordered_map<String, std::array<DescriptorData, MAX_FRAMES_IN_FLIGHT>> _descriptors;
@@ -63,16 +82,10 @@ namespace minty
 		/// <summary>
 		/// Creates a new DescriptorSet.
 		/// </summary>
-		/// <param name="renderer"></param>
-		DescriptorSet(Runtime& engine);
-
-		/// <summary>
-		/// Creates a new DescriptorSet.
-		/// </summary>
 		/// <param name="descriptorSets">The descriptor sets for one flight.</param>
 		/// <param name="buffers">The buffers associated with this DescriptorSet.</param>
 		/// <param name="renderer"></param>
-		DescriptorSet(std::array<VkDescriptorSet, MAX_FRAMES_IN_FLIGHT> const& descriptorSets, std::unordered_map<String, std::array<DescriptorData, MAX_FRAMES_IN_FLIGHT>> const& datas, Runtime& engine);
+		DescriptorSet(DescriptorSetBuilder const& builder, Runtime& engine);
 
 		// copy
 		DescriptorSet& operator=(DescriptorSet const& other);

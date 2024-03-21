@@ -9,12 +9,6 @@ assets
 	- "Assets/Audio/cow-bells.wav"
 	- "Assets/Audio/ding.wav"
 	- "Assets/Audio/dong.wav"
-	- "Assets\\Animations\\flicker.animation"
-	- "Assets\\Animations\\idle.animation"
-	- "Assets\\Animations\\moving.animation"
-	- "Assets\\Animations\\slide.animation"
-	- "Assets\\Animations\\animator.animator"
-	- "Assets\\Animations\\animator2.animator"
 	- "Assets/Resources/Models/pumpkin_tex.jpg"
 	- "Assets/Textures/brian.png"
 	- "Assets/Textures/death.png"
@@ -34,10 +28,9 @@ assets
 	- "Assets/Sprites/brian.sprite"
 	- "Assets/Sprites/x.sprite"
 systems
-	Audio
-	Script
 	Render
-	Animation
+	Script
+	Audio
 entities
 	Model Center: 2400de2c92f041ed
 		Transform

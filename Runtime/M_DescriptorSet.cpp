@@ -17,17 +17,13 @@ minty::DescriptorSet::DescriptorSet()
 	, _dirties()
 {}
 
-minty::DescriptorSet::DescriptorSet(Runtime& engine)
+minty::DescriptorSet::DescriptorSet(DescriptorSetBuilder const& builder, Runtime& engine)
 	: RenderObject::RenderObject(engine)
-	, _descriptorSets()
-	, _descriptors()
-	, _dirties()
-{}
-
-minty::DescriptorSet::DescriptorSet(std::array<VkDescriptorSet, MAX_FRAMES_IN_FLIGHT> const& descriptorSets, std::unordered_map<String, std::array<DescriptorData, MAX_FRAMES_IN_FLIGHT>> const& datas, Runtime& engine)
-	: RenderObject::RenderObject(engine)
-	, _descriptorSets(descriptorSets)
-	, _descriptors(datas)
+	, _shader(builder.shader)
+	, _descriptorPool(builder.pool)
+	, _set(builder.set)
+	, _descriptorSets(builder.descriptorSets)
+	, _descriptors(builder.datas)
 	, _dirties()
 {
 	// dirty all frames on the start so that they can all be set
@@ -53,11 +49,15 @@ void minty::DescriptorSet::destroy()
 	RenderEngine& renderer = get_render_engine();
 	AssetEngine& assets = get_asset_engine();
 
+	// free using shader, to clean up resources there
+	//if(_shader) _shader->free_descriptor_set(*this);
+
 	// remove references to all VK descriptor sets, since they not need be destroyed
 	for (size_t i = 0; i < _descriptorSets.size(); i++)
 	{
 		_descriptorSets[i] = VK_NULL_HANDLE;
 	}
+
 	// destroy all buffers for each descriptor
 	for (auto const& data : _descriptors)
 	{
@@ -67,12 +67,20 @@ void minty::DescriptorSet::destroy()
 			{
 				if (Buffer* buffer = assets.get<Buffer>(id))
 				{
-					renderer.destroy_buffer(*buffer);
+					// COMMENTED OUT: problem is that other materials might share resources, so...
+					// let the scene just destroy all of the material (buffers) later
+					
+					//renderer.destroy_buffer(*buffer);
 				}
 			}
 		}
 	}
+
+	_shader = nullptr;
+	_descriptorPool = VK_NULL_HANDLE;
+	_set = 0;
 	_descriptors.clear();
+	_dirties.clear();
 }
 
 void minty::DescriptorSet::set(String const& name, void const* const value)
@@ -248,7 +256,7 @@ void minty::DescriptorSet::apply()
 	}
 }
 
-std::array<DescriptorSet::DescriptorData, MAX_FRAMES_IN_FLIGHT>* minty::DescriptorSet::find_descriptors(String const& name)
+std::array<DescriptorData, MAX_FRAMES_IN_FLIGHT>* minty::DescriptorSet::find_descriptors(String const& name)
 {
 	auto found = _descriptors.find(name);
 
@@ -260,7 +268,7 @@ std::array<DescriptorSet::DescriptorData, MAX_FRAMES_IN_FLIGHT>* minty::Descript
 	return &found->second;
 }
 
-DescriptorSet::DescriptorData* minty::DescriptorSet::find_descriptor(String const& name, int const frame)
+DescriptorData* minty::DescriptorSet::find_descriptor(String const& name, int const frame)
 {
 	if (auto* descriptors = find_descriptors(name))
 	{

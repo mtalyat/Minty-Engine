@@ -57,7 +57,7 @@ minty::Shader::Shader()
 
 minty::Shader::Shader(ShaderBuilder const& builder, Runtime& engine)
 	: Asset(builder.id, builder.path, engine)
-	, _descriptorSet(engine)
+	, _descriptorSet(DescriptorSetBuilder{ .shader = this }, engine)
 {
 	for (auto const& pair : builder.pushConstantInfos)
 	{
@@ -235,6 +235,7 @@ VkDescriptorPool minty::Shader::create_pool(uint32_t const set)
 
 	VkDescriptorPoolCreateInfo poolInfo{};
 	poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+	//poolInfo.flags = VK_DESCRIPTOR_POOL_CREATE_FREE_DESCRIPTOR_SET_BIT;
 	poolInfo.poolSizeCount = static_cast<uint32_t>(poolSizes.size());
 	poolInfo.pPoolSizes = poolSizes.data();
 	poolInfo.maxSets = static_cast<uint32_t>(maxSets);
@@ -244,7 +245,7 @@ VkDescriptorPool minty::Shader::create_pool(uint32_t const set)
 	return descriptorPool;
 }
 
-VkDescriptorPool minty::Shader::get_pool(uint32_t const set, uint32_t const amount)
+VkDescriptorPool minty::Shader::take_pool(uint32_t const set, uint32_t const amount)
 {
 	uint32_t const maxSets = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT * DESCRIPTOR_SETS_PER_POOL);
 
@@ -257,17 +258,17 @@ VkDescriptorPool minty::Shader::get_pool(uint32_t const set, uint32_t const amou
 
 		if (found->second.size())
 		{
-			for (auto& pair : found->second)
+			for (auto& [pool, count] : found->second)
 			{
 				// check if pool is not full
-				if (pair.second + amount <= maxSets)
+				if (count + amount <= maxSets)
 				{
 					// pool is not full, return it for use
 
 					// inc first
-					pair.second += amount;
+					count += amount;
 
-					return pair.first;
+					return pool;
 				}
 			}
 		}
@@ -277,28 +278,44 @@ VkDescriptorPool minty::Shader::get_pool(uint32_t const set, uint32_t const amou
 		// no set list found
 
 		// create one
-		_descriptorPools.emplace(set, std::vector<std::pair<VkDescriptorPool, uint32_t>>());
+		_descriptorPools.emplace(set, std::unordered_map<VkDescriptorPool, uint32_t>());
 	}
 
 	// no set found, so make a new one
 	VkDescriptorPool pool = create_pool(set);
 
 	// add for later usage
-	_descriptorPools.at(set).push_back(
-		{
-			pool,
-			amount, // set as 1 for first usage
-		});
+	_descriptorPools.at(set).emplace(pool, amount);
 
 	// return it
 	return pool;
 }
 
-std::array<VkDescriptorSet, MAX_FRAMES_IN_FLIGHT> minty::Shader::create_descriptor_sets(uint32_t const set)
+void minty::Shader::give_pool(uint32_t const set, VkDescriptorPool const& pool, uint32_t const amount)
 {
-	// get a pool for the set
-	VkDescriptorPool descriptorPool = get_pool(set);
+	// find the group of pools for this set
+	auto found = _descriptorPools.find(set);
 
+	if (found == _descriptorPools.end())
+	{
+		MINTY_ABORT("Attempting to give pool when there are no pools for the given set.");
+	}
+
+	// find the pool itself
+	auto found2 = found->second.find(pool);
+
+	if (found2 == found->second.end())
+	{
+		MINTY_ABORT("Missing descriptor pool for descriptor set within shader.");
+	}
+
+	MINTY_ASSERT(found2->second >= amount);
+
+	found2->second -= amount;
+}
+
+std::array<VkDescriptorSet, MAX_FRAMES_IN_FLIGHT> minty::Shader::create_descriptor_sets(VkDescriptorPool const& pool, uint32_t const set)
+{
 	// get the layout to use
 	VkDescriptorSetLayout descriptorSetLayout = _descriptorSetLayouts.at(set);
 
@@ -310,7 +327,7 @@ std::array<VkDescriptorSet, MAX_FRAMES_IN_FLIGHT> minty::Shader::create_descript
 
 	VkDescriptorSetAllocateInfo allocInfo{};
 	allocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-	allocInfo.descriptorPool = descriptorPool;
+	allocInfo.descriptorPool = pool;
 	allocInfo.descriptorSetCount = static_cast<uint32_t>(descriptorSets.size());
 	allocInfo.pSetLayouts = layouts.data();
 
@@ -327,21 +344,30 @@ DescriptorSet minty::Shader::create_descriptor_set(uint32_t const set, bool cons
 	if (set == DESCRIPTOR_SET_INVALID)
 	{
 		// invalid set, so just create an empty descriptor
-		return DescriptorSet(get_runtime());
+		return DescriptorSet(DescriptorSetBuilder
+			{
+				.shader = this,
+			}, get_runtime());
 	}
 
 	// create and allocate sets
-	auto descriptorSets = create_descriptor_sets(set);
+	
+	// get a pool for the set
+	DescriptorSetBuilder builder
+	{
+		.shader = this,
+		.pool = take_pool(set),
+		.set = set,
+	};
+
+	builder.descriptorSets = create_descriptor_sets(builder.pool, set);
 
 	// get constant infos
 	auto const& constantInfos = get_uniform_constant_infos(set);
 
-	// update descriptor set with data
-	std::unordered_map<String, std::array<DescriptorSet::DescriptorData, MAX_FRAMES_IN_FLIGHT>> datas;
-
 	int frame = 0;
 
-	for (auto const set : descriptorSets)
+	for (auto const set : builder.descriptorSets)
 	{
 		int i = 0;
 
@@ -351,15 +377,15 @@ DescriptorSet minty::Shader::create_descriptor_set(uint32_t const set, bool cons
 			auto const type = info.type;
 
 			// create a new data for this constant, if needed
-			auto found = datas.find(info.name);
-			if (found == datas.end())
+			auto found = builder.datas.find(info.name);
+			if (found == builder.datas.end())
 			{
 				// add new array
-				datas.emplace(info.name, std::array<DescriptorSet::DescriptorData, MAX_FRAMES_IN_FLIGHT>());
+				builder.datas.emplace(info.name, std::array<DescriptorData, MAX_FRAMES_IN_FLIGHT>());
 			}
 
 			// get the data we are using
-			auto& data = datas.at(info.name).at(frame);
+			auto& data = builder.datas.at(info.name).at(frame);
 
 			// set the shared data for each write
 			data.empty = true;
@@ -404,7 +430,7 @@ DescriptorSet minty::Shader::create_descriptor_set(uint32_t const set, bool cons
 	}
 
 	// all done, create set
-	DescriptorSet descriptorSet(descriptorSets, datas, get_runtime());
+	DescriptorSet descriptorSet(builder, get_runtime());
 
 	// "initialize" it if told to
 	if (initialize)
@@ -413,6 +439,20 @@ DescriptorSet minty::Shader::create_descriptor_set(uint32_t const set, bool cons
 	}
 
 	return descriptorSet;
+}
+
+void minty::Shader::free_descriptor_set(DescriptorSet const& set)
+{
+	MINTY_ABORT("Shader::free_descriptor_set not implemented");
+	//MINTY_ASSERT(set._shader == this);
+
+	//RenderEngine& renderer = get_runtime().get_render_engine();
+
+	// take from the count for this pool
+	//give_pool(set._set, set._descriptorPool);
+
+	// free the descriptor sets from the pool
+	//vkFreeDescriptorSets(renderer.get_device(), set._descriptorPool, static_cast<uint32_t>(set._descriptorSets.size()), set._descriptorSets.data());
 }
 
 std::vector<UniformConstantInfo> minty::Shader::get_uniform_constant_infos(uint32_t const set) const
