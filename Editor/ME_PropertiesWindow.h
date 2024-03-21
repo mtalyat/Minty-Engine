@@ -36,6 +36,8 @@ namespace mintye
 #pragma region Drawing
 
 	private:
+		bool input_node(minty::Node& node, bool const printRoot, uint32_t const offset);
+
 		void draw_none();
 
 		void draw_entity();

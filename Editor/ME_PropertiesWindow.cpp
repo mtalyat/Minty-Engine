@@ -68,6 +68,73 @@ void mintye::PropertiesWindow::set_scene(minty::Scene* const scene)
 	EditorWindow::set_scene(scene);
 }
 
+bool mintye::PropertiesWindow::input_node(minty::Node& rootNode, bool const printRoot, uint32_t const offset)
+{
+	static int const BUFFER_SIZE = 256;
+	static char buffer[BUFFER_SIZE] = "";
+
+	std::vector<std::pair<Node*, int>> nodes;
+	nodes.push_back({ &rootNode, printRoot ? 0 : -1 });
+
+	bool modified = false;
+
+	size_t i = offset;
+
+	while (!nodes.empty())
+	{
+		// get next node
+		std::pair<Node*, int> pair = nodes.back();
+		nodes.pop_back();
+
+		// ignore < 0 indents
+		if (pair.second < 0) continue;
+
+		String indentString = String(static_cast<size_t>(pair.second << 1), ' ');
+
+		// print, if indent is >= 0
+		if (pair.second == 0)
+		{
+			// display text on root
+			String string = pair.first->get_node_string();
+			ImGui::Text(indentString.append(string.empty() ? "_" : string).c_str());
+		}
+		else
+		{
+			// input text
+
+			size_t size = min(BUFFER_SIZE, pair.first->get_data().size() + 1);
+			memcpy(buffer, pair.first->get_data().c_str(), size);
+			buffer[size - 1] = '\0';
+
+			ImGui::Text(std::format("{}{}: ", indentString, pair.first->get_name()).c_str());
+			ImGui::SameLine();
+			// if an ID, get the name of the object with the ID
+			UUID id(INVALID_UUID);
+			String idName = "";
+			if (Parse::try_uuid(buffer, id))
+			{
+				idName = get_application().get_name(id);
+			}
+			if (ImGui::InputText(std::format("{}##{}", idName, i).c_str(), buffer, BUFFER_SIZE))
+			{
+				pair.first->set_data(buffer);
+				modified = true;
+			}
+		}
+
+		// add children, in reverse so first children get dealt with first
+		std::vector<Node>& children = pair.first->get_children();
+		for (auto it = children.rbegin(); it != children.rend(); it++)
+		{
+			nodes.push_back({ &(*it), pair.second + 1 });
+		}
+
+		i++;
+	}
+
+	return modified;
+}
+
 void mintye::PropertiesWindow::draw_none()
 {
 	ImGui::Text("--");
@@ -228,7 +295,7 @@ void mintye::PropertiesWindow::draw_component(minty::Node& node, size_t const i,
 	ImGui::BeginGroupBox();
 
 	// list components
-	if (ImGui::InputNode(node, true, i))
+	if (input_node(node, true, i))
 	{
 		// component changed, update it in the registy
 		Component* component = registry.get_by_name(node.get_name(), _targetEntity);

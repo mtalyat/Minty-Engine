@@ -394,6 +394,39 @@ void mintye::EditorApplication::open_asset(minty::Path const& path)
 	}
 }
 
+minty::String mintye::EditorApplication::get_name(minty::UUID const id) const
+{
+	if (_project)
+	{
+		Runtime& runtime = get_runtime();
+
+		// check assets
+		AssetEngine& assets = runtime.get_asset_engine();
+
+		if (Asset* asset = assets.get_asset(id))
+		{
+			return asset->get_name();
+		}
+
+		// not an asset, check entities
+		if (_sceneId.valid())
+		{
+			Scene& scene = runtime.get_scene_manager().at_scene(_sceneId);
+			EntityRegistry& registry = scene.get_entity_registry();
+
+			Entity entity = registry.find_by_id(id);
+
+			if (entity != NULL_ENTITY)
+			{
+				return registry.get_name(entity);
+			}
+		}
+	}
+
+	// none of the above
+	return "";
+}
+
 void mintye::EditorApplication::save_project()
 {
 	

@@ -128,6 +128,13 @@ namespace mintye
 		/// <param name="path"></param>
 		void open_asset(minty::Path const& path);
 
+		/// <summary>
+		/// Gets the name of the thing with the given ID. Could be an Entity or Asset.
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
+		minty::String get_name(minty::UUID const id) const;
+
 #pragma endregion
 
 #pragma region Building and Running
