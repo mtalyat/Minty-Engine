@@ -102,10 +102,19 @@ void mintye::ConsoleWindow::draw()
 
 	ImGui::Separator();
 
+	ImGui::Text("Command:");
+	ImGui::SameLine();
+
+	float windowWidth = ImGui::GetContentRegionAvail().x;
+	float padding = ImGui::GetStyle().WindowPadding.x;
+	float width = (windowWidth - padding * 2.0f);
+
+	ImGui::PushItemWidth(width);
+
 	bool reclaimFocus = false;
 	static char commandBuffer[128];
 	ImGuiInputTextFlags flags = ImGuiInputTextFlags_EnterReturnsTrue | ImGuiInputTextFlags_EscapeClearsAll;// | ImGuiInputTextFlags_CallbackCompletion | ImGuiInputTextFlags_CallbackHistory;
-	if (ImGui::InputText("Command", commandBuffer, 128, flags))
+	if (ImGui::InputText("##CommandLine", commandBuffer, 128, flags))
 	{
 		if (commandBuffer[0])
 		{
@@ -114,6 +123,8 @@ void mintye::ConsoleWindow::draw()
 		}
 		reclaimFocus = true;
 	}
+
+	ImGui::PopItemWidth();
 
 	// focus on prev window
 	ImGui::SetItemDefaultFocus();
