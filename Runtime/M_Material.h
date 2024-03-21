@@ -1,22 +1,42 @@
 #pragma once
-#include "M_Object.h"
+#include "M_Asset.h"
 
 #include "M_DescriptorSet.h"
 #include <vector>
 
 namespace minty
 {
-	struct MaterialBuilder;
+	class MaterialTemplate;
+
+	/// <summary>
+	/// Holds data to create a new Material.
+	/// </summary>
+	struct MaterialBuilder
+	{
+		UUID id;
+
+		Path path;
+
+		/// <summary>
+		/// The MaterialTemplate.
+		/// </summary>
+		MaterialTemplate* materialTemplate;
+
+		/// <summary>
+		/// The values to set.
+		/// </summary>
+		std::unordered_map<String, Dynamic> values;
+	};
 
 	/// <summary>
 	/// Holds graphics information.
 	/// </summary>
 	class Material
-		: public RenderObject
+		: public Asset
 	{
 	private:
 		// the material template id
-		ID _templateId;
+		MaterialTemplate* _template;
 		std::vector<DescriptorSet> _passDescriptorSets;
 
 	public:
@@ -30,7 +50,9 @@ namespace minty
 		/// </summary>
 		/// <param name="builder"></param>
 		/// <param name="renderer"></param>
-		Material(MaterialBuilder const& builder, Engine& engine, ID const sceneId);
+		Material(MaterialBuilder const& builder, Runtime& engine);
+
+		~Material();
 
 		/// <summary>
 		/// Destroys all of the resources associated with this Material.
@@ -41,7 +63,7 @@ namespace minty
 		/// Gets the MaterialTemplate ID.
 		/// </summary>
 		/// <returns></returns>
-		ID get_template_id() const;
+		MaterialTemplate* get_template() const;
 
 		/// <summary>
 		/// Gets the DescriptorSet for the given ShaderPass index.

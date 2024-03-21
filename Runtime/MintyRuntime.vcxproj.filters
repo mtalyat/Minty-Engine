@@ -58,18 +58,45 @@
     <Filter Include="Header Files\Transform">
       <UniqueIdentifier>{30483a13-5871-4e8e-9c19-a93c57aff238}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Libraries\imgui">
+      <UniqueIdentifier>{262fae94-dccc-459c-8b18-0468fd5e0636}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Libraries\imguifiledialog">
+      <UniqueIdentifier>{bd1db8bd-8d93-4302-89d0-c8d21edf3ae3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Libraries">
+      <UniqueIdentifier>{29ecdbd6-4808-40b8-a87b-611e78590c6d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Libraries\entt">
+      <UniqueIdentifier>{82679ae3-2406-4819-ab6a-047a1331f24a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Scripting">
+      <UniqueIdentifier>{fe27c581-a0ec-4826-aa16-1b104d6661c6}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Asset">
+      <UniqueIdentifier>{db48e676-d133-4b66-a198-a2ef1298c3f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Runtime">
+      <UniqueIdentifier>{cf883742-6da1-4840-b0ef-0dadd43d1df1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Camera">
+      <UniqueIdentifier>{681223b2-489b-4248-b2b5-b9440d18606f}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Application">
+      <UniqueIdentifier>{6be5e59a-d15e-4196-a795-3d2e6b9888b0}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\UserInterface">
+      <UniqueIdentifier>{6d87d6d6-95f1-4db3-a6ae-bfeebc8f3f99}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Libraries\tinyxml2">
+      <UniqueIdentifier>{b98e5250-b001-42f5-8844-a1498e4d63b0}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="pch.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="M_Runtime.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="M_Engine.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Minty.h">
@@ -144,15 +171,6 @@
     <ClInclude Include="M_Parse.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="M_CameraComponent.h">
-      <Filter>Header Files\Components</Filter>
-    </ClInclude>
-    <ClInclude Include="libraries\entt\entt.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="M_MeshComponent.h">
-      <Filter>Header Files\Components</Filter>
-    </ClInclude>
     <ClInclude Include="M_Info.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -186,12 +204,6 @@
     <ClInclude Include="M_InputMap.h">
       <Filter>Header Files\Input</Filter>
     </ClInclude>
-    <ClInclude Include="glm.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="M_Error.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="M_Matrix.h">
       <Filter>Header Files</Filter>
     </ClInclude>
@@ -204,9 +216,6 @@
     <ClInclude Include="M_CursorMode.h">
       <Filter>Header Files\Input</Filter>
     </ClInclude>
-    <ClInclude Include="glfw.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="M_RelationshipComponent.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
@@ -215,12 +224,6 @@
     </ClInclude>
     <ClInclude Include="M_Sprite.h">
       <Filter>Header Files\Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="M_UISystem.h">
-      <Filter>Header Files\Systems</Filter>
-    </ClInclude>
-    <ClInclude Include="M_UITransformComponent.h">
-      <Filter>Header Files\Components</Filter>
     </ClInclude>
     <ClInclude Include="M_ShaderPass.h">
       <Filter>Header Files\Rendering</Filter>
@@ -236,9 +239,6 @@
     </ClInclude>
     <ClInclude Include="M_File.h">
       <Filter>Header Files\Files</Filter>
-    </ClInclude>
-    <ClInclude Include="vulkan.h">
-      <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="M_Text.h">
       <Filter>Header Files</Filter>
@@ -366,9 +366,6 @@
     <ClInclude Include="M_DirtyComponent.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>
-    <ClInclude Include="M_Asset.h">
-      <Filter>Header Files\Files</Filter>
-    </ClInclude>
     <ClInclude Include="M_Builtin.h">
       <Filter>Header Files\Builtin</Filter>
     </ClInclude>
@@ -408,13 +405,7 @@
     <ClInclude Include="M_AnimationSystem.h">
       <Filter>Header Files\Animation</Filter>
     </ClInclude>
-    <ClInclude Include="M_AnimationBuilder.h">
-      <Filter>Header Files\Animation</Filter>
-    </ClInclude>
     <ClInclude Include="M_Animator.h">
-      <Filter>Header Files\Animation</Filter>
-    </ClInclude>
-    <ClInclude Include="M_AnimatorBuilder.h">
       <Filter>Header Files\Animation</Filter>
     </ClInclude>
     <ClInclude Include="M_RenderSystem.h">
@@ -438,55 +429,22 @@
     <ClInclude Include="M_SpriteComponent.h">
       <Filter>Header Files\Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="M_SceneObject.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="M_AudioObject.h">
       <Filter>Header Files\Audio</Filter>
     </ClInclude>
     <ClInclude Include="M_TransformComponent.h">
       <Filter>Header Files\Transform</Filter>
     </ClInclude>
-    <ClInclude Include="M_Buffer.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
     <ClInclude Include="M_Entity.h">
       <Filter>Header Files\Entities</Filter>
     </ClInclude>
-    <ClInclude Include="M_MaterialTemplateBuilder.h">
-      <Filter>Header Files\Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="M_MaterialBuilder.h">
-      <Filter>Header Files\Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="M_ShaderPassBuilder.h">
-      <Filter>Header Files\Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="M_ShaderBuilder.h">
-      <Filter>Header Files\Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="M_RendererBuilder.h">
-      <Filter>Header Files\Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="M_PushConstantInfo.h">
-      <Filter>Header Files\Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="M_SpriteBuilder.h">
       <Filter>Header Files\Rendering</Filter>
     </ClInclude>
     <ClInclude Include="M_SpritePushData.h">
       <Filter>Header Files\Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="M_TextureAtlasBuilder.h">
-      <Filter>Header Files\Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="M_TextureBuilder.h">
-      <Filter>Header Files\Rendering</Filter>
-    </ClInclude>
     <ClInclude Include="M_UniformConstantInfo.h">
-      <Filter>Header Files\Rendering</Filter>
-    </ClInclude>
-    <ClInclude Include="M_UIPushData.h">
       <Filter>Header Files\Rendering</Filter>
     </ClInclude>
     <ClInclude Include="M_Viewport.h">
@@ -504,6 +462,135 @@
     <ClInclude Include="M_RenderObject.h">
       <Filter>Header Files\Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="M_Time.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Operations.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\imguifiledialog\ImGuiFileDialog.h">
+      <Filter>Libraries\imguifiledialog</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\imguifiledialog\ImGuiFileDialogConfig.h">
+      <Filter>Libraries\imguifiledialog</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\imgui\imgui.h">
+      <Filter>Libraries\imgui</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Engine.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="M_GLM.hpp">
+      <Filter>Header Files\Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="M_GLFW.h">
+      <Filter>Header Files\Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="M_ImGui.h">
+      <Filter>Header Files\Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Mono.h">
+      <Filter>Header Files\Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Vulkan.h">
+      <Filter>Header Files\Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="libraries\entt\entt.hpp">
+      <Filter>Libraries\entt</Filter>
+    </ClInclude>
+    <ClInclude Include="M_TypeRegister.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="M_ScriptComponent.h">
+      <Filter>Header Files\Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="M_ScriptClass.h">
+      <Filter>Header Files\Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="M_ScriptObject.h">
+      <Filter>Header Files\Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Accessibility.h">
+      <Filter>Header Files\Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="M_ScriptEngine.h">
+      <Filter>Header Files\Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="M_ScriptSystem.h">
+      <Filter>Header Files\Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="M_DestroyEntityComponent.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="M_UUID.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="M_ScriptAssembly.h">
+      <Filter>Header Files\Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="M_ScriptArguments.h">
+      <Filter>Header Files\Scripting</Filter>
+    </ClInclude>
+    <ClInclude Include="M_DestroyComponentComponent.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="M_EnabledComponent.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="M_UITransformComponent.h">
+      <Filter>Header Files\Transform</Filter>
+    </ClInclude>
+    <ClInclude Include="M_TagComponent.h">
+      <Filter>Header Files\Components</Filter>
+    </ClInclude>
+    <ClInclude Include="M_EnTT.h">
+      <Filter>Header Files\Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Asset.h">
+      <Filter>Header Files\Asset</Filter>
+    </ClInclude>
+    <ClInclude Include="M_AssetEngine.h">
+      <Filter>Header Files\Asset</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Runtime.h">
+      <Filter>Header Files\Runtime</Filter>
+    </ClInclude>
+    <ClInclude Include="M_RuntimeObject.h">
+      <Filter>Header Files\Runtime</Filter>
+    </ClInclude>
+    <ClInclude Include="M_SceneObject.h">
+      <Filter>Header Files\Scenes</Filter>
+    </ClInclude>
+    <ClInclude Include="M_MeshComponent.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="M_CameraComponent.h">
+      <Filter>Header Files\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Camera.h">
+      <Filter>Header Files\Camera</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Application.h">
+      <Filter>Header Files\Application</Filter>
+    </ClInclude>
+    <ClInclude Include="M_RunMode.h">
+      <Filter>Header Files\Application</Filter>
+    </ClInclude>
+    <ClInclude Include="M_UIPushData.h">
+      <Filter>Header Files\UserInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="M_UISystem.h">
+      <Filter>Header Files\UserInterface</Filter>
+    </ClInclude>
+    <ClInclude Include="tinyxml2.h">
+      <Filter>Libraries\tinyxml2</Filter>
+    </ClInclude>
+    <ClInclude Include="M_TinyXML.h">
+      <Filter>Header Files\Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Buffer.h">
+      <Filter>Header Files\Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -513,9 +600,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_Runtime.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="M_Engine.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_CommandLineParser.cpp">
@@ -603,9 +687,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_Info.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="M_Error.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_Quaternion.cpp">
@@ -806,7 +887,7 @@
     <ClCompile Include="M_AnimatorComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="M_SceneObject.cpp">
+    <ClCompile Include="M_RuntimeObject.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="M_AudioObject.cpp">
@@ -827,8 +908,89 @@
     <ClCompile Include="M_PushConstantInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="M_ShaderBuilder.cpp">
+    <ClCompile Include="M_Time.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_Operations.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui.cpp">
+      <Filter>Libraries\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui_demo.cpp">
+      <Filter>Libraries\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui_draw.cpp">
+      <Filter>Libraries\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui_impl_glfw.cpp">
+      <Filter>Libraries\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui_impl_vulkan.cpp">
+      <Filter>Libraries\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui_stdlib.cpp">
+      <Filter>Libraries\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui_tables.cpp">
+      <Filter>Libraries\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="imgui_widgets.cpp">
+      <Filter>Libraries\imgui</Filter>
+    </ClCompile>
+    <ClCompile Include="ImGuiFileDialog.cpp">
+      <Filter>Libraries\imguifiledialog</Filter>
+    </ClCompile>
+    <ClCompile Include="M_Engine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_ScriptComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_ScriptClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_ScriptObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_Accessibility.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_ScriptEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_ScriptSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_DestroyEntityComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_UUID.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_ScriptAssembly.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_ScriptArguments.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_TagComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_AssetEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_SceneObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_Camera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_Application.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="tinyxml2.cpp">
+      <Filter>Libraries\tinyxml2</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

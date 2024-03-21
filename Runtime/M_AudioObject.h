@@ -1,20 +1,20 @@
 #pragma once
 
-#include "M_SceneObject.h"
+#include "M_RuntimeObject.h"
 
 namespace minty
 {
 	class AudioEngine;
 
 	class AudioObject
-		: public SceneObject
+		: public RuntimeObject
 	{
 	private:
 
 	public:
 		AudioObject();
 
-		AudioObject(Engine& engine, ID const sceneId);
+		AudioObject(Runtime& engine);
 
 		virtual ~AudioObject();
 

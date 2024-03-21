@@ -1,6 +1,7 @@
 #pragma once
 
 #include "M_Types.h"
+#include "M_UUID.h"
 #include <vector>
 #include <unordered_map>
 
@@ -46,10 +47,18 @@ namespace minty
 		void set_data(String const& data);
 
 		/// <summary>
-		/// Gets the Node string as it were serialized.
+		/// Gets the Node string as if it were serialized.
 		/// </summary>
 		/// <returns></returns>
 		String get_node_string() const;
+
+		/// <summary>
+		/// Gets the Node string and its children as if it were serialized.
+		/// </summary>
+		/// <returns></returns>
+		std::vector<String> get_formatted(bool const toplevel = false) const;
+
+		String get_formatted_string() const;
 
 		std::vector<Node>& get_children();
 
@@ -93,6 +102,8 @@ namespace minty
 		/// Converts this Node's data to an ID.
 		/// </summary>
 		ID to_id(ID const defaultValue = 0) const;
+
+		UUID to_uuid() const;
 
 		/// <summary>
 		/// Converts this Node's data to an unsigned int.
@@ -143,7 +154,9 @@ namespace minty
 #pragma endregion
 
 	public:
-		static Node load_node(Path const& path);
+		static Node parse(String const& text);
+
+		static Node parse(std::vector<String> const& lines);
 
 	public:
 		friend String to_string(Node const& value);

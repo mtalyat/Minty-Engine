@@ -1,5 +1,5 @@
 #pragma once
-#include "M_Object.h"
+#include "M_Engine.h"
 
 #include "M_Register.h"
 #include "M_Color.h"
@@ -9,13 +9,15 @@
 #include "M_Buffer.h"
 #include "M_Entity.h"
 #include "M_Matrix.h"
+#include "M_Mesh.h"
 
-#include "glm.hpp"
-#include "vulkan.h"
+#include "M_GLM.hpp"
+#include "M_Vulkan.h"
 
 #include <array>
 #include <vector>
 #include <set>
+#include <unordered_set>
 #include <optional>
 #include <string>
 #include <cstring>
@@ -54,23 +56,35 @@ namespace minty
 	struct UITransformComponent;
 	struct SpriteComponent;
 
-	struct RenderEngineBuilder;
 	struct TextureBuilder;
+
+	class Material;
+	class Shader;
+	class Camera;
+
+	class Info;
+	class Window;
+
+	/// <summary>
+	/// Holds data to create a new RenderEngine.
+	/// </summary>
+	struct RenderEngineBuilder
+	{
+		Info const* info;
+
+		Window* window;
+	};
 
 	/// <summary>
 	/// Handles rendering for the game engine.
 	/// </summary>
 	class RenderEngine
-		: public Object
+		: public Engine
 	{
-	private:
-		RenderEngineBuilder const* _builder;
+	protected:
 		Window* _window;
 
-		// assets
-		Register<Buffer> _buffers;
-
-		std::array<ID, BIND_COUNT> _boundIds;
+		std::array<void const*, BIND_COUNT> _bound;
 
 		Viewport _view;
 		Color _backgroundColor;
@@ -80,9 +94,11 @@ namespace minty
 		RenderSystem* _renderSystem = nullptr;
 		EntityRegistry* _registry = nullptr;
 
+		std::unordered_map<MeshType, UUID> _builtinMeshes;
+
 		// (Vulkan) rendering components
 		VkDevice _device;
-		VkInstance instance;
+		VkInstance _instance;
 		VkPhysicalDevice _physicalDevice = nullptr;
 
 		VkDebugUtilsMessengerEXT _debugMessenger;
@@ -112,20 +128,9 @@ namespace minty
 		/// <summary>
 		/// Creates a new RenderEngine that will render to the given Window.
 		/// </summary>
-		RenderEngine(Window* const window);
+		RenderEngine(Runtime& runtime);
 
-		~RenderEngine();
-
-		/// <summary>
-		/// Draws a frame to the screen.
-		/// </summary>
-		void render_frame();
-
-		/// <summary>
-		/// Checks if the render engine is still running.
-		/// </summary>
-		/// <returns>True if the engine is still running.</returns>
-		bool is_running() const;
+		virtual ~RenderEngine();
 
 		/// <summary>
 		/// Checks if this RenderEngine has been initialized.
@@ -133,8 +138,24 @@ namespace minty
 		/// <returns>True if the engine is initialized.</returns>
 		bool is_initialized() const;
 
+	public:
+		void set_loaded_scene(Scene* const scene) override;
+
+#pragma region Frame
+
+	public:
+		/// <summary>
+		/// Draws a frame to the screen.
+		/// </summary>
+		virtual void render_frame();
+
+		virtual void set_camera(Vector3 const position, Quaternion const rotation, Camera const& camera);
+
+#pragma endregion
+
 #pragma region Get
 
+	public:
 		/// <summary>
 		/// Gets the device that this RenderEngine is rendering to.
 		/// </summary>
@@ -165,6 +186,19 @@ namespace minty
 		/// <returns>The swap chain extent width / height.</returns>
 		float get_aspect_ratio() const;
 
+		UUID get_or_create_mesh(MeshType const type);
+
+		Viewport& get_viewport();
+
+		Viewport const& get_viewport() const;
+
+#pragma endregion
+
+#pragma region Set
+
+	public:
+		void set_viewport(Viewport const& viewport);
+
 #pragma endregion
 
 #pragma region Init
@@ -173,13 +207,13 @@ namespace minty
 		/// <summary>
 		/// Initializes the RenderEngine.
 		/// </summary>
-		void init(RenderEngineBuilder const& builder);
+		virtual void init(RenderEngineBuilder const& builder);
 
 	private:
 		/// <summary>
 		/// Creates a Vulkan instance.
 		/// </summary>
-		void create_instance();
+		void create_instance(RenderEngineBuilder const& builder);
 
 		/// <summary>
 		/// Initializes the debug messenger.
@@ -258,7 +292,7 @@ namespace minty
 		/// <param name="commandBuffer">The buffer to use to bind.</param>
 		/// <param name="materialId">The ID of the Material to bind.</param>
 		/// <param name="pass">The ShaderPass index.</param>
-		void bind(VkCommandBuffer const commandBuffer, ID const materialId, uint32_t const pass = 0); // TODO: easier way to select shader pass?
+		void bind(VkCommandBuffer const commandBuffer, Material const* const material, uint32_t const pass = 0); // TODO: easier way to select shader pass?
 
 #pragma endregion
 
@@ -273,7 +307,7 @@ namespace minty
 		/// <summary>
 		/// Cleans up all of the render engine resources.
 		/// </summary>
-		void destroy();
+		virtual void destroy();
 
 #pragma endregion
 
@@ -310,40 +344,40 @@ namespace minty
 		/// <param name="usage">How the buffer will be used.</param>
 		/// <param name="properties">The memory properties.</param>
 		/// <returns>The ID of the new buffer.</returns>
-		ID create_buffer(VkDeviceSize const size, VkBufferUsageFlags const usage, VkMemoryPropertyFlags const properties);
+		Buffer const& create_buffer(VkDeviceSize const size, VkBufferUsageFlags const usage, VkMemoryPropertyFlags const properties);
 
 		/// <summary>
 		/// Creates a uniform buffer.
 		/// </summary>
 		/// <param name="size">The size of the buffer.</param>
 		/// <returns>The ID of the new buffer.</returns>
-		ID create_buffer_uniform(VkDeviceSize const size);
+		Buffer const& create_buffer_uniform(VkDeviceSize const size);
 
 		/// <summary>
 		/// Destroys the buffer with the given ID.
 		/// </summary>
 		/// <param name="id"></param>
-		void destroy_buffer(ID const id);
+		void destroy_buffer(Buffer const& buffer);
 
 		/// <summary>
 		/// Maps the buffer data to a pointer in memory.
 		/// </summary>
 		/// <param name="id">The ID of the buffer to map.</param>
 		/// <returns>A pointer to the buffer data in memory.</returns>
-		void* map_buffer(ID const id) const;
+		void* map_buffer(Buffer const& buffer) const;
 
 		/// <summary>
 		/// Unmaps the buffer data from memory. The invalidates the pointer given from map_buffer for the same ID.
 		/// </summary>
 		/// <param name="id">The ID of the buffer to unmap.</param>
-		void unmap_buffer(ID const id) const;
+		void unmap_buffer(Buffer const& buffer) const;
 
 		/// <summary>
 		/// Sets the data for the buffer with the given ID.
 		/// </summary>
 		/// <param name="id">The ID of the buffer to modify.</param>
 		/// <param name="data">The data to set to the buffer.</param>
-		void set_buffer(ID const id, void const* const data);
+		void set_buffer(Buffer const& buffer, void const* const data);
 
 		/// <summary>
 		/// Sets the data for the buffer with the given ID.
@@ -352,28 +386,14 @@ namespace minty
 		/// <param name="data">The data to set to the buffer.</param>
 		/// <param name="size">The size of the data in bytes.</param>
 		/// <param name="offset">The offset of the data within the buffer in bytes.</param>
-		void set_buffer(ID const id, void const* const data, VkDeviceSize const size, VkDeviceSize const offset = 0);
-
-		/// <summary>
-		/// Gets the buffer with the given ID.
-		/// </summary>
-		/// <param name="id">The ID of the buffer.</param>
-		/// <returns>The buffer with the givne ID.</returns>
-		VkBuffer get_buffer(ID const id) const;
+		void set_buffer(Buffer const& buffer, void const* const data, VkDeviceSize const size, VkDeviceSize const offset = 0);
 
 		/// <summary>
 		/// Gets the data of the buffer with the given ID and stores it within the out pointer.
 		/// </summary>
 		/// <param name="id">The ID of the buffer to get the data from.</param>
 		/// <param name="out">The pointer to the location of the data to be set.</param>
-		void get_buffer_data(ID const id, void* const out) const; // TODO: test method
-
-		/// <summary>
-		/// Gets the size of the buffer with the given ID.
-		/// </summary>
-		/// <param name="id">The ID of the buffer to get the size of.</param>
-		/// <returns>The size of the buffer in bytes.</returns>
-		VkDeviceSize get_buffer_size(ID const id) const;
+		void get_buffer_data(Buffer const& buffer, void* const out) const; // TODO: test method
 
 		/// <summary>
 		/// Copies the buffer with the srcId to the buffer with the dstId.
@@ -381,15 +401,14 @@ namespace minty
 		/// <param name="srcId">The ID of the source buffer.</param>
 		/// <param name="dstId">The ID of the destination buffer.</param>
 		/// <param name="size">The number of bytes to copy.</param>
-		void copy_buffer(ID const srcId, ID const dstId, VkDeviceSize const size);
-
-	private:
-		// destroys the buffer data directly
-		void destroy_buffer(Buffer const& buffer);
+		void copy_buffer(Buffer const& src, Buffer const& dst, VkDeviceSize const size);
 
 #pragma endregion
 
 #pragma region Drawing
+
+	protected:
+		virtual void draw(VkCommandBuffer commandBuffer);
 
 	private:
 		void draw_scene(VkCommandBuffer commandBuffer);
@@ -462,7 +481,7 @@ namespace minty
 
 #pragma endregion
 
-	private:
+	protected:
 		/// <summary>
 		/// Finds the depth rendering format that can be used.
 		/// </summary>
@@ -533,7 +552,7 @@ namespace minty
 		/// </summary>
 		/// <param name="availableFormats">The available surface formats.</param>
 		/// <returns>The chosen format.</returns>
-		VkSurfaceFormatKHR choose_swap_surface_format(const std::vector<VkSurfaceFormatKHR>& availableFormats);
+		virtual VkSurfaceFormatKHR choose_swap_surface_format(const std::vector<VkSurfaceFormatKHR>& availableFormats);
 
 		/// <summary>
 		/// Checks if the given device supports a swap chain.

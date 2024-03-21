@@ -1,34 +1,37 @@
 #include "pch.h"
 #include "M_AudioClip.h"
 
+#include "M_Runtime.h"
+#include "M_AssetEngine.h"
 #include "M_Asset.h"
 #include "M_Console.h"
+#include "M_Reader.h"
+#include "M_Writer.h"
 
 minty::AudioClip::AudioClip()
 	: _clip()
-{
+{}
 
+minty::AudioClip::AudioClip(AudioClipBuilder const& builder, Runtime& runtime)
+	: Asset(builder.id, builder.path, runtime)
+	, _clip()
+{
+	load(builder.path);
 }
 
 void minty::AudioClip::load(Path const& path)
 {
+	AssetEngine& assets = get_runtime().get_asset_engine();
+	std::vector<Byte> fileData = assets.read_file_bytes(path);
+
 	// load clip
-	SoLoud::result result = _clip.load(Asset::absolute(path).string().c_str());
+	SoLoud::result result = _clip.loadMem(fileData.data(), static_cast<unsigned int>(fileData.size()), true, false);
 
 	if (result != SoLoud::SOLOUD_ERRORS::SO_NO_ERROR)
 	{
-		Console::error(std::format("Failed to load_animation AudioClip at path \"{}\". Error code {}.", Asset::absolute(path).string(), result));
+		MINTY_ERROR_FORMAT("Failed to load AudioClip at path \"{}\". Error code {}.", path.string(), result);
 		return;
 	}
-
-	// load meta
-	Node meta = Asset::load_meta(path);
-	Reader reader(meta);
-
-	set_volume(reader.read_float("volume", 1.0f));
-	set_looping(reader.read_bool("looping", false));
-	set_loop_point(reader.read_float("loopPoint", 0.0f));
-	set_single_instance(reader.read_bool("singleInstance", false));
 }
 
 void minty::AudioClip::set_volume(float const value)

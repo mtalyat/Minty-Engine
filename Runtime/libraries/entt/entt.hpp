@@ -1,3 +1,11 @@
+// CUSTOM MODIFICATIONS
+// define a custom assert macro to override the default one so we can see the message
+#ifndef ENTT_ASSERT
+#include <iostream>
+#include <cassert>
+#define ENTT_ASSERT(condition, message) if(!(condition)) { std::cerr << "EnTT failed assert: (" #condition ") " #message << std::endl; assert(condition); }
+#endif
+
 // IWYU pragma: begin_exports
 // #include "config/config.h"
 #ifndef ENTT_CONFIG_CONFIG_H

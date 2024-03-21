@@ -13,7 +13,7 @@ namespace minty
 		/// <summary>
 		/// The name of the Entity.
 		/// </summary>
-		String name = Text::EMPTY;
+		String name = "";
 
 		void serialize(Writer& writer) const override;
 		void deserialize(Reader const& reader) override;

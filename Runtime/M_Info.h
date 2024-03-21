@@ -1,7 +1,7 @@
 #pragma once
 
 #include "M_Object.h"
-#include "vulkan.h"
+#include "M_Vulkan.h"
 
 namespace minty
 {
@@ -38,6 +38,12 @@ namespace minty
 		/// </summary>
 		/// <returns>The name of the application.</returns>
 		String const& get_application_name() const;
+
+		uint32_t get_application_major() const;
+
+		uint32_t get_application_minor() const;
+		
+		uint32_t get_application_patch() const;
 
 		/// <summary>
 		/// Gets the application verson.

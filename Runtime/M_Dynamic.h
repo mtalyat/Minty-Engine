@@ -82,8 +82,6 @@ namespace minty
 		template<typename T>
 		T get() const
 		{
-			MINTY_ASSERT(_size == sizeof(T), std::format("Dynamic::get<T>(): size must be equal to sizeof(T). size: {}, sizeof(T): {}", _size, sizeof(T)));
-
 			return *static_cast<T*>(_data);
 		}
 

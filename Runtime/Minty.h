@@ -10,16 +10,26 @@ access to the entire engine without needing include each file.
 */
 
 // LIBRARIES
-#include "vulkan.h"
-#include "glm.hpp"
+#include "M_Vulkan.h"
+#include "M_GLM.hpp"
+#ifdef MINTY_IMGUI
+#include "M_ImGui.h"
+#endif
+#include "M_TinyXML.h"
 
 // ANIMATION
 #include "M_Animation.h"
-#include "M_AnimationBuilder.h"
 #include "M_AnimationSystem.h"
 #include "M_Animator.h"
-#include "M_AnimatorBuilder.h"
 #include "M_AnimatorComponent.h"
+
+// APPLICATION
+#include "M_Application.h"
+#include "M_RunMode.h"
+
+// ASSET
+#include "M_Asset.h"
+#include "M_AssetEngine.h"
 
 // AUDIO
 #include "M_Audio.h"
@@ -32,21 +42,20 @@ access to the entire engine without needing include each file.
 // BUILTIN
 #include "M_Builtin.h"
 
+// CAMERA
+#include "M_Camera.h"
+#include "M_CameraComponent.h"
+
 // COMPONENTS
 #include "M_Component.h"
 
-#include "M_CameraComponent.h"
-#include "M_DirtyComponent.h"
 #include "M_MeshComponent.h"
-#include "M_NameComponent.h"
 #include "M_RelationshipComponent.h"
-#include "M_UITransformComponent.h"
 
 // ENTITIES
 #include "M_EntityRegistry.h"
 
 // FILES
-#include "M_Asset.h"
 #include "M_File.h"
 #include "M_PhysicalFile.h"
 #include "M_VirtualFile.h"
@@ -71,16 +80,8 @@ access to the entire engine without needing include each file.
 #include "M_Buffer.h"
 #include "M_DescriptorSet.h"
 #include "M_DrawCallObjectInfo.h"
-#include "M_MaterialBuilder.h"
-#include "M_MaterialTemplateBuilder.h"
 #include "M_RenderObject.h"
 #include "M_PushConstantInfo.h"
-#include "M_RendererBuilder.h"
-#include "M_ShaderBuilder.h"
-#include "M_ShaderPassBuilder.h"
-#include "M_SpriteBuilder.h"
-#include "M_TextureAtlasBuilder.h"
-#include "M_TextureBuilder.h"
 #include "M_UniformConstantInfo.h"
 #include "M_RenderSystem.h"
 #include "M_Shader.h"
@@ -89,10 +90,20 @@ access to the entire engine without needing include each file.
 #include "M_SpriteComponent.h"
 #include "M_Texture.h"
 #include "M_TextureAtlas.h"
+#include "M_Viewport.h"
 
 // SCENES
 #include "M_Scene.h"
 #include "M_SceneManager.h"
+
+// SCRIPTING
+#include "M_Accessibility.h"
+#include "M_ScriptAssembly.h"
+#include "M_ScriptClass.h"
+#include "M_ScriptComponent.h"
+#include "M_ScriptEngine.h"
+#include "M_ScriptObject.h"
+#include "M_ScriptSystem.h"
 
 // SERIALIZATION
 #include "M_ISerializable.h"
@@ -108,6 +119,7 @@ access to the entire engine without needing include each file.
 
 // TRANSFORM
 #include "M_TransformComponent.h"
+#include "M_UITransformComponent.h"
 
 // GENERAL
 #include "M_Base.h"
@@ -118,14 +130,13 @@ access to the entire engine without needing include each file.
 #include "M_Constants.h"
 #include "M_Dynamic.h"
 #include "M_Encoding.h"
-#include "M_Engine.h"
-#include "M_Error.h"
 #include "M_Event.h"
 #include "M_FiniteStateMachine.h"
 #include "M_Info.h"
 #include "M_Math.h"
 #include "M_Matrix.h"
 #include "M_Object.h"
+#include "M_Operations.h"
 #include "M_Parse.h"
 #include "M_Quaternion.h"
 #include "M_Rect.h"
@@ -134,6 +145,8 @@ access to the entire engine without needing include each file.
 #include "M_Runtime.h"
 #include "M_Stopwatch.h"
 #include "M_Text.h"
+#include "M_Time.h"
+#include "M_TypeRegister.h"
 #include "M_Types.h"
 #include "M_Vector.h"
 #include "M_Window.h"

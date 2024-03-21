@@ -1,22 +1,63 @@
 #pragma once
-#include "M_RenderObject.h"
+#include "M_Asset.h"
 
 #include "M_CoordinateMode.h"
 #include "M_Vector.h"
 
 namespace minty
 {
-	struct SpriteBuilder;
+	class Texture;
+	class Material;
+
+	/// <summary>
+	/// Holds data to create a new Sprite.
+	/// </summary>
+	struct SpriteBuilder
+	{
+		UUID id;
+
+		Path path;
+
+		/// <summary>
+		/// The Texture that is being used.
+		/// </summary>
+		Texture* texture = nullptr;
+
+		/// <summary>
+		/// The Material to use.
+		/// </summary>
+		Material* material = nullptr;
+
+		/// <summary>
+		/// The type of input of the data within minimum, maximum and pivot.
+		/// </summary>
+		CoordinateMode coordinateMode = CoordinateMode::Normalized;
+
+		/// <summary>
+		/// The minimum position of the Sprite within the Texture.
+		/// </summary>
+		Vector2 minCoords = Vector2(0.0f, 0.0f);
+
+		/// <summary>
+		/// The maximum position of the Sprite within the Texture.
+		/// </summary>
+		Vector2 maxCoords = Vector2(1.0f, 1.0f);
+
+		/// <summary>
+		/// The offset to the center of the Sprite when rendered.
+		/// </summary>
+		Vector2 pivot = Vector2(0.5f, 0.5f);
+	};
 
 	/// <summary>
 	/// Holds the data for a slice of a texture.
 	/// </summary>
 	class Sprite
-		: public RenderObject
+		: public Asset
 	{
 	private:
-		ID _textureId;
-		ID _materialId;
+		Texture* _texture;
+		Material* _material;
 
 		Vector2 _minCoords;
 		Vector2 _maxCoords;
@@ -27,7 +68,9 @@ namespace minty
 		/// </summary>
 		Sprite();
 
-		Sprite(SpriteBuilder const& builder, Engine& engine, ID const sceneId);
+		Sprite(SpriteBuilder const& builder, Runtime& engine);
+
+		~Sprite();
 
 		/// <summary>
 		/// Destroys all of the resources associated with this Sprite.
@@ -37,7 +80,9 @@ namespace minty
 #pragma region Get
 
 	public:
-		ID get_material_id() const;
+		Texture* get_texture() const;
+
+		Material* get_material() const;
 
 		Vector2 get_min_coords() const;
 

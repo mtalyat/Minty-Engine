@@ -154,20 +154,32 @@ namespace minty
 		virtual void read(void* const buffer, Size const size) = 0;
 
 		/// <summary>
-		/// Reads the next line of text, and moves the cursor the appropriate amount of bytes.
+		/// Reads all of the bytes from the file and returns it as a vector.
 		/// </summary>
 		/// <returns></returns>
-		bool read_line(String& line)
-		{
-			return read_line(line, '\n');
-		}
+		std::vector<char> read_all();
+
+		std::vector<Byte> read_all_bytes();
 
 		/// <summary>
 		/// Reads the next line of text, and moves the cursor the appropriate amount of bytes.
 		/// </summary>
 		/// <param name="delimiter">The separating character.</param>
 		/// <returns></returns>
-		virtual bool read_line(String& line, char const delimiter) = 0;
+		virtual bool read_line(String& line) = 0;
+
+		/// <summary>
+		/// Reads a number of lines from the file and returns it as a vector.
+		/// </summary>
+		/// <param name="count"></param>
+		/// <returns></returns>
+		std::vector<String> read_lines(size_t const count);
+
+		/// <summary>
+		/// Reads all of the lines from the file and returns it as a vector.
+		/// </summary>
+		/// <returns></returns>
+		std::vector<String> read_all_lines();
 
 		/// <summary>
 		/// Writes the given size of data to the file, and moves the cursor size number of bytes.
@@ -199,6 +211,8 @@ namespace minty
 		/// <returns>The lines from the file.</returns>
 		static std::vector<String> read_all_lines(Path const& path);
 
+		static std::vector<String> read_lines(Path const& path, size_t const count);
+
 		/// <summary>
 		/// Parses a Node from the file at the given path.
 		/// </summary>
@@ -221,6 +235,14 @@ namespace minty
 		/// <param name="lines">The text to write.</param>
 		/// <returns>True if the lines were successfully written.</returns>
 		static bool write_all_lines(Path const& path, std::vector<String> const& lines);
+
+		/// <summary>
+		/// Writes the given Node to the file at the given path.
+		/// </summary>
+		/// <param name="path"></param>
+		/// <param name="node"></param>
+		/// <returns></returns>
+		static bool write_node(Path const& path, Node const& node);
 
 #pragma endregion
 	};

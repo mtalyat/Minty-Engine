@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "M_Console.h"
 
+#include "M_Base.h"
 #include "M_Node.h"
 #include <iostream>
 
@@ -39,7 +40,7 @@ String minty::Console::to_string(Color const value)
 	case Color::BrightMagenta: return "Bright Magenta";
 	case Color::BrightCyan: return "Bright Cyan";
 	case Color::BrightWhite: return "Bright White";
-	default: return minty::Error::ERROR_TEXT;
+	default: return "";
 	}
 }
 
@@ -47,57 +48,60 @@ void minty::Console::print(String const& message)
 {
 	std::cout << message << std::endl;
 }
-
-void print_node(Node const& node, int const indent)
-{
-	auto const& children = node.get_children();
-
-	// do nothing if no children
-	if (!children.size()) return;
-
-	// create indent string before the printed line
-	String indentString(indent, '\t');
-
-	// print children
-	// parent takes care of printing this node's data
-	for (auto const& child : children)
-	{
-		if (child.has_name())
-		{
-			if (child.has_data())
-			{
-				// print data if there is something
-				Console::print(std::format("{}{}: {}", indentString, child.get_name(), child.get_data()));
-			}
-			else
-			{
-				// print, but no data
-				Console::print(std::format("{}{}", indentString, child.get_name()));
-			}
-		}
-		else
-		{
-			// no name, so print as a bullet point
-			if (child.has_data())
-			{
-				// print data if there is something
-				Console::print(std::format("{}- {}", indentString, child.get_data()));
-			}
-			else
-			{
-				// print, but no data or name
-				Console::print(std::format("{}- ", indentString));
-			}
-		}
-
-		// print children, if any
-		print_node(child, indent + 1);
-	}
-}
+//
+//void print_node(Node const& node, int const indent)
+//{
+//	auto const& children = node.get_children();
+//
+//	// do nothing if no children
+//	if (!children.size()) return;
+//
+//	// create indent string before the printed line
+//	String indentString(indent, '\t');
+//
+//	// print children
+//	// parent takes care of printing this node's data
+//	for (auto const& child : children)
+//	{
+//		if (child.has_name())
+//		{
+//			if (child.has_data())
+//			{
+//				// print data if there is something
+//				Console::print(std::format("{}{}: {}", indentString, child.get_name(), child.get_data()));
+//			}
+//			else
+//			{
+//				// print, but no data
+//				Console::print(std::format("{}{}", indentString, child.get_name()));
+//			}
+//		}
+//		else
+//		{
+//			// no name, so print as a bullet point
+//			if (child.has_data())
+//			{
+//				// print data if there is something
+//				Console::print(std::format("{}- {}", indentString, child.get_data()));
+//			}
+//			else
+//			{
+//				// print, but no data or name
+//				Console::print(std::format("{}- ", indentString));
+//			}
+//		}
+//
+//		// print children, if any
+//		print_node(child, indent + 1);
+//	}
+//}
 
 void minty::Console::print(Node const& node)
 {
-	print_node(node, 0);
+	for (String const& line : node.get_formatted())
+	{
+		print(line);
+	}
 }
 
 void minty::Console::print(String const& message, Color const color)
@@ -112,51 +116,58 @@ void minty::Console::wait()
 	std::getline(std::cin, temp);
 }
 
-void minty::Console::log(String const& message, Color const color)
+void minty::Console::log_color(String const& message, Color const color)
 {
-#ifndef NDEBUG
+#ifdef MINTY_DEBUG
 	print_raw(std::cout, message, color);
+#endif
+}
+
+void minty::Console::log(String const& message)
+{
+#ifdef MINTY_DEBUG
+	print_raw(std::cout, message, Color::White);
 #endif
 }
 
 void minty::Console::todo(String const& message)
 {
-#ifndef NDEBUG
+#ifdef MINTY_DEBUG
 	print_raw(std::cout, "[todo]: " + message, Color::Magenta);
 #endif
 }
 
-void minty::Console::test(String const& message, Color const color)
+void minty::Console::test(String const& message)
 {
-#ifndef NDEBUG
-	print_raw(std::cout, "[test]: " + message, color);
+#ifdef MINTY_DEBUG
+	print_raw(std::cout, "[test]: " + message, Color::Blue);
 #endif
 }
 
 void minty::Console::info(String const& message)
 {
-#ifndef NDEBUG
+#ifdef MINTY_DEBUG
 	print_raw(std::cout, "[info]: " + message, Color::Gray);
 #endif
 }
 
 void minty::Console::warn(String const& message)
 {
-#ifndef NDEBUG
+#ifdef MINTY_DEBUG
 	print_raw(std::cout, "[warn]: " + message, Color::Yellow);
 #endif
 }
 
 void minty::Console::error(String const& message)
 {
-#ifndef NDEBUG
+#ifdef MINTY_DEBUG
 	print_raw(std::cout, "[errr]: " + message, Color::Red);
 #endif
 }
 
 bool minty::Console::ass(bool const value, String const& errorMessage)
 {
-#ifndef NDEBUG
+#ifdef MINTY_DEBUG
 	if (!value)
 	{
 		Console::error(errorMessage);

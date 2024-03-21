@@ -90,7 +90,7 @@ void minty::VirtualFile::read(void* const buffer, Size const size)
     // if at the end of the file, stop
     if (end_of_file())
     {
-        Console::error("Cannot read from file to buffer. End Of File.");
+        Console::error("Cannot read_file from file to buffer. End Of File.");
         return;
     }
 

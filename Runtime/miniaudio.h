@@ -4636,7 +4636,7 @@ const char* ma_get_backend_name(ma_backend backend)
         case ma_backend_wasapi:     return "WASAPI";
         case ma_backend_dsound:     return "DirectSound";
         case ma_backend_winmm:      return "WinMM";
-        case ma_backend_coreaudio:  return "Core Audio";
+        case ma_backend_coreaudio:  return "Core AudioClip";
         case ma_backend_sndio:      return "sndio";
         case ma_backend_audio4:     return "audio(4)";
         case ma_backend_oss:        return "OSS";
@@ -4645,7 +4645,7 @@ const char* ma_get_backend_name(ma_backend backend)
         case ma_backend_jack:       return "JACK";
         case ma_backend_aaudio:     return "AAudio";
         case ma_backend_opensl:     return "OpenSL|ES";
-        case ma_backend_webaudio:   return "Web Audio";
+        case ma_backend_webaudio:   return "Web AudioClip";
         case ma_backend_null:       return "Null";
         default:                    return "Unknown";
     }
@@ -14000,7 +14000,7 @@ ma_bool32 ma_device_read_and_send_to_client__alsa(ma_device* pDevice)
 
                     framesRead = ((ma_snd_pcm_readi_proc)pDevice->pContext->alsa.snd_pcm_readi)((ma_snd_pcm_t*)pDevice->alsa.pPCM, pDevice->alsa.pIntermediaryBuffer, framesAvailable);
                     if (framesRead < 0) {
-                        ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[ALSA] Failed to read data from the internal device.", MA_FAILED_TO_READ_DATA_FROM_DEVICE);
+                        ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[ALSA] Failed to read_file data from the internal device.", MA_FAILED_TO_READ_DATA_FROM_DEVICE);
                         return MA_FALSE;
                     }
 
@@ -14574,7 +14574,7 @@ ma_result ma_device_read__alsa(ma_device* pDevice, void* pFramesOut, ma_uint32 f
 
                 resultALSA = ((ma_snd_pcm_readi_proc)pDevice->pContext->alsa.snd_pcm_readi)((ma_snd_pcm_t*)pDevice->alsa.pPCMCapture, pFramesOut, frameCount);
                 if (resultALSA < 0) {
-                    return ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[ALSA] Failed to read data from the internal device.", MA_FAILED_TO_READ_DATA_FROM_DEVICE);
+                    return ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[ALSA] Failed to read_file data from the internal device.", MA_FAILED_TO_READ_DATA_FROM_DEVICE);
                 }
             }
         }
@@ -19981,42 +19981,42 @@ static ma_result ma_device__untrack__coreaudio(ma_device* pDevice)
         case AVAudioSessionRouteChangeReasonOldDeviceUnavailable:
         {
         #if defined(MA_DEBUG_OUTPUT)
-            printf("[Core Audio] Route Changed: AVAudioSessionRouteChangeReasonOldDeviceUnavailable\n");
+            printf("[Core AudioClip] Route Changed: AVAudioSessionRouteChangeReasonOldDeviceUnavailable\n");
         #endif
         } break;
 
         case AVAudioSessionRouteChangeReasonNewDeviceAvailable:
         {
         #if defined(MA_DEBUG_OUTPUT)
-            printf("[Core Audio] Route Changed: AVAudioSessionRouteChangeReasonNewDeviceAvailable\n");
+            printf("[Core AudioClip] Route Changed: AVAudioSessionRouteChangeReasonNewDeviceAvailable\n");
         #endif
         } break;
 
         case AVAudioSessionRouteChangeReasonNoSuitableRouteForCategory:
         {
         #if defined(MA_DEBUG_OUTPUT)
-            printf("[Core Audio] Route Changed: AVAudioSessionRouteChangeReasonNoSuitableRouteForCategory\n");
+            printf("[Core AudioClip] Route Changed: AVAudioSessionRouteChangeReasonNoSuitableRouteForCategory\n");
         #endif
         } break;
 
         case AVAudioSessionRouteChangeReasonWakeFromSleep:
         {
         #if defined(MA_DEBUG_OUTPUT)
-            printf("[Core Audio] Route Changed: AVAudioSessionRouteChangeReasonWakeFromSleep\n");
+            printf("[Core AudioClip] Route Changed: AVAudioSessionRouteChangeReasonWakeFromSleep\n");
         #endif
         } break;
 
         case AVAudioSessionRouteChangeReasonOverride:
         {
         #if defined(MA_DEBUG_OUTPUT)
-            printf("[Core Audio] Route Changed: AVAudioSessionRouteChangeReasonOverride\n");
+            printf("[Core AudioClip] Route Changed: AVAudioSessionRouteChangeReasonOverride\n");
         #endif
         } break;
 
         case AVAudioSessionRouteChangeReasonCategoryChange:
         {
         #if defined(MA_DEBUG_OUTPUT)
-            printf("[Core Audio] Route Changed: AVAudioSessionRouteChangeReasonCategoryChange\n");
+            printf("[Core AudioClip] Route Changed: AVAudioSessionRouteChangeReasonCategoryChange\n");
         #endif
         } break;
 
@@ -20024,7 +20024,7 @@ static ma_result ma_device__untrack__coreaudio(ma_device* pDevice)
         default:
         {
         #if defined(MA_DEBUG_OUTPUT)
-            printf("[Core Audio] Route Changed: AVAudioSessionRouteChangeReasonUnknown\n");
+            printf("[Core AudioClip] Route Changed: AVAudioSessionRouteChangeReasonUnknown\n");
         #endif
         } break;
     }
@@ -20694,7 +20694,7 @@ ma_result ma_device_init__coreaudio(ma_context* pContext, const ma_device_config
         ma_uint32 rbSizeInFrames = (ma_uint32)ma_calculate_frame_count_after_src(pDevice->sampleRate, pDevice->capture.internalSampleRate, pDevice->capture.internalBufferSizeInFrames);
         ma_result result = ma_pcm_rb_init(pDevice->capture.format, pDevice->capture.channels, rbSizeInFrames, NULL, &pDevice->coreaudio.duplexRB);
         if (result != MA_SUCCESS) {
-            return ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[Core Audio] Failed to initialize ring buffer.", result);
+            return ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[Core AudioClip] Failed to initialize ring buffer.", result);
         }
 
         /* We need a period to act as a buffer for cases where the playback and capture device's end up desyncing. */
@@ -21740,7 +21740,7 @@ ma_result ma_device_read__sndio(ma_device* pDevice, void* pPCMFrames, ma_uint32 
 
     result = ((ma_sio_read_proc)pDevice->pContext->sndio.sio_read)((struct ma_sio_hdl*)pDevice->sndio.handleCapture, pPCMFrames, frameCount * ma_get_bytes_per_frame(pDevice->capture.internalFormat, pDevice->capture.internalChannels));
     if (result == 0) {
-        return ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[sndio] Failed to read data from the device to be sent to the device.", MA_FAILED_TO_SEND_DATA_TO_DEVICE);
+        return ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[sndio] Failed to read_file data from the device to be sent to the device.", MA_FAILED_TO_SEND_DATA_TO_DEVICE);
     }
 
     if (pFramesRead != NULL) {
@@ -22697,7 +22697,7 @@ ma_result ma_device_read__audio4(ma_device* pDevice, void* pPCMFrames, ma_uint32
 
     result = read(pDevice->audio4.fdCapture, pPCMFrames, frameCount * ma_get_bytes_per_frame(pDevice->capture.internalFormat, pDevice->capture.internalChannels));
     if (result < 0) {
-        return ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[audio4] Failed to read data from the device.", MA_FAILED_TO_READ_DATA_FROM_DEVICE);
+        return ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[audio4] Failed to read_file data from the device.", MA_FAILED_TO_READ_DATA_FROM_DEVICE);
     }
 
     if (pFramesRead != NULL) {
@@ -23405,7 +23405,7 @@ ma_result ma_device_read__oss(ma_device* pDevice, void* pPCMFrames, ma_uint32 fr
 
     resultOSS = read(pDevice->oss.fdCapture, pPCMFrames, frameCount * ma_get_bytes_per_frame(pDevice->capture.internalFormat, pDevice->capture.internalChannels));
     if (resultOSS < 0) {
-        return ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[OSS] Failed to read data from the device to be sent to the client.", MA_FAILED_TO_READ_DATA_FROM_DEVICE);
+        return ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[OSS] Failed to read_file data from the device to be sent to the client.", MA_FAILED_TO_READ_DATA_FROM_DEVICE);
     }
     
     if (pFramesRead != NULL) {

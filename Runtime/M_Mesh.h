@@ -1,11 +1,18 @@
 #pragma once
-#include "M_RenderObject.h"
+#include "M_Asset.h"
 
-#include "vulkan.h"
+#include "M_Vulkan.h"
 #include <vector>
 
 namespace minty
 {
+	struct MeshBuilder
+	{
+		UUID id;
+
+		Path path;
+	};
+
 	/// <summary>
 	/// The type of mesh.
 	/// </summary>
@@ -50,20 +57,24 @@ namespace minty
 	String to_string(MeshType const value);
 	MeshType from_string_mesh_type(String const& value);
 
+	class Buffer;
+
 	/// <summary>
 	/// Holds data for a model to be rendered to the screen.
 	/// </summary>
 	class Mesh :
-		public RenderObject
+		public Asset
 	{
 	private:
 		uint32_t _vertexCount;
 		uint32_t _vertexSize;
-		ID _vertexBufferId;
+		UUID _vertexBufferId;
+		Buffer const* _vertexBuffer;
 
 		uint32_t _indexCount;
 		uint32_t _indexSize;
-		ID _indexBufferId;
+		UUID _indexBufferId;
+		Buffer const* _indexBuffer;
 		VkIndexType _indexType;
 	public:
 		/// <summary>
@@ -75,7 +86,7 @@ namespace minty
 		/// Creates a new Mesh.
 		/// </summary>
 		/// <param name="renderer"></param>
-		Mesh(Engine& engine, ID const sceneId);
+		Mesh(MeshBuilder const& builder, Runtime& engine);
 
 		~Mesh();
 
@@ -134,7 +145,7 @@ namespace minty
 		/// Gets the ID of the vertex buffer.
 		/// </summary>
 		/// <returns></returns>
-		ID get_vertex_buffer_id() const;
+		Buffer const* get_vertex_buffer() const;
 
 		/// <summary>
 		/// Gets the number of indices in this Mesh.
@@ -146,7 +157,7 @@ namespace minty
 		/// Gets the ID of the index buffer.
 		/// </summary>
 		/// <returns></returns>
-		ID get_index_buffer_id() const;
+		Buffer const* get_index_buffer() const;
 
 		/// <summary>
 		/// Gets the index type for this Mesh.

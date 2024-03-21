@@ -4,21 +4,6 @@
     <ClCompile Include="C:\Users\mitch\source\repos\Minty-Engine\Projects\Tests\TestProject\Build\main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="C:\Users\mitch\source\repos\Minty-Engine\Projects\Tests\TestProject\Assets\Scripts\Components\TestComponent.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="C:\Users\mitch\source\repos\Minty-Engine\Projects\Tests\TestProject\Assets\Scripts\Systems\CameraControllerSystem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="C:\Users\mitch\source\repos\Minty-Engine\Projects\Tests\TestProject\Assets\Scripts\Systems\MoveSystem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="C:\Users\mitch\source\repos\Minty-Engine\Projects\Tests\TestProject\Assets\Scripts\Systems\TestSystem.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="C:\Users\mitch\source\repos\Minty-Engine\Projects\Tests\TestProject\Assets\Scripts\init.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <CustomBuild Include="C:\Users\mitch\source\repos\Minty-Engine\Projects\Tests\TestProject\Build\CMakeLists.txt" />

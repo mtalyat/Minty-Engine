@@ -50,7 +50,7 @@ namespace minty
 
 		virtual void read(void* const buffer, Size const size) override;
 
-		virtual bool read_line(String& line, char const delimiter) override;
+		virtual bool read_line(String& line) override;
 
 		virtual void write(void const* const buffer, Size const size) override;
 	};

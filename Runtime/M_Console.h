@@ -1,6 +1,6 @@
 #pragma once
 
-#include "M_Base.h"
+#include "M_Types.h"
 #include "M_Node.h"
 
 namespace minty::Console
@@ -55,11 +55,13 @@ namespace minty::Console
 	/// </summary>
 	void wait();
 
+	void log_color(String const& message, Color const color = Color::White);
+
 	/// <summary>
 	/// Debug log prints the given message to the screen.
 	/// </summary>
 	/// <param name="message">The string to print.</param>
-	void log(String const& message, Color const color = Color::White);
+	void log(String const& message);
 
 	/// <summary>
 	/// Debug log prints the given message to the screen, in cyan.
@@ -71,7 +73,7 @@ namespace minty::Console
 	/// Debug log prints the given message to the screen, in blue.
 	/// </summary>
 	/// <param name="message">The string to print.</param>
-	void test(String const& message, Color const color = Color::Blue);
+	void test(String const& message);
 
 	/// <summary>
 	/// Debug info prints the given message to the screen, in gray.

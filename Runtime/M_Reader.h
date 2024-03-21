@@ -1,8 +1,10 @@
 #pragma once
 
 #include "M_Base.h"
-#include "M_Node.h"
 #include "M_Register.h"
+#include "M_UUID.h"
+#include "M_Color.h"
+#include "M_Node.h"
 #include <map>
 #include <unordered_map>
 #include <set>
@@ -11,6 +13,7 @@
 
 namespace minty
 {
+	class Node;
 	class Object;
 	class ISerializable;
 
@@ -95,6 +98,12 @@ namespace minty
 
 		bool try_read_id(String const& name, ID& value) const;
 
+		UUID to_uuid() const;
+
+		UUID read_uuid(String const& name, UUID const defaultValue = UUID(INVALID_UUID)) const;
+
+		bool try_read_uuid(String const& name, UUID& value) const;
+
 		float to_float(float const defaultValue = 0.0f) const;
 
 		float read_float(String const& name, float const defaultValue = 0.0f) const;
@@ -118,6 +127,12 @@ namespace minty
 		bool read_bool(String const& name, bool const defaultValue = false) const;
 
 		bool try_read_bool(String const& name, bool& value) const;
+
+		Color to_color(Color const defaultValue = Color()) const;
+
+		Color read_color(String const& name, Color const defaultValue = Color()) const;
+
+		bool try_read_color(String const& name, Color& color) const;
 	public:
 		template<typename T>
 		void to_object_ref(T& value) const
@@ -468,16 +483,14 @@ namespace minty
 		{
 			value.clear();
 
-			if (auto const* list = node.find_all(BLANK))
-			{
-				value.reserve(list->size());
+			auto const list = node.find_all(BLANK);
+			value.reserve(list.size());
 
-				for (Node const& node : *list)
-				{
-					T t;
-					parse_object(node, t);
-					value.push_back(t);
-				}
+			for (Node const* node : list)
+			{
+				T t;
+				parse_object(*node, t);
+				value.push_back(t);
 			}
 		}
 
@@ -486,16 +499,14 @@ namespace minty
 		{
 			value.clear();
 
-			if (auto const* list = node.find_all(BLANK))
-			{
-				value.reserve(list->size());
+			auto const list = node.find_all(BLANK);
+			value.reserve(list.size());
 
-				for (Node const& node : *list)
-				{
-					T t;
-					parse_object(node, t);
-					value.push_back(t);
-				}
+			for (Node const* node : list)
+			{
+				T t;
+				parse_object(*node, t);
+				value.emplace(t);
 			}
 		}
 
@@ -506,7 +517,7 @@ namespace minty
 
 			Reader reader(node, _data);
 
-			for (auto const& child : node->children)
+			for (auto const& child : node.get_children())
 			{
 				// parse T
 				T t{};
@@ -526,7 +537,7 @@ namespace minty
 
 			Reader reader(node, _data);
 
-			for (auto const& child : node->children)
+			for (auto const& child : node.get_children())
 			{
 				// parse T
 				T t{};

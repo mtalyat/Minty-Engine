@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "M_Writer.h"
 
+#include "M_Asset.h"
+#include "M_Node.h"
 #include "M_ISerializable.h"
 
 using namespace minty;

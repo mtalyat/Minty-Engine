@@ -1,7 +1,6 @@
 #include "pch.h"
 #include "M_Material.h"
 
-#include "M_MaterialBuilder.h"
 #include "M_RenderEngine.h"
 #include "M_RenderSystem.h"
 #include "M_Scene.h"
@@ -10,37 +9,29 @@ using namespace minty;
 using namespace minty;
 
 minty::Material::Material()
-	: RenderObject()
-	, _templateId(ERROR_ID)
+	: Asset()
+	, _template()
 	, _passDescriptorSets()
 {}
 
-minty::Material::Material(MaterialBuilder const& builder, Engine& engine, ID const sceneId)
-	: RenderObject(engine, sceneId)
-	, _templateId(builder.templateId)
+minty::Material::Material(MaterialBuilder const& builder, Runtime& engine)
+	: Asset(builder.id, builder.path, engine)
+	, _template(builder.materialTemplate)
 	, _passDescriptorSets()
 {
-	RenderSystem* renderSystem = get_render_system();
-
-	MINTY_ASSERT(renderSystem != nullptr, "Material(): renderSystem cannot be null.");
-
 	// use template to generate descriptor sets
-	auto const& materialTemplate = renderSystem->get_material_template(_templateId);
-	auto const& passIds = materialTemplate.get_shader_pass_ids();
+	auto const& materialTemplate = _template;
+	auto const& passes = materialTemplate->get_shader_passes();
 
-	auto const& defaultValues = materialTemplate.get_default_values();
+	auto const& defaultValues = materialTemplate->get_default_values();
 
-	for (auto const passId : passIds)
+	for (auto const pass : passes)
 	{
-		// get the shader pass
-		auto const& shaderPass = renderSystem->get_shader_pass(passId);
-
 		// get the shader that the pass belongs to
-		auto const shaderId = shaderPass.get_shader_id();
-		auto& shader = renderSystem->get_shader(shaderId);
+		auto const shader = pass->get_shader();
 
 		// get the descriptor set for the pass
-		DescriptorSet descriptorSet = shader.create_descriptor_set(DESCRIPTOR_SET_MATERIAL, false);
+		DescriptorSet descriptorSet = shader->create_descriptor_set(DESCRIPTOR_SET_MATERIAL, false);
 		
 		// set all values
 		for (auto const& defaultValue : defaultValues)
@@ -66,15 +57,24 @@ minty::Material::Material(MaterialBuilder const& builder, Engine& engine, ID con
 	}
 }
 
+minty::Material::~Material()
+{
+	destroy();
+}
+
 void minty::Material::destroy()
 {
-	_templateId = ERROR_ID;
+	_template = nullptr;
+	for (auto& set : _passDescriptorSets)
+	{
+		set.destroy();
+	}
 	_passDescriptorSets.clear();
 }
 
-ID minty::Material::get_template_id() const
+MaterialTemplate* minty::Material::get_template() const
 {
-	return _templateId;
+	return _template;
 }
 
 DescriptorSet const& minty::Material::get_descriptor_set(uint32_t const pass) const

@@ -1,6 +1,9 @@
 #include "pch.h"
 #include "M_Info.h"
 
+#include "M_Reader.h"
+#include "M_Writer.h"
+
 using namespace minty;
 
 minty::Info::Info()
@@ -20,6 +23,21 @@ Info::Info(String const& name, uint32_t const major, uint32_t const minor, uint3
 String const& minty::Info::get_application_name() const
 {
 	return _applicationName;
+}
+
+uint32_t minty::Info::get_application_major() const
+{
+	return _applicationMajor;
+}
+
+uint32_t minty::Info::get_application_minor() const
+{
+	return _applicationMinor;
+}
+
+uint32_t minty::Info::get_application_patch() const
+{
+	return _applicationPatch;
 }
 
 uint32_t minty::Info::get_application_version() const

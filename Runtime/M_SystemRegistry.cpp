@@ -3,8 +3,10 @@
 
 #include "M_System.h"
 #include "M_Console.h"
-#include "M_Engine.h"
+#include "M_Runtime.h"
 #include "M_Parse.h"
+#include "M_Reader.h"
+#include "M_Writer.h"
 
 #include <sstream>
 
@@ -12,25 +14,27 @@ namespace minty
 {
 	std::map<String const, SystemRegistry::SystemFunc const> SystemRegistry::_systemTypes = std::map<String const, SystemRegistry::SystemFunc const>();
 
-	SystemRegistry::SystemRegistry(Engine& engine, ID const sceneId)
-		: SceneObject(engine, sceneId)
+	SystemRegistry::SystemRegistry(Runtime& engine, Scene& scene)
+		: SceneObject(engine, scene)
 		, _orderedSystems()
 		, _allSystems()
+		, _typeLookup()
 	{}
 
 	SystemRegistry::~SystemRegistry()
 	{
 		// delete each system
-		for (auto& pair : _allSystems)
+		for (auto const& pair : _allSystems)
 		{
 			delete pair.second;
 		}
 	}
 
 	SystemRegistry::SystemRegistry(SystemRegistry&& other) noexcept
-		: SceneObject(other)
+		: SceneObject(std::move(other))
 		, _orderedSystems(std::move(other._orderedSystems))
 		, _allSystems(std::move(other._allSystems))
+		, _typeLookup(std::move(other._typeLookup))
 	{}
 
 	SystemRegistry& SystemRegistry::operator=(SystemRegistry&& other) noexcept
@@ -40,22 +44,22 @@ namespace minty
 			SceneObject::operator=(std::move(other));
 			_orderedSystems = std::move(other._orderedSystems);
 			_allSystems = std::move(other._allSystems);
+			_typeLookup = std::move(other._typeLookup);
 		}
 
 		return *this;
 	}
 
-	System* SystemRegistry::emplace(String const& name, System* const system, int const priority)
+	System* SystemRegistry::emplace(System* const system, int const priority)
 	{
+		MINTY_ASSERT(system != nullptr);
+
 		// if exists in all, do not add a duplicate
-		if (_allSystems.contains(name))
-		{
-			Console::error(std::format("SystemRegistry already contains a System with the name \"{}\". Returning NULL.", name));
-			return nullptr;
-		}
+		MINTY_ASSERT_FORMAT(!_allSystems.contains(system->get_name()), "SystemRegistry already contains a System with the name \"{}\". Returning NULL.", system->get_name());
 
 		// add to all systems
-		_allSystems.emplace(name, system);
+		_allSystems.emplace(system->get_name(), system);
+		_typeLookup.emplace(typeid(*system), system);
 
 		// add to ordered list for updating
 		auto found = _orderedSystems.find(priority);
@@ -76,32 +80,33 @@ namespace minty
 
 	System* SystemRegistry::emplace_by_name(String const& name, int const priority)
 	{
-		auto found = _systemTypes.find(name);
-		if (found == _systemTypes.end())
-		{
-			// name not found
-			Console::error(std::format("Cannot emplace System \"{}\". It has not been registered with the SystemRegistry.", name));
-			return nullptr;
-		}
-		else
-		{
-			// name found
-			System* system = found->second(get_engine(), get_scene_id());
-			this->emplace(name, system, priority);
-			return system;
-		}
+		MINTY_ASSERT_FORMAT(_systemTypes.contains(name), "Cannot emplace System \"{}\". It has not been registered with the SystemRegistry.", name);
+
+		// name found
+		System* system = _systemTypes.at(name)(get_runtime(), get_scene());
+		this->emplace(system, priority);
+		return system;
 	}
 
-	void SystemRegistry::erase(System* const system)
+	void SystemRegistry::erase_by_name(String const& name)
 	{
-		// find system, remove it from list
-		for (auto& pair : _orderedSystems)
+		auto found = _allSystems.find(name);
+
+		if (found != _allSystems.end())
 		{
-			if (pair.second.erase(system))
+			_typeLookup.erase(typeid(*found->second));
+
+			for (auto& pair : _orderedSystems)
 			{
-				// found
-				return;
+				auto found2 = pair.second.find(found->second);
+
+				if (found2 != pair.second.end())
+				{
+					pair.second.erase(found2);
+				}
 			}
+
+			_allSystems.erase(name);
 		}
 	}
 
@@ -114,7 +119,7 @@ namespace minty
 	{
 		for (auto& pair : _orderedSystems)
 		{
-			for (auto system : pair.second)
+			for (System* const system : pair.second)
 			{
 				system->load();
 			}
@@ -125,12 +130,9 @@ namespace minty
 	{
 		for (auto& pair : _orderedSystems)
 		{
-			for (auto system : pair.second)
+			for (System* const system : pair.second)
 			{
-				if (system->is_enabled())
-				{
-					system->update();
-				}
+				system->update();
 			}
 		}
 	}
@@ -139,12 +141,9 @@ namespace minty
 	{
 		for (auto& pair : _orderedSystems)
 		{
-			for (auto system : pair.second)
+			for (System* const system : pair.second)
 			{
-				if (system->is_enabled())
-				{
-					system->fixed_update();
-				}
+				system->fixed_update();
 			}
 		}
 	}
@@ -153,7 +152,7 @@ namespace minty
 	{
 		for (auto& pair : _orderedSystems)
 		{
-			for (auto system : pair.second)
+			for (System* const system : pair.second)
 			{
 				system->unload();
 			}
@@ -163,13 +162,27 @@ namespace minty
 	void SystemRegistry::clear()
 	{
 		// delete all systems
-		for (auto& pair : _allSystems)
+		for (auto const& pair : _allSystems)
 		{
 			delete pair.second;
 		}
 
 		_allSystems.clear();
 		_orderedSystems.clear();
+		_typeLookup.clear();
+	}
+
+	std::vector<String> SystemRegistry::get_registered_systems()
+	{
+		std::vector<String> result;
+		result.reserve(_systemTypes.size());
+
+		for (auto const& pair : _systemTypes)
+		{
+			result.push_back(pair.first);
+		}
+
+		return result;
 	}
 
 	void SystemRegistry::serialize(Writer& writer) const
@@ -187,7 +200,7 @@ namespace minty
 
 		for (auto const& pair : _orderedSystems)
 		{
-			for (auto const system : pair.second)
+			for (System* const system : pair.second)
 			{
 				String systemPriority = "";
 				if (pair.first)

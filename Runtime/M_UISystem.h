@@ -7,7 +7,7 @@
 
 namespace minty
 {
-    class Engine;
+    class Runtime;
 
     /// <summary>
     /// Handles User Interface (UI) inputs.
@@ -16,18 +16,7 @@ namespace minty
         : public System
     {
     private:
-        std::unordered_set<Entity> _hoverEntities;
-
-        InputMap::MoveEvent_t::func _onMouseMove;
-        InputMap::ClickEvent_t::func _onMouseClick;
-
     public:
-        UISystem(Engine& engine, ID const sceneId);
-
-        void load() override;
-
-        void update() override;
-
-        void unload() override;
+        UISystem(Runtime& engine, Scene& scene);
     };
 }

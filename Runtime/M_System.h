@@ -1,10 +1,14 @@
 #pragma once
 #include "M_SceneObject.h"
 
+#include <unordered_set>
+#include <vector>
+#include <functional>
+
 namespace minty
 {
-	class Engine;
-	class Scene;
+	class Asset;
+	class AssetEngine;
 	class EntityRegistry;
 	class SystemRegistry;
 
@@ -18,15 +22,18 @@ namespace minty
 		// is this system enabled?
 		bool _enabled;
 
+		String _name;
 	public:
 		/// <summary>
 		/// Creates a new System.
 		/// </summary>
-		System(Engine& engine, ID const sceneId);
+		System(String const& name, Runtime& runtime, Scene& scene);
 
 		virtual ~System();
 
 	public:
+		String const& get_name() const;
+
 		EntityRegistry& get_entity_registry() const;
 
 		SystemRegistry& get_system_registry() const;
@@ -52,7 +59,7 @@ namespace minty
 		/// <summary>
 		/// Called when the Scene is being loaded.
 		/// </summary>
-		virtual void load() {}
+		virtual void load();
 
 		/// <summary>
 		/// Does one frame of work on the System.
@@ -67,7 +74,11 @@ namespace minty
 		/// <summary>
 		/// Called when the Scene is being unloaded.
 		/// </summary>
-		virtual void unload() {}
+		virtual void unload();
+	public:
+		virtual void serialize(Writer& writer) const override;
+		virtual void deserialize(Reader const& reader) override;
+
 	public:
 		friend String to_string(System const& value);
 	};

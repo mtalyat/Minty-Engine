@@ -7,5 +7,5 @@
 namespace minty
 {
 	typedef SoLoud::handle AudioHandle;
-	constexpr const AudioHandle ERROR_AUDIO_HANDLE = UINT_MAX;
+	constexpr static AudioHandle ERROR_AUDIO_HANDLE = UINT_MAX;
 }

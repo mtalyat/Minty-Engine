@@ -1,5 +1,5 @@
 #pragma once
-#include "M_RenderObject.h"
+#include "M_Asset.h"
 
 #include "M_CoordinateMode.h"
 #include "M_Vector.h"
@@ -7,19 +7,55 @@
 namespace minty
 {
 	class RenderSystem;
-	struct TextureAtlasBuilder;
+	class Texture;
+	class Material;
+	class Sprite;
+
+	/// <summary>
+	/// Holds data to create a new TextureAtlas.
+	/// </summary>
+	struct TextureAtlasBuilder
+	{
+		UUID id;
+
+		Path path;
+
+		/// <summary>
+		/// The ID of the Texture to be used.
+		/// </summary>
+		Texture* texture = nullptr;
+
+		/// <summary>
+		/// The ID of the Material to be used. If left as ERROR_ID, a new Material will be generated using the texture.
+		/// </summary>
+		Material* material = nullptr;
+
+		/// <summary>
+		/// The coordinate mode for the pivot and slice data.
+		/// </summary>
+		CoordinateMode coordinateMode = CoordinateMode::Normalized;
+
+		/// <summary>
+		/// The size of a slice within the atlas.
+		/// </summary>
+		Vector2 slice = Vector2(1.0f, 1.0f);
+
+		/// <summary>
+		/// The location of the pivot for newly created Sprites.
+		/// </summary>
+		Vector2 pivot = Vector2(0.5f, 0.5f);
+	};
 
 	/// <summary>
 	/// A collection of Sprites that originate from a Texture.
 	/// </summary>
 	class TextureAtlas
-		: public RenderObject
+		: public Asset
 	{
 	private:
-		// id to texture
-		ID _textureId;
-		// id to the material
-		ID _materialId;
+		Texture* _texture;
+		Material* _material;
+
 		// size of slice in atlas, in pixels
 		Vector2 _slice;
 		// pivot of each sprite when sliced, in pixels
@@ -32,7 +68,7 @@ namespace minty
 		/// </summary>
 		TextureAtlas();
 
-		TextureAtlas(TextureAtlasBuilder const& builder, Engine& engine, ID const sceneId);
+		TextureAtlas(TextureAtlasBuilder const& builder, Runtime& engine);
 
 		~TextureAtlas();
 
@@ -49,11 +85,11 @@ namespace minty
 
 		Vector2Int get_size() const;
 
-		ID slice_sprite(Vector2 const minCoords, Vector2 const maxCoords, CoordinateMode const coordinateMode = CoordinateMode::Normalized);
+		Sprite* slice_sprite(Vector2 const minCoords, Vector2 const maxCoords, CoordinateMode const coordinateMode = CoordinateMode::Normalized);
 
-		ID slice_sprite(Vector2 const minCoords, Vector2 const maxCoords, String const& name, CoordinateMode const coordinateMode = CoordinateMode::Normalized);
+		Sprite* slice_sprite(Vector2 const minCoords, Vector2 const maxCoords, String const& name, CoordinateMode const coordinateMode = CoordinateMode::Normalized);
 		
-		ID slice_sprite(Vector2 const minCoords, Vector2 const maxCoords, Vector2 const pivot, String const& name, CoordinateMode const coordinateMode = CoordinateMode::Normalized);
+		Sprite* slice_sprite(Vector2 const minCoords, Vector2 const maxCoords, Vector2 const pivot, String const& name, CoordinateMode const coordinateMode = CoordinateMode::Normalized);
 
 		/// <summary>
 		/// Creates a new Sprite using the given X and Y slice coordinates.
@@ -63,7 +99,7 @@ namespace minty
 		/// <param name="pivot">The pivot of the newly created Sprite.</param>
 		/// <param name="coordinateMode">The coordinate mode to interpret the pivot in.</param>
 		/// <returns>The ID to the newly created Sprite.</returns>
-		ID create_sprite(int const x, int const y, Vector2 const pivot = Vector2(0.5f, 0.5f), CoordinateMode const coordinateMode = CoordinateMode::Normalized);
+		Sprite* create_sprite(int const x, int const y, Vector2 const pivot = Vector2(0.5f, 0.5f), CoordinateMode const coordinateMode = CoordinateMode::Normalized);
 
 		/// <summary>
 		/// Creates a new Sprite using the given X and Y slice coordinates.
@@ -74,7 +110,7 @@ namespace minty
 		/// <param name="name">The name of the new Sprite.</param>
 		/// <param name="coordinateMode">The coordinate mode to interpret the pivot in.</param>
 		/// <returns>The ID to the newly created Sprite.</returns>
-		ID create_sprite(int const x, int const y, Vector2 const pivot, String const& name, CoordinateMode const coordinateMode = CoordinateMode::Normalized);
+		Sprite* create_sprite(int const x, int const y, Vector2 const pivot, String const& name, CoordinateMode const coordinateMode = CoordinateMode::Normalized);
 
 		/// <summary>
 		/// Creates a Sprite of all possible full slices that can be created within this TextureAtlas.
@@ -82,7 +118,7 @@ namespace minty
 		/// <param name="pivot">The pivot to apply to all the Sprites.</param>
 		/// <param name="coordinateMode">The coordinate mode to interpret the pivot in.</param>
 		/// <returns>A list of all new Sprite IDs.</returns>
-		std::vector<ID> create_all(Vector2 const pivot = Vector2(0.5f, 0.5f), CoordinateMode const coordinateMode = CoordinateMode::Normalized);
+		std::vector<Sprite*> create_all(Vector2 const pivot = Vector2(0.5f, 0.5f), CoordinateMode const coordinateMode = CoordinateMode::Normalized);
 	private:
 		String get_next_slice_name() const;
 	};

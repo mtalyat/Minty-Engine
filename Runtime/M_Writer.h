@@ -1,8 +1,10 @@
 #pragma once
 
 #include "M_Base.h"
-#include "M_Node.h"
 #include "M_Register.h"
+#include "M_UUID.h"
+#include "M_Color.h"
+#include "M_Node.h"
 #include <map>
 #include <unordered_map>
 #include <set>
@@ -11,7 +13,9 @@
 
 namespace minty
 {
+	class Node;
 	class Object;
+	class Asset;
 	class ISerializable;
 
 	/// <summary>
@@ -155,15 +159,15 @@ namespace minty
 				return;
 			}
 
-			Node node;
-			Writer writer(node);
+			Node node(name);
+			Writer writer(node, _data);
 
 			for (auto const& v : value)
 			{
 				writer.write(BLANK, v);
 			}
 
-			write(name, node);
+			write(node);
 		}
 
 		template<typename T>
@@ -174,15 +178,15 @@ namespace minty
 				return;
 			}
 
-			Node node;
-			Writer writer(node);
+			Node node(name);
+			Writer writer(node, _data);
 
 			for (auto const& v : value)
 			{
 				writer.write(BLANK, v);
 			}
 
-			write(name, node);
+			write(node);
 		}
 
 		template<typename T, typename U>
@@ -193,8 +197,8 @@ namespace minty
 				return;
 			}
 
-			Node node;
-			Writer writer(node);
+			Node node(name);
+			Writer writer(node, _data);
 
 			for (auto const& pair : value)
 			{
@@ -203,7 +207,7 @@ namespace minty
 				writer.write(stream.str(), pair.second);
 			}
 
-			write(name, node);
+			write(node);
 		}
 
 		template<typename T, typename U>
@@ -214,8 +218,8 @@ namespace minty
 				return;
 			}
 
-			Node node;
-			Writer writer(node);
+			Node node(name);
+			Writer writer(node, _data);
 
 			for (auto const& pair : value)
 			{
@@ -224,7 +228,7 @@ namespace minty
 				writer.write(stream.str(), pair.second);
 			}
 
-			write(name, node);
+			write(node);
 		}
 
 		template<typename T>
@@ -236,25 +240,18 @@ namespace minty
 			}
 		}
 
-#pragma endregion
-
-#pragma region Default Writing
-
 		template<typename T>
-		void write(String const& name, T const& value, T const& defaultValue)
+		void write_as(T const& value)
 		{
-			if (value != defaultValue)
+			if (ISerializable const* serializable = try_cast<T, ISerializable const>(&value))
 			{
-				write(name, value);
+				serializable->serialize(*this);
 			}
-		}
-
-		template<typename T, typename U>
-		void write(String const& name, T const& value, U const& defaultValue)
-		{
-			if (value != defaultValue)
+			else
 			{
-				write(name, value);
+				std::ostringstream stream;
+				stream << value;
+				_node->set_data(stream.str());
 			}
 		}
 

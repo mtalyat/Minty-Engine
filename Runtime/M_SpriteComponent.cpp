@@ -1,10 +1,14 @@
 #include "pch.h"
 #include "M_SpriteComponent.h"
 
+#include "M_Runtime.h"
+#include "M_AssetEngine.h"
 #include "M_SerializationData.h"
 #include "M_RenderSystem.h"
 #include "M_SystemRegistry.h"
 #include "M_Scene.h"
+#include "M_Reader.h"
+#include "M_Writer.h"
 
 using namespace minty;
 
@@ -13,23 +17,26 @@ void minty::SpriteComponent::serialize(Writer& writer) const
 	SerializationData const* data = static_cast<SerializationData const*>(writer.get_data());
 	RenderSystem const* renderSystem = data->scene->get_system_registry().find<RenderSystem>();
 
-	writer.write("sprite", renderSystem->get_sprite_name(spriteId));
-	writer.write("size", size, Vector2(1.0f, 1.0f));
-	writer.write("order", order, 0);
+	writer.write("sprite", sprite ? sprite->get_id() : UUID(INVALID_UUID));
+	writer.write("size", size);
+	writer.write("order", order);
 }
 
 void minty::SpriteComponent::deserialize(Reader const& reader)
 {
 	SerializationData const* data = static_cast<SerializationData const*>(reader.get_data());
-	RenderSystem const* renderSystem = data->scene->get_system_registry().find<RenderSystem>();
+	AssetEngine& assets = data->scene->get_runtime().get_asset_engine();
 
-	String spriteName;
-	if (reader.try_read_string("sprite", spriteName))spriteId = renderSystem->find_sprite(spriteName);
+	UUID spriteId(INVALID_UUID);
+	if (reader.try_read_uuid("sprite", spriteId))
+	{
+		sprite = assets.get<Sprite>(spriteId);
+	}
 	reader.try_read_object("size", size);
 	reader.try_read_int("order", order);
 }
 
 String minty::to_string(SpriteComponent const& value)
 {
-	return std::format("SpriteComponent(id = {}, layer = {})", value.spriteId, value.order);
+	return std::format("SpriteComponent()");
 }

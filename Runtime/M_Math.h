@@ -3,7 +3,9 @@
 
 namespace minty::Math
 {
-	float const PI = 3.14159265359f;
+	static float const PI = 3.14159265359f;
+	static float const RAD2DEG = 180.0f / PI;
+	static float const DEG2RAD = PI / 180.0f;
 
 	/// <summary>
 	/// Clamps the given value between two other values.

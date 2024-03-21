@@ -331,7 +331,7 @@ namespace minty
 
 		if (found == _names.end())
 		{
-			return Text::EMPTY;
+			return "";
 		}
 		else
 		{

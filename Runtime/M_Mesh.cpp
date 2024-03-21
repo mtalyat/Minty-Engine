@@ -1,34 +1,40 @@
 #include "pch.h"
 #include "M_Mesh.h"
 
+#include "M_Runtime.h"
 #include "M_Builtin.h"
 #include "M_RenderEngine.h"
+#include "M_AssetEngine.h"
 #include "M_Text.h"
-#include "glm.hpp"
+#include "M_GLM.hpp"
 
 using namespace minty;
 using namespace minty::Builtin;
 using namespace minty;
 
 minty::Mesh::Mesh()
-	: RenderObject::RenderObject()
+	: Asset()
 	, _vertexCount()
 	, _vertexSize()
-	, _vertexBufferId(ERROR_ID)
+	, _vertexBufferId(INVALID_UUID)
+	, _vertexBuffer()
 	, _indexCount()
 	, _indexSize()
-	, _indexBufferId(ERROR_ID)
+	, _indexBufferId(INVALID_UUID)
+	, _indexBuffer()
 	, _indexType()
 {}
 
-minty::Mesh::Mesh(Engine& engine, ID const sceneId)
-	: RenderObject::RenderObject(engine, sceneId)
+minty::Mesh::Mesh(MeshBuilder const& builder, Runtime& engine)
+	: Asset(builder.id, builder.path, engine)
 	, _vertexCount()
 	, _vertexSize()
-	, _vertexBufferId(ERROR_ID)
+	, _vertexBufferId(INVALID_UUID)
+	, _vertexBuffer()
 	, _indexCount()
 	, _indexSize()
-	, _indexBufferId(ERROR_ID)
+	, _indexBufferId(INVALID_UUID)
+	, _indexBuffer()
 	, _indexType()
 {}
 
@@ -49,9 +55,9 @@ uint32_t minty::Mesh::get_vertex_count() const
 	return _vertexCount;
 }
 
-ID minty::Mesh::get_vertex_buffer_id() const
+Buffer const* minty::Mesh::get_vertex_buffer() const
 {
-	return _vertexBufferId;
+	return _vertexBuffer;
 }
 
 uint32_t minty::Mesh::get_index_count() const
@@ -59,9 +65,9 @@ uint32_t minty::Mesh::get_index_count() const
 	return _indexCount;
 }
 
-ID minty::Mesh::get_index_buffer_id() const
+Buffer const* minty::Mesh::get_index_buffer() const
 {
-	return _indexBufferId;
+	return _indexBuffer;
 }
 
 VkIndexType minty::Mesh::get_index_type() const
@@ -459,32 +465,34 @@ void minty::Mesh::set_vertices(void const* const vertices, size_t const count, s
 		return;
 	}
 
-	RenderEngine& renderer = get_render_engine();
+	RenderEngine& renderer = get_runtime().get_render_engine();
 
 	// get buffer size
 	VkDeviceSize bufferSize = static_cast<VkDeviceSize>(count * vertexSize);
 
 	// use buffer to copy data into device memory
-	ID stagingBufferId = renderer.create_buffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+	Buffer const& stagingBuffer = renderer.create_buffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
 	auto device = renderer.get_device();
 
 	// map data so it can be set
-	void* mappedData = renderer.map_buffer(stagingBufferId);
+	void* mappedData = renderer.map_buffer(stagingBuffer);
 
 	// copy into staging buffer
 	memcpy(mappedData, vertices, static_cast<size_t>(bufferSize));
 
 	// unmap
-	renderer.unmap_buffer(stagingBufferId);
+	renderer.unmap_buffer(stagingBuffer);
 
 	// copy into device memory
-	_vertexBufferId = renderer.create_buffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+	Buffer const& vertexBuffer = renderer.create_buffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+	_vertexBufferId = vertexBuffer.get_id();
+	_vertexBuffer = &vertexBuffer;
 
-	renderer.copy_buffer(stagingBufferId, _vertexBufferId, bufferSize);
+	renderer.copy_buffer(stagingBuffer, vertexBuffer, bufferSize);
 
 	// clean up
-	renderer.destroy_buffer(stagingBufferId);
+	renderer.destroy_buffer(stagingBuffer);
 }
 
 void minty::Mesh::set_indices(void const* const indices, size_t const count, size_t const indexSize, VkIndexType const type)
@@ -502,54 +510,66 @@ void minty::Mesh::set_indices(void const* const indices, size_t const count, siz
 		return;
 	}
 
-	RenderEngine& renderer = get_render_engine();
+	RenderEngine& renderer = get_runtime().get_render_engine();
 
 	// get buffer size
 	VkDeviceSize bufferSize = static_cast<VkDeviceSize>(count * indexSize);
 
 	// use buffer to copy data into device memory
-	ID stagingBufferId = renderer.create_buffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+	Buffer const& stagingBuffer = renderer.create_buffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
 	auto device = renderer.get_device();
 
 	// copy into staging buffer
-	void* mappedData = renderer.map_buffer(stagingBufferId);
+	void* mappedData = renderer.map_buffer(stagingBuffer);
 	memcpy(mappedData, indices, static_cast<size_t>(bufferSize));
-	renderer.unmap_buffer(stagingBufferId);
+	renderer.unmap_buffer(stagingBuffer);
 
 	// copy into device memory
-	_indexBufferId = renderer.create_buffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+	Buffer const& indexBuffer = renderer.create_buffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+	_indexBufferId = indexBuffer.get_id();
+	_indexBuffer = &indexBuffer;
 
-	renderer.copy_buffer(stagingBufferId, _indexBufferId, bufferSize);
+	renderer.copy_buffer(stagingBuffer, indexBuffer, bufferSize);
 
 	// clean up
-	renderer.destroy_buffer(stagingBufferId);
+	renderer.destroy_buffer(stagingBuffer);
 }
 
 void minty::Mesh::dispose_vertices()
 {
-	if (!_vertexCount)
+	AssetEngine& assets = get_runtime().get_asset_engine();
+
+	// if buffer not loaded, ignore, it was already disposed
+	if (!assets.contains(_vertexBufferId))
 	{
 		return;
 	}
 
-	RenderEngine& renderer = get_render_engine();
+	RenderEngine& renderer = get_runtime().get_render_engine();
 
-	renderer.destroy_buffer(_vertexBufferId);
+	renderer.destroy_buffer(*_vertexBuffer);
+	_vertexBufferId = INVALID_UUID;
+	_vertexBuffer = nullptr;
 	_vertexCount = 0;
 	_vertexSize = 0;
 }
 
 void minty::Mesh::dispose_indices()
 {
-	if (!_indexCount)
+	AssetEngine& assets = get_runtime().get_asset_engine();
+
+	// if buffer not loaded, ignore, it was already disposed
+	if (!assets.contains(_indexBufferId))
 	{
 		return;
 	}
 
-	RenderEngine& renderer = get_render_engine();
+	RenderEngine& renderer = get_runtime().get_render_engine();
 
-	renderer.destroy_buffer(_indexBufferId);
+	renderer.destroy_buffer(*_indexBuffer);
+	_indexBufferId = INVALID_UUID;
+	_indexBuffer = nullptr;
 	_indexCount = 0;
 	_indexSize = 0;
 }
@@ -573,7 +593,7 @@ String minty::to_string(MeshType const value)
 	case MeshType::Cylinder:
 		return "CYLINDER";
 	default:
-		return Error::ERROR_TEXT;
+		return "";
 	}
 }
 

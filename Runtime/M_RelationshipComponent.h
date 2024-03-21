@@ -20,6 +20,11 @@ namespace minty
 		/// The first child this Entity has.
 		/// </summary>
 		Entity first = NULL_ENTITY;
+		
+		/// <summary>
+		/// The last child this Entity has.
+		/// </summary>
+		Entity last = NULL_ENTITY;
 
 		/// <summary>
 		/// The previous sibling this Entity has.

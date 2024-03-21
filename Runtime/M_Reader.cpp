@@ -157,6 +157,31 @@ bool minty::Reader::try_read_id(String const& name, ID& value) const
 	return false;
 }
 
+UUID minty::Reader::to_uuid() const
+{
+	return _node->to_uuid();
+}
+
+UUID minty::Reader::read_uuid(String const& name, UUID const defaultValue) const
+{
+	if (Node const* child = _node->find(name))
+	{
+		return child->to_uuid();
+	}
+
+	return defaultValue;
+}
+
+bool minty::Reader::try_read_uuid(String const& name, UUID& value) const
+{
+	if (Node const* child = _node->find(name))
+	{
+		value = child->to_uuid();
+		return true;
+	}
+	return false;
+}
+
 float minty::Reader::to_float(float const defaultValue) const
 {
 	return _node->to_float(defaultValue);
@@ -252,6 +277,31 @@ bool minty::Reader::try_read_bool(String const& name, bool& value) const
 	if (Node const* child = _node->find(name))
 	{
 		value = child->to_bool();
+		return true;
+	}
+	return false;
+}
+
+Color minty::Reader::to_color(Color const defaultValue) const
+{
+	return Color::fromHex(_node->to_string());
+}
+
+Color minty::Reader::read_color(String const& name, Color const defaultValue) const
+{
+	if (Node const* child = _node->find(name))
+	{
+		return Color::fromHex(child->to_string());
+	}
+
+	return defaultValue;
+}
+
+bool minty::Reader::try_read_color(String const& name, Color& value) const
+{
+	if (Node const* child = _node->find(name))
+	{
+		value = Color::fromHex(child->to_string());
 		return true;
 	}
 	return false;

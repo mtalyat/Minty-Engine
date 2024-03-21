@@ -1,95 +1,88 @@
 #include "pch.h"
 #include "M_Quaternion.h"
 
+#include "M_Reader.h"
+#include "M_Writer.h"
+
 using namespace minty;
 
-minty::Quaternion::Quaternion(glm::quat const& other)
-    : glm::quat(other)
-{}
-
-Vector3 minty::Quaternion::forward() const
+Vector3 minty::forward(Quaternion const& value)
 {
-    return glm::normalize(*this * Vector3(0.0f, 0.0f, 1.0f));
+    return glm::normalize(value * Vector3(0.0f, 0.0f, 1.0f));
 }
 
-Vector3 minty::Quaternion::backward() const
+Vector3 minty::backward(Quaternion const& value)
 {
-    return glm::normalize(*this * Vector3(0.0f, 0.0f, -1.0f));
+    return glm::normalize(value * Vector3(0.0f, 0.0f, -1.0f));
 }
 
-Vector3 minty::Quaternion::right() const
+Vector3 minty::right(Quaternion const& value)
 {
-    return glm::normalize(*this * Vector3(1.0f, 0.0f, 0.0f));
+    return glm::normalize(value * Vector3(1.0f, 0.0f, 0.0f));
 }
 
-Vector3 minty::Quaternion::left() const
+Vector3 minty::left(Quaternion const& value)
 {
-    return glm::normalize(*this * Vector3(-1.0f, 0.0f, 0.0f));
+    return glm::normalize(value * Vector3(-1.0f, 0.0f, 0.0f));
 }
 
-Vector3 minty::Quaternion::up() const
+Vector3 minty::up(Quaternion const& value)
 {
-    return glm::normalize(*this * Vector3(0.0f, 1.0f, 0.0f));
+    return glm::normalize(value * Vector3(0.0f, -1.0f, 0.0f));
 }
 
-Vector3 minty::Quaternion::down() const
+Vector3 minty::down(Quaternion const& value)
 {
-    return glm::normalize(*this * Vector3(0.0f, -1.0f, 0.0f));
-}
-
-Vector3 minty::Quaternion::to_euler_angles() const
-{
-    return glm::eulerAngles(*this);
-}
-
-void minty::Quaternion::serialize(Writer& writer) const
-{
-    Vector3 angles = glm::eulerAngles(*this);
-
-    writer.write("x", angles.x); // pitch
-    writer.write("y", angles.y); // yaw
-    writer.write("z", angles.z); // roll
-}
-
-void minty::Quaternion::deserialize(Reader const& reader)
-{
-    Quaternion quat = Quaternion::from_euler_angles(reader.read_float("x"), reader.read_float("y"), reader.read_float("z"));
-
-    x = quat.x;
-    y = quat.y;
-    z = quat.z;
-    w = quat.w;
-}
-
-Quaternion minty::Quaternion::from_euler_angles(float const x, float const y, float const z)
-{
-    return Quaternion(Vector3(x, y, z));
-}
-
-Quaternion minty::Quaternion::from_euler_angles(Vector3 const v)
-{
-    return Quaternion(v);
+    return glm::normalize(value * Vector3(0.0f, 1.0f, 0.0f));
 }
 
 std::istream& minty::operator>>(std::istream& stream, Quaternion& quat)
 {
     Vector3 euler;
     stream >> euler;
-    Quaternion other(euler);
-    quat.x = other.x;
-    quat.y = other.y;
-    quat.z = other.y;
-    quat.w = other.w;
+    quat = from_euler(euler);
     return stream;
 }
 
-std::ostream& minty::operator<<(std::ostream& stream, const Quaternion& quat)
+std::ostream& minty::operator<<(std::ostream& stream, Quaternion const& quat)
 {
-    stream << quat.to_euler_angles();
+    stream << to_euler(quat);
     return stream;
+}
+
+float fix_angle(float angle)
+{
+    if (angle == 0.0f)
+    {
+        // fix negative zero
+        return 0.0f;
+    }
+    //else if(angle < 0.0f)
+    //{
+    //    // fix negative angle
+    //    return angle += 360.0f;
+    //}
+    else
+    {
+        // nothing to fix
+        return angle;
+    }
+}
+
+Vector3 minty::to_euler(Quaternion const& value)
+{
+    Vector3 euler = glm::eulerAngles(value) * Math::RAD2DEG;
+    euler = Vector3(fix_angle(euler.x), fix_angle(euler.y), fix_angle(euler.z));
+
+    return euler;
+}
+
+Quaternion minty::from_euler(Vector3 const& value)
+{
+    return Quaternion(value * Math::DEG2RAD);
 }
 
 String minty::to_string(Quaternion const& value)
 {
-    return std::format("Quaternion({})", to_string(value.to_euler_angles()));
+    return std::format("Quaternion({})", to_string(to_euler(value)));
 }

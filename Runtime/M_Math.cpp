@@ -2,7 +2,6 @@
 #include "M_Math.h"
 
 #include "M_Console.h"
-#include "M_Error.h"
 #include "M_Parse.h"
 #include "M_Text.h"
 #include "M_Vector.h"
@@ -94,12 +93,12 @@ float minty::Math::mod(float const value, float const mod)
 
 float minty::Math::deg2rad(float const degree)
 {
-	return degree * PI / 180.0f;
+	return degree * DEG2RAD;
 }
 
 float minty::Math::rad2deg(float const rad)
 {
-	return rad * 180.0f / PI;
+	return rad * RAD2DEG;
 }
 
 float minty::Math::sin(float const rad)
@@ -329,7 +328,7 @@ void sort_infix_to_postfix(std::vector<String>& tokens)
 				operators.pop_back();
 			}
 
-			MINTY_ASSERT(!operators.empty(), "Mismatch parenthesis.");
+			MINTY_ASSERT_MESSAGE(!operators.empty(), "Mismatch parenthesis.");
 
 			operators.pop_back();
 
@@ -341,13 +340,13 @@ void sort_infix_to_postfix(std::vector<String>& tokens)
 		}
 		else
 		{
-			minty::Error::abort(std::format("Invalid token: {}", token));
+			MINTY_ABORT(std::format("Invalid token: {}", token));
 		}
 	}
 
 	while (!operators.empty())
 	{
-		MINTY_ASSERT(operators.back() != "(", "Mismatch parenthesis.");
+		MINTY_ASSERT_MESSAGE(operators.back() != "(", "Mismatch parenthesis.");
 
 		tokens.push_back(operators.back());
 		operators.pop_back();
@@ -392,7 +391,7 @@ float minty::Math::evaluate(String const& expression)
 			}
 			else if (token == "/")
 			{
-				MINTY_ASSERT(right != 0.0f, "Attempt to divide by zero inside math::evaluate.");
+				MINTY_ASSERT_MESSAGE(right != 0.0f, "Attempt to divide by zero.");
 				stack.push_back(left / right);
 			}
 			else if (token == "+")
@@ -405,7 +404,7 @@ float minty::Math::evaluate(String const& expression)
 			}
 			else
 			{
-				minty::Error::abort(std::format("Invalid operator: {}", token));
+				MINTY_ABORT(std::format("Invalid operator: {}", token));
 			}
 		}
 		else if (is_function(token))
@@ -415,11 +414,11 @@ float minty::Math::evaluate(String const& expression)
 		else
 		{
 			// something else
-			minty::Error::abort(std::format("Invalid token: {}", token));
+			MINTY_ABORT(std::format("Invalid token: {}", token));
 		}
 	}
 
-	MINTY_ASSERT(stack.size() == 1, std::format("Invalid evaluation, resulted with {} values. (\"{}\").", stack.size(), expression));
+	MINTY_ASSERT_FORMAT(stack.size() == 1, "Invalid evaluation, resulted with {} values. (\"{}\").", stack.size(), expression);
 
 	// last value left on stack should be the result
 	return stack.back();

@@ -30,6 +30,8 @@ namespace minty
 		Matrix4 get_local_matrix() const;
 
 		Vector3 get_global_position() const;
+		Quaternion get_global_rotation() const;
+		Vector3 get_global_scale() const;
 
 		Vector3 get_forward() const;
 		Vector3 get_up() const;

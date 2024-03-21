@@ -5,6 +5,7 @@
 #include <map>
 #include <set>
 #include <functional>
+#include <vector>
 
 namespace minty
 {
@@ -18,19 +19,20 @@ namespace minty
 	{
 		friend class Scene;
 	public:
-		typedef std::function<System* (Engine&, ID const)> SystemFunc;
+		typedef std::function<System* (Runtime&, Scene& scene)> SystemFunc;
 
 	private:
 		// the systems to manage
 		std::map<int, std::set<System*>> _orderedSystems;
 		std::map<String const, System*> _allSystems;
+		std::unordered_map<TypeID, System*> _typeLookup;
 
 		static std::map<String const, SystemFunc const> _systemTypes;
 	public:
 		/// <summary>
 		/// Creates an empty SystemRegistry.
 		/// </summary>
-		SystemRegistry(Engine& engine, ID const sceneId);
+		SystemRegistry(Runtime& engine, Scene& scene);
 
 		~SystemRegistry();
 
@@ -46,7 +48,7 @@ namespace minty
 		/// </summary>
 		/// <param name="system">The system to add.</param>
 		/// <param name="priority">The priority in which to update this System in.</param>
-		System* emplace(String const& name, System* const system, int const priority = 0);
+		System* emplace(System* const system, int const priority = 0);
 
 	public:
 		/// <summary>
@@ -81,10 +83,10 @@ namespace minty
 		T* find() const;
 
 		/// <summary>
-		/// Removes the given System from the SystemRegistry.
+		/// Removes the System with the given name.
 		/// </summary>
-		/// <param name="system"></param>
-		void erase(System* const system);
+		/// <param name="name"></param>
+		void erase_by_name(String const& name);
 
 		/// <summary>
 		/// Gets the number of systems within the registry.
@@ -117,6 +119,7 @@ namespace minty
 		/// </summary>
 		void clear();
 
+	public:
 		/// <summary>
 		/// Registers the System, so the System can be dynamically created by name.
 		/// </summary>
@@ -124,56 +127,63 @@ namespace minty
 		template <class T>
 		static void register_system(String const& name);
 
+		/// <summary>
+		/// Returns a list of names of every System that have been registered.
+		/// </summary>
+		/// <returns></returns>
+		static std::vector<String> get_registered_systems();
+
+	public:
 		void serialize(Writer& writer) const override;
 		void deserialize(Reader const& reader) override;
 
 	public:
 		friend String to_string(SystemRegistry const& value);
-};
+	};
 
 	template<class T>
 	T* SystemRegistry::emplace(String const& name, int const priority)
 	{
-		return static_cast<T*>(this->emplace(name, new T(get_engine(), get_scene_id()), priority));
+		return static_cast<T*>(this->emplace(name, new T(get_runtime()), priority));
 	}
 
 	template<class T>
 	T* SystemRegistry::find(String const& name) const
 	{
-		for (auto const& pair : _allSystems)
+		auto found = _allSystems.find(name);
+
+		if (found != _allSystems.end())
 		{
-			if (pair.first.compare(name) == 0)
-			{
-				// found name, return system
-				return static_cast<T*>(pair.second);
-			}
+			return static_cast<T*>(found->second);
 		}
 
-		// not found
 		return nullptr;
 	}
 
 	template<class T>
 	T* SystemRegistry::find() const
 	{
-		for (auto const& pair : _allSystems)
+		auto found = _typeLookup.find(typeid(T));
+
+		if (found != _typeLookup.end())
 		{
-			if (typeid(*pair.second) == typeid(T))
-			{
-				// found, type matches
-				return static_cast<T*>(pair.second);
-			}
+			return static_cast<T*>(found->second);
 		}
 
-		// not found
 		return nullptr;
 	}
 
 	template<class T>
 	void SystemRegistry::register_system(String const& name)
 	{
-		_systemTypes.emplace(name, [](Engine& engine, ID const sceneId) { return new T(engine, sceneId); });
+		if (_systemTypes.contains(name))
+		{
+			Console::info(std::format("System {} already registered.", name));
+			return;
+		}
 
-		Console::info(std::format("Registered system {}", name));
+		_systemTypes.emplace(name, [](Runtime& engine, Scene& scene) { return new T(engine, scene); });
+
+		Console::info(std::format("Registered system {}.", name));
 	}
 }

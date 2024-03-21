@@ -1,34 +1,30 @@
 #pragma once
-#include "M_Object.h"
+#include "M_RuntimeObject.h"
 
 namespace minty
 {
-	class Engine;
 	class Scene;
+	class EntityRegistry;
+	class SystemRegistry;
 
+	/// <summary>
+	/// An object that exists within a Scene.
+	/// </summary>
 	class SceneObject
-		: public Object
+		: public RuntimeObject
 	{
 	private:
-		Engine* _engine;
-
-		ID _sceneId;
-	public:
-		SceneObject();
-
-		SceneObject(Engine& engine, ID const sceneId);
-
-		virtual ~SceneObject();
+		Scene* _scene;
 
 	public:
-		Engine& get_engine() const;
-
-		void set_engine(Engine& engine);
+		SceneObject(Runtime& runtime, Scene& scene);
 
 		Scene& get_scene() const;
 
-		ID get_scene_id() const;
+		EntityRegistry& get_entity_registry() const;
 
-		void set_scene(ID const sceneId);
+		SystemRegistry& get_system_registry() const;
+
+		void set_scene(Scene& scene);
 	};
 }

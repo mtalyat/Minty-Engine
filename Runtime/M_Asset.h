@@ -1,80 +1,102 @@
 #pragma once
+#include "M_RuntimeObject.h"
 
-#include "M_Base.h"
 #include "M_Node.h"
 #include "M_Dynamic.h"
+#include "M_UUID.h"
 
 #include <filesystem>
 #include <array>
+#include <vector>
 
-namespace minty::Asset
+namespace minty
 {
-#ifdef N_DEBUG
-	Path const BASE_PATH = Path("");
-#else
-	Path const BASE_PATH = Path("Assets/");
-#endif
-
 	/// <summary>
-	/// Checks the given asset path, and ensures it exists.
+	/// All of the types of assets that can be loaded into the engine.
+	/// 
+	/// This determines the loading order of the assets when loading the scene.
 	/// </summary>
-	/// <param name="path">The path</param>
-	/// <returns>0 on success, 1 when the asset at the path does not exist, 2 when requiresMeta is true and the meta file does not exist.</returns>
-	int check(Path const& path, char const* const extension, bool const requiresMeta);
+	enum class AssetType
+	{
+		None,
+		Meta,
+		Wrap,
+		Text,
+		Script,
+		AudioClip,
+		Animation,
+		Animator,
+		Texture,
+		ShaderCode,
+		ShaderModule,
+		Shader,
+		ShaderPass,
+		MaterialTemplate,
+		Material,
+		Sprite,
+		Mesh,
+		Scene,
+	};
 
-	/// <summary>
-	/// Checks if the asset at the given path exists.
-	/// </summary>
-	/// <param name="path"></param>
-	/// <returns></returns>
-	bool exists(Path const& path);
+	class Asset
+		: public RuntimeObject
+	{
+	private:
+		UUID _id;
+		Path _path;
 
-	/// <summary>
-	/// Checks if the meta file for the asset at the given path exists.
-	/// </summary>
-	/// <param name="path"></param>
-	/// <returns></returns>
-	bool exists_meta(Path const& path);
+	public:
+		Asset();
 
-	/// <summary>
-	/// Returns the absolute path of the given asset path.
-	/// </summary>
-	/// <param name="path"></param>
-	/// <returns></returns>
-	Path absolute(Path const& path);
+		Asset(UUID const id, Path const& path, Runtime& runtime);
 
-	/// <summary>
-	/// Loads the given asset file into a Node.
-	/// </summary>
-	/// <param name="path">The path to the asset, relative to the project's Assets folder.</param>
-	/// <returns>A node with the file contents.</returns>
-	Node load_node(Path const& path);
+		virtual ~Asset();
 
-	/// <summary>
-	/// Loads the given asset file's meta into a Node.
-	/// </summary>
-	/// <param name="path">The path to the asset, relative to the project's Assets folder.</param>
-	/// <returns>A node with the meta file contents.</returns>
-	Node load_meta(Path const& path);
+		UUID get_id() const;
 
-	/// <summary>
-	/// Loads the given asset file into a vector of chars.
-	/// </summary>
-	/// <param name="path"></param>
-	/// <returns></returns>
-	std::vector<char> load_chars(Path const& path);
+		Path const& get_path() const;
 
-	/// <summary>
-	/// Loads the given asset file into a string.
-	/// </summary>
-	/// <param name="path"></param>
-	/// <returns></returns>
-	String load_text(Path const& path);
+		AssetType get_type() const;
 
-	/// <summary>
-	/// Loads the given asset file into a vector of line strings.
-	/// </summary>
-	/// <param name="path"></param>
-	/// <returns></returns>
-	std::vector<String> load_lines(Path const& path);
+		virtual String get_name() const;
+
+		friend bool operator==(Asset const& left, Asset const& right);
+		friend bool operator!=(Asset const& left, Asset const& right);
+
+#pragma region Static
+
+		/// <summary>
+		/// Gets the meta path of the given asset path.
+		/// </summary>
+		/// <param name="assetPath"></param>
+		/// <returns></returns>
+		static Path get_meta_path(Path const& assetPath);
+
+		/// <summary>
+		/// Gets the AssetType based on the given path extension.
+		/// </summary>
+		/// <param name="assetPath"></param>
+		/// <returns></returns>
+		static AssetType get_type(Path const& assetPath);
+
+		static std::vector<Path> const& get_extensions(AssetType const type);
+
+		/// <summary>
+		/// Checks if the given asset type's file is text readable or not.
+		/// </summary>
+		/// <param name="type"></param>
+		/// <returns></returns>
+		static bool is_readable(Path const& assetPath);
+
+		/// <summary>
+		/// Checks if the given asset type's file is text readable or not.
+		/// </summary>
+		/// <param name="type"></param>
+		/// <returns></returns>
+		static bool is_readable(AssetType const type);
+
+		static bool check_type(Path const& path, AssetType const type);
+
+#pragma endregion
+	};
 }

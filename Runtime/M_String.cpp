@@ -7,6 +7,16 @@
 
 using namespace minty;
 
+minty::Text::Text(TextBuilder const& builder, Runtime& runtime)
+	: Asset(builder.id, builder.path, runtime)
+	, _text(builder.text)
+{}
+
+String const& minty::Text::get_text() const
+{
+	return _text;
+}
+
 String minty::Text::to_lower(String const& string)
 {
 	std::vector<char> data(string.size());
@@ -134,18 +144,25 @@ std::vector<String> minty::Text::split(String const& string, String const& delim
 	return {};
 }
 
-String minty::Text::join(std::vector<String> const& list)
+String minty::Text::join(std::vector<String> const& list, String const& separator)
 {
-	return join(list, 0, list.size());
+	return join(list, 0, list.size(), separator);
 }
 
-String minty::Text::join(std::vector<String> const& list, size_t start, size_t count)
+String minty::Text::join(std::vector<String> const& list, size_t const start, size_t const count, String const& separator)
 {
 	String out;
 
-	for (size_t i = start; i < start + count; i++)
+	size_t end = start + count;
+
+	for (size_t i = start; i < end; i++)
 	{
 		out += list.at(i);
+
+		if (i < end - 1)
+		{
+			out += separator;
+		}
 	}
 
 	return out;

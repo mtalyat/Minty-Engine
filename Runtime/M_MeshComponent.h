@@ -1,9 +1,12 @@
 #pragma once
-
 #include "M_Component.h"
+
+#include "M_Mesh.h"
 
 namespace minty
 {
+	class Material;
+
 	/// <summary>
 	/// Holds data for a Mesh to be drawn within the Scene.
 	/// </summary>
@@ -11,14 +14,19 @@ namespace minty
 		: public Component
 	{
 		/// <summary>
-		/// The ID of the Mesh to draw.
+		/// The type of mesh.
 		/// </summary>
-		ID meshId = ERROR_ID;
+		MeshType type;
+
+		/// <summary>
+		/// The Mesh to draw.
+		/// </summary>
+		Mesh* mesh = nullptr;
 
 		/// <summary>
 		/// The ID of the Material to use to draw the Mesh.
 		/// </summary>
-		ID materialId = ERROR_ID;
+		Material* material = nullptr;
 
 		void serialize(Writer& writer) const override;
 		void deserialize(Reader const& reader) override;

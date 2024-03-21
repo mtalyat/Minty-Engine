@@ -1,9 +1,0 @@
-template: materialTemplate
-values
-    material
-        i 2
-        e 12
-        f 1
-        f 1
-        f 1
-        f 1

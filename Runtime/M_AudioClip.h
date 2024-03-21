@@ -1,12 +1,27 @@
 #pragma once
+#include "M_Asset.h"
 
-#include "M_Object.h"
 #include "M_Audio.h"
 
 namespace minty
 {
+	struct AudioClipBuilder
+	{
+		UUID id;
+
+		Path path;
+
+		float volume = 1.0f;
+
+		bool looping = false;
+
+		float loopPoint = 0.0f;
+
+		bool singleInstance = false;
+	};
+
 	class AudioClip
-		: public Object
+		: public Asset
 	{
 		friend class AudioEngine;
 	private:
@@ -18,12 +33,16 @@ namespace minty
 		/// </summary>
 		AudioClip();
 
+		AudioClip(AudioClipBuilder const& builder, Runtime& runtime);
+
+	private:
 		/// <summary>
 		/// Loads this AudioClip with the data from the sound at the given path.
 		/// </summary>
 		/// <param name="path">The path to the sound file.</param>
 		void load(Path const& path);
 
+	public:
 		/// <summary>
 		/// Sets the base volume of this AudioClip.
 		/// </summary>

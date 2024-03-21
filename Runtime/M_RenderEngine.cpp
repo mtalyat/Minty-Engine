@@ -1,12 +1,13 @@
 #include "pch.h"
 #include "M_RenderEngine.h"
 
-#include "M_RendererBuilder.h"
+#include "M_AssetEngine.h"
 #include "M_DrawCallObjectInfo.h"
 #include "M_SpritePushData.h"
 
+#include "M_Camera.h"
 #include "M_Console.h"
-#include "M_Engine.h"
+#include "M_Runtime.h"
 #include "M_File.h"
 #include "M_Scene.h"
 #include "M_EntityRegistry.h"
@@ -22,8 +23,10 @@
 #include "M_MeshComponent.h"
 #include "M_RenderableComponent.h"
 #include "M_RelationshipComponent.h"
+#include "M_EnabledComponent.h"
 
 #include "M_Asset.h"
+#include "M_Mesh.h"
 #include "M_Parse.h"
 #include "M_Text.h"
 
@@ -31,14 +34,8 @@
 #include "M_Matrix.h"
 #include "M_Builtin.h"
 
-//#include <vulkan/vulkan.h>
-#define GLFW_INCLUDE_VULKAN
-#include <GLFW/glfw3.h>
-
-#define GLM_FORCE_RADIANS
-#define GLM_FORCE_DEPTH_ZERO_TO_ONE
-#include <glm/glm.hpp>
-#include <glm/gtc/matrix_transform.hpp>
+#include "M_GLFW.h"
+#include "M_GLM.hpp"
 
 #include <iostream>
 #include <stdexcept>
@@ -89,18 +86,18 @@ void DestroyDebugUtilsMessengerEXT(VkInstance instance, VkDebugUtilsMessengerEXT
 	}
 }
 
-RenderEngine::RenderEngine(Window* const window)
-	: _builder(nullptr)
-	, _window(window)
-	, _boundIds()
+RenderEngine::RenderEngine(Runtime& runtime)
+	: Engine(runtime)
+	, _window()
+	, _bound()
 	, _view()
 	, _backgroundColor({ 250, 220, 192, 255 }) // light tan color
 	, _initialized()
 	, _frame(0)
 {
-	for (size_t i = 0; i < _boundIds.size(); i++)
+	for (size_t i = 0; i < _bound.size(); i++)
 	{
-		_boundIds[i] = ERROR_ID;
+		_bound[i] = nullptr;
 	}
 }
 
@@ -111,10 +108,11 @@ RenderEngine::~RenderEngine()
 
 void minty::RenderEngine::init(RenderEngineBuilder const& builder)
 {
-	// keep track of builder
-	_builder = &builder;
+	if (_initialized) return; // already initialized, do nothing
 
-	create_instance();
+	_window = builder.window;
+
+	create_instance(builder);
 	setup_debug_messenger();
 	create_surface();
 	pick_physical_device();
@@ -130,9 +128,6 @@ void minty::RenderEngine::init(RenderEngineBuilder const& builder)
 	create_sync_objects();
 
 	_initialized = true;
-
-	// builder no longer needed
-	_builder = nullptr;
 }
 
 void RenderEngine::render_frame()
@@ -149,20 +144,17 @@ void RenderEngine::render_frame()
 		return;
 	}
 	else if (r != VK_SUCCESS && r != VK_SUBOPTIMAL_KHR) {
-		Error::abort("Failed to acquire swap chain image.");
+		MINTY_ABORT("Failed to acquire swap chain image.");
 	}
+
+	// record the command buffer so we know what to do to render stuff to the screen
+	record_command_buffer(_commandBuffers[_frame], imageIndex);
 
 	// reset the fence states so they can be used to wait again
 	vkResetFences(_device, 1, &_inFlightFences[_frame]);
 
 	// reset command buffer
-	vkResetCommandBuffer(_commandBuffers[_frame], 0);
-
-	// record the command buffer so we know what to do to render stuff to the screen
-	record_command_buffer(_commandBuffers[_frame], imageIndex);
-
-	// update uniform information
-	//update_uniform_buffer();
+	//vkResetCommandBuffer(_commandBuffers[_frame], 0);
 
 	// submit the command buffer
 	VkSubmitInfo submitInfo
@@ -212,7 +204,7 @@ void RenderEngine::render_frame()
 		recreate_swap_chain();
 	}
 	else if (r != VK_SUCCESS) {
-		Error::abort("Failed to present swap chain image.");
+		MINTY_ABORT("Failed to present swap chain image.");
 	}
 
 	// move to next frame
@@ -220,9 +212,41 @@ void RenderEngine::render_frame()
 	if (_frame == MAX_FRAMES_IN_FLIGHT) _frame = 0;
 }
 
-bool RenderEngine::is_running() const
+void minty::RenderEngine::set_camera(Vector3 const position, Quaternion const rotation, Camera const& camera)
 {
-	return _window->is_open();
+	Matrix4 view = glm::lookAt(position, position + forward(rotation), Vector3(0.0f, 1.0f, 0.0f));
+
+	// TODO: don't use lookat
+	// maybe invert global?
+
+	// get projection
+	Matrix4 proj;
+	switch (camera.get_perspective())
+	{
+	case Perspective::Perspective:
+		proj = glm::perspective(camera.get_fov(), get_aspect_ratio(), camera.get_near(), camera.get_far());
+		break;
+	default: // (orthographic)
+		proj = Matrix4(1.0f);
+		break;
+	}
+
+	// multiply together
+	Matrix4 transformMatrix = proj * view;
+
+	// update buffer object
+	CameraBufferObject obj =
+	{
+		.transform = transformMatrix,
+	};
+
+	AssetEngine& assets = get_runtime().get_asset_engine();
+
+	// update all shaders
+	for (auto const shader : assets.get_by_type<Shader>())
+	{
+		shader->update_global_uniform_constant("camera", get_frame(), &obj, sizeof(CameraBufferObject), 0);
+	}
 }
 
 bool minty::RenderEngine::is_initialized() const
@@ -230,12 +254,30 @@ bool minty::RenderEngine::is_initialized() const
 	return _initialized;
 }
 
-void RenderEngine::create_instance()
+void minty::RenderEngine::set_loaded_scene(Scene* const scene)
+{
+	Engine::set_loaded_scene(scene);
+
+	_scene = scene;
+
+	if (scene)
+	{
+		_renderSystem = scene->get_system_registry().find<RenderSystem>();
+		_registry = &scene->get_entity_registry();
+	}
+	else
+	{
+		_renderSystem = nullptr;
+		_registry = nullptr;
+	}
+}
+
+void RenderEngine::create_instance(RenderEngineBuilder const& builder)
 {
 	// check if we can use validation layers
 	if (enableValidationLayers && !check_validation_layer_support())
 	{
-		Error::abort("Validation layers requested, but not available.");
+		MINTY_ABORT("Validation layers requested, but not available.");
 	}
 
 	// get glfw extensions
@@ -246,7 +288,7 @@ void RenderEngine::create_instance()
 
 	VkApplicationInfo appInfo;
 
-	Info const* const info = _builder->info;
+	Info const* const info = builder.info;
 
 	if (info)
 	{
@@ -290,9 +332,9 @@ void RenderEngine::create_instance()
 		createInfo.pNext = nullptr;
 	}
 
-	if (vkCreateInstance(&createInfo, nullptr, &instance) != VK_SUCCESS)
+	if (vkCreateInstance(&createInfo, nullptr, &_instance) != VK_SUCCESS)
 	{
-		Error::abort("failed to create instance!");
+		MINTY_ABORT("failed to create instance!");
 	}
 }
 
@@ -321,7 +363,7 @@ VkFormat RenderEngine::find_supported_format(const std::vector<VkFormat>& candid
 		}
 	}
 
-	Error::abort("Failed to find_animation supported format.");
+	MINTY_ABORT("Failed to find_animation supported format.");
 
 	return VkFormat();
 }
@@ -351,7 +393,7 @@ void RenderEngine::create_image(uint32_t width, uint32_t height, VkFormat format
 	imageInfo.sharingMode = VK_SHARING_MODE_EXCLUSIVE;
 
 	if (vkCreateImage(_device, &imageInfo, nullptr, &image) != VK_SUCCESS) {
-		Error::abort("Failed to create image.");
+		MINTY_ABORT("Failed to create image.");
 	}
 
 	VkMemoryRequirements memRequirements;
@@ -363,7 +405,7 @@ void RenderEngine::create_image(uint32_t width, uint32_t height, VkFormat format
 	allocInfo.memoryTypeIndex = find_memory_type(memRequirements.memoryTypeBits, properties);
 
 	if (vkAllocateMemory(_device, &allocInfo, nullptr, &imageMemory) != VK_SUCCESS) {
-		Error::abort("Failed to allocate image memory.");
+		MINTY_ABORT("Failed to allocate image memory.");
 	}
 
 	vkBindImageMemory(_device, image, imageMemory, 0);
@@ -394,6 +436,78 @@ float minty::RenderEngine::get_aspect_ratio() const
 	return static_cast<float>(_swapChainExtent.width) / static_cast<float>(_swapChainExtent.height);
 }
 
+UUID minty::RenderEngine::get_or_create_mesh(MeshType const type)
+{
+	switch (type)
+	{
+	case MeshType::Empty:
+	case MeshType::Custom:
+		return UUID(INVALID_UUID);
+	}
+
+	auto found = _builtinMeshes.find(type);
+
+	if (found != _builtinMeshes.end())
+	{
+		// already exists
+		return found->second;
+	}
+
+	// create new
+	MeshBuilder builder
+	{
+
+	};
+	Mesh* mesh = new Mesh(builder, get_runtime());
+
+	// create data
+	switch (type)
+	{
+	case MeshType::Quad:
+		Mesh::create_primitive_quad(*mesh);
+		break;
+	case MeshType::Cube:
+		Mesh::create_primitive_cube(*mesh);
+		break;
+	case MeshType::Pyramid:
+		Mesh::create_primitive_pyramid(*mesh);
+		break;
+	case MeshType::Sphere:
+		Mesh::create_primitive_sphere(*mesh);
+		break;
+	case MeshType::Cylinder:
+		Mesh::create_primitive_cylinder(*mesh);
+		break;
+	default:
+		Console::todo(std::format("RenderEngine::get_or_create_mesh(): Type: {}", static_cast<int>(type)));
+		break;
+	}
+
+	// add to assets
+	AssetEngine& assets = get_runtime().get_asset_engine();
+	assets.emplace(mesh);
+
+	// add to built in
+	_builtinMeshes.emplace(type, mesh->get_id());
+
+	return mesh->get_id();
+}
+
+Viewport& minty::RenderEngine::get_viewport()
+{
+	return _view;
+}
+
+Viewport const& minty::RenderEngine::get_viewport() const
+{
+	return _view;
+}
+
+void minty::RenderEngine::set_viewport(Viewport const& viewport)
+{
+	_view = viewport;
+}
+
 VkImageView RenderEngine::create_image_view(VkImage image, VkFormat format, VkImageAspectFlags aspectFlags) {
 	VkImageViewCreateInfo viewInfo{};
 	viewInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -408,7 +522,7 @@ VkImageView RenderEngine::create_image_view(VkImage image, VkFormat format, VkIm
 
 	VkImageView imageView;
 	if (vkCreateImageView(_device, &viewInfo, nullptr, &imageView) != VK_SUCCESS) {
-		Error::abort("Failed to create texture image view.");
+		MINTY_ABORT("Failed to create texture image view.");
 	}
 
 	return imageView;
@@ -416,7 +530,8 @@ VkImageView RenderEngine::create_image_view(VkImage image, VkFormat format, VkIm
 
 VkShaderModule minty::RenderEngine::load_shader_module(String const& path) const
 {
-	return create_shader_module(Asset::load_chars(path));
+	AssetEngine& assets = get_runtime().get_asset_engine();
+	return create_shader_module(assets.read_file(path));
 }
 
 VkShaderModule minty::RenderEngine::create_shader_module(std::vector<char> const& code) const
@@ -430,7 +545,7 @@ VkShaderModule minty::RenderEngine::create_shader_module(std::vector<char> const
 
 	VkShaderModule shaderModule;
 	if (vkCreateShaderModule(_device, &createInfo, nullptr, &shaderModule) != VK_SUCCESS) {
-		Error::abort("Failed to create shader module.");
+		MINTY_ABORT("Failed to create shader module.");
 	}
 
 	return shaderModule;
@@ -568,8 +683,8 @@ void RenderEngine::create_image_views()
 void RenderEngine::create_surface()
 {
 	// create window surface that vulkan can use to draw
-	if (glfwCreateWindowSurface(instance, _window->get_raw(), nullptr, &_surface) != VK_SUCCESS) {
-		Error::abort("Failed to create window surface.");
+	if (glfwCreateWindowSurface(_instance, _window->get_raw(), nullptr, &_surface) != VK_SUCCESS) {
+		MINTY_ABORT("Failed to create window surface.");
 	}
 }
 
@@ -577,17 +692,17 @@ void RenderEngine::pick_physical_device()
 {
 	// find number of hardware GPUs
 	uint32_t deviceCount = 0;
-	vkEnumeratePhysicalDevices(instance, &deviceCount, nullptr);
+	vkEnumeratePhysicalDevices(_instance, &deviceCount, nullptr);
 
 	// if zero, error
 	if (deviceCount == 0)
 	{
-		Error::abort("Failed to find_animation GPU's with Vulkan support.");
+		MINTY_ABORT("Failed to find_animation GPU's with Vulkan support.");
 	}
 
 	// get devices
 	std::vector<VkPhysicalDevice> devices(deviceCount);
-	vkEnumeratePhysicalDevices(instance, &deviceCount, devices.data());
+	vkEnumeratePhysicalDevices(_instance, &deviceCount, devices.data());
 
 	// find a suitable device, pick the first one
 	for (const auto& device : devices) {
@@ -599,7 +714,7 @@ void RenderEngine::pick_physical_device()
 
 	// none found
 	if (_physicalDevice == VK_NULL_HANDLE) {
-		Error::abort("Failed to find_animation a suitable GPU.");
+		MINTY_ABORT("Failed to find_animation a suitable GPU.");
 	}
 }
 
@@ -689,7 +804,7 @@ void RenderEngine::create_swap_chain()
 
 	// create swap chain
 	if (vkCreateSwapchainKHR(_device, &createInfo, nullptr, &_swapChain) != VK_SUCCESS) {
-		Error::abort("Failed to create swap chain.");
+		MINTY_ABORT("Failed to create swap chain.");
 	}
 
 	vkGetSwapchainImagesKHR(_device, _swapChain, &imageCount, nullptr);
@@ -773,7 +888,7 @@ VkPresentModeKHR RenderEngine::choose_swap_present_mode(const std::vector<VkPres
 
 VkSurfaceFormatKHR RenderEngine::choose_swap_surface_format(const std::vector<VkSurfaceFormatKHR>& availableFormats) {
 	for (const auto& availableFormat : availableFormats) {
-		// VK_FORMAT_R8G8B8A8_UINT?
+		// VK_FORMAT_R8G8B8A8_UINT
 		if (availableFormat.format == VK_FORMAT_B8G8R8A8_SRGB && availableFormat.colorSpace == VK_COLOR_SPACE_SRGB_NONLINEAR_KHR) {
 			return availableFormat;
 		}
@@ -922,15 +1037,22 @@ void RenderEngine::create_logical_device()
 	}
 
 	if (vkCreateDevice(_physicalDevice, &createInfo, nullptr, &_device) != VK_SUCCESS) {
-		Error::abort("Failed to create logical device.");
+		MINTY_ABORT("Failed to create logical device.");
 	}
 
 	vkGetDeviceQueue(_device, indices.graphicsFamily.value(), 0, &_graphicsQueue);
 	vkGetDeviceQueue(_device, indices.presentFamily.value(), 0, &_presentQueue);
 }
 
+void minty::RenderEngine::draw(VkCommandBuffer commandBuffer)
+{
+	draw_scene(commandBuffer);
+}
+
 void minty::RenderEngine::draw_scene(VkCommandBuffer commandBuffer)
 {
+	if (!_registry) return;
+
 	// sort sprites so they render in the correct order, since Z does not matter
 	_registry->sort<SpriteComponent>([](SpriteComponent const& left, SpriteComponent const& right)
 		{
@@ -940,8 +1062,11 @@ void minty::RenderEngine::draw_scene(VkCommandBuffer commandBuffer)
 	TransformComponent const* transformComponent;
 
 	// draw all meshes in the scene
-	for (auto&& [entity, renderable, mesh] : _registry->view<RenderableComponent const, MeshComponent>().each())
+	for (auto&& [entity, mesh, renderable, enabled] : _registry->view<MeshComponent, RenderableComponent const, EnabledComponent const>().each())
 	{
+		// skip empty meshes
+		if (mesh.type == MeshType::Empty) continue;
+
 		// get transform for entity
 		transformComponent = _registry->try_get<TransformComponent>(entity);
 
@@ -958,7 +1083,7 @@ void minty::RenderEngine::draw_scene(VkCommandBuffer commandBuffer)
 	}
 
 	// draw all world sprites in the scene
-	for (auto&& [entity, renderable, transform, sprite] : _registry->view<RenderableComponent const, TransformComponent const, SpriteComponent const>().each())
+	for (auto&& [entity, renderable, transform, sprite, enabled] : _registry->view<RenderableComponent const, TransformComponent const, SpriteComponent const, EnabledComponent const>().each())
 	{
 		draw_sprite(commandBuffer, transform, sprite);
 	}
@@ -967,25 +1092,24 @@ void minty::RenderEngine::draw_scene(VkCommandBuffer commandBuffer)
 	_registry->sort<UITransformComponent, SpriteComponent>();
 
 	// draw all UI in scene
-	for (auto&& [entity, renderable, ui, sprite] : _registry->view<RenderableComponent const, UITransformComponent const, SpriteComponent const>().each())
+	for (auto&& [entity, renderable, ui, sprite, enabled] : _registry->view<RenderableComponent const, UITransformComponent const, SpriteComponent const, EnabledComponent const>().each())
 	{
 		draw_ui(commandBuffer, ui, sprite);
 	}
 
 	// unbind any shaders used
-	bind(commandBuffer, ERROR_ID);
-	//bind_shader(commandBuffer, nullptr);
+	bind(commandBuffer, nullptr);
 }
 
 void minty::RenderEngine::draw_mesh(VkCommandBuffer commandBuffer, Matrix4 const& transformationMatrix, MeshComponent const& meshComponent)
 {
-	// do nothing if null mesh
-	if (meshComponent.meshId == ERROR_ID)
+	// do nothing if null mesh or null material
+	if (!meshComponent.mesh || !meshComponent.material)
 	{
 		return;
 	}
 
-	Mesh& mesh = _renderSystem->get_mesh(meshComponent.meshId);
+	Mesh& mesh = *meshComponent.mesh;
 
 	// do nothing if empty mesh
 	if (mesh.empty())
@@ -995,13 +1119,13 @@ void minty::RenderEngine::draw_mesh(VkCommandBuffer commandBuffer, Matrix4 const
 
 	// bind the material, which will bind the shader and update its values
 	//bind_shader(commandBuffer, &shader);
-	bind(commandBuffer, meshComponent.materialId);
+	bind(commandBuffer, meshComponent.material);
 
 	// bind vertex data
-	VkBuffer vertexBuffers[] = { get_buffer(mesh.get_vertex_buffer_id()) };
+	VkBuffer vertexBuffers[] = { mesh.get_vertex_buffer()->get_buffer() };
 	VkDeviceSize offsets[] = { 0 };
 	vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
-	vkCmdBindIndexBuffer(commandBuffer, get_buffer(mesh.get_index_buffer_id()), 0, mesh.get_index_type());
+	vkCmdBindIndexBuffer(commandBuffer, mesh.get_index_buffer()->get_buffer(), 0, mesh.get_index_type());
 
 	// send push constants so we know where to draw
 	Matrix4 tmatrix = transformationMatrix;
@@ -1009,8 +1133,9 @@ void minty::RenderEngine::draw_mesh(VkCommandBuffer commandBuffer, Matrix4 const
 	{
 		.transform = tmatrix,
 	};
-	Shader& shader = _renderSystem->get_shader_from_material_id(meshComponent.materialId);
-	shader.update_push_constant(commandBuffer, &info, sizeof(DrawCallObject3D));
+	// TODO: make safer
+	Shader* shader = meshComponent.material->get_template()->get_shader_passes().front()->get_shader();
+	shader->update_push_constant(commandBuffer, &info, sizeof(DrawCallObject3D));
 
 	// draw
 	vkCmdDrawIndexed(commandBuffer, mesh.get_index_count(), 1, 0, 0, 0);
@@ -1019,16 +1144,16 @@ void minty::RenderEngine::draw_mesh(VkCommandBuffer commandBuffer, Matrix4 const
 void minty::RenderEngine::draw_sprite(VkCommandBuffer commandBuffer, TransformComponent const& transformComponent, SpriteComponent const& spriteComponent)
 {
 	// if no sprite, skip and draw nothing
-	if(spriteComponent.spriteId == ERROR_ID)
+	if(!spriteComponent.sprite)
 	{
 		return;
 	}
 
 	// get the sprite
-	Sprite const& sprite = _renderSystem->get_sprite(spriteComponent.spriteId);
+	Sprite const& sprite = *spriteComponent.sprite;
 
 	// bind the material the sprite is using
-	bind(commandBuffer, sprite.get_material_id());
+	bind(commandBuffer, sprite.get_material());
 
 	// get the data
 	SpritePushData pushData
@@ -1041,8 +1166,9 @@ void minty::RenderEngine::draw_sprite(VkCommandBuffer commandBuffer, TransformCo
 	};
 
 	// push data to shader
-	Shader& shader = _renderSystem->get_shader_from_material_id(sprite.get_material_id());
-	shader.update_push_constant(commandBuffer, &pushData, sizeof(SpritePushData));
+	// TODO: fix, make this safe
+	Shader* shader = sprite.get_material()->get_template()->get_shader_passes().front()->get_shader();
+	shader->update_push_constant(commandBuffer, &pushData, sizeof(SpritePushData));
 
 	// draw
 	vkCmdDraw(commandBuffer, 6, 1, 0, 0);
@@ -1050,7 +1176,7 @@ void minty::RenderEngine::draw_sprite(VkCommandBuffer commandBuffer, TransformCo
 
 void minty::RenderEngine::draw_ui(VkCommandBuffer commandBuffer, UITransformComponent const& uiComponent, SpriteComponent const& spriteComponent)
 {
-	Console::todo("fix draw_ui");
+	Console::todo("fix RenderEngine::draw_ui");
 	//// get the sprite
 	//Sprite const& sprite = get_sprite(spriteComponent.spriteId);
 
@@ -1178,8 +1304,8 @@ void RenderEngine::setup_debug_messenger() {
 	VkDebugUtilsMessengerCreateInfoEXT createInfo;
 	populate_debug_messenger_create_info(createInfo);
 
-	if (CreateDebugUtilsMessengerEXT(instance, &createInfo, nullptr, &_debugMessenger) != VK_SUCCESS) {
-		Error::abort("Failed to set up debug messenger.");
+	if (CreateDebugUtilsMessengerEXT(_instance, &createInfo, nullptr, &_debugMessenger) != VK_SUCCESS) {
+		MINTY_ABORT("Failed to set up debug messenger.");
 	}
 }
 
@@ -1272,7 +1398,7 @@ void RenderEngine::create_render_pass()
 	renderPassInfo.pDependencies = &dependency;
 
 	if (vkCreateRenderPass(_device, &renderPassInfo, nullptr, &_renderPass) != VK_SUCCESS) {
-		Error::abort("Failed to create render pass.");
+		MINTY_ABORT("Failed to create render pass.");
 	}
 }
 
@@ -1297,12 +1423,12 @@ void RenderEngine::create_framebuffers()
 		framebufferInfo.layers = 1;
 
 		if (vkCreateFramebuffer(_device, &framebufferInfo, nullptr, &_swapChainFramebuffers[i]) != VK_SUCCESS) {
-			Error::abort("Failed to create framebuffer.");
+			MINTY_ABORT("Failed to create framebuffer.");
 		}
 	}
 }
 
-ID minty::RenderEngine::create_buffer(VkDeviceSize const size, VkBufferUsageFlags const usage, VkMemoryPropertyFlags const properties)
+Buffer const& minty::RenderEngine::create_buffer(VkDeviceSize const size, VkBufferUsageFlags const usage, VkMemoryPropertyFlags const properties)
 {
 	VkBuffer buffer;
 	VkDeviceMemory bufferMemory;
@@ -1327,60 +1453,47 @@ ID minty::RenderEngine::create_buffer(VkDeviceSize const size, VkBufferUsageFlag
 
 	VK_ASSERT(vkBindBufferMemory(_device, buffer, bufferMemory, 0), "Failed to bind buffer memory.");
 
-	return _buffers.emplace(Buffer(buffer, bufferMemory, size));
+	AssetEngine& assets = get_runtime().get_asset_engine();
+	BufferBuilder builder
+	{
+		.buffer = buffer,
+		.memory = bufferMemory,
+		.size = size
+	};
+	Buffer* b = new Buffer(builder, get_runtime());
+	assets.emplace(b);
+	return *b;
 }
 
-ID minty::RenderEngine::create_buffer_uniform(VkDeviceSize const size)
+Buffer const& minty::RenderEngine::create_buffer_uniform(VkDeviceSize const size)
 {
 	return create_buffer(size, VkBufferUsageFlagBits::VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 }
 
-void minty::RenderEngine::destroy_buffer(ID const id)
+void* minty::RenderEngine::map_buffer(Buffer const& buffer) const
 {
-	if (!_buffers.contains(id))
-	{
-		return;
-	}
-
-	// destroy the buffer with the id
-	destroy_buffer(_buffers.at(id));
-
-	// remove it from the list
-	_buffers.erase(id);
-}
-
-void* minty::RenderEngine::map_buffer(ID const id) const
-{
-	Buffer const& buffer = _buffers.at(id);
-
 	void* data = nullptr;
 
-	VK_ASSERT(vkMapMemory(_device, buffer.memory, 0, buffer.size, 0, &data), "Failed to map memory for new buffer.");
+	VK_ASSERT(vkMapMemory(_device, buffer.get_memory(), 0, buffer.get_size(), 0, &data), "Failed to map memory for new buffer.");
 
 	return data;
 }
 
-void minty::RenderEngine::unmap_buffer(ID const id) const
+void minty::RenderEngine::unmap_buffer(Buffer const& buffer) const
 {
-	Buffer const& buffer = _buffers.at(id);
-
-	vkUnmapMemory(_device, buffer.memory);
+	vkUnmapMemory(_device, buffer.get_memory());
 }
 
-void minty::RenderEngine::set_buffer(ID const id, void const* const data)
+void minty::RenderEngine::set_buffer(Buffer const& buffer, void const* const data)
 {
-	Buffer const& buffer = _buffers.at(id);
-
 	// set whole buffer
-	set_buffer(id, data, 0, buffer.size);
+	set_buffer(buffer, data, 0, buffer.get_size());
 }
 
-void minty::RenderEngine::set_buffer(ID const id, void const* const data, VkDeviceSize const size, VkDeviceSize const offset)
+void minty::RenderEngine::set_buffer(Buffer const& buffer, void const* const data, VkDeviceSize const size, VkDeviceSize const offset)
 {
-	Buffer const& buffer = _buffers.at(id);
-
 	// map data
-	void* mappedData = map_buffer(id);
+	void* mappedData = map_buffer(buffer);
 
 	// offset if needed
 	if (offset)
@@ -1396,52 +1509,36 @@ void minty::RenderEngine::set_buffer(ID const id, void const* const data, VkDevi
 	memcpy(mappedData, data, size);
 
 	// unmap data
-	unmap_buffer(id);
+	unmap_buffer(buffer);
 }
 
-VkBuffer minty::RenderEngine::get_buffer(ID const id) const
+void minty::RenderEngine::get_buffer_data(Buffer const& buffer, void* const out) const
 {
-	return _buffers.at(id).buffer;
-}
-
-void minty::RenderEngine::get_buffer_data(ID const id, void* const out) const
-{
-	// get buffer
-	Buffer const& buffer = _buffers.at(id);
-
 	// map data
-	void* data = map_buffer(id);
+	void* data = map_buffer(buffer);
 
 	// copy out data
-	memcpy(out, data, buffer.size);
+	memcpy(out, data, buffer.get_size());
 
 	// unmap
-	unmap_buffer(id);
+	unmap_buffer(buffer);
 }
 
-VkDeviceSize minty::RenderEngine::get_buffer_size(ID const id) const
+void minty::RenderEngine::copy_buffer(Buffer const& src, Buffer const& dst, VkDeviceSize const size)
 {
-	return _buffers.at(id).size;
-}
-
-void minty::RenderEngine::copy_buffer(ID const srcId, ID const dstId, VkDeviceSize const size)
-{
-	Buffer const& srcBuffer = _buffers.at(srcId);
-	Buffer const& dstBuffer = _buffers.at(dstId);
-
 	VkCommandBuffer commandBuffer = begin_single_time_commands(_commandPool);
 
 	VkBufferCopy copyRegion{};
 	copyRegion.size = size;
-	vkCmdCopyBuffer(commandBuffer, srcBuffer.buffer, dstBuffer.buffer, 1, &copyRegion);
+	vkCmdCopyBuffer(commandBuffer, src.get_buffer(), dst.get_buffer(), 1, &copyRegion);
 
 	end_single_time_commands(commandBuffer, _commandPool);
 }
 
 void minty::RenderEngine::destroy_buffer(Buffer const& buffer)
 {
-	vkDestroyBuffer(_device, buffer.buffer, nullptr);
-	vkFreeMemory(_device, buffer.memory, nullptr);
+	AssetEngine& assets = get_runtime().get_asset_engine();
+	assets.unload(buffer);
 }
 
 uint32_t RenderEngine::find_memory_type(uint32_t typeFilter, VkMemoryPropertyFlags properties)
@@ -1455,7 +1552,7 @@ uint32_t RenderEngine::find_memory_type(uint32_t typeFilter, VkMemoryPropertyFla
 		}
 	}
 
-	Error::abort("Failed to find_animation suitable memory type.");
+	MINTY_ABORT("Failed to find_animation suitable memory type.");
 	return 0;
 }
 
@@ -1470,7 +1567,7 @@ void RenderEngine::create_command_pool(VkCommandPool& commandPool)
 	};
 
 	if (vkCreateCommandPool(_device, &poolInfo, nullptr, &commandPool) != VK_SUCCESS) {
-		Error::abort("Failed to create command pool.");
+		MINTY_ABORT("Failed to create command pool.");
 	}
 }
 
@@ -1489,7 +1586,7 @@ void RenderEngine::create_command_buffers()
 	};
 
 	if (vkAllocateCommandBuffers(_device, &allocInfo, _commandBuffers.data()) != VK_SUCCESS) {
-		Error::abort("Failed to allocate command buffers.");
+		MINTY_ABORT("Failed to allocate command buffers.");
 	}
 }
 
@@ -1515,12 +1612,13 @@ void RenderEngine::record_command_buffer(VkCommandBuffer commandBuffer, uint32_t
 	VkCommandBufferBeginInfo beginInfo
 	{
 		.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO,
-		.flags = 0, // Optional
-		.pInheritanceInfo = nullptr, // Optional
+#ifdef MINTY_IMGUI
+		.flags = VK_COMMAND_BUFFER_USAGE_ONE_TIME_SUBMIT_BIT,
+#endif
 	};
 
 	if (vkBeginCommandBuffer(commandBuffer, &beginInfo) != VK_SUCCESS) {
-		Error::abort("Failed to begin recording command buffer.");
+		MINTY_ABORT("Failed to begin recording command buffer.");
 	}
 
 	// begin the render pass
@@ -1557,13 +1655,13 @@ void RenderEngine::record_command_buffer(VkCommandBuffer commandBuffer, uint32_t
 	_view.bind(commandBuffer);
 
 	// render meshes
-	draw_scene(commandBuffer);
+	draw(commandBuffer);
 
 	// done rendering
 	vkCmdEndRenderPass(commandBuffer);
 
 	if (vkEndCommandBuffer(commandBuffer) != VK_SUCCESS) {
-		Error::abort("Failed to record command buffer.");
+		MINTY_ABORT("Failed to record command buffer.");
 	}
 }
 
@@ -1596,7 +1694,7 @@ void RenderEngine::create_sync_objects()
 			vkCreateSemaphore(_device, &semaphoreInfo, nullptr, &_renderFinishedSemaphores[i]) != VK_SUCCESS ||
 			vkCreateFence(_device, &fenceInfo, nullptr, &_inFlightFences[i]) != VK_SUCCESS) {
 
-			Error::abort("Failed to create synchronization objects for a frame.");
+			MINTY_ABORT("Failed to create synchronization objects for a frame.");
 		}
 	}
 }
@@ -1613,12 +1711,6 @@ void RenderEngine::destroy()
 	// clean up vulkan
 	cleanup_swap_chain();
 
-	for (auto& buffer : _buffers)
-	{
-		destroy_buffer(buffer.second);
-	}
-	_buffers.clear();
-
 	// destroy renderer data
 	for (size_t i = 0; i < MAX_FRAMES_IN_FLIGHT; i++) {
 		vkDestroySemaphore(_device, _renderFinishedSemaphores[i], nullptr);
@@ -1629,10 +1721,10 @@ void RenderEngine::destroy()
 	vkDestroyRenderPass(_device, _renderPass, nullptr);
 	vkDestroyDevice(_device, nullptr);
 	if (enableValidationLayers) {
-		DestroyDebugUtilsMessengerEXT(instance, _debugMessenger, nullptr);
+		DestroyDebugUtilsMessengerEXT(_instance, _debugMessenger, nullptr);
 	}
-	vkDestroySurfaceKHR(instance, _surface, nullptr);
-	vkDestroyInstance(instance, nullptr);
+	vkDestroySurfaceKHR(_instance, _surface, nullptr);
+	vkDestroyInstance(_instance, nullptr);
 
 	_initialized = false;
 }
@@ -1640,15 +1732,15 @@ void RenderEngine::destroy()
 void minty::RenderEngine::bind(VkCommandBuffer const commandBuffer)
 {
 	// bind using the bound ids
-	if (_boundIds.at(0) == ERROR_ID)
+	if (!_bound.at(0))
 	{
 		return;
 	}
 
 	// get references to grab descriptor sets from
-	Shader const& shader = _renderSystem->get_shader(_boundIds.at(BIND_SHADER));
-	ShaderPass const& shaderPass = _renderSystem->get_shader_pass(_boundIds.at(BIND_SHADER_PASS));
-	Material const& material = _renderSystem->get_material(_boundIds.at(BIND_MATERIAL));
+	Shader const& shader = *static_cast<Shader const*>(_bound.at(BIND_SHADER));
+	ShaderPass const& shaderPass = *static_cast<ShaderPass const*>(_bound.at(BIND_SHADER_PASS));
+	Material const& material = *static_cast<Material const*>(_bound.at(BIND_MATERIAL));
 
 	// set descriptor sets we actually care about
 	std::array<VkDescriptorSet, DESCRIPTOR_SET_COUNT> descriptorSets;
@@ -1661,54 +1753,52 @@ void minty::RenderEngine::bind(VkCommandBuffer const commandBuffer)
 	vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, shader.get_pipeline_layout(), 0, DESCRIPTOR_SET_COUNT, descriptorSets.data(), 0, nullptr);
 }
 
-void minty::RenderEngine::bind(VkCommandBuffer const commandBuffer, ID const materialId, uint32_t const pass)
+void minty::RenderEngine::bind(VkCommandBuffer const commandBuffer, Material const* const material, uint32_t const pass)
 {
 	// if ERROR_ID material, unbind all
-	if (materialId == ERROR_ID)
+	if (!material)
 	{
-		for (size_t i = 0; i < _boundIds.size(); i++)
+		for (size_t i = 0; i < _bound.size(); i++)
 		{
-			_boundIds[i] = ERROR_ID;
+			_bound[i] = nullptr;
 		}
 		return;
 	}
 
 	// if the same, do nothing
-	if (_boundIds.at(BIND_MATERIAL) == materialId)
+	if (_bound.at(BIND_MATERIAL) == material)
 	{
 		return;
 	}
 
 	// new material, so update bound ids and bind descriptor sets as needed
 
-	_boundIds[BIND_MATERIAL] = materialId;
+	_bound[BIND_MATERIAL] = material;
 
-	Material const& material = _renderSystem->get_material(materialId);
-	ID const materialTemplateId = material.get_template_id();
+	MaterialTemplate const* materialTemplate = material->get_template();
 
-	if (_boundIds.at(BIND_MATERIAL_TEMPLATE) == materialTemplateId)
+	if (_bound.at(BIND_MATERIAL_TEMPLATE) == materialTemplate)
 	{
 		// only update material
 		bind(commandBuffer);
 		return;
 	}
 
-	_boundIds[BIND_MATERIAL_TEMPLATE] = materialTemplateId;
-	MaterialTemplate const& materialTemplate = _renderSystem->get_material_template(materialTemplateId);
-	ID const shaderPassId = materialTemplate.get_shader_pass_ids().front();
+	_bound[BIND_MATERIAL_TEMPLATE] = materialTemplate;
+	// TODO: do all passes?
+	ShaderPass const* shaderPass = materialTemplate->get_shader_passes().front();
 
-	if (_boundIds.at(BIND_SHADER_PASS) == shaderPassId)
+	if (_bound.at(BIND_SHADER_PASS) == shaderPass)
 	{
 		// only update material and material template
 		bind(commandBuffer);
 		return;
 	}
 
-	_boundIds[BIND_SHADER_PASS] = shaderPassId;
-	ShaderPass const& shaderPass = _renderSystem->get_shader_pass(shaderPassId);
-	ID const shaderId = shaderPass.get_shader_id();
+	_bound[BIND_SHADER_PASS] = shaderPass;
+	Shader const* shader = shaderPass->get_shader();
 
-	if (_boundIds.at(BIND_SHADER) == shaderId)
+	if (_bound.at(BIND_SHADER) == shader)
 	{
 		// only update material, material template, and shader pass
 		bind(commandBuffer);
@@ -1716,7 +1806,7 @@ void minty::RenderEngine::bind(VkCommandBuffer const commandBuffer, ID const mat
 	}
 
 	// update everything
-	_boundIds[BIND_SHADER] = shaderId;
+	_bound[BIND_SHADER] = shader;
 	bind(commandBuffer);
 }
 

@@ -1,22 +1,79 @@
 #pragma once
-#include "M_RenderObject.h"
+#include "M_Asset.h"
 
 #include "M_DescriptorSet.h"
 
-#include "vulkan.h"
+#include "M_Vulkan.h"
 
 namespace minty
 {
-	struct ShaderPassBuilder;
+	class Shader;
+
+	/// <summary>
+	/// Holds data to create a new ShaderPass.
+	/// </summary>
+	struct ShaderPassBuilder
+	{
+		/// <summary>
+		/// Holds info for a stage in the shader.
+		/// </summary>
+		struct ShaderStageInfo
+		{
+			VkShaderStageFlagBits stage;
+			std::vector<char> code;
+			String entry;
+		};
+
+		UUID id;
+
+		Path path;
+
+		Shader* shader;
+
+		/// <summary>
+		/// The topology for this ShaderPass. The type of primitive shapes that the GPU interprets the vertex data as (points, lines, triangles...)
+		/// </summary>
+		VkPrimitiveTopology topology;
+		/// <summary>
+		/// The polygon mode for this ShaderPass. The way each primitive shape is drawn (line, triangle...)
+		/// </summary>
+		VkPolygonMode polygonMode;
+		/// <summary>
+		/// The cull mode for this ShaderPass. The side that will not be drawn.
+		/// </summary>
+		VkCullModeFlags cullMode;
+		/// <summary>
+		/// The front face for this ShaderPass. The direction vertices must travel for it to be considered a front side.
+		/// </summary>
+		VkFrontFace frontFace;
+		/// <summary>
+		/// The width of the line if the polygon mode is not fill.
+		/// </summary>
+		float lineWidth;
+
+		/// <summary>
+		/// The vertex bindings.
+		/// </summary>
+		std::vector<VkVertexInputBindingDescription> vertexBindings;
+		/// <summary>
+		/// The vertex attributes.
+		/// </summary>
+		std::vector<VkVertexInputAttributeDescription> vertexAttributes;
+
+		/// <summary>
+		/// The shader stages.
+		/// </summary>
+		std::vector<ShaderStageInfo> stages;
+	};
 	
 	/// <summary>
 	/// Holds data for a ShaderPass.
 	/// </summary>
 	class ShaderPass
-		: public RenderObject
+		: public Asset
 	{
 	private:
-		ID _shaderId;
+		Shader* _shader;
 
 		VkPipeline _pipeline;
 
@@ -33,7 +90,9 @@ namespace minty
 		/// </summary>
 		/// <param name="builder"></param>
 		/// <param name="renderer"></param>
-		ShaderPass(ShaderPassBuilder const& builder, Engine& engine, ID const sceneId);
+		ShaderPass(ShaderPassBuilder const& builder, Runtime& engine);
+
+		~ShaderPass();
 
 		/// <summary>
 		/// Destroys all of the resources associated with this ShaderPass.
@@ -44,7 +103,7 @@ namespace minty
 		/// Gets the Shader ID for this ShaderPass.
 		/// </summary>
 		/// <returns></returns>
-		ID get_shader_id() const;
+		Shader* get_shader() const;
 
 		/// <summary>
 		/// Gets the pipeline for this ShaderPass.

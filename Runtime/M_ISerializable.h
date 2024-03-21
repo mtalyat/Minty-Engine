@@ -1,11 +1,12 @@
 #pragma once
 
 #include "M_Types.h"
-#include "M_Writer.h"
-#include "M_Reader.h"
 
 namespace minty
 {
+	class Writer;
+	class Reader;
+
 	class ISerializable
 	{
 	public:

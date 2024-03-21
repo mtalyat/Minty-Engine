@@ -18,8 +18,9 @@
 
 using namespace minty;
 
-minty::AudioEngine::AudioEngine()
-	: _engine()
+minty::AudioEngine::AudioEngine(Runtime& runtime)
+	: Engine(runtime)
+	, _engine()
 {
 	_engine.init(SoLoud::Soloud::CLIP_ROUNDOFF || SoLoud::Soloud::LEFT_HANDED_3D);
 	// SoLoud::Soloud::CLIP_ROUNDOFF

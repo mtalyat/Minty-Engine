@@ -1,20 +1,90 @@
 #pragma once
+#include "M_Asset.h"
 
-#include "M_Object.h"
 #include "M_Entity.h"
+#include "M_Node.h"
 #include <vector>
 #include <unordered_map>
 
 namespace minty
 {
-	struct AnimationBuilder;
 	class Scene;
+
+	enum AnimationStepFlags
+	{
+		ANIMATION_STEP_FLAGS_NONE = 0b0000,
+		ANIMATION_STEP_FLAGS_ADD_REMOVE = 0b0001,
+		ANIMATION_STEP_FLAGS_ALL = 0b0001,
+	};
+
+	/// <summary>
+	/// Holds all of the indices required for a step, to different component values.
+	/// </summary>
+	struct AnimationStep
+	{
+		size_t entityIndex;
+		size_t componentIndex;
+		size_t variableIndex;
+		size_t timeIndex;
+		size_t valueIndex;
+		AnimationStepFlags flags;
+	};
+
+	/// <summary>
+	/// Holds data to create a new Animation.
+	/// </summary>
+	struct AnimationBuilder
+	{
+		UUID id;
+
+		Path path;
+
+		/// <summary>
+		/// The amount of time this Animation runs for, in seconds.
+		/// </summary>
+		float length;
+
+		/// <summary>
+		/// The animation will loop when it ends.
+		/// </summary>
+		bool loops;
+
+		/// <summary>
+		/// A list of all Entities being affected by this Animation.
+		/// </summary>
+		std::vector<String> entities;
+
+		/// <summary>
+		/// A list of all Components being edited by this Animation.
+		/// </summary>
+		std::vector<String> components;
+
+		/// <summary>
+		/// A list of all variable names being set by this Animation.
+		/// </summary>
+		std::vector<String> variables;
+
+		/// <summary>
+		/// A list of all values being set by this Animation.
+		/// </summary>
+		std::vector<Node> values;
+
+		/// <summary>
+		/// The steps within this Animation.
+		/// </summary>
+		std::vector<std::pair<float, AnimationStep>> steps;
+
+		/// <summary>
+		/// The steps taken when resetting this Animation.
+		/// </summary>
+		std::vector<AnimationStep> resetSteps;
+	};
 
 	/// <summary>
 	/// Holds data for an animation that can be ran.
 	/// </summary>
 	class Animation
-		: public Object
+		: public Asset
 	{
 	private:
 		enum Flags : int
@@ -45,26 +115,6 @@ namespace minty
 		constexpr static step_value_t INVALID_STEP_VALUE = (MAX_VALUE_INDEX << VALUE_OFFSET) | (MAX_FLAGS_INDEX << FLAGS_OFFSET);
 
 	public:
-		enum StepFlags
-		{
-			ANIMATION_STEP_FLAGS_NONE = 0b0000,
-			ANIMATION_STEP_FLAGS_ADD_REMOVE = 0b0001,
-			ANIMATION_STEP_FLAGS_ALL = 0b0001,
-		};
-
-		/// <summary>
-		/// Holds all of the indices required for a step, to different component values.
-		/// </summary>
-		struct Step
-		{
-			size_t entityIndex = MAX_ENTITY_INDEX;
-			size_t componentIndex = MAX_COMPONENT_INDEX;
-			size_t variableIndex = MAX_VARIABLE_INDEX;
-			size_t timeIndex = MAX_TIME_INDEX;
-			size_t valueIndex = MAX_VALUE_INDEX;
-			StepFlags flags;
-		};
-
 		typedef uint32_t Index;
 	private:
 		/// <summary>
@@ -125,7 +175,7 @@ namespace minty
 		/// </summary>
 		/// <param name="frames">A list of Sprite IDs.</param>
 		/// <param name="frameTime">The time to elapse per frame.</param>
-		Animation(AnimationBuilder const& builder);
+		Animation(AnimationBuilder const& builder, Runtime& runtime);
 
 		/// <summary>
 		/// Checks if this Animation loops.
@@ -152,16 +202,16 @@ namespace minty
 		void reset(Entity const thisEntity, Scene& scene) const;
 
 	public:
-		static Step parse_step(String const& string);
+		static AnimationStep parse_step(String const& string);
 
 	private:
 		step_key_t compile_key(size_t const entityIndex, size_t const componentIndex, size_t const variableIndex) const;
 
-		step_value_t compile_value(size_t const valueIndex, StepFlags const flags) const;
+		step_value_t compile_value(size_t const valueIndex, AnimationStepFlags const flags) const;
 
 		void perform_step(step_key_t const key, step_time_t const time, step_value_t const value, Entity const thisEntity, Scene& scene) const;
 
-		void perform_step(Step const& step, Entity const thisEntity, Scene& scene) const;
+		void perform_step(AnimationStep const& step, Entity const thisEntity, Scene& scene) const;
 	public:
 		void serialize(Writer& writer) const override;
 		void deserialize(Reader const& reader) override;

@@ -1,8 +1,9 @@
 #pragma once
-#include "M_SceneObject.h"
+#include "M_RuntimeObject.h"
 
 namespace minty
 {
+	class AssetEngine;
 	class RenderEngine;
 	class RenderSystem;
 
@@ -10,7 +11,7 @@ namespace minty
 	/// Base class for an object that is used with the RenderEngine.
 	/// </summary>
 	class RenderObject :
-		public SceneObject
+		public RuntimeObject
 	{
 		//friend class RenderEngine;
 		//friend class RenderSystem;
@@ -22,9 +23,11 @@ namespace minty
 		/// Creates a new RenderObject.
 		/// </summary>
 		/// <param name="renderer"></param>
-		RenderObject(Engine& engine, ID const sceneId);
+		RenderObject(Runtime& engine);
 
 		virtual ~RenderObject();
+
+		AssetEngine& get_asset_engine() const;
 
 		RenderEngine& get_render_engine() const;
 

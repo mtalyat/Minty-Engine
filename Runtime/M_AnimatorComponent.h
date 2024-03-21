@@ -20,7 +20,7 @@ namespace minty
 		/// <summary>
 		/// The ID of the current animation being ran.
 		/// </summary>
-		ID animationId = ERROR_ID;
+		Animation* animation = nullptr;
 
 		/// <summary>
 		/// The amount of time elapsed on the animation.

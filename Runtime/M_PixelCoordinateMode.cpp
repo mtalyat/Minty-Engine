@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "M_CoordinateMode.h"
 
+#include "M_Text.h"
+
 using namespace minty;
 
 std::string minty::to_string(CoordinateMode const value)

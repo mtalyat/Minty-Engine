@@ -2,19 +2,23 @@
 #include "M_Encoding.h"
 
 #include <vector>
+#include <algorithm>
 
 using namespace minty;
 
-// https://stackoverflow.com/questions/180947/base64-decode-snippet-in-c
 String minty::Encoding::encode_base64(Dynamic const& in)
 {
-    String out;
+    return encode_base64(in.data(), in.size());
+}
 
-    Byte* bytes = static_cast<Byte*>(in.data());
-    size_t count = in.size();
+// https://stackoverflow.com/questions/180947/base64-decode-snippet-in-c
+String minty::Encoding::encode_base64(void const* const data, size_t const size)
+{
+    String out;
+    Byte const* bytes = static_cast<Byte const*>(data);
 
     int val = 0, valb = -6;
-    for (size_t i = 0; i < count; i++)
+    for (size_t i = 0; i < size; i++)
     {
         Byte c = bytes[i];
 
@@ -49,4 +53,95 @@ Dynamic minty::Encoding::decode_base64(String const& in)
         }
     }
     return Dynamic(bytes.data(), bytes.size());
+}
+
+bool minty::Encoding::is_base64(String const& text)
+{
+    // from chatGPT:
+
+    // Base64 strings must be divisible by 4
+    if (text.empty() || text.size() % 4 != 0) {
+        return false;
+    }
+
+    // Check each character to ensure it is part of the Base64 alphabet
+    for (char c : text) {
+        if (!isalnum(c) && c != '+' && c != '/' && c != '=') {
+            return false;
+        }
+    }
+
+    // Check for proper padding
+    size_t paddingCount = 0;
+    if (text.back() == '=') {
+        paddingCount = 1;
+        // Check for a second padding character
+        if (text.size() > 1 && text[text.size() - 2] == '=') {
+            paddingCount = 2;
+        }
+    }
+
+    // More than two padding characters is invalid
+    if (paddingCount > 2) {
+        return false;
+    }
+
+    // Ensure padding, if present, is only at the end
+    for (size_t i = 0; i < text.size() - paddingCount; ++i) {
+        if (text[i] == '=') {
+            return false;
+        }
+    }
+
+    return true;
+}
+
+String minty::Encoding::encode_base16(Dynamic const& data)
+{
+    return encode_base16(data.data(), data.size());
+}
+
+String minty::Encoding::encode_base16(void const* const data, size_t const size)
+{
+    Byte const* bytes = reinterpret_cast<Byte const*>(data);
+
+    std::stringstream ss;
+
+    ss << std::hex << std::setfill('0');
+    for (long long i = size - 1; i >= 0; i--)
+    {
+        ss << std::setw(2) << static_cast<int>(bytes[i]);
+    }
+
+    return ss.str();
+}
+
+Dynamic minty::Encoding::decode_base16(String const& text)
+{
+    std::vector<Byte> bytes;
+
+    for (size_t i = 0; i < text.size(); i += 2)
+    {
+        String byteString = text.substr(i, 2);
+        Byte byte = static_cast<Byte>(std::stoul(byteString, nullptr, 16));
+        bytes.push_back(byte);
+    }
+
+    return Dynamic(bytes.data(), bytes.size());
+}
+
+bool minty::Encoding::is_base16(String const& text)
+{
+    if (text.empty()) return false;
+
+    for (char c : text)
+    {
+        if (!isdigit(c) && (c < 'a' || c > 'f') && (c < 'A' || c > 'F'))
+        {
+            // not a digit or a-f/A-F
+            return false;
+        }
+    }
+
+    return true;
 }

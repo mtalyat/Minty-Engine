@@ -1,14 +1,27 @@
 #pragma once
+#include "M_Asset.h"
 
-#include "M_Object.h"
 #include "M_FiniteStateMachine.h"
 
 namespace minty
 {
-	struct AnimatorBuilder;
+	/// <summary>
+	/// Holds data to create a new Animator.
+	/// </summary>
+	struct AnimatorBuilder
+	{
+		UUID id;
+
+		Path path;
+
+		/// <summary>
+		/// The finite state machine within the Animator.
+		/// </summary>
+		FSM fsm;
+	};
 
 	class Animator
-		: public Object
+		: public Asset
 	{
 	private:
 		FSM _fsm;
@@ -16,13 +29,13 @@ namespace minty
 	public:
 		Animator();
 
-		Animator(AnimatorBuilder const& builder);
+		Animator(AnimatorBuilder const& builder, Runtime& runtime);
 
 		void set_variable(String const& name, int const value);
 
 		int get_variable(String const& name) const;
 
-		ID update();
+		UUID update();
 
 		FSM& get_fsm();
 	};
