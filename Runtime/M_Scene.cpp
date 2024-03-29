@@ -11,6 +11,7 @@
 #include "M_DirtyComponent.h"
 #include "M_CameraComponent.h"
 #include "M_RenderSystem.h"
+#include "M_ScriptComponent.h"
 #include "M_Reader.h"
 #include "M_Writer.h"
 #include "M_SerializationData.h"
@@ -75,7 +76,6 @@ bool minty::Scene::is_loaded() const
 
 void minty::Scene::load()
 {
-	_loaded = true;
 	load_registered_assets();
 	_systems->load();
 
@@ -98,6 +98,20 @@ void minty::Scene::load()
 	if (RenderSystem* renderSystem = _systems->find<RenderSystem>())
 	{
 		renderSystem->set_main_camera(_entities->find_by_type<CameraComponent>());
+	}
+
+	// finally mark as loaded
+	_loaded = true;
+
+	// call all load/enable/etc. events on entities already in the system
+	for (auto&& [entity, script, onLoad] : _entities->view<ScriptComponent const, ScriptOnLoadComponent const>().each())
+	{
+		onLoad.invoke(SCRIPT_METHOD_NAME_ONLOAD, script);
+	}
+
+	for (auto&& [entity, script, onEnable] : _entities->view<ScriptComponent const, ScriptOnEnableComponent const>().each())
+	{
+		onEnable.invoke(SCRIPT_METHOD_NAME_ONENABLE, script);
 	}
 }
 
@@ -140,9 +154,10 @@ void minty::Scene::fixed_update()
 
 void minty::Scene::unload()
 {
-	_loaded = false;
 	_systems->unload();
 	unload_registered_assets();
+
+	_loaded = false;
 }
 
 void minty::Scene::finalize()

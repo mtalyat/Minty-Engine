@@ -110,7 +110,7 @@
 				"role" : "flags"
 			},
 			{
-				"fragment" : "/NODEFAULTLIB:\"LIBCMT\" /INCREMENTAL:NO /subsystem:console",
+				"fragment" : "/machine:x64 /NODEFAULTLIB:LIBCMT /INCREMENTAL:NO /subsystem:console",
 				"role" : "flags"
 			},
 			{

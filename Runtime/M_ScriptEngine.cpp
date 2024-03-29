@@ -22,6 +22,9 @@
 #include "M_TransformComponent.h"
 #include "M_EnabledComponent.h"
 #include "M_RelationshipComponent.h"
+#include "M_CameraComponent.h"
+
+#include "M_RenderSystem.h"
 
 using namespace minty;
 using namespace minty::Scripting;
@@ -875,6 +878,22 @@ static void object_destroy_immediate_entity(UUID id)
 
 #pragma region Entity
 
+static Entity util_get_entity(UUID id)
+{
+	MINTY_ASSERT(_data.engine);
+	MINTY_ASSERT(id.valid());
+
+	Scene* scene = _data.get_scene();
+	MINTY_ASSERT(scene != nullptr);
+
+	EntityRegistry& registry = scene->get_entity_registry();
+
+	Entity entity = registry.find_by_id(id);
+	MINTY_ASSERT(entity != NULL_ENTITY);
+
+	return entity;
+}
+
 static MonoString* entity_get_name(UUID id)
 {
 	if (!id) return _data.engine->to_mono_string("");
@@ -1226,9 +1245,109 @@ static void window_restore()
 
 #pragma region Components
 
+#pragma region Camera
+
+static CameraComponent& util_get_camera_component(UUID id)
+{
+	MINTY_ASSERT(_data.engine);
+	MINTY_ASSERT(id.valid());
+
+	Scene* scene = _data.get_scene();
+	MINTY_ASSERT(scene != nullptr);
+
+	EntityRegistry& registry = scene->get_entity_registry();
+
+	Entity entity = registry.find_by_id(id);
+	MINTY_ASSERT(entity != NULL_ENTITY);
+
+	CameraComponent* component = registry.try_get<CameraComponent>(entity);
+	MINTY_ASSERT(component != nullptr);
+
+	return *component;
+}
+
+static int camera_get_perspective(UUID id)
+{
+	CameraComponent& camera = util_get_camera_component(id);
+
+	return static_cast<int>(camera.camera.get_perspective());
+}
+
+static void camera_set_perspective(UUID id, int value)
+{
+	CameraComponent& camera = util_get_camera_component(id);
+
+	camera.camera.set_perspective(static_cast<Perspective>(value));
+}
+
+static float camera_get_fov(UUID id)
+{
+	CameraComponent& camera = util_get_camera_component(id);
+
+	return camera.camera.get_fov();
+}
+
+static void camera_set_fov(UUID id, float value)
+{
+	CameraComponent& camera = util_get_camera_component(id);
+
+	camera.camera.set_fov(value);
+}
+
+static float camera_get_near(UUID id)
+{
+	CameraComponent& camera = util_get_camera_component(id);
+
+	return camera.camera.get_near();
+}
+
+static void camera_set_near(UUID id, float value)
+{
+	CameraComponent& camera = util_get_camera_component(id);
+
+	camera.camera.set_near(value);
+}
+
+static float camera_get_far(UUID id)
+{
+	CameraComponent& camera = util_get_camera_component(id);
+
+	return camera.camera.get_far();
+}
+
+static void camera_set_far(UUID id, float value)
+{
+	CameraComponent& camera = util_get_camera_component(id);
+
+	camera.camera.set_far(value);
+}
+
+static void camera_set_as_main(UUID id)
+{
+	MINTY_ASSERT(_data.engine);
+	MINTY_ASSERT(id.valid());
+
+	Scene* scene = _data.get_scene();
+	MINTY_ASSERT(scene != nullptr);
+
+	EntityRegistry& registry = scene->get_entity_registry();
+
+	Entity entity = registry.find_by_id(id);
+	MINTY_ASSERT(entity != NULL_ENTITY);
+	MINTY_ASSERT(registry.all_of<CameraComponent>(entity));
+
+	// set main in render system
+	RenderSystem* renderSystem = scene->get_system_registry().find<RenderSystem>();
+	MINTY_ASSERT(renderSystem != nullptr);
+
+	renderSystem->set_main_camera(entity);
+}
+
+#pragma endregion
+
 #pragma region Transform
 
-TransformComponent& util_get_transform_component(UUID id, bool setDirty)
+static TransformComponent& util_get_transform_component(UUID id, bool setDirty)
 {
 	MINTY_ASSERT(_data.engine);
 	MINTY_ASSERT(id.valid());
@@ -1374,6 +1493,18 @@ void minty::ScriptEngine::link()
 #pragma endregion
 
 #pragma region Components
+
+#pragma region Camera
+	ADD_INTERNAL_CALL("Camera_GetPerspective", camera_get_perspective);
+	ADD_INTERNAL_CALL("Camera_SetPerspective", camera_set_perspective);
+	ADD_INTERNAL_CALL("Camera_GetFov", camera_get_fov);
+	ADD_INTERNAL_CALL("Camera_SetFov", camera_set_fov);
+	ADD_INTERNAL_CALL("Camera_GetNear", camera_get_near);
+	ADD_INTERNAL_CALL("Camera_SetNear", camera_set_near);
+	ADD_INTERNAL_CALL("Camera_GetFar", camera_get_far);
+	ADD_INTERNAL_CALL("Camera_SetFar", camera_set_far);
+	ADD_INTERNAL_CALL("Camera_SetAsMain", camera_set_as_main);
+#pragma endregion
 
 #pragma region Transform
 	ADD_INTERNAL_CALL("Transform_GetLocalPosition", transform_get_local_position);

@@ -34,13 +34,13 @@ public class TestScript : Script
             Destroy(Entity);
         }
 
-        //Vector3 pos = transform.LocalPosition;
-        //pos.Z += Time.ElapsedTime;
-        //transform.LocalPosition = pos;
+        Vector3 pos = transform.LocalPosition;
+        pos.Z += Time.ElapsedTime;
+        transform.LocalPosition = pos;
 
-        //transform.LocalScale /= 1.0f + Time.ElapsedTime * 0.1f;
+        transform.LocalScale /= 1.0f + Time.ElapsedTime * 0.1f;
 
-        //Debug.Log(transform.LocalPosition);
+        Debug.Log(transform.LocalPosition);
     }
 
     void OnDisable()

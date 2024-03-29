@@ -11,7 +11,7 @@ namespace MintyEngine
     /// </summary>
     public class Entity : Object
     {
-        public readonly ulong ID;
+        internal readonly ulong ID;
 
         public string Name
         {

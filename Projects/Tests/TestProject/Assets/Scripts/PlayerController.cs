@@ -23,6 +23,27 @@ public class PlayerController : Script
         }
     }
 
+    private void OnLoad()
+    {
+        transform = Entity.GetComponent<Transform>();
+    }
+
+    private void OnUpdate()
+    {
+        float movement = moveSpeed * Time.ElapsedTime;
+
+        if (Input.IsKeyDown(Key.LeftControl))
+        {
+            movement *= 10.0f;
+        }
+
+        Vector3 move = movement * input.X * transform.Right +
+            movement * input.Y * transform.Up +
+            movement * input.Z * transform.Forward;
+
+        transform.LocalPosition += move;
+    }
+
     private void OnKeyMove(object sender, KeyPressEventArgs e)
     {
         float direction = e.Action == ButtonAction.Down ? 1.0f : -1.0f;
@@ -48,26 +69,5 @@ public class PlayerController : Script
                 input.Z -= direction;
                 break;
         }
-    }
-
-    private void OnLoad()
-    {
-        transform = Entity.GetComponent<Transform>();
-    }
-
-    private void OnUpdate()
-    {
-        float movement = moveSpeed * Time.ElapsedTime;
-
-        if (Input.IsKeyDown(Key.LeftControl))
-        {
-            movement *= 10.0f;
-        }
-
-        Vector3 move = movement * input.X * transform.Right +
-            movement * input.Y * transform.Up +
-            movement * input.Z * transform.Forward;
-
-        transform.LocalPosition += move;
     }
 }

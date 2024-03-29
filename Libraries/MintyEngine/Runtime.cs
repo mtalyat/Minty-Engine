@@ -62,6 +62,18 @@ namespace MintyEngine
 
         #region Components
 
+        #region Camera
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static int Camera_GetPerspective(ulong id);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Camera_SetPerspective(ulong id, int perspective);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static float Camera_GetFov(ulong id);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Camera_SetFov(ulong id, float perspective);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static float Camera_GetNear(ulong id);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Camera_SetNear(ulong id, float perspective);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static float Camera_GetFar(ulong id);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Camera_SetFar(ulong id, float perspective);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Camera_SetAsMain(ulong id);
+        #endregion
+
         #region Transform
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_GetLocalPosition(ulong id, out Vector3 position);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_SetLocalPosition(ulong id, in Vector3 position);

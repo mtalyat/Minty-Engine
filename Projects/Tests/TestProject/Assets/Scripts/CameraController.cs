@@ -11,12 +11,40 @@ public class CameraController : Script
 
     Transform transform;
 
+    Camera camera;
+
     private void OnCreate()
     {
         Session.InputMap.OnMouseMove += OnMouseMove;
         Session.InputMap.OnMouseDown[MouseButton.Left] += OnMouseClick;
+        Session.InputMap.OnKeyDown[Key.F] += OnFDown;
+    }
 
+    private void OnLoad()
+    {
         transform = Entity.GetComponent<Transform>();
+        camera = Entity.GetComponent<Camera>();
+
+        Debug.Log(transform == null);
+        Debug.Log(camera == null);
+    }
+
+    private void OnUpdate()
+    {
+        if (Cursor.Mode == CursorMode.Disabled)
+        {
+            // clamp pitch so camera cannot go upside down/backwards
+            pitch = Math.Min(Math.Max(pitch, -89.99f), 89.99f);
+            yaw %= 360.0f;
+
+            // set new rotation to the values
+            transform.LocalRotation = Quaternion.FromEuler(pitch * Math.Deg2Rad, yaw * Math.Deg2Rad, 0.0f);
+        }
+    }
+
+    private void OnFDown(object sender, KeyPressEventArgs e)
+    {
+        camera.FOV += 1.0f;
     }
 
     private void OnMouseMove(object sender, MouseMoveEventArgs e)
@@ -39,19 +67,6 @@ public class CameraController : Script
         else
         {
             Cursor.Mode = CursorMode.Normal;
-        }
-    }
-
-    private void OnUpdate()
-    {
-        if (Cursor.Mode == CursorMode.Disabled)
-        {
-            // clamp pitch so camera cannot go upside down/backwards
-            pitch = Math.Min(Math.Max(pitch, -89.99f), 89.99f);
-            yaw %= 360.0f;
-
-            // set new rotation to the values
-            transform.LocalRotation = Quaternion.FromEuler(pitch * Math.Deg2Rad, yaw * Math.Deg2Rad, 0.0f);
         }
     }
 }

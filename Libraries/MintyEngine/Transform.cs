@@ -64,5 +64,8 @@ namespace MintyEngine
                 return forward;
             }
         }
+
+        internal Transform()
+        { }
     }
 }
