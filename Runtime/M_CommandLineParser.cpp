@@ -26,7 +26,8 @@ void CommandLineParser::parse(int argc, char const* argv[])
 	for (int i = 0; i < argc; i++)
 	{
 		// find positional argument or flag argument, flag takes priority
-		auto flagFound = _flagParams.find(argv[i]);
+		char const* argument = argv[i];
+		auto flagFound = _flagParams.find(argument);
 		auto posFound = _positionalParams.find(i);
 		if (flagFound != _flagParams.end())
 		{
