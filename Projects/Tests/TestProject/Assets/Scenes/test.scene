@@ -28,9 +28,9 @@ assets
 	- "Assets/Sprites/brian.sprite"
 	- "Assets/Sprites/x.sprite"
 systems
+	Audio
 	Render
 	Script
-	Audio
 entities
 	Model Center: 2400de2c92f041ed
 		Transform
@@ -39,7 +39,7 @@ entities
 			scale: (1, 1, 1)
 		Script
 			- c5bbd244d3aafdbf
-				time: 5
+				time: 1
 		Enabled
 		Renderable
 		Mesh

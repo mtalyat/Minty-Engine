@@ -96,6 +96,8 @@ minty::AssetEngine::AssetEngine(Runtime& runtime)
 	{
 		if (Asset::check_type(entry.path(), AssetType::Wrap))
 		{
+			MINTY_LOG_FORMAT("Loading Wrap file \"{}\".", entry.path().filename().string());
+
 			_wrapper.emplace(entry.path());
 		}
 	}

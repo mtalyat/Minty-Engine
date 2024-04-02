@@ -1,11 +1,11 @@
-# 2024-03-22 19:49:52
+# 2024-04-02 21:01:33
 cmake_minimum_required(VERSION 3.16)
 project(TestProject LANGUAGES CXX)
 find_package(Vulkan REQUIRED)
 set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_CXX_EXTENSIONS OFF)
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /NODEFAULTLIB:LIBCMT")
+set(CMAKE_EXE_LINKER_FLAGS /NODEFAULTLIB:\"LIBCMT\")
 set(SOURCES main.cpp)
 add_executable(${PROJECT_NAME} ${SOURCES})
 set_property(TARGET ${PROJECT_NAME} PROPERTY INTERPROCEDURAL_OPTIMIZATION_RELEASE TRUE)
@@ -16,6 +16,8 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy C:/Libraries/Mono/lib/mscorlib.dll ${CMAKE_CURRENT_BINARY_DIR}/Debug/mscorlib.dll)
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ../Assembly/bin/Debug/MintyEngine.dll ${CMAKE_CURRENT_BINARY_DIR}/Debug/MintyEngine.dll)
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ../Assembly/bin/Debug/TestProject.dll ${CMAKE_CURRENT_BINARY_DIR}/Debug/TestProject.dll)
+file(GLOB DATA_FILES "C:/Users/mitch/source/repos/Minty-Engine/Data/*")
+file(COPY ${DATA_FILES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Debug)
 include_directories(${Vulkan_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} C:/Users/mitch/source/repos/Minty-Engine/Runtime/x64/Debug/MintyRuntime.lib)
 target_link_libraries(${PROJECT_NAME} ${Vulkan_LIBRARIES})

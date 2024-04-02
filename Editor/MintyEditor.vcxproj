@@ -148,10 +148,11 @@
       </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>xcopy /y "C:\Users\mitch\source\repos\Minty-Engine\Runtime\x64\$(ConfigurationName)\*.dll" "$(TargetDir)"</Command>
+      <Command>xcopy /y "C:\Users\mitch\source\repos\Minty-Engine\Runtime\x64\$(ConfigurationName)\*.dll" "$(TargetDir)"
+xcopy /Y /E /I "$(ProjectDir)..\Data\*" "$(TargetDir)Data\"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
-      <Message>Copy DLLs from Minty Runtime.</Message>
+      <Message>Copy Minty Engine files.</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -181,10 +182,11 @@
       </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>xcopy /y "C:\Users\mitch\source\repos\Minty-Engine\Runtime\x64\$(ConfigurationName)\*.dll" "$(TargetDir)"</Command>
+      <Command>xcopy /y "C:\Users\mitch\source\repos\Minty-Engine\Runtime\x64\$(ConfigurationName)\*.dll" "$(TargetDir)"
+xcopy /Y /E /I "$(ProjectDir)..\Data\*" "$(TargetDir)Data\"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
-      <Message>Copy DLLs from Minty Runtime.</Message>
+      <Message>Copy Minty Engine files.</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>

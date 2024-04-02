@@ -29,13 +29,13 @@
 // Deletes and sets the given pointer to null, if the condition is true.
 #define MINTY_DELETE_COND(pointer, condition) if((pointer) && (condition)) { delete (pointer); (pointer) = nullptr; }
 
-//#define MINTY_INFO(message) std::format("{}/{}()/{} -> {}", minty::Path(__FILE__).filename().string(), __func__, __LINE__, message)
-#define MINTY_INFO(message) std::format("[{}][{}()][line {}] -> {}", minty::Path(__FILE__).filename().string(), __func__, __LINE__, message)
+//#define MINTY_DEBUG_INFO(message) std::format("{}/{}()/{} -> {}", minty::Path(__FILE__).filename().string(), __func__, __LINE__, message)
+#define MINTY_DEBUG_INFO(message) std::format("[{}][{}()][line {}] -> {}", minty::Path(__FILE__).filename().string(), __func__, __LINE__, message)
 
 #ifdef MINTY_RELEASE
-#define MINTY_ABORT(message) { minty::Console::error(std::format("FATAL ERROR: {}", MINTY_INFO(message))); }
+#define MINTY_ABORT(message) { minty::Console::error(std::format("FATAL ERROR: {}", MINTY_DEBUG_INFO(message))); }
 #else
-#define MINTY_ABORT(message) { minty::Console::error(std::format("FATAL ERROR: {}", MINTY_INFO(message))); throw std::runtime_error(message); }
+#define MINTY_ABORT(message) { minty::Console::error(std::format("FATAL ERROR: {}", MINTY_DEBUG_INFO(message))); throw std::runtime_error(message); }
 #endif
 
 #ifdef MINTY_RELEASE
@@ -70,4 +70,12 @@
 #else
 #define MINTY_LOG(message) minty::Console::log(message)
 #define MINTY_LOG_FORMAT(message, ...) minty::Console::log(std::format(message, __VA_ARGS__))
+#endif
+
+#ifdef MINTY_RELEASE
+#define MINTY_INFO(message)
+#define MINTY_INFO_FORMAT(message, ...)
+#else
+#define MINTY_INFO(message) minty::Console::info(message)
+#define MINTY_INFO_FORMAT(message, ...) minty::Console::info(std::format(message, __VA_ARGS__))
 #endif

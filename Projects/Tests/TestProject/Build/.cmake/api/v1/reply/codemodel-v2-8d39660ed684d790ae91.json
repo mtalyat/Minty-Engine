@@ -43,14 +43,14 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "ALL_BUILD::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-ALL_BUILD-Debug-6392aad6c3e600d90a45.json",
+					"jsonFile" : "target-ALL_BUILD-Debug-fffcbe3adbc092bc1ae0.json",
 					"name" : "ALL_BUILD",
 					"projectIndex" : 0
 				},
 				{
 					"directoryIndex" : 0,
 					"id" : "TestProject::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-TestProject-Debug-58fb5be023a74df3d39f.json",
+					"jsonFile" : "target-TestProject-Debug-f2cf899f8375289a8589.json",
 					"name" : "TestProject",
 					"projectIndex" : 0
 				},
@@ -105,14 +105,14 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "ALL_BUILD::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-ALL_BUILD-Release-6392aad6c3e600d90a45.json",
+					"jsonFile" : "target-ALL_BUILD-Release-fffcbe3adbc092bc1ae0.json",
 					"name" : "ALL_BUILD",
 					"projectIndex" : 0
 				},
 				{
 					"directoryIndex" : 0,
 					"id" : "TestProject::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-TestProject-Release-41ac5e359f4243e1dbca.json",
+					"jsonFile" : "target-TestProject-Release-90631d438ff6cf1ce62a.json",
 					"name" : "TestProject",
 					"projectIndex" : 0
 				},
@@ -167,14 +167,14 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "ALL_BUILD::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-ALL_BUILD-MinSizeRel-6392aad6c3e600d90a45.json",
+					"jsonFile" : "target-ALL_BUILD-MinSizeRel-fffcbe3adbc092bc1ae0.json",
 					"name" : "ALL_BUILD",
 					"projectIndex" : 0
 				},
 				{
 					"directoryIndex" : 0,
 					"id" : "TestProject::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-TestProject-MinSizeRel-f8e0c6ca93f8e09a0b64.json",
+					"jsonFile" : "target-TestProject-MinSizeRel-e786b9f4455195dbd7c9.json",
 					"name" : "TestProject",
 					"projectIndex" : 0
 				},
@@ -229,14 +229,14 @@
 				{
 					"directoryIndex" : 0,
 					"id" : "ALL_BUILD::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-ALL_BUILD-RelWithDebInfo-6392aad6c3e600d90a45.json",
+					"jsonFile" : "target-ALL_BUILD-RelWithDebInfo-fffcbe3adbc092bc1ae0.json",
 					"name" : "ALL_BUILD",
 					"projectIndex" : 0
 				},
 				{
 					"directoryIndex" : 0,
 					"id" : "TestProject::@6890427a1f51a3e7e1df",
-					"jsonFile" : "target-TestProject-RelWithDebInfo-92dfd5e387f9bb42e9ec.json",
+					"jsonFile" : "target-TestProject-RelWithDebInfo-3e633cc2ea1d4e31f1f0.json",
 					"name" : "TestProject",
 					"projectIndex" : 0
 				},
@@ -259,6 +259,6 @@
 	"version" : 
 	{
 		"major" : 2,
-		"minor" : 5
+		"minor" : 7
 	}
 }
