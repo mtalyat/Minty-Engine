@@ -16,6 +16,7 @@ assets
 	- "Assets/Textures/pattern.png"
 	- "Assets/Textures/texture.jpg"
 	- "Assets/Textures/x.png"
+	- "BuiltIn/Sprite/default.png"
 	- "Assets/Shaders/shader.shader"
 	- "BuiltIn\\Sprite\\defaultSpriteShader.shader"
 	- "Assets/Shaders/shaderPass.shaderpass"
@@ -26,8 +27,8 @@ assets
 	- "BuiltIn\\Sprite\\defaultSpriteMaterial.material"
 	- "Assets\\Sprites\\brian.sprite"
 systems
-	Script
 	Render
+	Script
 	Audio
 entities
 	Model Center: 2400de2c92f041ed
