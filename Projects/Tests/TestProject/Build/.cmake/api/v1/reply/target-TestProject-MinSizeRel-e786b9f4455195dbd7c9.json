@@ -36,13 +36,13 @@
 			{
 				"command" : 1,
 				"file" : 0,
-				"line" : 20,
+				"line" : 22,
 				"parent" : 0
 			},
 			{
 				"command" : 1,
 				"file" : 0,
-				"line" : 21,
+				"line" : 23,
 				"parent" : 0
 			},
 			{
@@ -54,7 +54,7 @@
 			{
 				"command" : 3,
 				"file" : 0,
-				"line" : 19,
+				"line" : 21,
 				"parent" : 0
 			}
 		]
@@ -110,7 +110,7 @@
 				"role" : "flags"
 			},
 			{
-				"fragment" : "/machine:x64 /NODEFAULTLIB:LIBCMT /INCREMENTAL:NO /subsystem:console",
+				"fragment" : "/NODEFAULTLIB:\"LIBCMT\" /INCREMENTAL:NO /subsystem:console",
 				"role" : "flags"
 			},
 			{

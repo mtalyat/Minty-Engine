@@ -78,6 +78,10 @@ namespace minty
 		template<typename T>
 		T* load(Path const& path);
 
+		Wrapper& get_wrapper();
+
+		Wrapper const& get_wrapper() const;
+
 	private:
 		void check(Path const& path) const;
 

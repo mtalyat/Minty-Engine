@@ -33,6 +33,23 @@ namespace minty
 		void emplace(Path const& path);
 
 		/// <summary>
+		/// Gets the number of Wraps within this Wrapper.
+		/// </summary>
+		size_t get_wrap_count() const;
+
+		/// <summary>
+		/// Gets the Wrap at the given index.
+		/// </summary>
+		/// <returns></returns>
+		Wrap& get_wrap(size_t const index);
+
+		/// <summary>
+		/// Gets the Wrap at the given index.
+		/// </summary>
+		/// <returns></returns>
+		Wrap const& get_wrap(size_t const index) const;
+
+		/// <summary>
 		/// Finds the Wrap file that contains the given Path.
 		/// </summary>
 		/// <param name="path">A path that the target Wrap file contains.</param>

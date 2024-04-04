@@ -15,7 +15,7 @@ mintye::AssetsWindow::AssetsWindow(EditorApplication& application)
 	, _directories()
 	, _files()
 {
-	// go to Assets folder
+	// go to base folder
 	set_path("");
 }
 
@@ -24,7 +24,7 @@ void mintye::AssetsWindow::set_project(Project* const project)
 	// set the project
 	EditorWindow::set_project(project);
 
-	// update the path to the project's Assets folder
+	// update the path to the project's base folder
 	set_path("");
 }
 
@@ -48,7 +48,9 @@ void mintye::AssetsWindow::draw()
 
 	ImGui::SameLine();
 
-	if (ImGui::Button("New File"))
+	bool inBuiltInDirectory = _path.string().starts_with("BuiltIn");
+
+	if (!inBuiltInDirectory && ImGui::Button("New File"))
 	{
 		// new file popup
 		ImGui::OpenPopup("Create New Asset File");
@@ -67,7 +69,7 @@ void mintye::AssetsWindow::draw()
 		if (ImGui::Button("Create") || ImGui::IsKeyPressed(ImGuiKey_Enter))
 		{
 			// create new file in the currently selected folder, if it does not exist
-			Path path = get_project()->get_assets_path() / _path / newAssetName;
+			Path path = get_project()->get_base_path() / _path / newAssetName;
 
 			AssetEngine& assets = get_runtime().get_asset_engine();
 
@@ -96,10 +98,10 @@ void mintye::AssetsWindow::draw()
 
 	ImGui::SameLine();
 
-	if (ImGui::Button("Open Folder"))
+	if (!inBuiltInDirectory && ImGui::Button("Open Folder"))
 	{
 		// open the assets folder
-		Operations::open(project->get_assets_path() / _path);
+		Operations::open(project->get_base_path() / _path);
 	}
 
 	ImGui::Separator();
@@ -159,7 +161,7 @@ void mintye::AssetsWindow::draw()
 		if (ImGui::Button(name.c_str(), itemSize))
 		{
 			EditorApplication& app = get_application();
-			app.open_asset(project->get_assets_path() / _path / fileData.path);
+			app.open_asset(project->get_base_path() / _path / fileData.path);
 		}
 
 		// if right clicked, toggle inclusion in the scene
@@ -189,6 +191,8 @@ void mintye::AssetsWindow::draw()
 
 void mintye::AssetsWindow::reset()
 {
+	// go back to the base folder
+	set_path("");
 }
 
 void mintye::AssetsWindow::refresh()
@@ -211,33 +215,80 @@ void mintye::AssetsWindow::set_path(minty::Path const& path)
 	// do nothing if no project loaded
 	if (!project) return;
 
-	Path fullPath = project->get_assets_path() / _path;
+	// if empty path, just do the base asset location options
+	if (_path.empty())
+	{
+		_directories.push_back("Assets");
+		_directories.push_back("BuiltIn");
+
+		return;
+	}
 
 	Scene* scene = get_scene();
 
-	// update directories and paths
-	for (auto const& entry : fs::directory_iterator(fullPath))
+	// if BuiltIn, grab from AssetManager
+	if (_path.string().starts_with("BuiltIn"))
 	{
-		// ignore hidden directories (such as .vscode)
-		if (fs::is_directory(entry.status()) && !fullPath.stem().string().starts_with("."))
+		// TODO: filter out directories and such
+
+		AssetEngine& assets = get_runtime().get_asset_engine();
+
+		Wrapper const& wrapper = assets.get_wrapper();
+
+		for (size_t i = 0; i < wrapper.get_wrap_count(); i++)
 		{
-			_directories.push_back(entry.path().stem());
+			Wrap const& wrap = wrapper.get_wrap(i);
+			
+			for (size_t j = 0; j < wrap.get_entry_count(); j++)
+			{
+				Wrap::Entry const& entry = wrap.get_entry(j);
+
+				// ignore meta
+				if (Asset::get_type(entry.path) == AssetType::Meta) continue;
+
+				// for now, add directly
+				_files.push_back(FileData
+					{
+						.path = entry.path,
+						.canIncludeInScene = Asset::get_type(entry.path) != AssetType::Scene,
+						.includedInScene = scene && scene->is_registered(Path(wrap.get_base_path()) / entry.path),
+					});
+			}
 		}
-		// add all regular files that aren't meta
-		else if (fs::is_regular_file(entry.status()) && Asset::get_type(entry.path()) != AssetType::Meta)
-		{
-			_files.push_back(FileData{
-				.path = entry.path().filename(),
-				.canIncludeInScene = Asset::get_type(entry.path()) != AssetType::Scene,
-				.includedInScene = scene && scene->is_registered(get_path(entry.path()).lexically_relative(project->get_base_path())),
-				});
-		}
+
+		return;
 	}
 
-	int i = 0;
+	// if Assets, grab from disk
+	if (_path.string().starts_with("Assets"))
+	{
+		// real path
+		Path fullPath = project->get_base_path() / _path;
+
+		// update directories and paths
+		for (auto const& entry : fs::directory_iterator(fullPath))
+		{
+			// ignore hidden directories (such as .vscode)
+			if (fs::is_directory(entry.status()) && !fullPath.stem().string().starts_with("."))
+			{
+				_directories.push_back(entry.path().stem());
+			}
+			// add all regular files that aren't meta
+			else if (fs::is_regular_file(entry.status()) && Asset::get_type(entry.path()) != AssetType::Meta)
+			{
+				_files.push_back(FileData{
+					.path = entry.path().filename(),
+					.canIncludeInScene = Asset::get_type(entry.path()) != AssetType::Scene,
+					.includedInScene = scene && scene->is_registered(get_path(entry.path()).lexically_relative(project->get_base_path())),
+					});
+			}
+		}
+
+		return;
+	}	
 }
 
 minty::Path mintye::AssetsWindow::get_path(minty::Path const& path) const
 {
-	return get_project()->get_assets_path() / _path / path;
+	return get_project()->get_base_path() / _path / path;
 }

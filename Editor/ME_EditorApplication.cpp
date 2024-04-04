@@ -30,7 +30,7 @@
 //#include <string>
 #include <array>
 
-#define CMAKE_PATH "C:/Users/mitch/source/repos/Minty-Engine/Editor/cmake/bin/cmake.exe"
+#define CMAKE_PATH "cmake"
 #define EditorApplication_NAME "TestProject"
 #define EXE_NAME std::string(EditorApplication_NAME).append(".exe")
 
@@ -753,6 +753,9 @@ void EditorApplication::generate_cmake(BuildInfo const& buildInfo)
 		"add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy C:/Libraries/Mono/lib/mscorlib.dll ${CMAKE_CURRENT_BINARY_DIR}/" << buildInfo.get_config() << "/mscorlib.dll)" << std::endl <<
 		"add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ../" << ASSEMBLY_DIRECTORY_NAME << "/bin/" << buildInfo.get_config() << "/MintyEngine.dll ${CMAKE_CURRENT_BINARY_DIR}/" << buildInfo.get_config() << "/MintyEngine.dll)" << std::endl <<
 		"add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ../" << ASSEMBLY_DIRECTORY_NAME << "/bin/" << buildInfo.get_config() << "/" << _project->get_name() << ".dll ${CMAKE_CURRENT_BINARY_DIR}/" << buildInfo.get_config() << "/" << _project->get_name() << ".dll)" << std::endl <<
+		// copy all necessary engine data files
+		"file(GLOB DATA_FILES \"C:/Users/mitch/source/repos/Minty-Engine/Data/*.wrap\")" << std::endl <<
+		"file(COPY ${DATA_FILES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/" << buildInfo.get_config() << ")" << std::endl <<
 		// include and link Vulkan
 		"include_directories(${Vulkan_INCLUDE_DIRS})" << std::endl <<
 		// target and link the MintyRuntime.lib
@@ -1049,7 +1052,7 @@ void EditorApplication::build_project(BuildInfo const& buildInfo)
 
 	console->log_important("\tbuilding program...");
 
-	std::string command = "cd " + _project->get_build_path().string() + " && " + std::filesystem::absolute(CMAKE_PATH).string();
+	std::string command = "cd " + _project->get_build_path().string() + " && " + CMAKE_PATH;
 	console->run_commands({
 		// build C# assembly
 		// https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-build

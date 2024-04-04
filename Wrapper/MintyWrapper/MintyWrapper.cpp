@@ -187,8 +187,8 @@ int main(int argc, char const* argv[])
 		{ "Base Path: ", base.generic_string() },
 		{ "Compression Level: ", std::to_string(static_cast<int>(compression)) },
 		{ "Compression Percent: ", std::to_string(uncompressedSize == 0 ? 0.0f : max(0.0f, 100.0f - 100.0f * compressedSize / uncompressedSize)) + '%' },
-		{ "Compressed Size: ", std::to_string(compressedSize) + 'b' },
 		{ "Uncompressed Size: ", std::to_string(uncompressedSize) + 'b' },
+		{ "Compressed Size: ", std::to_string(compressedSize) + 'b' },
 	};
 
 	int const reportMinWidth = 20;
