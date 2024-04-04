@@ -17,13 +17,13 @@ assets
 	- "Assets/Textures/texture.jpg"
 	- "Assets/Textures/x.png"
 	- "Assets/Shaders/shader.shader"
-	- "BuiltIn\\spriteShader.shader"
+	- "BuiltIn\\Sprite\\defaultSpriteShader.shader"
 	- "Assets/Shaders/shaderPass.shaderpass"
-	- "BuiltIn\\spriteShaderPass.shaderpass"
+	- "BuiltIn\\Sprite\\defaultSpriteShaderPass.shaderpass"
 	- "Assets/Materials/materialTemplate.materialtemplate"
-	- "BuiltIn\\spriteMaterialTemplate.materialtemplate"
+	- "BuiltIn\\Sprite\\defaultSpriteMaterialTemplate.materialtemplate"
 	- "Assets/Materials/material1.material"
-	- "BuiltIn\\spriteMaterial.material"
+	- "BuiltIn\\Sprite\\defaultSpriteMaterial.material"
 	- "Assets\\Sprites\\brian.sprite"
 systems
 	Script
