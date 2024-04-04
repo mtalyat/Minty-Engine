@@ -223,7 +223,7 @@ int main(int argc, char const* argv[])
 
 	for (auto const& p : paths)
 	{
-		std::cout << p.generic_string() << "\n";
+		std::cout << "  " << p.generic_string() << "\n";
 
 		Path relativePath = p.lexically_relative(path);
 
