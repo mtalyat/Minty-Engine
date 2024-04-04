@@ -452,6 +452,11 @@ void minty::Wrap::set_type(Type const type)
     _header.type = type;
 }
 
+size_t minty::Wrap::get_size() const
+{
+    return std::filesystem::file_size(_path);
+}
+
 Wrap minty::Wrap::load_or_create(Path const& path, String const& name, uint32_t const entryCount, Path const& base, uint32_t const contentVersion)
 {
     if (std::filesystem::exists(path))
