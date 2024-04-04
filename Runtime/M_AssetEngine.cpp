@@ -115,7 +115,7 @@ bool minty::AssetEngine::exists(Path const& path) const
 	case RunMode::Normal:
 		return _wrapper.contains(path);
 	case RunMode::Edit:
-		return std::filesystem::exists(path);
+		return _wrapper.contains(path) || std::filesystem::exists(path);
 	default:
 		MINTY_ABORT("Unrecognized RunMode.");
 		return false;
@@ -167,6 +167,16 @@ UUID minty::AssetEngine::read_id(Path const& path)
 	return read_file_meta(path).to_uuid();
 }
 
+Wrapper& minty::AssetEngine::get_wrapper()
+{
+	return _wrapper;
+}
+
+Wrapper const& minty::AssetEngine::get_wrapper() const
+{
+	return _wrapper;
+}
+
 void minty::AssetEngine::check(Path const& path) const
 {
 	// can load if assets exists, and if no meta is required, or if a meta is required, it exists
@@ -197,6 +207,8 @@ std::vector<char> minty::AssetEngine::read_file(Path const& path) const
 	case RunMode::Normal:
 		return _wrapper.read(path);
 	case RunMode::Edit:
+		// if wrapper contains the file, read from wrapper, otherwise read from disk
+		if (_wrapper.contains(path)) return _wrapper.read(path);
 		return File::read_all_chars(path);
 	default:
 		MINTY_ABORT("Unrecognized RunMode.");

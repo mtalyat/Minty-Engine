@@ -1,4 +1,4 @@
-# 2024-04-02 21:01:33
+# 2024-04-04 20:38:23
 cmake_minimum_required(VERSION 3.16)
 project(TestProject LANGUAGES CXX)
 find_package(Vulkan REQUIRED)

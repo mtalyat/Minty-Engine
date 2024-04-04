@@ -149,7 +149,7 @@
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>xcopy /y "C:\Users\mitch\source\repos\Minty-Engine\Runtime\x64\$(ConfigurationName)\*.dll" "$(TargetDir)"
-xcopy /Y /E /I "$(ProjectDir)..\Data\*" "$(TargetDir)Data\"</Command>
+xcopy /Y /E /I "$(ProjectDir)..\Data\*" "$(ProjectDir)"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copy Minty Engine files.</Message>
@@ -183,7 +183,7 @@ xcopy /Y /E /I "$(ProjectDir)..\Data\*" "$(TargetDir)Data\"</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>xcopy /y "C:\Users\mitch\source\repos\Minty-Engine\Runtime\x64\$(ConfigurationName)\*.dll" "$(TargetDir)"
-xcopy /Y /E /I "$(ProjectDir)..\Data\*" "$(TargetDir)Data\"</Command>
+xcopy /Y /E /I "$(ProjectDir)..\Data\*" "$(ProjectDir)"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copy Minty Engine files.</Message>

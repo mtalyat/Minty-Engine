@@ -432,6 +432,11 @@ Wrap::Entry const& minty::Wrap::get_entry(size_t const index) const
     return _entries.at(index);
 }
 
+size_t minty::Wrap::get_entry_count() const
+{
+    return _entries.size();
+}
+
 Wrap::Entry const& minty::Wrap::get_entry(Path const& path) const
 {
     return _entries.at(_indexed.at(path));

@@ -236,6 +236,12 @@ namespace minty
 		Entry const& get_entry(size_t const index) const;
 
 		/// <summary>
+		/// Gets the number of entries in this Wrap.
+		/// </summary>
+		/// <returns></returns>
+		size_t get_entry_count() const;
+
+		/// <summary>
 		/// Gets the Entry at the given path.
 		/// </summary>
 		/// <param name="index"></param>
