@@ -29,29 +29,33 @@ void CommandLineParser::parse(int argc, char const* argv[])
 		char const* argument = argv[i];
 		auto flagFound = _flagParams.find(argument);
 		auto posFound = _positionalParams.find(i);
+
+		Argument arg;
+
 		if (flagFound != _flagParams.end())
 		{
 			param = &flagFound->second;
 
-			// ignore flag itself
-			i++;
+			// grab values, store in argument
+			for (int j = 1; j <= param->argc && j + i <= argc; j++)
+			{
+				arg.args.push_back(argv[i + j]);
+			}
 		}
 		else if (posFound != _positionalParams.end())
 		{
 			param = &posFound->second;
+
+			// grab values, store in argument
+			for (int j = 0; j < param->argc && j + i < argc; j++)
+			{
+				arg.args.push_back(argv[i + j]);
+			}
 		}
 		else
 		{
 			// no arg found at this position
 			continue;
-		}
-
-		Argument arg;
-
-		// grab values, store in argument
-		for (int j = 0; j < param->argc && j + i < argc; j++)
-		{
-			arg.args.push_back(argv[i + j]);
 		}
 
 		// add/override to total arguments

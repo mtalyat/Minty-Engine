@@ -65,11 +65,13 @@ int main(int argc, char const* argv[])
 		std::cout
 			<< "Command: wrap [file path] [flags]\n"
 			<< "Flags:\n"
+			<< "--help ........... prints the help text.\n"
+			<< "--info ........... prints the info of the Wrap file, when [file path] is a Wrap file.\n"
+			<< "--update ......... updates the appropriate wrap file and replaces it.\n"
 			<< "-n <name> ........ specifies the name of the new Wrap file.\n"
 			<< "-c <[0-9]> ....... specifies the level of compression.\n"
 			<< "-b <path> ........ specifies the base virtual path shared by all of the files in the Wrap file.\n"
-			<< "-v <number> ...... specifies the content version number.\n"
-			<< "--help ........... prints the help text.\n";
+			<< "-v <number> ...... specifies the content version number.\n";
 
 		if (!parser.get_argument("path")) return 0;
 
@@ -115,6 +117,8 @@ int main(int argc, char const* argv[])
 		};
 
 		print_wrap_stats(path, stats);
+
+		return 0;
 	}
 
 	if (!std::filesystem::is_directory(path))
