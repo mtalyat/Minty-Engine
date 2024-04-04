@@ -136,11 +136,23 @@ int main(int argc, char const* argv[])
 
 	Path wrapPath = path.parent_path() / (name + EXTENSION_WRAP);
 
+	// if updating, load the wrap
+	Wrap* wrap = nullptr;
+
+	if (parser.get_argument("update"))
+	{
+		wrap = new Wrap(wrapPath);
+	}
+
 	Path base;
 
 	if (parser.get_argument("base", arg))
 	{
 		base = Path(arg.args.front());
+	}
+	else if (wrap)
+	{
+		base = wrap->get_base_path();
 	}
 	else
 	{
@@ -156,6 +168,11 @@ int main(int argc, char const* argv[])
 			std::cerr << "Failed to parse the given version argument: " << arg.args.front() << "\n";
 			return 4;
 		}
+	}
+	else if (wrap)
+	{
+		// if updating, set version to wrap version + 1
+		version = wrap->get_content_version() + 1;
 	}
 
 	CompressionLevel compression = CompressionLevel::Default;
@@ -183,8 +200,6 @@ int main(int argc, char const* argv[])
 
 	directoriesToCheck.push_back(path);
 
-	size_t uncompressedSize = 0;
-
 	// collect all files within the directory at the given path
 	while (!directoriesToCheck.empty())
 	{
@@ -200,7 +215,6 @@ int main(int argc, char const* argv[])
 			else if (entry.is_regular_file())
 			{
 				paths.push_back(entry.path());
-				uncompressedSize += std::filesystem::file_size(entry.path());
 			}
 		}
 	}
@@ -219,7 +233,13 @@ int main(int argc, char const* argv[])
 	Stopwatch watch = Stopwatch::start_new();
 
 	// create a wrap file using an input file that uses regex to determine how to compress each file type
-	Wrap wrap(wrapPath, name, count, base, version);
+
+	if (wrap != nullptr)
+	{
+		delete wrap;
+	}
+
+	wrap = new Wrap(wrapPath, name, count, base, version);
 
 	for (auto const& p : paths)
 	{
@@ -227,12 +247,12 @@ int main(int argc, char const* argv[])
 
 		Path relativePath = p.lexically_relative(path);
 
-		wrap.emplace(p, relativePath, compression);
+		wrap->emplace(p, relativePath, compression);
 	}
 
 	watch.stop();
 
-	size_t wrapSize = wrap.get_size();
+	size_t wrapSize = wrap->get_size();
 
 	std::cout << '\n';
 
@@ -248,6 +268,8 @@ int main(int argc, char const* argv[])
 	};
 
 	print_wrap_stats(wrapPath, stats);
+
+	delete wrap;
 
 	return 0;
 }
