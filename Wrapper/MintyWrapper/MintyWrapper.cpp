@@ -9,17 +9,54 @@ using namespace minty;
 typedef CommandLineParser::Parameter Param;
 typedef CommandLineParser::Argument Arg;
 
+void print_wrap_stats(Path const& path, std::vector<std::pair<String, String>> const& stats)
+{
+	int const reportMinWidth = 20;
+	int reportWidth = reportMinWidth;
+
+	// get max width from stats
+	for (auto const& [left, right] : stats)
+	{
+		int width = static_cast<int>(left.length() + right.length());
+
+		if (width > reportWidth)
+		{
+			reportWidth = width;
+		}
+	}
+
+	// print the table
+	String line = "+-" + String(reportWidth, '-') + "-+";
+
+	std::cout
+		<< line << "\n"
+		<< "| WRAP FILE REPORT    " << String(reportWidth - reportMinWidth, ' ') << " |\n"
+		<< line << "\n";
+
+	for (auto const& [left, right] : stats)
+	{
+		int width = static_cast<int>(left.length() + right.length());
+
+		std::cout << "| " << left << String(reportWidth - width, ' ') << right << " |\n";
+	}
+
+	std::cout
+		<< line << "\n";
+}
+
 int main(int argc, char const* argv[])
 {
 	CommandLineParser parser;
 
-	parser.add_parameter(Param("file", 0));				// the path to the program
-	parser.add_parameter(Param("path", 1));				// the path to the file to wrap
-	parser.add_parameter(Param("name", "-n"));			// the name of the wrap being created
-	parser.add_parameter(Param("compression", "-c"));	// the default compression level
-	parser.add_parameter(Param("base", "-b"));			// the base file path for all files added to this wrap file
-	parser.add_parameter(Param("version", "-v"));		// the content version
-	parser.add_parameter(Param("help", "--help", 0));	// shows the help text
+	parser.add_parameter(Param("file", 0));					// the path to the program
+	parser.add_parameter(Param("path", 1));					// the path to the file to wrap
+	parser.add_parameter(Param("name", "-n"));				// the name of the wrap being created
+	parser.add_parameter(Param("compression", "-c"));		// the default compression level
+	parser.add_parameter(Param("base", "-b"));				// the base file path for all files added to this wrap file
+	parser.add_parameter(Param("version", "-v"));			// the content version
+	parser.add_parameter(Param("help", "--help", 0));		// shows the help text
+	parser.add_parameter(Param("update", "--update", 0));	// updates the wrap file
+	parser.add_parameter(Param("info", "--info", 0));		// prints the info for the wrap file
 
 	parser.parse(argc, argv);
 
@@ -55,6 +92,31 @@ int main(int argc, char const* argv[])
 		return 2;
 	}
 
+	if (parser.get_argument("info"))
+	{
+		// if path is a file, load that wrap file
+		
+		if (!std::filesystem::is_regular_file(path) || path.extension() != EXTENSION_WRAP)
+		{
+			std::cout << "Path is not a wrap file: " << path.string() << "\n";
+			return 8;
+		}
+
+		Wrap wrap(path);
+
+		std::vector<std::pair<String, String>> stats
+		{
+			{ "File: ", path.generic_string() },
+			{ "Name: ", wrap.get_name() },
+			{ "Version: ", std::to_string(wrap.get_content_version()) },
+			{ "Entry Count: ", std::to_string(wrap.get_entry_count()) },
+			{ "Base Path: ", wrap.get_base_path() },
+			{ "Size: ", std::to_string(wrap.get_size()) + 'b' },
+		};
+
+		print_wrap_stats(path, stats);
+	}
+
 	if (!std::filesystem::is_directory(path))
 	{
 		std::cout << "Path is not a directory: " << path.string() << "\n";
@@ -74,11 +136,23 @@ int main(int argc, char const* argv[])
 
 	Path wrapPath = path.parent_path() / (name + EXTENSION_WRAP);
 
+	// if updating, load the wrap
+	Wrap* wrap = nullptr;
+
+	if (parser.get_argument("update"))
+	{
+		wrap = new Wrap(wrapPath);
+	}
+
 	Path base;
 
 	if (parser.get_argument("base", arg))
 	{
 		base = Path(arg.args.front());
+	}
+	else if (wrap)
+	{
+		base = wrap->get_base_path();
 	}
 	else
 	{
@@ -94,6 +168,11 @@ int main(int argc, char const* argv[])
 			std::cerr << "Failed to parse the given version argument: " << arg.args.front() << "\n";
 			return 4;
 		}
+	}
+	else if (wrap)
+	{
+		// if updating, set version to wrap version + 1
+		version = wrap->get_content_version() + 1;
 	}
 
 	CompressionLevel compression = CompressionLevel::Default;
@@ -121,8 +200,6 @@ int main(int argc, char const* argv[])
 
 	directoriesToCheck.push_back(path);
 
-	size_t uncompressedSize = 0;
-
 	// collect all files within the directory at the given path
 	while (!directoriesToCheck.empty())
 	{
@@ -138,7 +215,6 @@ int main(int argc, char const* argv[])
 			else if (entry.is_regular_file())
 			{
 				paths.push_back(entry.path());
-				uncompressedSize += std::filesystem::file_size(entry.path());
 			}
 		}
 	}
@@ -157,26 +233,29 @@ int main(int argc, char const* argv[])
 	Stopwatch watch = Stopwatch::start_new();
 
 	// create a wrap file using an input file that uses regex to determine how to compress each file type
-	Wrap wrap(wrapPath, name, count, base, version);
 
-	size_t compressedSize = 0;
+	if (wrap != nullptr)
+	{
+		delete wrap;
+	}
+
+	wrap = new Wrap(wrapPath, name, count, base, version);
 
 	for (auto const& p : paths)
 	{
-		std::cout << p.generic_string() << "\n";
+		std::cout << "  " << p.generic_string() << "\n";
 
 		Path relativePath = p.lexically_relative(path);
 
-		wrap.emplace(p, relativePath, compression);
-
-		compressedSize += wrap.get_entry(base / relativePath).compressedSize;
+		wrap->emplace(p, relativePath, compression);
 	}
 
 	watch.stop();
 
+	size_t wrapSize = wrap->get_size();
+
 	std::cout << '\n';
 
-	// all of the stats to draw
 	std::vector<std::pair<String, String>> stats
 	{
 		{ "File: ", wrapPath.generic_string() },
@@ -185,43 +264,12 @@ int main(int argc, char const* argv[])
 		{ "Version: ", std::to_string(version) },
 		{ "Entry Count: ", std::to_string(count) },
 		{ "Base Path: ", base.generic_string() },
-		{ "Compression Level: ", std::to_string(static_cast<int>(compression)) },
-		{ "Compression Percent: ", std::to_string(uncompressedSize == 0 ? 0.0f : max(0.0f, 100.0f - 100.0f * compressedSize / uncompressedSize)) + '%' },
-		{ "Uncompressed Size: ", std::to_string(uncompressedSize) + 'b' },
-		{ "Compressed Size: ", std::to_string(compressedSize) + 'b' },
+		{ "Size: ", std::to_string(wrapSize) + 'b' },
 	};
 
-	int const reportMinWidth = 20;
-	int reportWidth = reportMinWidth;
+	print_wrap_stats(wrapPath, stats);
 
-	// get max width from stats
-	for (auto const& [left, right] : stats)
-	{
-		int width = static_cast<int>(left.length() + right.length());
-
-		if (width > reportWidth)
-		{
-			reportWidth = width;
-		}
-	}
-
-	// print the table
-	String line = "+-" + String(reportWidth, '-') + "-+";
-
-	std::cout
-		<< line << "\n"
-		<< "| WRAP FILE REPORT    " << String(reportWidth - reportMinWidth, ' ') << " |\n"
-		<< line << "\n";
-
-	for (auto const& [left, right] : stats)
-	{
-		int width = static_cast<int>(left.length() + right.length());
-
-		std::cout << "| " << left << String(reportWidth - width, ' ') << right << " |\n";
-	}
-
-	std::cout
-		<< line << "\n";
+	delete wrap;
 
 	return 0;
 }

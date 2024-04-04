@@ -306,6 +306,12 @@ namespace minty
 		/// <param name="type"></param>
 		void set_type(Type const type);
 
+		/// <summary>
+		/// Gets the size of the Wrap file.
+		/// </summary>
+		/// <returns></returns>
+		size_t get_size() const;
+
 #pragma endregion
 
 		/// <summary>
