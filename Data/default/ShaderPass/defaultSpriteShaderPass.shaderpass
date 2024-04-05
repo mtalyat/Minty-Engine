@@ -5,6 +5,6 @@ cullMode: NONE
 frontFace: CLOCKWISE
 lineWidth: 1
 stage: VERTEX_BIT
-    path: BuiltIn/Sprite/defaultSprite_vert.spv
+    path: BuiltIn/Shader/defaultSprite_vert.spv
 stage: FRAGMENT_BIT
-    path: BuiltIn/Sprite/defaultSprite_frag.spv
+    path: BuiltIn/Shader/defaultSprite_frag.spv

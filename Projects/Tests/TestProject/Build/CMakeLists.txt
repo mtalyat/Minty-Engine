@@ -1,4 +1,4 @@
-# 2024-04-04 20:38:23
+# 2024-04-05 04:59:44
 cmake_minimum_required(VERSION 3.16)
 project(TestProject LANGUAGES CXX)
 find_package(Vulkan REQUIRED)
@@ -16,7 +16,7 @@ add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy C:/Libraries/Mono/lib/mscorlib.dll ${CMAKE_CURRENT_BINARY_DIR}/Debug/mscorlib.dll)
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ../Assembly/bin/Debug/MintyEngine.dll ${CMAKE_CURRENT_BINARY_DIR}/Debug/MintyEngine.dll)
 add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ../Assembly/bin/Debug/TestProject.dll ${CMAKE_CURRENT_BINARY_DIR}/Debug/TestProject.dll)
-file(GLOB DATA_FILES "C:/Users/mitch/source/repos/Minty-Engine/Data/*")
+file(GLOB DATA_FILES "C:/Users/mitch/source/repos/Minty-Engine/Data/*.wrap")
 file(COPY ${DATA_FILES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/Debug)
 include_directories(${Vulkan_INCLUDE_DIRS})
 target_link_libraries(${PROJECT_NAME} C:/Users/mitch/source/repos/Minty-Engine/Runtime/x64/Debug/MintyRuntime.lib)

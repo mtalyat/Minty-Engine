@@ -20,6 +20,6 @@ attribute: 2
     format: R32G32_SFLOAT
     offset: 24
 stage: VERTEX_BIT
-    path: Assets/Shaders/vert.spv
+    path: BuiltIn/Shader/defaultVert.spv
 stage: FRAGMENT_BIT
-    path: Assets/Shaders/frag.spv
+    path: BuiltIn/Shader/defaultFrag.spv
