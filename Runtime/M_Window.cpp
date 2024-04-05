@@ -27,6 +27,7 @@ minty::Window::Window(String const& title, int const x, int const y, int const w
 	, _resized(true) // start as "resized" so render engine regenerates data on start
 	, _windowScript()
 	, _inputScript()
+	, _gamepads()
 {
 	// if no windows have been made yet, init glfw
 	if (_windowCount == 0)
@@ -72,6 +73,7 @@ minty::Window::Window(String const& title, int const x, int const y, int const w
 	glfwSetMouseButtonCallback(_window, button_ballback);
 	glfwSetCursorPosCallback(_window, cursor_callback);
 	glfwSetScrollCallback(_window, scroll_callback);
+	//glfwSetJoystickCallback(gamepad_callback);
 
 	// might want this for engine:
 	// glfwSetDropCallback
@@ -81,6 +83,12 @@ minty::Window::Window(String const& title, int const x, int const y, int const w
 
 Window::~Window()
 {
+	// destroy gamepads
+	for (auto const& [id, state] : _gamepads)
+	{
+		delete state;
+	}
+
 	// destroy window
 	glfwDestroyWindow(_window);
 
@@ -227,6 +235,47 @@ GLFWwindow* minty::Window::get_raw() const
 void minty::Window::poll_events()
 {
 	glfwPollEvents();
+
+	GLFWgamepadstate state;
+
+	// check for each controller
+	for (size_t i = 0; i <= GLFW_JOYSTICK_LAST; i++)
+	{
+		if (glfwGetGamepadState(i, &state))
+		{
+			auto found = _gamepads.find(i);
+			if (found == _gamepads.end())
+			{
+				// newly connected controller
+				GLFWgamepadstate* newState = new GLFWgamepadstate();
+
+				// add to connected
+				_gamepads.emplace(i, newState);
+
+				// copy over data so the initial state is whatever it is right now
+				memcpy(newState, &state, sizeof(GLFWgamepadstate));
+
+				MINTY_LOG_FORMAT("Controller {} connected.", i);
+			}
+
+			// get old data
+			GLFWgamepadstate* oldState = _gamepads.at(i);
+
+			// TODO: check inputs
+
+
+			// copy over new state data
+			memcpy(oldState, &state, sizeof(GLFWgamepadstate));
+		}
+		else if(_gamepads.contains(i))
+		{
+			delete _gamepads.at(i);
+			_gamepads.erase(i);
+
+			// if the gamepad is no longer connected, disconnect
+			MINTY_LOG_FORMAT("Controller {} disconnected.", i);
+		}
+	}
 }
 
 void minty::Window::save_restore_info()
@@ -310,6 +359,22 @@ void minty::Window::cursor_callback(GLFWwindow* window, double xpos, double ypos
 		w->trigger_mouse_move(static_cast<float>(xpos), static_cast<float>(ypos));
 	}
 }
+
+//void minty::Window::gamepad_callback(int id, int event)
+//{
+//	if (event == GLFW_CONNECTED)
+//	{
+//		MINTY_LOG_FORMAT("Controller {} connected.", id);
+//	}
+//	else if (event == GLFW_DISCONNECTED)
+//	{
+//		MINTY_LOG_FORMAT("Controller {} disconnected.", id);
+//	}
+//
+//	void* data = glfwGetJoystickUserPointer(id);
+//
+//	MINTY_LOG_FORMAT("User Pointer is {}null.", data == nullptr ? "" : "not ");
+//}
 
 void minty::Window::error_callback(int const error, char const* description)
 {
