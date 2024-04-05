@@ -23,6 +23,14 @@ namespace minty
 		: public Object
 	{
 	private:
+		struct Gamepad
+		{
+			GLFWgamepadstate* state;
+
+			char const* name;
+		};
+
+	private:
 		static int _windowCount;
 
 		String _title;
@@ -35,7 +43,7 @@ namespace minty
 		ScriptClass const* _windowScript;
 		ScriptClass const* _inputScript;
 
-		std::unordered_map<int, GLFWgamepadstate*> _gamepads;
+		std::unordered_map<int, Gamepad> _gamepads;
 	public:
 		/// <summary>
 		/// Creates a new Window.

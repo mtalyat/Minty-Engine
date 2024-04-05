@@ -13,6 +13,8 @@ using namespace minty;
 
 int Window::_windowCount = 0;
 
+static constexpr float JOYSTICK_THRESHOLD = 0.1f;
+
 Window::Window(String const& title, int const width, int const height, Path const& iconPath)
 	: Window(title, -1, -1, width, height, iconPath)
 {}
@@ -84,9 +86,9 @@ minty::Window::Window(String const& title, int const x, int const y, int const w
 Window::~Window()
 {
 	// destroy gamepads
-	for (auto const& [id, state] : _gamepads)
+	for (auto const& [id, gamepad] : _gamepads)
 	{
-		delete state;
+		delete gamepad.state;
 	}
 
 	// destroy window
@@ -239,7 +241,7 @@ void minty::Window::poll_events()
 	GLFWgamepadstate state;
 
 	// check for each controller
-	for (size_t i = 0; i <= GLFW_JOYSTICK_LAST; i++)
+	for (int i = 0; i <= GLFW_JOYSTICK_LAST; i++)
 	{
 		if (glfwGetGamepadState(i, &state))
 		{
@@ -250,30 +252,57 @@ void minty::Window::poll_events()
 				GLFWgamepadstate* newState = new GLFWgamepadstate();
 
 				// add to connected
-				_gamepads.emplace(i, newState);
+				_gamepads.emplace(i, Gamepad
+					{
+						.state = newState,
+						.name = glfwGetGamepadName(i),
+					});
 
-				// copy over data so the initial state is whatever it is right now
-				memcpy(newState, &state, sizeof(GLFWgamepadstate));
+				Gamepad const& gamepad = _gamepads.at(i);
 
-				MINTY_LOG_FORMAT("Controller {} connected.", i);
+				MINTY_LOG_FORMAT("Controller \"{}\" ({}) connected.", gamepad.name, i);
 			}
 
 			// get old data
-			GLFWgamepadstate* oldState = _gamepads.at(i);
+			GLFWgamepadstate* oldState = _gamepads.at(i).state;
 
-			// TODO: check inputs
+			// check button changes
+			for (int j = 0; j <= GLFW_GAMEPAD_BUTTON_LAST; j++)
+			{
+				if (state.buttons[j] != oldState->buttons[j])
+				{
+					MINTY_LOG_FORMAT("[Gamepad] Button {}: old = {}, new = {}", j, oldState->buttons[j], state.buttons[j]);
+				}
+			}
 
+			// check axes changes
+			for (int j = 0; j <= GLFW_GAMEPAD_AXIS_LAST; j++)
+			{
+				// round to zero if needed, only for joysticks
+				if (j <= GLFW_GAMEPAD_AXIS_RIGHT_Y && Math::abs(state.axes[j]) < JOYSTICK_THRESHOLD)
+				{
+					state.axes[j] = 0.0f;
+				}
+
+				// compare to old
+				if (state.axes[j] != oldState->axes[j])
+				{
+					MINTY_LOG_FORMAT("[Gamepad] Axis {}: old = {}, new = {}", j, oldState->axes[j], state.axes[j]);
+				}
+			}
 
 			// copy over new state data
 			memcpy(oldState, &state, sizeof(GLFWgamepadstate));
 		}
 		else if(_gamepads.contains(i))
 		{
-			delete _gamepads.at(i);
-			_gamepads.erase(i);
+			Gamepad const& gamepad = _gamepads.at(i);
 
 			// if the gamepad is no longer connected, disconnect
-			MINTY_LOG_FORMAT("Controller {} disconnected.", i);
+			MINTY_LOG_FORMAT("Controller \"{}\" ({}) disconnected.", gamepad.name, i);
+
+			delete gamepad.state;
+			_gamepads.erase(i);
 		}
 	}
 }
