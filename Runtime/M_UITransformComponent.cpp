@@ -80,12 +80,12 @@ AnchorMode minty::from_string_anchor_mode(String const& string)
 
 String minty::to_string(UITransformComponent const& value)
 {
-	return std::format("SpriteComponent(anchor = {}, x/left = {}, y/top = {}, width/right = {}, height/bottom = {})", static_cast<Byte>(value.anchorMode), value.x, value.y, value.width, value.height);
+	return std::format("SpriteComponent(anchorMode = {}, x/left = {}, y/top = {}, width/right = {}, height/bottom = {})", static_cast<Byte>(value.anchorMode), value.x, value.y, value.width, value.height);
 }
 
 void minty::UITransformComponent::serialize(Writer& writer) const
 {
-	writer.write("anchor", to_string(anchorMode));
+	writer.write("anchorMode", to_string(anchorMode));
 	writer.write("x", x);
 	writer.write("y", y);
 	writer.write("width", width);
@@ -95,7 +95,7 @@ void minty::UITransformComponent::serialize(Writer& writer) const
 void minty::UITransformComponent::deserialize(Reader const& reader)
 {
 	String name;
-	if (reader.try_read_string("anchor", name))anchorMode = from_string_anchor_mode(name);
+	if (reader.try_read_string("anchorMode", name))anchorMode = from_string_anchor_mode(name);
 	reader.try_read_float("x", x);
 	reader.try_read_float("left", left);
 	reader.try_read_float("y", y);

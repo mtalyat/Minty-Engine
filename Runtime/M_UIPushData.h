@@ -8,11 +8,19 @@ namespace minty
 {
 	struct UIPushData
 	{
-		alignas(16) Vector2 minCoords;
-		Vector2 maxCoords;
-		alignas(16) Vector2 position;
-		Vector2 size;
-		alignas(16) int anchor;
+		alignas(16) float x; // left
+		float y; // top
+		float width; // right
+		float height; // bottom
+		alignas(16) int anchorMode;
 		int unused0, unused1, unused2;
+	};
+
+	struct CanvasBufferObject
+	{
+		alignas(16) int width;
+		int height;
+		int resolutionWidth;
+		int resolutionHeight;
 	};
 }

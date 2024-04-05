@@ -4,6 +4,7 @@
 #include "M_AssetEngine.h"
 #include "M_DrawCallObjectInfo.h"
 #include "M_SpritePushData.h"
+#include "M_UIPushData.h"
 
 #include "M_Camera.h"
 #include "M_Console.h"
@@ -1176,77 +1177,43 @@ void minty::RenderEngine::draw_sprite(VkCommandBuffer commandBuffer, TransformCo
 
 void minty::RenderEngine::draw_ui(VkCommandBuffer commandBuffer, UITransformComponent const& uiComponent, SpriteComponent const& spriteComponent)
 {
-	Console::todo("fix RenderEngine::draw_ui");
-	//// get the sprite
-	//Sprite const& sprite = get_sprite(spriteComponent.spriteId);
+	// do not draw if null sprite
+	if (!spriteComponent.sprite) return;
 
-	//// bind the material the sprite is using
-	//bind(commandBuffer, sprite.get_material_id());
+	// get the sprite
+	Sprite const& sprite = *spriteComponent.sprite;
 
-	//// adjust info based on anchor and pivot
-	//float width = static_cast<float>(_window->get_width());
-	//float height = static_cast<float>(_window->get_height());
-	//float left, top, right, bottom;
+	// bind the material the sprite is using
+	bind(commandBuffer, sprite.get_material());
 
-	//int anchor = static_cast<int>(uiComponent.anchorMode);
+	// TODO: make safer
+	Shader* shader = sprite.get_material()->get_template()->get_shader_passes().front()->get_shader();
 
-	//// do x, then y
-	//if (anchor & static_cast<int>(AnchorMode::Left))
-	//{
-	//	left = uiComponent.x / width;
-	//	right = (uiComponent.x + uiComponent.width) / width;
-	//}
-	//else if (anchor & static_cast<int>(AnchorMode::Center))
-	//{
-	//	left = uiComponent.x / width + 0.5f;
-	//	right = (uiComponent.x + uiComponent.width) / width + 0.5f;
-	//}
-	//else if (anchor & static_cast<int>(AnchorMode::Right))
-	//{
-	//	left = uiComponent.x / width + 1.0f;
-	//	right = (uiComponent.x + uiComponent.width) / width + 1.0f;
-	//}
-	//else
-	//{
-	//	left = uiComponent.left;
-	//	right = uiComponent.right;
-	//}
+	MINTY_ASSERT(shader != nullptr);
 
-	//if (anchor & static_cast<int>(AnchorMode::Top))
-	//{
-	//	top = uiComponent.y / height;
-	//	bottom = (uiComponent.y + uiComponent.height) / height;
-	//}
-	//else if (anchor & static_cast<int>(AnchorMode::Middle))
-	//{
-	//	top = uiComponent.y / height + 0.5f;
-	//	bottom = (uiComponent.y + uiComponent.height) / height + 0.5f;
-	//}
-	//else if (anchor & static_cast<int>(AnchorMode::Bottom))
-	//{
-	//	top = uiComponent.y / height + 1.0f;
-	//	bottom = (uiComponent.y + uiComponent.height) / height + 1.0f;
-	//}
-	//else
-	//{
-	//	top = uiComponent.top;
-	//	bottom = uiComponent.bottom;
-	//}
+	// TODO: do this elsewhere, not every draw call
+	CanvasBufferObject canvasBufferObject
+	{
+		.width = _window->get_frame_width(),
+		.height = _window->get_frame_height(),
+		.resolutionWidth = _window->get_width(),
+		.resolutionHeight = _window->get_height(),
+	};
+	shader->update_global_uniform_constant("canvas", &canvasBufferObject, sizeof(CanvasBufferObject), 0);
 
-	//// set draw call info
-	//DrawCallObjectUI info
-	//{
-	//	.materialId = sprite.get_material_id(),
-	//	.layer = spriteComponent.layer,
-	//	.coords = Vector4(sprite.get_min_coords(), sprite.get_max_coords()),
-	//	.pos = Vector4(left, top, right, bottom),
-	//};
+	// update push data and draw
+	UIPushData pushData
+	{
+		.x = uiComponent.x,
+		.y = uiComponent.y,
+		.width = uiComponent.width,
+		.height = uiComponent.height,
+		.anchorMode = static_cast<int>(uiComponent.anchorMode),
+	};
+	shader->update_push_constant(commandBuffer, &pushData, sizeof(UIPushData));
 
-	//Shader& shader = get_shader_from_material_id(sprite.get_material_id());
-	//shader.update_push_constant(commandBuffer, &info, sizeof(DrawCallObjectUI));
-
-	//// draw
-	//vkCmdDraw(commandBuffer, 6, 1, 0, 0);
+	// draw
+	vkCmdDraw(commandBuffer, 6, 1, 0, 0);
 }
 
 bool RenderEngine::check_validation_layer_support()
