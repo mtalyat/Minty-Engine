@@ -6,6 +6,7 @@
 #include "M_KeyModifiers.h"
 #include "M_MouseButton.h"
 #include "M_CursorMode.h"
+#include "M_Gamepad.h"
 #include <unordered_map>
 
 struct GLFWwindow;
@@ -180,6 +181,18 @@ namespace minty
 
 		// triggers a move in the input map
 		void trigger_mouse_move(float x, float y);
+
+		// triggers a gamepad connect
+		void trigger_gamepad_connect(int controller);
+
+		// triggers a gamepad disconnect
+		void trigger_gamepad_disconnect(int controller);
+
+		// triggers a gamepad button in the input map
+		void trigger_gamepad_button(int controller, GamepadButton button, KeyAction action);
+
+		// triggers 
+		void trigger_gamepad_axis(int controller, GamepadAxis axis, float value);
 
 		// window resize
 		static void resize_callback(GLFWwindow* const window, int const width, int const height);

@@ -179,15 +179,50 @@ namespace MintyEngine
         Middle = Button3,
     };
 
+    /// <summary>
+    /// A button on a gamepad.
+    /// </summary>
+    public enum GamepadButton
+    {
+        ButtonSouth = 0,
+        ButtonEast = 1,
+        ButtonWest = 2,
+        ButtonNorth = 3,
+        LeftBumper = 4,
+        RightBumper = 5,
+        Back = 6,
+        Start = 7,
+        Home = 8,
+        LeftThumb = 9,
+        RightThumb = 10,
+        DpadUp = 11,
+        DpadRight = 12,
+        DpadDown = 13,
+        DpadLeft = 14,
+    }
+
+    /// <summary>
+    /// An axis on a gamepad.
+    /// </summary>
+    public enum GamepadAxis
+    {
+        LeftX = 0,
+        LeftY = 1,
+        RightX = 2,
+        RightY = 3,
+        LeftTrigger = 4,
+        RightTrigger = 5,
+    }
+
     public class KeyPressEventArgs : EventArgs
     {
-        private Key _key;
+        private readonly Key _key;
         public Key Key => _key;
 
-        private ButtonAction _action;
+        private readonly ButtonAction _action;
         public ButtonAction Action => _action;
 
-        private KeyModifiers _mods;
+        private readonly KeyModifiers _mods;
         public KeyModifiers Modifiers => _mods;
 
         public KeyPressEventArgs(Key key, ButtonAction action, KeyModifiers mods)
@@ -200,16 +235,16 @@ namespace MintyEngine
 
     public class MouseClickEventArgs : EventArgs
     {
-        private MouseButton _button;
+        private readonly MouseButton _button;
         public MouseButton Button => _button;
 
-        private ButtonAction _action;
+        private readonly ButtonAction _action;
         public ButtonAction Action => _action;
 
-        private KeyModifiers _modifiers;
+        private readonly KeyModifiers _modifiers;
         public KeyModifiers Modifiers => _modifiers;
 
-        private Vector2 _position;
+        private readonly Vector2 _position;
         public Vector2 Position => _position;
 
         public MouseClickEventArgs(MouseButton button, ButtonAction action, KeyModifiers modifiers, Vector2 position)
@@ -223,13 +258,13 @@ namespace MintyEngine
 
     public class MouseMoveEventArgs : EventArgs
     {
-        private Vector2 _newPosition;
+        private readonly Vector2 _newPosition;
         public Vector2 NewPosition => _newPosition;
 
-        private Vector2 _deltaPosition;
+        private readonly Vector2 _deltaPosition;
         public Vector2 DeltaPosition => _deltaPosition;
 
-        private Vector2 _oldPosition;
+        private readonly Vector2 _oldPosition;
         public Vector2 OldPosition => _oldPosition;
 
         public MouseMoveEventArgs(Vector2 newPosition, Vector2 oldPosition)
@@ -242,7 +277,7 @@ namespace MintyEngine
 
     public class MouseScrollEventArgs : EventArgs
     {
-        private Vector2 _deltaScroll;
+        private readonly Vector2 _deltaScroll;
         public Vector2 DeltaScroll => _deltaScroll;
 
         public MouseScrollEventArgs(Vector2 deltaScroll)
@@ -251,20 +286,113 @@ namespace MintyEngine
         }
     }
 
+    public class GamepadConnectionEventArgs : EventArgs
+    {
+        private readonly int _controller;
+        public int Controller => _controller;
+
+        public GamepadConnectionEventArgs(int controller)
+        {
+            _controller = controller;
+        }
+    }
+
+    public class GamepadButtonEventArgs : EventArgs
+    {
+        private readonly int _controller;
+        public int Controller => _controller;
+
+        private readonly GamepadButton _button;
+        public GamepadButton Button => _button;
+
+        private readonly ButtonAction _action;
+        public ButtonAction Action => _action;
+
+        public GamepadButtonEventArgs(int controller, GamepadButton button, ButtonAction action)
+        {
+            _controller = controller;
+            _button = button;
+            _action = action;
+        }
+    }
+
+    public class GamepadAxisEventArgs : EventArgs
+    {
+        private readonly int _controller;
+        public int Controller => _controller;
+
+        private readonly GamepadAxis _axis;
+        public GamepadAxis Axis => _axis;
+
+        private readonly float _value;
+        public float Value => _value;
+
+        public GamepadAxisEventArgs(int controller, GamepadAxis axis, float value)
+        {
+            _controller = controller;
+            _axis = axis;
+            _value = value;
+        }
+    }
+
     public delegate void KeyPressEventHandler(object sender, KeyPressEventArgs e);
     public delegate void MouseClickEventHandler(object sender, MouseClickEventArgs e);
     public delegate void MouseMoveEventHandler(object sender, MouseMoveEventArgs e);
     public delegate void MouseScrollEventHandler(object sender, MouseScrollEventArgs e);
+    public delegate void GamepadConnectEventHandler(object sender, GamepadConnectionEventArgs e);
+    public delegate void GamepadDisconnectEventHandler(object sender, GamepadConnectionEventArgs e);
+    public delegate void GamepadButtonEventHandler(object sender, GamepadButtonEventArgs e);
+    public delegate void GamepadAxisEventHandler(object sender, GamepadAxisEventArgs e);
 
     public class InputMap
     {
-        private EventHandlerCollection<Key, KeyPressEventHandler, KeyPressEventArgs>[] _keyEvents = new EventHandlerCollection<Key, KeyPressEventHandler, KeyPressEventArgs>[] { new EventHandlerCollection<Key, KeyPressEventHandler, KeyPressEventArgs>(), new EventHandlerCollection<Key, KeyPressEventHandler, KeyPressEventArgs>() };
+        private EventHandlerCollection<Key, KeyPressEventHandler, KeyPressEventArgs>[] _keyEvents =
+            new EventHandlerCollection<Key, KeyPressEventHandler, KeyPressEventArgs>[]
+            {
+                new EventHandlerCollection<Key, KeyPressEventHandler, KeyPressEventArgs>(),
+                new EventHandlerCollection<Key, KeyPressEventHandler, KeyPressEventArgs>()
+            };
         public EventHandlerCollection<Key, KeyPressEventHandler, KeyPressEventArgs> OnKeyUp => _keyEvents[(int)ButtonAction.Up];
         public EventHandlerCollection<Key, KeyPressEventHandler, KeyPressEventArgs> OnKeyDown => _keyEvents[(int)ButtonAction.Down];
 
-        private EventHandlerCollection<MouseButton, MouseClickEventHandler, MouseClickEventArgs>[] _mouseEvents = new EventHandlerCollection<MouseButton, MouseClickEventHandler, MouseClickEventArgs>[] { new EventHandlerCollection<MouseButton, MouseClickEventHandler, MouseClickEventArgs>(), new EventHandlerCollection<MouseButton, MouseClickEventHandler, MouseClickEventArgs>() };
+        private EventHandlerCollection<MouseButton, MouseClickEventHandler, MouseClickEventArgs>[] _mouseEvents =
+            new EventHandlerCollection<MouseButton, MouseClickEventHandler, MouseClickEventArgs>[]
+            {
+                new EventHandlerCollection<MouseButton, MouseClickEventHandler, MouseClickEventArgs>(),
+                new EventHandlerCollection<MouseButton, MouseClickEventHandler, MouseClickEventArgs>()
+            };
         public EventHandlerCollection<MouseButton, MouseClickEventHandler, MouseClickEventArgs> OnMouseUp => _mouseEvents[(int)ButtonAction.Up];
         public EventHandlerCollection<MouseButton, MouseClickEventHandler, MouseClickEventArgs> OnMouseDown => _mouseEvents[(int)ButtonAction.Down];
+
+        private event GamepadConnectEventHandler _gamepadConnect;
+        public GamepadConnectEventHandler OnGamepadConnect
+        {
+            get => _gamepadConnect;
+            set => _gamepadConnect = value;
+        }
+
+        private event GamepadDisconnectEventHandler _gamepadDisconnect;
+        public GamepadDisconnectEventHandler OnGamepadDisconnect
+        {
+            get => _gamepadDisconnect;
+            set => _gamepadDisconnect = value;
+        }
+
+        private EventHandlerCollection<GamepadButton, GamepadButtonEventHandler, GamepadButtonEventArgs>[] _gamepadButtonEvents =
+            new EventHandlerCollection<GamepadButton, GamepadButtonEventHandler, GamepadButtonEventArgs>[]
+            {
+                new EventHandlerCollection<GamepadButton, GamepadButtonEventHandler, GamepadButtonEventArgs>(),
+                new EventHandlerCollection<GamepadButton, GamepadButtonEventHandler, GamepadButtonEventArgs>()
+            };
+        public EventHandlerCollection<GamepadButton, GamepadButtonEventHandler, GamepadButtonEventArgs> OnGamepadUp => _gamepadButtonEvents[(int)ButtonAction.Up];
+        public EventHandlerCollection<GamepadButton, GamepadButtonEventHandler, GamepadButtonEventArgs> OnGamepadDown => _gamepadButtonEvents[(int)ButtonAction.Down];
+
+        private EventHandlerCollection<GamepadAxis, GamepadAxisEventHandler, GamepadAxisEventArgs> _gamepadAxisChange = new EventHandlerCollection<GamepadAxis, GamepadAxisEventHandler, GamepadAxisEventArgs>();
+        public EventHandlerCollection<GamepadAxis, GamepadAxisEventHandler, GamepadAxisEventArgs> OnGamepadChange
+        {
+            get => _gamepadAxisChange;
+            set => _gamepadAxisChange = value;
+        }
 
         private event MouseMoveEventHandler _mouseMove;
         public MouseMoveEventHandler OnMouseMove
@@ -307,6 +435,26 @@ namespace MintyEngine
             _mouseScroll?.Invoke(this, e);
         }
 
+        internal void TriggerGamepadConnect(GamepadConnectionEventArgs e)
+        {
+            _gamepadConnect?.Invoke(this, e);
+        }
+
+        internal void TriggerGamepadDisconnect(GamepadConnectionEventArgs e)
+        {
+            _gamepadDisconnect?.Invoke(this, e);
+        }
+
+        internal void TriggerGamepadButton(GamepadButtonEventArgs e)
+        {
+            _gamepadButtonEvents[(int)e.Action]?.Invoke(e.Button, this, e);
+        }
+
+        internal void TriggerGamepadAxis(GamepadAxisEventArgs e)
+        {
+            _gamepadAxisChange[e.Axis]?.Invoke(this, e);
+        }
+
         #endregion
     }
 
@@ -319,7 +467,8 @@ namespace MintyEngine
         private static InputMap _activeMap = null;
 
         private static HashSet<Key> _keyStates = new HashSet<Key>(); // all down keys
-        private static HashSet<MouseButton> _buttonStates = new HashSet<MouseButton>(); // all down mouse buttons
+        private static HashSet<MouseButton> _mouseButtonStates = new HashSet<MouseButton>(); // all down mouse buttons
+        private static Dictionary<int, HashSet<GamepadButton>> _gamepadButtonStates = new Dictionary<int, HashSet<GamepadButton>>(); // all down gamepad buttons
 
         private static Vector2 _mousePosition;
 
@@ -328,7 +477,7 @@ namespace MintyEngine
             _activeMap = inputMap;
         }
 
-        #region Key Checking
+        #region Checking
 
         public static bool IsKeyDown(Key key)
         {
@@ -337,7 +486,17 @@ namespace MintyEngine
 
         public static bool IsMouseButtonDown(MouseButton button)
         {
-            return _buttonStates.Contains(button);
+            return _mouseButtonStates.Contains(button);
+        }
+
+        public static bool IsControllerConnected(int controller)
+        {
+            return _gamepadButtonStates.ContainsKey(controller);
+        }
+
+        public static bool IsControllerButtonDown(int controller, GamepadButton button)
+        {
+            return _gamepadButtonStates[controller].Contains(button);
         }
 
         #endregion
@@ -356,10 +515,7 @@ namespace MintyEngine
                     break;
             }
 
-            if (_activeMap != null)
-            {
-                _activeMap.TriggerKey(new KeyPressEventArgs(key, action, mods));
-            }
+            _activeMap?.TriggerKey(new KeyPressEventArgs(key, action, mods));
         }
 
         private static void TriggerMouseClick(MouseButton button, ButtonAction action, KeyModifiers mods)
@@ -367,35 +523,60 @@ namespace MintyEngine
             switch (action)
             {
                 case ButtonAction.Up:
-                    _buttonStates.Remove(button);
+                    _mouseButtonStates.Remove(button);
                     break;
                 case ButtonAction.Down:
-                    _buttonStates.Add(button);
+                    _mouseButtonStates.Add(button);
                     break;
             }
 
-            if (_activeMap != null)
-            {
-                _activeMap.TriggerMouseClick(new MouseClickEventArgs(button, action, mods, _mousePosition));
-            }
+            _activeMap?.TriggerMouseClick(new MouseClickEventArgs(button, action, mods, _mousePosition));
         }
 
         private static void TriggerMouseMove(float x, float y)
         {
             Vector2 newPosition = new Vector2(x, y);
-            if (_activeMap != null)
-            {
-                _activeMap.TriggerMouseMove(new MouseMoveEventArgs(newPosition, _mousePosition));
-            }
+            _activeMap?.TriggerMouseMove(new MouseMoveEventArgs(newPosition, _mousePosition));
             _mousePosition = newPosition;
         }
 
         private static void TriggerMouseScroll(float dx, float dy)
         {
-            if (_activeMap != null)
+            _activeMap?.TriggerMouseScroll(new MouseScrollEventArgs(new Vector2(dx, dy)));
+        }
+
+        private static void TriggerGamepadConnect(int controller)
+        {
+            _gamepadButtonStates.Add(controller, new HashSet<GamepadButton>());
+
+            _activeMap?.TriggerGamepadConnect(new GamepadConnectionEventArgs(controller));
+        }
+
+        private static void TriggerGamepadDisconnect(int controller)
+        {
+            _gamepadButtonStates.Remove(controller);
+
+            _activeMap?.TriggerGamepadDisconnect(new GamepadConnectionEventArgs(controller));
+        }
+
+        private static void TriggerGamepadButton(int controller, GamepadButton button, ButtonAction action)
+        {
+            switch (action)
             {
-                _activeMap.TriggerMouseScroll(new MouseScrollEventArgs(new Vector2(dx, dy)));
+                case ButtonAction.Up:
+                    _gamepadButtonStates[controller].Remove(button);
+                    break;
+                case ButtonAction.Down:
+                    _gamepadButtonStates[controller].Add(button);
+                    break;
             }
+
+            _activeMap?.TriggerGamepadButton(new GamepadButtonEventArgs(controller, button, action));
+        }
+
+        private static void TriggerGamepadAxis(int controller, GamepadAxis axis, float value)
+        {
+            _activeMap?.TriggerGamepadAxis(new GamepadAxisEventArgs(controller, axis, value));
         }
 
         #endregion

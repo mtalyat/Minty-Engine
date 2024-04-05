@@ -21,6 +21,20 @@ public class PlayerController : Script
             Session.InputMap.OnKeyDown[key] += OnKeyMove;
             Session.InputMap.OnKeyUp[key] += OnKeyMove;
         }
+
+        Session.InputMap.OnGamepadConnect += OnGamepadConnect;
+        Session.InputMap.OnGamepadDisconnect += OnGamepadDisconnect;
+
+        foreach(GamepadButton button in new GamepadButton[] { GamepadButton.ButtonSouth, GamepadButton.ButtonNorth, GamepadButton.ButtonEast, GamepadButton.ButtonWest })
+        {
+            Session.InputMap.OnGamepadDown[button] += OnGamepadDown;
+            Session.InputMap.OnGamepadUp[button] += OnGamepadUp;
+        }
+
+        foreach(GamepadAxis axis in new GamepadAxis[] { GamepadAxis.LeftX, GamepadAxis.LeftY })
+        {
+            Session.InputMap.OnGamepadChange[axis] += OnGamepadAxis;
+        }
     }
 
     private void OnLoad()
@@ -69,5 +83,30 @@ public class PlayerController : Script
                 input.Z -= direction;
                 break;
         }
+    }
+
+    private void OnGamepadConnect(object sender, GamepadConnectionEventArgs e)
+    {
+        Debug.Log($"Gamepad connect: {e.Controller}");
+    }
+
+    private void OnGamepadDisconnect(object sender, GamepadConnectionEventArgs e)
+    {
+        Debug.Log($"Gamepad disconnect: {e.Controller}");
+    }
+
+    private void OnGamepadDown(object sender, GamepadButtonEventArgs e)
+    {
+        Debug.Log($"Down: {e.Button}");
+    }
+
+    private void OnGamepadUp(object sender, GamepadButtonEventArgs e)
+    {
+        Debug.Log($"Up: {e.Button}");
+    }
+
+    private void OnGamepadAxis(object sender, GamepadAxisEventArgs e)
+    {
+        Debug.Log($"Axis: {e.Axis}");
     }
 }

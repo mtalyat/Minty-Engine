@@ -260,7 +260,7 @@ void minty::Window::poll_events()
 
 				Gamepad const& gamepad = _gamepads.at(i);
 
-				MINTY_LOG_FORMAT("Controller \"{}\" ({}) connected.", gamepad.name, i);
+				trigger_gamepad_connect(i);
 			}
 
 			// get old data
@@ -271,7 +271,7 @@ void minty::Window::poll_events()
 			{
 				if (state.buttons[j] != oldState->buttons[j])
 				{
-					MINTY_LOG_FORMAT("[Gamepad] Button {}: old = {}, new = {}", j, oldState->buttons[j], state.buttons[j]);
+					trigger_gamepad_button(i, static_cast<GamepadButton>(j), static_cast<KeyAction>(state.buttons[j]));
 				}
 			}
 
@@ -287,7 +287,7 @@ void minty::Window::poll_events()
 				// compare to old
 				if (state.axes[j] != oldState->axes[j])
 				{
-					MINTY_LOG_FORMAT("[Gamepad] Axis {}: old = {}, new = {}", j, oldState->axes[j], state.axes[j]);
+					trigger_gamepad_axis(i, static_cast<GamepadAxis>(j), state.axes[j]);
 				}
 			}
 
@@ -298,8 +298,7 @@ void minty::Window::poll_events()
 		{
 			Gamepad const& gamepad = _gamepads.at(i);
 
-			// if the gamepad is no longer connected, disconnect
-			MINTY_LOG_FORMAT("Controller \"{}\" ({}) disconnected.", gamepad.name, i);
+			trigger_gamepad_disconnect(i);
 
 			delete gamepad.state;
 			_gamepads.erase(i);
@@ -346,6 +345,42 @@ void minty::Window::trigger_mouse_move(float x, float y)
 	{
 		ScriptArguments arguments({ &x, &y });
 		_inputScript->invoke(SCRIPT_INPUT_TRIGGER_MOUSE_MOVE, arguments);
+	}
+}
+
+void minty::Window::trigger_gamepad_connect(int controller)
+{
+	if (_inputScript)
+	{
+		ScriptArguments arguments({ &controller });
+		_inputScript->invoke(SCRIPT_INPUT_TRIGGER_GAMEPAD_CONNECT, arguments);
+	}
+}
+
+void minty::Window::trigger_gamepad_disconnect(int controller)
+{
+	if (_inputScript)
+	{
+		ScriptArguments arguments({ &controller });
+		_inputScript->invoke(SCRIPT_INPUT_TRIGGER_GAMEPAD_DISCONNECT, arguments);
+	}
+}
+
+void minty::Window::trigger_gamepad_button(int controller, GamepadButton button, KeyAction action)
+{
+	if (_inputScript)
+	{
+		ScriptArguments arguments({ &controller, &button, &action });
+		_inputScript->invoke(SCRIPT_INPUT_TRIGGER_GAMEPAD_BUTTON, arguments);
+	}
+}
+
+void minty::Window::trigger_gamepad_axis(int controller, GamepadAxis axis, float value)
+{
+	if (_inputScript)
+	{
+		ScriptArguments arguments({ &controller, &axis, &value });
+		_inputScript->invoke(SCRIPT_INPUT_TRIGGER_GAMEPAD_AXIS, arguments);
 	}
 }
 
