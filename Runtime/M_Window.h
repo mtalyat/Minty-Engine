@@ -6,9 +6,11 @@
 #include "M_KeyModifiers.h"
 #include "M_MouseButton.h"
 #include "M_CursorMode.h"
-#include <map>
+#include "M_Gamepad.h"
+#include <unordered_map>
 
 struct GLFWwindow;
+struct GLFWgamepadstate;
 
 namespace minty
 {
@@ -22,6 +24,14 @@ namespace minty
 		: public Object
 	{
 	private:
+		struct Gamepad
+		{
+			GLFWgamepadstate* state;
+
+			char const* name;
+		};
+
+	private:
 		static int _windowCount;
 
 		String _title;
@@ -33,6 +43,8 @@ namespace minty
 
 		ScriptClass const* _windowScript;
 		ScriptClass const* _inputScript;
+
+		std::unordered_map<int, Gamepad> _gamepads;
 	public:
 		/// <summary>
 		/// Creates a new Window.
@@ -154,7 +166,7 @@ namespace minty
 		/// <summary>
 		/// Processes all pending Window events.
 		/// </summary>
-		static void poll_events();
+		void poll_events();
 	private:
 		void save_restore_info();
 
@@ -170,20 +182,35 @@ namespace minty
 		// triggers a move in the input map
 		void trigger_mouse_move(float x, float y);
 
+		// triggers a gamepad connect
+		void trigger_gamepad_connect(int controller);
+
+		// triggers a gamepad disconnect
+		void trigger_gamepad_disconnect(int controller);
+
+		// triggers a gamepad button in the input map
+		void trigger_gamepad_button(int controller, GamepadButton button, KeyAction action);
+
+		// triggers 
+		void trigger_gamepad_axis(int controller, GamepadAxis axis, float value);
+
 		// window resize
 		static void resize_callback(GLFWwindow* const window, int const width, int const height);
 
 		// keyboard key
-		static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods);
+		static void key_callback(GLFWwindow* const window, int key, int scancode, int action, int mods);
 
 		// mouse button
-		static void button_ballback(GLFWwindow* window, int button, int action, int mods);
+		static void button_ballback(GLFWwindow* const window, int button, int action, int mods);
 
 		// mouse scroll
-		static void scroll_callback(GLFWwindow* window, double xoffset, double yoffset);
+		static void scroll_callback(GLFWwindow* const window, double xoffset, double yoffset);
 
 		// cursor position
-		static void cursor_callback(GLFWwindow* window, double xpos, double ypos);
+		static void cursor_callback(GLFWwindow* const window, double xpos, double ypos);
+
+		// gamepad connect/disconnect
+		//static void gamepad_callback(int id, int event);
 
 		// error reporting
 		static void error_callback(int const error, char const* description);

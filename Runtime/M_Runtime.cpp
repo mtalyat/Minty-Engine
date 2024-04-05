@@ -215,8 +215,8 @@ bool minty::Runtime::loop()
 		return false;
 	}
 
-	// run window events
-	glfwPollEvents();
+	// run window events and input
+	_window->poll_events();
 
 	// update scene(s)
 	_sceneManager->update();

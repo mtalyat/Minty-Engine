@@ -38,7 +38,7 @@ entities
 			scale: (1, 1, 1)
 		Script
 			- c5bbd244d3aafdbf
-				time: 10
+				time: 1
 		Enabled
 		Renderable
 		AudioSource
