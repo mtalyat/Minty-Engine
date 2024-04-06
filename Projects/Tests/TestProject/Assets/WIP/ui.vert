@@ -22,6 +22,7 @@ layout(push_constant) uniform UIObject
 	float y; // top
 	float width; // right
 	float height; // bottom
+    vec4 color;
     int anchorMode;
     int unused0, unused1, unused2;
 } object;
@@ -43,6 +44,6 @@ void main() {
 
     vec2 pos = vertices[gl_VertexIndex % 6];
     gl_Position = vec4((object.x + pos.x * object.width) / canvas.width * 2.0f - 1.0f, (object.y + pos.y * object.height) / canvas.height * 2.0f - 1.0f, 0.0, 1.0);
-    fragColor = vec4(1.0, 1.0, 1.0, 1.0);
+    fragColor = object.color;
     fragTexCoord = pos;
 }

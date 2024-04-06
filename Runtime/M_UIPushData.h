@@ -12,6 +12,7 @@ namespace minty
 		float y; // top
 		float width; // right
 		float height; // bottom
+		Vector4 color;
 		alignas(16) int anchorMode;
 		int unused0, unused1, unused2;
 	};

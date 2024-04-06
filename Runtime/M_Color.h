@@ -113,6 +113,9 @@ namespace minty
 		friend std::ostream& operator<<(std::ostream& stream, Color const& color);
 		friend std::istream& operator>>(std::istream& stream, Color& color);
 
+		void serialize(Writer& writer) const override;
+		void deserialize(Reader const& reader) override;
+
 		/// <summary>
 		/// Gets the red value as a scale from 0.0f to 1.0f.
 		/// </summary>

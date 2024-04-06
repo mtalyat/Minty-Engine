@@ -2,6 +2,7 @@
 
 #include "M_Component.h"
 #include "M_Vector.h"
+#include "M_Color.h"
 
 namespace minty
 {
@@ -24,6 +25,11 @@ namespace minty
 		/// The size of the Sprite in world space.
 		/// </summary>
 		Vector2 size = Vector2(1.0f, 1.0f);
+
+		/// <summary>
+		/// The color of the Sprite.
+		/// </summary>
+		Color color = Color(255, 255, 255, 255);
 
 		void serialize(Writer& writer) const override;
 		void deserialize(Reader const& reader) override;

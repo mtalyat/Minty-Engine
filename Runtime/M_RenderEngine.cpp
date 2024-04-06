@@ -1220,6 +1220,7 @@ void minty::RenderEngine::draw_ui(VkCommandBuffer commandBuffer, UITransformComp
 		.y = uiComponent.y,
 		.width = uiComponent.width,
 		.height = uiComponent.height,
+		.color = Vector4(spriteComponent.color.rf(), spriteComponent.color.gf(), spriteComponent.color.bf(), spriteComponent.color.af()),
 		.anchorMode = static_cast<int>(uiComponent.anchorMode),
 	};
 	shader->update_push_constant(commandBuffer, &pushData, sizeof(UIPushData));

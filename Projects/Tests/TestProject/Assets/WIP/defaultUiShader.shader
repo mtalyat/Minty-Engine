@@ -1,7 +1,7 @@
 push: object
     stageFlags: VERTEX_BIT
     offset: 0
-    size: 32
+    size: 48
 uniform: canvas
     type: UNIFORM_BUFFER
     stageFlags: VERTEX_BIT

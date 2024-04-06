@@ -20,6 +20,7 @@ void minty::SpriteComponent::serialize(Writer& writer) const
 	writer.write("sprite", sprite ? sprite->get_id() : UUID(INVALID_UUID));
 	writer.write("size", size);
 	writer.write("order", order);
+	writer.write("color", color);
 }
 
 void minty::SpriteComponent::deserialize(Reader const& reader)
@@ -34,6 +35,7 @@ void minty::SpriteComponent::deserialize(Reader const& reader)
 	}
 	reader.try_read_object("size", size);
 	reader.try_read_int("order", order);
+	reader.try_read_color("color", color);
 }
 
 String minty::to_string(SpriteComponent const& value)
