@@ -220,6 +220,20 @@ void mintye::HierarchyWindow::set_scene(minty::Scene* const scene)
 	EditorWindow::set_scene(scene);
 }
 
+minty::Entity mintye::HierarchyWindow::create_entity()
+{
+	EntityRegistry& registry = get_scene()->get_entity_registry();
+
+	// create empty entity
+	Entity entity = registry.create();
+
+	// enable and visible by default
+	registry.enable(entity);
+	registry.set_renderable(entity, true);
+
+	return entity;
+}
+
 void mintye::HierarchyWindow::copy_entity(minty::Entity const entity)
 {
 	get_application().copy_asset(get_scene()->get_entity_registry().get_id(entity));
@@ -376,7 +390,7 @@ void mintye::HierarchyWindow::draw_popup()
 	if (ImGui::MenuItem("Create empty"))
 	{
 		// create and select
-		set_selected(registry.create());
+		set_selected(create_entity());
 		get_scene()->sort();
 
 		return;

@@ -25,6 +25,8 @@ namespace mintye
 		void set_scene(minty::Scene* const scene) override;
 
 	private:
+		minty::Entity create_entity();
+
 		void copy_entity(minty::Entity const entity);
 
 		minty::Entity paste_entity();
