@@ -35,9 +35,9 @@ assets
 	- "Assets\\Sprites\\defaultUiSprite.sprite"
 	- "Assets\\Sprites\\x.sprite"
 systems
-	Script
-	Render
 	Audio
+	Render
+	Script
 entities
 	Canvas: d2b000d091cd782b
 		UITransform
@@ -66,7 +66,23 @@ entities
 			sprite: 51156c5dc9972f6b
 			size: (1, 1)
 			order: 0
-			color: #ffffffff
+			color: #ff0000ff
+	Test2: 5e4e62ad4a8f49db
+		UITransform
+			anchorMode: All
+			left: 0
+			right: 200
+			top: 0
+			bottom: 200
+		Enabled
+		Relationship
+			parent: d2b000d091cd782b
+		Renderable
+		Sprite
+			sprite: 51156c5dc9972f6b
+			size: (1, 1)
+			order: 0
+			color: #0000ffff
 	Big Ball: b620841e2d57dd79
 		Transform
 			position: (0, -2, 0)

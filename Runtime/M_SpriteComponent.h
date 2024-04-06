@@ -17,7 +17,12 @@ namespace minty
 		Sprite* sprite;
 
 		/// <summary>
-		/// The order in which to render the Sprite, when it has equal distance to the Camera as another Sprite.
+		/// The layer in which the Sprite exists. Used for sorting and rendering.
+		/// </summary>
+		int layer = 0;
+
+		/// <summary>
+		/// The order within the layer in which to render the Sprite.
 		/// </summary>
 		int order = 0;
 

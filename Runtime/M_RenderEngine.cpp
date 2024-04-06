@@ -1104,17 +1104,20 @@ void minty::RenderEngine::draw_scene(VkCommandBuffer commandBuffer)
 			canvasEntity = ui.canvas;
 
 			// TODO: make safer
-			Shader* shader = sprite.sprite->get_material()->get_template()->get_shader_passes().front()->get_shader();
-
-			MINTY_ASSERT(shader != nullptr);
-
-			CanvasComponent* canvas = _registry->try_get<CanvasComponent>(canvasEntity);
-			CanvasBufferObject canvasBufferObject
+			if (sprite.sprite)
 			{
-				.width = canvas ? canvas->referenceResolutionWidth : 0,
-				.height = canvas ? canvas->referenceResolutionHeight : 0,
-			};
-			shader->update_global_uniform_constant("canvas", &canvasBufferObject, sizeof(CanvasBufferObject), 0);
+				Shader* shader = sprite.sprite->get_material()->get_template()->get_shader_passes().front()->get_shader();
+
+				MINTY_ASSERT(shader != nullptr);
+
+				CanvasComponent* canvas = _registry->try_get<CanvasComponent>(canvasEntity);
+				CanvasBufferObject canvasBufferObject
+				{
+					.width = canvas ? canvas->referenceResolutionWidth : 0,
+					.height = canvas ? canvas->referenceResolutionHeight : 0,
+				};
+				shader->update_global_uniform_constant("canvas", &canvasBufferObject, sizeof(CanvasBufferObject), 0);
+			}
 		}
 
 		draw_ui(commandBuffer, ui, sprite);
