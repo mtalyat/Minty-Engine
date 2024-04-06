@@ -20,7 +20,6 @@ namespace minty
 	{
 		alignas(16) int width;
 		int height;
-		int resolutionWidth;
-		int resolutionHeight;
+		int unused0, unused1;
 	};
 }

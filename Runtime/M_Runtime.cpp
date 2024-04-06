@@ -22,6 +22,7 @@
 #include "M_AudioListenerComponent.h"
 #include "M_AudioSourceComponent.h"
 #include "M_CameraComponent.h"
+#include "M_CanvasComponent.h"
 #include "M_DirtyComponent.h"
 #include "M_DestroyEntityComponent.h"
 #include "M_EnabledComponent.h"
@@ -299,6 +300,7 @@ void minty::Runtime::link()
 	register_component<AudioListenerComponent>(ASSEMBLY_ENGINE_NAME, "AudioListener");
 	register_component<AudioSourceComponent>(ASSEMBLY_ENGINE_NAME, "AudioSource");
 	register_component<CameraComponent>(ASSEMBLY_ENGINE_NAME, "Camera");
+	register_component<CanvasComponent>(ASSEMBLY_ENGINE_NAME, "Canvas");
 	//register_component<DestroyComponent>(ASSEMBLY_ENGINE_NAME, "Destroy");
 	//register_component<DirtyComponent>(ASSEMBLY_ENGINE_NAME, "Dirty");
 	register_component<EnabledComponent>(ASSEMBLY_ENGINE_NAME, "Enabled", false);

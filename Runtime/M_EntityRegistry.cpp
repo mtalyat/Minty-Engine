@@ -11,6 +11,8 @@
 #include "M_TagComponent.h"
 #include "M_RelationshipComponent.h"
 #include "M_TransformComponent.h"
+#include "M_UITransformComponent.h"
+#include "M_CanvasComponent.h"
 #include "M_DirtyComponent.h"
 #include "M_DestroyEntityComponent.h"
 #include "M_DestroyComponentComponent.h"
@@ -43,6 +45,10 @@ minty::EntityRegistry::EntityRegistry(Runtime& engine, Scene& scene)
 	// make it so whenever a transform is editied, it is marked as dirty
 	on_construct<TransformComponent>().connect<&EntityRegistry::emplace_or_replace<DirtyComponent>>();
 	on_update<TransformComponent>().connect<&EntityRegistry::emplace_or_replace<DirtyComponent>>();
+	on_construct<UITransformComponent>().connect<&EntityRegistry::emplace_or_replace<DirtyComponent>>();
+	on_update<UITransformComponent>().connect<&EntityRegistry::emplace_or_replace<DirtyComponent>>();
+	on_construct<CanvasComponent>().connect<&EntityRegistry::emplace_or_replace<DirtyComponent>>();
+	on_update<CanvasComponent>().connect<&EntityRegistry::emplace_or_replace<DirtyComponent>>();
 }
 
 minty::EntityRegistry::~EntityRegistry()
@@ -267,6 +273,28 @@ void minty::EntityRegistry::set_parent(Entity const entity, Entity const parentE
 		}
 
 		parentRelationship.children++;
+	}
+
+	// if the entity has a UITransform, update its Canvas value
+	if (UITransformComponent* uiTransform = try_get<UITransformComponent>(entity))
+	{
+		uiTransform->canvas = NULL_ENTITY;
+
+		Entity parent = entity;
+
+		while (parent != NULL_ENTITY)
+		{
+			// if parent has canvas, set value
+			if (CanvasComponent* canvas = try_get<CanvasComponent>(parent))
+			{
+				uiTransform->canvas = parent;
+				break;
+			}
+
+			// move to next parent
+			RelationshipComponent const& parentRelationship = get<RelationshipComponent>(parent);
+			parent = parentRelationship.parent;
+		}
 	}
 }
 

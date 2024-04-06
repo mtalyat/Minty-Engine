@@ -1,15 +1,20 @@
 #version 450
 
 #define ANCHOR_MODE_ALL 0b00000000
+#define ANCHOR_MODE_TOP 0b00000001
+#define ANCHOR_MODE_MIDDLE 0b00000010
+#define ANCHOR_MODE_BOTTOM 0b00000100
+#define ANCHOR_MODE_LEFT 0b00001000
+#define ANCHOR_MODE_CENTER 0b00010000
+#define ANCHOR_MODE_RIGHT 0b00100000
 
 #extension GL_EXT_nonuniform_qualifier : require
 
 layout(set = 0, binding = 0) uniform CanvasBufferObject {
     int width;
     int height;
-    int resolutionWidth;
-    int resolutionHeight;
-} camera;
+	int unused0, unused1;
+} canvas;
 
 layout(push_constant) uniform UIObject
 {
@@ -35,9 +40,9 @@ void main() {
         vec2(1.0, 0.0),
         vec2(1.0, 1.0)
     };
-    // get the X/Y based on the anchor mode
+
     vec2 pos = vertices[gl_VertexIndex % 6];
-    gl_Position = vec4(pos.x, pos.y, 0.0, 1.0);
+    gl_Position = vec4((object.x + pos.x * object.width) / canvas.width * 2.0f - 1.0f, (object.y + pos.y * object.height) / canvas.height * 2.0f - 1.0f, 0.0, 1.0);
     fragColor = vec4(1.0, 1.0, 1.0, 1.0);
     fragTexCoord = pos;
 }

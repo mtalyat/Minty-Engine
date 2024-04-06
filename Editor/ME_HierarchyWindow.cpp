@@ -99,7 +99,7 @@ void mintye::HierarchyWindow::draw()
 		{
 			// family
 
-				// if not the same parent, determine what to do...
+			// if not the same parent, determine what to do...
 			if (familySet.contains(relationship.parent))
 			{
 				// the parent is part of this line

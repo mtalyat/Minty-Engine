@@ -228,6 +228,7 @@
   <ItemGroup>
     <ClInclude Include="M_Accessibility.h" />
     <ClInclude Include="M_Application.h" />
+    <ClInclude Include="M_CanvasComponent.h" />
     <ClInclude Include="M_Gamepad.h" />
     <ClInclude Include="M_RunMode.h" />
     <ClInclude Include="M_AssetEngine.h" />
@@ -421,6 +422,7 @@
     <ClCompile Include="M_AudioSourceComponent.cpp" />
     <ClCompile Include="M_AudioSystem.cpp" />
     <ClCompile Include="M_Camera.cpp" />
+    <ClCompile Include="M_CanvasComponent.cpp" />
     <ClCompile Include="M_Compression.cpp" />
     <ClCompile Include="M_DestroyEntityComponent.cpp" />
     <ClCompile Include="M_Dynamic.cpp" />

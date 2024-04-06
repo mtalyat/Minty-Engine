@@ -594,6 +594,9 @@
     <ClInclude Include="M_Gamepad.h">
       <Filter>Header Files\Input</Filter>
     </ClInclude>
+    <ClInclude Include="M_CanvasComponent.h">
+      <Filter>Header Files\UserInterface</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -994,6 +997,9 @@
     </ClCompile>
     <ClCompile Include="tinyxml2.cpp">
       <Filter>Libraries\tinyxml2</Filter>
+    </ClCompile>
+    <ClCompile Include="M_CanvasComponent.cpp">
+      <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

@@ -216,6 +216,18 @@ std::vector<char> minty::AssetEngine::read_file(Path const& path) const
 	}
 }
 
+String minty::AssetEngine::read_text(Path const& path) const
+{
+	// read file as chars
+	std::vector<char> chars = read_file(path);
+
+	// add null char for good measure
+	chars.push_back('\0');
+
+	// turn into string
+	return String(chars.data());
+}
+
 std::vector<Byte> minty::AssetEngine::read_file_bytes(Path const& path) const
 {
 	std::vector<char> data = read_file(path);

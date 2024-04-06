@@ -45,6 +45,8 @@ namespace minty
 
 		std::vector<char> read_file(Path const& path) const;
 
+		String read_text(Path const& path) const;
+
 		// reads the file at the given path as a node
 		Node read_file_node(Path const& path) const;
 

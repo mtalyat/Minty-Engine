@@ -45,6 +45,16 @@ String minty::to_string(AnchorMode const anchor)
 	return result;
 }
 
+AnchorMode minty::operator|(AnchorMode const left, AnchorMode const right)
+{
+	return static_cast<AnchorMode>(static_cast<int>(left) | static_cast<int>(right));
+}
+
+AnchorMode minty::operator&(AnchorMode const left, AnchorMode const right)
+{
+	return static_cast<AnchorMode>(static_cast<int>(left) & static_cast<int>(right));
+}
+
 AnchorMode minty::from_string_anchor_mode(String const& string)
 {
 	int mode = 0;
@@ -83,13 +93,84 @@ String minty::to_string(UITransformComponent const& value)
 	return std::format("SpriteComponent(anchorMode = {}, x/left = {}, y/top = {}, width/right = {}, height/bottom = {})", static_cast<Byte>(value.anchorMode), value.x, value.y, value.width, value.height);
 }
 
+void minty::UITransformComponent::update_global_rect(RectF const parentRect)
+{
+	if ((anchorMode & AnchorMode::Left) != AnchorMode::Empty)
+	{
+		globalRect.x = parentRect.x + x;
+		globalRect.width = width;
+	}
+	else if ((anchorMode & AnchorMode::Center) != AnchorMode::Empty)
+	{
+		globalRect.x = parentRect.x + x + (parentRect.width * 0.5f);
+		globalRect.width = width;
+	}
+	else if ((anchorMode & AnchorMode::Right) != AnchorMode::Empty)
+	{
+		globalRect.x = parentRect.x + x + parentRect.width;
+		globalRect.width = width;
+	}
+	else
+	{
+		// stretch
+		globalRect.x = parentRect.x + left;
+		globalRect.width = parentRect.width - right - globalRect.x;
+	}
+
+	if ((anchorMode & AnchorMode::Top) != AnchorMode::Empty)
+	{
+		globalRect.y = parentRect.y + y;
+		globalRect.height = height;
+	}
+	else if ((anchorMode & AnchorMode::Middle) != AnchorMode::Empty)
+	{
+		globalRect.y = parentRect.y + y + (parentRect.height * 0.5f);
+		globalRect.height = height;
+	}
+	else if ((anchorMode & AnchorMode::Bottom) != AnchorMode::Empty)
+	{
+		globalRect.y = parentRect.y + y + parentRect.height;
+		globalRect.height = height;
+	}
+	else
+	{
+		// stretch
+		globalRect.y = parentRect.y + top;
+		globalRect.height = parentRect.height - bottom - globalRect.y;
+	}
+}
+
 void minty::UITransformComponent::serialize(Writer& writer) const
 {
 	writer.write("anchorMode", to_string(anchorMode));
-	writer.write("x", x);
-	writer.write("y", y);
-	writer.write("width", width);
-	writer.write("height", height);
+
+	// write differently based on the anchor mode
+
+	if ((anchorMode & (AnchorMode::Left | AnchorMode::Center | AnchorMode::Right)) == AnchorMode::All)
+	{
+		// stretching horizontally
+		writer.write("left", left);
+		writer.write("right", right);
+	}
+	else
+	{
+		// fixed horizontally
+		writer.write("x", x);
+		writer.write("width", width);
+	}
+
+	if ((anchorMode & (AnchorMode::Top | AnchorMode::Middle | AnchorMode::Bottom)) == AnchorMode::All)
+	{
+		// stretching vertically
+		writer.write("top", top);
+		writer.write("bottom", bottom);
+	}
+	else
+	{
+		// fixed vertically
+		writer.write("y", y);
+		writer.write("height", height);
+	}
 }
 
 void minty::UITransformComponent::deserialize(Reader const& reader)

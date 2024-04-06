@@ -19,6 +19,7 @@
 
 #include "M_TransformComponent.h"
 #include "M_UITransformComponent.h"
+#include "M_CanvasComponent.h"
 #include "M_SpriteComponent.h"
 #include "M_CameraComponent.h"
 #include "M_MeshComponent.h"
@@ -1093,8 +1094,29 @@ void minty::RenderEngine::draw_scene(VkCommandBuffer commandBuffer)
 	_registry->sort<UITransformComponent, SpriteComponent>();
 
 	// draw all UI in scene
+	// keep track of the canvas being used
+	Entity canvasEntity = NULL_ENTITY;
 	for (auto&& [entity, renderable, ui, sprite, enabled] : _registry->view<RenderableComponent const, UITransformComponent const, SpriteComponent const, EnabledComponent const>().each())
 	{
+		// if new canvas, update shader values
+		if (ui.canvas != canvasEntity)
+		{
+			canvasEntity = ui.canvas;
+
+			// TODO: make safer
+			Shader* shader = sprite.sprite->get_material()->get_template()->get_shader_passes().front()->get_shader();
+
+			MINTY_ASSERT(shader != nullptr);
+
+			CanvasComponent* canvas = _registry->try_get<CanvasComponent>(canvasEntity);
+			CanvasBufferObject canvasBufferObject
+			{
+				.width = canvas ? canvas->referenceResolutionWidth : 0,
+				.height = canvas ? canvas->referenceResolutionHeight : 0,
+			};
+			shader->update_global_uniform_constant("canvas", &canvasBufferObject, sizeof(CanvasBufferObject), 0);
+		}
+
 		draw_ui(commandBuffer, ui, sprite);
 	}
 
@@ -1190,16 +1212,6 @@ void minty::RenderEngine::draw_ui(VkCommandBuffer commandBuffer, UITransformComp
 	Shader* shader = sprite.get_material()->get_template()->get_shader_passes().front()->get_shader();
 
 	MINTY_ASSERT(shader != nullptr);
-
-	// TODO: do this elsewhere, not every draw call
-	CanvasBufferObject canvasBufferObject
-	{
-		.width = _window->get_frame_width(),
-		.height = _window->get_frame_height(),
-		.resolutionWidth = _window->get_width(),
-		.resolutionHeight = _window->get_height(),
-	};
-	shader->update_global_uniform_constant("canvas", &canvasBufferObject, sizeof(CanvasBufferObject), 0);
 
 	// update push data and draw
 	UIPushData pushData
