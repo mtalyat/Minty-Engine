@@ -229,6 +229,17 @@ int minty::Window::get_height() const
 	return _height;
 }
 
+Vector2 minty::Window::get_mouse_position() const
+{
+	return _mousePosition;
+}
+
+Vector2 minty::Window::get_mouse_position(RectF const bounds) const
+{
+	// normalize mouse position, then scale to bound size, then offset using bound position
+	return _mousePosition / Vector2(_width, _height) * bounds.size() - bounds.position();
+}
+
 GLFWwindow* minty::Window::get_raw() const
 {
 	return _window;
@@ -341,6 +352,8 @@ void minty::Window::trigger_mouse_scroll(float dx, float dy)
 
 void minty::Window::trigger_mouse_move(float x, float y)
 {
+	_mousePosition.x = x;
+	_mousePosition.y = y;
 	if (_inputScript)
 	{
 		ScriptArguments arguments({ &x, &y });

@@ -597,9 +597,6 @@
     <ClInclude Include="M_CanvasComponent.h">
       <Filter>Header Files\UserInterface</Filter>
     </ClInclude>
-    <ClInclude Include="M_OnPointerEventComponent.h">
-      <Filter>Header Files\UserInterface</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

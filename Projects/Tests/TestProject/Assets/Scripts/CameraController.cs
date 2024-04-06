@@ -24,9 +24,6 @@ public class CameraController : Script
     {
         transform = Entity.GetComponent<Transform>();
         camera = Entity.GetComponent<Camera>();
-
-        Debug.Log(transform == null);
-        Debug.Log(camera == null);
     }
 
     private void OnUpdate()

@@ -7,6 +7,8 @@
 #include "M_MouseButton.h"
 #include "M_CursorMode.h"
 #include "M_Gamepad.h"
+#include "M_Vector.h"
+#include "M_RectF.h"
 #include <unordered_map>
 
 struct GLFWwindow;
@@ -44,6 +46,7 @@ namespace minty
 		ScriptClass const* _windowScript;
 		ScriptClass const* _inputScript;
 
+		Vector2 _mousePosition;
 		std::unordered_map<int, Gamepad> _gamepads;
 	public:
 		/// <summary>
@@ -156,6 +159,19 @@ namespace minty
 		/// </summary>
 		/// <returns></returns>
 		int get_height() const;
+
+		/// <summary>
+		/// Gets the position of the mouse in Window coordinates.
+		/// </summary>
+		/// <returns></returns>
+		Vector2 get_mouse_position() const;
+
+		/// <summary>
+		/// Gets the position of the mouse, relative to the given bounds.
+		/// </summary>
+		/// <param name="bounds"></param>
+		/// <returns></returns>
+		Vector2 get_mouse_position(RectF const bounds) const;
 
 		/// <summary>
 		/// Gets the raw GLFWwindow component.

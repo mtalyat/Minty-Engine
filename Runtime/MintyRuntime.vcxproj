@@ -230,7 +230,6 @@
     <ClInclude Include="M_Application.h" />
     <ClInclude Include="M_CanvasComponent.h" />
     <ClInclude Include="M_Gamepad.h" />
-    <ClInclude Include="M_OnPointerEventComponent.h" />
     <ClInclude Include="M_RunMode.h" />
     <ClInclude Include="M_AssetEngine.h" />
     <ClInclude Include="M_Camera.h" />

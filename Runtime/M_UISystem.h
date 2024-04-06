@@ -18,5 +18,7 @@ namespace minty
     private:
     public:
         UISystem(Runtime& engine, Scene& scene);
+
+        void update() override;
     };
 }

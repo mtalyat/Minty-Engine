@@ -966,6 +966,17 @@ void minty::EntityRegistry::register_script(String const& name)
 					ScriptOnDestroyComponent& eventComp = registry.get_or_emplace<ScriptOnDestroyComponent>(entity);
 					eventComp.scriptIds.emplace(id);
 				}
+
+				if (script->has_method(SCRIPT_METHOD_NAME_ONPOINTERENTER))
+				{
+					ScriptOnPointerEnterComponent& eventComp = registry.get_or_emplace<ScriptOnPointerEnterComponent>(entity);
+					eventComp.scriptIds.emplace(id);
+				}
+				if (script->has_method(SCRIPT_METHOD_NAME_ONPOINTEREXIT))
+				{
+					ScriptOnPointerExitComponent& eventComp = registry.get_or_emplace<ScriptOnPointerExitComponent>(entity);
+					eventComp.scriptIds.emplace(id);
+				}
 			}
 
 			// return the script object
@@ -1012,6 +1023,9 @@ void minty::EntityRegistry::register_script(String const& name)
 			if (ScriptOnDisableComponent* eventComp = registry.try_get<ScriptOnDisableComponent>(entity)) eventComp->scriptIds.erase(id);
 			if (ScriptOnUnloadComponent* eventComp = registry.try_get<ScriptOnUnloadComponent>(entity)) eventComp->scriptIds.erase(id);
 			if (ScriptOnDestroyComponent* eventComp = registry.try_get<ScriptOnDestroyComponent>(entity)) eventComp->scriptIds.erase(id);
+
+			if (ScriptOnPointerEnterComponent* eventComp = registry.try_get<ScriptOnPointerEnterComponent>(entity)) eventComp->scriptIds.erase(id);
+			if (ScriptOnPointerExitComponent* eventComp = registry.try_get<ScriptOnPointerExitComponent>(entity)) eventComp->scriptIds.erase(id);
 
 			// remove from scripts
 			component->scripts.erase(id);

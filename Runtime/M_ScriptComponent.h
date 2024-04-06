@@ -58,4 +58,12 @@ namespace minty
 	struct ScriptOnDestroyComponent
 		: public ScriptEventComponent
 	{};
+
+	struct ScriptOnPointerEnterComponent
+		: public ScriptEventComponent
+	{};
+
+	struct ScriptOnPointerExitComponent
+		: public ScriptEventComponent
+	{};
 }
