@@ -77,6 +77,10 @@ namespace minty
 
 		bool get_enabled(Entity const entity) const;
 
+		void set_renderable(Entity const entity, bool const renderable);
+
+		bool get_renderable(Entity const entity) const;
+
 		void dirty(Entity const entity);
 
 		void set_parent(Entity const entity, Entity const parentEntity);

@@ -17,6 +17,7 @@
 #include "M_DestroyEntityComponent.h"
 #include "M_DestroyComponentComponent.h"
 #include "M_EnabledComponent.h"
+#include "M_RenderableComponent.h"
 
 #include "M_ScriptClass.h"
 #include "M_ScriptObject.h"
@@ -139,6 +140,23 @@ void minty::EntityRegistry::set_enabled(Entity const entity, bool const enabled)
 bool minty::EntityRegistry::get_enabled(Entity const entity) const
 {
 	return all_of<EnabledComponent>(entity);
+}
+
+void minty::EntityRegistry::set_renderable(Entity const entity, bool const renderable)
+{
+	if (renderable)
+	{
+		entt::registry::get_or_emplace<RenderableComponent>(entity);
+	}
+	else
+	{
+		erase<RenderableComponent>(entity);
+	}
+}
+
+bool minty::EntityRegistry::get_renderable(Entity const entity) const
+{
+	return all_of<RenderableComponent>(entity);
 }
 
 void minty::EntityRegistry::dirty(Entity const entity)

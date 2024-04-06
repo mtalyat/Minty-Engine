@@ -186,6 +186,15 @@ void mintye::PropertiesWindow::draw_entity()
 		registry.set_enabled(_targetEntity, enabled);
 	}
 
+	ImGui::SameLine();
+
+	// renderable (visible)
+	bool visible = registry.get_renderable(_targetEntity);
+	if (ImGui::Checkbox("Visible", &visible))
+	{
+		registry.set_renderable(_targetEntity, visible);
+	}
+
 	// tag
 	text = registry.get_tag(_targetEntity);
 	size = min(INPUT_SIZE, text.size() + 1);
@@ -201,7 +210,7 @@ void mintye::PropertiesWindow::draw_entity()
 
 	// these will be ignored in the general components list below,
 	// since they are already drawn above
-	static std::unordered_set<String> ignoreComponentNames = { "Name", "Tag", "Enabled" };
+	static std::unordered_set<String> ignoreComponentNames = { "Name", "Tag", "Enabled", "Renderable"};
 
 	//		Components
 
