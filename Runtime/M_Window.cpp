@@ -390,6 +390,7 @@ void Window::resize_callback(GLFWwindow* const window, int const width, int cons
 	Console::ass(w != nullptr, "Window is null on resize callback.");
 	if (w)
 	{
+		w->refresh();
 		w->_resized = true;
 	}
 }

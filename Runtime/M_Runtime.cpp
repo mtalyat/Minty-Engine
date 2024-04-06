@@ -5,6 +5,7 @@
 #include "M_SceneManager.h"
 #include "M_Info.h"
 #include "M_Console.h"
+#include "M_Scene.h"
 
 #include "M_AssetEngine.h"
 #include "M_RenderEngine.h"
@@ -218,6 +219,20 @@ bool minty::Runtime::loop()
 
 	// run window events and input
 	_window->poll_events();
+
+	if (_window->is_resized())
+	{
+		// window was resized, dirty all UI components so they update
+		if (Scene* scene = _sceneManager->get_loaded_scene())
+		{
+			EntityRegistry& registry = scene->get_entity_registry();
+
+			for (auto [entity, transform] : registry.view<UITransformComponent>().each())
+			{
+				registry.dirty(entity);
+			}
+		}
+	}
 
 	// update scene(s)
 	_sceneManager->update();

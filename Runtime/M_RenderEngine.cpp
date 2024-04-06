@@ -1220,10 +1220,10 @@ void minty::RenderEngine::draw_ui(VkCommandBuffer commandBuffer, UITransformComp
 	// update push data and draw
 	UIPushData pushData
 	{
-		.x = uiComponent.x,
-		.y = uiComponent.y,
-		.width = uiComponent.width,
-		.height = uiComponent.height,
+		.x = uiComponent.globalRect.x,
+		.y = uiComponent.globalRect.y,
+		.width = uiComponent.globalRect.width,
+		.height = uiComponent.globalRect.height,
 		.color = spriteComponent.color.toVector(),
 		.anchorMode = static_cast<int>(uiComponent.anchorMode),
 	};

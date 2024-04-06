@@ -146,7 +146,10 @@ void minty::EntityRegistry::set_renderable(Entity const entity, bool const rende
 {
 	if (renderable)
 	{
-		entt::registry::get_or_emplace<RenderableComponent>(entity);
+		if (!all_of<RenderableComponent>(entity))
+		{
+			emplace<RenderableComponent>(entity);
+		}
 	}
 	else
 	{

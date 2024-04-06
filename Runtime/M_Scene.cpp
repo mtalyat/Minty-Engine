@@ -237,9 +237,14 @@ void minty::Scene::finalize()
 			UITransformComponent& parentTransform = _entities->get<UITransformComponent>(relationship.parent);
 			transform.update_global_rect(parentTransform.globalRect);
 		}
+		else if(CanvasComponent* canvas = _entities->try_get<CanvasComponent>(entity))
+		{
+			// canvas
+			transform.update_global_rect(canvas->toRect());
+		}
 		else
 		{
-			// no parent
+			// no parent, not a canvas
 
 			// set to not draw
 			transform.globalRect = RectF();

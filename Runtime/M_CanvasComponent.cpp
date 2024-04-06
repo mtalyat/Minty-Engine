@@ -6,6 +6,11 @@
 
 using namespace minty;
 
+RectF minty::CanvasComponent::toRect() const
+{
+	return RectF(0, 0, referenceResolutionWidth, referenceResolutionHeight);
+}
+
 void minty::CanvasComponent::serialize(Writer& writer) const
 {
 	writer.write("resolutionWidth", referenceResolutionWidth);

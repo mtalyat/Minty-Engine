@@ -171,6 +171,9 @@ void minty::UITransformComponent::serialize(Writer& writer) const
 		writer.write("y", y);
 		writer.write("height", height);
 	}
+
+	// TODO: remove (for testing)
+	writer.write("globalRect READONLY", globalRect);
 }
 
 void minty::UITransformComponent::deserialize(Reader const& reader)
