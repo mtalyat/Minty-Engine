@@ -1182,6 +1182,7 @@ void minty::RenderEngine::draw_sprite(VkCommandBuffer commandBuffer, TransformCo
 	SpritePushData pushData
 	{
 		.transform = transformComponent.globalMatrix,
+		.color = spriteComponent.color.toVector(),
 		.minCoords = sprite.get_min_coords(),
 		.maxCoords = sprite.get_max_coords(),
 		.pivot = sprite.get_pivot(),
@@ -1220,7 +1221,7 @@ void minty::RenderEngine::draw_ui(VkCommandBuffer commandBuffer, UITransformComp
 		.y = uiComponent.y,
 		.width = uiComponent.width,
 		.height = uiComponent.height,
-		.color = Vector4(spriteComponent.color.rf(), spriteComponent.color.gf(), spriteComponent.color.bf(), spriteComponent.color.af()),
+		.color = spriteComponent.color.toVector(),
 		.anchorMode = static_cast<int>(uiComponent.anchorMode),
 	};
 	shader->update_push_constant(commandBuffer, &pushData, sizeof(UIPushData));

@@ -148,6 +148,11 @@ inline Color Color::lighten(float const percent) const
 	return Color();
 }
 
+Vector4 minty::Color::toVector() const
+{
+	return Vector4(rf(), gf(), bf(), af());
+}
+
 String minty::Color::toHex() const
 {
 	std::stringstream ss;

@@ -1,5 +1,6 @@
 #pragma once
 #include "M_Object.h"
+#include "M_Vector.h"
 
 namespace minty
 {
@@ -153,6 +154,8 @@ namespace minty
 		/// <param name="percent">The percentage to lighten the color by.</param>
 		/// <returns>A new lightened color.</returns>
 		Color lighten(float const percent) const;
+
+		Vector4 toVector() const;
 
 		String toHex() const;
 

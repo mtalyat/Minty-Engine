@@ -9,6 +9,7 @@ layout(set = 0, binding = 0) uniform CameraBufferObject {
 layout(push_constant) uniform SpriteObject
 {
     mat4 transform;
+    vec4 color;
     vec2 minCoords;
     vec2 maxCoords;
     vec2 pivot;
@@ -31,6 +32,6 @@ void main() {
     };
     vec2 pos = vertices[gl_VertexIndex % 6];
     gl_Position = camera.transform * object.transform * vec4((pos.x - object.pivot.x) * object.size.x, (pos.y - object.pivot.y) * object.size.y, 0.0, 1.0);
-    fragColor = vec4(1.0, 1.0, 1.0, 1.0);
+    fragColor = object.color;
     fragTexCoord = pos * (object.maxCoords - object.minCoords) + object.minCoords;
 }

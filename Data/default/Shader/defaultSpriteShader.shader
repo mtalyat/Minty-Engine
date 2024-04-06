@@ -1,7 +1,7 @@
 push: object
     stageFlags: VERTEX_BIT
     offset: 0
-    size: 96
+    size: 112
 uniform: camera
     type: UNIFORM_BUFFER
     stageFlags: VERTEX_BIT
