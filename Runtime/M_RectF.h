@@ -170,6 +170,9 @@ namespace minty
 		/// <returns></returns>
 		bool contains(Vector2 const& other) const;
 
+		void serialize(Writer& writer) const override;
+		void deserialize(Reader const& reader) override;
+
 		/// <summary>
 		/// Creates a Rect using the given bounds of each size of the Rect.
 		/// </summary>
@@ -198,7 +201,6 @@ namespace minty
 		/// <param name="rect">The RectF to ceil.</param>
 		/// <returns>A RectF, with the given values, ceiled.</returns>
 		static Rect ceil(RectF const& rect);
-
 	public:
 		friend String to_string(RectF const& value);
 	};

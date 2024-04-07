@@ -115,11 +115,14 @@ access to the entire engine without needing include each file.
 // SYSTEMS
 #include "M_System.h"
 #include "M_SystemRegistry.h"
-#include "M_UISystem.h"
 
 // TRANSFORM
 #include "M_TransformComponent.h"
 #include "M_UITransformComponent.h"
+
+// USERINTERFACE
+#include "M_CanvasComponent.h"
+#include "M_UISystem.h"
 
 // GENERAL
 #include "M_Base.h"

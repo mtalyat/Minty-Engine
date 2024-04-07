@@ -1,13 +1,13 @@
 push: object
     stageFlags: VERTEX_BIT
     offset: 0
-    size: 112
-uniform: camera
+    size: 48
+uniform: canvas
     type: UNIFORM_BUFFER
     stageFlags: VERTEX_BIT
     set: 0
     binding: 0
-    size: 64
+    size: 16
 uniform: texture
     type: COMBINED_IMAGE_SAMPLER
     stageFlags: FRAGMENT_BIT

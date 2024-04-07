@@ -11,6 +11,7 @@ using namespace mintye;
 mintye::PropertiesWindow::PropertiesWindow(EditorApplication& application)
 	: EditorWindow(application)
 	, _targetMode(TargetMode::None)
+	, _targetIsBuiltIn(false)
 	, _targetId(INVALID_UUID)
 	, _targetEntity(NULL_ENTITY)
 	, _targetPath()
@@ -185,6 +186,15 @@ void mintye::PropertiesWindow::draw_entity()
 		registry.set_enabled(_targetEntity, enabled);
 	}
 
+	ImGui::SameLine();
+
+	// renderable (visible)
+	bool visible = registry.get_renderable(_targetEntity);
+	if (ImGui::Checkbox("Visible", &visible))
+	{
+		registry.set_renderable(_targetEntity, visible);
+	}
+
 	// tag
 	text = registry.get_tag(_targetEntity);
 	size = min(INPUT_SIZE, text.size() + 1);
@@ -200,7 +210,7 @@ void mintye::PropertiesWindow::draw_entity()
 
 	// these will be ignored in the general components list below,
 	// since they are already drawn above
-	static std::unordered_set<String> ignoreComponentNames = { "Name", "Tag", "Enabled" };
+	static std::unordered_set<String> ignoreComponentNames = { "Name", "Tag", "Enabled", "Renderable"};
 
 	//		Components
 
@@ -292,10 +302,12 @@ void mintye::PropertiesWindow::draw_component(minty::Node& node, size_t const i,
 	static float const yMargin = 2.0f;
 	float const width = ImGui::GetContentRegionAvail().x - 2.0f * xMargin;
 
+	static std::unordered_set<String> dirtyableComponentNames = { "Transform", "UITransform", "Canvas" };
+
 	ImGui::BeginGroupBox();
 
 	// list components
-	if (input_node(node, true, i))
+	if (input_node(node, true, static_cast<uint32_t>(i)))
 	{
 		// component changed, update it in the registy
 		Component* component = registry.get_by_name(node.get_name(), _targetEntity);
@@ -307,9 +319,8 @@ void mintye::PropertiesWindow::draw_component(minty::Node& node, size_t const i,
 		Reader reader(node, &data);
 		component->deserialize(reader);
 
-		// TODO: get rid of magic value:
-		// if Transform component was updated, dirty the entity, update, continue
-		if (node.get_name() == "Transform")
+		// if certain component was updated, dirty the entity, update, continue
+		if (dirtyableComponentNames.contains(node.get_name()))
 		{
 			registry.dirty(_targetEntity);
 			scene->finalize();
@@ -340,56 +351,59 @@ void mintye::PropertiesWindow::draw_asset()
 		ImGui::SetClipboardText(to_string(_targetId).c_str());
 	}
 
-	ImGui::Separator();
-
-	// button to refresh the contents
-	if (ImGui::Button("Refresh"))
+	if (!_targetIsBuiltIn)
 	{
-		get_application().refresh();
-		return;
-	}
+		ImGui::Separator();
 
-	// gap
-	ImGui::SameLine();
-	ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 20.0f);
+		// button to refresh the contents
+		if (ImGui::Button("Refresh"))
+		{
+			get_application().refresh();
+			return;
+		}
 
-	// button to open the file
-	if (ImGui::Button("Open File"))
-	{
-		Operations::open(get_project()->get_base_path() / _targetPath);
-	}
+		// gap
+		ImGui::SameLine();
+		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 20.0f);
 
-	ImGui::SameLine();
+		// button to open the file
+		if (ImGui::Button("Open File"))
+		{
+			Operations::open(get_project()->get_base_path() / _targetPath);
+		}
 
-	// button to open the meta file
-	if (ImGui::Button("Open Meta"))
-	{
-		Operations::open(get_project()->get_base_path() / Asset::get_meta_path(_targetPath));
-	}
+		ImGui::SameLine();
 
-	ImGui::SameLine();
+		// button to open the meta file
+		if (ImGui::Button("Open Meta"))
+		{
+			Operations::open(get_project()->get_base_path() / Asset::get_meta_path(_targetPath));
+		}
 
-	// button to open the directory
-	if (ImGui::Button("Open Folder"))
-	{
-		Operations::open_directory(get_project()->get_base_path() / _targetPath);
-	}
+		ImGui::SameLine();
 
-	// gap
-	ImGui::SameLine();
-	ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 20.0f);
+		// button to open the directory
+		if (ImGui::Button("Open Folder"))
+		{
+			Operations::open_directory(get_project()->get_base_path() / _targetPath);
+		}
 
-	if (ImGui::Button("Delete File"))
-	{
-		// delete file and its corresponding .meta file
-		std::filesystem::remove(get_project()->get_base_path() / _targetPath);
-		std::filesystem::remove(get_project()->get_base_path() / Asset::get_meta_path(_targetPath));
+		// gap
+		ImGui::SameLine();
+		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 20.0f);
 
-		clear_target();
+		if (ImGui::Button("Delete File"))
+		{
+			// delete file and its corresponding .meta file
+			std::filesystem::remove(get_project()->get_base_path() / _targetPath);
+			std::filesystem::remove(get_project()->get_base_path() / Asset::get_meta_path(_targetPath));
 
-		get_application().refresh();
+			clear_target();
 
-		return;
+			get_application().refresh();
+
+			return;
+		}
 	}
 
 	// show all texts
@@ -404,6 +418,7 @@ void mintye::PropertiesWindow::draw_asset()
 void mintye::PropertiesWindow::clear_target()
 {
 	_targetMode = TargetMode::None;
+	_targetIsBuiltIn = false;
 	_targetId = INVALID_UUID;
 
 	_targetEntity = NULL_ENTITY;
@@ -429,20 +444,21 @@ void mintye::PropertiesWindow::set_target(minty::Path const& path)
 {
 	clear_target();
 
-	if (std::filesystem::exists(path))
+	AssetEngine& assets = get_runtime().get_asset_engine();
+	if (assets.exists(path))
 	{
 		_targetMode = TargetMode::Asset;
+		_targetIsBuiltIn = path.string().starts_with("BuiltIn");
 		_targetPath = path;
 
-		AssetEngine& assets = get_runtime().get_asset_engine();
 		_targetId = assets.read_id(path);
 
 		// add file itself to be drawn, if it is readable
 		if (Asset::is_readable(path))
 		{
-			_texts.push_back(File::read_all_text(path));
+			_texts.push_back(assets.read_text(path));
 		}
 
-		_texts.push_back(File::read_all_text(Asset::get_meta_path(path)));
+		_texts.push_back(assets.read_text(Asset::get_meta_path(path)));
 	}
 }

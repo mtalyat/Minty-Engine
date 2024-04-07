@@ -1,10 +1,10 @@
-shader: 999530dea6d52f76
+shader: 5773366b6c43318f
 primitiveTopology: TRIANGLE_LIST
 polygonMode: FILL
 cullMode: NONE
 frontFace: CLOCKWISE
 lineWidth: 1
 stage: VERTEX_BIT
-    path: BuiltIn/Shader/defaultSpriteVert.spv
+    path: Assets/WIP/uivert.spv
 stage: FRAGMENT_BIT
-    path: BuiltIn/Shader/defaultSpriteFrag.spv
+    path: Assets/WIP/uifrag.spv

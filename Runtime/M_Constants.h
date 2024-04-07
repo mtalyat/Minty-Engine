@@ -36,6 +36,14 @@ namespace minty
 	constexpr static char const* SCRIPT_METHOD_NAME_ONUNLOAD = "OnUnload";
 	constexpr static char const* SCRIPT_METHOD_NAME_ONDESTROY = "OnDestroy";
 
+	constexpr static char const* SCRIPT_METHOD_NAME_ONPOINTERENTER = "OnPointerEnter";
+	constexpr static char const* SCRIPT_METHOD_NAME_ONPOINTERHOVER = "OnPointerHover";
+	constexpr static char const* SCRIPT_METHOD_NAME_ONPOINTEREXIT = "OnPointerExit";
+	constexpr static char const* SCRIPT_METHOD_NAME_ONPOINTERMOVE = "OnPointerMove";
+	constexpr static char const* SCRIPT_METHOD_NAME_ONPOINTERDOWN = "OnPointerDown";
+	constexpr static char const* SCRIPT_METHOD_NAME_ONPOINTERUP = "OnPointerUp";
+	constexpr static char const* SCRIPT_METHOD_NAME_ONPOINTERCLICK = "OnPointerClick";
+
 	constexpr static char const* SCRIPT_INPUT_TRIGGER_KEY = "TriggerKey";
 	constexpr static char const* SCRIPT_INPUT_TRIGGER_MOUSE_CLICK = "TriggerMouseClick";
 	constexpr static char const* SCRIPT_INPUT_TRIGGER_MOUSE_MOVE = "TriggerMouseMove";

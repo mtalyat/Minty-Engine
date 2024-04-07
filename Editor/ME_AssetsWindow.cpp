@@ -161,7 +161,15 @@ void mintye::AssetsWindow::draw()
 		if (ImGui::Button(name.c_str(), itemSize))
 		{
 			EditorApplication& app = get_application();
-			app.open_asset(project->get_base_path() / _path / fileData.path);
+
+			if (_path.string().starts_with("BuiltIn"))
+			{
+				app.open_asset(_path / fileData.path);
+			}
+			else
+			{
+				app.open_asset(project->get_base_path() / _path / fileData.path);
+			}			
 		}
 
 		// if right clicked, toggle inclusion in the scene

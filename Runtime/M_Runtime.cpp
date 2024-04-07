@@ -5,6 +5,7 @@
 #include "M_SceneManager.h"
 #include "M_Info.h"
 #include "M_Console.h"
+#include "M_Scene.h"
 
 #include "M_AssetEngine.h"
 #include "M_RenderEngine.h"
@@ -22,6 +23,7 @@
 #include "M_AudioListenerComponent.h"
 #include "M_AudioSourceComponent.h"
 #include "M_CameraComponent.h"
+#include "M_CanvasComponent.h"
 #include "M_DirtyComponent.h"
 #include "M_DestroyEntityComponent.h"
 #include "M_EnabledComponent.h"
@@ -218,6 +220,20 @@ bool minty::Runtime::loop()
 	// run window events and input
 	_window->poll_events();
 
+	if (_window->is_resized())
+	{
+		// window was resized, dirty all UI components so they update
+		if (Scene* scene = _sceneManager->get_loaded_scene())
+		{
+			EntityRegistry& registry = scene->get_entity_registry();
+
+			for (auto [entity, transform] : registry.view<UITransformComponent>().each())
+			{
+				registry.dirty(entity);
+			}
+		}
+	}
+
 	// update scene(s)
 	_sceneManager->update();
 
@@ -299,6 +315,7 @@ void minty::Runtime::link()
 	register_component<AudioListenerComponent>(ASSEMBLY_ENGINE_NAME, "AudioListener");
 	register_component<AudioSourceComponent>(ASSEMBLY_ENGINE_NAME, "AudioSource");
 	register_component<CameraComponent>(ASSEMBLY_ENGINE_NAME, "Camera");
+	register_component<CanvasComponent>(ASSEMBLY_ENGINE_NAME, "Canvas");
 	//register_component<DestroyComponent>(ASSEMBLY_ENGINE_NAME, "Destroy");
 	//register_component<DirtyComponent>(ASSEMBLY_ENGINE_NAME, "Dirty");
 	register_component<EnabledComponent>(ASSEMBLY_ENGINE_NAME, "Enabled", false);

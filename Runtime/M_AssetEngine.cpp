@@ -96,9 +96,12 @@ minty::AssetEngine::AssetEngine(Runtime& runtime)
 	{
 		if (Asset::check_type(entry.path(), AssetType::Wrap))
 		{
-			MINTY_LOG_FORMAT("Loading Wrap file \"{}\".", entry.path().filename().string());
-
 			_wrapper.emplace(entry.path());
+
+			// get wrap and print with version
+			Wrap const& wrap = _wrapper.get_wrap(_wrapper.get_wrap_count() - 1);
+
+			MINTY_LOG_FORMAT("Loading Wrap file \"{}\" v{}.", wrap.get_name(), wrap.get_content_version());
 		}
 	}
 }
@@ -214,6 +217,18 @@ std::vector<char> minty::AssetEngine::read_file(Path const& path) const
 		MINTY_ABORT("Unrecognized RunMode.");
 		return std::vector<char>();
 	}
+}
+
+String minty::AssetEngine::read_text(Path const& path) const
+{
+	// read file as chars
+	std::vector<char> chars = read_file(path);
+
+	// add null char for good measure
+	chars.push_back('\0');
+
+	// turn into string
+	return String(chars.data());
 }
 
 std::vector<Byte> minty::AssetEngine::read_file_bytes(Path const& path) const

@@ -17,125 +17,101 @@ assets
 	- "Assets/Textures/texture.jpg"
 	- "Assets/Textures/x.png"
 	- "BuiltIn/Texture/square.png"
+	- "Assets\\WIP\\defaultUiShader.shader"
 	- "BuiltIn/Shader/defaultShader.shader"
 	- "BuiltIn\\Shader\\defaultSpriteShader.shader"
+	- "Assets\\WIP\\defaultUiShaderPass.shaderpass"
 	- "BuiltIn/ShaderPass/defaultShaderPass.shaderpass"
 	- "BuiltIn\\ShaderPass\\defaultSpriteShaderPass.shaderpass"
+	- "Assets\\WIP\\defaultUiMaterialTemplate.materialtemplate"
 	- "BuiltIn/MaterialTemplate/defaultMaterialTemplate.materialtemplate"
 	- "BuiltIn\\MaterialTemplate\\defaultSpriteMaterialTemplate.materialtemplate"
+	- "Assets\\Materials\\xSpriteMaterial.material"
+	- "Assets\\WIP\\defaultUiMaterial.material"
 	- "BuiltIn/Material/defaultMaterial.material"
 	- "BuiltIn\\Material\\defaultSpriteMaterial.material"
 	- "Assets\\Sprites\\brian.sprite"
+	- "Assets\\Sprites\\defaultSprite.sprite"
+	- "Assets\\Sprites\\defaultUiSprite.sprite"
+	- "Assets\\Sprites\\x.sprite"
 systems
+	UI
 	Audio
-	Render
 	Script
+	Render
 entities
-	Model Center: 2400de2c92f041ed
+	Canvas: d2b000d091cd782b
+		UITransform
+			anchorMode: All
+			left: 0
+			right: 0
+			top: 0
+			bottom: 0
+		Canvas
+			resolutionWidth: 1920
+			resolutionHeight: 1080
+		Relationship
+			parent: 0
+	Test: b7761f2bc863d61c
+		UITransform
+			anchorMode: TopLeft
+			x: 100
+			width: 100
+			y: 100
+			height: 100
+		Script
+			- c5bbd244d3aafdbf
+		Enabled
+		Relationship
+			parent: d2b000d091cd782b
+		Renderable
+		Sprite
+			sprite: 51156c5dc9972f6b
+			size: (1, 1)
+			order: 0
+			color: #ff0000ff
+	Test2: 5e4e62ad4a8f49db
+		UITransform
+			anchorMode: All
+			left: 0
+			right: 200
+			top: 0
+			bottom: 200
+		Script
+			- c5bbd244d3aafdbf
+		Enabled
+		Relationship
+			parent: d2b000d091cd782b
+		Renderable
+		Sprite
+			sprite: 51156c5dc9972f6b
+			size: (1, 1)
+			order: 0
+			color: #0000ffff
+	Big Ball: b620841e2d57dd79
+		Transform
+			position: (0, -2, 0)
+			rotation: (0, 0, 0)
+			scale: (2, 2, 2)
+		Enabled
+		Relationship
+			parent: 0
+		Renderable
+		Mesh
+			type: SPHERE
+			material: decef49af1cbe3d9
+	Sprite Test: ad451c056f75ebf5
 		Transform
 			position: (0, 0, 0)
 			rotation: (0, 0, 0)
 			scale: (1, 1, 1)
-		Script
-			- c5bbd244d3aafdbf
-				time: 1
 		Enabled
 		Renderable
-		AudioSource
-			volume: 1
-			clip: 0
-			attenuation: 1
-			near: 1
-			far: 100
-		Relationship
-			parent: 0
 		Sprite
-			sprite: 11bf45fad071f771
+			sprite: 6fe2e95b986a93ad
 			size: (1, 1)
 			order: 0
-	Model Negative Z: c4f4d4fe682f0d64
-		Transform
-			position: (0, 0, -2)
-			rotation: (0, 0, 0)
-			scale: (1, 1, 1)
-		Enabled
-		Relationship
-			parent: 2400de2c92f041ed
-		Mesh
-			type: CUBE
-			material: decef49af1cbe3d9
-	Model Positive Z: 7fbaa46deceeb2b5
-		Transform
-			position: (0, 0, 2)
-			rotation: (0, 0, 0)
-			scale: (1, 1, 1)
-		Enabled
-		Renderable
-		Relationship
-			parent: 2400de2c92f041ed
-		Mesh
-			type: CUBE
-			material: decef49af1cbe3d9
-	Model Negative X: 46985c6913d94cb5
-		Transform
-			position: (-2, 0, 0)
-			rotation: (0, 0, 0)
-			scale: (1, 1, 1)
-		Enabled
-		Renderable
-		Relationship
-			parent: 2400de2c92f041ed
-		Mesh
-			type: CYLINDER
-			material: decef49af1cbe3d9
-	Model Positive X: d2d21b1dbd0dc426
-		Transform
-			position: (2, 0, 0)
-			rotation: (0, 0, 0)
-			scale: (1, 1, 1)
-		Enabled
-		Renderable
-		Relationship
-			parent: 2400de2c92f041ed
-		Mesh
-			type: CYLINDER
-			material: decef49af1cbe3d9
-	Model Negative Y: 929aa3c41974fc4c
-		Transform
-			position: (0, -2, 0)
-			rotation: (0, 0, 0)
-			scale: (1, 1, 1)
-		Enabled
-		Renderable
-		Relationship
-			parent: 2400de2c92f041ed
-		Mesh
-			type: SPHERE
-			material: decef49af1cbe3d9
-	Model Positive Y: af00215d6e2a1fcd
-		Transform
-			position: (0, 2, 0)
-			rotation: (0, 0, 0)
-			scale: (1, 1, 1)
-		Enabled
-		Renderable
-		Relationship
-			parent: 2400de2c92f041ed
-		Mesh
-			type: SPHERE
-			material: decef49af1cbe3d9
-	Big Ball: b620841e2d57dd79
-		Transform
-			position: (0, -4, 0)
-			rotation: (0, 0, 0)
-			scale: (2, 2, 2)
-		Enabled
-		Renderable
-		Relationship
-			parent: 0
-		Mesh
-			type: SPHERE
-			material: decef49af1cbe3d9
+			color: #ffffffff
 	Camera: 389d6462e322993a
 		Transform
 			position: (0, 0, -4)

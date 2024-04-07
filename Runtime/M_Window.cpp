@@ -29,6 +29,8 @@ minty::Window::Window(String const& title, int const x, int const y, int const w
 	, _resized(true) // start as "resized" so render engine regenerates data on start
 	, _windowScript()
 	, _inputScript()
+	, _mousePosition()
+	, _mouseDown()
 	, _gamepads()
 {
 	// if no windows have been made yet, init glfw
@@ -229,6 +231,22 @@ int minty::Window::get_height() const
 	return _height;
 }
 
+Vector2 minty::Window::get_mouse_position() const
+{
+	return _mousePosition;
+}
+
+Vector2 minty::Window::get_mouse_position(RectF const bounds) const
+{
+	// normalize mouse position, then scale to bound size, then offset using bound position
+	return _mousePosition / Vector2(_width, _height) * bounds.size() - bounds.position();
+}
+
+bool minty::Window::get_mouse_down() const
+{
+	return _mouseDown;
+}
+
 GLFWwindow* minty::Window::get_raw() const
 {
 	return _window;
@@ -328,6 +346,8 @@ void minty::Window::trigger_mouse_click(MouseButton button, KeyAction action, Ke
 		ScriptArguments arguments({ &button, &action, &mods });
 		_inputScript->invoke(SCRIPT_INPUT_TRIGGER_MOUSE_CLICK, arguments);
 	}
+
+	_mouseDown = action != KeyAction::Up;
 }
 
 void minty::Window::trigger_mouse_scroll(float dx, float dy)
@@ -341,6 +361,8 @@ void minty::Window::trigger_mouse_scroll(float dx, float dy)
 
 void minty::Window::trigger_mouse_move(float x, float y)
 {
+	_mousePosition.x = x;
+	_mousePosition.y = y;
 	if (_inputScript)
 	{
 		ScriptArguments arguments({ &x, &y });
@@ -390,6 +412,7 @@ void Window::resize_callback(GLFWwindow* const window, int const width, int cons
 	Console::ass(w != nullptr, "Window is null on resize callback.");
 	if (w)
 	{
+		w->refresh();
 		w->_resized = true;
 	}
 }

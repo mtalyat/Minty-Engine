@@ -5,13 +5,15 @@
 #include "M_UUID.h"
 #include "M_Object.h"
 #include "M_Console.h"
+#include "M_ScriptClass.h"
+#include "M_ScriptObject.h"
 #include <map>
 #include <unordered_map>
 
 namespace minty
 {
 	struct Component;
-	class ScriptClass;
+	struct ScriptComponent;
 
 	class EntityRegistry
 		: public SceneObject, public entt::registry
@@ -77,11 +79,22 @@ namespace minty
 
 		bool get_enabled(Entity const entity) const;
 
+		void set_renderable(Entity const entity, bool const renderable);
+
+		bool get_renderable(Entity const entity) const;
+
 		void dirty(Entity const entity);
 
 		void set_parent(Entity const entity, Entity const parentEntity);
 
 		Entity get_parent(Entity const entity) const;
+
+		/// <summary>
+		/// Gets the family line from this Entity all the way until the top parent.
+		/// </summary>
+		/// <param name="entity"></param>
+		/// <returns></returns>
+		std::vector<Entity> get_family_line(Entity const entity) const;
 
 		size_t get_child_count(Entity const entity) const;
 
@@ -270,6 +283,25 @@ namespace minty
 
 	public:
 		/// <summary>
+		/// Connects the event to the Entity if it has a Script with the event type.
+		/// </summary>
+		/// <typeparam name="ScriptEvent"></typeparam>
+		/// <param name="entity"></param>
+		/// <param name="trigger"></param>
+		/// <returns></returns>
+		template<class ScriptEvent>
+		bool connect_event(Entity const entity, ID const id, ScriptObject& scriptObject, String const& name, bool const trigger = false);
+
+		/// <summary>
+		/// Triggers the event tied to the given type. Returns true when the event was successfully triggered.
+		/// </summary>
+		/// <typeparam name="ScriptEvent">The ScriptEventComponent to invoke.</typeparam>
+		/// <param name="entity">The entity to trigger the event on.</param>
+		/// <returns>True when the method was successfully called on this Entity.</returns>
+		template<class ScriptEvent>
+		bool trigger_event(Entity const entity) const;
+
+		/// <summary>
 		/// Registers the Component, so the Component can be dynamically created by name.
 		/// </summary>
 		/// <typeparam name="T">The Component to register.</typeparam>
@@ -315,6 +347,38 @@ namespace minty
 
 		// no components on any entities
 		return NULL_ENTITY;
+	}
+
+	template<class ScriptEvent>
+	bool EntityRegistry::connect_event(Entity const entity, ID const id, ScriptObject& scriptObject, String const& name, bool const trigger)
+	{
+		if (scriptObject.get_class().has_method(name))
+		{
+			ScriptEvent& eventComp = get_or_emplace<ScriptEvent>(entity);
+			eventComp.scriptIds.emplace(id);
+
+			if (trigger)
+			{
+				scriptObject.invoke(name);
+			}
+
+			return true;
+		}
+
+		return false;
+	}
+
+	template<class ScriptEvent>
+	bool EntityRegistry::trigger_event(Entity const entity) const
+	{
+		if (ScriptEvent const* onEvent = try_get<ScriptEvent>(entity))
+		{
+			ScriptComponent const& component = get<ScriptComponent>(entity);
+			onEvent->invoke(component);
+			return true;
+		}
+
+		return false;
 	}
 
 	template<class T>
