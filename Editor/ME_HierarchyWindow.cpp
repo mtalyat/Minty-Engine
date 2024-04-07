@@ -200,6 +200,7 @@ void mintye::HierarchyWindow::reset()
 
 void mintye::HierarchyWindow::refresh()
 {
+	if(get_scene()) get_scene()->finalize();
 }
 
 void mintye::HierarchyWindow::set_project(Project* const project)

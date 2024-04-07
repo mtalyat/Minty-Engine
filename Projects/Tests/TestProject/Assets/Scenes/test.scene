@@ -37,8 +37,8 @@ assets
 systems
 	UI
 	Audio
-	Script
 	Render
+	Script
 entities
 	Canvas: d2b000d091cd782b
 		UITransform
@@ -53,7 +53,23 @@ entities
 		Enabled
 		Relationship
 			parent: 0
-	Test: b7761f2bc863d61c
+	Background: 941b3575c55377bc
+		UITransform
+			anchorMode: All
+			left: 0
+			right: 0
+			top: 0
+			bottom: 0
+		Enabled
+		Relationship
+			parent: d2b000d091cd782b
+		Sprite
+			sprite: 51156c5dc9972f6b
+			size: (1, 1)
+			layer: -100
+			order: 0
+			color: #ffffffff
+	Red Box: b7761f2bc863d61c
 		UITransform
 			anchorMode: TopLeft
 			x: 100
@@ -69,9 +85,10 @@ entities
 		Sprite
 			sprite: 51156c5dc9972f6b
 			size: (1, 1)
+			layer: 0
 			order: 0
 			color: #ff0000ff
-	Test2: 5e4e62ad4a8f49db
+	Blue Box: 5e4e62ad4a8f49db
 		UITransform
 			anchorMode: BottomCenter
 			x: -200
@@ -87,6 +104,7 @@ entities
 		Sprite
 			sprite: 51156c5dc9972f6b
 			size: (1, 1)
+			layer: 0
 			order: 0
 			color: #0000ffff
 	Big Ball: b620841e2d57dd79
@@ -101,6 +119,19 @@ entities
 		Mesh
 			type: SPHERE
 			material: decef49af1cbe3d9
+	Sprite Test: ad451c056f75ebf5
+		Transform
+			position: (0, 0, 0)
+			rotation: (0, 0, 0)
+			scale: (1, 1, 1)
+		Enabled
+		Renderable
+		Sprite
+			sprite: 6fe2e95b986a93ad
+			size: (1, 1)
+			layer: 0
+			order: 0
+			color: #ffffffff
 	Camera: 389d6462e322993a
 		Transform
 			position: (0, 0, -4)
@@ -117,15 +148,3 @@ entities
 			near: 0.1
 			far: 100
 		AudioListener
-	Sprite Test: ad451c056f75ebf5
-		Transform
-			position: (0, 0, 0)
-			rotation: (0, 0, 0)
-			scale: (1, 1, 1)
-		Enabled
-		Renderable
-		Sprite
-			sprite: 6fe2e95b986a93ad
-			size: (1, 1)
-			order: 0
-			color: #ffffffff

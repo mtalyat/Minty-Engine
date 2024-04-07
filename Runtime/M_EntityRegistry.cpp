@@ -198,7 +198,23 @@ void minty::EntityRegistry::dirty(Entity const entity)
 	}
 }
 
-void minty::EntityRegistry::set_parent(Entity const entity, Entity const parentEntity)
+void minty::EntityRegistry::fix_sibling_indices(Entity const startEntity, int const startIndex)
+{
+	Entity entity = startEntity;
+	int i = startIndex;
+
+	while (entity != NULL_ENTITY)
+	{
+		RelationshipComponent& relationship = get<RelationshipComponent>(entity);
+
+		relationship.index = i;
+		i++;
+
+		entity = relationship.next;
+	}
+}
+
+void minty::EntityRegistry::set_parent(Entity const entity, Entity const parentEntity, uint32_t const insertionIndex)
 {
 	// get or emplace: this entity could not have a relationship
 	RelationshipComponent& relationship = get_or_emplace<RelationshipComponent>(entity);
@@ -221,6 +237,9 @@ void minty::EntityRegistry::set_parent(Entity const entity, Entity const parentE
 		}
 		else
 		{
+			int index = relationship.index;
+			Entity next = relationship.next;
+
 			if (entity != parentRelationship.first && entity != parentRelationship.last)
 			{
 				// middle child: mend the gap
@@ -250,6 +269,9 @@ void minty::EntityRegistry::set_parent(Entity const entity, Entity const parentE
 					parentRelationship.last = relationship.prev;
 				}
 			}
+
+			// fix following indices
+			fix_sibling_indices(next, index + 1);
 		}
 
 		parentRelationship.children--;
@@ -263,6 +285,7 @@ void minty::EntityRegistry::set_parent(Entity const entity, Entity const parentE
 
 	// set new parent
 	relationship.parent = parentEntity;
+	relationship.index = 0;
 	relationship.prev = NULL_ENTITY;
 	relationship.next = NULL_ENTITY;
 
@@ -283,14 +306,47 @@ void minty::EntityRegistry::set_parent(Entity const entity, Entity const parentE
 			parentRelationship.first = entity;
 			parentRelationship.last = entity;
 		}
-		else
+		else if(insertionIndex == 0)
 		{
-			// if children list is not empty, add to back
-			RelationshipComponent& lastSiblingRelationship = get_or_emplace<RelationshipComponent>(parentRelationship.last);
+			// insert at beginning
+			RelationshipComponent& firstSiblingRelationship = get<RelationshipComponent>(parentRelationship.first);
+
+			firstSiblingRelationship.prev = entity;
+			relationship.next = parentRelationship.first;
+			parentRelationship.first = entity;
+			relationship.index = 0;
+
+			fix_sibling_indices(relationship.next, 1);
+		}
+		else if (insertionIndex >= parentRelationship.children)
+		{
+			// add to end
+			RelationshipComponent& lastSiblingRelationship = get<RelationshipComponent>(parentRelationship.last);
 
 			lastSiblingRelationship.next = entity;
 			relationship.prev = parentRelationship.last;
 			parentRelationship.last = entity;
+			relationship.index = lastSiblingRelationship.index + 1;
+		}
+		else
+		{
+			// insert into middle
+
+			// get child in middle
+			Entity middleChild = get_child(parentEntity, insertionIndex);
+
+			// get surrounding
+			RelationshipComponent& after = get<RelationshipComponent>(middleChild);
+			RelationshipComponent& before = get<RelationshipComponent>(after.prev);
+
+			// emplace into there
+			relationship.prev = after.prev;
+			relationship.next = middleChild;
+			before.next = entity;
+			after.prev = entity;
+			relationship.index = after.index;
+
+			fix_sibling_indices(relationship.next, relationship.index + 1);
 		}
 
 		parentRelationship.children++;
@@ -327,6 +383,174 @@ Entity minty::EntityRegistry::get_parent(Entity const entity) const
 	}
 
 	return NULL_ENTITY;
+}
+
+void minty::EntityRegistry::swap_siblings(Entity const left, Entity const right)
+{
+	if (left == NULL_ENTITY || right == NULL_ENTITY) return;
+
+	MINTY_ASSERT(all_of<RelationshipComponent>(left));
+	MINTY_ASSERT(all_of<RelationshipComponent>(right));
+
+	// swapping self
+	if (left == right) return;
+
+	RelationshipComponent& leftR = get<RelationshipComponent>(left);
+	RelationshipComponent& rightR = get<RelationshipComponent>(right);
+
+	MINTY_ASSERT(leftR.parent != NULL_ENTITY);
+	MINTY_ASSERT(leftR.parent == rightR.parent);
+
+	// swap
+	if (leftR.next == right)
+	{
+		Entity before = leftR.prev;
+		Entity after = rightR.next;
+
+		leftR.prev = right;
+		leftR.next = rightR.next;
+
+		rightR.prev = before;
+		rightR.next = left;
+
+		// fix surrounding
+		if (RelationshipComponent* beforeR = try_get<RelationshipComponent>(before))
+		{
+			beforeR->next = right;
+		}
+		if (RelationshipComponent* afterR = try_get<RelationshipComponent>(after))
+		{
+			afterR->prev = left;
+		}
+	}
+	else if (leftR.prev == right)
+	{
+		Entity before = rightR.prev;
+		Entity after = leftR.next;
+
+		leftR.prev = rightR.prev;
+		leftR.next = right;
+
+		rightR.prev = left;
+		rightR.next = after;
+
+		// fix surrounding
+		if (RelationshipComponent* beforeR = try_get<RelationshipComponent>(before))
+		{
+			beforeR->next = left;
+		}
+		if (RelationshipComponent* afterR = try_get<RelationshipComponent>(after))
+		{
+			afterR->prev = right;
+		}
+	}
+	else
+	{
+		// not connected at all
+		Entity before1 = leftR.prev;
+		Entity after1 = leftR.next;
+
+		Entity before2 = rightR.prev;
+		Entity after2 = rightR.next;
+
+		leftR.prev = rightR.prev;
+		leftR.next = rightR.next;
+
+		rightR.prev = before1;
+		rightR.next = after1;
+
+		// fix surrounding
+		if (RelationshipComponent* beforeR = try_get<RelationshipComponent>(before1))
+		{
+			beforeR->next = right;
+		}
+		if (RelationshipComponent* afterR = try_get<RelationshipComponent>(after1))
+		{
+			afterR->prev = right;
+		}
+		if (RelationshipComponent* beforeR = try_get<RelationshipComponent>(before2))
+		{
+			beforeR->next = left;
+		}
+		if (RelationshipComponent* afterR = try_get<RelationshipComponent>(after2))
+		{
+			afterR->prev = left;
+		}
+	}
+
+	// swap indices
+	int tempIndex = leftR.index;
+	leftR.index = rightR.index;
+	rightR.index = tempIndex;
+
+	// update parent first and last if needed
+	RelationshipComponent& parentR = get<RelationshipComponent>(leftR.parent);
+
+	if (parentR.first == left) parentR.first = right;
+	else if (parentR.first == right) parentR.first = left;
+
+	if (parentR.last == left) parentR.last = right;
+	else if (parentR.last == right) parentR.last = left;
+}
+
+void minty::EntityRegistry::move_to_next(Entity const entity)
+{
+	if (!all_of<RelationshipComponent>(entity)) return;
+	RelationshipComponent& relationship = get<RelationshipComponent>(entity);
+	if (relationship.parent == NULL_ENTITY) return;
+
+	swap_siblings(entity, relationship.next);
+}
+
+void minty::EntityRegistry::move_to_previous(Entity const entity)
+{
+	if (!all_of<RelationshipComponent>(entity)) return;
+	RelationshipComponent& relationship = get<RelationshipComponent>(entity);
+	if (relationship.parent == NULL_ENTITY) return;
+
+	swap_siblings(entity, relationship.prev);
+}
+
+void minty::EntityRegistry::move_to_first(Entity const entity)
+{
+	if (!all_of<RelationshipComponent>(entity)) return;
+	RelationshipComponent& relationship = get<RelationshipComponent>(entity);
+	if (relationship.parent == NULL_ENTITY) return;
+
+	// keep track of parent
+	Entity parent = relationship.parent;
+
+	RelationshipComponent& parentR = get<RelationshipComponent>(parent);
+
+	// already the first child
+	if (parentR.first == entity) return;
+
+	// remove from children
+	set_parent(entity, NULL_ENTITY);
+
+	// add to beginning
+	set_parent(entity, parent, 0);
+}
+
+void minty::EntityRegistry::move_to_last(Entity const entity)
+{
+	if (!all_of<RelationshipComponent>(entity)) return;
+	RelationshipComponent& relationship = get<RelationshipComponent>(entity);
+	if (relationship.parent == NULL_ENTITY) return;
+
+	// keep track of parent
+	Entity parent = relationship.parent;
+
+	RelationshipComponent& parentR = get<RelationshipComponent>(parent);
+
+	// already the last child
+	if (parentR.last == entity) return;
+
+	// remove from children
+	set_parent(entity, NULL_ENTITY);
+
+	// add back at end
+	set_parent(entity, parent);
 }
 
 std::vector<Entity> minty::EntityRegistry::get_family_line(Entity const entity) const

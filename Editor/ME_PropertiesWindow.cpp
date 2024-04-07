@@ -2,6 +2,7 @@
 
 #include "ME_EditorApplication.h"
 #include "ME_ConsoleWindow.h"
+#include "ME_HierarchyWindow.h"
 #include "ME_ImGuiHelper.h"
 #include "ME_Project.h"
 
@@ -324,6 +325,69 @@ void mintye::PropertiesWindow::draw_component(minty::Node& node, size_t const i,
 		{
 			registry.dirty(_targetEntity);
 			scene->finalize();
+		}
+	}
+
+	// additonal actions for specific components
+	if (node.get_name() == "Relationship")
+	{
+		// only if relationship has a parent
+		RelationshipComponent* relationship = static_cast<RelationshipComponent*>(registry.get_by_name(node.get_name(), _targetEntity));
+
+		if (relationship && relationship->parent != NULL_ENTITY)
+		{
+			bool canMoveUp = relationship->prev != NULL_ENTITY;
+			bool canMoveDown = relationship->next != NULL_ENTITY;
+
+			if (!canMoveUp) ImGui::BeginDisabled();
+
+			if (ImGui::Button(std::format("Move Up##{}", i).c_str()))
+			{
+				registry.move_to_previous(_targetEntity);
+				HierarchyWindow* hierarchy = get_application().find_editor_window<HierarchyWindow>("Hierarchy");
+				if (hierarchy) hierarchy->refresh();
+			}
+
+			if (!canMoveUp) ImGui::EndDisabled();
+
+			ImGui::SameLine();
+
+			if (!canMoveDown) ImGui::BeginDisabled();
+
+			if (ImGui::Button(std::format("Move Down##{}", i).c_str()))
+			{
+				registry.move_to_next(_targetEntity);
+				HierarchyWindow* hierarchy = get_application().find_editor_window<HierarchyWindow>("Hierarchy");
+				if (hierarchy) hierarchy->refresh();
+			}
+
+			if (!canMoveDown) ImGui::EndDisabled();
+
+			ImGui::SameLine();
+
+			if (!canMoveUp) ImGui::BeginDisabled();
+
+			if (ImGui::Button(std::format("Move to First##{}", i).c_str()))
+			{
+				registry.move_to_first(_targetEntity);
+				HierarchyWindow* hierarchy = get_application().find_editor_window<HierarchyWindow>("Hierarchy");
+				if (hierarchy) hierarchy->refresh();
+			}
+
+			if (!canMoveUp) ImGui::EndDisabled();
+
+			ImGui::SameLine();
+
+			if (!canMoveDown) ImGui::BeginDisabled();
+
+			if (ImGui::Button(std::format("Move to Last##{}", i).c_str()))
+			{
+				registry.move_to_last(_targetEntity);
+				HierarchyWindow* hierarchy = get_application().find_editor_window<HierarchyWindow>("Hierarchy");
+				if (hierarchy) hierarchy->refresh();
+			}
+
+			if (!canMoveDown) ImGui::EndDisabled();
 		}
 	}
 

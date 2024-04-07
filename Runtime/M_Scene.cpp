@@ -137,27 +137,11 @@ void minty::Scene::sort()
 			RelationshipComponent const& leftR = er->get<RelationshipComponent>(left);
 			RelationshipComponent const& rightR = er->get<RelationshipComponent>(right);
 
-			bool value =
+			return 
 				rightR.parent == left || // put parents on left of children
 				leftR.next == right || // put siblings in order
 				// put in order based on parent sibling index
-				(!(leftR.parent == right || rightR.next == left) && (leftR.parent < rightR.parent || (leftR.parent == rightR.parent && left < right)));
-
-			return value;
-		});
-
-	// sort sprites by order
-	_entities->sort<SpriteComponent>([er](Entity const left, Entity const right)
-		{
-			SpriteComponent const& leftS = er->get<SpriteComponent>(left);
-			SpriteComponent const& rightS = er->get<SpriteComponent>(right);
-
-			bool value =
-				leftS.layer < rightS.layer || // sort by layer
-				(leftS.layer == rightS.layer && leftS.order < rightS.order) || // sort by order within the layer
-				(leftS.layer == rightS.layer && leftS.order == rightS.order && left < right); // sort by entity ID if both equal
-
-			return value;
+				(!(leftR.parent == right || rightR.next == left) && (leftR.parent < rightR.parent || (leftR.parent == rightR.parent && leftR.index < rightR.index)));;
 		});
 }
 

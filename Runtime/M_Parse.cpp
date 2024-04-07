@@ -24,19 +24,17 @@ bool is_signed_integer(String const& string)
 {
     if (!string.length()) return false; // nothing in string
 
+    size_t i = string.at(0) == '-' ? 1 : 0;
+
+    // check if just the '-'
+    if (i == 1 && string.length() == 1) return false;
+
     char c;
-    for (size_t i = 0; i < string.size(); i++)
+    for (; i < string.size(); i++)
     {
         c = string.at(i);
 
-        switch (c)
-        {
-        case '-':
-            if (i > 0) return false; // - not at beginning
-            break;
-        default:
-            if (!isdigit(c)) return false; // not a digit
-        }
+        if (!isdigit(c)) return false; // not a digit
     }
 
     // all digits or - at beginning

@@ -12,9 +12,14 @@ namespace minty
 		: public Component
 	{
 		/// <summary>
+		/// The index of this Entity among its siblings.
+		/// </summary>
+		uint32_t index;
+
+		/// <summary>
 		/// The number of children this Entity has.
 		/// </summary>
-		size_t children = 0;
+		uint32_t children = 0;
 
 		/// <summary>
 		/// The first child this Entity has.

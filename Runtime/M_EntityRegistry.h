@@ -85,9 +85,44 @@ namespace minty
 
 		void dirty(Entity const entity);
 
-		void set_parent(Entity const entity, Entity const parentEntity);
+	private:
+		void fix_sibling_indices(Entity const startEntity, int const startIndex);
+
+	public:
+		void set_parent(Entity const entity, Entity const parentEntity, uint32_t const insertionIndex = -1);
 
 		Entity get_parent(Entity const entity) const;
+
+		/// <summary>
+		/// Given two entities that share the same parent, swap their positions.
+		/// </summary>
+		/// <param name="left"></param>
+		/// <param name="right"></param>
+		void swap_siblings(Entity const left, Entity const right);
+
+		/// <summary>
+		/// Moves this Entity to the next sibling index.
+		/// </summary>
+		/// <param name="entity"></param>
+		void move_to_next(Entity const entity);
+
+		/// <summary>
+		/// Moves this Entity to the previous sibling index.
+		/// </summary>
+		/// <param name="entity"></param>
+		void move_to_previous(Entity const entity);
+
+		/// <summary>
+		/// Moves this Entity to the first sibling position.
+		/// </summary>
+		/// <param name="entity"></param>
+		void move_to_first(Entity const entity);
+
+		/// <summary>
+		/// Moves this Entity to the last sibling position.
+		/// </summary>
+		/// <param name="entity"></param>
+		void move_to_last(Entity const entity);
 
 		/// <summary>
 		/// Gets the family line from this Entity all the way until the top parent.

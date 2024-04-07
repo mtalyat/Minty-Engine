@@ -1055,12 +1055,6 @@ void minty::RenderEngine::draw_scene(VkCommandBuffer commandBuffer)
 {
 	if (!_registry) return;
 
-	// sort sprites so they render in the correct order, since Z does not matter
-	_registry->sort<SpriteComponent>([](SpriteComponent const& left, SpriteComponent const& right)
-		{
-			return left.order < right.order;
-		});
-
 	TransformComponent const* transformComponent;
 
 	// draw all meshes in the scene
@@ -1084,19 +1078,31 @@ void minty::RenderEngine::draw_scene(VkCommandBuffer commandBuffer)
 		}
 	}
 
+	// sort sprites so they render in the correct order, since Z does not matter
+	_registry->sort<SpriteComponent>([](SpriteComponent const& left, SpriteComponent const& right)
+		{
+			return
+				left.layer > right.layer ||
+				(left.layer == right.layer && left.order > right.order);
+		});
+
 	// draw all world sprites in the scene
-	for (auto&& [entity, renderable, transform, sprite, enabled] : _registry->view<RenderableComponent const, TransformComponent const, SpriteComponent const, EnabledComponent const>().each())
+	auto spriteView = _registry->view<RenderableComponent const, TransformComponent const, SpriteComponent const, EnabledComponent const>();
+	spriteView.use<SpriteComponent const>();
+	for (auto&& [entity, renderable, transform, sprite, enabled] : spriteView.each())
 	{
 		draw_sprite(commandBuffer, transform, sprite);
 	}
 
 	// sort UITransforms so that it matches order of sprites for rendering
-	_registry->sort<UITransformComponent, SpriteComponent>();
+	//_registry->sort<UITransformComponent, SpriteComponent>();
 
 	// draw all UI in scene
 	// keep track of the canvas being used
 	Entity canvasEntity = NULL_ENTITY;
-	for (auto&& [entity, renderable, ui, sprite, enabled] : _registry->view<RenderableComponent const, UITransformComponent const, SpriteComponent const, EnabledComponent const>().each())
+	auto uiSpriteView = _registry->view<RenderableComponent const, UITransformComponent const, SpriteComponent const, EnabledComponent const>();
+	uiSpriteView.use<SpriteComponent const>();
+	for (auto&& [entity, renderable, ui, sprite, enabled] : uiSpriteView.each())
 	{
 		// if new canvas, update shader values
 		if (ui.canvas != canvasEntity)
