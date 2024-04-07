@@ -44,7 +44,7 @@ public class TestScript : Script
 
     void OnPointerHover()
     {
-        Debug.Log("Hover");
+        //Debug.Log("Hover");
     }
 
     void OnPointerExit()

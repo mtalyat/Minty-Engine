@@ -21,6 +21,7 @@ void minty::UISystem::update()
 {
 	Window& window = get_runtime().get_window();
 	bool mouseDown = window.get_mouse_down();
+	Vector2 mousePosition = window.get_mouse_position();
 
 	EntityRegistry& registry = get_entity_registry();
 
@@ -70,8 +71,52 @@ void minty::UISystem::update()
 		registry.trigger_event<ScriptOnPointerExitComponent>(entity);
 	}
 
+	// ON DOWN
+	if (!_mouseDown && mouseDown)
+	{
+		for (Entity entity : familyLine)
+		{
+			registry.trigger_event<ScriptOnPointerDownComponent>(entity);
+		}
+
+		_clicking = true;
+	}
+
+	// ON MOVE
+	if (mousePosition != _mousePosition)
+	{
+		for (Entity entity : familyLine)
+		{
+			registry.trigger_event<ScriptOnPointerMoveComponent>(entity);
+		}
+
+		// if moved, no longer clicking
+		_clicking = false;
+	}
+
+	// ON UP
+	if (_mouseDown && !mouseDown)
+	{
+		for (Entity entity : familyLine)
+		{
+			registry.trigger_event<ScriptOnPointerUpComponent>(entity);
+		}
+
+		if (_clicking)
+		{
+			for (Entity entity : familyLine)
+			{
+				registry.trigger_event<ScriptOnPointerClickComponent>(entity);
+			}
+		}
+	}
+
 	// update family
 	_family.clear();
 	_family.reserve(familyLine.size());
 	_family.insert(familyLine.begin(), familyLine.end());
+
+	// update mouse states
+	_mouseDown = mouseDown;
+	_mousePosition = mousePosition;
 }
