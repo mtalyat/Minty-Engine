@@ -1,5 +1,5 @@
 # Minty Engine
-A dynamic and advanced voxel engine.
+A dynamic and advanced game engine.
 
 ![A mint candy with a flaming mint leaf trailing it.](Images/Icon.png)
 
