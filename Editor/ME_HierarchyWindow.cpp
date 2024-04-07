@@ -390,8 +390,12 @@ void mintye::HierarchyWindow::draw_popup()
 	if (ImGui::MenuItem("Create empty"))
 	{
 		// create and select
-		set_selected(create_entity());
+		Entity newEntity = create_entity();
+		set_selected(newEntity);
 		get_scene()->sort();
+
+		// set parent as clicked
+		registry.set_parent(newEntity, _clicked);
 
 		return;
 	}
