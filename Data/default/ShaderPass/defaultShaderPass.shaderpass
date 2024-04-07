@@ -1,7 +1,7 @@
 shader: 279e2c5cb4625c3c
 primitiveTopology: TRIANGLE_LIST
 polygonMode: FILL
-cullMode: BACK_BIT
+cullMode: BACK
 frontFace: CLOCKWISE
 lineWidth: 1
 binding: 0

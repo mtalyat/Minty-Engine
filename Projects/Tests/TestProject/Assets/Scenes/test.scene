@@ -17,19 +17,19 @@ assets
 	- "Assets/Textures/texture.jpg"
 	- "Assets/Textures/x.png"
 	- "BuiltIn/Texture/square.png"
-	- "Assets\\WIP\\defaultUiShader.shader"
 	- "BuiltIn/Shader/defaultShader.shader"
 	- "BuiltIn\\Shader\\defaultSpriteShader.shader"
-	- "Assets\\WIP\\defaultUiShaderPass.shaderpass"
+	- "BuiltIn\\Shader\\defaultUiShader.shader"
 	- "BuiltIn/ShaderPass/defaultShaderPass.shaderpass"
 	- "BuiltIn\\ShaderPass\\defaultSpriteShaderPass.shaderpass"
-	- "Assets\\WIP\\defaultUiMaterialTemplate.materialtemplate"
+	- "BuiltIn\\ShaderPass\\defaultUiShaderPass.shaderpass"
 	- "BuiltIn/MaterialTemplate/defaultMaterialTemplate.materialtemplate"
 	- "BuiltIn\\MaterialTemplate\\defaultSpriteMaterialTemplate.materialtemplate"
+	- "BuiltIn\\MaterialTemplate\\defaultUiMaterialTemplate.materialtemplate"
 	- "Assets\\Materials\\xSpriteMaterial.material"
-	- "Assets\\WIP\\defaultUiMaterial.material"
 	- "BuiltIn/Material/defaultMaterial.material"
 	- "BuiltIn\\Material\\defaultSpriteMaterial.material"
+	- "BuiltIn\\Material\\defaultUiMaterial.material"
 	- "Assets\\Sprites\\brian.sprite"
 	- "Assets\\Sprites\\defaultSprite.sprite"
 	- "Assets\\Sprites\\defaultUiSprite.sprite"
@@ -50,6 +50,7 @@ entities
 		Canvas
 			resolutionWidth: 1920
 			resolutionHeight: 1080
+		Enabled
 		Relationship
 			parent: 0
 	Test: b7761f2bc863d61c
@@ -72,11 +73,11 @@ entities
 			color: #ff0000ff
 	Test2: 5e4e62ad4a8f49db
 		UITransform
-			anchorMode: All
-			left: 0
-			right: 200
-			top: 0
-			bottom: 200
+			anchorMode: BottomCenter
+			x: -200
+			width: 400
+			y: -140
+			height: 120
 		Script
 			- c5bbd244d3aafdbf
 		Enabled
@@ -100,18 +101,6 @@ entities
 		Mesh
 			type: SPHERE
 			material: decef49af1cbe3d9
-	Sprite Test: ad451c056f75ebf5
-		Transform
-			position: (0, 0, 0)
-			rotation: (0, 0, 0)
-			scale: (1, 1, 1)
-		Enabled
-		Renderable
-		Sprite
-			sprite: 6fe2e95b986a93ad
-			size: (1, 1)
-			order: 0
-			color: #ffffffff
 	Camera: 389d6462e322993a
 		Transform
 			position: (0, 0, -4)
@@ -128,3 +117,15 @@ entities
 			near: 0.1
 			far: 100
 		AudioListener
+	Sprite Test: ad451c056f75ebf5
+		Transform
+			position: (0, 0, 0)
+			rotation: (0, 0, 0)
+			scale: (1, 1, 1)
+		Enabled
+		Renderable
+		Sprite
+			sprite: 6fe2e95b986a93ad
+			size: (1, 1)
+			order: 0
+			color: #ffffffff

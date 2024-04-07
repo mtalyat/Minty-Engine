@@ -5,6 +5,6 @@ cullMode: NONE
 frontFace: CLOCKWISE
 lineWidth: 1
 stage: VERTEX_BIT
-    path: Assets/WIP/uivert.spv
+    path: BuiltIn/Shader/defaultUiVert.spv
 stage: FRAGMENT_BIT
-    path: Assets/WIP/uifrag.spv
+    path: BuiltIn/Shader/defaultUiFrag.spv
