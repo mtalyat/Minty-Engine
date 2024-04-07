@@ -10,16 +10,20 @@
 
 using namespace minty;
 
-void minty::ScriptEventComponent::invoke(String const& method, ScriptComponent const& script) const
+void minty::ScriptEventComponent::invoke(ScriptComponent const& script) const
 {
+	String method = get_method_name();
+
 	for (ID const id : scriptIds)
 	{
 		script.scripts.at(id).invoke(method);
 	}
 }
 
-void minty::ScriptEventComponent::invoke(String const& method, ScriptComponent const& script, std::unordered_set<String> const& componentNames) const
+void minty::ScriptEventComponent::invoke(ScriptComponent const& script, std::unordered_set<String> const& componentNames) const
 {
+	String method = get_method_name();
+
 	for (String const& name : componentNames)
 	{
 		ID id = script.scripts.find(name);
@@ -64,4 +68,69 @@ void minty::ScriptComponent::deserialize(Reader const& reader)
 		Reader scriptReader(node, data);
 		component->deserialize(scriptReader);
 	}
+}
+
+char const* minty::ScriptOnLoadComponent::get_method_name() const
+{
+	return SCRIPT_METHOD_NAME_ONLOAD;
+}
+
+char const* minty::ScriptOnEnableComponent::get_method_name() const
+{
+	return SCRIPT_METHOD_NAME_ONENABLE;
+}
+
+char const* minty::ScriptOnUpdateComponent::get_method_name() const
+{
+	return SCRIPT_METHOD_NAME_ONUPDATE;
+}
+
+char const* minty::ScriptOnDisableComponent::get_method_name() const
+{
+	return SCRIPT_METHOD_NAME_ONDISABLE;
+}
+
+char const* minty::ScriptOnUnloadComponent::get_method_name() const
+{
+	return SCRIPT_METHOD_NAME_ONUNLOAD;
+}
+
+char const* minty::ScriptOnDestroyComponent::get_method_name() const
+{
+	return SCRIPT_METHOD_NAME_ONDESTROY;
+}
+
+char const* minty::ScriptOnPointerEnterComponent::get_method_name() const
+{
+	return SCRIPT_METHOD_NAME_ONPOINTERENTER;
+}
+
+char const* minty::ScriptOnPointerHoverComponent::get_method_name() const
+{
+	return SCRIPT_METHOD_NAME_ONPOINTERHOVER;
+}
+
+char const* minty::ScriptOnPointerExitComponent::get_method_name() const
+{
+	return SCRIPT_METHOD_NAME_ONPOINTEREXIT;
+}
+
+char const* minty::ScriptOnPointerMoveComponent::get_method_name() const
+{
+	return SCRIPT_METHOD_NAME_ONPOINTERMOVE;
+}
+
+char const* minty::ScriptOnPointerDownComponent::get_method_name() const
+{
+	return SCRIPT_METHOD_NAME_ONPOINTERDOWN;
+}
+
+char const* minty::ScriptOnPointerUpComponent::get_method_name() const
+{
+	return SCRIPT_METHOD_NAME_ONPOINTERUP;
+}
+
+char const* minty::ScriptOnPointerClickComponent::get_method_name() const
+{
+	return SCRIPT_METHOD_NAME_ONPOINTERCLICK;
 }

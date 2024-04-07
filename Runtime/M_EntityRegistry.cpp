@@ -99,7 +99,7 @@ void minty::EntityRegistry::enable(Entity const entity)
 			ScriptOnEnableComponent* eventComponent = try_get<ScriptOnEnableComponent>(entity);
 			if (scriptComponent && eventComponent)
 			{
-				eventComponent->invoke(SCRIPT_METHOD_NAME_ONENABLE, *scriptComponent);
+				eventComponent->invoke(*scriptComponent);
 			}
 		}
 	}
@@ -119,7 +119,7 @@ void minty::EntityRegistry::disable(Entity const entity)
 			ScriptOnDisableComponent* eventComponent = try_get<ScriptOnDisableComponent>(entity);
 			if (scriptComponent && eventComponent)
 			{
-				eventComponent->invoke(SCRIPT_METHOD_NAME_ONDISABLE, *scriptComponent);
+				eventComponent->invoke(*scriptComponent);
 			}
 		}
 	}
@@ -329,6 +329,30 @@ Entity minty::EntityRegistry::get_parent(Entity const entity) const
 	return NULL_ENTITY;
 }
 
+std::vector<Entity> minty::EntityRegistry::get_family_line(Entity const entity) const
+{
+	if (entity == NULL_ENTITY) return std::vector<Entity>();
+
+	std::vector<Entity> result;
+	result.push_back(entity);
+
+	// if parent, get every parent
+	if (RelationshipComponent const* relationship = try_get<RelationshipComponent>(entity))
+	{
+		Entity parent = relationship->parent;
+
+		while (parent != NULL_ENTITY)
+		{
+			result.push_back(parent);
+
+			relationship = try_get<RelationshipComponent>(parent);
+			parent = relationship->parent;
+		}
+	}
+
+	return result;
+}
+
 size_t minty::EntityRegistry::get_child_count(Entity const entity) const
 {
 	if (RelationshipComponent const* component = try_get<RelationshipComponent>(entity))
@@ -494,10 +518,10 @@ void minty::EntityRegistry::destroy_queued()
 		// call events
 		if (loaded)
 		{
-			if (ScriptOnDisableComponent* eventComp = try_get<ScriptOnDisableComponent>(entity)) eventComp->invoke(SCRIPT_METHOD_NAME_ONDISABLE, script, destroy.components);
-			if (ScriptOnUnloadComponent* eventComp = try_get<ScriptOnUnloadComponent>(entity)) eventComp->invoke(SCRIPT_METHOD_NAME_ONUNLOAD, script, destroy.components);
+			if (ScriptOnDisableComponent* eventComp = try_get<ScriptOnDisableComponent>(entity)) eventComp->invoke(script, destroy.components);
+			if (ScriptOnUnloadComponent* eventComp = try_get<ScriptOnUnloadComponent>(entity)) eventComp->invoke(script, destroy.components);
 		}
-		if (ScriptOnDestroyComponent* eventComp = try_get<ScriptOnDestroyComponent>(entity)) eventComp->invoke(SCRIPT_METHOD_NAME_ONDESTROY, script, destroy.components);
+		if (ScriptOnDestroyComponent* eventComp = try_get<ScriptOnDestroyComponent>(entity)) eventComp->invoke(script, destroy.components);
 
 		// erase the script components
 		for (auto const& name : destroy.components)
@@ -549,13 +573,13 @@ void minty::EntityRegistry::destroy_trigger_events(Entity const entity, bool con
 		{
 			if (all_of<EnabledComponent>(entity))
 				if (ScriptOnDisableComponent* eventComp = try_get<ScriptOnDisableComponent>(entity))
-					eventComp->invoke(SCRIPT_METHOD_NAME_ONDISABLE, *scriptComponent);
+					eventComp->invoke(*scriptComponent);
 
 			if (ScriptOnUnloadComponent* eventComp = try_get<ScriptOnUnloadComponent>(entity))
-				eventComp->invoke(SCRIPT_METHOD_NAME_ONUNLOAD, *scriptComponent);
+				eventComp->invoke(*scriptComponent);
 		}
 		if (ScriptOnDestroyComponent* eventComp = try_get<ScriptOnDestroyComponent>(entity))
-			eventComp->invoke(SCRIPT_METHOD_NAME_ONDESTROY, *scriptComponent);
+			eventComp->invoke(*scriptComponent);
 	}
 }
 
@@ -564,7 +588,7 @@ void minty::EntityRegistry::clear()
 	// call OnDestroy on any scripts
 	for (auto [entity, script, ondestroy] : view<ScriptComponent const, ScriptOnDestroyComponent const>().each())
 	{
-		ondestroy.invoke(SCRIPT_METHOD_NAME_ONDESTROY, script);
+		ondestroy.invoke(script);
 	}
 
 	// destroy them all
@@ -926,57 +950,19 @@ void minty::EntityRegistry::register_script(String const& name)
 				bool isLoaded = registry.get_scene().is_loaded();
 
 				// now add the helper components, if they are needed
-				if (script->has_method(SCRIPT_METHOD_NAME_ONLOAD))
-				{
-					ScriptOnLoadComponent& eventComp = registry.get_or_emplace<ScriptOnLoadComponent>(entity);
-					eventComp.scriptIds.emplace(id);
-
-					if (isLoaded)
-					{
-						scriptObject.invoke(SCRIPT_METHOD_NAME_ONLOAD);
-					}
-				}
-				if (script->has_method(SCRIPT_METHOD_NAME_ONENABLE))
-				{
-					ScriptOnEnableComponent& eventComp = registry.get_or_emplace<ScriptOnEnableComponent>(entity);
-					eventComp.scriptIds.emplace(id);
-
-					if (isLoaded)
-					{
-						scriptObject.invoke(SCRIPT_METHOD_NAME_ONENABLE);
-					}
-				}
-				if (script->has_method(SCRIPT_METHOD_NAME_ONUPDATE))
-				{
-					ScriptOnUpdateComponent& eventComp = registry.get_or_emplace<ScriptOnUpdateComponent>(entity);
-					eventComp.scriptIds.emplace(id);
-				}
-				if (script->has_method(SCRIPT_METHOD_NAME_ONDISABLE))
-				{
-					ScriptOnDisableComponent& eventComp = registry.get_or_emplace<ScriptOnDisableComponent>(entity);
-					eventComp.scriptIds.emplace(id);
-				}
-				if (script->has_method(SCRIPT_METHOD_NAME_ONUNLOAD))
-				{
-					ScriptOnUnloadComponent& eventComp = registry.get_or_emplace<ScriptOnUnloadComponent>(entity);
-					eventComp.scriptIds.emplace(id);
-				}
-				if (script->has_method(SCRIPT_METHOD_NAME_ONDESTROY))
-				{
-					ScriptOnDestroyComponent& eventComp = registry.get_or_emplace<ScriptOnDestroyComponent>(entity);
-					eventComp.scriptIds.emplace(id);
-				}
-
-				if (script->has_method(SCRIPT_METHOD_NAME_ONPOINTERENTER))
-				{
-					ScriptOnPointerEnterComponent& eventComp = registry.get_or_emplace<ScriptOnPointerEnterComponent>(entity);
-					eventComp.scriptIds.emplace(id);
-				}
-				if (script->has_method(SCRIPT_METHOD_NAME_ONPOINTEREXIT))
-				{
-					ScriptOnPointerExitComponent& eventComp = registry.get_or_emplace<ScriptOnPointerExitComponent>(entity);
-					eventComp.scriptIds.emplace(id);
-				}
+				registry.connect_event<ScriptOnLoadComponent>(entity, id, scriptObject, SCRIPT_METHOD_NAME_ONLOAD, isLoaded);
+				registry.connect_event<ScriptOnEnableComponent>(entity, id, scriptObject, SCRIPT_METHOD_NAME_ONENABLE, isLoaded);
+				registry.connect_event<ScriptOnUpdateComponent>(entity, id, scriptObject, SCRIPT_METHOD_NAME_ONUPDATE);
+				registry.connect_event<ScriptOnDisableComponent>(entity, id, scriptObject, SCRIPT_METHOD_NAME_ONDISABLE);
+				registry.connect_event<ScriptOnUnloadComponent>(entity, id, scriptObject, SCRIPT_METHOD_NAME_ONUNLOAD);
+				registry.connect_event<ScriptOnDestroyComponent>(entity, id, scriptObject, SCRIPT_METHOD_NAME_ONDESTROY);
+				registry.connect_event<ScriptOnPointerEnterComponent>(entity, id, scriptObject, SCRIPT_METHOD_NAME_ONPOINTERENTER);
+				registry.connect_event<ScriptOnPointerHoverComponent>(entity, id, scriptObject, SCRIPT_METHOD_NAME_ONPOINTERHOVER);
+				registry.connect_event<ScriptOnPointerExitComponent>(entity, id, scriptObject, SCRIPT_METHOD_NAME_ONPOINTEREXIT);
+				registry.connect_event<ScriptOnPointerMoveComponent>(entity, id, scriptObject, SCRIPT_METHOD_NAME_ONPOINTERMOVE);
+				registry.connect_event<ScriptOnPointerDownComponent>(entity, id, scriptObject, SCRIPT_METHOD_NAME_ONPOINTERDOWN);
+				registry.connect_event<ScriptOnPointerUpComponent>(entity, id, scriptObject, SCRIPT_METHOD_NAME_ONPOINTERUP);
+				registry.connect_event<ScriptOnPointerClickComponent>(entity, id, scriptObject, SCRIPT_METHOD_NAME_ONPOINTERCLICK);
 			}
 
 			// return the script object

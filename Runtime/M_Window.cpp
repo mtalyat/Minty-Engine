@@ -29,6 +29,8 @@ minty::Window::Window(String const& title, int const x, int const y, int const w
 	, _resized(true) // start as "resized" so render engine regenerates data on start
 	, _windowScript()
 	, _inputScript()
+	, _mousePosition()
+	, _mouseDown()
 	, _gamepads()
 {
 	// if no windows have been made yet, init glfw
@@ -240,6 +242,11 @@ Vector2 minty::Window::get_mouse_position(RectF const bounds) const
 	return _mousePosition / Vector2(_width, _height) * bounds.size() - bounds.position();
 }
 
+bool minty::Window::get_mouse_down() const
+{
+	return _mouseDown;
+}
+
 GLFWwindow* minty::Window::get_raw() const
 {
 	return _window;
@@ -339,6 +346,8 @@ void minty::Window::trigger_mouse_click(MouseButton button, KeyAction action, Ke
 		ScriptArguments arguments({ &button, &action, &mods });
 		_inputScript->invoke(SCRIPT_INPUT_TRIGGER_MOUSE_CLICK, arguments);
 	}
+
+	_mouseDown = action != KeyAction::Up;
 }
 
 void minty::Window::trigger_mouse_scroll(float dx, float dy)

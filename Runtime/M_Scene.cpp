@@ -109,12 +109,12 @@ void minty::Scene::load()
 	// call all load/enable/etc. events on entities already in the system
 	for (auto&& [entity, script, onLoad] : _entities->view<ScriptComponent const, ScriptOnLoadComponent const>().each())
 	{
-		onLoad.invoke(SCRIPT_METHOD_NAME_ONLOAD, script);
+		onLoad.invoke(script);
 	}
 
 	for (auto&& [entity, script, onEnable] : _entities->view<ScriptComponent const, ScriptOnEnableComponent const>().each())
 	{
-		onEnable.invoke(SCRIPT_METHOD_NAME_ONENABLE, script);
+		onEnable.invoke(script);
 	}
 }
 
@@ -220,8 +220,6 @@ void minty::Scene::finalize()
 
 	Window const& window = get_runtime().get_window();
 	RectF windowRect(0, 0, window.get_frame_width(), window.get_frame_height());
-
-	// update canvases?
 
 	// update dirty UI transforms
 	auto uiView = _entities->view<DirtyComponent const, UITransformComponent, RelationshipComponent const>();

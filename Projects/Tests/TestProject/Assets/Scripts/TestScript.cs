@@ -42,8 +42,33 @@ public class TestScript : Script
         Debug.Log("Enter");
     }
 
+    void OnPointerHover()
+    {
+        Debug.Log("Hover");
+    }
+
     void OnPointerExit()
     {
         Debug.Log("Exit");
+    }
+
+    void OnPointerDown()
+    {
+        Debug.Log("Down");
+    }
+
+    void OnPointerUp()
+    {
+        Debug.Log("Up");
+    }
+
+    void OnPointerClick()
+    {
+        Debug.Log("Click");
+    }
+
+    void OnPointerMove()
+    {
+        Debug.Log("Move");
     }
 }

@@ -47,6 +47,8 @@ namespace minty
 		ScriptClass const* _inputScript;
 
 		Vector2 _mousePosition;
+		bool _mouseDown;
+
 		std::unordered_map<int, Gamepad> _gamepads;
 	public:
 		/// <summary>
@@ -172,6 +174,11 @@ namespace minty
 		/// <param name="bounds"></param>
 		/// <returns></returns>
 		Vector2 get_mouse_position(RectF const bounds) const;
+
+		/// <summary>
+		/// Gets if the mouse is currently being held down.
+		/// </summary>
+		bool get_mouse_down() const;
 
 		/// <summary>
 		/// Gets the raw GLFWwindow component.

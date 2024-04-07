@@ -1,4 +1,4 @@
-// 2024-04-06 20:56:13
+// 2024-04-07 05:41:53
 #include <Minty.h>
 int main(int argc, char const* argv[]) {
 	minty::Application app;
