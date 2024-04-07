@@ -39,7 +39,7 @@ public class TestScript : Script
 
     void OnPointerEnter()
     {
-        Debug.Log("Enter");
+        Debug.Log($"Enter {Entity.Name}");
     }
 
     void OnPointerHover()
@@ -49,26 +49,26 @@ public class TestScript : Script
 
     void OnPointerExit()
     {
-        Debug.Log("Exit");
+        Debug.Log($"Exit {Entity.Name}");
     }
 
     void OnPointerDown()
     {
-        Debug.Log("Down");
+        Debug.Log($"Down {Entity.Name}");
     }
 
     void OnPointerUp()
     {
-        Debug.Log("Up");
+        Debug.Log($"Up {Entity.Name}");
     }
 
     void OnPointerClick()
     {
-        Debug.Log("Click");
+        Debug.Log($"Click {Entity.Name}");
     }
 
     void OnPointerMove()
     {
-        Debug.Log("Move");
+        Debug.Log($"Move {Entity.Name}");
     }
 }
