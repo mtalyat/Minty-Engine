@@ -108,7 +108,9 @@ bool mintye::PropertiesWindow::input_node(minty::Node& rootNode, bool const prin
 			memcpy(buffer, pair.first->get_data().c_str(), size);
 			buffer[size - 1] = '\0';
 
-			ImGui::Text(std::format("{}{}: ", indentString, pair.first->get_name()).c_str());
+			String text = std::format("{}{}: ", indentString, pair.first->get_name());
+			float leftTextWidth = ImGui::CalcTextSize(text.c_str()).x;
+			ImGui::Text(text.c_str());
 			ImGui::SameLine();
 			// if an ID, get the name of the object with the ID
 			UUID id(INVALID_UUID);
@@ -117,7 +119,9 @@ bool mintye::PropertiesWindow::input_node(minty::Node& rootNode, bool const prin
 			{
 				idName = get_application().get_name(id);
 			}
-			if (ImGui::InputText(std::format("{}##{}", idName, i).c_str(), buffer, BUFFER_SIZE))
+			float rightTextWidth = ImGui::CalcTextSize(idName.c_str()).x;
+			// add 10 so it is within the group box
+			if (ImGui::InputTextExpandOffset(std::format("{}##{}", idName, i).c_str(), buffer, BUFFER_SIZE, leftTextWidth, rightTextWidth + 10.0f))
 			{
 				pair.first->set_data(buffer);
 				modified = true;

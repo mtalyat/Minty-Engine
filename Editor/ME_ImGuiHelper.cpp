@@ -1,4 +1,6 @@
 #include "ME_ImGuiHelper.h"
+
+#include "M_Math.h"
 #include <vector>
 
 using namespace minty;
@@ -120,4 +122,17 @@ void ImGui::EndGroupBox(minty::Vector2 const size, minty::Vector2 const margin, 
 	max.y += margin.y;
 
 	ImGui::GetWindowDrawList()->AddRect(min, max, IM_COL32(borderColor.r, borderColor.g, borderColor.b, borderColor.a));
+}
+
+bool ImGui::InputTextExpand(char const* label, char* buf, size_t buf_size, float widthPercent, ImGuiInputTextFlags flags)
+{
+	ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * widthPercent);
+	return ImGui::InputText(label, buf, buf_size, flags);
+}
+
+bool ImGui::InputTextExpandOffset(char const* label, char* buf, size_t buf_size, float const offsetLeft, float const offsetRight, float const widthPercent, ImGuiInputTextFlags flags)
+{
+	float avail = ImGui::GetContentRegionAvail().x;
+	ImGui::SetNextItemWidth(Math::clamp(avail * widthPercent, offsetLeft, avail - offsetRight));
+	return ImGui::InputText(label, buf, buf_size, flags);
 }
