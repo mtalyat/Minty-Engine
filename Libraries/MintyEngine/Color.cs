@@ -21,6 +21,15 @@ namespace MintyEngine
         private byte _b;
         private byte _a;
 
+        public static Color White => new Color(255, 255, 255, 255);
+        public static Color Black => new Color(0, 0, 0, 255);
+        public static Color Red => new Color(255, 0, 0, 255);
+        public static Color Green => new Color(0, 255, 0, 255);
+        public static Color Blue => new Color(0, 0, 255, 255);
+        public static Color Yellow => new Color(255, 255, 0, 255);
+        public static Color Cyan => new Color(0, 255, 255, 255);
+        public static Color Magenta => new Color(255, 0, 255, 255);
+
         public Color(byte r, byte g, byte b, byte a = 255)
         {
             _r = r;
