@@ -216,6 +216,8 @@ void RenderEngine::render_frame()
 
 void minty::RenderEngine::set_camera(Vector3 const position, Quaternion const rotation, Camera const& camera)
 {
+	_backgroundColor = camera.get_color();
+
 	Matrix4 view = glm::lookAt(position, position + forward(rotation), Vector3(0.0f, 1.0f, 0.0f));
 
 	// TODO: don't use lookat
