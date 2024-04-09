@@ -24,6 +24,8 @@ public class CameraController : Script
     {
         transform = Entity.GetComponent<Transform>();
         camera = Entity.GetComponent<Camera>();
+
+        camera.Color = Color.Random;
     }
 
     private void OnUpdate()

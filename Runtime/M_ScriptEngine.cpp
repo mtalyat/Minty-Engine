@@ -1343,14 +1343,14 @@ static void camera_set_as_main(UUID id)
 	renderSystem->set_main_camera(entity);
 }
 
-static int camera_get_color(UUID id)
+static Color::color_t camera_get_color(UUID id)
 {
 	CameraComponent& camera = util_get_camera_component(id);
 
-	return static_cast<int>(camera.camera.get_color());
+	return static_cast<Color::color_t>(camera.camera.get_color());
 }
 
-static void camera_set_color(UUID id, int value)
+static void camera_set_color(UUID id, Color::color_t value)
 {
 	CameraComponent& camera = util_get_camera_component(id);
 
