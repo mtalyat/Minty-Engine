@@ -1,15 +1,72 @@
 #pragma once
-
 #include "ME_Minty.h"
 
 namespace mintye
 {
 	class Project;
 
-	struct BuildInfo
+	class BuildInfo
 	{
-		bool debug;
+	public:
+		enum class BuildFlags
+		{
+			None = 0,
 
-		minty::String const get_config() const;
+			/// <summary>
+			/// Re-generate and re-build the program files.
+			/// </summary>
+			Program = 1 << 0,
+			
+			/// <summary>
+			/// Re-build the program files.
+			/// </summary>
+			ProgramBuild = 1 << 1,
+
+			/// <summary>
+			/// Re-generate and re-build the script assembly.
+			/// </summary>
+			Assembly = 1 << 2,
+
+			/// <summary>
+			/// Re-build the script assembly.
+			/// </summary>
+			AssemblyBuild = 1 << 3,
+
+			/// <summary>
+			/// Re-compile the assets.
+			/// </summary>
+			Assets,
+		};
+
+		friend BuildFlags operator |(BuildFlags const left, BuildFlags const right);
+		friend BuildFlags operator &(BuildFlags const left, BuildFlags const right);
+
+	private:
+		BuildFlags _buildFlags;
+
+		bool _release;
+
+	public:
+		BuildInfo();
+
+#pragma region Flags
+
+		bool get_flag(BuildFlags const flag) const;
+
+		void set_flag(BuildFlags const flag);
+
+		void clear_flags();
+
+#pragma endregion
+
+#pragma region Config
+
+		void set_config(bool const release);
+
+		bool get_config() const;
+
+		minty::String const get_config_name() const;
+
+#pragma endregion		
 	};
 }

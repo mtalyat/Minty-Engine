@@ -1,12 +1,12 @@
 #pragma once
-
 #include "ME_Minty.h"
+
+#include "ME_BuildInfo.h"
 #include <unordered_map>
 #include <vector>
 
 namespace mintye
 {
-	struct BuildInfo;
 	class Project;
 	class EditorWindow;
 
@@ -42,6 +42,7 @@ namespace mintye
 		constexpr static char const* NAME = "Minty Editor";
 	private:
 		EditorApplicationData _data;
+		BuildInfo _buildInfo;
 
 		// info needed for a loaded project:
 		Project* _project;
@@ -111,7 +112,7 @@ namespace mintye
 
 		void draw_menu_bar();
 
-		void draw_commands(BuildInfo& buildInfo);
+		void draw_commands();
 
 		void draw_editor_windows();
 
@@ -201,13 +202,13 @@ namespace mintye
 		/// Builds the target project.
 		/// </summary>
 		/// <param name="info">The target info.</param>
-		void build_project(BuildInfo const& buildInfo);
+		void build_project();
 
 		/// <summary>
 		/// Runs the target project.
 		/// </summary>
 		/// <param name="info">The target info.</param>
-		void run_project(BuildInfo const& buildInfo);
+		void run_project();
 
 #pragma region File Generation
 
@@ -216,23 +217,23 @@ namespace mintye
 
 		void generate_directories(minty::Path const& basePath) const;
 
-		void generate_application_data(BuildInfo const& buildInfo);
+		void generate_application_data();
 
-		void generate_wraps(BuildInfo const& buildInfo);
+		void generate_wraps();
 
-		void generate_assembly(BuildInfo const& buildInfo);
+		void generate_assembly();
 
 		/// <summary>
 		/// Generates and updates the cmake file for the target project.
 		/// </summary>
 		/// <param name="info">The target info.</param>
-		void generate_cmake(BuildInfo const& buildInfo);
+		void generate_cmake();
 
 		/// <summary>
 		/// Generates the main file for the target project.
 		/// </summary>
 		/// <param name="info"></param>
-		void generate_main(BuildInfo const& buildInfo);
+		void generate_main();
 
 #pragma endregion
 
