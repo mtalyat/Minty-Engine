@@ -85,9 +85,12 @@ namespace minty
 		Wrapper const& get_wrapper() const;
 
 	private:
-		void check(Path const& path) const;
+		bool check(Path const& path) const;
 
 #pragma region Render
+
+	private:
+		int check_dependencies(std::vector<void*> const& dependencies) const;
 
 	private:
 		/// <summary>
