@@ -45,7 +45,9 @@ static constexpr char const* DATA_FILENAME = "data.minty";
 EditorApplication::EditorApplication()
 	: Application()
 	, _data()
+	, _buildInfo()
 	, _project()
+	, _watcher()
 	, _sceneId(INVALID_UUID)
 	, _cwd(std::filesystem::current_path())
 	, _editorWindows()
@@ -62,7 +64,7 @@ EditorApplication::EditorApplication()
 
 mintye::EditorApplication::~EditorApplication()
 {
-	for(auto const& pair : _editorWindows)
+	for (auto const& pair : _editorWindows)
 	{
 		delete pair.second;
 	}
@@ -108,14 +110,9 @@ void mintye::EditorApplication::destroy()
 
 void mintye::EditorApplication::draw()
 {
-	BuildInfo buildInfo
-	{
-		.debug = true
-	};
-
 	draw_dock_space();
 	draw_menu_bar();
-	draw_commands(buildInfo);
+	draw_commands();
 	draw_editor_windows();
 }
 
@@ -248,6 +245,47 @@ void mintye::EditorApplication::load_project(minty::Path const& path)
 	Project* project = new Project(absPath);
 	project->refresh();
 
+	// create file watcher
+	_watcher = new FileWatcher(absPath, [this](Path const& path, FileWatcher::FileStatus const status)
+		{
+			String genericPath = path.generic_string();
+
+			// if anything within the assets folder, re-compile all the assets
+			if (genericPath.find(std::format("/{}/", ASSETS_DIRECTORY_NAME)) != std::string::npos)
+			{
+				_buildInfo.set_flag(BuildInfo::BuildFlags::Assets);
+			}
+
+			//// if anything within the build folder, redo all the project files
+			//if (genericPath.find(std::format("/{}/", BUILD_DIRECTORY_NAME)) != std::string::npos)
+			//{
+			//	_buildInfo.set_flag(BuildInfo::BuildFlags::Program);
+			//}
+
+			AssetType type = Asset::get_type(path);
+
+			// if path was a script file...
+			if (type == AssetType::Script)
+			{
+				// if addition or deletion, regen file
+				if (status == FileWatcher::FileStatus::Created || status == FileWatcher::FileStatus::Deleted)
+				{
+					_buildInfo.set_flag(BuildInfo::BuildFlags::Assembly);
+				}
+
+				// re-build regardless
+				_buildInfo.set_flag(BuildInfo::BuildFlags::AssemblyBuild);
+			}
+
+			// if anything changed that would change the application data
+			if (
+				type == AssetType::Scene && (status == FileWatcher::FileStatus::Created || status == FileWatcher::FileStatus::Deleted)
+				)
+			{
+				_buildInfo.set_flag(BuildInfo::BuildFlags::ApplicationData);
+			}
+		});
+
 	// set new types
 	set_project(project);
 	cwd_project();
@@ -279,6 +317,8 @@ void mintye::EditorApplication::unload_project()
 
 		refresh();
 	}
+
+	MINTY_DELETE(_watcher);
 
 	cwd_application();
 }
@@ -537,7 +577,7 @@ minty::Path mintye::EditorApplication::find_template(minty::Path const& extensio
 
 void mintye::EditorApplication::save_project()
 {
-	
+
 }
 
 void mintye::EditorApplication::close_project()
@@ -708,7 +748,7 @@ void mintye::EditorApplication::draw_menu_bar()
 	{
 		ImGui::Text("Create New Project");
 
-		if(createNewProject) ImGui::SetKeyboardFocusHere();
+		if (createNewProject) ImGui::SetKeyboardFocusHere();
 
 		ImGui::InputText("Project Name", newProjectTitle, IM_ARRAYSIZE(newProjectTitle));
 
@@ -780,7 +820,7 @@ void mintye::EditorApplication::draw_menu_bar()
 	}
 }
 
-void EditorApplication::draw_commands(BuildInfo& buildInfo)
+void EditorApplication::draw_commands()
 {
 	ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console");
 
@@ -795,7 +835,9 @@ void EditorApplication::draw_commands(BuildInfo& buildInfo)
 	}
 
 	// get debug mode
-	ImGui::Checkbox("Debug", &buildInfo.debug);
+	bool release = _buildInfo.get_config();
+	ImGui::Checkbox("Release", &release);
+	_buildInfo.set_config(release);
 
 	// commands:
 
@@ -805,11 +847,11 @@ void EditorApplication::draw_commands(BuildInfo& buildInfo)
 	}
 	if (ImGui::Button("Build"))
 	{
-		build_project(buildInfo);
+		build_project();
 	}
 	if (ImGui::Button("Run"))
 	{
-		run_project(buildInfo);
+		run_project();
 	}
 
 	if (disabled)
@@ -836,7 +878,7 @@ void mintye::EditorApplication::reset_editor_windows()
 	}
 }
 
-void EditorApplication::generate_cmake(BuildInfo const& buildInfo)
+void EditorApplication::generate_cmake()
 {
 	ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console");
 
@@ -875,7 +917,7 @@ void EditorApplication::generate_cmake(BuildInfo const& buildInfo)
 		"set(CMAKE_CXX_STANDARD_REQUIRED ON)" << std::endl <<
 		"set(CMAKE_CXX_EXTENSIONS OFF)" << std::endl;
 
-	if (buildInfo.debug)
+	if (!_buildInfo.get_config())
 	{
 		// only ignore if in debug mode
 		file << "set(CMAKE_EXE_LINKER_FLAGS /NODEFAULTLIB:\\\"LIBCMT\\\")" << std::endl;
@@ -892,25 +934,25 @@ void EditorApplication::generate_cmake(BuildInfo const& buildInfo)
 		// include the runtime dir
 		"target_include_directories(${PROJECT_NAME} PRIVATE C:/Users/mitch/source/repos/Minty-Engine/Runtime PUBLIC ${VULKAN_INCLUDE_DIRS})" << std::endl <<
 		// copy any DLL's that the Runtime uses
-		"add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy C:/Libraries/Mono/lib/mono-2.0-sgen.dll ${CMAKE_CURRENT_BINARY_DIR}/" << buildInfo.get_config() << "/mono-2.0-sgen.dll)" << std::endl <<
-		"add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy C:/Libraries/Mono/lib/MonoPosixHelper.dll ${CMAKE_CURRENT_BINARY_DIR}/" << buildInfo.get_config() << "/MonoPosixHelper.dll)" << std::endl <<
-		"add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy C:/Libraries/Mono/lib/mscorlib.dll ${CMAKE_CURRENT_BINARY_DIR}/" << buildInfo.get_config() << "/mscorlib.dll)" << std::endl <<
-		"add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ../" << ASSEMBLY_DIRECTORY_NAME << "/bin/" << buildInfo.get_config() << "/MintyEngine.dll ${CMAKE_CURRENT_BINARY_DIR}/" << buildInfo.get_config() << "/MintyEngine.dll)" << std::endl <<
-		"add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ../" << ASSEMBLY_DIRECTORY_NAME << "/bin/" << buildInfo.get_config() << "/" << _project->get_name() << ".dll ${CMAKE_CURRENT_BINARY_DIR}/" << buildInfo.get_config() << "/" << _project->get_name() << ".dll)" << std::endl <<
+		"add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy C:/Libraries/Mono/lib/mono-2.0-sgen.dll ${CMAKE_CURRENT_BINARY_DIR}/" << _buildInfo.get_config_name() << "/mono-2.0-sgen.dll)" << std::endl <<
+		"add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy C:/Libraries/Mono/lib/MonoPosixHelper.dll ${CMAKE_CURRENT_BINARY_DIR}/" << _buildInfo.get_config_name() << "/MonoPosixHelper.dll)" << std::endl <<
+		"add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy C:/Libraries/Mono/lib/mscorlib.dll ${CMAKE_CURRENT_BINARY_DIR}/" << _buildInfo.get_config_name() << "/mscorlib.dll)" << std::endl <<
+		"add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ../" << ASSEMBLY_DIRECTORY_NAME << "/bin/" << _buildInfo.get_config_name() << "/MintyEngine.dll ${CMAKE_CURRENT_BINARY_DIR}/" << _buildInfo.get_config_name() << "/MintyEngine.dll)" << std::endl <<
+		"add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ../" << ASSEMBLY_DIRECTORY_NAME << "/bin/" << _buildInfo.get_config_name() << "/" << _project->get_name() << ".dll ${CMAKE_CURRENT_BINARY_DIR}/" << _buildInfo.get_config_name() << "/" << _project->get_name() << ".dll)" << std::endl <<
 		// copy all necessary engine data files
 		"file(GLOB DATA_FILES \"C:/Users/mitch/source/repos/Minty-Engine/Data/*.wrap\")" << std::endl <<
-		"file(COPY ${DATA_FILES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/" << buildInfo.get_config() << ")" << std::endl <<
+		"file(COPY ${DATA_FILES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/" << _buildInfo.get_config_name() << ")" << std::endl <<
 		// include and link Vulkan
 		"include_directories(${Vulkan_INCLUDE_DIRS})" << std::endl <<
 		// target and link the MintyRuntime.lib
-		"target_link_libraries(${PROJECT_NAME} C:/Users/mitch/source/repos/Minty-Engine/Runtime/x64/" << buildInfo.get_config() << "/MintyRuntime.lib)" << std::endl <<
+		"target_link_libraries(${PROJECT_NAME} C:/Users/mitch/source/repos/Minty-Engine/Runtime/x64/" << _buildInfo.get_config_name() << "/MintyRuntime.lib)" << std::endl <<
 		// target and link the vulkan libs
 		"target_link_libraries(${PROJECT_NAME} ${Vulkan_LIBRARIES})";
 
 	file.close();
 }
 
-void EditorApplication::generate_main(BuildInfo const& buildInfo)
+void EditorApplication::generate_main()
 {
 	ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console");
 
@@ -1000,11 +1042,11 @@ void mintye::EditorApplication::generate_directories(Path const& basePath) const
 	generate_directory(basePath / BUILD_DIRECTORY_NAME);
 	generate_directory(basePath / ASSEMBLY_DIRECTORY_NAME);
 
-	generate_directory(basePath / BUILD_DIRECTORY_NAME / "Debug");
-	generate_directory(basePath / BUILD_DIRECTORY_NAME / "Release");
+	generate_directory(basePath / BUILD_DIRECTORY_NAME / _buildInfo.get_config_name());
+	//generate_directory(basePath / BUILD_DIRECTORY_NAME / "Release");
 }
 
-void mintye::EditorApplication::generate_application_data(BuildInfo const& buildInfo)
+void mintye::EditorApplication::generate_application_data()
 {
 	ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console");
 
@@ -1014,7 +1056,7 @@ void mintye::EditorApplication::generate_application_data(BuildInfo const& build
 		return;
 	}
 
-	// get path to cmake file
+	// get path to file
 	Path path = _project->get_build_path() / String("game").append(EXTENSION_APPLICATION_DATA);
 
 	// open file to overwrite
@@ -1023,7 +1065,7 @@ void mintye::EditorApplication::generate_application_data(BuildInfo const& build
 	// if not open, error
 	if (!file.is_open())
 	{
-		minty::Console::error(std::format("Could not open main file: {}", path.string()));
+		minty::Console::error(std::format("Could not open game application data file: {}", path.string()));
 		return;
 	}
 
@@ -1060,11 +1102,11 @@ void mintye::EditorApplication::generate_application_data(BuildInfo const& build
 	file.close();
 }
 
-void mintye::EditorApplication::generate_wraps(BuildInfo const& buildInfo)
+void mintye::EditorApplication::generate_wraps()
 {
 	// TODO: split into multile wrap files if needed
 
-	Path output = _project->get_build_path() / buildInfo.get_config();
+	Path output = _project->get_build_path() / _buildInfo.get_config_name();
 
 	// for now:
 	// compile all game files/assets into two wrap files
@@ -1080,7 +1122,7 @@ void mintye::EditorApplication::generate_wraps(BuildInfo const& buildInfo)
 	_project->wrap_assets(assetWrap);
 }
 
-void mintye::EditorApplication::generate_assembly(BuildInfo const& buildInfo)
+void mintye::EditorApplication::generate_assembly()
 {
 	ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console");
 
@@ -1159,14 +1201,14 @@ void mintye::EditorApplication::generate_assembly(BuildInfo const& buildInfo)
 		<< "    <Reference Include=\"System.Xml\" />" << std::endl
 		<< "  </ItemGroup>" << std::endl
 		<< "  <ItemGroup>" << std::endl;
-		//<< "    <Compile Include=\"..\Assets\Scripts\CameraController.cs\" />" << std::endl
-		//<< "    <Compile Include=\"..\Assets\Scripts\Link.cs\" />" << std::endl
-		//<< "    <Compile Include=\"..\Assets\Scripts\PlayerController.cs\" />" << std::endl
-		//<< "    <Compile Include=\"..\Assets\Scripts\Session.cs\" />" << std::endl
-		//<< "    <Compile Include=\"..\Assets\Scripts\TestScript.cs\" />" << std::endl
-		//<< "    <Compile Include=\"Properties\AssemblyInfo.cs\" />" << std::endl
+	//<< "    <Compile Include=\"..\Assets\Scripts\CameraController.cs\" />" << std::endl
+	//<< "    <Compile Include=\"..\Assets\Scripts\Link.cs\" />" << std::endl
+	//<< "    <Compile Include=\"..\Assets\Scripts\PlayerController.cs\" />" << std::endl
+	//<< "    <Compile Include=\"..\Assets\Scripts\Session.cs\" />" << std::endl
+	//<< "    <Compile Include=\"..\Assets\Scripts\TestScript.cs\" />" << std::endl
+	//<< "    <Compile Include=\"Properties\AssemblyInfo.cs\" />" << std::endl
 
-	// write all c# file paths
+// write all c# file paths
 	for (auto const& path : _project->find_assets(AssetType::Script))
 	{
 		file << "    <Compile Include=\"..\\" << path.string() << "\" />" << std::endl;
@@ -1192,11 +1234,28 @@ void EditorApplication::clean_project()
 
 	console->log_important("clean project");
 
-	// clean the build
-	console->run_command("cd " + _project->get_build_path().string() + " && " + std::filesystem::absolute(CMAKE_PATH).string() + " --build_project . --target clean_project");
+	Path buildDirectoryPath = _project->get_build_path();
+
+	try
+	{
+		for (auto const& entry : std::filesystem::directory_iterator(buildDirectoryPath))
+		{
+			std::filesystem::remove_all(entry.path());
+		}
+	}
+	catch (std::filesystem::filesystem_error const& e)
+	{
+		log_error(std::format("Error cleaning build: {}", e.what()));
+	}
+
+	//// clean the build
+	//console->run_command("cd " + _project->get_build_path().string() + " && " + std::filesystem::absolute(CMAKE_PATH).string() + " --build_project . --target clean_project");
+
+	// rebuild everything on next build
+	_buildInfo.set_flag(BuildInfo::BuildFlags::All);
 }
 
-void EditorApplication::build_project(BuildInfo const& buildInfo)
+void EditorApplication::build_project()
 {
 	ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console");
 
@@ -1206,45 +1265,78 @@ void EditorApplication::build_project(BuildInfo const& buildInfo)
 		return;
 	}
 
+	// check files for changes
+	if (_watcher)
+	{
+		_watcher->update();
+	}
+
 	console->log_important("build project");
 
 	generate_directories(_project->get_base_path());
 
-	console->log_important("\tgenerating cmake...");
+	if (_buildInfo.get_flag(BuildInfo::BuildFlags::Program))
+	{
+		console->log_important("\tgenerating cmake...");
 
-	generate_cmake(buildInfo);
+		generate_cmake();
 
-	console->log_important("\tgenerating main...");
+		console->log_important("\tgenerating main...");
 
-	generate_main(buildInfo);
+		generate_main();
+	}
 
-	console->log_important("\tgenerating application data...");
+	if (_buildInfo.get_flag(BuildInfo::BuildFlags::ApplicationData))
+	{
+		console->log_important("\tgenerating application data...");
 
-	generate_application_data(buildInfo);
+		generate_application_data();
+	}
 
-	console->log_important("\tgenerating assembly...");
+	if (_buildInfo.get_flag(BuildInfo::BuildFlags::Assembly))
+	{
+		console->log_important("\tgenerating assembly...");
 
-	generate_assembly(buildInfo);
+		generate_assembly();
+	}
 
-	console->log_important("\tgenerating wrap files...");
+	if (_buildInfo.get_flag(BuildInfo::BuildFlags::Assets))
+	{
+		console->log_important("\tgenerating wrap files...");
 
-	generate_wraps(buildInfo);
-
-	console->log_important("\tbuilding program...");
+		generate_wraps();
+	}
 
 	std::string command = "cd " + _project->get_build_path().string() + " && " + CMAKE_PATH;
-	console->run_commands({
-		// build C# assembly
-		// https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-build
-		"cd " + _project->get_assembly_path().string() + " && dotnet build -c " + buildInfo.get_config() + " /p:Platform=x64",
-		// create cmake files if needed
-		command + " .",
-		// build program with cmake
-		command + " --build . --config " + buildInfo.get_config(),
-		});
+
+	if (_buildInfo.get_flag(BuildInfo::BuildFlags::Assembly | BuildInfo::BuildFlags::AssemblyBuild))
+	{
+		console->log_important("\tbuilding assembly...");
+
+		console->run_commands({
+			// build C# assembly
+			// https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-build
+			"cd " + _project->get_assembly_path().string() + " && dotnet build -c " + _buildInfo.get_config_name() + " /p:Platform=x64"
+			});
+	}
+
+	if (_buildInfo.get_flag(BuildInfo::BuildFlags::Program))
+	{
+		console->log_important("\tbuilding program...");
+
+		console->run_commands({
+			// create cmake files if needed
+			command + " .",
+			// build program with cmake
+			command + " --build . --config " + _buildInfo.get_config_name(),
+			});
+	}
+
+	// done building, remove flags
+	_buildInfo.clear_flags();
 }
 
-void EditorApplication::run_project(BuildInfo const& buildInfo)
+void EditorApplication::run_project()
 {
 	ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console");
 
@@ -1257,7 +1349,7 @@ void EditorApplication::run_project(BuildInfo const& buildInfo)
 	console->log_important("run project");
 
 	// call executable, pass in project path as argument for the runtime, so it knows what to run
-	console->run_command("cd " + _project->get_build_path().string() + " && cd " + buildInfo.get_config() + " && call " + EXE_NAME);
+	console->run_command("cd " + _project->get_build_path().string() + " && cd " + _buildInfo.get_config_name() + " && call " + EXE_NAME);
 }
 
 mintye::EditorApplicationData::EditorApplicationData()
@@ -1283,7 +1375,7 @@ void mintye::EditorApplicationData::emplace_recent_project(minty::Path const& pa
 				// add it back
 				_recentProjects.insert(_recentProjects.begin(), newPath);
 			}
-			
+
 			// done
 			return;
 		}

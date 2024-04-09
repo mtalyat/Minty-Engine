@@ -196,6 +196,7 @@ xcopy /Y /E /I "$(ProjectDir)..\Data\*.wrap" "$(ProjectDir)"</Command>
     <ClCompile Include="ME_BuildInfo.cpp" />
     <ClCompile Include="ME_ConsoleWindow.cpp" />
     <ClCompile Include="ME_EditorWindow.cpp" />
+    <ClCompile Include="ME_FileWatcher.cpp" />
     <ClCompile Include="ME_GameWindow.cpp" />
     <ClCompile Include="ME_HierarchyWindow.cpp" />
     <ClCompile Include="ME_ImGuiHelper.cpp" />
@@ -213,6 +214,7 @@ xcopy /Y /E /I "$(ProjectDir)..\Data\*.wrap" "$(ProjectDir)"</Command>
     <ClInclude Include="ME_ConsoleWindow.h" />
     <ClInclude Include="ME_Constants.h" />
     <ClInclude Include="ME_EditorWindow.h" />
+    <ClInclude Include="ME_FileWatcher.h" />
     <ClInclude Include="ME_GameWindow.h" />
     <ClInclude Include="ME_HierarchyWindow.h" />
     <ClInclude Include="ME_ImGuiHelper.h" />
