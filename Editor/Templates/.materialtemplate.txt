@@ -1,4 +1,4 @@
-pass: 0
+pass: efa3aa1212115a84
 defaults
     material
         e 16
