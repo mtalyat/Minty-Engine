@@ -4,7 +4,7 @@ using namespace minty;
 using namespace mintye;
 
 mintye::BuildInfo::BuildInfo()
-	: _buildFlags()
+	: _buildFlags(BuildFlags::All)
 	, _release()
 {}
 

@@ -18,7 +18,7 @@ namespace mintye
 			Deleted,
 		};
 
-		typedef std::function<void(minty::Path, FileStatus)> OnChangeFunc;
+		typedef std::function<void(minty::Path const&, FileStatus const)> OnChangeFunc;
 
 	private:
 		struct FileData

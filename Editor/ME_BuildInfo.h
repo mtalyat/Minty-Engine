@@ -18,9 +18,9 @@ namespace mintye
 			Program = 1 << 0,
 			
 			/// <summary>
-			/// Re-build the program files.
+			/// Update the application data file.
 			/// </summary>
-			ProgramBuild = 1 << 1,
+			ApplicationData = 1 << 1,
 
 			/// <summary>
 			/// Re-generate and re-build the script assembly.
@@ -35,7 +35,12 @@ namespace mintye
 			/// <summary>
 			/// Re-compile the assets.
 			/// </summary>
-			Assets,
+			Assets = 1 << 4,
+
+			/// <summary>
+			/// Re-generate, re-build and re-compile everything.
+			/// </summary>
+			All = 0b00011111,
 		};
 
 		friend BuildFlags operator |(BuildFlags const left, BuildFlags const right);

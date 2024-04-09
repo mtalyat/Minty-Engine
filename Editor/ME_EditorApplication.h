@@ -2,6 +2,7 @@
 #include "ME_Minty.h"
 
 #include "ME_BuildInfo.h"
+#include "ME_FileWatcher.h"
 #include <unordered_map>
 #include <vector>
 
@@ -46,6 +47,7 @@ namespace mintye
 
 		// info needed for a loaded project:
 		Project* _project;
+		FileWatcher* _watcher;
 		minty::UUID _sceneId;
 
 		// starting working directory
