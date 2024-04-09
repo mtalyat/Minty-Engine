@@ -40,8 +40,11 @@ using namespace mintye;
 using namespace minty;
 using namespace tinyxml2;
 
+static constexpr char const* DATA_FILENAME = "data.minty";
+
 EditorApplication::EditorApplication()
 	: Application()
+	, _data()
 	, _project()
 	, _sceneId(INVALID_UUID)
 	, _cwd(std::filesystem::current_path())
@@ -67,6 +70,9 @@ mintye::EditorApplication::~EditorApplication()
 
 void mintye::EditorApplication::init(RuntimeBuilder* b)
 {
+	// load data
+	load_data();
+
 	RuntimeBuilder builder
 	{
 		.renderEngine = new EditorApplicationRenderEngine(*this, get_runtime()),
@@ -81,12 +87,7 @@ void mintye::EditorApplication::init(RuntimeBuilder* b)
 
 	load_assemblies({ "../Libraries/MintyEngine/bin/Debug/MintyEngine.dll" });
 
-	// TODO: remove this
-	// if the TestProject exists, open it by default
-	if (std::filesystem::exists("../Projects/Tests/TestProject"))
-	{
-		load_project("../Projects/Tests/TestProject");
-	}
+	load_most_recent_project();
 }
 
 void EditorApplication::loop()
@@ -97,6 +98,8 @@ void EditorApplication::loop()
 void mintye::EditorApplication::destroy()
 {
 	unload_project();
+
+	save_data();
 
 	reset_editor_windows();
 
@@ -149,6 +152,23 @@ void mintye::EditorApplication::cwd_project() const
 	MINTY_ASSERT(_project != nullptr);
 
 	std::filesystem::current_path(_project->get_base_path());
+}
+
+void mintye::EditorApplication::load_data()
+{
+	if (!std::filesystem::exists(DATA_FILENAME)) return;
+
+	Node dataNode = File::read_node(DATA_FILENAME);
+	Reader reader(dataNode);
+	_data.deserialize(reader);
+}
+
+void mintye::EditorApplication::save_data() const
+{
+	Node dataNode;
+	Writer writer(dataNode);
+	_data.serialize(writer);
+	File::write_node(DATA_FILENAME, dataNode);
 }
 
 void mintye::EditorApplication::set_project(Project* const project)
@@ -219,8 +239,13 @@ void mintye::EditorApplication::load_project(minty::Path const& path)
 		return;
 	}
 
+	Path absPath = std::filesystem::absolute(path);
+
+	// mark as recent
+	_data.emplace_recent_project(absPath);
+
 	// create new project
-	Project* project = new Project(path);
+	Project* project = new Project(absPath);
 	project->refresh();
 
 	// set new types
@@ -254,6 +279,8 @@ void mintye::EditorApplication::unload_project()
 
 		refresh();
 	}
+
+	cwd_application();
 }
 
 void mintye::EditorApplication::create_new_project(minty::String const& name, minty::Path const& path)
@@ -518,6 +545,26 @@ void mintye::EditorApplication::close_project()
 	unload_project();
 }
 
+void mintye::EditorApplication::load_most_recent_project()
+{
+	// if no recents, do nothing
+	auto const& recents = _data.get_recent_projects();
+	if (recents.empty()) return;
+
+	Path recent = recents.front();
+
+	// make sure the most recent one exists
+	if (!std::filesystem::exists(recent))
+	{
+		log_error(std::format("Recent project not found: \"{}\".", recent.generic_string()));
+		_data.erase_recent_project(recent);
+		return;
+	}
+
+	// load it
+	load_project(recent);
+}
+
 void mintye::EditorApplication::draw_dock_space()
 {
 	static bool fullscreen = true;
@@ -591,6 +638,22 @@ void mintye::EditorApplication::draw_menu_bar()
 			if (ImGui::MenuItem("New Project"))
 			{
 				createNewProject = true;
+			}
+			if (ImGui::BeginMenu("Open Recent...", !_data.get_recent_projects().empty()))
+			{
+				// create a menu item for each recent item on the list
+				auto const& recents = _data.get_recent_projects();
+
+				for (auto const& path : recents)
+				{
+					if (ImGui::MenuItem(path.generic_string().c_str()))
+					{
+						load_project(path);
+						break;
+					}
+				}
+
+				ImGui::EndMenu();
 			}
 			if (ImGui::MenuItem("Open Project"))
 			{
@@ -887,6 +950,42 @@ void EditorApplication::generate_main(BuildInfo const& buildInfo)
 	file.close();
 }
 
+void mintye::EditorApplication::log(minty::String const& message)
+{
+	if (ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console"))
+	{
+		console->log(message);
+	}
+	else
+	{
+		Console::log(message);
+	}
+}
+
+void mintye::EditorApplication::log_warning(minty::String const& message)
+{
+	if (ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console"))
+	{
+		console->log_warning(message);
+	}
+	else
+	{
+		Console::warn(message);
+	}
+}
+
+void mintye::EditorApplication::log_error(minty::String const& message)
+{
+	if (ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console"))
+	{
+		console->log_error(message);
+	}
+	else
+	{
+		Console::error(message);
+	}
+}
+
 void mintye::EditorApplication::generate_directory(minty::Path const& path) const
 {
 	fs::create_directories(path);
@@ -1159,4 +1258,73 @@ void EditorApplication::run_project(BuildInfo const& buildInfo)
 
 	// call executable, pass in project path as argument for the runtime, so it knows what to run
 	console->run_command("cd " + _project->get_build_path().string() + " && cd " + buildInfo.get_config() + " && call " + EXE_NAME);
+}
+
+mintye::EditorApplicationData::EditorApplicationData()
+	: minty::Object()
+	, _recentProjects()
+{}
+
+void mintye::EditorApplicationData::emplace_recent_project(minty::Path const& path)
+{
+	Path newPath = std::filesystem::absolute(path);
+
+	// if the path is in the list, remove and move to front
+	for (size_t i = 0; i < _recentProjects.size(); i++)
+	{
+		if (_recentProjects.at(i) == newPath)
+		{
+			// if not at beginning, move there
+			if (i > 0)
+			{
+				// remove it
+				_recentProjects.erase(_recentProjects.begin() + i);
+
+				// add it back
+				_recentProjects.insert(_recentProjects.begin(), newPath);
+			}
+			
+			// done
+			return;
+		}
+	}
+
+	// not in the list, add it
+	_recentProjects.insert(_recentProjects.begin(), newPath);
+
+	// if too many, remove the last one
+	if (_recentProjects.size() > MAX_RECENT_PROJECTS)
+	{
+		_recentProjects.pop_back();
+	}
+}
+
+void mintye::EditorApplicationData::erase_recent_project(minty::Path const& path)
+{
+	// if the path is in the list, remove and move to front
+	for (size_t i = 0; i < _recentProjects.size(); i++)
+	{
+		if (_recentProjects.at(i) == path)
+		{
+			// remove it
+			_recentProjects.erase(_recentProjects.begin() + i);
+
+			return;
+		}
+	}
+}
+
+std::vector<minty::Path> const& mintye::EditorApplicationData::get_recent_projects() const
+{
+	return _recentProjects;
+}
+
+void mintye::EditorApplicationData::serialize(minty::Writer& writer) const
+{
+	writer.write("recentProjects", _recentProjects);
+}
+
+void mintye::EditorApplicationData::deserialize(minty::Reader const& reader)
+{
+	reader.read_vector("recentProjects", _recentProjects);
 }

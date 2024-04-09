@@ -2,12 +2,35 @@
 
 #include "ME_Minty.h"
 #include <unordered_map>
+#include <vector>
 
 namespace mintye
 {
 	struct BuildInfo;
 	class Project;
 	class EditorWindow;
+
+	class EditorApplicationData
+		: public minty::Object
+	{
+	private:
+		static constexpr int MAX_RECENT_PROJECTS = 10;
+		std::vector<minty::Path> _recentProjects;
+
+	public:
+		EditorApplicationData();
+
+	public:
+		void emplace_recent_project(minty::Path const& path);
+
+		void erase_recent_project(minty::Path const& path);
+
+		std::vector<minty::Path> const& get_recent_projects() const;
+
+	public:
+		void serialize(minty::Writer& writer) const override;
+		void deserialize(minty::Reader const& reader) override;
+	};
 
 	/// <summary>
 	/// Holds data and runs the game engine application.
@@ -18,6 +41,8 @@ namespace mintye
 	private:
 		constexpr static char const* NAME = "Minty Editor";
 	private:
+		EditorApplicationData _data;
+
 		// info needed for a loaded project:
 		Project* _project;
 		minty::UUID _sceneId;
@@ -58,6 +83,16 @@ namespace mintye
 		void cwd_application() const;
 
 		void cwd_project() const;
+
+#pragma region Data
+
+	private:
+		void load_data();
+
+		void save_data() const;
+
+#pragma endregion
+
 #pragma region Set
 
 	private:
@@ -98,6 +133,8 @@ namespace mintye
 		void save_project();
 
 		void close_project();
+
+		void load_most_recent_project();
 
 		void load_project(minty::Path const& path);
 
@@ -200,6 +237,17 @@ namespace mintye
 #pragma endregion
 
 #pragma endregion
+
+#pragma region Logging
+
+		void log(minty::String const& message);
+
+		void log_warning(minty::String const& message);
+
+		void log_error(minty::String const& message);
+
+#pragma endregion
+
 	};
 
 	template<typename T>
@@ -210,7 +258,7 @@ namespace mintye
 		if (found == _editorWindows.end())
 		{
 			// none with that name
-			minty::Console::error(std::format("No editor window with the name \"{}\" exists.", name));
+			minty::Console::error(std::format("No editor window with the message \"{}\" exists.", name));
 			return nullptr;
 		}
 
