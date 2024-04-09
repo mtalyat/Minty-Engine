@@ -1343,6 +1343,20 @@ static void camera_set_as_main(UUID id)
 	renderSystem->set_main_camera(entity);
 }
 
+static Color::color_t camera_get_color(UUID id)
+{
+	CameraComponent& camera = util_get_camera_component(id);
+
+	return static_cast<Color::color_t>(camera.camera.get_color());
+}
+
+static void camera_set_color(UUID id, Color::color_t value)
+{
+	CameraComponent& camera = util_get_camera_component(id);
+
+	camera.camera.set_color(Color(value));
+}
+
 #pragma endregion
 
 #pragma region Transform
@@ -1504,6 +1518,8 @@ void minty::ScriptEngine::link()
 	ADD_INTERNAL_CALL("Camera_GetFar", camera_get_far);
 	ADD_INTERNAL_CALL("Camera_SetFar", camera_set_far);
 	ADD_INTERNAL_CALL("Camera_SetAsMain", camera_set_as_main);
+	ADD_INTERNAL_CALL("Camera_GetColor", camera_get_color);
+	ADD_INTERNAL_CALL("Camera_SetColor", camera_set_color);
 #pragma endregion
 
 #pragma region Transform

@@ -38,6 +38,12 @@ namespace MintyEngine
             set => Runtime.Camera_SetFar(Entity.ID, (float)value);
         }
 
+        public Color Color
+        {
+            get => Color.FromInt(Runtime.Camera_GetColor(Entity.ID));
+            set => Runtime.Camera_SetColor(Entity.ID, value.ToInt());
+        }
+
         internal Camera()
         { }
 

@@ -87,7 +87,7 @@ Color::Color(Color&& color) noexcept
 	color.a = 0;
 }
 
-inline Color::operator color_t() const
+Color::operator color_t() const
 {
 	return (a << COLOR_SHAMT_A) | (r << COLOR_SHAMT_R) | (g << COLOR_SHAMT_G) | (b << COLOR_SHAMT_B);
 }

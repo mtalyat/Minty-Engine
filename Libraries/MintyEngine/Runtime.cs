@@ -72,6 +72,8 @@ namespace MintyEngine
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static float Camera_GetFar(ulong id);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Camera_SetFar(ulong id, float perspective);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Camera_SetAsMain(ulong id);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Camera_SetColor(ulong id, int color);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static int Camera_GetColor(ulong id);
         #endregion
 
         #region Transform
