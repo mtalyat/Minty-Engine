@@ -1,0 +1,10 @@
+pass: 0
+defaults
+    material
+        e 16
+        f 1
+        f 1
+        f 1
+        f 1
+    textures
+        0: 0

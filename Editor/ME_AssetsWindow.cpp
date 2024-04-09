@@ -76,9 +76,7 @@ void mintye::AssetsWindow::draw()
 			if (!assets.exists(path))
 			{
 				// creating new asset
-				File::write_all_text(path, "");
-
-				get_application().refresh();
+				get_application().create_asset(path);
 			}
 
 			memset(newAssetName, 0, IM_ARRAYSIZE(newAssetName));

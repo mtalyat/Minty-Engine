@@ -44,6 +44,7 @@ EditorApplication::EditorApplication()
 	: Application()
 	, _project()
 	, _sceneId(INVALID_UUID)
+	, _cwd(std::filesystem::current_path())
 	, _editorWindows()
 {
 	// create all the editor windows
@@ -138,6 +139,18 @@ minty::Window* mintye::EditorApplication::create_window()
 	return new Window("", 1280, 720, "Icon.png");
 }
 
+void mintye::EditorApplication::cwd_application() const
+{
+	std::filesystem::current_path(_cwd);
+}
+
+void mintye::EditorApplication::cwd_project() const
+{
+	MINTY_ASSERT(_project != nullptr);
+
+	std::filesystem::current_path(_project->get_base_path());
+}
+
 void mintye::EditorApplication::set_project(Project* const project)
 {
 	// set new project
@@ -209,10 +222,10 @@ void mintye::EditorApplication::load_project(minty::Path const& path)
 	// create new project
 	Project* project = new Project(path);
 	project->refresh();
-	std::filesystem::current_path(path);
 
 	// set new types
 	set_project(project);
+	cwd_project();
 
 	// load assemblies
 	get_runtime().get_script_engine().load_assembly(std::format("{}/bin/Debug/{}.dll", ASSEMBLY_DIRECTORY_NAME, project->get_name()));
@@ -425,6 +438,74 @@ minty::String mintye::EditorApplication::get_name(minty::UUID const id) const
 
 	// none of the above
 	return "";
+}
+
+void mintye::EditorApplication::create_asset(minty::Path const& path)
+{
+	std::unordered_map<String, String> params
+	{
+		{ "<NAME>", path.stem().string() }
+	};
+	create_asset(path, params);
+}
+
+void mintye::EditorApplication::create_asset(minty::Path const& path, std::unordered_map<minty::String, minty::String> const& params)
+{
+	cwd_application();
+
+	String contents = "";
+
+	// if extension given, search for a template with the same extension
+	if (path.has_extension())
+	{
+		Path templatePath = find_template(path.extension());
+
+		if (!templatePath.empty())
+		{
+			contents = File::read_all_text(templatePath);
+
+			// replace all params in the file
+			for (auto const& [key, value] : params)
+			{
+				// find an instance to replace
+				size_t pos = contents.find(key);
+				while (pos != std::string::npos)
+				{
+					// replace the found instance
+					contents.replace(pos, key.length(), value);
+
+					// find the next instance
+					pos = contents.find(key, pos + value.length());
+				}
+			}
+		}
+	}
+
+	cwd_project();
+
+	File::write_all_text(path, contents);
+
+	refresh();
+}
+
+minty::Path mintye::EditorApplication::find_template(minty::Path const& extension)
+{
+	// get the name of the file with the given extension
+	minty::Path fileName = Path(std::format("{}.txt", extension.string()));
+
+	minty::Path templateDirectory = std::filesystem::absolute("Templates");
+
+	// check the templates folder
+	for (auto const& entry : std::filesystem::directory_iterator(templateDirectory))
+	{
+		if (entry.path().filename() == fileName)
+		{
+			return entry.path();
+		}
+	}
+
+	// none found
+	return Path();
 }
 
 void mintye::EditorApplication::save_project()
