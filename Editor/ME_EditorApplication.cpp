@@ -1234,8 +1234,22 @@ void EditorApplication::clean_project()
 
 	console->log_important("clean project");
 
-	// clean the build
-	console->run_command("cd " + _project->get_build_path().string() + " && " + std::filesystem::absolute(CMAKE_PATH).string() + " --build_project . --target clean_project");
+	Path buildDirectoryPath = _project->get_build_path();
+
+	try
+	{
+		for (auto const& entry : std::filesystem::directory_iterator(buildDirectoryPath))
+		{
+			std::filesystem::remove_all(entry.path());
+		}
+	}
+	catch (std::filesystem::filesystem_error const& e)
+	{
+		log_error(std::format("Error cleaning build: {}", e.what()));
+	}
+
+	//// clean the build
+	//console->run_command("cd " + _project->get_build_path().string() + " && " + std::filesystem::absolute(CMAKE_PATH).string() + " --build_project . --target clean_project");
 
 	// rebuild everything on next build
 	_buildInfo.set_flag(BuildInfo::BuildFlags::All);
