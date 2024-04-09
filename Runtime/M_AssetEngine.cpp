@@ -24,6 +24,16 @@
 #include "M_Animator.h"
 #include "M_Text.h"
 
+#ifdef MINTY_RELEASE
+#define CHECK_MISSING_DEPENDENCIES(name, missing)
+#define CHECK_DEPENDENCIES(name, ...)
+#define CHECK(path)
+#else
+#define CHECK_MISSING_DEPENDENCIES(name, missing) if(missing) { MINTY_ERROR_FORMAT("Cannot load {}, missing {} dependencies.", name, missing); return nullptr; }
+#define CHECK_DEPENDENCIES(name, ...) CHECK_MISSING_DEPENDENCIES(name, check_dependencies(std::vector<void*> { __VA_ARGS__ }))
+#define CHECK(path) if(!check(path)) { return nullptr; }
+#endif
+
 using namespace minty;
 using namespace minty::vk;
 using namespace minty::Builtin;
@@ -180,13 +190,42 @@ Wrapper const& minty::AssetEngine::get_wrapper() const
 	return _wrapper;
 }
 
-void minty::AssetEngine::check(Path const& path) const
+bool minty::AssetEngine::check(Path const& path) const
 {
 	// can load if assets exists, and if no meta is required, or if a meta is required, it exists
 	// also needs to have the correct extension, if one was provided
-	MINTY_ASSERT(!path.empty());
-	MINTY_ASSERT_FORMAT(exists(path), "Path does not exist: {}", std::filesystem::absolute(path).string());
-	MINTY_ASSERT_FORMAT(exists(Asset::get_meta_path(path)), "Missing meta file for path: {}, missing meta path: {}", std::filesystem::absolute(path).string(), std::filesystem::absolute(Asset::get_meta_path(path)).string());
+	if (path.empty())
+	{
+		MINTY_ERROR("Asset path is empty.");
+		return false;
+	}
+	else if (!exists(path))
+	{
+		MINTY_ERROR_FORMAT("Asset does not exist: \"{}\"", path.generic_string());
+		return false;
+	}
+	else if (!exists(Asset::get_meta_path(path)))
+	{
+		MINTY_ERROR_FORMAT("Asset meta file does not exist: \"{}\"", Asset::get_meta_path(path).generic_string());
+		return false;
+	}
+
+	return true;
+}
+
+int minty::AssetEngine::check_dependencies(std::vector<void*> const& dependencies) const
+{
+	int missingDependencies = 0;
+
+	for (auto const ptr : dependencies)
+	{
+		if (!ptr)
+		{
+			missingDependencies++;
+		}
+	}
+
+	return missingDependencies;
 }
 
 Node minty::AssetEngine::read_file_node(Path const& path) const
@@ -264,7 +303,7 @@ std::vector<String> minty::AssetEngine::read_file_lines(Path const& path) const
 
 Texture* minty::AssetEngine::load_texture(Path const& path)
 {
-	check(path);
+	CHECK(path);
 
 	Node meta = read_file_meta(path);
 	Reader reader(meta);
@@ -289,7 +328,7 @@ Texture* minty::AssetEngine::load_texture(Path const& path)
 
 Sprite* minty::AssetEngine::load_sprite(Path const& path)
 {
-	check(path);
+	CHECK(path);
 
 	Node node = read_file_node(path);
 	Node meta = read_file_meta(path);
@@ -307,12 +346,14 @@ Sprite* minty::AssetEngine::load_sprite(Path const& path)
 		.pivot = reader.read_object("pivot", Vector2(0.5f, 0.5f)),
 	};
 
+	CHECK_DEPENDENCIES(path.filename().string(), builder.texture, builder.material);
+
 	return emplace_new(new Sprite(builder, get_runtime()));
 }
 
 Shader* minty::AssetEngine::load_shader(Path const& path)
 {
-	check(path);
+	CHECK(path);
 
 	Node node = read_file_node(path);
 	Node meta = read_file_meta(path);
@@ -359,7 +400,7 @@ Shader* minty::AssetEngine::load_shader(Path const& path)
 
 ShaderPass* minty::AssetEngine::load_shader_pass(Path const& path)
 {
-	check(path);
+	CHECK(path);
 
 	Node node = read_file_node(path);
 	Node meta = read_file_meta(path);
@@ -371,6 +412,8 @@ ShaderPass* minty::AssetEngine::load_shader_pass(Path const& path)
 		.path = path,
 	};
 	builder.shader = get<Shader>(reader.read_uuid("shader"));
+	CHECK_DEPENDENCIES(path.filename().string(), builder.shader);
+
 	builder.topology = from_string_vk_primitive_topology(reader.read_string("primitiveTopology"));
 	builder.polygonMode = from_string_vk_polygon_mode(reader.read_string("polygonMode"));
 	builder.cullMode = from_string_vk_cull_mode_flag_bits(reader.read_string("cullMode"));
@@ -421,7 +464,7 @@ ShaderPass* minty::AssetEngine::load_shader_pass(Path const& path)
 
 MaterialTemplate* minty::AssetEngine::load_material_template(Path const& path)
 {
-	check(path);
+	CHECK(path);
 
 	Node node = read_file_node(path);
 	Node meta = read_file_meta(path);
@@ -432,11 +475,16 @@ MaterialTemplate* minty::AssetEngine::load_material_template(Path const& path)
 		.path = path,
 	};
 
+	int missingPasses = 0;
 	std::vector<Node const*> nodes = node.find_all("pass");
 	for (auto const* child : nodes)
 	{
-		builder.shaderPasses.push_back(get<ShaderPass>(child->to_uuid()));
+		ShaderPass* pass = get<ShaderPass>(child->to_uuid());
+		if (!pass) missingPasses++;
+		else builder.shaderPasses.push_back(pass);
 	}
+
+	CHECK_MISSING_DEPENDENCIES(path.filename().string(), missingPasses);
 
 	if (Node const* child = node.find("defaults"))
 	{
@@ -452,7 +500,7 @@ MaterialTemplate* minty::AssetEngine::load_material_template(Path const& path)
 
 Material* minty::AssetEngine::load_material(Path const& path)
 {
-	check(path);
+	CHECK(path);
 
 	Node node = read_file_node(path);
 	Node meta = read_file_meta(path);
@@ -465,6 +513,8 @@ Material* minty::AssetEngine::load_material(Path const& path)
 	};
 
 	builder.materialTemplate = get<MaterialTemplate>(reader.read_uuid("template"));
+
+	CHECK_DEPENDENCIES(path.filename().string(), builder.materialTemplate);
 
 	if (Node const* child = node.find("values"))
 	{
@@ -483,7 +533,7 @@ Material* minty::AssetEngine::load_material(Path const& path)
 
 Mesh* minty::AssetEngine::load_mesh(Path const& path)
 {
-	check(path);
+	CHECK(path);
 
 	String extension = path.extension().string();
 
@@ -616,7 +666,7 @@ void minty::AssetEngine::load_mesh_obj(Path const& path, Mesh& mesh)
 
 AudioClip* minty::AssetEngine::load_audio_clip(Path const& path)
 {
-	check(path);
+	CHECK(path);
 
 	// load meta
 	Node meta = read_file_meta(path);
@@ -638,7 +688,7 @@ AudioClip* minty::AssetEngine::load_audio_clip(Path const& path)
 
 Animation* minty::AssetEngine::load_animation(Path const& path)
 {
-	check(path);
+	CHECK(path);
 
 	Node node = read_file_node(path);
 	Node meta = read_file_meta(path);
@@ -696,7 +746,7 @@ Animation* minty::AssetEngine::load_animation(Path const& path)
 
 Animator* minty::AssetEngine::load_animator(Path const& path)
 {
-	check(path);
+	CHECK(path);
 
 	Node node = read_file_node(path);
 	Node meta = read_file_meta(path);
@@ -715,7 +765,7 @@ Animator* minty::AssetEngine::load_animator(Path const& path)
 Asset* minty::AssetEngine::load_script(Path const& path)
 {
 	// load meta, get its id, that's it
-	check(path);
+	CHECK(path);
 
 	Node meta = read_file_meta(path);
 
@@ -728,7 +778,7 @@ Asset* minty::AssetEngine::load_script(Path const& path)
 
 Asset* minty::AssetEngine::load_text(Path const& path)
 {
-	check(path);
+	CHECK(path);
 
 	Node meta = read_file_meta(path);
 
@@ -817,7 +867,7 @@ bool minty::AssetEngine::contains(UUID const id) const
 void minty::AssetEngine::emplace(Asset* const asset)
 {
 	MINTY_ASSERT(asset != nullptr);
-	MINTY_ASSERT(!_assets.contains(asset->get_id()));
+	MINTY_ASSERT_FORMAT(!_assets.contains(asset->get_id()), "An asset with the ID {} already exists and is loaded.", to_string(asset->get_id()));
 	MINTY_ASSERT(asset->get_id().valid());
 
 	_assets.emplace(asset->get_id(), asset);

@@ -3,6 +3,7 @@
 #include "ME_EditorApplication.h"
 #include "ME_Project.h"
 #include "ME_ConsoleWindow.h"
+#include "ME_ImGuiHelper.h"
 #include <filesystem>
 
 using namespace minty;
@@ -167,34 +168,42 @@ void mintye::AssetsWindow::draw()
 
 	ImVec2 windowSize = ImGui::GetWindowSize();
 	ImVec2 itemSize(windowSize.x, 30.0f);
+	ImVec2 spacing = ImVec2(0.0f, 1.0f);
 
 	// draw a list of buttons with their paths
 	// always draw back
-	if (!_path.empty() && ImGui::Button("../", itemSize))
+	if (!_path.empty())
 	{
-		// go back
-		if (!_path.has_parent_path())
+		if (ImGui::ButtonAlignedLeft("../", itemSize))
 		{
-			// go back to Assets
-			set_path("");
+			// go back
+			if (!_path.has_parent_path())
+			{
+				// go back to Assets
+				set_path("");
+			}
+			else
+			{
+				// go to previous folder
+				set_path(_path.parent_path());
+			}
 		}
-		else
-		{
-			// go to previous folder
-			set_path(_path.parent_path());
-		}
+
+		ImGui::Dummy(spacing);
 	}
 
 	// draw directories
 	for (auto const& path : _directories)
 	{
 		// if clicked, move to new directory
-		if (ImGui::Button(path.string().append("/").c_str(), itemSize))
+		if (ImGui::ButtonAlignedLeft(path.string().append("/").c_str(), itemSize))
 		{
 			// move to new folder
 			set_path(_path / path);
 			break;
 		}
+
+		ImGui::Dummy(spacing);
 	}
 
 	Scene* scene = get_scene();
@@ -217,7 +226,7 @@ void mintye::AssetsWindow::draw()
 		}
 
 		// if clicked, open the file
-		if (ImGui::Button(name.c_str(), itemSize))
+		if (ImGui::ButtonAlignedLeft(name.c_str(), itemSize))
 		{
 			EditorApplication& app = get_application();
 
@@ -251,6 +260,8 @@ void mintye::AssetsWindow::draw()
 			// refresh
 			get_application().refresh();
 		}
+
+		ImGui::Dummy(spacing);
 	}
 	
 	ImGui::End();
@@ -293,6 +304,12 @@ void mintye::AssetsWindow::set_path(minty::Path const& path)
 
 	Scene* scene = get_scene();
 
+	static std::unordered_set<AssetType> cannotIncludeToScene
+	{
+		AssetType::Scene,
+		AssetType::Script
+	};
+
 	// if BuiltIn, grab from AssetManager
 	if (_path.string().starts_with("BuiltIn"))
 	{
@@ -317,7 +334,7 @@ void mintye::AssetsWindow::set_path(minty::Path const& path)
 				_files.push_back(FileData
 					{
 						.path = entry.path,
-						.canIncludeInScene = Asset::get_type(entry.path) != AssetType::Scene,
+						.canIncludeInScene = !cannotIncludeToScene.contains(Asset::get_type(entry.path)),
 						.includedInScene = scene && scene->is_registered(Path(wrap.get_base_path()) / entry.path),
 					});
 			}
@@ -345,7 +362,7 @@ void mintye::AssetsWindow::set_path(minty::Path const& path)
 			{
 				_files.push_back(FileData{
 					.path = entry.path().filename(),
-					.canIncludeInScene = Asset::get_type(entry.path()) != AssetType::Scene,
+					.canIncludeInScene = !cannotIncludeToScene.contains(Asset::get_type(entry.path())),
 					.includedInScene = scene && scene->is_registered(get_path(entry.path()).lexically_relative(project->get_base_path())),
 					});
 			}

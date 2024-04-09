@@ -26,6 +26,7 @@ assets
 	- "BuiltIn/MaterialTemplate/defaultMaterialTemplate.materialtemplate"
 	- "BuiltIn\\MaterialTemplate\\defaultSpriteMaterialTemplate.materialtemplate"
 	- "BuiltIn\\MaterialTemplate\\defaultUiMaterialTemplate.materialtemplate"
+	- "Assets\\Materials\\pumpkinMat.material"
 	- "Assets\\Materials\\xSpriteMaterial.material"
 	- "BuiltIn/Material/defaultMaterial.material"
 	- "BuiltIn\\Material\\defaultSpriteMaterial.material"
@@ -34,11 +35,12 @@ assets
 	- "Assets\\Sprites\\defaultSprite.sprite"
 	- "Assets\\Sprites\\defaultUiSprite.sprite"
 	- "Assets\\Sprites\\x.sprite"
+	- "Assets\\Resources\\Models\\pumpkin.obj"
 systems
 	UI
+	Audio
 	Render
 	Script
-	Audio
 entities
 	Canvas: d2b000d091cd782b
 		UITransform
@@ -107,6 +109,19 @@ entities
 			order: 0
 			color: #0000ffff
 		Renderable
+	Pumpkin: 5c3a5ea711a4ac04
+		Transform
+			position: (4, 0, 0)
+			rotation: (0, 0, 0)
+			scale: (1, 1, 1)
+		Enabled
+		Relationship
+			parent: 0
+		Renderable
+		Mesh
+			type: CUSTOM
+			mesh: 52f965f9df54cfb2
+			material: 8c8461f5850a0ca0
 	Big Ball: b620841e2d57dd79
 		Transform
 			position: (0, -2, 0)
@@ -119,19 +134,6 @@ entities
 		Mesh
 			type: SPHERE
 			material: decef49af1cbe3d9
-	Sprite Test: ad451c056f75ebf5
-		Transform
-			position: (0, 0, 0)
-			rotation: (0, 0, 0)
-			scale: (1, 1, 1)
-		Enabled
-		Sprite
-			sprite: 6fe2e95b986a93ad
-			size: (1, 1)
-			layer: 0
-			order: 0
-			color: #ffffffff
-		Renderable
 	Camera: 389d6462e322993a
 		Transform
 			position: (0, 0, -4)
@@ -149,3 +151,16 @@ entities
 			far: 100
 			color: #000000ff
 		AudioListener
+	Sprite Test: ad451c056f75ebf5
+		Transform
+			position: (0, 0, 0)
+			rotation: (0, 0, 0)
+			scale: (1, 1, 1)
+		Enabled
+		Sprite
+			sprite: 6fe2e95b986a93ad
+			size: (1, 1)
+			layer: 0
+			order: 0
+			color: #ffffffff
+		Renderable

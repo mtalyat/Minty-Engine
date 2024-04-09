@@ -113,7 +113,7 @@ void mintye::EditorApplicationRenderEngine::init(RenderEngineBuilder const& buil
 
 	//// Our state
 	//bool show_demo_window = true;
-	_clearColor = ImVec4(0.45f, 0.55f, 0.60f, 1.00f);
+	_clearColor = ImVec4(0.0f, 0.0f, 0.0f, 1.00f);
 
 	//VkSamplerCreateInfo samplerInfo{};
 	//samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -246,7 +246,7 @@ void mintye::EditorApplicationRenderEngine::draw(VkCommandBuffer commandBuffer)
 
 	// set to scene camera
 	set_camera(Vector3(0.0f, 0.0f, -10.0f), Quaternion(), Camera());
-	
+
 	//// copy to scene image
 	//VkImageCopy copyRegion {};
 	//copyRegion.srcSubresource.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
@@ -281,6 +281,7 @@ void mintye::EditorApplicationRenderEngine::draw(VkCommandBuffer commandBuffer)
 
 VkSurfaceFormatKHR mintye::EditorApplicationRenderEngine::choose_swap_surface_format(const std::vector<VkSurfaceFormatKHR>& availableFormats)
 {
+	//return RenderEngine::choose_swap_surface_format(availableFormats);
 	// same as overriden function, but we use UNORM
 
 	for (const auto& availableFormat : availableFormats) {

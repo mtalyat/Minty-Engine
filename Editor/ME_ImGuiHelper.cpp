@@ -1,4 +1,6 @@
 #include "ME_ImGuiHelper.h"
+
+#include "M_Math.h"
 #include <vector>
 
 using namespace minty;
@@ -120,4 +122,37 @@ void ImGui::EndGroupBox(minty::Vector2 const size, minty::Vector2 const margin, 
 	max.y += margin.y;
 
 	ImGui::GetWindowDrawList()->AddRect(min, max, IM_COL32(borderColor.r, borderColor.g, borderColor.b, borderColor.a));
+}
+
+bool ImGui::InputTextExpand(char const* label, char* buf, size_t buf_size, float widthPercent, ImGuiInputTextFlags flags)
+{
+	ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * widthPercent);
+	return ImGui::InputText(label, buf, buf_size, flags);
+}
+
+bool ImGui::InputTextExpandOffset(char const* label, char* buf, size_t buf_size, float const offsetLeft, float const offsetRight, float const widthPercent, ImGuiInputTextFlags flags)
+{
+	float avail = ImGui::GetContentRegionAvail().x;
+	ImGui::SetNextItemWidth((avail - offsetLeft - offsetRight) * widthPercent + offsetLeft);
+	return ImGui::InputText(label, buf, buf_size, flags);
+}
+
+bool ImGui::ButtonAlignedLeft(char const* label, ImVec2 const& size)
+{
+	ImVec2 pos = ImGui::GetCursorScreenPos();
+
+	String labelId = String("##").append(label).append("button");
+	bool clicked = ImGui::Button(labelId.c_str(), size);
+
+	ImVec2 endingPos = ImVec2(ImGui::GetItemRectMin().x, ImGui::GetItemRectMax().y);
+
+	ImVec2 labelSize = ImGui::CalcTextSize(label);
+	ImGui::SetCursorScreenPos(ImVec2(pos.x + 4.0f, pos.y + (size.y - labelSize.y) * 0.5f));
+	ImGui::TextUnformatted(label);
+
+	// make a dummy object for sizing purposes
+	ImGui::SetCursorScreenPos(pos);
+	ImGui::Dummy(size);
+
+	return clicked;
 }

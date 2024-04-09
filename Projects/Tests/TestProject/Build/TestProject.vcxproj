@@ -117,7 +117,7 @@
     <PostBuildEvent>
       <Message>				</Message>
       <Command>setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -E copy C:/Libraries/Mono/lib/mono-2.0-sgen.dll C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build/Release/mono-2.0-sgen.dll
+"C:\Program Files\CMake\bin\cmake.exe" -E copy C:/Libraries/Mono/lib/mono-2.0-sgen.dll C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build/Debug/mono-2.0-sgen.dll
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -126,7 +126,7 @@ exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd
 setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -E copy C:/Libraries/Mono/lib/MonoPosixHelper.dll C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build/Release/MonoPosixHelper.dll
+"C:\Program Files\CMake\bin\cmake.exe" -E copy C:/Libraries/Mono/lib/MonoPosixHelper.dll C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build/Debug/MonoPosixHelper.dll
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -135,7 +135,7 @@ exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd
 setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -E copy C:/Libraries/Mono/lib/mscorlib.dll C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build/Release/mscorlib.dll
+"C:\Program Files\CMake\bin\cmake.exe" -E copy C:/Libraries/Mono/lib/mscorlib.dll C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build/Debug/mscorlib.dll
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -144,7 +144,7 @@ exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd
 setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -E copy ../Assembly/bin/Release/MintyEngine.dll C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build/Release/MintyEngine.dll
+"C:\Program Files\CMake\bin\cmake.exe" -E copy ../Assembly/bin/Debug/MintyEngine.dll C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build/Debug/MintyEngine.dll
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -153,7 +153,7 @@ exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd
 setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -E copy ../Assembly/bin/Release/TestProject.dll C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build/Release/TestProject.dll
+"C:\Program Files\CMake\bin\cmake.exe" -E copy ../Assembly/bin/Debug/TestProject.dll C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build/Debug/TestProject.dll
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -163,11 +163,10 @@ exit /b %1
 if %errorlevel% neq 0 goto :VCEnd</Command>
     </PostBuildEvent>
     <Link>
-      <AdditionalDependencies>C:\Users\mitch\source\repos\Minty-Engine\Runtime\x64\Release\MintyRuntime.lib;C:\Libraries\VulkanSDK\1.3.261.1\Lib\vulkan-1.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>C:\Users\mitch\source\repos\Minty-Engine\Runtime\x64\Debug\MintyRuntime.lib;C:\Libraries\VulkanSDK\1.3.261.1\Lib\vulkan-1.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>LIBCMT;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ImportLibrary>C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build/Debug/TestProject.lib</ImportLibrary>
       <ProgramDataBaseFile>C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build/Debug/TestProject.pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
@@ -209,7 +208,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <PostBuildEvent>
       <Message>				</Message>
       <Command>setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -E copy C:/Libraries/Mono/lib/mono-2.0-sgen.dll C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build/Release/mono-2.0-sgen.dll
+"C:\Program Files\CMake\bin\cmake.exe" -E copy C:/Libraries/Mono/lib/mono-2.0-sgen.dll C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build/Debug/mono-2.0-sgen.dll
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -218,7 +217,7 @@ exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd
 setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -E copy C:/Libraries/Mono/lib/MonoPosixHelper.dll C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build/Release/MonoPosixHelper.dll
+"C:\Program Files\CMake\bin\cmake.exe" -E copy C:/Libraries/Mono/lib/MonoPosixHelper.dll C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build/Debug/MonoPosixHelper.dll
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -227,7 +226,7 @@ exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd
 setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -E copy C:/Libraries/Mono/lib/mscorlib.dll C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build/Release/mscorlib.dll
+"C:\Program Files\CMake\bin\cmake.exe" -E copy C:/Libraries/Mono/lib/mscorlib.dll C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build/Debug/mscorlib.dll
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -236,7 +235,7 @@ exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd
 setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -E copy ../Assembly/bin/Release/MintyEngine.dll C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build/Release/MintyEngine.dll
+"C:\Program Files\CMake\bin\cmake.exe" -E copy ../Assembly/bin/Debug/MintyEngine.dll C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build/Debug/MintyEngine.dll
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -245,7 +244,7 @@ exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd
 setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -E copy ../Assembly/bin/Release/TestProject.dll C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build/Release/TestProject.dll
+"C:\Program Files\CMake\bin\cmake.exe" -E copy ../Assembly/bin/Debug/TestProject.dll C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build/Debug/TestProject.dll
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -255,11 +254,10 @@ exit /b %1
 if %errorlevel% neq 0 goto :VCEnd</Command>
     </PostBuildEvent>
     <Link>
-      <AdditionalDependencies>C:\Users\mitch\source\repos\Minty-Engine\Runtime\x64\Release\MintyRuntime.lib;C:\Libraries\VulkanSDK\1.3.261.1\Lib\vulkan-1.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>C:\Users\mitch\source\repos\Minty-Engine\Runtime\x64\Debug\MintyRuntime.lib;C:\Libraries\VulkanSDK\1.3.261.1\Lib\vulkan-1.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>LIBCMT;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ImportLibrary>C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build/Release/TestProject.lib</ImportLibrary>
       <ProgramDataBaseFile>C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build/Release/TestProject.pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
@@ -301,7 +299,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <PostBuildEvent>
       <Message>				</Message>
       <Command>setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -E copy C:/Libraries/Mono/lib/mono-2.0-sgen.dll C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build/Release/mono-2.0-sgen.dll
+"C:\Program Files\CMake\bin\cmake.exe" -E copy C:/Libraries/Mono/lib/mono-2.0-sgen.dll C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build/Debug/mono-2.0-sgen.dll
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -310,7 +308,7 @@ exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd
 setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -E copy C:/Libraries/Mono/lib/MonoPosixHelper.dll C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build/Release/MonoPosixHelper.dll
+"C:\Program Files\CMake\bin\cmake.exe" -E copy C:/Libraries/Mono/lib/MonoPosixHelper.dll C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build/Debug/MonoPosixHelper.dll
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -319,7 +317,7 @@ exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd
 setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -E copy C:/Libraries/Mono/lib/mscorlib.dll C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build/Release/mscorlib.dll
+"C:\Program Files\CMake\bin\cmake.exe" -E copy C:/Libraries/Mono/lib/mscorlib.dll C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build/Debug/mscorlib.dll
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -328,7 +326,7 @@ exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd
 setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -E copy ../Assembly/bin/Release/MintyEngine.dll C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build/Release/MintyEngine.dll
+"C:\Program Files\CMake\bin\cmake.exe" -E copy ../Assembly/bin/Debug/MintyEngine.dll C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build/Debug/MintyEngine.dll
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -337,7 +335,7 @@ exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd
 setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -E copy ../Assembly/bin/Release/TestProject.dll C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build/Release/TestProject.dll
+"C:\Program Files\CMake\bin\cmake.exe" -E copy ../Assembly/bin/Debug/TestProject.dll C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build/Debug/TestProject.dll
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -347,11 +345,10 @@ exit /b %1
 if %errorlevel% neq 0 goto :VCEnd</Command>
     </PostBuildEvent>
     <Link>
-      <AdditionalDependencies>C:\Users\mitch\source\repos\Minty-Engine\Runtime\x64\Release\MintyRuntime.lib;C:\Libraries\VulkanSDK\1.3.261.1\Lib\vulkan-1.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>C:\Users\mitch\source\repos\Minty-Engine\Runtime\x64\Debug\MintyRuntime.lib;C:\Libraries\VulkanSDK\1.3.261.1\Lib\vulkan-1.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>false</GenerateDebugInformation>
-      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>LIBCMT;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ImportLibrary>C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build/MinSizeRel/TestProject.lib</ImportLibrary>
       <ProgramDataBaseFile>C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build/MinSizeRel/TestProject.pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
@@ -392,7 +389,7 @@ if %errorlevel% neq 0 goto :VCEnd</Command>
     <PostBuildEvent>
       <Message>				</Message>
       <Command>setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -E copy C:/Libraries/Mono/lib/mono-2.0-sgen.dll C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build/Release/mono-2.0-sgen.dll
+"C:\Program Files\CMake\bin\cmake.exe" -E copy C:/Libraries/Mono/lib/mono-2.0-sgen.dll C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build/Debug/mono-2.0-sgen.dll
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -401,7 +398,7 @@ exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd
 setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -E copy C:/Libraries/Mono/lib/MonoPosixHelper.dll C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build/Release/MonoPosixHelper.dll
+"C:\Program Files\CMake\bin\cmake.exe" -E copy C:/Libraries/Mono/lib/MonoPosixHelper.dll C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build/Debug/MonoPosixHelper.dll
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -410,7 +407,7 @@ exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd
 setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -E copy C:/Libraries/Mono/lib/mscorlib.dll C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build/Release/mscorlib.dll
+"C:\Program Files\CMake\bin\cmake.exe" -E copy C:/Libraries/Mono/lib/mscorlib.dll C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build/Debug/mscorlib.dll
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -419,7 +416,7 @@ exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd
 setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -E copy ../Assembly/bin/Release/MintyEngine.dll C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build/Release/MintyEngine.dll
+"C:\Program Files\CMake\bin\cmake.exe" -E copy ../Assembly/bin/Debug/MintyEngine.dll C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build/Debug/MintyEngine.dll
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -428,7 +425,7 @@ exit /b %1
 :cmDone
 if %errorlevel% neq 0 goto :VCEnd
 setlocal
-"C:\Program Files\CMake\bin\cmake.exe" -E copy ../Assembly/bin/Release/TestProject.dll C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build/Release/TestProject.dll
+"C:\Program Files\CMake\bin\cmake.exe" -E copy ../Assembly/bin/Debug/TestProject.dll C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build/Debug/TestProject.dll
 if %errorlevel% neq 0 goto :cmEnd
 :cmEnd
 endlocal &amp; call :cmErrorLevel %errorlevel% &amp; goto :cmDone
@@ -438,11 +435,10 @@ exit /b %1
 if %errorlevel% neq 0 goto :VCEnd</Command>
     </PostBuildEvent>
     <Link>
-      <AdditionalDependencies>C:\Users\mitch\source\repos\Minty-Engine\Runtime\x64\Release\MintyRuntime.lib;C:\Libraries\VulkanSDK\1.3.261.1\Lib\vulkan-1.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
+      <AdditionalDependencies>C:\Users\mitch\source\repos\Minty-Engine\Runtime\x64\Debug\MintyRuntime.lib;C:\Libraries\VulkanSDK\1.3.261.1\Lib\vulkan-1.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;comdlg32.lib;advapi32.lib</AdditionalDependencies>
       <AdditionalLibraryDirectories>%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
-      <AdditionalOptions>%(AdditionalOptions) /machine:x64</AdditionalOptions>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <IgnoreSpecificDefaultLibraries>%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
+      <IgnoreSpecificDefaultLibraries>LIBCMT;%(IgnoreSpecificDefaultLibraries)</IgnoreSpecificDefaultLibraries>
       <ImportLibrary>C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build/RelWithDebInfo/TestProject.lib</ImportLibrary>
       <ProgramDataBaseFile>C:/Users/mitch/source/repos/Minty-Engine/Projects/Tests/TestProject/Build/RelWithDebInfo/TestProject.pdb</ProgramDataBaseFile>
       <SubSystem>Console</SubSystem>
