@@ -36,9 +36,9 @@ assets
 	- "Assets\\Sprites\\x.sprite"
 systems
 	UI
-	Audio
 	Render
 	Script
+	Audio
 entities
 	Canvas: d2b000d091cd782b
 		UITransform
@@ -119,6 +119,19 @@ entities
 		Mesh
 			type: SPHERE
 			material: decef49af1cbe3d9
+	Sprite Test: ad451c056f75ebf5
+		Transform
+			position: (0, 0, 0)
+			rotation: (0, 0, 0)
+			scale: (1, 1, 1)
+		Enabled
+		Sprite
+			sprite: 6fe2e95b986a93ad
+			size: (1, 1)
+			layer: 0
+			order: 0
+			color: #ffffffff
+		Renderable
 	Camera: 389d6462e322993a
 		Transform
 			position: (0, 0, -4)
@@ -136,16 +149,3 @@ entities
 			far: 100
 			color: #000000ff
 		AudioListener
-	Sprite Test: ad451c056f75ebf5
-		Transform
-			position: (0, 0, 0)
-			rotation: (0, 0, 0)
-			scale: (1, 1, 1)
-		Enabled
-		Sprite
-			sprite: 6fe2e95b986a93ad
-			size: (1, 1)
-			layer: 0
-			order: 0
-			color: #ffffffff
-		Renderable

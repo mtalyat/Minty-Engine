@@ -22,6 +22,9 @@ namespace mintye
 		Project* _project;
 		minty::UUID _sceneId;
 
+		// starting working directory
+		minty::Path _cwd;
+
 		// editor windows to be drawn
 		std::unordered_map<minty::String, EditorWindow*> _editorWindows;
 	public:
@@ -51,6 +54,10 @@ namespace mintye
 
 		minty::Window* create_window() override;
 
+	private:
+		void cwd_application() const;
+
+		void cwd_project() const;
 #pragma region Set
 
 	private:
@@ -134,6 +141,13 @@ namespace mintye
 		/// <param name="id"></param>
 		/// <returns></returns>
 		minty::String get_name(minty::UUID const id) const;
+
+		void create_asset(minty::Path const& path);
+
+	private:
+		void create_asset(minty::Path const& path, std::unordered_map<minty::String, minty::String> const& params);
+
+		minty::Path find_template(minty::Path const& extension);
 
 #pragma endregion
 

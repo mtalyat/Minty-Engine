@@ -1,0 +1,25 @@
+shader: 0
+primitiveTopology: TRIANGLE_LIST
+polygonMode: FILL
+cullMode: BACK
+frontFace: CLOCKWISE
+lineWidth: 1
+binding: 0
+    stride: 32
+    inputRate: VERTEX
+attribute: 0
+    binding: 0
+    format: R32G32B32_SFLOAT
+    offset: 0
+attribute: 1
+    binding: 0
+    format: R32G32B32_SFLOAT
+    offset: 12
+attribute: 2
+    binding: 0
+    format: R32G32_SFLOAT
+    offset: 24
+stage: VERTEX_BIT
+    path: BuiltIn/Shader/defaultVert.spv
+stage: FRAGMENT_BIT
+    path: BuiltIn/Shader/defaultFrag.spv
