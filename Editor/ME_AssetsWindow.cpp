@@ -304,6 +304,12 @@ void mintye::AssetsWindow::set_path(minty::Path const& path)
 
 	Scene* scene = get_scene();
 
+	static std::unordered_set<AssetType> cannotIncludeToScene
+	{
+		AssetType::Scene,
+		AssetType::Script
+	};
+
 	// if BuiltIn, grab from AssetManager
 	if (_path.string().starts_with("BuiltIn"))
 	{
@@ -328,7 +334,7 @@ void mintye::AssetsWindow::set_path(minty::Path const& path)
 				_files.push_back(FileData
 					{
 						.path = entry.path,
-						.canIncludeInScene = Asset::get_type(entry.path) != AssetType::Scene,
+						.canIncludeInScene = !cannotIncludeToScene.contains(Asset::get_type(entry.path)),
 						.includedInScene = scene && scene->is_registered(Path(wrap.get_base_path()) / entry.path),
 					});
 			}
@@ -356,7 +362,7 @@ void mintye::AssetsWindow::set_path(minty::Path const& path)
 			{
 				_files.push_back(FileData{
 					.path = entry.path().filename(),
-					.canIncludeInScene = Asset::get_type(entry.path()) != AssetType::Scene,
+					.canIncludeInScene = !cannotIncludeToScene.contains(Asset::get_type(entry.path())),
 					.includedInScene = scene && scene->is_registered(get_path(entry.path()).lexically_relative(project->get_base_path())),
 					});
 			}
