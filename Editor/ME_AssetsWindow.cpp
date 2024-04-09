@@ -50,10 +50,13 @@ void mintye::AssetsWindow::draw()
 
 	bool inBuiltInDirectory = _path.string().starts_with("BuiltIn");
 
+	static bool popupOpen = false;
+
 	if (!inBuiltInDirectory && ImGui::Button("New File"))
 	{
 		// new file popup
 		ImGui::OpenPopup("Create New Asset File");
+		popupOpen = true;
 	}
 
 	if (ImGui::BeginPopupModal("Create New Asset File"))
@@ -62,7 +65,11 @@ void mintye::AssetsWindow::draw()
 
 		ImGui::Text("Create New Asset File");
 
-		ImGui::SetKeyboardFocusHere();
+		if (popupOpen)
+		{
+			ImGui::SetKeyboardFocusHere();
+			popupOpen = false;
+		}
 
 		ImGui::InputText("Asset Name", newAssetName, IM_ARRAYSIZE(newAssetName));
 
