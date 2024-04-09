@@ -150,7 +150,9 @@ bool ImGui::ButtonAlignedLeft(char const* label, ImVec2 const& size)
 	ImGui::SetCursorScreenPos(ImVec2(pos.x + 4.0f, pos.y + (size.y - labelSize.y) * 0.5f));
 	ImGui::TextUnformatted(label);
 
-	ImGui::SetCursorScreenPos(endingPos);
+	// make a dummy object for sizing purposes
+	ImGui::SetCursorScreenPos(pos);
+	ImGui::Dummy(size);
 
 	return clicked;
 }
