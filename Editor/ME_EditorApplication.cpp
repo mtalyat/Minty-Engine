@@ -837,7 +837,13 @@ void EditorApplication::draw_commands()
 	// get debug mode
 	bool release = _buildInfo.get_config();
 	ImGui::Checkbox("Release", &release);
-	_buildInfo.set_config(release);
+
+	// if changed, re-build
+	if (release != _buildInfo.get_config())
+	{
+		_buildInfo.set_config(release);
+		_buildInfo.set_flag(BuildInfo::BuildFlags::All);
+	}
 
 	// commands:
 
