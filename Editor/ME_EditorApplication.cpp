@@ -239,16 +239,18 @@ void mintye::EditorApplication::load_project(minty::Path const& path)
 		return;
 	}
 
+	Path absPath = std::filesystem::absolute(path);
+
+	// mark as recent
+	_data.emplace_recent_project(absPath);
+
 	// create new project
-	Project* project = new Project(path);
+	Project* project = new Project(absPath);
 	project->refresh();
 
 	// set new types
 	set_project(project);
 	cwd_project();
-
-	// mark as recent
-	_data.emplace_recent_project(path);
 
 	// load assemblies
 	get_runtime().get_script_engine().load_assembly(std::format("{}/bin/Debug/{}.dll", ASSEMBLY_DIRECTORY_NAME, project->get_name()));
@@ -636,6 +638,22 @@ void mintye::EditorApplication::draw_menu_bar()
 			if (ImGui::MenuItem("New Project"))
 			{
 				createNewProject = true;
+			}
+			if (ImGui::BeginMenu("Open Recent...", !_data.get_recent_projects().empty()))
+			{
+				// create a menu item for each recent item on the list
+				auto const& recents = _data.get_recent_projects();
+
+				for (auto const& path : recents)
+				{
+					if (ImGui::MenuItem(path.generic_string().c_str()))
+					{
+						load_project(path);
+						break;
+					}
+				}
+
+				ImGui::EndMenu();
 			}
 			if (ImGui::MenuItem("Open Project"))
 			{
@@ -1249,10 +1267,12 @@ mintye::EditorApplicationData::EditorApplicationData()
 
 void mintye::EditorApplicationData::emplace_recent_project(minty::Path const& path)
 {
+	Path newPath = std::filesystem::absolute(path);
+
 	// if the path is in the list, remove and move to front
 	for (size_t i = 0; i < _recentProjects.size(); i++)
 	{
-		if (_recentProjects.at(i) == path)
+		if (_recentProjects.at(i) == newPath)
 		{
 			// if not at beginning, move there
 			if (i > 0)
@@ -1261,7 +1281,7 @@ void mintye::EditorApplicationData::emplace_recent_project(minty::Path const& pa
 				_recentProjects.erase(_recentProjects.begin() + i);
 
 				// add it back
-				_recentProjects.insert(_recentProjects.begin(), path);
+				_recentProjects.insert(_recentProjects.begin(), newPath);
 			}
 			
 			// done
@@ -1270,7 +1290,7 @@ void mintye::EditorApplicationData::emplace_recent_project(minty::Path const& pa
 	}
 
 	// not in the list, add it
-	_recentProjects.insert(_recentProjects.begin(), path);
+	_recentProjects.insert(_recentProjects.begin(), newPath);
 
 	// if too many, remove the last one
 	if (_recentProjects.size() > MAX_RECENT_PROJECTS)
