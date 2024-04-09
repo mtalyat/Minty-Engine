@@ -97,5 +97,25 @@ namespace MintyEngine
         {
             return !color1.Equals(color2);
         }
+
+        public static Color Lerp(Color left, Color right, float t)
+        {
+            return new Color(
+                Math.Lerp(left.R, right.R, t),
+                Math.Lerp(left.G, right.G, t),
+                Math.Lerp(left.B, right.B, t),
+                Math.Lerp(left.A, right.A, t)
+                );
+        }
+
+        public static Color Lerp(Color left, Color right, float t, int a)
+        {
+            return new Color(
+                Math.Lerp(left.R, right.R, t),
+                Math.Lerp(left.G, right.G, t),
+                Math.Lerp(left.B, right.B, t),
+                a
+                );
+        }
     }
 }
