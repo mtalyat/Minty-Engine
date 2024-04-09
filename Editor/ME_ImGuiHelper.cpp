@@ -136,3 +136,21 @@ bool ImGui::InputTextExpandOffset(char const* label, char* buf, size_t buf_size,
 	ImGui::SetNextItemWidth((avail - offsetLeft - offsetRight) * widthPercent + offsetLeft);
 	return ImGui::InputText(label, buf, buf_size, flags);
 }
+
+bool ImGui::ButtonAlignedLeft(char const* label, ImVec2 const& size)
+{
+	ImVec2 pos = ImGui::GetCursorScreenPos();
+
+	String labelId = String("##").append(label).append("button");
+	bool clicked = ImGui::Button(labelId.c_str(), size);
+
+	ImVec2 endingPos = ImVec2(ImGui::GetItemRectMin().x, ImGui::GetItemRectMax().y);
+
+	ImVec2 labelSize = ImGui::CalcTextSize(label);
+	ImGui::SetCursorScreenPos(ImVec2(pos.x + 4.0f, pos.y + (size.y - labelSize.y) * 0.5f));
+	ImGui::TextUnformatted(label);
+
+	ImGui::SetCursorScreenPos(endingPos);
+
+	return clicked;
+}
