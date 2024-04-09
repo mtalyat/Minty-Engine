@@ -644,7 +644,8 @@ void mintye::EditorApplication::draw_menu_bar()
 	{
 		ImGui::Text("Create New Project");
 
-		ImGui::SetKeyboardFocusHere();
+		if(createNewProject) ImGui::SetKeyboardFocusHere();
+
 		ImGui::InputText("Project Name", newProjectTitle, IM_ARRAYSIZE(newProjectTitle));
 
 		if (ImGui::Button("Create") || ImGui::IsKeyPressed(ImGuiKey_Enter))
