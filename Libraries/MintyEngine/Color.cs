@@ -17,9 +17,25 @@ namespace MintyEngine
         private const int COLOR_SHAMT_A = 24;
 
         private byte _r;
+        public byte R
+        {
+            get => _r; set => _r = value;
+        }
         private byte _g;
+        public byte G
+        {
+            get => _g; set => _g = value;
+        }
         private byte _b;
+        public byte B
+        {
+            get => _b; set => _b = value;
+        }
         private byte _a;
+        public byte A
+        {
+            get => _a; set => _a = value;
+        }
 
         public static Color White => new Color(255, 255, 255, 255);
         public static Color Black => new Color(0, 0, 0, 255);
@@ -29,6 +45,7 @@ namespace MintyEngine
         public static Color Yellow => new Color(255, 255, 0, 255);
         public static Color Cyan => new Color(0, 255, 255, 255);
         public static Color Magenta => new Color(255, 0, 255, 255);
+        public static Color Random => new Color(MintyEngine.Random.RandomByte(), MintyEngine.Random.RandomByte(), MintyEngine.Random.RandomByte(), (byte)255);
 
         public Color(byte r, byte g, byte b, byte a = 255)
         {
