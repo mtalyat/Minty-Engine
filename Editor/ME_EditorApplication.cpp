@@ -633,12 +633,13 @@ void mintye::EditorApplication::draw_menu_bar()
 		ImGui::EndMainMenuBar();
 	}
 
+	static char newProjectTitle[64] = "";
+
 	if (createNewProject)
 	{
 		new_project();
+		memset(newProjectTitle, 0, IM_ARRAYSIZE(newProjectTitle));
 	}
-
-	static char newProjectTitle[64] = "";
 
 	if (ImGui::BeginPopupModal("Create New Project"))
 	{
@@ -656,7 +657,6 @@ void mintye::EditorApplication::draw_menu_bar()
 			};
 			ImGuiFileDialog::Instance()->OpenDialog("new_project", "Choose directory to create project in...", nullptr, config);
 
-			memset(newProjectTitle, 0, IM_ARRAYSIZE(newProjectTitle));
 			ImGui::CloseCurrentPopup();
 		}
 
@@ -664,7 +664,6 @@ void mintye::EditorApplication::draw_menu_bar()
 
 		if (ImGui::Button("Cancel") || ImGui::IsKeyPressed(ImGuiKey_Escape))
 		{
-			memset(newProjectTitle, 0, IM_ARRAYSIZE(newProjectTitle));
 			ImGui::CloseCurrentPopup();
 		}
 

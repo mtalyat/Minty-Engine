@@ -103,6 +103,60 @@ void mintye::AssetsWindow::draw()
 
 	ImGui::SameLine();
 
+	if (!inBuiltInDirectory && ImGui::Button("New Directory"))
+	{
+		// new file popup
+		ImGui::OpenPopup("Create New Asset Directory");
+		popupOpen = true;
+	}
+
+	if (ImGui::BeginPopupModal("Create New Asset Directory"))
+	{
+		static char newDirectoryName[255];
+
+		ImGui::Text("Create New Asset Directory");
+
+		if (popupOpen)
+		{
+			ImGui::SetKeyboardFocusHere();
+			popupOpen = false;
+		}
+
+		ImGui::InputText("Directory Name", newDirectoryName, IM_ARRAYSIZE(newDirectoryName));
+
+		if (ImGui::Button("Create") || ImGui::IsKeyPressed(ImGuiKey_Enter))
+		{
+			// create new file in the currently selected folder, if it does not exist
+			Path path = get_project()->get_base_path() / _path / newDirectoryName;
+
+			AssetEngine& assets = get_runtime().get_asset_engine();
+
+			// creating new directory
+			if (!std::filesystem::create_directory(path))
+			{
+				if (ConsoleWindow* console = get_application().find_editor_window<ConsoleWindow>("Console"))
+				{
+					console->log_error(std::format("Failed to create a new directory at \"{}\".", path.generic_string()));
+				}
+			}
+
+			memset(newDirectoryName, 0, IM_ARRAYSIZE(newDirectoryName));
+			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::SameLine();
+
+		if (ImGui::Button("Cancel") || ImGui::IsKeyPressed(ImGuiKey_Escape))
+		{
+			memset(newDirectoryName, 0, IM_ARRAYSIZE(newDirectoryName));
+			ImGui::CloseCurrentPopup();
+		}
+
+		ImGui::EndPopup();
+	}
+
+	ImGui::SameLine();
+
 	if (!inBuiltInDirectory && ImGui::Button("Open Folder"))
 	{
 		// open the assets folder
