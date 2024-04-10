@@ -87,7 +87,7 @@ void mintye::EditorApplication::init(RuntimeBuilder* b)
 	Window& window = get_window();
 	window.maximize();
 
-	load_assemblies({ "../Libraries/MintyEngine/bin/Debug/MintyEngine.dll" });
+	load_assemblies({ "MintyEngine.dll" });
 
 	load_most_recent_project();
 }
@@ -441,7 +441,7 @@ void mintye::EditorApplication::copy_asset(UUID const id) const
 	}
 
 	// not set up yet
-	Console::todo("copy_asset for some asset");
+	MINTY_TODO("copy_asset for some asset");
 }
 
 bool mintye::EditorApplication::is_asset_copied(minty::String const& name) const
@@ -969,7 +969,7 @@ void EditorApplication::generate_main()
 	}
 
 	// get path to cmake file
-	std::string path = (std::filesystem::path(_project->get_build_path()) / "main.cpp").string();
+	String path = (Path(_project->get_build_path()) / "main.cpp").string();
 
 	// open file to overwrite
 	std::ofstream file(path, std::ios::trunc);
@@ -977,7 +977,7 @@ void EditorApplication::generate_main()
 	// if not open, error
 	if (!file.is_open())
 	{
-		minty::Console::error(std::string("Could not open main file: ") + path);
+		MINTY_ERROR_FORMAT("Could not open main file: {}", path);
 		return;
 	}
 
@@ -1006,7 +1006,7 @@ void mintye::EditorApplication::log(minty::String const& message)
 	}
 	else
 	{
-		Console::log(message);
+		MINTY_LOG(message);
 	}
 }
 
@@ -1018,7 +1018,7 @@ void mintye::EditorApplication::log_warning(minty::String const& message)
 	}
 	else
 	{
-		Console::warn(message);
+		MINTY_WARN(message);
 	}
 }
 
@@ -1030,7 +1030,7 @@ void mintye::EditorApplication::log_error(minty::String const& message)
 	}
 	else
 	{
-		Console::error(message);
+		MINTY_ERROR(message);
 	}
 }
 
@@ -1071,7 +1071,7 @@ void mintye::EditorApplication::generate_application_data()
 	// if not open, error
 	if (!file.is_open())
 	{
-		minty::Console::error(std::format("Could not open game application data file: {}", path.string()));
+		MINTY_ERROR_FORMAT("Could not open game application data file: {}", path.string());
 		return;
 	}
 
@@ -1139,7 +1139,7 @@ void mintye::EditorApplication::generate_assembly()
 	}
 
 	// get path to cmake file
-	std::string path = (std::filesystem::path(_project->get_assembly_path()) / "Assembly.csproj").string();
+	String path = (Path(_project->get_assembly_path()) / "Assembly.csproj").string();
 
 	// open file to overwrite
 	std::ofstream file(path, std::ios::trunc);
@@ -1147,7 +1147,7 @@ void mintye::EditorApplication::generate_assembly()
 	// if not open, error
 	if (!file.is_open())
 	{
-		minty::Console::error(std::string("Could not open assembly csproj file: ") + path);
+		MINTY_ERROR_FORMAT("Could not open assembly csproj file: {}", path);
 		return;
 	}
 

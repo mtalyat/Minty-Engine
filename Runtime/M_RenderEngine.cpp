@@ -483,7 +483,7 @@ UUID minty::RenderEngine::get_or_create_mesh(MeshType const type)
 		Mesh::create_primitive_cylinder(*mesh);
 		break;
 	default:
-		Console::todo(std::format("RenderEngine::get_or_create_mesh(): Type: {}", static_cast<int>(type)));
+		MINTY_TODO(std::format("RenderEngine::get_or_create_mesh(): Type: {}", static_cast<int>(type)));
 		break;
 	}
 
@@ -1305,20 +1305,19 @@ VKAPI_ATTR VkBool32 VKAPI_CALL RenderEngine::debug_callback(VkDebugUtilsMessageS
 	// change colors based on severity
 	if (messageSeverity & VkDebugUtilsMessageSeverityFlagBitsEXT::VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
 	{
-		Console::error(pCallbackData->pMessage);
+		MINTY_ERROR(pCallbackData->pMessage);
 	}
 	else if (messageSeverity & VkDebugUtilsMessageSeverityFlagBitsEXT::VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
 	{
-		Console::warn(pCallbackData->pMessage);
+		MINTY_WARN(pCallbackData->pMessage);
 	}
 	else if (messageSeverity & VkDebugUtilsMessageSeverityFlagBitsEXT::VK_DEBUG_UTILS_MESSAGE_SEVERITY_INFO_BIT_EXT)
 	{
-		Console::info(pCallbackData->pMessage);
+		MINTY_INFO(pCallbackData->pMessage);
 	}
 	else
 	{
-		Console::info(pCallbackData->pMessage);
-		//Console::log(pCallbackData->pMessage);
+		MINTY_INFO(pCallbackData->pMessage);
 	}
 
 	return VK_FALSE;

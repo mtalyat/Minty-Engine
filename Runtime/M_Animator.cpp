@@ -36,14 +36,14 @@ UUID minty::Animator::update()
 	case 0: // transitioned, new state
 		break;
 	case 1: // did nothing, no state
-		Console::warn(std::format("Animator::update(): No current state set."));
+		MINTY_WARN_FORMAT("Animator::update(): No current state set.");
 		return INVALID_UUID;
 	case 2:
 		// infinite loop
-		Console::warn(std::format("Animator::update(): Infinite loop indicated."));
+		MINTY_WARN_FORMAT("Animator::update(): Infinite loop indicated.");
 		return INVALID_UUID;
 	default:
-		Console::error(std::format("Animator::update(): Unrecognized FSM fsmResult code {}", result));
+		MINTY_ERROR_FORMAT("Animator::update(): Unrecognized FSM fsmResult code {}", result);
 		return INVALID_UUID;
 	}
 
@@ -55,7 +55,7 @@ UUID minty::Animator::update()
 	}
 	else
 	{
-		Console::error(std::format("Animator::update(): FSM value was not the size of a UUID. sizeof(UUID): {}, size: {}", sizeof(UUID), value.size()));
+		MINTY_ERROR_FORMAT("Animator::update(): FSM value was not the size of a UUID. sizeof(UUID): {}, size: {}", sizeof(UUID), value.size());
 	}
 
 	// no state or value

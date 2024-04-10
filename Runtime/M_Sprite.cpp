@@ -80,7 +80,7 @@ void minty::Sprite::set_min_coords(Vector2 const coords, CoordinateMode const co
 		_minCoords = normalize_coords(coords);
 		break;
 	default:
-		Console::error("set_min_coords invalid CoordinateMode.");
+		MINTY_ERROR("set_min_coords invalid CoordinateMode.");
 	}
 }
 
@@ -95,7 +95,7 @@ void minty::Sprite::set_max_coords(Vector2 const coords, CoordinateMode const co
 		_maxCoords = normalize_coords(coords);
 		break;
 	default:
-		Console::error("set_max_coords invalid CoordinateMode.");
+		MINTY_ERROR("set_max_coords invalid CoordinateMode.");
 	}
 }
 
@@ -110,7 +110,7 @@ void minty::Sprite::set_pivot(Vector2 const pivot, CoordinateMode const coordina
 		_pivot = normalize_coords(pivot);
 		break;
 	default:
-		Console::error("set_pivot invalid CoordinateMode.");
+		MINTY_ERROR("set_pivot invalid CoordinateMode.");
 	}
 }
 

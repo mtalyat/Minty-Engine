@@ -68,19 +68,19 @@ void minty::Wrap::load(Path const& path)
     if (!std::filesystem::exists(path))
     {
         // file does not exist
-        Console::error(std::format("Cannot load \"{}\" Wrap file: file does not exist.", path.string()));
+        MINTY_ERROR_FORMAT("Cannot load \"{}\" Wrap file: file does not exist.", path.string());
         return;
     }
     else if (!std::filesystem::is_regular_file(path))
     {
         // not a file
-        Console::error(std::format("Cannot load \"{}\" Wrap file: not a regular file.", path.string()));
+        MINTY_ERROR_FORMAT("Cannot load \"{}\" Wrap file: not a regular file.", path.string());
         return;
     }
     else if (path.extension() != EXTENSION_WRAP)
     {
         // not a .wrap file
-        Console::error(std::format("Cannot load \"{}\" Wrap file: missing .wrap file extension.", path.string()));
+        MINTY_ERROR_FORMAT("Cannot load \"{}\" Wrap file: missing .wrap file extension.", path.string());
         return;
     }
 
@@ -96,7 +96,7 @@ void minty::Wrap::load(Path const& path)
     if (memcmp(_header.id, WRAP_MAGIC, WRAP_MAGIC_SIZE))
     {
         // does not have the correct "WRAP" id magic
-        Console::error(std::format("Cannot emplace \"{}\" into Wrap file: invalid data.", _path.string()));
+        MINTY_ERROR_FORMAT("Cannot emplace \"{}\" into Wrap file: invalid data.", _path.string());
         _header = Header();
         return;
     }
@@ -199,7 +199,7 @@ uint32_t minty::Wrap::emplace_entry(Entry& newEntry)
     }
 
     // cannot fit
-    Console::error("Cannot emplace entry to Wrap file. Entry count surpassed.");
+    MINTY_ERROR("Cannot emplace entry to Wrap file. Entry count surpassed.");
 
     return -1;
 }
@@ -286,13 +286,13 @@ void minty::Wrap::emplace(Path const& physicalPath, Path const& virtualPath, Com
     if (!std::filesystem::exists(physicalPath))
     {
         // file does not exist
-        Console::error(std::format("Cannot emplace \"{}\" into Wrap file: file does not exist.", physicalPath.string()));
+        MINTY_ERROR_FORMAT("Cannot emplace \"{}\" into Wrap file: file does not exist.", physicalPath.string());
         return;
     }
     else if (!std::filesystem::is_regular_file(physicalPath))
     {
         // not a file
-        Console::error(std::format("Cannot emplace \"{}\" into Wrap file: not a regular file.", physicalPath.string()));
+        MINTY_ERROR_FORMAT("Cannot emplace \"{}\" into Wrap file: not a regular file.", physicalPath.string());
         return;
     }
 

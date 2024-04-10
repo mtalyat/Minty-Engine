@@ -91,6 +91,9 @@
     <Filter Include="Libraries\tinyxml2">
       <UniqueIdentifier>{b98e5250-b001-42f5-8844-a1498e4d63b0}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Debug">
+      <UniqueIdentifier>{3d890a60-3fb4-4111-ac4d-14f220531178}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -118,9 +121,6 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="M_Math.h">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="M_Console.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="M_Stopwatch.h">
@@ -597,6 +597,15 @@
     <ClInclude Include="M_CanvasComponent.h">
       <Filter>Header Files\UserInterface</Filter>
     </ClInclude>
+    <ClInclude Include="M_Console.h">
+      <Filter>Header Files\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Logger.h">
+      <Filter>Header Files\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Debug.h">
+      <Filter>Header Files\Debug</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -999,6 +1008,12 @@
       <Filter>Libraries\tinyxml2</Filter>
     </ClCompile>
     <ClCompile Include="M_CanvasComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_Logger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_Debug.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

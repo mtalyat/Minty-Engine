@@ -261,7 +261,7 @@ namespace mintye
 		if (found == _editorWindows.end())
 		{
 			// none with that name
-			minty::Console::error(std::format("No editor window with the message \"{}\" exists.", name));
+			MINTY_ERROR_FORMAT("No editor window with the message \"{}\" exists.", name);
 			return nullptr;
 		}
 

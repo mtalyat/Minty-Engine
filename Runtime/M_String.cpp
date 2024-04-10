@@ -140,7 +140,7 @@ std::vector<String> minty::Text::split(String const& string, char const delimite
 
 std::vector<String> minty::Text::split(String const& string, String const& delimiter)
 {
-	Console::todo("string::split() (string delimiter)");
+	MINTY_TODO("string::split() (string delimiter)");
 	return {};
 }
 

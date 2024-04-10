@@ -178,12 +178,12 @@ namespace minty
 	{
 		if (_systemTypes.contains(name))
 		{
-			Console::info(std::format("System {} already registered.", name));
+			MINTY_INFO(std::format("System {} already registered.", name));
 			return;
 		}
 
 		_systemTypes.emplace(name, [](Runtime& engine, Scene& scene) { return new T(engine, scene); });
 
-		Console::info(std::format("Registered system {}.", name));
+		MINTY_INFO(std::format("Registered system {}.", name));
 	}
 }

@@ -20,3 +20,10 @@ float minty::Time::calculate_duration_seconds(TimePoint const start, TimePoint c
 	// change from nanoseconds to seconds
 	return frameTime / 1000000000.0f;
 }
+
+String minty::Time::timestamp()
+{
+	auto now = std::chrono::system_clock::now();
+	auto current_time = std::chrono::zoned_time(std::chrono::current_zone(), now);
+	return std::format("{:%Y-%m-%d %H:%M:%S}", current_time);
+}

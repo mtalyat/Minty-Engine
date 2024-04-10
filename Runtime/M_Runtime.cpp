@@ -145,7 +145,7 @@ void minty::Runtime::abort(int const code, String const& message)
 {
 	if (code)
 	{
-		Console::error(message);
+		MINTY_ERROR(message);
 	}
 
 	exit(code);
@@ -301,7 +301,7 @@ void minty::Runtime::register_script(String const& name)
 
 void minty::Runtime::link()
 {
-	Console::log("Linking the Runtime:");
+	MINTY_LOG("Linking the Runtime:");
 
 	// systems
 	register_system<AnimationSystem>("Animation");

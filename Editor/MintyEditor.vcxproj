@@ -24,7 +24,7 @@
     <ProjectGuid>{A402FFEC-9889-447D-9ECD-362BB3E9826F}</ProjectGuid>
     <RootNamespace>Voxel</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>MintyEngine</ProjectName>
+    <ProjectName>MintyEditor</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -148,8 +148,10 @@
       </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>xcopy /y "C:\Users\mitch\source\repos\Minty-Engine\Runtime\x64\$(ConfigurationName)\*.dll" "$(TargetDir)"
-xcopy /Y /E /I "$(ProjectDir)..\Data\*.wrap" "$(ProjectDir)"</Command>
+      <Command>xcopy /y "$(ProjectDir)..\Runtime\x64\$(Configuration)\*.dll" "$(TargetDir)"
+for /r "$(ProjectDir)..\Data" %%f in (*.wrap) do xcopy /Y "%%f" "$(TargetDir)"
+xcopy /y "$(ProjectDir)Icon.png" "$(TargetDir)"
+xcopy /y "$(ProjectDir)..\Libraries\MintyEngine\bin\$(Configuration)\MintyEngine.dll" "$(TargetDir)"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copy Minty Engine files.</Message>
@@ -182,8 +184,10 @@ xcopy /Y /E /I "$(ProjectDir)..\Data\*.wrap" "$(ProjectDir)"</Command>
       </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>xcopy /y "C:\Users\mitch\source\repos\Minty-Engine\Runtime\x64\$(ConfigurationName)\*.dll" "$(TargetDir)"
-xcopy /Y /E /I "$(ProjectDir)..\Data\*.wrap" "$(ProjectDir)"</Command>
+      <Command>xcopy /y "$(ProjectDir)..\Runtime\x64\$(Configuration)\*.dll" "$(TargetDir)"
+for /r "$(ProjectDir)..\Data" %%f in (*.wrap) do xcopy /Y "%%f" "$(TargetDir)"
+xcopy /y "$(ProjectDir)Icon.png" "$(TargetDir)"
+xcopy /y "$(ProjectDir)..\Libraries\MintyEngine\bin\$(Configuration)\MintyEngine.dll" "$(TargetDir)"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copy Minty Engine files.</Message>
@@ -223,6 +227,13 @@ xcopy /Y /E /I "$(ProjectDir)..\Data\*.wrap" "$(ProjectDir)"</Command>
     <ClInclude Include="ME_PropertiesWindow.h" />
     <ClInclude Include="ME_SceneWindow.h" />
     <ClInclude Include="ME_Theme.h" />
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Icon.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

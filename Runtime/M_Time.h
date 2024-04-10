@@ -45,5 +45,11 @@ namespace minty
 		/// <param name="end"></param>
 		/// <returns></returns>
 		static float calculate_duration_seconds(TimePoint const start, TimePoint const end);
+
+		/// <summary>
+		/// Gets the current time as a time stamp string.
+		/// </summary>
+		/// <returns></returns>
+		static String timestamp();
 	};
 }

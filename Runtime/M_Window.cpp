@@ -409,7 +409,7 @@ void minty::Window::trigger_gamepad_axis(int controller, GamepadAxis axis, float
 void Window::resize_callback(GLFWwindow* const window, int const width, int const height)
 {
 	auto w = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
-	Console::ass(w != nullptr, "Window is null on resize callback.");
+	MINTY_ASSERT_MESSAGE(w != nullptr, "Window is null on resize callback.");
 	if (w)
 	{
 		w->refresh();
@@ -420,7 +420,7 @@ void Window::resize_callback(GLFWwindow* const window, int const width, int cons
 void Window::key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
 	auto w = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
-	Console::ass(w != nullptr, "Window is null on key callback.");
+	MINTY_ASSERT_MESSAGE(w != nullptr, "Window is null on key callback.");
 	if (w)
 	{
 		w->trigger_key(static_cast<Key>(key), static_cast<KeyAction>(action), static_cast<KeyModifiers>(mods));
@@ -430,7 +430,7 @@ void Window::key_callback(GLFWwindow* window, int key, int scancode, int action,
 void minty::Window::button_ballback(GLFWwindow* window, int button, int action, int mods)
 {
 	auto w = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
-	Console::ass(w != nullptr, "Window is null on button callback.");
+	MINTY_ASSERT_MESSAGE(w != nullptr, "Window is null on button callback.");
 	if (w)
 	{
 		w->trigger_mouse_click(static_cast<MouseButton>(button), static_cast<KeyAction>(action), static_cast<KeyModifiers>(mods));
@@ -440,7 +440,7 @@ void minty::Window::button_ballback(GLFWwindow* window, int button, int action, 
 void minty::Window::cursor_callback(GLFWwindow* window, double xpos, double ypos)
 {
 	auto w = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
-	Console::ass(w != nullptr, "Window is null on cursor callback.");
+	MINTY_ASSERT_MESSAGE(w != nullptr, "Window is null on cursor callback.");
 	if (w)
 	{
 		w->trigger_mouse_move(static_cast<float>(xpos), static_cast<float>(ypos));
@@ -465,13 +465,13 @@ void minty::Window::cursor_callback(GLFWwindow* window, double xpos, double ypos
 
 void minty::Window::error_callback(int const error, char const* description)
 {
-	Console::error(std::format("Window GLFW Error: code = {}, message = \"{}\"", error, description));
+	MINTY_ERROR_FORMAT("Window GLFW Error: code = {}, message = \"{}\"", error, description);
 }
 
 void minty::Window::scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
 	auto w = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
-	Console::ass(w != nullptr, "Window is null on scroll callback.");
+	MINTY_ASSERT_MESSAGE(w != nullptr, "Window is null on scroll callback.");
 	if (w)
 	{
 		w->trigger_mouse_scroll(static_cast<float>(xoffset), static_cast<float>(yoffset));

@@ -351,7 +351,7 @@ Node minty::Node::parse(std::vector<String> const& lines)
         // if new indent is too deep, ignore
         if (indentChange > 1)
         {
-            Console::warn(std::format("Discarding line, invalid indent change of {}: {}", indentChange, line));
+            MINTY_WARN_FORMAT("Discarding line, invalid indent change of {}: {}", indentChange, line);
             continue;
         }
 

@@ -200,7 +200,7 @@ void minty::ScriptObject::serialize_field(Writer& writer, String const& name, Mo
 		break;
 	}
 	default:
-		Console::todo(std::format("ScriptObject::serialize_field(): missing type {}.", static_cast<int>(fieldTypeEnum)));
+		MINTY_TODO_FORMAT("ScriptObject::serialize_field(): missing type {}.", static_cast<int>(fieldTypeEnum));
 	}
 }
 
@@ -235,6 +235,6 @@ void minty::ScriptObject::deserialize_field(Reader const& reader, String const& 
 		break;
 	}
 	default:
-		Console::todo(std::format("ScriptObject::deserialize_field(): missing type {}.", static_cast<int>(fieldTypeEnum)));
+		MINTY_TODO_FORMAT("ScriptObject::deserialize_field(): missing type {}.", static_cast<int>(fieldTypeEnum));
 	}
 }

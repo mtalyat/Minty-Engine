@@ -167,7 +167,7 @@ ScriptAssembly const* minty::ScriptEngine::find_assembly(String const& namespace
 
 void minty::ScriptEngine::reload_assembly(String const& name)
 {
-	Console::todo("reload assembly");
+	MINTY_TODO("reload assembly");
 }
 
 void minty::ScriptEngine::unload_assembly(String const& name)
@@ -306,7 +306,7 @@ MonoClassField* minty::ScriptEngine::get_field(MonoClass* const klass, String co
 
 	if (!field)
 	{
-		Console::error(std::format("Assembly::get_field(): Field \"{}\" does not exist.", fieldName));
+		MINTY_ERROR(std::format("Assembly::get_field(): Field \"{}\" does not exist.", fieldName));
 		return nullptr;
 	}
 
@@ -402,7 +402,7 @@ MonoProperty* minty::ScriptEngine::get_property(MonoClass* const klass, String c
 
 	if (!prop)
 	{
-		Console::error(std::format("Assembly::get_field(): Field \"{}\" does not exist.", propertyName));
+		MINTY_ERROR(std::format("Assembly::get_field(): Field \"{}\" does not exist.", propertyName));
 		return nullptr;
 	}
 
@@ -720,7 +720,7 @@ void minty::ScriptEngine::link_script(ScriptClass const& script)
 
 	_data.types[type] = &script;
 
-	Console::info(std::format("Linked {}.", script.get_full_name()));
+	MINTY_INFO_FORMAT("Linked {}.", script.get_full_name());
 }
 
 void minty::ScriptEngine::register_script_id(UUID const id, String const& name)
@@ -822,7 +822,7 @@ static void console_error(MonoString* string)
 }
 
 static void console_ass(bool condition, MonoString* string)
-{
+{	
 	Console::ass(condition, ScriptEngine::from_mono_string(string));
 }
 

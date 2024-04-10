@@ -421,7 +421,7 @@ namespace minty
 	{
 		if (_components.contains(name))
 		{
-			Console::info(std::format("Component {} already registered.", name));
+			MINTY_INFO_FORMAT("Component {} already registered.", name);
 			return;
 		}
 
@@ -438,6 +438,6 @@ namespace minty
 		// type names
 		_componentTypes.emplace(info.index(), name);
 
-		Console::info(std::format("Registered component {}.", name));
+		MINTY_INFO_FORMAT("Registered component {}.", name);
 	}
 }

@@ -68,7 +68,7 @@ std::vector<char> minty::File::read_all_chars(Path const& path)
 {
     if (!std::filesystem::exists(path))
     {
-        Console::error(std::format("File not found at: {}", std::filesystem::absolute(path).string()));
+        MINTY_ERROR_FORMAT("File not found at: {}", std::filesystem::absolute(path).string());
         return {};
     }
 
@@ -76,7 +76,7 @@ std::vector<char> minty::File::read_all_chars(Path const& path)
 
     if (!file.is_open())
     {
-        Console::error(std::format("Failed to open file at: {}", std::filesystem::absolute(path).string()));
+        MINTY_ERROR_FORMAT("Failed to open file at: {}", std::filesystem::absolute(path).string());
         return {};
     }
 
@@ -95,7 +95,7 @@ String minty::File::read_all_text(Path const& path)
 {
     if (!std::filesystem::exists(path))
     {
-        Console::error(std::format("File not found at: {}", std::filesystem::absolute(path).string()));
+        MINTY_ERROR_FORMAT("File not found at: {}", std::filesystem::absolute(path).string());
         return String();
     }
 
@@ -104,7 +104,7 @@ String minty::File::read_all_text(Path const& path)
 
     if (!file.is_open())
     {
-        Console::error(std::format("Failed to open file at: {}", std::filesystem::absolute(path).string()));
+        MINTY_ERROR_FORMAT("Failed to open file at: {}", std::filesystem::absolute(path).string());
         return String();
     }
 
@@ -126,7 +126,7 @@ String minty::File::read_all_text(Path const& path)
     }
     else
     {
-        Console::error(std::format("File not opened at: ", std::filesystem::absolute(path).string()));
+        MINTY_ERROR_FORMAT("File not opened at: ", std::filesystem::absolute(path).string());
         return String();
     }
 
@@ -138,7 +138,7 @@ std::vector<String> minty::File::read_all_lines(Path const& path)
 {
     if (!std::filesystem::exists(path))
     {
-        Console::error(std::format("File not found at: {}", std::filesystem::absolute(path).string()));
+        MINTY_ERROR_FORMAT("File not found at: {}", std::filesystem::absolute(path).string());
         return std::vector<String>();
     }
 
@@ -162,7 +162,7 @@ std::vector<String> minty::File::read_all_lines(Path const& path)
     }
     else
     {
-        Console::error(std::format("File not opened at: ", std::filesystem::absolute(path).string()));
+        MINTY_ERROR_FORMAT("File not opened at: ", std::filesystem::absolute(path).string());
         return std::vector<String>();
     }
 
@@ -174,7 +174,7 @@ std::vector<String> minty::File::read_lines(Path const& path, size_t const count
 {
     if (!std::filesystem::exists(path) || count <= 0)
     {
-        Console::error(std::format("File not found at: {}", std::filesystem::absolute(path).string()));
+        MINTY_ERROR_FORMAT("File not found at: {}", std::filesystem::absolute(path).string());
         return std::vector<String>();
     }
 
@@ -201,7 +201,7 @@ std::vector<String> minty::File::read_lines(Path const& path, size_t const count
     }
     else
     {
-        Console::error(std::format("File not opened at: ", std::filesystem::absolute(path).string()));
+        MINTY_ERROR_FORMAT("File not opened at: ", std::filesystem::absolute(path).string());
         return std::vector<String>();
     }
 
@@ -220,7 +220,7 @@ bool minty::File::write_all_text(Path const& path, String const& text)
 
     if (!file.is_open())
     {
-        Console::error(std::format("File not created at: {}", std::filesystem::absolute(path).string()));
+        MINTY_ERROR_FORMAT("File not created at: {}", std::filesystem::absolute(path).string());
         return false;
     }
 
@@ -239,7 +239,7 @@ bool minty::File::write_all_lines(Path const& path, std::vector<String> const& l
 
     if (!file.is_open())
     {
-        Console::error(std::format("File not created at: {}", std::filesystem::absolute(path).string()));
+        MINTY_ERROR_FORMAT("File not created at: {}", std::filesystem::absolute(path).string());
         return false;
     }
 

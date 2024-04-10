@@ -229,7 +229,9 @@
     <ClInclude Include="M_Accessibility.h" />
     <ClInclude Include="M_Application.h" />
     <ClInclude Include="M_CanvasComponent.h" />
+    <ClInclude Include="M_Debug.h" />
     <ClInclude Include="M_Gamepad.h" />
+    <ClInclude Include="M_Logger.h" />
     <ClInclude Include="M_RunMode.h" />
     <ClInclude Include="M_AssetEngine.h" />
     <ClInclude Include="M_Camera.h" />
@@ -424,6 +426,7 @@
     <ClCompile Include="M_Camera.cpp" />
     <ClCompile Include="M_CanvasComponent.cpp" />
     <ClCompile Include="M_Compression.cpp" />
+    <ClCompile Include="M_Debug.cpp" />
     <ClCompile Include="M_DestroyEntityComponent.cpp" />
     <ClCompile Include="M_Dynamic.cpp" />
     <ClCompile Include="M_CameraComponent.cpp" />
@@ -436,6 +439,7 @@
     <ClCompile Include="M_Engine.cpp" />
     <ClCompile Include="M_EntityRegistry.cpp" />
     <ClCompile Include="M_File.cpp" />
+    <ClCompile Include="M_Logger.cpp" />
     <ClCompile Include="M_Runtime.cpp" />
     <ClCompile Include="M_FiniteStateMachine.cpp" />
     <ClCompile Include="M_Operations.cpp" />

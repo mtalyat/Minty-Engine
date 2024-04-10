@@ -539,7 +539,7 @@ Mesh* minty::AssetEngine::load_mesh(Path const& path)
 
 	if (extension != ".obj")
 	{
-		Console::error(std::format("Cannot load_animation mesh from file type \"{}\".", extension));
+		MINTY_ERROR_FORMAT("Cannot load_animation mesh from file type \"{}\".", extension);
 		return nullptr;
 	}
 
