@@ -243,6 +243,7 @@ namespace mintye
 
 #pragma region Logging
 
+	public:
 		void log(minty::String const& message);
 
 		void log_warning(minty::String const& message);

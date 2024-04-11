@@ -18,6 +18,14 @@
 #include "M_DestroyComponentComponent.h"
 #include "M_EnabledComponent.h"
 #include "M_RenderableComponent.h"
+#include "M_SpriteComponent.h"
+#include "M_Sprite.h"
+#include "M_MeshComponent.h"
+#include "M_Material.h"
+#include "M_AnimatorComponent.h"
+#include "M_Animator.h"
+#include "M_AudioSourceComponent.h"
+#include "M_AudioClip.h"
 
 #include "M_ScriptClass.h"
 #include "M_ScriptObject.h"
@@ -1121,6 +1129,72 @@ void minty::EntityRegistry::print(Entity const entity) const
 size_t minty::EntityRegistry::size() const
 {
 	return this->storage<Entity>()->size();
+}
+
+std::vector<Entity> minty::EntityRegistry::get_dependents(Asset const& asset) const
+{
+	std::vector<Entity> result;
+
+	// get type
+	AssetType type = asset.get_type();
+
+	// check based on the type
+	// some types inherently have no dependents
+	switch (type)
+	{
+	case AssetType::Sprite:
+		// SpriteComponents use Sprites
+		for (auto const& [entity, sprite] : view<SpriteComponent const>().each())
+		{
+			if (sprite.sprite == &asset)
+			{
+				result.push_back(entity);
+			}
+		}
+		break;
+	case AssetType::Material:
+		// MeshComponents use Materials
+		for (auto const& [entity, mesh] : view<MeshComponent const>().each())
+		{
+			if (mesh.material == &asset)
+			{
+				result.push_back(entity);
+			}
+		}
+		break;
+	case AssetType::Mesh:
+		// MeshComponents use Meshes
+		for (auto const& [entity, mesh] : view<MeshComponent const>().each())
+		{
+			if (mesh.mesh == &asset)
+			{
+				result.push_back(entity);
+			}
+		}
+		break;
+	case AssetType::Animator:
+		// AnimatorComponent use Animators
+		for (auto const& [entity, animator] : view<AnimatorComponent const>().each())
+		{
+			if (animator.animator.get_id() == asset.get_id())
+			{
+				result.push_back(entity);
+			}
+		}
+		break;
+	case AssetType::AudioClip:
+		// AudioSourceComponents use AudioClips
+		for (auto const& [entity, source] : view<AudioSourceComponent>().each())
+		{
+			if (source.clip == &asset)
+			{
+				result.push_back(entity);
+			}
+		}
+		break;
+	}
+
+	return result;
 }
 
 void minty::EntityRegistry::register_script(String const& name)

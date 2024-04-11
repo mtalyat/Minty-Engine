@@ -36,7 +36,7 @@ void mintye::AssetsWindow::draw()
 	ImGui::SetNextWindowSize(ImVec2(400, 400), ImGuiCond_FirstUseEver);
 
 	// do not draw if no project loaded
-	if (!ImGui::Begin("Assets") || !project) 
+	if (!ImGui::Begin("Assets") || !project)
 	{
 		ImGui::End();
 		return;
@@ -237,20 +237,64 @@ void mintye::AssetsWindow::draw()
 			else
 			{
 				app.open_asset(project->get_base_path() / _path / fileData.path);
-			}			
+			}
 		}
 
 		// if right clicked, toggle inclusion in the scene
 		if (scene && fileData.canIncludeInScene && ImGui::IsItemClicked(ImGuiMouseButton_Right))
 		{
 			// inverse selection
-			Scene* scene = get_scene();
 
 			Path projectPath = get_path(fileData.path).lexically_relative(project->get_base_path());
 
 			if (scene->is_registered(projectPath))
 			{
-				scene->unregister_asset(projectPath);
+				// check for any dependents first
+				// if something depends on this asset, do not remove it, log something about needing it
+				AssetEngine& assets = get_runtime().get_asset_engine();
+				EntityRegistry& registry = scene->get_entity_registry();
+
+				// get the ID
+				UUID id = assets.read_id(projectPath);
+				MINTY_ASSERT(id.valid());
+
+				// get the asset
+				Asset const* asset = assets.get_asset(id);
+				MINTY_ASSERT(asset != nullptr);
+
+				// get dependents
+				std::vector<Asset*> dependentAssets = assets.get_dependents(*asset);
+				std::vector<Entity> dependentEntities = registry.get_dependents(*asset);
+
+				// register only if none
+				if (dependentAssets.empty() && dependentEntities.empty())
+				{
+					// no dependents
+					scene->unregister_asset(projectPath);
+				}
+				else
+				{
+					// something else depends on this
+					std::vector<String> assetStrings;
+					assetStrings.reserve(dependentAssets.size());
+					for (Asset* const asset : dependentAssets)
+					{
+						assetStrings.push_back(asset->get_name());
+					}
+					std::vector<String> entityStrings;
+					entityStrings.reserve(dependentEntities.size());
+					for (Entity const entity : dependentEntities)
+					{
+						entityStrings.push_back(registry.get_name(entity));
+					}
+
+					get_application().log_error(
+						std::format("Cannot unregister \"{}\". There are dependents: Assets: {}, Entities: {}",
+							projectPath.filename().string(),
+							assetStrings.empty() ? "(none)" : Text::join(assetStrings),
+							entityStrings.empty() ? "(none)" : Text::join(entityStrings)
+						));
+				}
 			}
 			else
 			{
@@ -263,7 +307,7 @@ void mintye::AssetsWindow::draw()
 
 		ImGui::Dummy(spacing);
 	}
-	
+
 	ImGui::End();
 }
 
@@ -322,7 +366,7 @@ void mintye::AssetsWindow::set_path(minty::Path const& path)
 		for (size_t i = 0; i < wrapper.get_wrap_count(); i++)
 		{
 			Wrap const& wrap = wrapper.get_wrap(i);
-			
+
 			for (size_t j = 0; j < wrap.get_entry_count(); j++)
 			{
 				Wrap::Entry const& entry = wrap.get_entry(j);
@@ -369,7 +413,7 @@ void mintye::AssetsWindow::set_path(minty::Path const& path)
 		}
 
 		return;
-	}	
+	}
 }
 
 minty::Path mintye::AssetsWindow::get_path(minty::Path const& path) const

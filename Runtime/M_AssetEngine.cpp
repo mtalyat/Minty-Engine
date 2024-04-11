@@ -847,6 +847,76 @@ void minty::AssetEngine::unload_all()
 	_assetsByType.clear();
 }
 
+std::vector<Asset*> minty::AssetEngine::get_dependents(Asset const& asset) const
+{
+	std::vector<Asset*> result;
+
+	// get type
+	AssetType type = asset.get_type();
+
+	// check based on the type
+	// some types inherently have no dependents
+	switch (type)
+	{
+	case AssetType::Shader:
+		// ShaderPasses use Shaders
+		for (auto const shaderPass : get_by_type<ShaderPass>())
+		{
+			if (shaderPass->get_shader() == &asset)
+			{
+				// this shaderPass uses this shader
+				result.push_back(shaderPass);
+			}
+		}
+		break;
+	case AssetType::ShaderPass:
+		// MaterialTemplates use ShaderPasses
+		for (auto const materialTemplate : get_by_type<MaterialTemplate>())
+		{
+			for (auto const shaderPass : materialTemplate->get_shader_passes())
+			{
+				if (shaderPass == &asset)
+				{
+					result.push_back(materialTemplate);
+				}
+			}
+		}
+		break;
+	case AssetType::MaterialTemplate:
+		// Materials use MaterialTemplates
+		for (auto const material : get_by_type<Material>())
+		{
+			if (material->get_template() == &asset)
+			{
+				result.push_back(material);
+			}
+		}
+		break;
+	case AssetType::Material:
+		// Sprites use Materials
+		for (auto const sprite : get_by_type<Sprite>())
+		{
+			if (sprite->get_material() == &asset)
+			{
+				result.push_back(sprite);
+			}
+		}
+		break;
+	case AssetType::Texture:
+		// Sprites use Textures
+		for (auto const sprite : get_by_type<Sprite>())
+		{
+			if (sprite->get_texture() == &asset)
+			{
+				result.push_back(sprite);
+			}
+		}
+		break;
+	}
+
+	return result;
+}
+
 Asset* minty::AssetEngine::get_asset(UUID const id) const
 {
 	auto found = _assets.find(id);

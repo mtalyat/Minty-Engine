@@ -1,6 +1,7 @@
 #pragma once
 #include "M_Engine.h"
 
+#include "M_Types.h"
 #include "M_Asset.h"
 #include "M_Wrapper.h"
 #include <unordered_map>
@@ -87,7 +88,7 @@ namespace minty
 	private:
 		bool check(Path const& path) const;
 
-#pragma region Render
+#pragma region Loading Types
 
 	private:
 		int check_dependencies(std::vector<void*> const& dependencies) const;
@@ -153,6 +154,13 @@ namespace minty
 		void unload_all();
 
 		/// <summary>
+		/// Checks if the given asset has any dependents.
+		/// </summary>
+		/// <param name="asset"></param>
+		/// <returns>True if any other assets need the given asset in order to function.</returns>
+		std::vector<Asset*> get_dependents(Asset const& asset) const;
+
+		/// <summary>
 		/// Gets the asset with the given ID.
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
@@ -210,7 +218,7 @@ namespace minty
 		}
 
 		template<class T>
-		std::vector<T*> get_by_type()
+		std::vector<T*> get_by_type() const
 		{
 			std::vector<T*> result;
 

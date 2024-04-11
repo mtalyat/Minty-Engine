@@ -9,11 +9,13 @@
 #include "M_ScriptObject.h"
 #include <map>
 #include <unordered_map>
+#include <vector>
 
 namespace minty
 {
 	struct Component;
 	struct ScriptComponent;
+	class Asset;
 
 	class EntityRegistry
 		: public SceneObject, public entt::registry
@@ -313,6 +315,8 @@ namespace minty
 		/// </summary>
 		/// <returns>The total number of Entities.</returns>
 		size_t size() const;
+
+		std::vector<Entity> get_dependents(Asset const& asset) const;
 
 		friend String to_string(EntityRegistry const& value);
 
