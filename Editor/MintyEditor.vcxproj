@@ -151,7 +151,8 @@
       <Command>xcopy /y "$(ProjectDir)..\Runtime\x64\$(Configuration)\*.dll" "$(TargetDir)"
 for /r "$(ProjectDir)..\Data" %%f in (*.wrap) do xcopy /Y "%%f" "$(TargetDir)"
 xcopy /y "$(ProjectDir)Icon.png" "$(TargetDir)"
-xcopy /y "$(ProjectDir)..\Libraries\MintyEngine\bin\$(Configuration)\MintyEngine.dll" "$(TargetDir)"</Command>
+xcopy /y "$(ProjectDir)..\Libraries\MintyEngine\bin\$(Configuration)\MintyEngine.dll" "$(TargetDir)"
+xcopy /y /e /i "$(ProjectDir)Templates\*" "$(TargetDir)Templates\"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copy Minty Engine files.</Message>
@@ -187,7 +188,8 @@ xcopy /y "$(ProjectDir)..\Libraries\MintyEngine\bin\$(Configuration)\MintyEngine
       <Command>xcopy /y "$(ProjectDir)..\Runtime\x64\$(Configuration)\*.dll" "$(TargetDir)"
 for /r "$(ProjectDir)..\Data" %%f in (*.wrap) do xcopy /Y "%%f" "$(TargetDir)"
 xcopy /y "$(ProjectDir)Icon.png" "$(TargetDir)"
-xcopy /y "$(ProjectDir)..\Libraries\MintyEngine\bin\$(Configuration)\MintyEngine.dll" "$(TargetDir)"</Command>
+xcopy /y "$(ProjectDir)..\Libraries\MintyEngine\bin\$(Configuration)\MintyEngine.dll" "$(TargetDir)"
+xcopy /y /e /i "$(ProjectDir)Templates\*" "$(TargetDir)Templates\"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copy Minty Engine files.</Message>
