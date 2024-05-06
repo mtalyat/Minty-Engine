@@ -133,13 +133,7 @@ void mintye::AssetsWindow::draw()
 			AssetEngine& assets = get_runtime().get_asset_engine();
 
 			// creating new directory
-			if (!std::filesystem::create_directory(path))
-			{
-				if (ConsoleWindow* console = get_application().find_editor_window<ConsoleWindow>("Console"))
-				{
-					console->log_error(std::format("Failed to create a new directory at \"{}\".", path.generic_string()));
-				}
-			}
+			get_application().create_directory(path);
 
 			memset(newDirectoryName, 0, IM_ARRAYSIZE(newDirectoryName));
 			ImGui::CloseCurrentPopup();

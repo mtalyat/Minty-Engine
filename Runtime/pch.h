@@ -11,6 +11,7 @@
 #include <string>
 #include <cstring>
 #include <cstdint>
+#include <cstdlib>
 
 #include <climits>
 #include <optional>

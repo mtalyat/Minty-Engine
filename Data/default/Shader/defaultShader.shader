@@ -20,4 +20,4 @@ uniform: textures
     set: 2
     binding: 1
     size: 8
-    count: 4
+    count: 1

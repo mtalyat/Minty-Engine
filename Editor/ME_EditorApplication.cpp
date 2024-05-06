@@ -516,6 +516,19 @@ void mintye::EditorApplication::create_asset(minty::Path const& path)
 	create_asset(path, params);
 }
 
+void mintye::EditorApplication::create_directory(minty::Path const& path)
+{
+	if (!std::filesystem::create_directory(path))
+	{
+		if (ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console"))
+		{
+			console->log_error(std::format("Failed to create a new directory at \"{}\".", path.generic_string()));
+		}
+	}
+
+	refresh();
+}
+
 void mintye::EditorApplication::create_asset(minty::Path const& path, std::unordered_map<minty::String, minty::String> const& params)
 {
 	cwd_application();
@@ -929,6 +942,9 @@ void EditorApplication::generate_cmake()
 		file << "set(CMAKE_EXE_LINKER_FLAGS /NODEFAULTLIB:\\\"LIBCMT\\\")" << std::endl;
 	}
 
+	Path mintyPath = Operations::get_minty_path();
+	String stringMintyPath = mintyPath.generic_string();
+
 	file <<
 		// add source files for project
 		"set(SOURCES main.cpp)" << std::endl <<
@@ -943,7 +959,7 @@ void EditorApplication::generate_cmake()
 		"add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy C:/Libraries/Mono/lib/mono-2.0-sgen.dll ${CMAKE_CURRENT_BINARY_DIR}/" << _buildInfo.get_config_name() << "/mono-2.0-sgen.dll)" << std::endl <<
 		"add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy C:/Libraries/Mono/lib/MonoPosixHelper.dll ${CMAKE_CURRENT_BINARY_DIR}/" << _buildInfo.get_config_name() << "/MonoPosixHelper.dll)" << std::endl <<
 		"add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy C:/Libraries/Mono/lib/mscorlib.dll ${CMAKE_CURRENT_BINARY_DIR}/" << _buildInfo.get_config_name() << "/mscorlib.dll)" << std::endl <<
-		"add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ../" << ASSEMBLY_DIRECTORY_NAME << "/bin/" << _buildInfo.get_config_name() << "/MintyEngine.dll ${CMAKE_CURRENT_BINARY_DIR}/" << _buildInfo.get_config_name() << "/MintyEngine.dll)" << std::endl <<
+		"add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy " << stringMintyPath << "/Libraries/MintyEngine/bin/" << _buildInfo.get_config_name() << "/MintyEngine.dll ${CMAKE_CURRENT_BINARY_DIR}/" << _buildInfo.get_config_name() << "/MintyEngine.dll)" << std::endl <<
 		"add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ../" << ASSEMBLY_DIRECTORY_NAME << "/bin/" << _buildInfo.get_config_name() << "/" << _project->get_name() << ".dll ${CMAKE_CURRENT_BINARY_DIR}/" << _buildInfo.get_config_name() << "/" << _project->get_name() << ".dll)" << std::endl <<
 		// copy all necessary engine data files
 		"file(GLOB DATA_FILES \"C:/Users/mitch/source/repos/Minty-Engine/Data/*.wrap\")" << std::endl <<
@@ -1156,6 +1172,9 @@ void mintye::EditorApplication::generate_assembly()
 
 	Info const& projectInfo = _project->get_info();
 
+	Path mintyPath = Operations::get_minty_path();
+	String stringMintyPath = mintyPath.string();
+
 	// write contents
 	file
 		<< "<?xml version=\"1.0\" encoding=\"utf-8\"?>" << std::endl
@@ -1195,7 +1214,7 @@ void mintye::EditorApplication::generate_assembly()
 		<< "  <ItemGroup>" << std::endl
 		<< "    <Reference Include=\"MintyEngine, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL\">" << std::endl
 		<< "      <SpecificVersion>False</SpecificVersion>" << std::endl
-		<< "      <HintPath>..\\..\\..\\..\\Libraries\\MintyEngine\\bin\\Debug\\MintyEngine.dll</HintPath>" << std::endl
+		<< "      <HintPath>" << stringMintyPath << "\\Libraries\\MintyEngine\\bin\\Debug\\MintyEngine.dll</HintPath>" << std::endl
 		<< "    </Reference>" << std::endl
 		<< "    <Reference Include=\"System\" />" << std::endl
 		<< "    <Reference Include=\"System.Core\" />" << std::endl
@@ -1315,17 +1334,6 @@ void EditorApplication::build_project()
 
 	std::string command = "cd " + _project->get_build_path().string() + " && " + CMAKE_PATH;
 
-	if (_buildInfo.get_flag(BuildInfo::BuildFlags::Assembly | BuildInfo::BuildFlags::AssemblyBuild))
-	{
-		console->log_important("\tbuilding assembly...");
-
-		console->run_commands({
-			// build C# assembly
-			// https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-build
-			"cd " + _project->get_assembly_path().string() + " && dotnet build -c " + _buildInfo.get_config_name() + " /p:Platform=x64"
-			});
-	}
-
 	if (_buildInfo.get_flag(BuildInfo::BuildFlags::Program))
 	{
 		console->log_important("\tbuilding program...");
@@ -1335,6 +1343,17 @@ void EditorApplication::build_project()
 			command + " .",
 			// build program with cmake
 			command + " --build . --config " + _buildInfo.get_config_name(),
+			});
+	}
+
+	if (_buildInfo.get_flag(BuildInfo::BuildFlags::Assembly | BuildInfo::BuildFlags::AssemblyBuild))
+	{
+		console->log_important("\tbuilding assembly...");
+
+		console->run_commands({
+			// build C# assembly
+			// https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-build
+			"cd " + _project->get_assembly_path().string() + " && dotnet build -c " + _buildInfo.get_config_name() + " /p:Platform=x64"
 			});
 	}
 

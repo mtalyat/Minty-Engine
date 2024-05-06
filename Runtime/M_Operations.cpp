@@ -3,14 +3,17 @@
 
 #include <filesystem>
 
+// for getenv
+#include <cstdlib>
+
 #ifdef MINTY_WINDOWS
 #include <windows.h>
 
-#elif defined(MINTY_APPLE)
-#include <cstdlib>
-
-#elif defined(MINTY_LINUX)
-#include <cstdlib>
+//#elif defined(MINTY_APPLE)
+//#include <cstdlib>
+//
+//#elif defined(MINTY_LINUX)
+//#include <cstdlib>
 
 #endif
 
@@ -70,4 +73,38 @@ void minty::Operations::open(Path const& path)
 	std::replace(pathString.begin(), pathString.end(), '\\', '/');
 	system(std::format("open \"{}\"", pathString).c_str());
 #endif
+}
+
+String minty::Operations::get_environment_variable(String const& name)
+{
+	char* buffer = nullptr;
+	size_t bufferSize = 0;
+
+	errno_t err = _dupenv_s(&buffer, &bufferSize, name.c_str());
+
+	if (err)
+	{
+		MINTY_ERROR_FORMAT("Error retrieving \"{}\" environment variable.", name);
+
+		return "";
+	}
+	else if (buffer == nullptr)
+	{
+		MINTY_ERROR_FORMAT("\"{}\" environment variable has not been set.", name);
+
+		return "";
+	}
+	else {
+		// variable set
+		String result(buffer);
+
+		free(buffer);
+
+		return result;
+	}	
+}
+
+Path minty::Operations::get_minty_path()
+{
+	return get_environment_variable("MINTY_PATH");
 }

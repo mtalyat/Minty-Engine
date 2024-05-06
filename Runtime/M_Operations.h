@@ -21,5 +21,9 @@ namespace minty
 		/// </summary>
 		/// <param name="path"></param>
 		void open(Path const& path);
+
+		String get_environment_variable(String const& name);
+
+		Path get_minty_path();
 	}
 }

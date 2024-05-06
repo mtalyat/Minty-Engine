@@ -184,6 +184,8 @@ namespace mintye
 
 		void create_asset(minty::Path const& path);
 
+		void create_directory(minty::Path const& path);
+
 	private:
 		void create_asset(minty::Path const& path, std::unordered_map<minty::String, minty::String> const& params);
 
