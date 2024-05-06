@@ -6,6 +6,7 @@
 #include "M_Parse.h"
 #include "M_Text.h"
 #include <vector>
+#include <algorithm>
 
 using namespace minty;
 
@@ -76,7 +77,7 @@ String minty::Node::get_node_string() const
 // TODO: make iterative
 static void get_formatted_recursive(std::vector<String>& list, int indent, Node const& node)
 {
-    list.push_back(String(static_cast<size_t>(max(0, indent)), '\t').append(node.get_node_string()));
+    list.push_back(String(static_cast<size_t>(std::max(0, indent)), '\t').append(node.get_node_string()));
 
     for (Node const& child : node.get_children())
     {
