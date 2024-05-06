@@ -8,24 +8,38 @@
 #define PCH_H
 
 // add headers that you want to pre-compile here
+#include <string>
+#include <cstring>
+#include <cstdint>
+
+#include <climits>
+#include <optional>
+#include <functional>
+#include <stdexcept>
+#include <chrono>
+#include <algorithm>
+
+#include <type_traits>
+#include <typeindex>
+#include <typeinfo>
+
+#include <filesystem>
+#include <fstream>
+
+#include <array>
+#include <vector>
+#include <set>
+#include <unordered_set>
+#include <map>
+#include <unordered_map>
+
 #include "framework.h"
 
-#include "dr_flac.h"
-#include "dr_mp3.h"
-#include "dr_wav.h"
-#include "soloud.h"
-//#include "soloud_audiosource.h"
-//#include "soloud_bassboostfilter.h"
-//#include "soloud_biquadresonantfilter.h"
-//#include "soloud_bus.h"
-//#include "soloud_c.h"
-//#include "soloud_dcremovalfilter.h"
-//#include "soloud_echofilter.h"
-//#include "soloud_error.h"
-//#include "soloud_fader.h"
-//#include "soloud_fft.h"
-//#include "soloud_fftfilter.h"
-//#include "soloud_file.h"
-//#include "soloud_f"
+#include "M_EnTT.h"
+#include "M_GLFW.h"
+#include "M_GLM.hpp"
+#include "M_Mono.h"
+#include "M_TinyXML.h"
+#include "M_Vulkan.h"
 
 #endif //PCH_H
