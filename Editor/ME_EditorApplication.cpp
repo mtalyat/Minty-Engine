@@ -1359,6 +1359,8 @@ void EditorApplication::build_project()
 
 	// done building, remove flags
 	_buildInfo.clear_flags();
+
+	console->log_important("Build finished.");
 }
 
 void EditorApplication::run_project()

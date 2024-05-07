@@ -285,7 +285,24 @@ void mintye::PropertiesWindow::draw_entity()
 
 		if (ImGui::Button("Done") || ImGui::IsKeyPressed(ImGuiKey_Enter))
 		{
-			registry.emplace_by_name(popupBuffer, _targetEntity);
+			// check for Script asset
+			// ensure it is loaded
+			Project* project = get_project();
+			AssetEngine& assets = get_runtime().get_asset_engine();
+
+			Path assetPath = project->find_asset(popupBuffer, AssetType::Script);
+			
+			// register it with scene if needed
+			if (!assetPath.empty())
+			{
+				if (!scene->is_registered(assetPath))
+				{
+					scene->register_asset(assetPath);
+				}
+
+				// place onto the object
+				registry.emplace_by_name(popupBuffer, _targetEntity);
+			}
 
 			memset(popupBuffer, 0, IM_ARRAYSIZE(popupBuffer));
 			ImGui::CloseCurrentPopup();
