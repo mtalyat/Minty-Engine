@@ -19,6 +19,7 @@
 #include <stdexcept>
 #include <chrono>
 #include <algorithm>
+#include <future>
 
 #include <type_traits>
 #include <typeindex>

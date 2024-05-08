@@ -55,6 +55,9 @@ namespace mintye
 
 		// editor windows to be drawn
 		std::unordered_map<minty::String, EditorWindow*> _editorWindows;
+
+		// tasks being ran (such as building)
+		minty::TaskFactory<void> _taskFactory;
 	public:
 		EditorApplication();
 

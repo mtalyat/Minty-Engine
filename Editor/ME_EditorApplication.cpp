@@ -105,6 +105,8 @@ void mintye::EditorApplication::destroy()
 
 void mintye::EditorApplication::draw()
 {
+	_taskFactory.update();
+
 	draw_dock_space();
 	draw_menu_bar();
 	draw_commands();
@@ -354,7 +356,7 @@ void mintye::EditorApplication::save_scene()
 	};
 	Writer writer(node, &data);
 	scene.serialize(writer);
-	
+
 	if (File::write_node(scene.get_path(), node))
 	{
 		log(std::format("Saved scene \"{}\".", scene.get_name()));
@@ -1283,6 +1285,12 @@ void EditorApplication::build_project()
 {
 	ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console");
 
+	if (_taskFactory.contains("build"))
+	{
+		console->log_error("Cannot build project: last build has not finished.");
+		return;
+	}
+
 	if (!_project)
 	{
 		console->log_error("Cannot build project: no project loaded.");
@@ -1297,97 +1305,106 @@ void EditorApplication::build_project()
 
 	console->log_important("build project");
 
+	// generate directories before all else
 	generate_directories(_project->get_base_path());
+
+	TaskGroup<void>* taskGroup = _taskFactory.create("build", [this, console] {
+		// done building, remove flags
+		_buildInfo.clear_flags();
+
+		console->log_important("Build finished.");
+		});
 
 	if (_buildInfo.get_flag(BuildInfo::BuildFlags::Program))
 	{
-		console->log_important("\tgenerating cmake...");
+		taskGroup->create([this, console] {
+			console->log_important("\tgenerating cmake...");
 
-		generate_cmake();
+			generate_cmake();
 
-		console->log_important("\tgenerating main...");
+			console->log_important("\tgenerating main...");
 
-		generate_main();
+			generate_main();
+			});
 	}
 
 	if (_buildInfo.get_flag(BuildInfo::BuildFlags::ApplicationData))
 	{
-		console->log_important("\tgenerating application data...");
+		taskGroup->create([this, console] {
+			console->log_important("\tgenerating application data...");
 
-		generate_application_data();
+			generate_application_data();
+			});
 	}
 
 	if (_buildInfo.get_flag(BuildInfo::BuildFlags::Assembly))
 	{
-		console->log_important("\tgenerating assembly...");
+		taskGroup->create([this, console] {
+			console->log_important("\tgenerating assembly...");
 
-		generate_assembly();
+			generate_assembly();
+			});
 	}
 
 	if (_buildInfo.get_flag(BuildInfo::BuildFlags::Assets))
 	{
-		console->log_important("\tgenerating wrap files...");
+		taskGroup->create([this, console] {
+			console->log_important("\tgenerating wrap files...");
 
-		generate_wraps();
+			generate_wraps();
+			});
 	}
-
-	std::string command = "cd " + _project->get_build_path().string() + " && " + CMAKE_PATH;
 
 	if (_buildInfo.get_flag(BuildInfo::BuildFlags::Program))
 	{
-		console->log_important("\tbuilding program...");
+		taskGroup->create([this, console] {
+			console->log_important("\tbuilding program...");
 
-		console->run_commands({
-			// create cmake files if needed
-			command + " .",
-			// build program with cmake
-			command + " --build . --config " + _buildInfo.get_config_name(),
+			std::string command = "cd " + _project->get_build_path().string() + " && " + CMAKE_PATH;
+
+			console->run_commands({
+				// create cmake files if needed
+				command + " .",
+				// build program with cmake
+				command + " --build . --config " + _buildInfo.get_config_name(),
+				}, true);
 			});
 	}
 
 	if (_buildInfo.get_flag(BuildInfo::BuildFlags::Assembly | BuildInfo::BuildFlags::AssemblyBuild))
 	{
-		console->log_important("\tbuilding assembly...");
+		taskGroup->create([this, console] {
+			console->log_important("\tbuilding assembly...");
 
-		String assemblyPath = _project->get_assembly_path().generic_string();
-		String configName = _buildInfo.get_config_name();
+			String assemblyPath = _project->get_assembly_path().generic_string();
+			String configName = _buildInfo.get_config_name();
 
-		console->run_commands({
-			// build C# assembly
-			// https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-build
-			"cd " + assemblyPath + " && dotnet build -c " + configName + " /p:Platform=x64"
+			console->run_commands({
+				// build C# assembly
+				// https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-build
+				"cd " + assemblyPath + " && dotnet build -c " + configName + " /p:Platform=x64"
+				}, true);
+
+			// if not running cmake build, but scripts rebuilt, copy the DLL over manually, since the cmake is not doing it
+			if (_buildInfo.get_flag(BuildInfo::BuildFlags::Assembly | BuildInfo::BuildFlags::AssemblyBuild) && !_buildInfo.get_flag(BuildInfo::BuildFlags::Program))
+			{
+				console->log_info("Manually copying files");
+
+				String configName = _buildInfo.get_config_name();
+				String const& projectName = _project->get_name();
+				String source = std::format("{}/bin/{}/{}.dll", _project->get_assembly_path().generic_string(), configName, projectName);
+				String destination = std::format("{}/{}/{}.dll", _project->get_build_path().generic_string(), configName, projectName);
+
+				try {
+					std::filesystem::copy(source, destination, std::filesystem::copy_options::overwrite_existing);
+				}
+				catch (std::filesystem::filesystem_error& e)
+				{
+					console->log_error(std::format("Failed to copy assembly DLL: \"{}\"", e.what()));
+				}
+			}
 			});
 	}
-
-	// wait for commands to finish
-	while (console->is_command_running())
-	{
-
-	}
-
-	// if not running cmake build, but scripts rebuilt, copy the DLL over manually, since the cmake is not doing it
-	if (_buildInfo.get_flag(BuildInfo::BuildFlags::Assembly | BuildInfo::BuildFlags::AssemblyBuild) && !_buildInfo.get_flag(BuildInfo::BuildFlags::Program))
-	{
-		console->log_info("Manually copying files");
-
-		String configName = _buildInfo.get_config_name();
-		String const& projectName = _project->get_name();
-		String source = std::format("{}/bin/{}/{}.dll", _project->get_assembly_path().generic_string(), configName, projectName);
-		String destination = std::format("{}/{}/{}.dll", _project->get_build_path().generic_string(), configName, projectName);
-
-		try {
-			std::filesystem::copy(source, destination, std::filesystem::copy_options::overwrite_existing);
-		}
-		catch (std::filesystem::filesystem_error& e)
-		{
-			console->log_error(std::format("Failed to copy assembly DLL: \"{}\"", e.what()));
-		}
-	}
-
-	// done building, remove flags
-	_buildInfo.clear_flags();
-
-	console->log_important("Build finished.");
 }
 
 void EditorApplication::run_project()

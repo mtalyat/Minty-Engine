@@ -276,6 +276,7 @@
     <ClInclude Include="M_ScriptSystem.h" />
     <ClInclude Include="M_SpritePushData.h" />
     <ClInclude Include="M_TagComponent.h" />
+    <ClInclude Include="M_Task.h" />
     <ClInclude Include="M_Time.h" />
     <ClInclude Include="M_TinyXML.h" />
     <ClInclude Include="M_TypeRegister.h" />
