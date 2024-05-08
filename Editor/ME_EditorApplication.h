@@ -63,13 +63,6 @@ namespace mintye
 	protected:
 		void init(minty::RuntimeBuilder* builder = nullptr) override;
 
-		/// <summary>
-		/// Runs the game engine application.
-		/// </summary>
-		/// <param name="argc">The command line argument count.</param>
-		/// <param name="argv">The command line arguments.</param>
-		void loop() override;
-
 		void destroy() override;
 
 	public:

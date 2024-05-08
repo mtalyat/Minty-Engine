@@ -92,7 +92,7 @@ void minty::Application::start()
 	_runtime->start();
 }
 
-void minty::Application::loop()
+void minty::Application::run()
 {
 	if (!_runtime) return;
 
@@ -119,12 +119,12 @@ void minty::Application::destroy()
 	MINTY_DELETE(_runtime);
 }
 
-int minty::Application::run()
+int minty::Application::execute()
 {
 	create();
 	init();
 	start();
-	loop();
+	run();
 	stop();
 
 	int code = _runtime->get_exit_code();

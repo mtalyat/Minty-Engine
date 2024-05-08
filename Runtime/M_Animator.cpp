@@ -40,7 +40,7 @@ UUID minty::Animator::update()
 		return INVALID_UUID;
 	case 2:
 		// infinite loop
-		MINTY_WARN_FORMAT("Animator::update(): Infinite loop indicated.");
+		MINTY_WARN_FORMAT("Animator::update(): Infinite execute indicated.");
 		return INVALID_UUID;
 	default:
 		MINTY_ERROR_FORMAT("Animator::update(): Unrecognized FSM fsmResult code {}", result);

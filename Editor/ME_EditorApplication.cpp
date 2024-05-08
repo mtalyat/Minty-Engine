@@ -92,11 +92,6 @@ void mintye::EditorApplication::init(RuntimeBuilder* b)
 	load_most_recent_project();
 }
 
-void EditorApplication::loop()
-{
-	Application::loop();
-}
-
 void mintye::EditorApplication::destroy()
 {
 	unload_project();
@@ -1012,7 +1007,7 @@ void EditorApplication::generate_main()
 		"#include <Minty.h>" << std::endl <<
 		"int main(int argc, char const* argv[]) {" << std::endl <<
 		"\tminty::Application app;" << std::endl <<
-		"\treturn app.run();" << std::endl <<
+		"\treturn app.execute();" << std::endl <<
 		"}";
 
 	file.close();
@@ -1365,7 +1360,10 @@ void EditorApplication::build_project()
 	}
 
 	// wait for commands to finish
-	while (console->is_command_running()) {}
+	while (console->is_command_running())
+	{
+
+	}
 
 	// if not running cmake build, but scripts rebuilt, copy the DLL over manually, since the cmake is not doing it
 	if (_buildInfo.get_flag(BuildInfo::BuildFlags::Assembly | BuildInfo::BuildFlags::AssemblyBuild) && !_buildInfo.get_flag(BuildInfo::BuildFlags::Program))

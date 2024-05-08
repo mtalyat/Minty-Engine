@@ -205,11 +205,17 @@ bool minty::Runtime::start()
 
 void Runtime::run()
 {
-	while (_state == State::Running && loop()) {}
+	while (loop()) {}
 }
 
 bool minty::Runtime::loop()
 {
+	// stop running if state not Running
+	if (_state != State::Running)
+	{
+		return false;
+	}
+
 	// stop running if window is closed
 	if (!_window->is_open())
 	{

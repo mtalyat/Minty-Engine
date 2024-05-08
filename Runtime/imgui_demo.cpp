@@ -4052,7 +4052,7 @@ static void ShowDemoWindowTables()
 
         // [Method 1] Using TableNextRow() to create a new row, and TableSetColumnIndex() to select the column.
         // In many situations, this is the most flexible and easy to use pattern.
-        HelpMarker("Using TableNextRow() + calling TableSetColumnIndex() _before_ each cell, in a loop.");
+        HelpMarker("Using TableNextRow() + calling TableSetColumnIndex() _before_ each cell, in a execute.");
         if (ImGui::BeginTable("table1", 3))
         {
             for (int row = 0; row < 4; row++)
@@ -4519,7 +4519,7 @@ static void ShowDemoWindowTables()
         if (contents_type == CT_FillButton)
         {
             ImGui::SameLine();
-            HelpMarker("Be mindful that using right-alignment (e.g. size.x = -FLT_MIN) creates a feedback loop where contents width can feed into auto-column width can feed into contents width.");
+            HelpMarker("Be mindful that using right-alignment (e.g. size.x = -FLT_MIN) creates a feedback execute where contents width can feed into auto-column width can feed into contents width.");
         }
         ImGui::DragInt("Columns", &column_count, 0.1f, 1, 64, "%d", ImGuiSliderFlags_AlwaysClamp);
         ImGui::CheckboxFlags("ImGuiTableFlags_Resizable", &flags, ImGuiTableFlags_Resizable);
@@ -7581,7 +7581,7 @@ static void ShowExampleAppAutoResize(bool* p_open)
     ImGui::TextUnformatted(
         "Window will resize every-frame to the size of its content.\n"
         "Note that you probably don't want to query the window size to\n"
-        "output your content because that would create a feedback loop.");
+        "output your content because that would create a feedback execute.");
     ImGui::SliderInt("Number of lines", &lines, 1, 20);
     for (int i = 0; i < lines; i++)
         ImGui::Text("%*sThis is line %d", i * 4, "", i); // Pad with space to extend size horizontally
