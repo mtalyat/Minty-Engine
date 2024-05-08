@@ -34,7 +34,7 @@ void mintye::HierarchyWindow::draw()
 
 	// draw systems
 	SystemRegistry& systemRegistry = scene->get_system_registry();
-	if (ImGui::BeginChild("HierarchySystems", ImVec2(0.0f, min(200.0f, splitHeight)), true))
+	if (ImGui::BeginChild("HierarchySystems", ImVec2(0.0f, std::min(200.0f, splitHeight)), true))
 	{
 		ImGui::Text(std::format("Systems ({})", systemRegistry.size()).c_str());
 		ImGui::Separator();

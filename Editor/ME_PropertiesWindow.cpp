@@ -104,7 +104,7 @@ bool mintye::PropertiesWindow::input_node(minty::Node& rootNode, bool const prin
 		{
 			// input text
 
-			size_t size = min(BUFFER_SIZE, pair.first->get_data().size() + 1);
+			size_t size = std::min(static_cast<size_t>(BUFFER_SIZE), pair.first->get_data().size() + 1);
 			memcpy(buffer, pair.first->get_data().c_str(), size);
 			buffer[size - 1] = '\0';
 
@@ -165,7 +165,7 @@ void mintye::PropertiesWindow::draw_entity()
 
 	// name
 	String text = registry.get_name(_targetEntity);
-	size_t size = min(INPUT_SIZE, text.size() + 1);
+	size_t size = std::min(INPUT_SIZE, text.size() + 1);
 	memcpy(inputBuffer, text.c_str(), size);
 	inputBuffer[size - 1] = '\0';
 
@@ -202,7 +202,7 @@ void mintye::PropertiesWindow::draw_entity()
 
 	// tag
 	text = registry.get_tag(_targetEntity);
-	size = min(INPUT_SIZE, text.size() + 1);
+	size = std::min(INPUT_SIZE, text.size() + 1);
 	memcpy(inputBuffer, text.c_str(), size);
 	inputBuffer[size - 1] = '\0';
 

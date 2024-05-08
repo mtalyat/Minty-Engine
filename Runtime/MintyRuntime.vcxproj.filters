@@ -94,6 +94,9 @@
     <Filter Include="Header Files\Debug">
       <UniqueIdentifier>{3d890a60-3fb4-4111-ac4d-14f220531178}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Tasks">
+      <UniqueIdentifier>{6da74662-db7b-4856-bb97-fb531afeb34e}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -602,6 +605,9 @@
     </ClInclude>
     <ClInclude Include="M_Debug.h">
       <Filter>Header Files\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="M_Task.h">
+      <Filter>Header Files\Tasks</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

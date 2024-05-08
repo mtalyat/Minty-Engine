@@ -9,14 +9,6 @@ access to the entire engine without needing include each file.
 
 */
 
-// LIBRARIES
-#include "M_Vulkan.h"
-#include "M_GLM.hpp"
-#ifdef MINTY_IMGUI
-#include "M_ImGui.h"
-#endif
-#include "M_TinyXML.h"
-
 // ANIMATION
 #include "M_Animation.h"
 #include "M_AnimationSystem.h"
@@ -69,6 +61,17 @@ access to the entire engine without needing include each file.
 #include "M_KeyAction.h"
 #include "M_KeyModifiers.h"
 #include "M_MouseButton.h"
+
+// LIBRARIES
+#include "M_Vulkan.h"
+#include "M_GLM.hpp"
+#ifdef MINTY_IMGUI
+#include "M_ImGui.h"
+#endif
+#include "M_TinyXML.h"
+
+// TASKS
+#include "M_Task.h"
 
 // RENDERING
 #include "M_CoordinateMode.h"

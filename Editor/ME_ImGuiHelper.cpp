@@ -67,7 +67,7 @@ bool ImGui::InputNode(minty::Node& rootNode, bool const printRoot, size_t const 
 		{
 			// input text
 
-			size_t size = min(BUFFER_SIZE, pair.first->get_data().size() + 1);
+			size_t size = std::min(static_cast<size_t>(BUFFER_SIZE), pair.first->get_data().size() + 1);
 			memcpy(buffer, pair.first->get_data().c_str(), size);
 			buffer[size - 1] = '\0';
 
