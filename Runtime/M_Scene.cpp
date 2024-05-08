@@ -137,11 +137,22 @@ void minty::Scene::sort()
 			RelationshipComponent const& leftR = er->get<RelationshipComponent>(left);
 			RelationshipComponent const& rightR = er->get<RelationshipComponent>(right);
 
-			return 
-				rightR.parent == left || // put parents on left of children
-				leftR.next == right || // put siblings in order
-				// put in order based on parent sibling index
-				(!(leftR.parent == right || rightR.next == left) && (leftR.parent < rightR.parent || (leftR.parent == rightR.parent && leftR.index < rightR.index)));;
+			if (rightR.parent == left) return true;
+
+			if (leftR.next == right) return true;
+
+			if (leftR.parent == rightR.parent && leftR.index < rightR.index) return true;
+
+			// check for grandparents
+			Entity parent = er->get_parent(rightR.parent);
+			while (parent != NULL_ENTITY)
+			{
+				if (left == parent) return true;
+
+				parent = er->get_parent(parent);
+			}
+
+			return left < right;
 		});
 }
 
