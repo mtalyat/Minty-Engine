@@ -1310,8 +1310,6 @@ void minty::EntityRegistry::register_script(String const& name)
 
 			// destroy the script object
 			engine.destroy_object(component->id);
-
-			MINTY_LOG_FORMAT("Erased {} from {}.", name, registry.get_name(entity));
 		},
 	};
 	_components.emplace(name, funcs);
