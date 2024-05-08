@@ -64,6 +64,13 @@ namespace MintyEngine
             return Runtime.Entity_GetComponent(ID, typeof(T)) as T;
         }
 
+        public bool TryGetComponent<T>(out T component) where T : Component
+        {
+            component = GetComponent<T>();
+
+            return component != null;
+        }
+
         public void RemoveComponent<T>() where T : Component
         {
             Runtime.Entity_RemoveComponent(ID, typeof(T));
