@@ -682,9 +682,9 @@ String minty::vk::to_string(VkCullModeFlagBits const value)
 	switch (value)
 	{
 	case VkCullModeFlagBits::VK_CULL_MODE_NONE: return "NONE";
-	case VkCullModeFlagBits::VK_CULL_MODE_FRONT_BIT: return "FRONT_BIT";
-	case VkCullModeFlagBits::VK_CULL_MODE_BACK_BIT: return "BACK_BIT";
-	case VkCullModeFlagBits::VK_CULL_MODE_FRONT_AND_BACK: return "FRONT_AND_BACK";
+	case VkCullModeFlagBits::VK_CULL_MODE_FRONT_BIT: return "FRONT";
+	case VkCullModeFlagBits::VK_CULL_MODE_BACK_BIT: return "BACK";
+	case VkCullModeFlagBits::VK_CULL_MODE_FRONT_AND_BACK: return "BOTH";
 	default: return "";
 	}
 }
@@ -693,9 +693,9 @@ VkCullModeFlagBits minty::vk::from_string_vk_cull_mode_flag_bits(String const& v
 {
 	String value2 = minty::Text::to_upper(value);
 	if (value2 == "NONE") return VkCullModeFlagBits::VK_CULL_MODE_NONE;
-	if (value2 == "FRONT_BIT") return VkCullModeFlagBits::VK_CULL_MODE_FRONT_BIT;
-	if (value2 == "BACK_BIT") return VkCullModeFlagBits::VK_CULL_MODE_BACK_BIT;
-	if (value2 == "FRONT_AND_BACK") return VkCullModeFlagBits::VK_CULL_MODE_FRONT_AND_BACK;
+	if (value2 == "FRONT") return VkCullModeFlagBits::VK_CULL_MODE_FRONT_BIT;
+	if (value2 == "BACK") return VkCullModeFlagBits::VK_CULL_MODE_BACK_BIT;
+	if (value2 == "BOTH") return VkCullModeFlagBits::VK_CULL_MODE_FRONT_AND_BACK;
 
 	return static_cast<VkCullModeFlagBits>(0);
 }

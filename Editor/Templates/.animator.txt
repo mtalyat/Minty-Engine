@@ -1,0 +1,20 @@
+name: <NAME>
+fsm
+    start: state1
+    scope
+        variable1: 0
+    states
+        state1
+            value: ID 0
+            transitions
+                -
+                    state: state2
+                    conditions
+                        - variable1 != 0
+        state2
+            value: ID 0
+            transitions
+                -
+                    state: state1
+                    conditions
+                        - variable1 == 0

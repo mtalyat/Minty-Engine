@@ -19,6 +19,21 @@ void minty::Wrapper::emplace(Path const& path)
 	emplace(Wrap(path));
 }
 
+size_t minty::Wrapper::get_wrap_count() const
+{
+	return _wraps.size();
+}
+
+Wrap& minty::Wrapper::get_wrap(size_t const index)
+{
+	return _wraps.at(index);
+}
+
+Wrap const& minty::Wrapper::get_wrap(size_t const index) const
+{
+	return _wraps.at(index);
+}
+
 Wrap* minty::Wrapper::find_by_path(Path const& path)
 {
 	for (Wrap& wrap : _wraps)

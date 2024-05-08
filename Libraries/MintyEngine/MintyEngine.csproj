@@ -44,6 +44,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Camera.cs" />
+    <Compile Include="Color.cs" />
     <Compile Include="Component.cs" />
     <Compile Include="Cursor.cs" />
     <Compile Include="Debug.cs" />
@@ -53,6 +54,7 @@
     <Compile Include="Math.cs" />
     <Compile Include="Object.cs" />
     <Compile Include="Quaternion.cs" />
+    <Compile Include="Random.cs" />
     <Compile Include="Runtime.cs" />
     <Compile Include="Script.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

@@ -47,6 +47,11 @@ void mintye::ConsoleWindow::draw()
 		return;
 	}
 
+	if (ImGui::Button("Clear"))
+	{
+		run_command("clear");
+	}
+
 	//ImGui::Checkbox("Show Messages", &showNormal);
 	//ImGui::Checkbox("Show Warnings", &showWarnings);
 	//ImGui::Checkbox("Show Errors", &showErrors);

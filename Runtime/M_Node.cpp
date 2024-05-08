@@ -6,6 +6,7 @@
 #include "M_Parse.h"
 #include "M_Text.h"
 #include <vector>
+#include <algorithm>
 
 using namespace minty;
 
@@ -76,7 +77,7 @@ String minty::Node::get_node_string() const
 // TODO: make iterative
 static void get_formatted_recursive(std::vector<String>& list, int indent, Node const& node)
 {
-    list.push_back(String(static_cast<size_t>(max(0, indent)), '\t').append(node.get_node_string()));
+    list.push_back(String(static_cast<size_t>(std::max(0, indent)), '\t').append(node.get_node_string()));
 
     for (Node const& child : node.get_children())
     {
@@ -351,7 +352,7 @@ Node minty::Node::parse(std::vector<String> const& lines)
         // if new indent is too deep, ignore
         if (indentChange > 1)
         {
-            Console::warn(std::format("Discarding line, invalid indent change of {}: {}", indentChange, line));
+            MINTY_WARN_FORMAT("Discarding line, invalid indent change of {}: {}", indentChange, line);
             continue;
         }
 

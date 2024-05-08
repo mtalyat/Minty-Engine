@@ -38,7 +38,7 @@ void minty::RenderSystem::update()
 	// do nothing if no camera
 	if (_mainCamera == NULL_ENTITY)
 	{
-		Console::warn("There is no Camera to render to!");
+		MINTY_WARN("There is no Camera to render to!");
 		return;
 	}
 

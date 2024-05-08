@@ -1,0 +1,17 @@
+push: object
+    stageFlags: VERTEX_BIT
+    offset: 0
+    size: 112
+uniform: camera
+    type: UNIFORM_BUFFER
+    stageFlags: VERTEX_BIT
+    set: 0
+    binding: 0
+    size: 64
+uniform: texture
+    type: COMBINED_IMAGE_SAMPLER
+    stageFlags: FRAGMENT_BIT
+    set: 2
+    binding: 0
+    count: 1
+    size: 8

@@ -1,6 +1,7 @@
 #pragma once
 #include "M_Engine.h"
 
+#include "M_Types.h"
 #include "M_Asset.h"
 #include "M_Wrapper.h"
 #include <unordered_map>
@@ -45,6 +46,8 @@ namespace minty
 
 		std::vector<char> read_file(Path const& path) const;
 
+		String read_text(Path const& path) const;
+
 		// reads the file at the given path as a node
 		Node read_file_node(Path const& path) const;
 
@@ -78,10 +81,17 @@ namespace minty
 		template<typename T>
 		T* load(Path const& path);
 
-	private:
-		void check(Path const& path) const;
+		Wrapper& get_wrapper();
 
-#pragma region Render
+		Wrapper const& get_wrapper() const;
+
+	private:
+		bool check(Path const& path) const;
+
+#pragma region Loading Types
+
+	private:
+		int check_dependencies(std::vector<void*> const& dependencies) const;
 
 	private:
 		/// <summary>
@@ -144,6 +154,13 @@ namespace minty
 		void unload_all();
 
 		/// <summary>
+		/// Checks if the given asset has any dependents.
+		/// </summary>
+		/// <param name="asset"></param>
+		/// <returns>True if any other assets need the given asset in order to function.</returns>
+		std::vector<Asset*> get_dependents(Asset const& asset) const;
+
+		/// <summary>
 		/// Gets the asset with the given ID.
 		/// </summary>
 		/// <typeparam name="T"></typeparam>
@@ -201,7 +218,7 @@ namespace minty
 		}
 
 		template<class T>
-		std::vector<T*> get_by_type()
+		std::vector<T*> get_by_type() const
 		{
 			std::vector<T*> result;
 

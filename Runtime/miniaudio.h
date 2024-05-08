@@ -11158,7 +11158,7 @@ ma_result ma_device_main_loop__dsound(ma_device* pDevice)
                             } else {
                                 /* This is an error. */
                             #ifdef MA_DEBUG_OUTPUT
-                                printf("[DirectSound] (Duplex/Playback) WARNING: Play cursor has moved in front of the write cursor (same loop iterations). physicalPlayCursorInBytes=%d, virtualWriteCursorInBytes=%d.\n", physicalPlayCursorInBytes, virtualWriteCursorInBytesPlayback);
+                                printf("[DirectSound] (Duplex/Playback) WARNING: Play cursor has moved in front of the write cursor (same execute iterations). physicalPlayCursorInBytes=%d, virtualWriteCursorInBytes=%d.\n", physicalPlayCursorInBytes, virtualWriteCursorInBytesPlayback);
                             #endif
                                 availableBytesPlayback = 0;
                             }
@@ -11169,7 +11169,7 @@ ma_result ma_device_main_loop__dsound(ma_device* pDevice)
                             } else {
                                 /* This is an error. */
                             #ifdef MA_DEBUG_OUTPUT
-                                printf("[DirectSound] (Duplex/Playback) WARNING: Write cursor has moved behind the play cursor (different loop iterations). physicalPlayCursorInBytes=%d, virtualWriteCursorInBytes=%d.\n", physicalPlayCursorInBytes, virtualWriteCursorInBytesPlayback);
+                                printf("[DirectSound] (Duplex/Playback) WARNING: Write cursor has moved behind the play cursor (different execute iterations). physicalPlayCursorInBytes=%d, virtualWriteCursorInBytes=%d.\n", physicalPlayCursorInBytes, virtualWriteCursorInBytesPlayback);
                             #endif
                                 availableBytesPlayback = 0;
                             }
@@ -11378,7 +11378,7 @@ ma_result ma_device_main_loop__dsound(ma_device* pDevice)
                     } else {
                         /* This is an error. */
                     #ifdef MA_DEBUG_OUTPUT
-                        printf("[DirectSound] (Playback) WARNING: Play cursor has moved in front of the write cursor (same loop iterations). physicalPlayCursorInBytes=%d, virtualWriteCursorInBytes=%d.\n", physicalPlayCursorInBytes, virtualWriteCursorInBytesPlayback);
+                        printf("[DirectSound] (Playback) WARNING: Play cursor has moved in front of the write cursor (same execute iterations). physicalPlayCursorInBytes=%d, virtualWriteCursorInBytes=%d.\n", physicalPlayCursorInBytes, virtualWriteCursorInBytesPlayback);
                     #endif
                         availableBytesPlayback = 0;
                     }
@@ -11389,7 +11389,7 @@ ma_result ma_device_main_loop__dsound(ma_device* pDevice)
                     } else {
                         /* This is an error. */
                     #ifdef MA_DEBUG_OUTPUT
-                        printf("[DirectSound] (Playback) WARNING: Write cursor has moved behind the play cursor (different loop iterations). physicalPlayCursorInBytes=%d, virtualWriteCursorInBytes=%d.\n", physicalPlayCursorInBytes, virtualWriteCursorInBytesPlayback);
+                        printf("[DirectSound] (Playback) WARNING: Write cursor has moved behind the play cursor (different execute iterations). physicalPlayCursorInBytes=%d, virtualWriteCursorInBytes=%d.\n", physicalPlayCursorInBytes, virtualWriteCursorInBytesPlayback);
                     #endif
                         availableBytesPlayback = 0;
                     }
@@ -16332,13 +16332,13 @@ ma_result ma_device_init__pulse(ma_context* pContext, const ma_device_config* pC
 
     pDevice->pulse.pMainLoop = ((ma_pa_mainloop_new_proc)pContext->pulse.pa_mainloop_new)();
     if (pDevice->pulse.pMainLoop == NULL) {
-        result = ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[PulseAudio] Failed to create main loop for device.", MA_FAILED_TO_INIT_BACKEND);
+        result = ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[PulseAudio] Failed to create main execute for device.", MA_FAILED_TO_INIT_BACKEND);
         goto on_error0;
     }
 
     pDevice->pulse.pAPI = ((ma_pa_mainloop_get_api_proc)pContext->pulse.pa_mainloop_get_api)((ma_pa_mainloop*)pDevice->pulse.pMainLoop);
     if (pDevice->pulse.pAPI == NULL) {
-        result = ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[PulseAudio] Failed to retrieve PulseAudio main loop.", MA_FAILED_TO_INIT_BACKEND);
+        result = ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[PulseAudio] Failed to retrieve PulseAudio main execute.", MA_FAILED_TO_INIT_BACKEND);
         goto on_error1;
     }
 
@@ -16372,7 +16372,7 @@ ma_result ma_device_init__pulse(ma_context* pContext, const ma_device_config* pC
 
         error = ((ma_pa_mainloop_iterate_proc)pContext->pulse.pa_mainloop_iterate)((ma_pa_mainloop*)pDevice->pulse.pMainLoop, 1, NULL);
         if (error < 0) {
-            result = ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[PulseAudio] The PulseAudio main loop returned an error while connecting the PulseAudio context.", ma_result_from_pulse(error));
+            result = ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[PulseAudio] The PulseAudio main execute returned an error while connecting the PulseAudio context.", ma_result_from_pulse(error));
             goto on_error3;
         }
     }
@@ -16418,7 +16418,7 @@ ma_result ma_device_init__pulse(ma_context* pContext, const ma_device_config* pC
         while (((ma_pa_stream_get_state_proc)pContext->pulse.pa_stream_get_state)((ma_pa_stream*)pDevice->pulse.pStreamCapture) != MA_PA_STREAM_READY) {
             error = ((ma_pa_mainloop_iterate_proc)pContext->pulse.pa_mainloop_iterate)((ma_pa_mainloop*)pDevice->pulse.pMainLoop, 1, NULL);
             if (error < 0) {
-                result = ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[PulseAudio] The PulseAudio main loop returned an error while connecting the PulseAudio capture stream.", ma_result_from_pulse(error));
+                result = ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[PulseAudio] The PulseAudio main execute returned an error while connecting the PulseAudio capture stream.", ma_result_from_pulse(error));
                 goto on_error5;
             }
         }
@@ -16516,7 +16516,7 @@ ma_result ma_device_init__pulse(ma_context* pContext, const ma_device_config* pC
         while (((ma_pa_stream_get_state_proc)pContext->pulse.pa_stream_get_state)((ma_pa_stream*)pDevice->pulse.pStreamPlayback) != MA_PA_STREAM_READY) {
             error = ((ma_pa_mainloop_iterate_proc)pContext->pulse.pa_mainloop_iterate)((ma_pa_mainloop*)pDevice->pulse.pMainLoop, 1, NULL);
             if (error < 0) {
-                result = ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[PulseAudio] The PulseAudio main loop returned an error while connecting the PulseAudio playback stream.", ma_result_from_pulse(error));
+                result = ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "[PulseAudio] The PulseAudio main execute returned an error while connecting the PulseAudio playback stream.", ma_result_from_pulse(error));
                 goto on_error7;
             }
         }
@@ -26012,7 +26012,7 @@ ma_thread_result MA_THREADCALL ma_worker_thread(void* pData)
         if (pDevice->pContext->onDeviceMainLoop != NULL) {
             pDevice->pContext->onDeviceMainLoop(pDevice);
         } else {
-            ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "No main loop implementation.", MA_API_NOT_FOUND);
+            ma_post_error(pDevice, MA_LOG_LEVEL_ERROR, "No main execute implementation.", MA_API_NOT_FOUND);
         }
 
         /*

@@ -1,0 +1,7 @@
+C:/Libraries/VulkanSDK/1.3.261.1/Bin/glslc.exe C:/Users/mitch/source/repos/Minty-Engine/Data/default/Shader/defaultShader.vert -o C:/Users/mitch/source/repos/Minty-Engine/Data/default/Shader/defaultVert.spv
+C:/Libraries/VulkanSDK/1.3.261.1/Bin/glslc.exe C:/Users/mitch/source/repos/Minty-Engine/Data/default/Shader/defaultShader.frag -o C:/Users/mitch/source/repos/Minty-Engine/Data/default/Shader/defaultFrag.spv
+C:/Libraries/VulkanSDK/1.3.261.1/Bin/glslc.exe C:/Users/mitch/source/repos/Minty-Engine/Data/default/Shader/defaultSprite.vert -o C:/Users/mitch/source/repos/Minty-Engine/Data/default/Shader/defaultSpriteVert.spv
+C:/Libraries/VulkanSDK/1.3.261.1/Bin/glslc.exe C:/Users/mitch/source/repos/Minty-Engine/Data/default/Shader/defaultSprite.frag -o C:/Users/mitch/source/repos/Minty-Engine/Data/default/Shader/defaultSpriteFrag.spv
+C:/Libraries/VulkanSDK/1.3.261.1/Bin/glslc.exe C:/Users/mitch/source/repos/Minty-Engine/Data/default/Shader/defaultUi.vert -o C:/Users/mitch/source/repos/Minty-Engine/Data/default/Shader/defaultUiVert.spv
+C:/Libraries/VulkanSDK/1.3.261.1/Bin/glslc.exe C:/Users/mitch/source/repos/Minty-Engine/Data/default/Shader/defaultUi.frag -o C:/Users/mitch/source/repos/Minty-Engine/Data/default/Shader/defaultUiFrag.spv
+pause

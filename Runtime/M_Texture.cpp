@@ -47,7 +47,7 @@ Texture::Texture(TextureBuilder const& builder, Runtime& engine)
 	{
 		if (builder.pixelFormat == PixelFormat::None)
 		{
-			Console::error("Attempting to load_animation texture with a pixelFormat of None.");
+			MINTY_ERROR("Attempting to load_animation texture with a pixelFormat of None.");
 			return;
 		}
 
@@ -62,7 +62,7 @@ Texture::Texture(TextureBuilder const& builder, Runtime& engine)
 		// if no pixels, error
 		if (!pixels)
 		{
-			Console::error(std::format("Failed to load_animation texture: {}", path.string()));
+			MINTY_ERROR_FORMAT("Failed to load_animation texture: {}", path.string());
 			return;
 		}
 	}
@@ -85,7 +85,7 @@ Texture::Texture(TextureBuilder const& builder, Runtime& engine)
 
 	if (!pixels)
 	{
-		Console::error("Failed to create texture. Pixels are null.");
+		MINTY_ERROR("Failed to create texture. Pixels are null.");
 		return;
 	}
 

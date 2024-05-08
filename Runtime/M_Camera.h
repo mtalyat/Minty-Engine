@@ -2,6 +2,7 @@
 #include "M_Object.h"
 
 #include "M_Matrix.h"
+#include "M_Color.h"
 
 namespace minty
 {
@@ -33,6 +34,7 @@ namespace minty
 		float _fov;
 		float _near;
 		float _far;
+		Color _color;
 
 	public:
 		Camera(Perspective const perspective = Perspective::Perspective, float const fov = 45.0f, float const nearPlane = 0.1f, float const farPlane = 1000.0f);
@@ -48,6 +50,8 @@ namespace minty
 
 		float get_far() const;
 
+		Color get_color() const;
+
 #pragma endregion
 
 #pragma region Set
@@ -60,6 +64,8 @@ namespace minty
 		void set_near(float const nearPlane);
 
 		void set_far(float const farPlane);
+
+		void set_color(Color const color);
 
 #pragma endregion
 

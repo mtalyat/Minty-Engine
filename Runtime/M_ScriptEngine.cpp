@@ -167,7 +167,7 @@ ScriptAssembly const* minty::ScriptEngine::find_assembly(String const& namespace
 
 void minty::ScriptEngine::reload_assembly(String const& name)
 {
-	Console::todo("reload assembly");
+	MINTY_TODO("reload assembly");
 }
 
 void minty::ScriptEngine::unload_assembly(String const& name)
@@ -306,7 +306,7 @@ MonoClassField* minty::ScriptEngine::get_field(MonoClass* const klass, String co
 
 	if (!field)
 	{
-		Console::error(std::format("Assembly::get_field(): Field \"{}\" does not exist.", fieldName));
+		MINTY_ERROR(std::format("Assembly::get_field(): Field \"{}\" does not exist.", fieldName));
 		return nullptr;
 	}
 
@@ -402,7 +402,7 @@ MonoProperty* minty::ScriptEngine::get_property(MonoClass* const klass, String c
 
 	if (!prop)
 	{
-		Console::error(std::format("Assembly::get_field(): Field \"{}\" does not exist.", propertyName));
+		MINTY_ERROR(std::format("Assembly::get_field(): Field \"{}\" does not exist.", propertyName));
 		return nullptr;
 	}
 
@@ -720,7 +720,7 @@ void minty::ScriptEngine::link_script(ScriptClass const& script)
 
 	_data.types[type] = &script;
 
-	Console::info(std::format("Linked {}.", script.get_full_name()));
+	MINTY_INFO_FORMAT("Linked {}.", script.get_full_name());
 }
 
 void minty::ScriptEngine::register_script_id(UUID const id, String const& name)
@@ -822,7 +822,7 @@ static void console_error(MonoString* string)
 }
 
 static void console_ass(bool condition, MonoString* string)
-{
+{	
 	Console::ass(condition, ScriptEngine::from_mono_string(string));
 }
 
@@ -1191,6 +1191,31 @@ static MonoObject* entity_get_child(UUID id, int index)
 	return _data.engine->get_or_create_entity(childId).data();
 }
 
+static MonoObject* entity_clone(UUID id)
+{
+	MINTY_ASSERT(id.valid());
+
+	Scene* scene = _data.get_scene();
+	MINTY_ASSERT(scene != nullptr);
+
+	EntityRegistry& registry = scene->get_entity_registry();
+
+	// get the entity
+	Entity entity = registry.find_by_id(id);
+	MINTY_ASSERT(entity != NULL_ENTITY);
+
+	// clone it
+	Entity clone = registry.clone(entity);
+
+	// get the ID
+	UUID cloneId = registry.get_id(clone);
+
+	if (!cloneId.valid()) return nullptr;
+
+	MINTY_ASSERT(_data.engine != nullptr);
+	return _data.engine->get_or_create_entity(cloneId).data();
+}
+
 #pragma endregion
 
 #pragma region Window
@@ -1343,6 +1368,20 @@ static void camera_set_as_main(UUID id)
 	renderSystem->set_main_camera(entity);
 }
 
+static Color::color_t camera_get_color(UUID id)
+{
+	CameraComponent& camera = util_get_camera_component(id);
+
+	return static_cast<Color::color_t>(camera.camera.get_color());
+}
+
+static void camera_set_color(UUID id, Color::color_t value)
+{
+	CameraComponent& camera = util_get_camera_component(id);
+
+	camera.camera.set_color(Color(value));
+}
+
 #pragma endregion
 
 #pragma region Transform
@@ -1479,6 +1518,7 @@ void minty::ScriptEngine::link()
 	ADD_INTERNAL_CALL("Entity_SetParent", entity_set_parent);
 	ADD_INTERNAL_CALL("Entity_GetChildCount", entity_get_child_count);
 	ADD_INTERNAL_CALL("Entity_GetChild", entity_get_child);
+	ADD_INTERNAL_CALL("Entity_Clone", entity_clone);
 #pragma endregion
 
 #pragma region Window
@@ -1504,6 +1544,8 @@ void minty::ScriptEngine::link()
 	ADD_INTERNAL_CALL("Camera_GetFar", camera_get_far);
 	ADD_INTERNAL_CALL("Camera_SetFar", camera_set_far);
 	ADD_INTERNAL_CALL("Camera_SetAsMain", camera_set_as_main);
+	ADD_INTERNAL_CALL("Camera_GetColor", camera_get_color);
+	ADD_INTERNAL_CALL("Camera_SetColor", camera_set_color);
 #pragma endregion
 
 #pragma region Transform

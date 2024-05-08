@@ -7,7 +7,10 @@
 #include "M_SystemRegistry.h"
 
 #include "M_TransformComponent.h"
+#include "M_UITransformComponent.h"
+#include "M_CanvasComponent.h"
 #include "M_RelationshipComponent.h"
+#include "M_SpriteComponent.h"
 #include "M_DirtyComponent.h"
 #include "M_CameraComponent.h"
 #include "M_RenderSystem.h"
@@ -106,12 +109,12 @@ void minty::Scene::load()
 	// call all load/enable/etc. events on entities already in the system
 	for (auto&& [entity, script, onLoad] : _entities->view<ScriptComponent const, ScriptOnLoadComponent const>().each())
 	{
-		onLoad.invoke(SCRIPT_METHOD_NAME_ONLOAD, script);
+		onLoad.invoke(script);
 	}
 
 	for (auto&& [entity, script, onEnable] : _entities->view<ScriptComponent const, ScriptOnEnableComponent const>().each())
 	{
-		onEnable.invoke(SCRIPT_METHOD_NAME_ONENABLE, script);
+		onEnable.invoke(script);
 	}
 }
 
@@ -128,16 +131,28 @@ void minty::Scene::sort()
 {
 	EntityRegistry const* er = _entities;
 
+	// sort relationships
 	_entities->sort<RelationshipComponent>([er](Entity const left, Entity const right)
 		{
-			RelationshipComponent const& leftRelationship = er->get<RelationshipComponent>(left);
-			RelationshipComponent const& rightRelationship = er->get<RelationshipComponent>(right);
+			RelationshipComponent const& leftR = er->get<RelationshipComponent>(left);
+			RelationshipComponent const& rightR = er->get<RelationshipComponent>(right);
 
-			return
-				rightRelationship.parent == left || // put parents on left of children
-				leftRelationship.next == right || // put siblings in order
-				// put in order based on parent sibling index
-				((leftRelationship.parent != right && rightRelationship.next != left) && (leftRelationship.parent < rightRelationship.parent || (leftRelationship.parent == rightRelationship.parent && left < right)));
+			if (rightR.parent == left) return true;
+
+			if (leftR.next == right) return true;
+
+			if (leftR.parent == rightR.parent && leftR.index < rightR.index) return true;
+
+			// check for grandparents
+			Entity parent = er->get_parent(rightR.parent);
+			while (parent != NULL_ENTITY)
+			{
+				if (left == parent) return true;
+
+				parent = er->get_parent(parent);
+			}
+
+			return left < right;
 		});
 }
 
@@ -168,7 +183,7 @@ void minty::Scene::finalize()
 	sort();
 
 	// update dirty transform group with relationships
-	auto view = _entities->view<DirtyComponent const, TransformComponent, RelationshipComponent>();
+	auto view = _entities->view<DirtyComponent const, TransformComponent, RelationshipComponent const>();
 	view.use<RelationshipComponent const>();
 	for (auto [entity, dirty, transform, relationship] : view.each())
 	{
@@ -178,16 +193,17 @@ void minty::Scene::finalize()
 		{
 			// parent
 
-			// get parent Transform
-			TransformComponent& parentTransform = _entities->get<TransformComponent>(relationship.parent);
+			// get parent Transform, if any
+			if (TransformComponent* parentTransform = _entities->try_get<TransformComponent>(relationship.parent))
+			{
+				transform.globalMatrix = parentTransform->globalMatrix * transform.get_local_matrix();
 
-			transform.globalMatrix = parentTransform.globalMatrix * transform.get_local_matrix();
+				continue;
+			}
 		}
-		else
-		{
-			// no parent
-			transform.globalMatrix = transform.get_local_matrix();
-		}
+
+		// no parent
+		transform.globalMatrix = transform.get_local_matrix();
 	}
 	
 	// update dirty transform group with no relationships
@@ -195,6 +211,44 @@ void minty::Scene::finalize()
 	{
 		// no parent, set to self matrix
 		transform.globalMatrix = transform.get_local_matrix();
+	}
+
+	Window const& window = get_runtime().get_window();
+	RectF windowRect(0, 0, window.get_frame_width(), window.get_frame_height());
+
+	// update dirty UI transforms
+	auto uiView = _entities->view<DirtyComponent const, UITransformComponent, RelationshipComponent const>();
+	uiView.use<RelationshipComponent const>();
+	for (auto [entity, dirty, transform, relationship] : uiView.each())
+	{
+		// if parent, apply local to parent global for this global
+		// if no parent, set global to local
+		if (relationship.parent != NULL_ENTITY)
+		{
+			// parent
+
+			UITransformComponent& parentTransform = _entities->get<UITransformComponent>(relationship.parent);
+			transform.update_global_rect(parentTransform.globalRect);
+		}
+		else if(CanvasComponent* canvas = _entities->try_get<CanvasComponent>(entity))
+		{
+			// canvas
+			transform.update_global_rect(canvas->toRect());
+		}
+		else
+		{
+			// no parent, not a canvas
+
+			// set to not draw
+			transform.globalRect = RectF();
+		}
+	}
+
+	// update dirty UI transform group with no relationships
+	for (auto [entity, dirty, transform] : _entities->view<DirtyComponent const, UITransformComponent>(entt::exclude<RelationshipComponent>).each())
+	{
+		// no parent, set to self matrix
+		transform.update_global_rect(windowRect);
 	}
 
 	// remove all dirty tags

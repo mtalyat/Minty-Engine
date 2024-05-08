@@ -24,7 +24,7 @@
     <ProjectGuid>{A402FFEC-9889-447D-9ECD-362BB3E9826F}</ProjectGuid>
     <RootNamespace>Voxel</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
-    <ProjectName>MintyEngine</ProjectName>
+    <ProjectName>MintyEditor</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -148,10 +148,14 @@
       </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>xcopy /y "C:\Users\mitch\source\repos\Minty-Engine\Runtime\x64\$(ConfigurationName)\*.dll" "$(TargetDir)"</Command>
+      <Command>xcopy /y "$(ProjectDir)..\Runtime\x64\$(Configuration)\*.dll" "$(TargetDir)"
+for /r "$(ProjectDir)..\Data" %%f in (*.wrap) do xcopy /Y "%%f" "$(TargetDir)"
+xcopy /y "$(ProjectDir)Icon.png" "$(TargetDir)"
+xcopy /y "$(ProjectDir)..\Libraries\MintyEngine\bin\$(Configuration)\MintyEngine.dll" "$(TargetDir)"
+xcopy /y /e /i "$(ProjectDir)Templates\*" "$(TargetDir)Templates\"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
-      <Message>Copy DLLs from Minty Runtime.</Message>
+      <Message>Copy Minty Engine files.</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -181,10 +185,14 @@
       </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>xcopy /y "C:\Users\mitch\source\repos\Minty-Engine\Runtime\x64\$(ConfigurationName)\*.dll" "$(TargetDir)"</Command>
+      <Command>xcopy /y "$(ProjectDir)..\Runtime\x64\$(Configuration)\*.dll" "$(TargetDir)"
+for /r "$(ProjectDir)..\Data" %%f in (*.wrap) do xcopy /Y "%%f" "$(TargetDir)"
+xcopy /y "$(ProjectDir)Icon.png" "$(TargetDir)"
+xcopy /y "$(ProjectDir)..\Libraries\MintyEngine\bin\$(Configuration)\MintyEngine.dll" "$(TargetDir)"
+xcopy /y /e /i "$(ProjectDir)Templates\*" "$(TargetDir)Templates\"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
-      <Message>Copy DLLs from Minty Runtime.</Message>
+      <Message>Copy Minty Engine files.</Message>
     </PostBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -194,6 +202,7 @@
     <ClCompile Include="ME_BuildInfo.cpp" />
     <ClCompile Include="ME_ConsoleWindow.cpp" />
     <ClCompile Include="ME_EditorWindow.cpp" />
+    <ClCompile Include="ME_FileWatcher.cpp" />
     <ClCompile Include="ME_GameWindow.cpp" />
     <ClCompile Include="ME_HierarchyWindow.cpp" />
     <ClCompile Include="ME_ImGuiHelper.cpp" />
@@ -211,6 +220,7 @@
     <ClInclude Include="ME_ConsoleWindow.h" />
     <ClInclude Include="ME_Constants.h" />
     <ClInclude Include="ME_EditorWindow.h" />
+    <ClInclude Include="ME_FileWatcher.h" />
     <ClInclude Include="ME_GameWindow.h" />
     <ClInclude Include="ME_HierarchyWindow.h" />
     <ClInclude Include="ME_ImGuiHelper.h" />
@@ -219,6 +229,13 @@
     <ClInclude Include="ME_PropertiesWindow.h" />
     <ClInclude Include="ME_SceneWindow.h" />
     <ClInclude Include="ME_Theme.h" />
+    <ClInclude Include="resource.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="Resource.rc" />
+  </ItemGroup>
+  <ItemGroup>
+    <Image Include="Icon.ico" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

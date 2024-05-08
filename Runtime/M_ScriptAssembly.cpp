@@ -18,7 +18,7 @@ minty::ScriptAssembly::ScriptAssembly(Path const& path, ScriptEngine& engine, bo
 {
 	MINTY_ASSERT_FORMAT(std::filesystem::exists(_path), "Assembly not found at path \"{}\".", _path.string());
 
-	Console::log(std::format("Loading Assembly at path: \"{}\"", _path.string()));
+	MINTY_LOG_FORMAT("Loading Assembly at path: \"{}\"", _path.string());
 	std::vector<char> fileData = File::read_all_chars(_path);
 
 	// load the assembly image
@@ -57,7 +57,7 @@ minty::ScriptAssembly::ScriptAssembly(Path const& path, ScriptEngine& engine, bo
 		MonoClass* klass = mono_class_from_name(_image, namespaceName, className);
 
 		// create script class and add to list
-		Console::info(std::format("Found {}::{}.", name, fullName));
+		MINTY_INFO_FORMAT("Found {}::{}.", name, fullName);
 		_classes.emplace(fullName, ScriptClass(namespaceName, className, *this)).first->second;
 	}
 }

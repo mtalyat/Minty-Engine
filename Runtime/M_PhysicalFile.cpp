@@ -37,7 +37,7 @@ void minty::PhysicalFile::open(Path const& path, Flags const flags)
     // check if open
     if (!_stream.is_open())
     {
-        Console::error(std::format("Cannot open File at path: \"{}\"", path.string()));
+        MINTY_ERROR_FORMAT("Cannot open File at path: \"{}\"", path.string());
         return;
     }
 }

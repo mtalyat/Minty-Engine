@@ -1,5 +1,6 @@
 #pragma once
 #include "M_Object.h"
+#include "M_Vector.h"
 
 namespace minty
 {
@@ -113,6 +114,9 @@ namespace minty
 		friend std::ostream& operator<<(std::ostream& stream, Color const& color);
 		friend std::istream& operator>>(std::istream& stream, Color& color);
 
+		void serialize(Writer& writer) const override;
+		void deserialize(Reader const& reader) override;
+
 		/// <summary>
 		/// Gets the red value as a scale from 0.0f to 1.0f.
 		/// </summary>
@@ -150,6 +154,8 @@ namespace minty
 		/// <param name="percent">The percentage to lighten the color by.</param>
 		/// <returns>A new lightened color.</returns>
 		Color lighten(float const percent) const;
+
+		Vector4 toVector() const;
 
 		String toHex() const;
 

@@ -31,14 +31,14 @@ namespace minty
 
 		virtual void start();
 
-		virtual void loop();
+		virtual void run();
 
 		virtual void stop();
 
 		virtual void destroy();
 
 	public:
-		virtual int run();
+		virtual int execute();
 
 	protected:
 		virtual Window* create_window();

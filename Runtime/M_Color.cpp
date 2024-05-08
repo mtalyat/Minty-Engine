@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "M_Color.h"
 
+#include "M_Writer.h"
+#include "M_Reader.h"
 #include "M_Math.h"
 
 using namespace minty;
@@ -85,7 +87,7 @@ Color::Color(Color&& color) noexcept
 	color.a = 0;
 }
 
-inline Color::operator color_t() const
+Color::operator color_t() const
 {
 	return (a << COLOR_SHAMT_A) | (r << COLOR_SHAMT_R) | (g << COLOR_SHAMT_G) | (b << COLOR_SHAMT_B);
 }
@@ -98,6 +100,22 @@ Color& Color::operator=(const Color& color)
 	a = color.a;
 
 	return *this;
+}
+
+void minty::Color::serialize(Writer& writer) const
+{
+	std::stringstream ss;
+
+	ss << *this;
+
+	writer.get_node().set_data(ss.str());
+}
+
+void minty::Color::deserialize(Reader const& reader)
+{
+	std::stringstream ss(reader.get_node().get_data());
+
+	ss >> *this;
 }
 
 float minty::Color::rf() const
@@ -128,6 +146,11 @@ inline Color Color::darken(float const percent) const
 inline Color Color::lighten(float const percent) const
 {
 	return Color();
+}
+
+Vector4 minty::Color::toVector() const
+{
+	return Vector4(rf(), gf(), bf(), af());
 }
 
 String minty::Color::toHex() const
@@ -166,15 +189,8 @@ Color Color::lerpa(Color const left, Color const right, float const t)
 std::ostream& minty::operator<<(std::ostream& stream, Color const& color)
 {
 	// hex code
-	stream << '#' << std::hex << std::setfill('0')
-		<< std::setw(2) << color.r
-		<< std::setw(2) << color.g
-		<< std::setw(2) << color.b;
-	if (color.a < Color::MAX_CHANNEL)
-	{
-		stream << std::setw(2) << color.a;
-	}
-	stream << std::dec;
+	uint32_t hex = ((color.r << 24) | (color.g << 16) | (color.b << 8) | color.a);
+	stream << '#' << std::hex << std::setfill('0') << std::setw(8) << hex << std::dec;
 	return stream;
 }
 
@@ -188,20 +204,14 @@ std::istream& minty::operator>>(std::istream& stream, Color& color)
 	}
 
 	// get each value
-	stream >> std::hex
-		>> std::setw(2) >> color.r
-		>> std::setw(2) >> color.g
-		>> std::setw(2) >> color.b;
-	// get a if it exists
-	if (!std::isspace(stream.peek()))
-	{
-		stream >> std::setw(2) >> color.a;
-	}
-	else
-	{
-		color.a = Color::MAX_CHANNEL;
-	}
-	stream >> std::dec;
+	uint32_t hex;
+	stream >> std::hex >> std::setw(8) >> hex >> std::dec;
+	color = Color(
+		static_cast<Byte>((hex >> 24) & 0xff),
+		static_cast<Byte>((hex >> 16) & 0xff),
+		static_cast<Byte>((hex >> 8) & 0xff),
+		static_cast<Byte>(hex & 0xff)
+	);
 	return stream;
 }
 

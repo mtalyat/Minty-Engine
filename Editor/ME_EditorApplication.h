@@ -1,13 +1,37 @@
 #pragma once
-
 #include "ME_Minty.h"
+
+#include "ME_BuildInfo.h"
+#include "ME_FileWatcher.h"
 #include <unordered_map>
+#include <vector>
 
 namespace mintye
 {
-	struct BuildInfo;
 	class Project;
 	class EditorWindow;
+
+	class EditorApplicationData
+		: public minty::Object
+	{
+	private:
+		static constexpr int MAX_RECENT_PROJECTS = 10;
+		std::vector<minty::Path> _recentProjects;
+
+	public:
+		EditorApplicationData();
+
+	public:
+		void emplace_recent_project(minty::Path const& path);
+
+		void erase_recent_project(minty::Path const& path);
+
+		std::vector<minty::Path> const& get_recent_projects() const;
+
+	public:
+		void serialize(minty::Writer& writer) const override;
+		void deserialize(minty::Reader const& reader) override;
+	};
 
 	/// <summary>
 	/// Holds data and runs the game engine application.
@@ -18,12 +42,22 @@ namespace mintye
 	private:
 		constexpr static char const* NAME = "Minty Editor";
 	private:
+		EditorApplicationData _data;
+		BuildInfo _buildInfo;
+
 		// info needed for a loaded project:
 		Project* _project;
+		FileWatcher* _watcher;
 		minty::UUID _sceneId;
+
+		// starting working directory
+		minty::Path _cwd;
 
 		// editor windows to be drawn
 		std::unordered_map<minty::String, EditorWindow*> _editorWindows;
+
+		// tasks being ran (such as building)
+		minty::TaskFactory<void> _taskFactory;
 	public:
 		EditorApplication();
 
@@ -31,13 +65,6 @@ namespace mintye
 
 	protected:
 		void init(minty::RuntimeBuilder* builder = nullptr) override;
-
-		/// <summary>
-		/// Runs the game engine application.
-		/// </summary>
-		/// <param name="argc">The command line argument count.</param>
-		/// <param name="argv">The command line arguments.</param>
-		void loop() override;
 
 		void destroy() override;
 
@@ -50,6 +77,20 @@ namespace mintye
 		minty::Runtime* create_runtime() override;
 
 		minty::Window* create_window() override;
+
+	private:
+		void cwd_application() const;
+
+		void cwd_project() const;
+
+#pragma region Data
+
+	private:
+		void load_data();
+
+		void save_data() const;
+
+#pragma endregion
 
 #pragma region Set
 
@@ -69,7 +110,7 @@ namespace mintye
 
 		void draw_menu_bar();
 
-		void draw_commands(BuildInfo& buildInfo);
+		void draw_commands();
 
 		void draw_editor_windows();
 
@@ -91,6 +132,8 @@ namespace mintye
 		void save_project();
 
 		void close_project();
+
+		void load_most_recent_project();
 
 		void load_project(minty::Path const& path);
 
@@ -135,6 +178,15 @@ namespace mintye
 		/// <returns></returns>
 		minty::String get_name(minty::UUID const id) const;
 
+		void create_asset(minty::Path const& path);
+
+		void create_directory(minty::Path const& path);
+
+	private:
+		void create_asset(minty::Path const& path, std::unordered_map<minty::String, minty::String> const& params);
+
+		minty::Path find_template(minty::Path const& extension);
+
 #pragma endregion
 
 #pragma region Building and Running
@@ -150,13 +202,13 @@ namespace mintye
 		/// Builds the target project.
 		/// </summary>
 		/// <param name="info">The target info.</param>
-		void build_project(BuildInfo const& buildInfo);
+		void build_project();
 
 		/// <summary>
 		/// Runs the target project.
 		/// </summary>
 		/// <param name="info">The target info.</param>
-		void run_project(BuildInfo const& buildInfo);
+		void run_project();
 
 #pragma region File Generation
 
@@ -165,27 +217,39 @@ namespace mintye
 
 		void generate_directories(minty::Path const& basePath) const;
 
-		void generate_application_data(BuildInfo const& buildInfo);
+		void generate_application_data();
 
-		void generate_wraps(BuildInfo const& buildInfo);
+		void generate_wraps();
 
-		void generate_assembly(BuildInfo const& buildInfo);
+		void generate_assembly();
 
 		/// <summary>
 		/// Generates and updates the cmake file for the target project.
 		/// </summary>
 		/// <param name="info">The target info.</param>
-		void generate_cmake(BuildInfo const& buildInfo);
+		void generate_cmake();
 
 		/// <summary>
 		/// Generates the main file for the target project.
 		/// </summary>
 		/// <param name="info"></param>
-		void generate_main(BuildInfo const& buildInfo);
+		void generate_main();
 
 #pragma endregion
 
 #pragma endregion
+
+#pragma region Logging
+
+	public:
+		void log(minty::String const& message);
+
+		void log_warning(minty::String const& message);
+
+		void log_error(minty::String const& message);
+
+#pragma endregion
+
 	};
 
 	template<typename T>
@@ -196,7 +260,7 @@ namespace mintye
 		if (found == _editorWindows.end())
 		{
 			// none with that name
-			minty::Console::error(std::format("No editor window with the name \"{}\" exists.", name));
+			MINTY_ERROR_FORMAT("No editor window with the message \"{}\" exists.", name);
 			return nullptr;
 		}
 

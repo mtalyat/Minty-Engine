@@ -3,6 +3,8 @@
 
 #include "M_Math.h"
 #include "M_Rect.h"
+#include "M_Writer.h"
+#include "M_Reader.h"
 #include <format>
 
 using namespace minty;
@@ -76,6 +78,22 @@ RectF RectF::overlap(RectF const& other) const
 bool RectF::contains(Vector2 const& other) const
 {
 	return other.x >= x && other.x < x + width && other.y >= y && other.y < y + height;
+}
+
+void minty::RectF::serialize(Writer& writer) const
+{
+	writer.write("x", x);
+	writer.write("y", y);
+	writer.write("width", width);
+	writer.write("height", height);
+}
+
+void minty::RectF::deserialize(Reader const& reader)
+{
+	reader.try_read_float("x", x);
+	reader.try_read_float("y", y);
+	reader.try_read_float("width", width);
+	reader.try_read_float("height", height);
 }
 
 RectF RectF::bounds(float const left, float const right, float const top, float const bottom)

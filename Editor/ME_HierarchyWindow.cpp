@@ -34,7 +34,7 @@ void mintye::HierarchyWindow::draw()
 
 	// draw systems
 	SystemRegistry& systemRegistry = scene->get_system_registry();
-	if (ImGui::BeginChild("HierarchySystems", ImVec2(0.0f, min(200.0f, splitHeight)), true))
+	if (ImGui::BeginChild("HierarchySystems", ImVec2(0.0f, std::min(200.0f, splitHeight)), true))
 	{
 		ImGui::Text(std::format("Systems ({})", systemRegistry.size()).c_str());
 		ImGui::Separator();
@@ -99,7 +99,7 @@ void mintye::HierarchyWindow::draw()
 		{
 			// family
 
-				// if not the same parent, determine what to do...
+			// if not the same parent, determine what to do...
 			if (familySet.contains(relationship.parent))
 			{
 				// the parent is part of this line
@@ -200,6 +200,7 @@ void mintye::HierarchyWindow::reset()
 
 void mintye::HierarchyWindow::refresh()
 {
+	if(get_scene()) get_scene()->finalize();
 }
 
 void mintye::HierarchyWindow::set_project(Project* const project)
@@ -218,6 +219,20 @@ void mintye::HierarchyWindow::set_scene(minty::Scene* const scene)
 	}
 
 	EditorWindow::set_scene(scene);
+}
+
+minty::Entity mintye::HierarchyWindow::create_entity()
+{
+	EntityRegistry& registry = get_scene()->get_entity_registry();
+
+	// create empty entity
+	Entity entity = registry.create();
+
+	// enable and visible by default
+	registry.enable(entity);
+	registry.set_renderable(entity, true);
+
+	return entity;
 }
 
 void mintye::HierarchyWindow::copy_entity(minty::Entity const entity)
@@ -376,8 +391,12 @@ void mintye::HierarchyWindow::draw_popup()
 	if (ImGui::MenuItem("Create empty"))
 	{
 		// create and select
-		set_selected(registry.create());
+		Entity newEntity = create_entity();
+		set_selected(newEntity);
 		get_scene()->sort();
+
+		// set parent as clicked
+		registry.set_parent(newEntity, _clicked);
 
 		return;
 	}

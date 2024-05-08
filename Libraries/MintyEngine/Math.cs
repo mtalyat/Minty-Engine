@@ -49,5 +49,22 @@ namespace MintyEngine
         public static float Atan(float radians) => (float)SystemMath.Atan(radians);
 
         public static float Atan2(float y, float x) => (float)SystemMath.Atan2(y, x);
+
+        public static float Round(float value) => (float)SystemMath.Round(value);
+        public static int RoundToInt(float value) => (int)SystemMath.Round(value);
+
+        public static float Floor(float value) => (float)SystemMath.Floor(value);
+        public static int FloorToInt(float value) => (int)SystemMath.Floor(value);
+
+        public static float Ceiling(float value) => (float)SystemMath.Ceiling(value);
+        public static int CeilingToInt(float value) => (int)SystemMath.Ceiling(value);
+
+        public static float Lerp(float left, float right, float t) => (right - left) * t + left;
+
+        public static float LerpClamped(float left, float right, float t) => (right - left) * Clamp(0.0f, 1.0f, t) + left;
+
+        public static int Lerp(int left, int right, float t) => RoundToInt((right - left) * t) + left;
+
+        public static int LerpClamped(int left, int right, float t) => RoundToInt((right - left) * Clamp(0.0f, 1.0f, t)) + left;
     }
 }

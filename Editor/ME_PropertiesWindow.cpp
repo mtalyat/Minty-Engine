@@ -2,6 +2,7 @@
 
 #include "ME_EditorApplication.h"
 #include "ME_ConsoleWindow.h"
+#include "ME_HierarchyWindow.h"
 #include "ME_ImGuiHelper.h"
 #include "ME_Project.h"
 
@@ -11,6 +12,7 @@ using namespace mintye;
 mintye::PropertiesWindow::PropertiesWindow(EditorApplication& application)
 	: EditorWindow(application)
 	, _targetMode(TargetMode::None)
+	, _targetIsBuiltIn(false)
 	, _targetId(INVALID_UUID)
 	, _targetEntity(NULL_ENTITY)
 	, _targetPath()
@@ -102,11 +104,13 @@ bool mintye::PropertiesWindow::input_node(minty::Node& rootNode, bool const prin
 		{
 			// input text
 
-			size_t size = min(BUFFER_SIZE, pair.first->get_data().size() + 1);
+			size_t size = std::min(static_cast<size_t>(BUFFER_SIZE), pair.first->get_data().size() + 1);
 			memcpy(buffer, pair.first->get_data().c_str(), size);
 			buffer[size - 1] = '\0';
 
-			ImGui::Text(std::format("{}{}: ", indentString, pair.first->get_name()).c_str());
+			String text = std::format("{}{}: ", indentString, pair.first->get_name());
+			float leftTextWidth = ImGui::CalcTextSize(text.c_str()).x;
+			ImGui::Text(text.c_str());
 			ImGui::SameLine();
 			// if an ID, get the name of the object with the ID
 			UUID id(INVALID_UUID);
@@ -115,7 +119,9 @@ bool mintye::PropertiesWindow::input_node(minty::Node& rootNode, bool const prin
 			{
 				idName = get_application().get_name(id);
 			}
-			if (ImGui::InputText(std::format("{}##{}", idName, i).c_str(), buffer, BUFFER_SIZE))
+			float rightTextWidth = ImGui::CalcTextSize(idName.c_str()).x;
+			// add 10 so it is within the group box
+			if (ImGui::InputTextExpandOffset(std::format("{}##{}", idName, i).c_str(), buffer, BUFFER_SIZE, leftTextWidth, rightTextWidth + 10.0f))
 			{
 				pair.first->set_data(buffer);
 				modified = true;
@@ -159,7 +165,7 @@ void mintye::PropertiesWindow::draw_entity()
 
 	// name
 	String text = registry.get_name(_targetEntity);
-	size_t size = min(INPUT_SIZE, text.size() + 1);
+	size_t size = std::min(INPUT_SIZE, text.size() + 1);
 	memcpy(inputBuffer, text.c_str(), size);
 	inputBuffer[size - 1] = '\0';
 
@@ -185,9 +191,18 @@ void mintye::PropertiesWindow::draw_entity()
 		registry.set_enabled(_targetEntity, enabled);
 	}
 
+	ImGui::SameLine();
+
+	// renderable (visible)
+	bool visible = registry.get_renderable(_targetEntity);
+	if (ImGui::Checkbox("Visible", &visible))
+	{
+		registry.set_renderable(_targetEntity, visible);
+	}
+
 	// tag
 	text = registry.get_tag(_targetEntity);
-	size = min(INPUT_SIZE, text.size() + 1);
+	size = std::min(INPUT_SIZE, text.size() + 1);
 	memcpy(inputBuffer, text.c_str(), size);
 	inputBuffer[size - 1] = '\0';
 
@@ -200,7 +215,7 @@ void mintye::PropertiesWindow::draw_entity()
 
 	// these will be ignored in the general components list below,
 	// since they are already drawn above
-	static std::unordered_set<String> ignoreComponentNames = { "Name", "Tag", "Enabled" };
+	static std::unordered_set<String> ignoreComponentNames = { "Name", "Tag", "Enabled", "Renderable"};
 
 	//		Components
 
@@ -270,7 +285,27 @@ void mintye::PropertiesWindow::draw_entity()
 
 		if (ImGui::Button("Done") || ImGui::IsKeyPressed(ImGuiKey_Enter))
 		{
-			registry.emplace_by_name(popupBuffer, _targetEntity);
+			// check for Script asset
+			// ensure it is loaded
+			Project* project = get_project();
+			AssetEngine& assets = get_runtime().get_asset_engine();
+
+			Path assetPath = project->find_asset(popupBuffer, AssetType::Script);
+			
+			// register it with scene if needed
+			if (!assetPath.empty())
+			{
+				if (!scene->is_registered(assetPath))
+				{
+					scene->register_asset(assetPath);
+				}
+			}
+
+			// place onto the object
+			if (!registry.emplace_by_name(popupBuffer, _targetEntity))
+			{
+				get_application().log_error(std::format("Failed to add component \"{}\" to Entity \"{}\".", popupBuffer, registry.get_name(_targetEntity)));
+			}
 
 			memset(popupBuffer, 0, IM_ARRAYSIZE(popupBuffer));
 			ImGui::CloseCurrentPopup();
@@ -292,10 +327,12 @@ void mintye::PropertiesWindow::draw_component(minty::Node& node, size_t const i,
 	static float const yMargin = 2.0f;
 	float const width = ImGui::GetContentRegionAvail().x - 2.0f * xMargin;
 
+	static std::unordered_set<String> dirtyableComponentNames = { "Transform", "UITransform", "Canvas" };
+
 	ImGui::BeginGroupBox();
 
 	// list components
-	if (input_node(node, true, i))
+	if (input_node(node, true, static_cast<uint32_t>(i)))
 	{
 		// component changed, update it in the registy
 		Component* component = registry.get_by_name(node.get_name(), _targetEntity);
@@ -307,12 +344,74 @@ void mintye::PropertiesWindow::draw_component(minty::Node& node, size_t const i,
 		Reader reader(node, &data);
 		component->deserialize(reader);
 
-		// TODO: get rid of magic value:
-		// if Transform component was updated, dirty the entity, update, continue
-		if (node.get_name() == "Transform")
+		// if certain component was updated, dirty the entity, update, continue
+		if (dirtyableComponentNames.contains(node.get_name()))
 		{
 			registry.dirty(_targetEntity);
 			scene->finalize();
+		}
+	}
+
+	// additonal actions for specific components
+	if (node.get_name() == "Relationship")
+	{
+		// only if relationship has a parent
+		RelationshipComponent* relationship = static_cast<RelationshipComponent*>(registry.get_by_name(node.get_name(), _targetEntity));
+
+		if (relationship && relationship->parent != NULL_ENTITY)
+		{
+			bool canMoveUp = relationship->prev != NULL_ENTITY;
+			bool canMoveDown = relationship->next != NULL_ENTITY;
+
+			if (!canMoveUp) ImGui::BeginDisabled();
+
+			if (ImGui::Button(std::format("Move Up##{}", i).c_str()))
+			{
+				registry.move_to_previous(_targetEntity);
+				HierarchyWindow* hierarchy = get_application().find_editor_window<HierarchyWindow>("Hierarchy");
+				if (hierarchy) hierarchy->refresh();
+			}
+
+			if (!canMoveUp) ImGui::EndDisabled();
+
+			ImGui::SameLine();
+
+			if (!canMoveDown) ImGui::BeginDisabled();
+
+			if (ImGui::Button(std::format("Move Down##{}", i).c_str()))
+			{
+				registry.move_to_next(_targetEntity);
+				HierarchyWindow* hierarchy = get_application().find_editor_window<HierarchyWindow>("Hierarchy");
+				if (hierarchy) hierarchy->refresh();
+			}
+
+			if (!canMoveDown) ImGui::EndDisabled();
+
+			ImGui::SameLine();
+
+			if (!canMoveUp) ImGui::BeginDisabled();
+
+			if (ImGui::Button(std::format("Move to First##{}", i).c_str()))
+			{
+				registry.move_to_first(_targetEntity);
+				HierarchyWindow* hierarchy = get_application().find_editor_window<HierarchyWindow>("Hierarchy");
+				if (hierarchy) hierarchy->refresh();
+			}
+
+			if (!canMoveUp) ImGui::EndDisabled();
+
+			ImGui::SameLine();
+
+			if (!canMoveDown) ImGui::BeginDisabled();
+
+			if (ImGui::Button(std::format("Move to Last##{}", i).c_str()))
+			{
+				registry.move_to_last(_targetEntity);
+				HierarchyWindow* hierarchy = get_application().find_editor_window<HierarchyWindow>("Hierarchy");
+				if (hierarchy) hierarchy->refresh();
+			}
+
+			if (!canMoveDown) ImGui::EndDisabled();
 		}
 	}
 
@@ -340,56 +439,59 @@ void mintye::PropertiesWindow::draw_asset()
 		ImGui::SetClipboardText(to_string(_targetId).c_str());
 	}
 
-	ImGui::Separator();
-
-	// button to refresh the contents
-	if (ImGui::Button("Refresh"))
+	if (!_targetIsBuiltIn)
 	{
-		get_application().refresh();
-		return;
-	}
+		ImGui::Separator();
 
-	// gap
-	ImGui::SameLine();
-	ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 20.0f);
+		// button to refresh the contents
+		if (ImGui::Button("Refresh"))
+		{
+			get_application().refresh();
+			return;
+		}
 
-	// button to open the file
-	if (ImGui::Button("Open File"))
-	{
-		Operations::open(get_project()->get_base_path() / _targetPath);
-	}
+		// gap
+		ImGui::SameLine();
+		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 20.0f);
 
-	ImGui::SameLine();
+		// button to open the file
+		if (ImGui::Button("Open File"))
+		{
+			Operations::open(get_project()->get_base_path() / _targetPath);
+		}
 
-	// button to open the meta file
-	if (ImGui::Button("Open Meta"))
-	{
-		Operations::open(get_project()->get_base_path() / Asset::get_meta_path(_targetPath));
-	}
+		ImGui::SameLine();
 
-	ImGui::SameLine();
+		// button to open the meta file
+		if (ImGui::Button("Open Meta"))
+		{
+			Operations::open(get_project()->get_base_path() / Asset::get_meta_path(_targetPath));
+		}
 
-	// button to open the directory
-	if (ImGui::Button("Open Folder"))
-	{
-		Operations::open_directory(get_project()->get_base_path() / _targetPath);
-	}
+		ImGui::SameLine();
 
-	// gap
-	ImGui::SameLine();
-	ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 20.0f);
+		// button to open the directory
+		if (ImGui::Button("Open Folder"))
+		{
+			Operations::open_directory(get_project()->get_base_path() / _targetPath);
+		}
 
-	if (ImGui::Button("Delete File"))
-	{
-		// delete file and its corresponding .meta file
-		std::filesystem::remove(get_project()->get_base_path() / _targetPath);
-		std::filesystem::remove(get_project()->get_base_path() / Asset::get_meta_path(_targetPath));
+		// gap
+		ImGui::SameLine();
+		ImGui::SetCursorPosX(ImGui::GetCursorPosX() + 20.0f);
 
-		clear_target();
+		if (ImGui::Button("Delete File"))
+		{
+			// delete file and its corresponding .meta file
+			std::filesystem::remove(get_project()->get_base_path() / _targetPath);
+			std::filesystem::remove(get_project()->get_base_path() / Asset::get_meta_path(_targetPath));
 
-		get_application().refresh();
+			clear_target();
 
-		return;
+			get_application().refresh();
+
+			return;
+		}
 	}
 
 	// show all texts
@@ -404,6 +506,7 @@ void mintye::PropertiesWindow::draw_asset()
 void mintye::PropertiesWindow::clear_target()
 {
 	_targetMode = TargetMode::None;
+	_targetIsBuiltIn = false;
 	_targetId = INVALID_UUID;
 
 	_targetEntity = NULL_ENTITY;
@@ -429,20 +532,21 @@ void mintye::PropertiesWindow::set_target(minty::Path const& path)
 {
 	clear_target();
 
-	if (std::filesystem::exists(path))
+	AssetEngine& assets = get_runtime().get_asset_engine();
+	if (assets.exists(path))
 	{
 		_targetMode = TargetMode::Asset;
+		_targetIsBuiltIn = path.string().starts_with("BuiltIn");
 		_targetPath = path;
 
-		AssetEngine& assets = get_runtime().get_asset_engine();
 		_targetId = assets.read_id(path);
 
 		// add file itself to be drawn, if it is readable
 		if (Asset::is_readable(path))
 		{
-			_texts.push_back(File::read_all_text(path));
+			_texts.push_back(assets.read_text(path));
 		}
 
-		_texts.push_back(File::read_all_text(Asset::get_meta_path(path)));
+		_texts.push_back(assets.read_text(Asset::get_meta_path(path)));
 	}
 }

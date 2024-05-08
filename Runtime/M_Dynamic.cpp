@@ -83,7 +83,7 @@ void minty::Dynamic::set(void* const data, size_t const size)
 	// ensure properly allocated
 	if (!_data)
 	{
-		Console::error("Failed to malloc in Dynamic set().");
+		MINTY_ERROR("Failed to malloc in Dynamic set().");
 		return;
 	}
 

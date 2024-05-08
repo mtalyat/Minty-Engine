@@ -9,6 +9,7 @@ namespace minty
 	struct SpritePushData
 	{
 		alignas(16) Matrix4 transform;
+		Vector4 color;
 		Vector2 minCoords;
 		Vector2 maxCoords;
 		Vector2 pivot;

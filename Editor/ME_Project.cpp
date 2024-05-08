@@ -151,7 +151,7 @@ void Project::refresh()
 {
 	if (!std::filesystem::exists(_base.string()))
 	{
-		Console::error(std::format("Project missing project directory at path: {}", _base.string()));
+		MINTY_ERROR_FORMAT("Project missing project directory at path: {}", _base.string());
 		return;
 	}
 
@@ -159,7 +159,7 @@ void Project::refresh()
 
 	if (!std::filesystem::exists(assetsPath))
 	{
-		Console::error(std::format("Project missing assets directory at path: {}", _base.string()));
+		MINTY_ERROR_FORMAT("Project missing assets directory at path: {}", _base.string());
 		return;
 	}
 

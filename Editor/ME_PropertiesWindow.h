@@ -17,6 +17,7 @@ namespace mintye
 	private:
 		TargetMode _targetMode;
 
+		bool _targetIsBuiltIn;
 		minty::UUID _targetId;
 		minty::Entity _targetEntity;
 		minty::Path _targetPath;

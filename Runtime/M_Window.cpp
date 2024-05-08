@@ -13,6 +13,8 @@ using namespace minty;
 
 int Window::_windowCount = 0;
 
+static constexpr float JOYSTICK_THRESHOLD = 0.1f;
+
 Window::Window(String const& title, int const width, int const height, Path const& iconPath)
 	: Window(title, -1, -1, width, height, iconPath)
 {}
@@ -27,6 +29,9 @@ minty::Window::Window(String const& title, int const x, int const y, int const w
 	, _resized(true) // start as "resized" so render engine regenerates data on start
 	, _windowScript()
 	, _inputScript()
+	, _mousePosition()
+	, _mouseDown()
+	, _gamepads()
 {
 	// if no windows have been made yet, init glfw
 	if (_windowCount == 0)
@@ -72,6 +77,7 @@ minty::Window::Window(String const& title, int const x, int const y, int const w
 	glfwSetMouseButtonCallback(_window, button_ballback);
 	glfwSetCursorPosCallback(_window, cursor_callback);
 	glfwSetScrollCallback(_window, scroll_callback);
+	//glfwSetJoystickCallback(gamepad_callback);
 
 	// might want this for engine:
 	// glfwSetDropCallback
@@ -81,6 +87,12 @@ minty::Window::Window(String const& title, int const x, int const y, int const w
 
 Window::~Window()
 {
+	// destroy gamepads
+	for (auto const& [id, gamepad] : _gamepads)
+	{
+		delete gamepad.state;
+	}
+
 	// destroy window
 	glfwDestroyWindow(_window);
 
@@ -219,6 +231,22 @@ int minty::Window::get_height() const
 	return _height;
 }
 
+Vector2 minty::Window::get_mouse_position() const
+{
+	return _mousePosition;
+}
+
+Vector2 minty::Window::get_mouse_position(RectF const bounds) const
+{
+	// normalize mouse position, then scale to bound size, then offset using bound position
+	return _mousePosition / Vector2(_width, _height) * bounds.size() - bounds.position();
+}
+
+bool minty::Window::get_mouse_down() const
+{
+	return _mouseDown;
+}
+
 GLFWwindow* minty::Window::get_raw() const
 {
 	return _window;
@@ -227,6 +255,73 @@ GLFWwindow* minty::Window::get_raw() const
 void minty::Window::poll_events()
 {
 	glfwPollEvents();
+
+	GLFWgamepadstate state;
+
+	// check for each controller
+	for (int i = 0; i <= GLFW_JOYSTICK_LAST; i++)
+	{
+		if (glfwGetGamepadState(i, &state))
+		{
+			auto found = _gamepads.find(i);
+			if (found == _gamepads.end())
+			{
+				// newly connected controller
+				GLFWgamepadstate* newState = new GLFWgamepadstate();
+
+				// add to connected
+				_gamepads.emplace(i, Gamepad
+					{
+						.state = newState,
+						.name = glfwGetGamepadName(i),
+					});
+
+				Gamepad const& gamepad = _gamepads.at(i);
+
+				trigger_gamepad_connect(i);
+			}
+
+			// get old data
+			GLFWgamepadstate* oldState = _gamepads.at(i).state;
+
+			// check button changes
+			for (int j = 0; j <= GLFW_GAMEPAD_BUTTON_LAST; j++)
+			{
+				if (state.buttons[j] != oldState->buttons[j])
+				{
+					trigger_gamepad_button(i, static_cast<GamepadButton>(j), static_cast<KeyAction>(state.buttons[j]));
+				}
+			}
+
+			// check axes changes
+			for (int j = 0; j <= GLFW_GAMEPAD_AXIS_LAST; j++)
+			{
+				// round to zero if needed, only for joysticks
+				if (j <= GLFW_GAMEPAD_AXIS_RIGHT_Y && Math::abs(state.axes[j]) < JOYSTICK_THRESHOLD)
+				{
+					state.axes[j] = 0.0f;
+				}
+
+				// compare to old
+				if (state.axes[j] != oldState->axes[j])
+				{
+					trigger_gamepad_axis(i, static_cast<GamepadAxis>(j), state.axes[j]);
+				}
+			}
+
+			// copy over new state data
+			memcpy(oldState, &state, sizeof(GLFWgamepadstate));
+		}
+		else if(_gamepads.contains(i))
+		{
+			Gamepad const& gamepad = _gamepads.at(i);
+
+			trigger_gamepad_disconnect(i);
+
+			delete gamepad.state;
+			_gamepads.erase(i);
+		}
+	}
 }
 
 void minty::Window::save_restore_info()
@@ -251,6 +346,8 @@ void minty::Window::trigger_mouse_click(MouseButton button, KeyAction action, Ke
 		ScriptArguments arguments({ &button, &action, &mods });
 		_inputScript->invoke(SCRIPT_INPUT_TRIGGER_MOUSE_CLICK, arguments);
 	}
+
+	_mouseDown = action != KeyAction::Up;
 }
 
 void minty::Window::trigger_mouse_scroll(float dx, float dy)
@@ -264,6 +361,8 @@ void minty::Window::trigger_mouse_scroll(float dx, float dy)
 
 void minty::Window::trigger_mouse_move(float x, float y)
 {
+	_mousePosition.x = x;
+	_mousePosition.y = y;
 	if (_inputScript)
 	{
 		ScriptArguments arguments({ &x, &y });
@@ -271,12 +370,49 @@ void minty::Window::trigger_mouse_move(float x, float y)
 	}
 }
 
+void minty::Window::trigger_gamepad_connect(int controller)
+{
+	if (_inputScript)
+	{
+		ScriptArguments arguments({ &controller });
+		_inputScript->invoke(SCRIPT_INPUT_TRIGGER_GAMEPAD_CONNECT, arguments);
+	}
+}
+
+void minty::Window::trigger_gamepad_disconnect(int controller)
+{
+	if (_inputScript)
+	{
+		ScriptArguments arguments({ &controller });
+		_inputScript->invoke(SCRIPT_INPUT_TRIGGER_GAMEPAD_DISCONNECT, arguments);
+	}
+}
+
+void minty::Window::trigger_gamepad_button(int controller, GamepadButton button, KeyAction action)
+{
+	if (_inputScript)
+	{
+		ScriptArguments arguments({ &controller, &button, &action });
+		_inputScript->invoke(SCRIPT_INPUT_TRIGGER_GAMEPAD_BUTTON, arguments);
+	}
+}
+
+void minty::Window::trigger_gamepad_axis(int controller, GamepadAxis axis, float value)
+{
+	if (_inputScript)
+	{
+		ScriptArguments arguments({ &controller, &axis, &value });
+		_inputScript->invoke(SCRIPT_INPUT_TRIGGER_GAMEPAD_AXIS, arguments);
+	}
+}
+
 void Window::resize_callback(GLFWwindow* const window, int const width, int const height)
 {
 	auto w = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
-	Console::ass(w != nullptr, "Window is null on resize callback.");
+	MINTY_ASSERT_MESSAGE(w != nullptr, "Window is null on resize callback.");
 	if (w)
 	{
+		w->refresh();
 		w->_resized = true;
 	}
 }
@@ -284,7 +420,7 @@ void Window::resize_callback(GLFWwindow* const window, int const width, int cons
 void Window::key_callback(GLFWwindow* window, int key, int scancode, int action, int mods)
 {
 	auto w = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
-	Console::ass(w != nullptr, "Window is null on key callback.");
+	MINTY_ASSERT_MESSAGE(w != nullptr, "Window is null on key callback.");
 	if (w)
 	{
 		w->trigger_key(static_cast<Key>(key), static_cast<KeyAction>(action), static_cast<KeyModifiers>(mods));
@@ -294,7 +430,7 @@ void Window::key_callback(GLFWwindow* window, int key, int scancode, int action,
 void minty::Window::button_ballback(GLFWwindow* window, int button, int action, int mods)
 {
 	auto w = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
-	Console::ass(w != nullptr, "Window is null on button callback.");
+	MINTY_ASSERT_MESSAGE(w != nullptr, "Window is null on button callback.");
 	if (w)
 	{
 		w->trigger_mouse_click(static_cast<MouseButton>(button), static_cast<KeyAction>(action), static_cast<KeyModifiers>(mods));
@@ -304,22 +440,38 @@ void minty::Window::button_ballback(GLFWwindow* window, int button, int action, 
 void minty::Window::cursor_callback(GLFWwindow* window, double xpos, double ypos)
 {
 	auto w = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
-	Console::ass(w != nullptr, "Window is null on cursor callback.");
+	MINTY_ASSERT_MESSAGE(w != nullptr, "Window is null on cursor callback.");
 	if (w)
 	{
 		w->trigger_mouse_move(static_cast<float>(xpos), static_cast<float>(ypos));
 	}
 }
 
+//void minty::Window::gamepad_callback(int id, int event)
+//{
+//	if (event == GLFW_CONNECTED)
+//	{
+//		MINTY_LOG_FORMAT("Controller {} connected.", id);
+//	}
+//	else if (event == GLFW_DISCONNECTED)
+//	{
+//		MINTY_LOG_FORMAT("Controller {} disconnected.", id);
+//	}
+//
+//	void* data = glfwGetJoystickUserPointer(id);
+//
+//	MINTY_LOG_FORMAT("User Pointer is {}null.", data == nullptr ? "" : "not ");
+//}
+
 void minty::Window::error_callback(int const error, char const* description)
 {
-	Console::error(std::format("Window GLFW Error: code = {}, message = \"{}\"", error, description));
+	MINTY_ERROR_FORMAT("Window GLFW Error: code = {}, message = \"{}\"", error, description);
 }
 
 void minty::Window::scroll_callback(GLFWwindow* window, double xoffset, double yoffset)
 {
 	auto w = reinterpret_cast<Window*>(glfwGetWindowUserPointer(window));
-	Console::ass(w != nullptr, "Window is null on scroll callback.");
+	MINTY_ASSERT_MESSAGE(w != nullptr, "Window is null on scroll callback.");
 	if (w)
 	{
 		w->trigger_mouse_scroll(static_cast<float>(xoffset), static_cast<float>(yoffset));

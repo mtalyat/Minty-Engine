@@ -44,7 +44,7 @@ bool minty::Writer::exists(String const& name) const
 
 void minty::Writer::write(String const& name)
 {
-	write(Node(name));
+	
 }
 
 void minty::Writer::write(Node const& node)

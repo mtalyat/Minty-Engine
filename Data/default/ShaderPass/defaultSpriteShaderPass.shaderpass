@@ -1,0 +1,10 @@
+shader: 999530dea6d52f76
+primitiveTopology: TRIANGLE_LIST
+polygonMode: FILL
+cullMode: NONE
+frontFace: CLOCKWISE
+lineWidth: 1
+stage: VERTEX_BIT
+    path: BuiltIn/Shader/defaultSpriteVert.spv
+stage: FRAGMENT_BIT
+    path: BuiltIn/Shader/defaultSpriteFrag.spv

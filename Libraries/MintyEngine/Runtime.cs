@@ -47,6 +47,7 @@ namespace MintyEngine
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Entity_SetParent(ulong id, ulong parentId);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static int Entity_GetChildCount(ulong id);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static object Entity_GetChild(ulong id, int index);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static object Entity_Clone(ulong id);
         #endregion
 
         #region Window
@@ -72,6 +73,8 @@ namespace MintyEngine
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static float Camera_GetFar(ulong id);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Camera_SetFar(ulong id, float perspective);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Camera_SetAsMain(ulong id);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Camera_SetColor(ulong id, int color);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static int Camera_GetColor(ulong id);
         #endregion
 
         #region Transform

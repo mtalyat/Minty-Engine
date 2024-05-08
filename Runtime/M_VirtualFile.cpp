@@ -90,7 +90,7 @@ void minty::VirtualFile::read(void* const buffer, Size const size)
     // if at the end of the file, stop
     if (end_of_file())
     {
-        Console::error("Cannot read_file from file to buffer. End Of File.");
+        MINTY_ERROR("Cannot read_file from file to buffer. End Of File.");
         return;
     }
 
@@ -103,7 +103,7 @@ void minty::VirtualFile::write(void const* const buffer, Size const size)
     // ensure will not write out of bounds
     if (tell_read() + size >= _virtualSize)
     {
-        Console::error("Failed to write to virtual file. Out of bounds.");
+        MINTY_ERROR("Failed to write to virtual file. Out of bounds.");
         return;
     }
 

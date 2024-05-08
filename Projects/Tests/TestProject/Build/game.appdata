@@ -1,5 +1,0 @@
-scenes
-	- Assets\Scenes\test.scene
-assemblies
-	- MintyEngine.dll
-	- TestProject.dll

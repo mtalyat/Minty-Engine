@@ -28,7 +28,7 @@ minty::TextureAtlas::TextureAtlas(TextureAtlasBuilder const& builder, Runtime& r
 	, _pivot()
 	, _createdSlices(0)
 {
-	Console::todo("TextureAtlas::TextureAtlas()");
+	MINTY_TODO("TextureAtlas::TextureAtlas()");
 	//MINTY_ASSERT(_texture != nullptr);
 
 	//// set sizes

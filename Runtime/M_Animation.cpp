@@ -271,7 +271,7 @@ void minty::Animation::serialize(Writer& writer) const
 	writer.write("length", _length);
 	writer.write("loops", static_cast<bool>(_flags & ANIMATION_FLAGS_LOOPS));
 	
-	Console::todo("Finish Animation::serialize()");
+	MINTY_TODO("Finish Animation::serialize()");
 }
 
 void minty::Animation::deserialize(Reader const& reader)
@@ -282,5 +282,5 @@ void minty::Animation::deserialize(Reader const& reader)
 	MINTY_ASSERT(data != nullptr);
 	MINTY_ASSERT(renderer != nullptr);
 
-	Console::todo("Animation::deserialize()");
+	MINTY_TODO("Animation::deserialize()");
 }

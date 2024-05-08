@@ -3,6 +3,8 @@
 
 #include "M_Math.h"
 #include "M_RectF.h"
+#include "M_Writer.h"
+#include "M_Reader.h"
 #include <format>
 
 using namespace minty;
@@ -67,6 +69,22 @@ bool Rect::contains(Vector2Int const& other) const
 RectF Rect::to_RectF() const
 {
 	return RectF(x, y, width, height);
+}
+
+void minty::Rect::serialize(Writer& writer) const
+{
+	writer.write("x", x);
+	writer.write("y", y);
+	writer.write("width", width);
+	writer.write("height", height);
+}
+
+void minty::Rect::deserialize(Reader const& reader)
+{
+	reader.try_read_int("x", x);
+	reader.try_read_int("y", y);
+	reader.try_read_int("width", width);
+	reader.try_read_int("height", height);
 }
 
 Rect Rect::bounds(int const left, int const right, int const top, int const bottom)

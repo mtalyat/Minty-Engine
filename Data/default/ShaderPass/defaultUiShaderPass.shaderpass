@@ -1,0 +1,10 @@
+shader: 5773366b6c43318f
+primitiveTopology: TRIANGLE_LIST
+polygonMode: FILL
+cullMode: NONE
+frontFace: CLOCKWISE
+lineWidth: 1
+stage: VERTEX_BIT
+    path: BuiltIn/Shader/defaultUiVert.spv
+stage: FRAGMENT_BIT
+    path: BuiltIn/Shader/defaultUiFrag.spv

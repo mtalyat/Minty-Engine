@@ -32,6 +32,7 @@ minty::Camera::Camera(Perspective const perspective, float const fov, float cons
 	, _fov(fov * Math::DEG2RAD)
 	, _near(nearPlane)
 	, _far(farPlane)
+	, _color(Color::black())
 {}
 
 Perspective minty::Camera::get_perspective() const
@@ -54,6 +55,11 @@ float minty::Camera::get_far() const
 	return _far;
 }
 
+Color minty::Camera::get_color() const
+{
+	return _color;
+}
+
 void minty::Camera::set_perspective(Perspective const perspective)
 {
 	_perspective = perspective;
@@ -74,12 +80,18 @@ void minty::Camera::set_far(float const farPlane)
 	_far = farPlane;
 }
 
+void minty::Camera::set_color(Color const color)
+{
+	_color = color;
+}
+
 void minty::Camera::serialize(Writer& writer) const
 {
 	writer.write("perspective", to_string(_perspective));
 	writer.write("fov", _fov);
 	writer.write("near", _near);
 	writer.write("far", _far);
+	writer.write("color", _color);
 }
 
 void minty::Camera::deserialize(Reader const& reader)
@@ -92,4 +104,5 @@ void minty::Camera::deserialize(Reader const& reader)
 	reader.try_read_float("fov", _fov);
 	reader.try_read_float("near", _near);
 	reader.try_read_float("far", _far);
+	reader.try_read_color("color", _color);
 }

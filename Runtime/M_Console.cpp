@@ -48,53 +48,6 @@ void minty::Console::print(String const& message)
 {
 	std::cout << message << std::endl;
 }
-//
-//void print_node(Node const& node, int const indent)
-//{
-//	auto const& children = node.get_children();
-//
-//	// do nothing if no children
-//	if (!children.size()) return;
-//
-//	// create indent string before the printed line
-//	String indentString(indent, '\t');
-//
-//	// print children
-//	// parent takes care of printing this node's data
-//	for (auto const& child : children)
-//	{
-//		if (child.has_name())
-//		{
-//			if (child.has_data())
-//			{
-//				// print data if there is something
-//				Console::print(std::format("{}{}: {}", indentString, child.get_name(), child.get_data()));
-//			}
-//			else
-//			{
-//				// print, but no data
-//				Console::print(std::format("{}{}", indentString, child.get_name()));
-//			}
-//		}
-//		else
-//		{
-//			// no name, so print as a bullet point
-//			if (child.has_data())
-//			{
-//				// print data if there is something
-//				Console::print(std::format("{}- {}", indentString, child.get_data()));
-//			}
-//			else
-//			{
-//				// print, but no data or name
-//				Console::print(std::format("{}- ", indentString));
-//			}
-//		}
-//
-//		// print children, if any
-//		print_node(child, indent + 1);
-//	}
-//}
 
 void minty::Console::print(Node const& node)
 {
