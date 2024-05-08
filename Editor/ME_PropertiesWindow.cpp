@@ -299,9 +299,12 @@ void mintye::PropertiesWindow::draw_entity()
 				{
 					scene->register_asset(assetPath);
 				}
+			}
 
-				// place onto the object
-				registry.emplace_by_name(popupBuffer, _targetEntity);
+			// place onto the object
+			if (!registry.emplace_by_name(popupBuffer, _targetEntity))
+			{
+				get_application().log_error(std::format("Failed to add component \"{}\" to Entity \"{}\".", popupBuffer, registry.get_name(_targetEntity)));
 			}
 
 			memset(popupBuffer, 0, IM_ARRAYSIZE(popupBuffer));
