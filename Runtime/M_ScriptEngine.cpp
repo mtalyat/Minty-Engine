@@ -1191,6 +1191,31 @@ static MonoObject* entity_get_child(UUID id, int index)
 	return _data.engine->get_or_create_entity(childId).data();
 }
 
+static MonoObject* entity_clone(UUID id)
+{
+	MINTY_ASSERT(id.valid());
+
+	Scene* scene = _data.get_scene();
+	MINTY_ASSERT(scene != nullptr);
+
+	EntityRegistry& registry = scene->get_entity_registry();
+
+	// get the entity
+	Entity entity = registry.find_by_id(id);
+	MINTY_ASSERT(entity != NULL_ENTITY);
+
+	// clone it
+	Entity clone = registry.clone(entity);
+
+	// get the ID
+	UUID cloneId = registry.get_id(clone);
+
+	if (!cloneId.valid()) return nullptr;
+
+	MINTY_ASSERT(_data.engine != nullptr);
+	return _data.engine->get_or_create_entity(cloneId).data();
+}
+
 #pragma endregion
 
 #pragma region Window
@@ -1493,6 +1518,7 @@ void minty::ScriptEngine::link()
 	ADD_INTERNAL_CALL("Entity_SetParent", entity_set_parent);
 	ADD_INTERNAL_CALL("Entity_GetChildCount", entity_get_child_count);
 	ADD_INTERNAL_CALL("Entity_GetChild", entity_get_child);
+	ADD_INTERNAL_CALL("Entity_Clone", entity_clone);
 #pragma endregion
 
 #pragma region Window

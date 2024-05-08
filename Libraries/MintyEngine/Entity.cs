@@ -52,6 +52,8 @@ namespace MintyEngine
             ID = id;
         }
 
+        #region Component
+
         public T AddComponent<T>() where T : Component
         {
             return Runtime.Entity_AddComponent(ID, typeof(T)) as T;
@@ -71,6 +73,19 @@ namespace MintyEngine
         {
             return Runtime.Entity_GetChild(ID, index) as Entity;
         }
+
+        #endregion
+
+        #region Clone
+
+        public Entity Clone()
+        {
+            return Runtime.Entity_Clone(ID) as Entity;
+        }
+
+        #endregion
+
+        #region Comparison
 
         public override bool Equals(object obj)
         {
@@ -93,6 +108,8 @@ namespace MintyEngine
         }
 
         public static bool operator !=(Entity left, Entity right) => !(left == right);
+
+        #endregion
 
         public override string ToString()
         {

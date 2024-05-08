@@ -47,6 +47,7 @@ namespace MintyEngine
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Entity_SetParent(ulong id, ulong parentId);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static int Entity_GetChildCount(ulong id);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static object Entity_GetChild(ulong id, int index);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static object Entity_Clone(ulong id);
         #endregion
 
         #region Window

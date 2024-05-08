@@ -23,6 +23,11 @@ namespace minty
 	};
 
 	/// <summary>
+	/// Used to trigger OnLoad, OnEnable, etc. on a new Entity
+	/// </summary>
+	struct TriggerScriptEvents {};
+
+	/// <summary>
 	/// The base component type for all ScriptOnXComponents.
 	/// </summary>
 	struct ScriptEventComponent
@@ -33,6 +38,8 @@ namespace minty
 		void invoke(ScriptComponent const& script) const;
 
 		void invoke(ScriptComponent const& script, std::unordered_set<String> const& componentNames) const;
+
+		void invoke(ScriptComponent const& script, String const& componentName) const;
 
 		virtual char const* get_method_name() const = 0;
 	};

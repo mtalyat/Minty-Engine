@@ -34,6 +34,17 @@ void minty::ScriptEventComponent::invoke(ScriptComponent const& script, std::uno
 	}
 }
 
+void minty::ScriptEventComponent::invoke(ScriptComponent const& script, String const& componentName) const
+{
+	String method = get_method_name();
+
+	ID id = script.scripts.find(componentName);
+
+	if (id == ERROR_ID) return;
+
+	script.scripts.at(id).invoke(method);
+}
+
 void minty::ScriptComponent::serialize(Writer& writer) const
 {
 	// write ID

@@ -531,9 +531,6 @@
     <ClInclude Include="M_ScriptArguments.h">
       <Filter>Header Files\Scripting</Filter>
     </ClInclude>
-    <ClInclude Include="M_DestroyComponentComponent.h">
-      <Filter>Header Files\Components</Filter>
-    </ClInclude>
     <ClInclude Include="M_EnabledComponent.h">
       <Filter>Header Files\Components</Filter>
     </ClInclude>

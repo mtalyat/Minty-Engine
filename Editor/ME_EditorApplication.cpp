@@ -1350,11 +1350,36 @@ void EditorApplication::build_project()
 	{
 		console->log_important("\tbuilding assembly...");
 
+		String assemblyPath = _project->get_assembly_path().generic_string();
+		String configName = _buildInfo.get_config_name();
+
 		console->run_commands({
 			// build C# assembly
 			// https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-build
-			"cd " + _project->get_assembly_path().string() + " && dotnet build -c " + _buildInfo.get_config_name() + " /p:Platform=x64"
+			"cd " + assemblyPath + " && dotnet build -c " + configName + " /p:Platform=x64"
 			});
+	}
+
+	// wait for commands to finish
+	while (console->is_command_running()) {}
+
+	// if not running cmake build, but scripts rebuilt, copy the DLL over manually, since the cmake is not doing it
+	if (_buildInfo.get_flag(BuildInfo::BuildFlags::Assembly | BuildInfo::BuildFlags::AssemblyBuild) && !_buildInfo.get_flag(BuildInfo::BuildFlags::Program))
+	{
+		console->log_info("Manually copying files");
+
+		String configName = _buildInfo.get_config_name();
+		String const& projectName = _project->get_name();
+		String source = std::format("{}/bin/{}/{}.dll", _project->get_assembly_path().generic_string(), configName, projectName);
+		String destination = std::format("{}/{}/{}.dll", _project->get_build_path().generic_string(), configName, projectName);
+
+		try {
+			std::filesystem::copy(source, destination, std::filesystem::copy_options::overwrite_existing);
+		}
+		catch (std::filesystem::filesystem_error& e)
+		{
+			console->log_error(std::format("Failed to copy assembly DLL: \"{}\"", e.what()));
+		}
 	}
 
 	// done building, remove flags

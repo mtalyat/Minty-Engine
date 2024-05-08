@@ -15,7 +15,6 @@
 #include "M_CanvasComponent.h"
 #include "M_DirtyComponent.h"
 #include "M_DestroyEntityComponent.h"
-#include "M_DestroyComponentComponent.h"
 #include "M_EnabledComponent.h"
 #include "M_RenderableComponent.h"
 #include "M_SpriteComponent.h"
@@ -674,8 +673,28 @@ void minty::EntityRegistry::destroy(Entity const entity, bool const includeChild
 
 void minty::EntityRegistry::destroy(Entity const entity, String const& componentName)
 {
-	DestroyComponentComponent& destroyComponent = get_or_emplace<DestroyComponentComponent>(entity);
-	destroyComponent.components.emplace(componentName);
+	// if script, call events
+	if (all_of<ScriptComponent>(entity))
+	{
+		bool loaded = get_scene().is_loaded();
+
+		ScriptComponent& script = get<ScriptComponent>(entity);
+
+		// call events, if init events called
+		if (!all_of<TriggerScriptEvents>(entity))
+		{
+			if (loaded)
+			{
+				if (ScriptOnDisableComponent* eventComp = try_get<ScriptOnDisableComponent>(entity)) eventComp->invoke(script, componentName);
+				if (ScriptOnUnloadComponent* eventComp = try_get<ScriptOnUnloadComponent>(entity)) eventComp->invoke(script, componentName);
+			}
+			if (ScriptOnDestroyComponent* eventComp = try_get<ScriptOnDestroyComponent>(entity)) eventComp->invoke(script, componentName);
+		}
+
+	}
+
+	// erase the component
+	erase_by_name(componentName, entity);
 }
 
 void minty::EntityRegistry::destroy_immediate(Entity const entity, bool const includeChildren)
@@ -743,37 +762,6 @@ void minty::EntityRegistry::destroy_queued()
 	// call all events first
 
 	bool loaded = get_scene().is_loaded();
-
-	// destroy all components, as long as the entity itself is not being destroyed
-	for (auto [entity, destroy, script] : view<DestroyComponentComponent const, ScriptComponent const>(entt::exclude<DestroyEntityComponent>).each())
-	{
-		// call events
-		if (loaded)
-		{
-			if (ScriptOnDisableComponent* eventComp = try_get<ScriptOnDisableComponent>(entity)) eventComp->invoke(script, destroy.components);
-			if (ScriptOnUnloadComponent* eventComp = try_get<ScriptOnUnloadComponent>(entity)) eventComp->invoke(script, destroy.components);
-		}
-		if (ScriptOnDestroyComponent* eventComp = try_get<ScriptOnDestroyComponent>(entity)) eventComp->invoke(script, destroy.components);
-
-		// erase the script components
-		for (auto const& name : destroy.components)
-		{
-			erase_by_name(name, entity);
-		}
-	}
-
-	// erase all components w/o a script
-	for (auto [entity, destroy] : view<DestroyComponentComponent const>(entt::exclude<DestroyEntityComponent>).each())
-	{
-		for (auto const& name : destroy.components)
-		{
-			// remove from entity
-			erase_by_name(name, entity);
-		}
-	}
-
-	// clear all tags, as the entity is still alive
-	clear<DestroyComponentComponent>();
 
 	// destroy entities with scripts
 	for (auto [entity, destroy, script] : view<DestroyEntityComponent const, ScriptComponent>().each())
@@ -1106,18 +1094,16 @@ void minty::EntityRegistry::erase_by_name(String const& name, Entity const entit
 
 Entity minty::EntityRegistry::clone(Entity const entity)
 {
-	Entity newEntity = create();
+	// serialize entity
+	Node data = serialize_entity(entity);
 
-	for (auto [id, storage] : this->storage()) {
-		if (storage.contains(entity) && !storage.contains(newEntity)) {
-			if (void* value = storage.value(entity))
-			{
-				storage.push(newEntity, value);
-			}
-		}
-	}
+	// change its id
+	data.set_data(to_string(UUID()));
 
-	return newEntity;
+	// deserialize
+	Entity clone = deserialize_entity(data);
+
+	return clone;
 }
 
 void minty::EntityRegistry::print(Entity const entity) const
@@ -1245,11 +1231,14 @@ void minty::EntityRegistry::register_script(String const& name)
 				scriptObject.try_invoke(SCRIPT_METHOD_NAME_ONCREATE);
 
 				// call load and enable right now if the scene is already loaded, otherwise do it later
-				bool isLoaded = registry.get_scene().is_loaded();
+				if (registry.get_scene().is_loaded())
+				{
+					registry.emplace_or_replace<TriggerScriptEvents>(entity);
+				}
 
 				// now add the helper components, if they are needed
-				registry.connect_event<ScriptOnLoadComponent>(entity, id, scriptObject, SCRIPT_METHOD_NAME_ONLOAD, isLoaded);
-				registry.connect_event<ScriptOnEnableComponent>(entity, id, scriptObject, SCRIPT_METHOD_NAME_ONENABLE, isLoaded);
+				registry.connect_event<ScriptOnLoadComponent>(entity, id, scriptObject, SCRIPT_METHOD_NAME_ONLOAD);
+				registry.connect_event<ScriptOnEnableComponent>(entity, id, scriptObject, SCRIPT_METHOD_NAME_ONENABLE);
 				registry.connect_event<ScriptOnUpdateComponent>(entity, id, scriptObject, SCRIPT_METHOD_NAME_ONUPDATE);
 				registry.connect_event<ScriptOnDisableComponent>(entity, id, scriptObject, SCRIPT_METHOD_NAME_ONDISABLE);
 				registry.connect_event<ScriptOnUnloadComponent>(entity, id, scriptObject, SCRIPT_METHOD_NAME_ONUNLOAD);
@@ -1321,6 +1310,8 @@ void minty::EntityRegistry::register_script(String const& name)
 
 			// destroy the script object
 			engine.destroy_object(component->id);
+
+			MINTY_LOG_FORMAT("Erased {} from {}.", name, registry.get_name(entity));
 		},
 	};
 	_components.emplace(name, funcs);
@@ -1539,7 +1530,6 @@ void minty::EntityRegistry::serialize_entity(Writer& writer, Entity const entity
 			auto found = _componentTypes.find(ctype.index());
 			if (found == _componentTypes.end())
 			{
-				MINTY_ERROR_FORMAT("Cannot find component type with id: {}, name: {}", ctype.index(), ctype.name().data());
 				continue;
 			}
 
