@@ -359,10 +359,14 @@ void mintye::EditorApplication::save_scene()
 	};
 	Writer writer(node, &data);
 	scene.serialize(writer);
-	if (!File::write_node(scene.get_path(), node))
+	
+	if (File::write_node(scene.get_path(), node))
 	{
-		ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console");
-		console->log_error("Failed to save scene.");
+		log(std::format("Saved scene \"{}\".", scene.get_name()));
+	}
+	else
+	{
+		log_error(std::format("Failed to save scene \"{}\".", scene.get_name()));
 	}
 }
 
