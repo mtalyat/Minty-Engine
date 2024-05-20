@@ -1,0 +1,486 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{1e1205c1-a0bc-47eb-a8ab-791fcd948e52}</ProjectGuid>
+    <RootNamespace>MintyRuntime</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Linkage-zlib_static>static</Linkage-zlib_static>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Linkage-zlib_static>static</Linkage-zlib_static>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;MINTYRUNTIME_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>C:\Libraries\VulkanSDK\1.3.261.1\Include;C:\Libraries\GLM\glm;C:\Libraries\GLFW\glfw-3.3.8.bin.WIN64\include;C:\Libraries\STB;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalLibraryDirectories>C:\VulkanSDK\1.3.261.1\Lib;C:\GL\GLFW\glfw-3.3.8.bin.WIN64\lib-vc2022;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+    <Lib>
+      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
+    <Lib>
+      <AdditionalLibraryDirectories>C:\Libraries\VulkanSDK\1.3.261.1\Lib;C:\Libraries\GLFW\glfw-3.3.8.bin.WIN64\lib-vc2022;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+      <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;MINTYRUNTIME_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>C:\Libraries\VulkanSDK\1.3.261.1\Include;C:\Libraries\GLM\glm;C:\Libraries\GLFW\glfw-3.3.8.bin.WIN64\include;C:\Libraries\STB;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalLibraryDirectories>C:\VulkanSDK\1.3.261.1\Lib;C:\GL\GLFW\glfw-3.3.8.bin.WIN64\lib-vc2022;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+    <Lib>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+      <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
+      <AdditionalDependencies>vulkan-1.lib;glfw3.lib%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Libraries\VulkanSDK\1.3.261.1\Lib;C:\Libraries\GLFW\glfw-3.3.8.bin.WIN64\lib-vc2022;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;MINTYRUNTIME_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>C:\Libraries\Mono\include;C:\Libraries\VulkanSDK\1.3.261.1\Include;C:\Libraries\GLM\glm;C:\Libraries\GLFW\glfw-3.3.8.bin.WIN64\include;C:\Libraries\STB;C:\Libraries\ZLIB\include;.;..\vendor;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalLibraryDirectories>C:\VulkanSDK\1.3.261.1\Lib;C:\GL\GLFW\glfw-3.3.8.bin.WIN64\lib-vc2022;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+    <Lib>
+      <AdditionalDependencies>mono-2.0-sgen.lib;vulkan-1.lib;glfw3_mt.lib;zlib-static.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Lib>
+    <Lib>
+      <AdditionalLibraryDirectories>C:\Libraries\Mono\lib;C:\Libraries\VulkanSDK\1.3.261.1\Lib;C:\Libraries\GLFW\glfw-3.3.8.bin.WIN64\lib-vc2022;C:\Libraries\ZLIB\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+      <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
+    </Lib>
+    <PostBuildEvent>
+      <Command>xcopy /y "C:\Libraries\Mono\lib\*.dll" "$(TargetDir)"</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Copy Mono to build output.</Message>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;MINTYRUNTIME_EXPORTS;_WINDOWS;_USRDLL;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>C:\Libraries\Mono\include;C:\Libraries\VulkanSDK\1.3.261.1\Include;C:\Libraries\GLM\glm;C:\Libraries\GLFW\glfw-3.3.8.bin.WIN64\include;C:\Libraries\STB;C:\Libraries\ZLIB\include;.;..\vendor;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <BufferSecurityCheck>true</BufferSecurityCheck>
+    </ClCompile>
+    <Link>
+      <SubSystem>Windows</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <EnableUAC>false</EnableUAC>
+      <AdditionalLibraryDirectories>C:\VulkanSDK\1.3.261.1\Lib;C:\GL\GLFW\glfw-3.3.8.bin.WIN64\lib-vc2022;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalDependencies>vulkan-1.lib;glfw3.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+    <PreBuildEvent>
+      <Command>
+      </Command>
+    </PreBuildEvent>
+    <Lib>
+      <IgnoreSpecificDefaultLibraries>
+      </IgnoreSpecificDefaultLibraries>
+      <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
+      <AdditionalDependencies>mono-2.0-sgen.lib;vulkan-1.lib;glfw3_mt.lib;zlib-static.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>C:\Libraries\Mono\lib;C:\Libraries\VulkanSDK\1.3.261.1\Lib;C:\Libraries\GLFW\glfw-3.3.8.bin.WIN64\lib-vc2022;C:\Libraries\ZLIB\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+    </Lib>
+    <PostBuildEvent>
+      <Command>xcopy /y "C:\Libraries\Mono\lib\*.dll" "$(TargetDir)"</Command>
+    </PostBuildEvent>
+    <PostBuildEvent>
+      <Message>Copy Mono to build output.</Message>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="animation\M_Animation.h" />
+    <ClInclude Include="animation\M_AnimationSystem.h" />
+    <ClInclude Include="animation\M_Animator.h" />
+    <ClInclude Include="animation\M_AnimatorComponent.h" />
+    <ClInclude Include="assets\M_Asset.h" />
+    <ClInclude Include="assets\M_AssetEngine.h" />
+    <ClInclude Include="assets\M_Text.h" />
+    <ClInclude Include="audio\M_Audio.h" />
+    <ClInclude Include="audio\M_AudioClip.h" />
+    <ClInclude Include="audio\M_AudioEngine.h" />
+    <ClInclude Include="audio\M_AudioListenerComponent.h" />
+    <ClInclude Include="audio\M_AudioObject.h" />
+    <ClInclude Include="audio\M_AudioSourceComponent.h" />
+    <ClInclude Include="audio\M_AudioSystem.h" />
+    <ClInclude Include="components\M_Component.h" />
+    <ClInclude Include="components\M_DestroyEntityComponent.h" />
+    <ClInclude Include="components\M_DirtyComponent.h" />
+    <ClInclude Include="components\M_EnabledComponent.h" />
+    <ClInclude Include="components\M_NameComponent.h" />
+    <ClInclude Include="components\M_RelationshipComponent.h" />
+    <ClInclude Include="components\M_TagComponent.h" />
+    <ClInclude Include="components\M_TransformComponent.h" />
+    <ClInclude Include="core\M_Base.h" />
+    <ClInclude Include="core\M_Constants.h" />
+    <ClInclude Include="core\M_Macros.h" />
+    <ClInclude Include="entities\M_Entity.h" />
+    <ClInclude Include="entities\M_EntityRegistry.h" />
+    <ClInclude Include="files\M_File.h" />
+    <ClInclude Include="files\M_PhysicalFile.h" />
+    <ClInclude Include="files\M_VirtualFile.h" />
+    <ClInclude Include="files\M_Wrap.h" />
+    <ClInclude Include="files\M_Wrapper.h" />
+    <ClInclude Include="input\M_CursorMode.h" />
+    <ClInclude Include="input\M_Gamepad.h" />
+    <ClInclude Include="input\M_InputMap.h" />
+    <ClInclude Include="input\M_Key.h" />
+    <ClInclude Include="input\M_KeyAction.h" />
+    <ClInclude Include="input\M_KeyModifiers.h" />
+    <ClInclude Include="input\M_MouseButton.h" />
+    <ClInclude Include="libraries\M_EnTT.h" />
+    <ClInclude Include="libraries\M_GLFW.h" />
+    <ClInclude Include="libraries\M_GLM.hpp" />
+    <ClInclude Include="libraries\M_ImGui.h" />
+    <ClInclude Include="libraries\M_Mono.h" />
+    <ClInclude Include="libraries\M_SoLoud.h" />
+    <ClInclude Include="libraries\M_TinyXML.h" />
+    <ClInclude Include="libraries\M_Vulkan.h" />
+    <ClInclude Include="math\M_Math.h" />
+    <ClInclude Include="Minty.h" />
+    <ClInclude Include="multithreading\M_Task.h" />
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="rendering\M_Buffer.h" />
+    <ClInclude Include="rendering\M_Builtin.h" />
+    <ClInclude Include="rendering\M_Camera.h" />
+    <ClInclude Include="rendering\M_CameraComponent.h" />
+    <ClInclude Include="rendering\M_CoordinateMode.h" />
+    <ClInclude Include="rendering\M_DescriptorSet.h" />
+    <ClInclude Include="rendering\M_DrawCallObjectInfo.h" />
+    <ClInclude Include="rendering\M_Material.h" />
+    <ClInclude Include="rendering\M_MaterialTemplate.h" />
+    <ClInclude Include="rendering\M_Mesh.h" />
+    <ClInclude Include="rendering\M_MeshComponent.h" />
+    <ClInclude Include="rendering\M_PixelFormat.h" />
+    <ClInclude Include="rendering\M_PushConstantInfo.h" />
+    <ClInclude Include="rendering\M_RenderableComponent.h" />
+    <ClInclude Include="rendering\M_RenderEngine.h" />
+    <ClInclude Include="rendering\M_RenderObject.h" />
+    <ClInclude Include="rendering\M_RenderSystem.h" />
+    <ClInclude Include="rendering\M_Shader.h" />
+    <ClInclude Include="rendering\M_ShaderPass.h" />
+    <ClInclude Include="rendering\M_Sprite.h" />
+    <ClInclude Include="rendering\M_SpriteComponent.h" />
+    <ClInclude Include="rendering\M_SpritePushData.h" />
+    <ClInclude Include="rendering\M_Texture.h" />
+    <ClInclude Include="rendering\M_TextureAtlas.h" />
+    <ClInclude Include="rendering\M_UniformConstantInfo.h" />
+    <ClInclude Include="rendering\M_Viewport.h" />
+    <ClInclude Include="rendering\M_Window.h" />
+    <ClInclude Include="runtime\M_Application.h" />
+    <ClInclude Include="runtime\M_Engine.h" />
+    <ClInclude Include="runtime\M_Info.h" />
+    <ClInclude Include="runtime\M_RunMode.h" />
+    <ClInclude Include="runtime\M_Runtime.h" />
+    <ClInclude Include="runtime\M_RuntimeObject.h" />
+    <ClInclude Include="scenes\M_Scene.h" />
+    <ClInclude Include="scenes\M_SceneManager.h" />
+    <ClInclude Include="scenes\M_SceneObject.h" />
+    <ClInclude Include="scripting\M_Accessibility.h" />
+    <ClInclude Include="scripting\M_ScriptArguments.h" />
+    <ClInclude Include="scripting\M_ScriptAssembly.h" />
+    <ClInclude Include="scripting\M_ScriptClass.h" />
+    <ClInclude Include="scripting\M_ScriptComponent.h" />
+    <ClInclude Include="scripting\M_ScriptEngine.h" />
+    <ClInclude Include="scripting\M_ScriptObject.h" />
+    <ClInclude Include="scripting\M_ScriptSystem.h" />
+    <ClInclude Include="serialization\M_ISerializable.h" />
+    <ClInclude Include="serialization\M_Reader.h" />
+    <ClInclude Include="serialization\M_SerializationData.h" />
+    <ClInclude Include="serialization\M_Writer.h" />
+    <ClInclude Include="systems\M_System.h" />
+    <ClInclude Include="systems\M_SystemRegistry.h" />
+    <ClInclude Include="tools\M_Compression.h" />
+    <ClInclude Include="tools\M_Console.h" />
+    <ClInclude Include="tools\M_Debug.h" />
+    <ClInclude Include="tools\M_Encoding.h" />
+    <ClInclude Include="tools\M_Operations.h" />
+    <ClInclude Include="tools\M_Parse.h" />
+    <ClInclude Include="types\M_Color.h" />
+    <ClInclude Include="types\M_CommandLineParser.h" />
+    <ClInclude Include="types\M_Dynamic.h" />
+    <ClInclude Include="types\M_Event.h" />
+    <ClInclude Include="types\M_FiniteStateMachine.h" />
+    <ClInclude Include="types\M_Logger.h" />
+    <ClInclude Include="types\M_Matrix.h" />
+    <ClInclude Include="types\M_Node.h" />
+    <ClInclude Include="types\M_Object.h" />
+    <ClInclude Include="types\M_Quaternion.h" />
+    <ClInclude Include="types\M_Rect.h" />
+    <ClInclude Include="types\M_RectF.h" />
+    <ClInclude Include="types\M_Register.h" />
+    <ClInclude Include="types\M_Stopwatch.h" />
+    <ClInclude Include="types\M_Time.h" />
+    <ClInclude Include="types\M_TypeRegister.h" />
+    <ClInclude Include="types\M_Types.h" />
+    <ClInclude Include="types\M_UUID.h" />
+    <ClInclude Include="types\M_Vector.h" />
+    <ClInclude Include="ui\M_CanvasComponent.h" />
+    <ClInclude Include="ui\M_UIPushData.h" />
+    <ClInclude Include="ui\M_UISystem.h" />
+    <ClInclude Include="ui\M_UITransformComponent.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="animation\M_Animation.cpp" />
+    <ClCompile Include="animation\M_AnimationSystem.cpp" />
+    <ClCompile Include="animation\M_Animator.cpp" />
+    <ClCompile Include="animation\M_AnimatorComponent.cpp" />
+    <ClCompile Include="assets\M_Asset.cpp" />
+    <ClCompile Include="assets\M_AssetEngine.cpp" />
+    <ClCompile Include="assets\M_Text.cpp" />
+    <ClCompile Include="audio\M_AudioClip.cpp" />
+    <ClCompile Include="audio\M_AudioEngine.cpp" />
+    <ClCompile Include="audio\M_AudioListenerComponent.cpp" />
+    <ClCompile Include="audio\M_AudioObject.cpp" />
+    <ClCompile Include="audio\M_AudioSourceComponent.cpp" />
+    <ClCompile Include="audio\M_AudioSystem.cpp" />
+    <ClCompile Include="components\M_DestroyEntityComponent.cpp" />
+    <ClCompile Include="components\M_DirtyComponent.cpp" />
+    <ClCompile Include="components\M_NameComponent.cpp" />
+    <ClCompile Include="components\M_RelationshipComponent.cpp" />
+    <ClCompile Include="components\M_TagComponent.cpp" />
+    <ClCompile Include="components\M_TransformComponent.cpp" />
+    <ClCompile Include="dllmain.cpp" />
+    <ClCompile Include="entities\M_EntityRegistry.cpp" />
+    <ClCompile Include="files\M_File.cpp" />
+    <ClCompile Include="files\M_PhysicalFile.cpp" />
+    <ClCompile Include="files\M_VirtualFile.cpp" />
+    <ClCompile Include="files\M_Wrap.cpp" />
+    <ClCompile Include="files\M_Wrapper.cpp" />
+    <ClCompile Include="input\M_CursorMode.cpp" />
+    <ClCompile Include="input\M_InputMap.cpp" />
+    <ClCompile Include="input\M_Key.cpp" />
+    <ClCompile Include="input\M_KeyAction.cpp" />
+    <ClCompile Include="input\M_KeyModifiers.cpp" />
+    <ClCompile Include="input\M_MouseButton.cpp" />
+    <ClCompile Include="libraries\M_Vulkan.cpp" />
+    <ClCompile Include="math\M_Math.cpp" />
+    <ClCompile Include="pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="rendering\M_Buffer.cpp" />
+    <ClCompile Include="rendering\M_Camera.cpp" />
+    <ClCompile Include="rendering\M_CameraComponent.cpp" />
+    <ClCompile Include="rendering\M_CoordinateMode.cpp" />
+    <ClCompile Include="rendering\M_DescriptorSet.cpp" />
+    <ClCompile Include="rendering\M_Material.cpp" />
+    <ClCompile Include="rendering\M_MaterialTemplate.cpp" />
+    <ClCompile Include="rendering\M_Mesh.cpp" />
+    <ClCompile Include="rendering\M_MeshComponent.cpp" />
+    <ClCompile Include="rendering\M_PixelFormat.cpp" />
+    <ClCompile Include="rendering\M_PushConstantInfo.cpp" />
+    <ClCompile Include="rendering\M_RenderableComponent.cpp" />
+    <ClCompile Include="rendering\M_RenderEngine.cpp" />
+    <ClCompile Include="rendering\M_RenderObject.cpp" />
+    <ClCompile Include="rendering\M_RenderSystem.cpp" />
+    <ClCompile Include="rendering\M_Shader.cpp" />
+    <ClCompile Include="rendering\M_ShaderPass.cpp" />
+    <ClCompile Include="rendering\M_Sprite.cpp" />
+    <ClCompile Include="rendering\M_SpriteComponent.cpp" />
+    <ClCompile Include="rendering\M_Texture.cpp" />
+    <ClCompile Include="rendering\M_TextureAtlas.cpp" />
+    <ClCompile Include="rendering\M_Viewport.cpp" />
+    <ClCompile Include="rendering\M_Window.cpp" />
+    <ClCompile Include="runtime\M_Application.cpp" />
+    <ClCompile Include="runtime\M_Engine.cpp" />
+    <ClCompile Include="runtime\M_Info.cpp" />
+    <ClCompile Include="runtime\M_Runtime.cpp" />
+    <ClCompile Include="runtime\M_RuntimeObject.cpp" />
+    <ClCompile Include="scenes\M_Scene.cpp" />
+    <ClCompile Include="scenes\M_SceneManager.cpp" />
+    <ClCompile Include="scenes\M_SceneObject.cpp" />
+    <ClCompile Include="scripting\M_Accessibility.cpp" />
+    <ClCompile Include="scripting\M_ScriptArguments.cpp" />
+    <ClCompile Include="scripting\M_ScriptAssembly.cpp" />
+    <ClCompile Include="scripting\M_ScriptClass.cpp" />
+    <ClCompile Include="scripting\M_ScriptComponent.cpp" />
+    <ClCompile Include="scripting\M_ScriptEngine.cpp" />
+    <ClCompile Include="scripting\M_ScriptObject.cpp" />
+    <ClCompile Include="scripting\M_ScriptSystem.cpp" />
+    <ClCompile Include="serialization\M_Reader.cpp" />
+    <ClCompile Include="serialization\M_Writer.cpp" />
+    <ClCompile Include="systems\M_System.cpp" />
+    <ClCompile Include="systems\M_SystemRegistry.cpp" />
+    <ClCompile Include="tools\M_Compression.cpp" />
+    <ClCompile Include="tools\M_Console.cpp" />
+    <ClCompile Include="tools\M_Debug.cpp" />
+    <ClCompile Include="tools\M_Encoding.cpp" />
+    <ClCompile Include="tools\M_Operations.cpp" />
+    <ClCompile Include="tools\M_Parse.cpp" />
+    <ClCompile Include="types\M_Color.cpp" />
+    <ClCompile Include="types\M_CommandLineParser.cpp" />
+    <ClCompile Include="types\M_Dynamic.cpp" />
+    <ClCompile Include="types\M_FiniteStateMachine.cpp" />
+    <ClCompile Include="types\M_Logger.cpp" />
+    <ClCompile Include="types\M_Matrix.cpp" />
+    <ClCompile Include="types\M_Node.cpp" />
+    <ClCompile Include="types\M_Object.cpp" />
+    <ClCompile Include="types\M_Quaternion.cpp" />
+    <ClCompile Include="types\M_Rect.cpp" />
+    <ClCompile Include="types\M_RectF.cpp" />
+    <ClCompile Include="types\M_Stopwatch.cpp" />
+    <ClCompile Include="types\M_Time.cpp" />
+    <ClCompile Include="types\M_UUID.cpp" />
+    <ClCompile Include="types\M_Vector.cpp" />
+    <ClCompile Include="ui\M_CanvasComponent.cpp" />
+    <ClCompile Include="ui\M_UISystem.cpp" />
+    <ClCompile Include="ui\M_UITransformComponent.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="notes.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="README_Wrap_Files.md" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+    <Import Project="packages\zlib_static.1.2.11.12\build\native\zlib_static.targets" Condition="Exists('packages\zlib_static.1.2.11.12\build\native\zlib_static.targets')" />
+  </ImportGroup>
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>This project references NuGet package(s) that are missing on this computer. Use NuGet Package Restore to download them.  For more information, see http://go.microsoft.com/fwlink/?LinkID=322105. The missing file is {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('packages\zlib_static.1.2.11.12\build\native\zlib_static.targets')" Text="$([System.String]::Format('$(ErrorText)', 'packages\zlib_static.1.2.11.12\build\native\zlib_static.targets'))" />
+  </Target>
+</Project>

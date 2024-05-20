@@ -1,0 +1,81 @@
+#include "pch.h"
+#include "animation/M_AnimationSystem.h"
+
+#include "animation/M_AnimatorComponent.h"
+#include "rendering/M_SpriteComponent.h"
+#include "components/M_EnabledComponent.h"
+#include "assets/M_Asset.h"
+#include "rendering/M_RenderEngine.h"
+#include "rendering/M_RenderSystem.h"
+#include "runtime/M_Runtime.h"
+#include "assets/M_AssetEngine.h"
+#include "entities/M_EntityRegistry.h"
+#include "systems/M_SystemRegistry.h"
+#include "scenes/M_Scene.h"
+#include "serialization/M_Reader.h"
+#include "serialization/M_Writer.h"
+
+using namespace minty;
+
+minty::AnimationSystem::AnimationSystem(Runtime& engine, Scene& scene)
+	: System("Animation", engine, scene)
+{}
+
+void minty::AnimationSystem::update()
+{
+	float deltaTime = get_scene().get_runtime().get_time().elapsed;
+
+	EntityRegistry& registry = get_entity_registry();
+
+	AssetEngine& assets = get_runtime().get_asset_engine();
+
+	for (auto&& [entity, animatorComponent, enabled] : registry.view<AnimatorComponent, EnabledComponent const>().each())
+	{
+		// update the animator, get the current animation ID
+		UUID newId = animatorComponent.animator.update();
+		Animation* newAnimation = assets.get<Animation>(newId);
+
+		// if the ID has changed, reset with new animation data
+		if (animatorComponent.animation != newAnimation)
+		{
+			// reset animation state data
+			
+			// get the animation so it can be used
+			if (animatorComponent.animation)
+			{
+				animatorComponent.animation->reset(entity, get_scene());
+			}
+
+			// reset animator for new animation
+			animatorComponent.animation = newAnimation;
+			animatorComponent.reset();
+		}
+
+		// if the animator time is below zero, then the animator has paused, so do nothing
+		// OR if the animation ID is ERROR_ID, do nothing
+		if (animatorComponent.time < 0.0f || !animatorComponent.animation)
+		{
+			continue;
+		}
+
+		// animate with it
+		if (animatorComponent.animation->animate(animatorComponent.time, deltaTime, animatorComponent.index, entity, get_scene()))
+		{
+			// animation has completed, loop if supposed to
+			if (animatorComponent.animation->loops())
+			{
+				animatorComponent.reset();
+			}
+			else
+			{
+				// not looping
+
+				// set time to -1 to indicate that it has stopped, until a new animation ID is given
+				animatorComponent.time = -1.0f;
+			}
+		}
+	}
+}
+
+void minty::AnimationSystem::reset()
+{}
