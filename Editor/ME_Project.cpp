@@ -9,19 +9,15 @@ using namespace Mintye;
 
 Mintye::Project::Project(Minty::Path const& path)
 	: _base(std::filesystem::absolute(path))
+	, _info({
+		.name = path.stem().string(),
+		.major = 1,
+		.minor = 0,
+		.patch = 0
+		})
 	, _fileCount()
 	, _files()
 {}
-
-Minty::String const& Mintye::Project::get_name() const
-{
-	return Application::instance().get_info().name;
-}
-
-Path Project::get_base_path() const
-{
-	return _base;
-}
 
 Minty::Path Mintye::Project::get_sub_path(Minty::Path const& subPath) const
 {

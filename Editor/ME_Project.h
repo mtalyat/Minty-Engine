@@ -19,6 +19,9 @@ namespace Mintye
 		// the base Minty::Path of the project
 		Minty::Path _base;
 
+		// the application info for the project
+		Minty::ApplicationInfo _info;
+
 		// files, organized by extension type
 		size_t _fileCount;
 		std::unordered_map<Minty::Path, std::vector<Minty::Path>> _files;
@@ -30,16 +33,28 @@ namespace Mintye
 		Project(Minty::Path const& path);
 
 		/// <summary>
+		/// Gets the ApplicationInfo for this project.
+		/// </summary>
+		/// <returns></returns>
+		Minty::ApplicationInfo& get_info() { return _info; }
+
+		/// <summary>
+		/// Gets the ApplicationInfo for this project.
+		/// </summary>
+		/// <returns></returns>
+		Minty::ApplicationInfo const& get_info() const { return _info; }
+
+		/// <summary>
 		/// Gets the name of this Project.
 		/// </summary>
 		/// <returns></returns>
-		Minty::String const& get_name() const;
+		Minty::String const& get_name() const { return _info.name; }
 
 		/// <summary>
 		/// Gets the base file path for this Project.
 		/// </summary>
 		/// <returns></returns>
-		Minty::Path get_base_path() const;
+		Minty::Path get_base_path() const { return _base; }
 
 		/// <summary>
 		/// Gets the full path to the sub path location from the base path.
