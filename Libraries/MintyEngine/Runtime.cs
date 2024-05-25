@@ -52,15 +52,14 @@ namespace MintyEngine
 
         #region Window
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static object Window_GetMain();
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static object Window_Get(ulong id);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static string Window_GetTitle(uint id);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Window_SetTitle(uint id, string title);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Window_SetIcon(uint id, string path);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static bool Window_IsOpen(uint id);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Window_Close(uint id);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Window_Maximize(uint id);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Window_Minimize(uint id);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Window_Restore(uint id);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static string Window_GetTitle(ulong id);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Window_SetTitle(ulong id, string title);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Window_SetIcon(ulong id, string path);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static bool Window_IsOpen(ulong id);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Window_Close(ulong id);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Window_Maximize(ulong id);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Window_Minimize(ulong id);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Window_Restore(ulong id);
         #endregion
 
         #region Components

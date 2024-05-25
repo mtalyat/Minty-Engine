@@ -1,7 +1,7 @@
 #pragma once
 #include "ME_EditorWindow.h"
 
-namespace mintye
+namespace Mintye
 {
 	class PropertiesWindow
 		: public EditorWindow
@@ -18,11 +18,11 @@ namespace mintye
 		TargetMode _targetMode;
 
 		bool _targetIsBuiltIn;
-		minty::UUID _targetId;
-		minty::Entity _targetEntity;
-		minty::Path _targetPath;
+		Minty::UUID _targetId;
+		Minty::Entity _targetEntity;
+		Minty::Path _targetPath;
 
-		std::vector<minty::String> _texts;
+		std::vector<Minty::String> _texts;
 	public:
 		PropertiesWindow(EditorApplication& application);
 
@@ -32,18 +32,18 @@ namespace mintye
 
 		void refresh() override;
 
-		void set_scene(minty::Scene* const scene) override;
+		void set_scene(Minty::Ref<Minty::Scene> const scene) override;
 
 #pragma region Drawing
 
 	private:
-		bool input_node(minty::Node& node, bool const printRoot, uint32_t const offset);
+		bool input_node(Minty::Node& node, bool const printRoot, uint32_t const offset);
 
 		void draw_none();
 
 		void draw_entity();
 
-		void draw_component(minty::Node& node, size_t const i, minty::Scene* const scene, minty::EntityRegistry& registry);
+		void draw_component(Minty::Node& node, size_t const i, Minty::Ref<Minty::Scene> const scene, Minty::EntityRegistry& registry);
 
 		void draw_asset();
 
@@ -61,13 +61,13 @@ namespace mintye
 		/// Sets the target to show on the window.
 		/// </summary>
 		/// <param name="entity"></param>
-		void set_target(minty::Entity const entity);
+		void set_target(Minty::Entity const entity);
 
 		/// <summary>
 		/// Sets the target to show on the window.
 		/// </summary>
 		/// <param name="asset"></param>
-		void set_target(minty::Path const& path);
+		void set_target(Minty::Path const& path);
 
 #pragma endregion
 	};

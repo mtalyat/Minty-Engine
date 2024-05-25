@@ -1,11 +1,9 @@
 #include "ME_ImGuiHelper.h"
-
-#include "M_Math.h"
 #include <vector>
 
-using namespace minty;
+using namespace Minty;
 
-void ImGui::TextNode(minty::Node const& rootNode, bool const printRoot)
+void ImGui::TextNode(Minty::Node const& rootNode, bool const printRoot)
 {
 	std::vector<std::pair<Node const*, int>> nodes;
 	nodes.push_back({ &rootNode, printRoot ? 0 : -1 });
@@ -33,7 +31,7 @@ void ImGui::TextNode(minty::Node const& rootNode, bool const printRoot)
 	}
 }
 
-bool ImGui::InputNode(minty::Node& rootNode, bool const printRoot, size_t const offset)
+bool ImGui::InputNode(Minty::Node& rootNode, bool const printRoot, size_t const offset)
 {
 	static int const BUFFER_SIZE = 256;
 	static char buffer[BUFFER_SIZE] = "";
@@ -98,7 +96,7 @@ void ImGui::BeginGroupBox()
 	ImGui::BeginGroup();
 }
 
-void ImGui::EndGroupBox(minty::Vector2 const size, minty::Vector2 const margin, minty::Color const borderColor)
+void ImGui::EndGroupBox(Minty::Vector2 const size, Minty::Vector2 const margin, Minty::Color const borderColor)
 {
 	ImGui::EndGroup();
 

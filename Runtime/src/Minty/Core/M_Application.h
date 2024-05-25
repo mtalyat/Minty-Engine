@@ -11,6 +11,7 @@ namespace Minty
 	class RenderEngine;
 	class ScriptEngine;
 	class DefaultLayer;
+	class SceneManager;
 	class WindowCloseEvent;
 	class WindowResizeEvent;
 
@@ -96,6 +97,7 @@ namespace Minty
 		ApplicationMode const get_mode() const { return _mode; }
 		Window& get_window() const { return *_window; }
 		DefaultLayer& get_default_layer() const { return *_defaultLayer; }
+		SceneManager& get_scene_manager() const;
 		Time get_time() const { return _time; }
 
 		void push_engine(Engine* const engine);
@@ -112,6 +114,9 @@ namespace Minty
 		void close();
 
 		static Application& instance() { return *_instance; }
+
+	protected:
+		void load_starting_scene();
 
 	private:
 		void load_assemblies();

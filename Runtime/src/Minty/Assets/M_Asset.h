@@ -49,10 +49,11 @@ namespace Minty
 		Path _path;
 
 	public:
-		Asset() = default;
+		Asset()
+			: _id(UUID::create()), _path() {}
 
 		Asset(UUID const id, Path const& path)
-			: _id(id), _path() {}
+			: _id(id), _path(path) {}
 
 		virtual ~Asset() = default;
 

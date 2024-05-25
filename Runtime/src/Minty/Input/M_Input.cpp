@@ -7,6 +7,11 @@
 
 using namespace Minty;
 
+ScriptClass const* Input::_script = nullptr;
+
+Vector2 Input::_mousePosition = Vector2();
+std::unordered_map<MouseButton, KeyAction> Input::_mouseButtons = std::unordered_map<MouseButton, KeyAction>();
+
 KeyAction Minty::Input::get_mouse_button(MouseButton const button)
 {
 	auto found = _mouseButtons.find(button);

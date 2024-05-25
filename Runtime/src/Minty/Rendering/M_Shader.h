@@ -18,7 +18,7 @@ namespace Minty
 	/// </summary>
 	struct ShaderBuilder
 	{
-		UUID id;
+		UUID id = UUID::create();
 
 		Path path;
 

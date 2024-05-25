@@ -40,6 +40,8 @@ using namespace Minty;
 using namespace Minty::vk;
 using namespace Minty::Builtin;
 
+AssetEngine* Minty::AssetEngine::_instance = nullptr;
+
 // util
 void load_descriptor_values(AssetEngine& engine, std::unordered_map<String, Dynamic>& values, Node const& node, std::vector<UniformConstantInfo> const& infos)
 {
@@ -807,8 +809,6 @@ void Minty::AssetEngine::unload(UUID const id)
 		return;
 	}
 
-	Ref<Asset> asset = found->second;
-
 	// remove the reference
 	erase(id);
 }
@@ -949,7 +949,7 @@ void Minty::AssetEngine::erase(UUID const id)
 
 void Minty::AssetEngine::emplace_by_type(Ref<Asset> const asset)
 {
-	TypeID typeId = typeid(asset.get());
+	TypeID typeId = typeid(*asset.get());
 
 	auto found = _assetsByType.find(typeId);
 
@@ -968,7 +968,7 @@ void Minty::AssetEngine::emplace_by_type(Ref<Asset> const asset)
 
 void Minty::AssetEngine::erase_by_type(Ref<Asset> const asset)
 {
-	TypeID typeId = typeid(asset.get());
+	TypeID typeId = typeid(*asset.get());
 
 	auto found = _assetsByType.find(typeId);
 

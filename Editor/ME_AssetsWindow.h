@@ -3,7 +3,7 @@
 
 #include <vector>
 
-namespace mintye
+namespace Mintye
 {
 	class AssetsWindow
 		: public EditorWindow
@@ -11,15 +11,15 @@ namespace mintye
 	private:
 		struct FileData
 		{
-			minty::Path path;
+			Minty::Path path;
 			bool canIncludeInScene;
 			bool includedInScene;
 		};
 
 	private:
-		minty::Path _path;
+		Minty::Path _path;
 
-		std::vector<minty::Path> _directories;
+		std::vector<Minty::Path> _directories;
 		std::vector<FileData> _files;
 
 	public:
@@ -34,8 +34,8 @@ namespace mintye
 		void refresh() override;
 
 	private:
-		minty::Path get_path(minty::Path const& file) const;
+		Minty::Path get_path(Minty::Path const& file) const;
 
-		void set_path(minty::Path const& path);
+		void set_path(Minty::Path const& path);
 	};
 }

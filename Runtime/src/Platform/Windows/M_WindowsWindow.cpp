@@ -30,8 +30,12 @@ Minty::WindowsWindow::WindowsWindow(WindowBuilder const& builder)
 	// if no windows have been made yet, init glfw
 	if (_windows.empty())
 	{
-		glfwInit();
+		if (!glfwInit())
+		{
+			MINTY_ERROR("Failed to initialize GLFW.");
+		}
 		glfwSetErrorCallback(error_callback);
+		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
 	}
 
 	_window = glfwCreateWindow(static_cast<int>(builder.width), static_cast<int>(builder.height), builder.title.c_str(), nullptr, nullptr);

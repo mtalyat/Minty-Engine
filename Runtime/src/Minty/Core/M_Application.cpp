@@ -21,6 +21,8 @@ using namespace Minty;
 
 #define CREATE_DEFAULT_ENGINE_IF_NEEDED(type, name) (builder.name ? builder.name : new type())
 
+Application* Application::_instance = nullptr;
+
 Minty::Application::Application(ApplicationBuilder const& builder)
 	: _info(builder.info)
 	, _mode(builder.mode)
@@ -42,12 +44,17 @@ Minty::Application::Application(ApplicationBuilder const& builder)
 	push_engine(CREATE_DEFAULT_ENGINE_IF_NEEDED(RenderEngine, renderEngine));
 	push_engine(CREATE_DEFAULT_ENGINE_IF_NEEDED(ScriptEngine, scriptEngine));
 
-	// init static things
+	// load scripts
 	load_assemblies();
-	Input::set_input_script(ScriptEngine::instance().find_class(SCRIPT_NAMESPACE_NAME, "Input"));
+	ScriptLink::link();
 
 	// create window
 	_window = Window::create();
+	_window->set_event_callback([this](Event& e) { on_event(e); });
+
+	// initialize things
+	RenderEngine::instance().init();
+	Input::set_input_script(ScriptEngine::instance().find_class(SCRIPT_NAMESPACE_NAME, "Input"));
 
 	// create default layer
 	_defaultLayer = new DefaultLayer();
@@ -61,6 +68,11 @@ Minty::Application::~Application()
 	_instance = nullptr;
 
 	delete _defaultLayer;
+}
+
+SceneManager& Minty::Application::get_scene_manager() const
+{
+	return get_default_layer().get_scene_manager();
 }
 
 void Minty::Application::push_engine(Engine* const engine)
@@ -88,6 +100,8 @@ void Minty::Application::run()
 {
 	MINTY_ASSERT(!_running);
 	_running = true;
+
+	load_starting_scene();
 
 	reset_time();
 
@@ -145,8 +159,31 @@ static void load_script_assemblies(std::vector<Path> const& paths)
 	}
 }
 
+void Minty::Application::load_starting_scene()
+{
+	AssetEngine& assets = AssetEngine::instance();
+	Path applicationDataPath = String("game").append(EXTENSION_APPLICATION_DATA);
+
+	if (assets.exists(applicationDataPath))
+	{
+		Node node = assets.read_file_node(applicationDataPath);
+
+		if (Node const* scenes = node.find("scenes"))
+		{
+			SceneManager& sceneManager = _defaultLayer->get_scene_manager();
+			Scene& scene = sceneManager.create_scene(scenes->get_children().front().get_data());
+			sceneManager.load_scene(scene.get_id());
+		}
+	}
+}
+
 void Minty::Application::load_assemblies()
 {
+	// Load MintyEngine by default
+	ScriptEngine& scripts = ScriptEngine::instance();
+	scripts.load_assembly("MintyEngine.dll");
+
+	// load other assemblies included in game
 	AssetEngine& assets = AssetEngine::instance();
 	Path applicationDataPath = String("game").append(EXTENSION_APPLICATION_DATA);
 
@@ -173,20 +210,6 @@ void Minty::Application::load_assemblies()
 		{
 			load_script_assemblies({});
 		}
-
-		// connect C++ to C#
-		ScriptLink::link();
-
-		if (Node const* scenes = node.find("scenes"))
-		{
-			SceneManager& sceneManager = _defaultLayer->get_scene_manager();
-			Scene& scene = sceneManager.create_scene(scenes->get_children().front().get_data());
-			sceneManager.load_scene(scene.get_id());
-		}
-	}
-	else
-	{
-		MINTY_WARN("No application data found.");
 	}
 }
 
@@ -232,15 +255,3 @@ bool Minty::Application::on_window_resize(WindowResizeEvent& event)
 
 	return false;
 }
-
-// LINKING
-/*
-MINTY_LOG("Linking the Runtime:");
-
-	
-*/
-
-// REGISTER STUFF
-/*
-
-*/

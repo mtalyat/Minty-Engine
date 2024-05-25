@@ -30,10 +30,6 @@
 using namespace Minty;
 using namespace Minty::Scripting;
 
-//
-//		SCRIPT ENGINE
-//
-
 // SCRIPT FUNCTIONS C++ -> C#
 /*
 * OnCreate
@@ -47,8 +43,7 @@ using namespace Minty::Scripting;
 * OnDisable
 */
 
-// SCRIPT FUNCTIONS C# -> C++
-// a lot, check ScriptLinkage.cpp
+ScriptEngine* Minty::ScriptEngine::_instance = nullptr;
 
 Minty::ScriptEngine::ScriptEngine()
 	: Engine()

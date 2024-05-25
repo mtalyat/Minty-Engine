@@ -27,12 +27,12 @@ Perspective Minty::from_string_perspective(String const& value)
 	return static_cast<Perspective>(0);
 }
 
-Minty::Camera::Camera(Perspective const perspective, float const fov, float const nearPlane, float const farPlane)
-	: _perspective(perspective)
-	, _fov(fov * Math::DEG2RAD)
-	, _near(nearPlane)
-	, _far(farPlane)
-	, _color(Color::black())
+Minty::Camera::Camera(CameraBuilder const& builder)
+	: _perspective(builder.perspective)
+	, _fov(builder.fov * Math::DEG2RAD)
+	, _near(builder.nearPlane)
+	, _far(builder.farPlane)
+	, _color(builder.color)
 {}
 
 void Minty::Camera::serialize(Writer& writer) const

@@ -2,28 +2,20 @@
 #include "ME_Project.h"
 
 #include "ME_Constants.h"
-#include "M_Console.h"
-#include "M_File.h"
 #include <vector>
 
-using namespace minty;
-using namespace mintye;
+using namespace Minty;
+using namespace Mintye;
 
-Project::Project(minty::Path const& path)
-	: _info(path.stem().string(), 0, 0, 0)
-	, _base(std::filesystem::absolute(path))
+Mintye::Project::Project(Minty::Path const& path)
+	: _base(std::filesystem::absolute(path))
 	, _fileCount()
 	, _files()
 {}
 
-minty::Info const& mintye::Project::get_info() const
+Minty::String const& Mintye::Project::get_name() const
 {
-	return _info;
-}
-
-minty::String const& mintye::Project::get_name() const
-{
-	return _info.get_application_name();
+	return Application::instance().get_info().name;
 }
 
 Path Project::get_base_path() const
@@ -31,7 +23,7 @@ Path Project::get_base_path() const
 	return _base;
 }
 
-minty::Path mintye::Project::get_sub_path(minty::Path const& subPath) const
+Minty::Path Mintye::Project::get_sub_path(Minty::Path const& subPath) const
 {
 	return (_base / subPath);
 }
@@ -46,12 +38,12 @@ Path Project::get_build_path() const
 	return (_base / BUILD_DIRECTORY_NAME);
 }
 
-minty::Path mintye::Project::get_assembly_path() const
+Minty::Path Mintye::Project::get_assembly_path() const
 {
 	return (_base / ASSEMBLY_DIRECTORY_NAME);
 }
 
-std::set<Path> mintye::Project::find_assets(std::vector<minty::Path> const& extensions) const
+std::set<Path> Mintye::Project::find_assets(std::vector<Minty::Path> const& extensions) const
 {
 	// output files
 	std::set<Path> result;
@@ -70,25 +62,25 @@ std::set<Path> mintye::Project::find_assets(std::vector<minty::Path> const& exte
 	return result;
 }
 
-std::set<Path> mintye::Project::find_assets(AssetType const assetType) const
+std::set<Path> Mintye::Project::find_assets(AssetType const assetType) const
 {
 	return find_assets(Asset::get_extensions(assetType));
 }
 
-Path mintye::Project::find_asset(std::string name) const
+Path Mintye::Project::find_asset(std::string name) const
 {
 	// get the path
 	Path path(name);
 
 	// get the extension
 	std::string extension = path.extension().string();
-	
+
 	// get the name without the extension
 	Path stem = path.stem();
 
 	// check files with extension
 	auto found = _files.find(extension);
-	
+
 	if (found != _files.end())
 	{
 		for (Path const& path : found->second)
@@ -105,12 +97,12 @@ Path mintye::Project::find_asset(std::string name) const
 	return Path();
 }
 
-minty::Path mintye::Project::find_asset(AssetType const assetType) const
+Minty::Path Mintye::Project::find_asset(AssetType const assetType) const
 {
 	return find_asset(Asset::get_extensions(assetType));
 }
 
-minty::Path mintye::Project::find_asset(std::vector<minty::Path> const& extensions) const
+Minty::Path Mintye::Project::find_asset(std::vector<Minty::Path> const& extensions) const
 {
 	// check each extension, if it exists
 	for (auto const& extension : extensions)
@@ -130,7 +122,7 @@ minty::Path mintye::Project::find_asset(std::vector<minty::Path> const& extensio
 	return Path();
 }
 
-minty::Path mintye::Project::find_asset(minty::String const& name, AssetType const assetType) const
+Minty::Path Mintye::Project::find_asset(Minty::String const& name, AssetType const assetType) const
 {
 	for (auto const& extension : Asset::get_extensions(assetType))
 	{
@@ -231,12 +223,12 @@ void Project::refresh()
 	}
 }
 
-size_t mintye::Project::get_asset_count() const
+size_t Mintye::Project::get_asset_count() const
 {
 	return _fileCount;
 }
 
-void mintye::Project::wrap_assets(Wrap& wrap) const
+void Mintye::Project::wrap_assets(Wrap& wrap) const
 {
 	for (auto const& [extension, paths] : _files)
 	{

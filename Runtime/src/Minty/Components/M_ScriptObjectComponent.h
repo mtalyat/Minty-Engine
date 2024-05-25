@@ -8,7 +8,9 @@ namespace Minty
 	{
 		UUID id;
 
-		ScriptObjectComponent() = default;
+		ScriptObjectComponent()
+			: id(UUID::create()) {}
+
 		ScriptObjectComponent(UUID const id)
 			: id(id) {}
 	};

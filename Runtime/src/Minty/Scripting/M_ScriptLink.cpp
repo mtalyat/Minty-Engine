@@ -807,7 +807,6 @@ void Minty::ScriptLink::link()
 
 #pragma region Window
 	ADD_INTERNAL_CALL("Window_GetMain", window_get_main);
-	ADD_INTERNAL_CALL("Window_Get", window_get);
 	ADD_INTERNAL_CALL("Window_GetTitle", window_get_title);
 	ADD_INTERNAL_CALL("Window_SetTitle", window_set_title);
 	ADD_INTERNAL_CALL("Window_SetIcon", window_set_icon);

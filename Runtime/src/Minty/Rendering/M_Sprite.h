@@ -14,7 +14,7 @@ namespace Minty
 	/// </summary>
 	struct SpriteBuilder
 	{
-		UUID id;
+		UUID id = UUID::create();
 
 		Path path;
 

@@ -36,6 +36,8 @@
 //#define MINTY_DEBUG_INFO(message) std::format("{}/{}()/{} -> {}", Minty::Path(__FILE__).filename().string(), __func__, __LINE__, message)
 #define MINTY_DEBUG_INFO(message) std::format("[{}][{}()][line {}] -> {}", Minty::Path(__FILE__).filename().string(), __func__, __LINE__, message)
 
+#define MINTY_MAKE_VERSION(major, minor, patch) ((((uint32_t)(major)) << 22U) | (((uint32_t)(minor)) << 12U) | ((uint32_t)(patch)))    
+
 #ifdef MINTY_RELEASE
 #define MINTY_ABORT(message) { minty::Debug::log_error(std::format("FATAL ERROR: {}", MINTY_DEBUG_INFO(message))); }
 #else

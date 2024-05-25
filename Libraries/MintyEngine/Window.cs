@@ -68,10 +68,5 @@ namespace MintyEngine
         {
             Runtime.Window_Restore(ID);
         }
-
-        public Window GetWindow(uint index)
-        {
-
-        }
     }
 }

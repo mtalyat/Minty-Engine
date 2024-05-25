@@ -17,17 +17,20 @@ namespace Minty
 		/// <summary>
 		/// Creates an empty Dynamic.
 		/// </summary>
-		Dynamic() = default;
+		Dynamic()
+			: _data(nullptr), _size(0) {}
 
 		/// <summary>
 		/// Creates a Dynamic with the given data.
 		/// </summary>
 		/// <param name="data">The data to set.</param>
 		/// <param name="size">The size of the data in bytes.</param>
-		Dynamic(void* const data, size_t const size) { set(data, size); }
+		Dynamic(void* const data, size_t const size) 
+			: _data(nullptr), _size(0) { set(data, size); }
 
 		// copy
-		Dynamic(Dynamic const& other) { set(other._data, other._size); }
+		Dynamic(Dynamic const& other)
+			: _data(nullptr), _size(0) { set(other._data, other._size); }
 
 		// copy
 		Dynamic& operator=(Dynamic const& other);

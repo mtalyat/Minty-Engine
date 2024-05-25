@@ -14,7 +14,7 @@ namespace Minty
 
 	struct SceneBuilder
 	{
-		UUID id;
+		UUID id = UUID::create();
 
 		Path path;
 	};

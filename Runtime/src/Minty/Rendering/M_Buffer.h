@@ -7,7 +7,7 @@ namespace Minty
 {
 	struct BufferBuilder
 	{
-		UUID id;
+		UUID id = UUID::create();
 		VkBuffer buffer;
 		VkDeviceMemory memory;
 		VkDeviceSize size;

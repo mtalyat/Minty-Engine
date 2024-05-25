@@ -26,6 +26,15 @@ namespace Minty
 		alignas (16) Matrix4 transform;
 	};
 
+	struct CameraBuilder
+	{
+		Perspective perspective = Perspective::Perspective;
+		float fov = 45.0f;
+		float nearPlane = 0.1f;
+		float farPlane = 1000.0f;
+		Color color = Color::black();
+	};
+
 	class Camera
 		: public Object
 	{
@@ -37,7 +46,7 @@ namespace Minty
 		Color _color;
 
 	public:
-		Camera(Perspective const perspective = Perspective::Perspective, float const fov = 45.0f, float const nearPlane = 0.1f, float const farPlane = 1000.0f);
+		Camera(CameraBuilder const& builder = {});
 
 #pragma region Get
 

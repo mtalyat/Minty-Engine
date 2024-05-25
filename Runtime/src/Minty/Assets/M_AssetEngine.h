@@ -256,8 +256,8 @@ namespace Minty
 
 		void erase_by_type(Ref<Asset> const asset);
 
-		public:
-			static AssetEngine& instance() { return *_instance; }
+	public:
+		static AssetEngine& instance() { return *_instance; }
 	};
 
 	template<typename T>

@@ -3,13 +3,13 @@
 #include "ME_EditorApplication.h"
 #include "ME_EditorApplicationRenderEngine.h"
 
-using namespace minty;
-using namespace mintye;
+using namespace Minty;
+using namespace Mintye;
 
 constexpr static float MOUSE_MOVE_SENSITIVITY = 0.02f;
 constexpr static float MOUSE_ROTATE_SENSITIVITY = 0.1f;
 
-mintye::SceneWindow::SceneWindow(EditorApplication& application)
+Mintye::SceneWindow::SceneWindow(EditorApplication& application)
 	: EditorWindow(application)
 	, _cameraPosition()
 	, _cameraRotation()
@@ -19,7 +19,7 @@ mintye::SceneWindow::SceneWindow(EditorApplication& application)
 	, _mouseDragPos()
 {}
 
-void mintye::SceneWindow::draw()
+void Mintye::SceneWindow::draw()
 {
 	ImGui::SetNextWindowSize(ImVec2(400, 400), ImGuiCond_FirstUseEver);
 	if (!ImGui::Begin("Scene", nullptr, ImGuiWindowFlags_NoBackground))
@@ -28,7 +28,7 @@ void mintye::SceneWindow::draw()
 		return;
 	}
 
-	EditorApplicationRenderEngine& renderer = static_cast<EditorApplicationRenderEngine&>(get_application().get_runtime().get_render_engine());
+	EditorApplicationRenderEngine& renderer = EditorApplicationRenderEngine::instance();
 
 	renderer.set_camera(_cameraPosition, _cameraRotation, _camera);
 
@@ -107,15 +107,15 @@ void mintye::SceneWindow::draw()
 	ImGui::End();
 }
 
-void mintye::SceneWindow::reset()
+void Mintye::SceneWindow::reset()
 {
 }
 
-void mintye::SceneWindow::refresh()
+void Mintye::SceneWindow::refresh()
 {
 }
 
-void mintye::SceneWindow::focus(minty::Entity const entity)
+void Mintye::SceneWindow::focus(Minty::Entity const entity)
 {
 	// move camera to entity - camera forward
 	EntityRegistry& registry = get_scene()->get_entity_registry();

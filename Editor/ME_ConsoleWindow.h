@@ -4,13 +4,13 @@
 #include <vector>
 #include <queue>
 
-namespace mintye
+namespace Mintye
 {
 	class ConsoleWindow
 		: public EditorWindow
 	{
 	public:
-		typedef minty::Console::Color Color;
+		typedef Minty::Console::Color Color;
 
 	private:
 		struct Line
@@ -28,7 +28,7 @@ namespace mintye
 		bool showErrors;
 
 		// commands that are handled by the editor
-		std::unordered_map <minty::String, std::function<void()>> _editorCommands;
+		std::unordered_map <Minty::String, std::function<void()>> _editorCommands;
 
 		ImGuiTextFilter _filter;
 

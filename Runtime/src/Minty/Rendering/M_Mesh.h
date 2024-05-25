@@ -8,7 +8,7 @@ namespace Minty
 {
 	struct MeshBuilder
 	{
-		UUID id;
+		UUID id = UUID::create();
 
 		Path path;
 	};

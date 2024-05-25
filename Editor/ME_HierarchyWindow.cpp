@@ -7,19 +7,19 @@
 #include <vector>
 #include <unordered_set>
 
-using namespace mintye;
-using namespace minty;
+using namespace Mintye;
+using namespace Minty;
 
-mintye::HierarchyWindow::HierarchyWindow(EditorApplication& application)
+Mintye::HierarchyWindow::HierarchyWindow(EditorApplication& application)
 	: EditorWindow(application)
 	, _registeredSystems()
 	, _selected(NULL_ENTITY)
 	, _clicked(NULL_ENTITY)
 {}
 
-void mintye::HierarchyWindow::draw()
+void Mintye::HierarchyWindow::draw()
 {
-	Scene* scene = get_scene();
+	Ref<Scene> scene = get_scene();
 
 	ImGui::SetNextWindowSize(ImVec2(400, 800), ImGuiCond_FirstUseEver);
 	if (!ImGui::Begin("Hierarchy") || !scene)
@@ -192,25 +192,25 @@ void mintye::HierarchyWindow::draw()
 	ImGui::End();
 }
 
-void mintye::HierarchyWindow::reset()
+void Mintye::HierarchyWindow::reset()
 {
 	_selected = NULL_ENTITY;
 	_clicked = NULL_ENTITY;
 }
 
-void mintye::HierarchyWindow::refresh()
+void Mintye::HierarchyWindow::refresh()
 {
 	if(get_scene()) get_scene()->finalize();
 }
 
-void mintye::HierarchyWindow::set_project(Project* const project)
+void Mintye::HierarchyWindow::set_project(Project* const project)
 {
 	EditorWindow::set_project(project);
 
 	_registeredSystems = SystemRegistry::get_registered_systems();
 }
 
-void mintye::HierarchyWindow::set_scene(minty::Scene* const scene)
+void Mintye::HierarchyWindow::set_scene(Minty::Ref<Minty::Scene> const scene)
 {
 	if (get_scene() != scene)
 	{
@@ -221,7 +221,7 @@ void mintye::HierarchyWindow::set_scene(minty::Scene* const scene)
 	EditorWindow::set_scene(scene);
 }
 
-minty::Entity mintye::HierarchyWindow::create_entity()
+Minty::Entity Mintye::HierarchyWindow::create_entity()
 {
 	EntityRegistry& registry = get_scene()->get_entity_registry();
 
@@ -235,12 +235,12 @@ minty::Entity mintye::HierarchyWindow::create_entity()
 	return entity;
 }
 
-void mintye::HierarchyWindow::copy_entity(minty::Entity const entity)
+void Mintye::HierarchyWindow::copy_entity(Minty::Entity const entity)
 {
 	get_application().copy_asset(get_scene()->get_entity_registry().get_id(entity));
 }
 
-minty::Entity mintye::HierarchyWindow::paste_entity()
+Minty::Entity Mintye::HierarchyWindow::paste_entity()
 {
 	if (!get_application().is_asset_copied("Entity")) return NULL_ENTITY;
 
@@ -261,7 +261,7 @@ minty::Entity mintye::HierarchyWindow::paste_entity()
 	return registry.deserialize_entity(node);
 }
 
-void mintye::HierarchyWindow::destroy_entity(minty::Entity const entity)
+void Mintye::HierarchyWindow::destroy_entity(Minty::Entity const entity)
 {
 	if (entity == _clicked)
 	{
@@ -277,13 +277,13 @@ void mintye::HierarchyWindow::destroy_entity(minty::Entity const entity)
 	registry.destroy_immediate(entity);
 }
 
-minty::Entity mintye::HierarchyWindow::clone_entity(minty::Entity const entity)
+Minty::Entity Mintye::HierarchyWindow::clone_entity(Minty::Entity const entity)
 {
 	EntityRegistry& registry = get_scene()->get_entity_registry();
 	return registry.clone(entity);
 }
 
-void mintye::HierarchyWindow::focus_entity(minty::Entity const entity)
+void Mintye::HierarchyWindow::focus_entity(Minty::Entity const entity)
 {
 	// ignore null
 	if (entity == NULL_ENTITY) return;
@@ -299,12 +299,12 @@ void mintye::HierarchyWindow::focus_entity(minty::Entity const entity)
 	sceneWindow->focus(entity);
 }
 
-void mintye::HierarchyWindow::set_clicked(minty::Entity const entity)
+void Mintye::HierarchyWindow::set_clicked(Minty::Entity const entity)
 {
 	_clicked = entity;
 }
 
-void mintye::HierarchyWindow::set_selected(minty::Entity const entity)
+void Mintye::HierarchyWindow::set_selected(Minty::Entity const entity)
 {
 	// when selected, send Entity to properties window
 	if (PropertiesWindow* properties = get_application().find_editor_window<PropertiesWindow>("Properties"))
@@ -314,7 +314,7 @@ void mintye::HierarchyWindow::set_selected(minty::Entity const entity)
 	_selected = entity;
 }
 
-void mintye::HierarchyWindow::draw_popup()
+void Mintye::HierarchyWindow::draw_popup()
 {
 	EntityRegistry& registry = get_scene()->get_entity_registry();
 
@@ -402,7 +402,7 @@ void mintye::HierarchyWindow::draw_popup()
 	}
 }
 
-void mintye::HierarchyWindow::run_shortcuts()
+void Mintye::HierarchyWindow::run_shortcuts()
 {
 	EntityRegistry& registry = get_scene()->get_entity_registry();
 

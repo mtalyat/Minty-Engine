@@ -1353,7 +1353,7 @@ struct IGFD_Thumbnail_Info {
 #ifdef IMGUI_INCLUDE
 #include IMGUI_INCLUDE
 #else  // IMGUI_INCLUDE
-#include "../../libraries/imgui/imgui.h"
+#include "../../imgui/include/imgui.h"
 #endif  // IMGUI_INCLUDE
 
 #include <set>

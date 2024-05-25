@@ -58,6 +58,8 @@ using namespace Minty;
 using namespace Minty::vk;
 using namespace Minty::Builtin;
 
+RenderEngine* Minty::RenderEngine::_instance = nullptr;
+
 const std::vector<const char*> validationLayers = {
 	"VK_LAYER_KHRONOS_validation"
 };
@@ -106,8 +108,6 @@ RenderEngine::RenderEngine()
 	{
 		_bound[i] = nullptr;
 	}
-
-	init();
 }
 
 RenderEngine::~RenderEngine()

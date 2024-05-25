@@ -1,5 +1,7 @@
 #pragma once
 
+#include "M_Macros.h"
+
 namespace Minty
 {
 	constexpr char const* ASSEMBLY_ENGINE_NAME = "MintyEngine";
@@ -7,8 +9,8 @@ namespace Minty
 	constexpr char const* SCRIPT_NAMESPACE_NAME = "MintyEngine";
 
 	constexpr char const* MINTY_NAME = "Minty Engine";
-	constexpr uint32_t const MINTY_VERSION = VK_MAKE_VERSION(0, 1, 0);
-	constexpr uint32_t const MINTY_API_VERSION = VK_API_VERSION_1_2;
+	constexpr uint32_t const MINTY_VERSION = MINTY_MAKE_VERSION(0, 1, 0);
+	constexpr uint32_t const MINTY_API_VERSION = MINTY_MAKE_VERSION(1, 2, 0);
 
 	constexpr char const* BLANK = "";
 

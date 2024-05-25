@@ -6,10 +6,10 @@
 #include "ME_ImGuiHelper.h"
 #include "ME_Project.h"
 
-using namespace minty;
-using namespace mintye;
+using namespace Minty;
+using namespace Mintye;
 
-mintye::PropertiesWindow::PropertiesWindow(EditorApplication& application)
+Mintye::PropertiesWindow::PropertiesWindow(EditorApplication& application)
 	: EditorWindow(application)
 	, _targetMode(TargetMode::None)
 	, _targetIsBuiltIn(false)
@@ -19,7 +19,7 @@ mintye::PropertiesWindow::PropertiesWindow(EditorApplication& application)
 	, _texts()
 {}
 
-void mintye::PropertiesWindow::draw()
+void Mintye::PropertiesWindow::draw()
 {
 	ImGui::SetNextWindowSize(ImVec2(400, 400), ImGuiCond_FirstUseEver);
 	if (!ImGui::Begin("Properties"))
@@ -48,17 +48,17 @@ void mintye::PropertiesWindow::draw()
 	ImGui::End();
 }
 
-void mintye::PropertiesWindow::reset()
+void Mintye::PropertiesWindow::reset()
 {
 }
 
-void mintye::PropertiesWindow::refresh()
+void Mintye::PropertiesWindow::refresh()
 {
 	Path path = _targetPath;
 	set_target(path);
 }
 
-void mintye::PropertiesWindow::set_scene(minty::Scene* const scene)
+void Mintye::PropertiesWindow::set_scene(Minty::Ref<Minty::Scene> const scene)
 {
 	if (get_scene() != scene)
 	{
@@ -70,7 +70,7 @@ void mintye::PropertiesWindow::set_scene(minty::Scene* const scene)
 	EditorWindow::set_scene(scene);
 }
 
-bool mintye::PropertiesWindow::input_node(minty::Node& rootNode, bool const printRoot, uint32_t const offset)
+bool Mintye::PropertiesWindow::input_node(Minty::Node& rootNode, bool const printRoot, uint32_t const offset)
 {
 	static int const BUFFER_SIZE = 256;
 	static char buffer[BUFFER_SIZE] = "";
@@ -141,14 +141,14 @@ bool mintye::PropertiesWindow::input_node(minty::Node& rootNode, bool const prin
 	return modified;
 }
 
-void mintye::PropertiesWindow::draw_none()
+void Mintye::PropertiesWindow::draw_none()
 {
 	ImGui::Text("--");
 }
 
-void mintye::PropertiesWindow::draw_entity()
+void Mintye::PropertiesWindow::draw_entity()
 {
-	Scene* scene = get_scene();
+	Ref<Scene> scene = get_scene();
 
 	// no scene?
 	if (!scene) return;
@@ -242,7 +242,7 @@ void mintye::PropertiesWindow::draw_entity()
 		// if the node is a script component, list all of the scripts instead
 		if (node.get_name() == "Script")
 		{
-			ScriptEngine& scriptEngine = get_runtime().get_script_engine();
+			ScriptEngine& scriptEngine = ScriptEngine::instance();
 
 			// treat each script as a component
 			for (auto childNode : node.get_children())
@@ -288,7 +288,7 @@ void mintye::PropertiesWindow::draw_entity()
 			// check for Script asset
 			// ensure it is loaded
 			Project* project = get_project();
-			AssetEngine& assets = get_runtime().get_asset_engine();
+			AssetEngine& assets = AssetEngine::instance();
 
 			Path assetPath = project->find_asset(popupBuffer, AssetType::Script);
 			
@@ -321,7 +321,7 @@ void mintye::PropertiesWindow::draw_entity()
 	}
 }
 
-void mintye::PropertiesWindow::draw_component(minty::Node& node, size_t const i, minty::Scene* const scene, minty::EntityRegistry& registry)
+void Mintye::PropertiesWindow::draw_component(Minty::Node& node, size_t const i, Minty::Ref<Minty::Scene> const scene, Minty::EntityRegistry& registry)
 {
 	static float const xMargin = 2.0f;
 	static float const yMargin = 2.0f;
@@ -338,7 +338,7 @@ void mintye::PropertiesWindow::draw_component(minty::Node& node, size_t const i,
 		Component* component = registry.get_by_name(node.get_name(), _targetEntity);
 		SerializationData data
 		{
-			.scene = get_scene(),
+			.scene = ref_to_pointer(get_scene()),
 			.entity = _targetEntity,
 		};
 		Reader reader(node, &data);
@@ -424,7 +424,7 @@ void mintye::PropertiesWindow::draw_component(minty::Node& node, size_t const i,
 	ImGui::EndGroupBox(Vector2(width, 0.0f), Vector2(xMargin, yMargin));
 }
 
-void mintye::PropertiesWindow::draw_asset()
+void Mintye::PropertiesWindow::draw_asset()
 {
 	// TODO: do differently for specific asset types
 
@@ -503,7 +503,7 @@ void mintye::PropertiesWindow::draw_asset()
 	}
 }
 
-void mintye::PropertiesWindow::clear_target()
+void Mintye::PropertiesWindow::clear_target()
 {
 	_targetMode = TargetMode::None;
 	_targetIsBuiltIn = false;
@@ -515,7 +515,7 @@ void mintye::PropertiesWindow::clear_target()
 	_texts.clear();
 }
 
-void mintye::PropertiesWindow::set_target(minty::Entity const entity)
+void Mintye::PropertiesWindow::set_target(Minty::Entity const entity)
 {
 	clear_target();
 
@@ -528,11 +528,11 @@ void mintye::PropertiesWindow::set_target(minty::Entity const entity)
 	}
 }
 
-void mintye::PropertiesWindow::set_target(minty::Path const& path)
+void Mintye::PropertiesWindow::set_target(Minty::Path const& path)
 {
 	clear_target();
 
-	AssetEngine& assets = get_runtime().get_asset_engine();
+	AssetEngine& assets = AssetEngine::instance();
 	if (assets.exists(path))
 	{
 		_targetMode = TargetMode::Asset;

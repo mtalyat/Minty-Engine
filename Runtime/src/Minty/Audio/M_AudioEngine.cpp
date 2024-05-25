@@ -18,6 +18,8 @@
 
 using namespace Minty;
 
+AudioEngine* Minty::AudioEngine::_instance = nullptr;
+
 Minty::AudioEngine::AudioEngine()
 	: Engine()
 	, _engine()

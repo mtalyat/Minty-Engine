@@ -4,12 +4,16 @@
 #include "Minty/Scripting/M_ScriptEngine.h"
 #include "Minty/Scripting/M_ScriptClass.h"
 #include "Minty/Scripting/M_ScriptObject.h"
+#include "Minty/Scripting/M_ScriptArguments.h"
 
 #ifdef MINTY_WINDOWS
 #include "Platform/Windows/M_WindowsWindow.h"
 #endif
 
 using namespace Minty;
+
+std::unordered_map<UUID, Window*> Minty::Window::_windows = std::unordered_map<UUID, Window*>();
+Window* Minty::Window::_main = nullptr;
 
 Scope<Window> Minty::Window::create(WindowBuilder const& builder)
 {
@@ -30,7 +34,10 @@ void Minty::Window::register_window(Window* window)
 	ScriptEngine& scripts = ScriptEngine::instance();
 	window->_scriptClass = scripts.find_class(SCRIPT_NAMESPACE_NAME, "Window");
 	MINTY_ASSERT(window->_scriptClass);
-	scripts.create_object(*window->_scriptClass, window->get_id());
+
+	UUID windowId = window->get_id();
+	ScriptArguments args({ &windowId });
+	scripts.create_object(*window->_scriptClass, window->get_id(), args);
 }
 
 void Minty::Window::unregister_window(Window* window)
@@ -213,9 +220,11 @@ void Minty::Window::unregister_window(Window* window)
 //}
 
 Minty::Window::Window(WindowBuilder const& builder)
-	: _data(WindowData{
+	: _id(UUID::create())
+	, _data(WindowData{
 .title = builder.title,
 .width = builder.width,
 .height = builder.height
 		})
+	, _scriptClass()
 {}

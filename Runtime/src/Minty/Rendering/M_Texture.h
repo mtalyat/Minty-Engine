@@ -12,7 +12,7 @@ namespace Minty
 	/// </summary>
 	struct TextureBuilder
 	{
-		UUID id;
+		UUID id = UUID::create();
 
 		/// <summary>
 		/// The path to the Texture on the disk.

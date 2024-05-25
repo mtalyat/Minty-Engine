@@ -15,7 +15,7 @@ namespace Minty
 	/// </summary>
 	struct MaterialTemplateBuilder
 	{
-		UUID id;
+		UUID id = UUID::create();
 
 		Path path;
 

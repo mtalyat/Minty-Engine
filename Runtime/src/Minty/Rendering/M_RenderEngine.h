@@ -191,7 +191,7 @@ namespace Minty
 
 #pragma region Init
 
-	protected:
+	public:
 		/// <summary>
 		/// Initializes the RenderEngine.
 		/// </summary>

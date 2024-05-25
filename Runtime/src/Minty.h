@@ -73,7 +73,7 @@ access to the entire engine without needing include each file.
 
 // LIBRARIES
 #ifdef MINTY_IMGUI
-#include "M_ImGui.h"
+#include "Minty/Libraries/M_ImGui.h"
 #endif
 
 // MATH

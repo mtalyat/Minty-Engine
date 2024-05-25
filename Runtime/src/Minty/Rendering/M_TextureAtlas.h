@@ -16,7 +16,7 @@ namespace Minty
 	/// </summary>
 	struct TextureAtlasBuilder
 	{
-		UUID id;
+		UUID id = UUID::create();
 
 		Path path;
 

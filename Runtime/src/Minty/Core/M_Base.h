@@ -30,6 +30,6 @@ namespace Minty
 	template<typename T>
 	constexpr T* ref_to_pointer(Ref<T> const ref)
 	{
-		return &(*ref);
+		return ref.get();
 	}
 }

@@ -3,16 +3,16 @@
 
 #include "ME_Minty.h"
 
-namespace mintye
+namespace Mintye
 {
 	class SceneWindow
 		: public EditorWindow
 	{
 	private:
-		minty::Vector3 _cameraPosition;
-		minty::Vector3 _cameraOrientation;
-		minty::Quaternion _cameraRotation;
-		minty::Camera _camera;
+		Minty::Vector3 _cameraPosition;
+		Minty::Vector3 _cameraOrientation;
+		Minty::Quaternion _cameraRotation;
+		Minty::Camera _camera;
 
 		bool _isMouseMoving;
 		bool _isMouseRotating;
@@ -28,6 +28,6 @@ namespace mintye
 		void refresh() override;
 
 	public:
-		void focus(minty::Entity const entity);
+		void focus(Minty::Entity const entity);
 	};
 }

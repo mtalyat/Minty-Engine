@@ -2,16 +2,16 @@
 
 #include "ME_Minty.h"
 
-namespace mintye
+namespace Mintye
 {
 	/// <summary>
 	/// Holds a color theme in the editor application.
 	/// </summary>
 	class Theme
-		: public minty::Object
+		: public Minty::Object
 	{
 	private:
-		minty::Color* _colors;
+		Minty::Color* _colors;
 
 	public:
 		Theme();
@@ -29,7 +29,7 @@ namespace mintye
 		/// </summary>
 		/// <param name="col"></param>
 		/// <returns></returns>
-		minty::Color& operator[](ImGuiCol_ const col);
+		Minty::Color& operator[](ImGuiCol_ const col);
 
 		/// <summary>
 		/// Copies the colors from the given style into this Theme.

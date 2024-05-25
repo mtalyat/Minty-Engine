@@ -13,7 +13,7 @@ namespace Minty
 	/// </summary>
 	struct MaterialBuilder
 	{
-		UUID id;
+		UUID id = UUID::create();
 
 		Path path;
 
