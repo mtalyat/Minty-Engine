@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,51 +10,68 @@ namespace MintyEngine
     /// <summary>
     /// Represents a Window on the screen that the engine is rendering to.
     /// </summary>
-    public static class Window
+    public class Window
     {
-        public static string Title
+        internal readonly ulong ID;
+
+        public static Window Main
         {
-            get => Runtime.Window_GetTitle();
-            set => Runtime.Window_SetTitle(value);
+            get => (Window)Runtime.Window_GetMain();
         }
 
-        public static bool IsOpen
+        public string Title
         {
-            get => Runtime.Window_IsOpen();
+            get => Runtime.Window_GetTitle(ID);
+            set => Runtime.Window_SetTitle(ID, value);
         }
 
-        public static void SetIcon(string path)
+        public bool IsOpen
         {
-            Runtime.Window_SetIcon(path);
+            get => Runtime.Window_IsOpen(ID);
         }
 
-        public static void Close()
+        internal Window(uint id)
         {
-            Runtime.Window_Close();
+            ID = id;
+        }
+
+        public void SetIcon(string path)
+        {
+            Runtime.Window_SetIcon(ID, path);
+        }
+
+        public void Close()
+        {
+            Runtime.Window_Close(ID);
         }
 
         /// <summary>
         /// Maximizes the Window.
         /// </summary>
-        public static void Maximize()
+        public void Maximize()
         {
-            Runtime.Window_Maximize();
+            Runtime.Window_Maximize(ID);
         }
 
         /// <summary>
         /// Minimizes the window.
         /// </summary>
-        public static void Minimize()
+        public void Minimize()
         {
-            Runtime.Window_Minimize();
+            Runtime.Window_Minimize(ID);
         }
 
         /// <summary>
         /// Returns the window from minimized or maximized back to a regular window state.
         /// </summary>
-        public static void Restore()
+        public void Restore()
         {
-            Runtime.Window_Restore();
+            Runtime.Window_Restore(ID);
+        }
+
+        public Window GetWindow(uint index)
+        {
+
         }
     }
 }

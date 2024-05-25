@@ -20,6 +20,7 @@
 #include <chrono>
 #include <algorithm>
 #include <future>
+#include <memory>
 
 #include <type_traits>
 #include <typeindex>
@@ -37,11 +38,11 @@
 
 #include "framework.h"
 
-#include "libraries/M_EnTT.h"
-#include "libraries/M_GLFW.h"
-#include "libraries/M_GLM.hpp"
-#include "libraries/M_Mono.h"
-#include "libraries/M_TinyXML.h"
-#include "libraries/M_Vulkan.h"
+#include "Minty/Libraries/M_EnTT.h"
+#include "Minty/Libraries/M_GLFW.h"
+#include "Minty/Libraries/M_GLM.hpp"
+#include "Minty/Libraries/M_Mono.h"
+#include "Minty/Libraries/M_TinyXML.h"
+#include "Minty/Libraries/M_Vulkan.h"
 
 #endif //PCH_H
