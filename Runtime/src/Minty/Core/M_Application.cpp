@@ -66,8 +66,6 @@ Minty::Application::Application(ApplicationBuilder const& builder)
 Minty::Application::~Application()
 {
 	_instance = nullptr;
-
-	delete _defaultLayer;
 }
 
 SceneManager& Minty::Application::get_scene_manager() const

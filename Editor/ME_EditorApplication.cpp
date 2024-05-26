@@ -75,15 +75,15 @@ EditorApplication::EditorApplication()
 }
 
 Mintye::EditorApplication::~EditorApplication()
-{
+{	
+	unload_project();
+
+	save_data();
+
 	for (auto const& pair : _editorWindows)
 	{
 		delete pair.second;
 	}
-	
-	unload_project();
-
-	save_data();
 }
 
 void Mintye::EditorApplication::draw()
