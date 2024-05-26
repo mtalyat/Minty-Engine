@@ -23,12 +23,12 @@ namespace Minty
 		/// <summary>
 		/// The ID of the Texture to be used.
 		/// </summary>
-		Texture* texture = nullptr;
+		Ref<Texture> texture = nullptr;
 
 		/// <summary>
 		/// The ID of the Material to be used. If left as ERROR_ID, a new Material will be generated using the texture.
 		/// </summary>
-		Material* material = nullptr;
+		Ref<Material> material = nullptr;
 
 		/// <summary>
 		/// The coordinate mode for the pivot and slice data.

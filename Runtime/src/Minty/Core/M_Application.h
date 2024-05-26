@@ -74,7 +74,7 @@ namespace Minty
 		ApplicationInfo _info;
 		ApplicationMode _mode;
 
-		Scope<Window> _window;
+		Owner<Window> _window;
 		bool _minimized;
 
 		std::vector<Engine*> _engines;

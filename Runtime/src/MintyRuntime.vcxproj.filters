@@ -492,6 +492,9 @@
     <ClInclude Include="Minty\Components\M_ScriptObjectComponent.h">
       <Filter>Minty\Components</Filter>
     </ClInclude>
+    <ClInclude Include="Minty\Core\M_Pointer.h">
+      <Filter>Minty\Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">

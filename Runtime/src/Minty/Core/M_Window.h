@@ -161,7 +161,7 @@ namespace Minty
 
 		static Window& main() { return *_main; }
 
-		static Scope<Window> create(WindowBuilder const& builder = {});
+		static Owner<Window> create(WindowBuilder const& builder = {});
 
 	protected:
 		static void register_window(Window* window);

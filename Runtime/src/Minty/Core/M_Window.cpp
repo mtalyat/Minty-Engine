@@ -15,10 +15,10 @@ using namespace Minty;
 std::unordered_map<UUID, Window*> Minty::Window::_windows = std::unordered_map<UUID, Window*>();
 Window* Minty::Window::_main = nullptr;
 
-Scope<Window> Minty::Window::create(WindowBuilder const& builder)
+Owner<Window> Minty::Window::create(WindowBuilder const& builder)
 {
 #ifdef MINTY_WINDOWS
-	return create_scope<WindowsWindow>(builder);
+	return Owner<WindowsWindow>(builder);
 #else
 	MINTY_ERROR("Unknown platform: cannot create Window.");
 	return nullptr;

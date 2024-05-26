@@ -458,7 +458,7 @@ UUID Minty::RenderEngine::get_or_create_mesh(MeshType const type)
 
 	// create new
 	MeshBuilder builder {};
-	Ref<Mesh> mesh = create_ref<Mesh>(builder);
+	Owner<Mesh> mesh = Owner<Mesh>(builder);
 
 	// create data
 	switch (type)
@@ -1447,7 +1447,7 @@ Buffer const& Minty::RenderEngine::create_buffer(VkDeviceSize const size, VkBuff
 		.memory = bufferMemory,
 		.size = size
 	};
-	Ref<Buffer> b = create_ref<Buffer>(builder);
+	Owner<Buffer> b = Owner<Buffer>(builder);
 	assets.emplace(b);
 	return *b;
 }
@@ -1753,39 +1753,39 @@ void Minty::RenderEngine::bind(VkCommandBuffer const commandBuffer, Ref<Material
 	}
 
 	// if the same, do nothing
-	if (_bound.at(BIND_MATERIAL) == ref_to_pointer(material))
+	if (_bound.at(BIND_MATERIAL) == material.get())
 	{
 		return;
 	}
 
 	// new material, so update bound ids and bind descriptor sets as needed
 
-	_bound[BIND_MATERIAL] = ref_to_pointer(material);
+	_bound[BIND_MATERIAL] = material.get();
 
 	Ref<MaterialTemplate> materialTemplate = material->get_template();
 
-	if (_bound.at(BIND_MATERIAL_TEMPLATE) == ref_to_pointer(materialTemplate))
+	if (_bound.at(BIND_MATERIAL_TEMPLATE) == materialTemplate.get())
 	{
 		// only update material
 		bind(commandBuffer);
 		return;
 	}
 
-	_bound[BIND_MATERIAL_TEMPLATE] = ref_to_pointer<MaterialTemplate>(materialTemplate);
+	_bound[BIND_MATERIAL_TEMPLATE] = materialTemplate.get();
 	// TODO: do all passes?
 	Ref<ShaderPass> shaderPass = materialTemplate->get_shader_passes().front();
 
-	if (_bound.at(BIND_SHADER_PASS) == ref_to_pointer(shaderPass))
+	if (_bound.at(BIND_SHADER_PASS) == shaderPass.get())
 	{
 		// only update material and material template
 		bind(commandBuffer);
 		return;
 	}
 
-	_bound[BIND_SHADER_PASS] = ref_to_pointer(shaderPass);
+	_bound[BIND_SHADER_PASS] = shaderPass.get();
 	Ref<Shader> shader = shaderPass->get_shader();
 
-	if (_bound.at(BIND_SHADER) == ref_to_pointer(shader))
+	if (_bound.at(BIND_SHADER) == shader.get())
 	{
 		// only update material, material template, and shader pass
 		bind(commandBuffer);
@@ -1793,7 +1793,7 @@ void Minty::RenderEngine::bind(VkCommandBuffer const commandBuffer, Ref<Material
 	}
 
 	// update everything
-	_bound[BIND_SHADER] = ref_to_pointer(shader);
+	_bound[BIND_SHADER] = shader.get();
 	bind(commandBuffer);
 }
 

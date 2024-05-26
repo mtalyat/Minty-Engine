@@ -254,6 +254,7 @@
     <ClInclude Include="Minty\Core\M_Constants.h" />
     <ClInclude Include="Minty\Core\M_Engine.h" />
     <ClInclude Include="Minty\Core\M_Macros.h" />
+    <ClInclude Include="Minty\Core\M_Pointer.h" />
     <ClInclude Include="Minty\Core\M_Window.h" />
     <ClInclude Include="Minty\Entities\M_Entity.h" />
     <ClInclude Include="Minty\Entities\M_EntityRegistry.h" />

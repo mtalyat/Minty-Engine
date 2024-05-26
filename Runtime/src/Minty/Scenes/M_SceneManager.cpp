@@ -30,7 +30,7 @@ Scene& Minty::SceneManager::create_scene(Path const& path)
 		.path = path
 	};
 
-	Ref<Scene> scene = create_ref<Scene>(builder);
+	Owner<Scene> scene = Owner<Scene>(builder);
 	Reader reader(node);
 	scene->deserialize(reader);
 

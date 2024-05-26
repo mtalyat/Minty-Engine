@@ -34,7 +34,7 @@ namespace Minty
 		: public Engine
 	{
 	private:
-		std::unordered_map<UUID, Ref<Asset>> _assets;
+		std::unordered_map<UUID, Owner<Asset>> _assets;
 		std::unordered_map<TypeID, std::unordered_set<Ref<Asset>>> _assetsByType;
 
 		Wrapper _wrapper;
@@ -188,7 +188,7 @@ namespace Minty
 		{
 			MINTY_ASSERT_FORMAT(_assets.contains(id), "{}", to_string(id));
 
-			return std::static_pointer_cast<T>(_assets.at(id));
+			return _assets.at(id).create_ref<T>();
 		}
 
 		/// <summary>
@@ -207,7 +207,7 @@ namespace Minty
 				return nullptr;
 			}
 
-			return std::static_pointer_cast<T>(found->second);
+			return found->second.create_ref<T>();
 		}
 
 		Ref<Asset> get_asset(UUID const id) const;
@@ -219,7 +219,7 @@ namespace Minty
 		/// </summary>
 		/// <param name="asset"></param>
 		/// <returns></returns>
-		void emplace(Ref<Asset> const asset);
+		void emplace(Owner<Asset> const asset);
 
 		/// <summary>
 		/// Removes an asset from this AssetEngine. Does not delete the asset.
@@ -243,7 +243,7 @@ namespace Minty
 
 				for (auto const asset : found->second)
 				{
-					result.push_back(std::static_pointer_cast<T>(asset));
+					result.push_back(asset.static_cast_to<T>());
 				}
 			}
 
@@ -261,16 +261,16 @@ namespace Minty
 	};
 
 	template<typename T>
-	inline Ref<T> AssetEngine::load(Path const& path)
+	Ref<T> AssetEngine::load(Path const& path)
 	{
 		return static_cast<Ref<T>>(load_asset(path));
 	}
 
 	template<typename T, typename ...Args>
-	inline Ref<T> AssetEngine::create(Args && ...args)
+	Ref<T> AssetEngine::create(Args && ...args)
 	{
-		Ref<T> ref = create_ref<T>(std::forward<Args>(args)...);
-		emplace(ref);
-		return ref;
+		Owner<T> asset = Owner<T>(std::forward<Args>(args)...);
+		emplace(asset);
+		return asset;
 	}
 }

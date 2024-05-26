@@ -918,7 +918,7 @@ Ref<Asset> Minty::AssetEngine::get_asset(UUID const id) const
 
 	if (found != _assets.end())
 	{
-		return found->second;
+		return found->second.create_ref();
 	}
 
 	return nullptr;
@@ -929,7 +929,7 @@ bool Minty::AssetEngine::contains(UUID const id) const
 	return _assets.contains(id);
 }
 
-void Minty::AssetEngine::emplace(Ref<Asset> const asset)
+void Minty::AssetEngine::emplace(Owner<Asset> const asset)
 {
 	MINTY_ASSERT(asset != nullptr);
 	MINTY_ASSERT_FORMAT(!_assets.contains(asset->get_id()), "An asset with the ID {} already exists and is loaded.", to_string(asset->get_id()));
