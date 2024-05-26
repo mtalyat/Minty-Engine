@@ -396,10 +396,10 @@ DescriptorSet Minty::Shader::create_descriptor_set(uint32_t const set, bool cons
 				data.ids.resize(1);
 
 				// create a buffer
-				Buffer const& buffer = renderer.create_buffer_uniform(static_cast<VkDeviceSize>(info.size));
+				Ref<Buffer> buffer = renderer.create_buffer_uniform(static_cast<VkDeviceSize>(info.size));
 
 				// add to buffers
-				data.ids[0] = buffer.get_id();
+				data.ids[0] = buffer->get_id();
 
 				// not empty by default
 				data.empty = false;

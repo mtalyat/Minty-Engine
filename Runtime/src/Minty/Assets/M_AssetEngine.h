@@ -85,7 +85,10 @@ namespace Minty
 		/// <param name="path"></param>
 		/// <returns></returns>
 		template<typename T>
-		Ref<T> load(Path const& path);
+		Ref<T> load(Path const& path)
+		{
+			return static_cast<Ref<T>>(load_asset(path));
+		}
 
 		/// <summary>
 		/// Creates an asset of the given type T, using its corresponding builder, of type U.
@@ -95,7 +98,12 @@ namespace Minty
 		/// <param name="builder"></param>
 		/// <returns></returns>
 		template<typename T, typename... Args>
-		Ref<T> create(Args&&... args);
+		Ref<T> create(Args&&... args)
+		{
+			Owner<T> asset = Owner<T>(std::forward<Args>(args)...);
+			emplace(asset);
+			return asset;
+		}
 
 	public:
 		Wrapper& get_wrapper() { return _wrapper; }
@@ -163,7 +171,7 @@ namespace Minty
 		/// </summary>
 		/// <param name="asset"></param>
 		/// <returns></returns>
-		void unload(Asset const& asset);
+		void unload(Ref<Asset> const asset);
 
 		/// <summary>
 		/// Unloads all assets in this AssetManager.
@@ -260,17 +268,4 @@ namespace Minty
 		static AssetEngine& instance() { return *_instance; }
 	};
 
-	template<typename T>
-	Ref<T> AssetEngine::load(Path const& path)
-	{
-		return static_cast<Ref<T>>(load_asset(path));
 	}
-
-	template<typename T, typename ...Args>
-	Ref<T> AssetEngine::create(Args && ...args)
-	{
-		Owner<T> asset = Owner<T>(std::forward<Args>(args)...);
-		emplace(asset);
-		return asset;
-	}
-}

@@ -68,13 +68,11 @@ namespace Minty
 	private:
 		uint32_t _vertexCount;
 		uint32_t _vertexSize;
-		UUID _vertexBufferId;
-		Buffer const* _vertexBuffer;
+		Ref<Buffer> _vertexBuffer;
 
 		uint32_t _indexCount;
 		uint32_t _indexSize;
-		UUID _indexBufferId;
-		Buffer const* _indexBuffer;
+		Ref<Buffer> _indexBuffer;
 		VkIndexType _indexType;
 	public:
 		/// <summary>
@@ -139,37 +137,37 @@ namespace Minty
 		/// Gets the number of vertices in this Mesh.
 		/// </summary>
 		/// <returns></returns>
-		uint32_t get_vertex_count() const;
+		uint32_t get_vertex_count() const { return _vertexCount; }
 
 		/// <summary>
 		/// Gets the ID of the vertex buffer.
 		/// </summary>
 		/// <returns></returns>
-		Buffer const* get_vertex_buffer() const;
+		Ref<Buffer> get_vertex_buffer() const { return _vertexBuffer; }
 
 		/// <summary>
 		/// Gets the number of indices in this Mesh.
 		/// </summary>
 		/// <returns></returns>
-		uint32_t get_index_count() const;
+		uint32_t get_index_count() const { return _indexCount; }
 
 		/// <summary>
 		/// Gets the ID of the index buffer.
 		/// </summary>
 		/// <returns></returns>
-		Buffer const* get_index_buffer() const;
+		Ref<Buffer> get_index_buffer() const { return _indexBuffer; }
 
 		/// <summary>
 		/// Gets the index type for this Mesh.
 		/// </summary>
 		/// <returns></returns>
-		VkIndexType get_index_type() const;
+		VkIndexType get_index_type() const { return _indexType; }
 
 		/// <summary>
 		/// Checks if this Mesh is empty.
 		/// </summary>
 		/// <returns></returns>
-		bool empty() const;
+		bool empty() const { return _vertexCount == 0; }
 
 #pragma endregion
 

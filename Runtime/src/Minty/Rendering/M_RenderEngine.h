@@ -332,40 +332,40 @@ namespace Minty
 		/// <param name="usage">How the buffer will be used.</param>
 		/// <param name="properties">The memory properties.</param>
 		/// <returns>The ID of the new buffer.</returns>
-		Buffer const& create_buffer(VkDeviceSize const size, VkBufferUsageFlags const usage, VkMemoryPropertyFlags const properties);
+		Ref<Buffer> create_buffer(VkDeviceSize const size, VkBufferUsageFlags const usage, VkMemoryPropertyFlags const properties);
 
 		/// <summary>
 		/// Creates a uniform buffer.
 		/// </summary>
 		/// <param name="size">The size of the buffer.</param>
 		/// <returns>The ID of the new buffer.</returns>
-		Buffer const& create_buffer_uniform(VkDeviceSize const size);
+		Ref<Buffer> create_buffer_uniform(VkDeviceSize const size);
 
 		/// <summary>
 		/// Destroys the buffer with the given ID.
 		/// </summary>
 		/// <param name="id"></param>
-		void destroy_buffer(Buffer const& buffer);
+		void destroy_buffer(Ref<Buffer> const buffer);
 
 		/// <summary>
 		/// Maps the buffer data to a pointer in memory.
 		/// </summary>
 		/// <param name="id">The ID of the buffer to map.</param>
 		/// <returns>A pointer to the buffer data in memory.</returns>
-		void* map_buffer(Buffer const& buffer) const;
+		void* map_buffer(Ref<Buffer> const buffer) const;
 
 		/// <summary>
 		/// Unmaps the buffer data from memory. The invalidates the pointer given from map_buffer for the same ID.
 		/// </summary>
 		/// <param name="id">The ID of the buffer to unmap.</param>
-		void unmap_buffer(Buffer const& buffer) const;
+		void unmap_buffer(Ref<Buffer> const buffer) const;
 
 		/// <summary>
 		/// Sets the data for the buffer with the given ID.
 		/// </summary>
 		/// <param name="id">The ID of the buffer to modify.</param>
 		/// <param name="data">The data to set to the buffer.</param>
-		void set_buffer(Buffer const& buffer, void const* const data);
+		void set_buffer(Ref<Buffer> const buffer, void const* const data);
 
 		/// <summary>
 		/// Sets the data for the buffer with the given ID.
@@ -374,14 +374,14 @@ namespace Minty
 		/// <param name="data">The data to set to the buffer.</param>
 		/// <param name="size">The size of the data in bytes.</param>
 		/// <param name="offset">The offset of the data within the buffer in bytes.</param>
-		void set_buffer(Buffer const& buffer, void const* const data, VkDeviceSize const size, VkDeviceSize const offset = 0);
+		void set_buffer(Ref<Buffer> const buffer, void const* const data, VkDeviceSize const size, VkDeviceSize const offset = 0);
 
 		/// <summary>
 		/// Gets the data of the buffer with the given ID and stores it within the out pointer.
 		/// </summary>
 		/// <param name="id">The ID of the buffer to get the data from.</param>
 		/// <param name="out">The pointer to the location of the data to be set.</param>
-		void get_buffer_data(Buffer const& buffer, void* const out) const; // TODO: test method
+		void get_buffer_data(Ref<Buffer> const buffer, void* const out) const; // TODO: test method
 
 		/// <summary>
 		/// Copies the buffer with the srcId to the buffer with the dstId.
@@ -389,7 +389,7 @@ namespace Minty
 		/// <param name="srcId">The ID of the source buffer.</param>
 		/// <param name="dstId">The ID of the destination buffer.</param>
 		/// <param name="size">The number of bytes to copy.</param>
-		void copy_buffer(Buffer const& src, Buffer const& dst, VkDeviceSize const size);
+		void copy_buffer(Ref<Buffer> const src, Ref<Buffer> const dst, VkDeviceSize const size);
 
 #pragma endregion
 

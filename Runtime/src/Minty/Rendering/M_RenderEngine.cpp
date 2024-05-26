@@ -1141,7 +1141,7 @@ void Minty::RenderEngine::draw_mesh(VkCommandBuffer commandBuffer, Matrix4 const
 
 	Mesh& mesh = *meshComponent.mesh;
 
-	// do nothing if empty mesh
+	// do nothing if empty mesh or empty material
 	if (mesh.empty())
 	{
 		return;
@@ -1415,7 +1415,7 @@ void RenderEngine::create_framebuffers()
 	}
 }
 
-Buffer const& Minty::RenderEngine::create_buffer(VkDeviceSize const size, VkBufferUsageFlags const usage, VkMemoryPropertyFlags const properties)
+Ref<Buffer> Minty::RenderEngine::create_buffer(VkDeviceSize const size, VkBufferUsageFlags const usage, VkMemoryPropertyFlags const properties)
 {
 	VkBuffer buffer;
 	VkDeviceMemory bufferMemory;
@@ -1447,37 +1447,35 @@ Buffer const& Minty::RenderEngine::create_buffer(VkDeviceSize const size, VkBuff
 		.memory = bufferMemory,
 		.size = size
 	};
-	Owner<Buffer> b = Owner<Buffer>(builder);
-	assets.emplace(b);
-	return *b;
+	return assets.create<Buffer>(builder);
 }
 
-Buffer const& Minty::RenderEngine::create_buffer_uniform(VkDeviceSize const size)
+Ref<Buffer> Minty::RenderEngine::create_buffer_uniform(VkDeviceSize const size)
 {
 	return create_buffer(size, VkBufferUsageFlagBits::VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 }
 
-void* Minty::RenderEngine::map_buffer(Buffer const& buffer) const
+void* Minty::RenderEngine::map_buffer(Ref<Buffer> const buffer) const
 {
 	void* data = nullptr;
 
-	VK_ASSERT(vkMapMemory(_device, buffer.get_memory(), 0, buffer.get_size(), 0, &data), "Failed to map memory for new buffer.");
+	VK_ASSERT(vkMapMemory(_device, buffer->get_memory(), 0, buffer->get_size(), 0, &data), "Failed to map memory for new buffer.");
 
 	return data;
 }
 
-void Minty::RenderEngine::unmap_buffer(Buffer const& buffer) const
+void Minty::RenderEngine::unmap_buffer(Ref<Buffer> const buffer) const
 {
-	vkUnmapMemory(_device, buffer.get_memory());
+	vkUnmapMemory(_device, buffer->get_memory());
 }
 
-void Minty::RenderEngine::set_buffer(Buffer const& buffer, void const* const data)
+void Minty::RenderEngine::set_buffer(Ref<Buffer> const buffer, void const* const data)
 {
 	// set whole buffer
-	set_buffer(buffer, data, 0, buffer.get_size());
+	set_buffer(buffer, data, 0, buffer->get_size());
 }
 
-void Minty::RenderEngine::set_buffer(Buffer const& buffer, void const* const data, VkDeviceSize const size, VkDeviceSize const offset)
+void Minty::RenderEngine::set_buffer(Ref<Buffer> const buffer, void const* const data, VkDeviceSize const size, VkDeviceSize const offset)
 {
 	// map data
 	void* mappedData = map_buffer(buffer);
@@ -1499,30 +1497,30 @@ void Minty::RenderEngine::set_buffer(Buffer const& buffer, void const* const dat
 	unmap_buffer(buffer);
 }
 
-void Minty::RenderEngine::get_buffer_data(Buffer const& buffer, void* const out) const
+void Minty::RenderEngine::get_buffer_data(Ref<Buffer> const buffer, void* const out) const
 {
 	// map data
 	void* data = map_buffer(buffer);
 
 	// copy out data
-	memcpy(out, data, buffer.get_size());
+	memcpy(out, data, buffer->get_size());
 
 	// unmap
 	unmap_buffer(buffer);
 }
 
-void Minty::RenderEngine::copy_buffer(Buffer const& src, Buffer const& dst, VkDeviceSize const size)
+void Minty::RenderEngine::copy_buffer(Ref<Buffer> const src, Ref<Buffer> const dst, VkDeviceSize const size)
 {
 	VkCommandBuffer commandBuffer = begin_single_time_commands(_commandPool);
 
 	VkBufferCopy copyRegion{};
 	copyRegion.size = size;
-	vkCmdCopyBuffer(commandBuffer, src.get_buffer(), dst.get_buffer(), 1, &copyRegion);
+	vkCmdCopyBuffer(commandBuffer, src->get_buffer(), dst->get_buffer(), 1, &copyRegion);
 
 	end_single_time_commands(commandBuffer, _commandPool);
 }
 
-void Minty::RenderEngine::destroy_buffer(Buffer const& buffer)
+void Minty::RenderEngine::destroy_buffer(Ref<Buffer> const buffer)
 {
 	AssetEngine& assets = AssetEngine::instance();
 	assets.unload(buffer);

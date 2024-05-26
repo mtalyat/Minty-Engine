@@ -288,7 +288,7 @@ void Minty::DescriptorSet::set_descriptor(DescriptorData& data, int const frame,
 
 		// set buffer
 		RenderEngine& renderer = RenderEngine::instance();
-		renderer.set_buffer(*buffer, value, size, offset);
+		renderer.set_buffer(buffer, value, size, offset);
 
 		break;
 	}
@@ -337,7 +337,7 @@ bool Minty::DescriptorSet::get(String const& name, int const frame, void* const 
 
 		// set the data
 		RenderEngine& renderer = RenderEngine::instance();
-		renderer.get_buffer_data(*buffer, out);
+		renderer.get_buffer_data(buffer, out);
 
 		return true;
 	}

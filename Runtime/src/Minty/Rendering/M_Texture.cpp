@@ -86,7 +86,7 @@ Texture::Texture(TextureBuilder const& builder)
 
 	// create a buffer that can be used as the source of a transfer command
 	// the memory can be mapped, and specify that flush is not needed (we do not need to flush to make writes)
-	Buffer const& stagingBuffer = renderEngine.create_buffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+	Ref<Buffer> stagingBuffer = renderEngine.create_buffer(imageSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
 	VkDevice device = renderEngine.get_device();
 
@@ -116,7 +116,7 @@ Texture::Texture(TextureBuilder const& builder)
 	renderEngine.change_image_layout(_image, _format, VK_IMAGE_LAYOUT_UNDEFINED, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL);
 
 	// copy pixel data to image
-	renderEngine.copy_buffer_to_image(stagingBuffer.get_buffer(), _image, _width, _height);
+	renderEngine.copy_buffer_to_image(stagingBuffer->get_buffer(), _image, _width, _height);
 
 	// prep texture for rendering
 	renderEngine.change_image_layout(_image, _format, VK_IMAGE_LAYOUT_TRANSFER_DST_OPTIMAL, VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL);

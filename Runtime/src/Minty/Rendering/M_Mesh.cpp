@@ -15,11 +15,9 @@ Minty::Mesh::Mesh()
 	: Asset()
 	, _vertexCount()
 	, _vertexSize()
-	, _vertexBufferId(INVALID_UUID)
 	, _vertexBuffer()
 	, _indexCount()
 	, _indexSize()
-	, _indexBufferId(INVALID_UUID)
 	, _indexBuffer()
 	, _indexType()
 {}
@@ -28,11 +26,9 @@ Minty::Mesh::Mesh(MeshBuilder const& builder)
 	: Asset(builder.id, builder.path)
 	, _vertexCount()
 	, _vertexSize()
-	, _vertexBufferId(INVALID_UUID)
 	, _vertexBuffer()
 	, _indexCount()
 	, _indexSize()
-	, _indexBufferId(INVALID_UUID)
 	, _indexBuffer()
 	, _indexType()
 {}
@@ -47,36 +43,6 @@ void Minty::Mesh::clear()
 {
 	set_vertices(nullptr, 0, 0);
 	set_indices(nullptr, 0, 0);
-}
-
-uint32_t Minty::Mesh::get_vertex_count() const
-{
-	return _vertexCount;
-}
-
-Buffer const* Minty::Mesh::get_vertex_buffer() const
-{
-	return _vertexBuffer;
-}
-
-uint32_t Minty::Mesh::get_index_count() const
-{
-	return _indexCount;
-}
-
-Buffer const* Minty::Mesh::get_index_buffer() const
-{
-	return _indexBuffer;
-}
-
-VkIndexType Minty::Mesh::get_index_type() const
-{
-	return _indexType;
-}
-
-bool Minty::Mesh::empty() const
-{
-	return _vertexCount == 0;
 }
 
 void Minty::Mesh::create_primitive_quad(Mesh& mesh)
@@ -470,7 +436,7 @@ void Minty::Mesh::set_vertices(void const* const vertices, size_t const count, s
 	VkDeviceSize bufferSize = static_cast<VkDeviceSize>(count * vertexSize);
 
 	// use buffer to copy data into device memory
-	Buffer const& stagingBuffer = renderer.create_buffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+	Ref<Buffer> stagingBuffer = renderer.create_buffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
 	auto device = renderer.get_device();
 
@@ -484,11 +450,8 @@ void Minty::Mesh::set_vertices(void const* const vertices, size_t const count, s
 	renderer.unmap_buffer(stagingBuffer);
 
 	// copy into device memory
-	Buffer const& vertexBuffer = renderer.create_buffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-	_vertexBufferId = vertexBuffer.get_id();
-	_vertexBuffer = &vertexBuffer;
-
-	renderer.copy_buffer(stagingBuffer, vertexBuffer, bufferSize);
+	_vertexBuffer = renderer.create_buffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_VERTEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+	renderer.copy_buffer(stagingBuffer, _vertexBuffer, bufferSize);
 
 	// clean up
 	renderer.destroy_buffer(stagingBuffer);
@@ -515,7 +478,7 @@ void Minty::Mesh::set_indices(void const* const indices, size_t const count, siz
 	VkDeviceSize bufferSize = static_cast<VkDeviceSize>(count * indexSize);
 
 	// use buffer to copy data into device memory
-	Buffer const& stagingBuffer = renderer.create_buffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
+	Ref<Buffer> stagingBuffer = renderer.create_buffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_SRC_BIT, VK_MEMORY_PROPERTY_HOST_VISIBLE_BIT | VK_MEMORY_PROPERTY_HOST_COHERENT_BIT);
 
 	auto device = renderer.get_device();
 
@@ -525,11 +488,8 @@ void Minty::Mesh::set_indices(void const* const indices, size_t const count, siz
 	renderer.unmap_buffer(stagingBuffer);
 
 	// copy into device memory
-	Buffer const& indexBuffer = renderer.create_buffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
-	_indexBufferId = indexBuffer.get_id();
-	_indexBuffer = &indexBuffer;
-
-	renderer.copy_buffer(stagingBuffer, indexBuffer, bufferSize);
+	_indexBuffer = renderer.create_buffer(bufferSize, VK_BUFFER_USAGE_TRANSFER_DST_BIT | VK_BUFFER_USAGE_INDEX_BUFFER_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT);
+	renderer.copy_buffer(stagingBuffer, _indexBuffer, bufferSize);
 
 	// clean up
 	renderer.destroy_buffer(stagingBuffer);
@@ -540,15 +500,14 @@ void Minty::Mesh::dispose_vertices()
 	AssetEngine& assets = AssetEngine::instance();
 
 	// if buffer not loaded, ignore, it was already disposed
-	if (!assets.contains(_vertexBufferId))
+	if (!_vertexBuffer || !assets.contains(_vertexBuffer->get_id()))
 	{
 		return;
 	}
 
 	RenderEngine& renderer = RenderEngine::instance();
 
-	renderer.destroy_buffer(*_vertexBuffer);
-	_vertexBufferId = INVALID_UUID;
+	renderer.destroy_buffer(_vertexBuffer);
 	_vertexBuffer = nullptr;
 	_vertexCount = 0;
 	_vertexSize = 0;
@@ -559,15 +518,14 @@ void Minty::Mesh::dispose_indices()
 	AssetEngine& assets = AssetEngine::instance();
 
 	// if buffer not loaded, ignore, it was already disposed
-	if (!assets.contains(_indexBufferId))
+	if (!_indexBuffer || !assets.contains(_indexBuffer->get_id()))
 	{
 		return;
 	}
 
 	RenderEngine& renderer = RenderEngine::instance();
 
-	renderer.destroy_buffer(*_indexBuffer);
-	_indexBufferId = INVALID_UUID;
+	renderer.destroy_buffer(_indexBuffer);
 	_indexBuffer = nullptr;
 	_indexCount = 0;
 	_indexSize = 0;

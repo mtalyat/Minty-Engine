@@ -38,6 +38,9 @@ namespace Minty
 		Scene,
 	};
 
+	String to_string(AssetType const value);
+	AssetType from_string_asset_type(String const& value);
+
 	/// <summary>
 	/// The base class for all Assets.
 	/// </summary>

@@ -70,7 +70,7 @@ namespace Minty
 			: _ptr(new T(std::forward<Args>(args)...))
 			, _counter(new Counter())
 		{
-			if (_counter) _counter->strongCount++;
+			_counter->strongCount++;
 		}
 
 		// implicit from null
@@ -94,7 +94,6 @@ namespace Minty
 			{
 				_ptr = other._ptr;
 				_counter = other._counter;
-				if (_counter) _counter->strongCount++;
 			}
 			return *this;
 		}
@@ -104,11 +103,11 @@ namespace Minty
 		{
 			other._ptr = nullptr;
 			other._counter = nullptr;
+
+			if (_counter) _counter->strongCount++;
 		}
 		Owner& operator=(Owner&& other) noexcept {
 			if (this != &other) {
-				delete _ptr;
-				delete _counter;
 				_ptr = other._ptr;
 				_counter = other._counter;
 				other._ptr = nullptr;
@@ -216,7 +215,6 @@ namespace Minty
 			{
 				_ptr = other._ptr;
 				_counter = other._counter;
-				if (_counter) _counter->weakCount++;
 			}
 			return *this;
 		}
@@ -226,11 +224,11 @@ namespace Minty
 		{
 			other._ptr = nullptr;
 			other._counter = nullptr;
+
+			if(_counter) _counter->weakCount++;
 		}
 		Ref& operator=(Ref&& other) noexcept {
 			if (this != &other) {
-				delete _ptr;
-				delete _counter;
 				_ptr = other._ptr;
 				_counter = other._counter;
 				other._ptr = nullptr;
@@ -274,8 +272,10 @@ namespace Minty
 
 		T* get() const
 		{
-			// if no strong count, ptr has been deleted, so return null
-			return _counter->strongCount ? _ptr : nullptr;
+			if(_counter)
+				return _counter->strongCount ? _ptr : nullptr;
+
+			return nullptr;
 		}
 		T& operator*() const { return *get(); }
 		T* operator->() const { return get(); }

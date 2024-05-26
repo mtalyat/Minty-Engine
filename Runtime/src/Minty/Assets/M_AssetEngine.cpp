@@ -813,9 +813,10 @@ void Minty::AssetEngine::unload(UUID const id)
 	erase(id);
 }
 
-void Minty::AssetEngine::unload(Asset const& asset)
-{
-	unload(asset.get_id());
+void Minty::AssetEngine::unload(Ref<Asset> const asset)
+{ 
+	MINTY_ASSERT(asset != nullptr);
+	unload(asset->get_id());
 }
 
 void Minty::AssetEngine::unload_all()
