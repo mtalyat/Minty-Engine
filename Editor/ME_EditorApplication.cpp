@@ -326,7 +326,7 @@ void Mintye::EditorApplication::save_scene()
 	Node node("", to_string(_sceneId));
 	SerializationData data
 	{
-		.scene = ref_to_pointer(scene),
+		.scene = scene.get(),
 		.entity = NULL_ENTITY,
 	};
 	Writer writer(node, &data);

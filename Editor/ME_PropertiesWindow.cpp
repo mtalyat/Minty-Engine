@@ -338,7 +338,7 @@ void Mintye::PropertiesWindow::draw_component(Minty::Node& node, size_t const i,
 		Component* component = registry.get_by_name(node.get_name(), _targetEntity);
 		SerializationData data
 		{
-			.scene = ref_to_pointer(get_scene()),
+			.scene = get_scene().get(),
 			.entity = _targetEntity,
 		};
 		Reader reader(node, &data);

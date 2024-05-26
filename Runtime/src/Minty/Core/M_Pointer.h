@@ -61,7 +61,7 @@ namespace Minty
 		explicit Owner(T* const ptr, Counter* const counter)
 			: _ptr(ptr), _counter(counter)
 		{
-			_counter->strongCount++;
+			if (_counter) _counter->strongCount++;
 		}
 
 		// create new
@@ -70,7 +70,7 @@ namespace Minty
 			: _ptr(new T(std::forward<Args>(args)...))
 			, _counter(new Counter())
 		{
-			_counter->strongCount++;
+			if (_counter) _counter->strongCount++;
 		}
 
 		// implicit from null
@@ -86,7 +86,7 @@ namespace Minty
 			: _ptr(other._ptr)
 			, _counter(other._counter)
 		{
-			_counter->strongCount++;
+			if (_counter) _counter->strongCount++;
 		}
 		Owner& operator=(Owner const& other)
 		{
@@ -94,7 +94,7 @@ namespace Minty
 			{
 				_ptr = other._ptr;
 				_counter = other._counter;
-				_counter->strongCount++;
+				if (_counter) _counter->strongCount++;
 			}
 			return *this;
 		}
@@ -124,6 +124,8 @@ namespace Minty
 
 		void release()
 		{
+			if (_ptr == nullptr) return;
+
 			_counter->strongCount--;
 
 			// no more owners, so delete the data
@@ -182,7 +184,7 @@ namespace Minty
 		explicit Ref(T* const ptr, Counter* const counter)
 			: _ptr(ptr), _counter(counter)
 		{
-			_counter->weakCount++;
+			if (_counter) _counter->weakCount++;
 		}
 
 		// implicit from null
@@ -198,7 +200,7 @@ namespace Minty
 		Ref(Owner<T> const owner)
 			: _ptr(owner._ptr), _counter(owner._counter)
 		{
-			_counter->weakCount++;
+			if (_counter) _counter->weakCount++;
 		}
 
 	public:
@@ -206,7 +208,7 @@ namespace Minty
 			: _ptr(other._ptr)
 			, _counter(other._counter)
 		{
-			_counter->weakCount++;
+			if(_counter) _counter->weakCount++;
 		}
 		Ref& operator=(Ref const& other)
 		{
@@ -214,7 +216,7 @@ namespace Minty
 			{
 				_ptr = other._ptr;
 				_counter = other._counter;
-				_counter->weakCount++;
+				if (_counter) _counter->weakCount++;
 			}
 			return *this;
 		}
@@ -244,6 +246,8 @@ namespace Minty
 
 		void release()
 		{
+			if (_counter == nullptr) return;
+
 			_counter->weakCount--;
 
 			// if no more strong and no more weak, delete counter
@@ -265,8 +269,8 @@ namespace Minty
 		bool operator<(Owner<T> const& other) const { return _ptr < other._ptr; }
 		bool operator<(T* const other) const { return _ptr < other; }
 		bool operator<(Ref<T> const& other) const { return _ptr < other._ptr; }
-		bool operator!() const { return !_counter->strongCount; }
-		operator bool() const { return static_cast<bool>(_counter->strongCount); }
+		bool operator!() const { return !_counter || !_counter->strongCount; }
+		operator bool() const { return _counter && static_cast<bool>(_counter->strongCount); }
 
 		T* get() const
 		{
