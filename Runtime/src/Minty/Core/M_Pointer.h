@@ -92,8 +92,10 @@ namespace Minty
 		{
 			if (this != &other)
 			{
+				if (_counter) _counter->strongCount--;
 				_ptr = other._ptr;
 				_counter = other._counter;
+				if (_counter) _counter->strongCount++;
 			}
 			return *this;
 		}
@@ -103,8 +105,6 @@ namespace Minty
 		{
 			other._ptr = nullptr;
 			other._counter = nullptr;
-
-			if (_counter) _counter->strongCount++;
 		}
 		Owner& operator=(Owner&& other) noexcept {
 			if (this != &other) {
@@ -213,8 +213,10 @@ namespace Minty
 		{
 			if (this != &other)
 			{
+				if (_counter) _counter->weakCount--;
 				_ptr = other._ptr;
 				_counter = other._counter;
+				if (_counter) _counter->weakCount++;
 			}
 			return *this;
 		}
@@ -224,8 +226,6 @@ namespace Minty
 		{
 			other._ptr = nullptr;
 			other._counter = nullptr;
-
-			if(_counter) _counter->weakCount++;
 		}
 		Ref& operator=(Ref&& other) noexcept {
 			if (this != &other) {
