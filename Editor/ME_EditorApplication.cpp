@@ -31,9 +31,6 @@
 #include <array>
 
 #define CMAKE_PATH "cmake"
-#define EditorApplication_NAME "TestProject"
-#define EXE_NAME std::string(EditorApplication_NAME).append(".exe")
-
 
 namespace fs = std::filesystem;
 using namespace Mintye;
@@ -904,7 +901,7 @@ void EditorApplication::generate_cmake()
 		// cmake version requirement
 		"cmake_minimum_required(VERSION 3.16)" << std::endl <<
 		// project name, c++ settings
-		"project(" << EditorApplication_NAME << " LANGUAGES CXX)" << std::endl <<
+		"project(" << _project->get_name() << " LANGUAGES CXX)" << std::endl <<
 		"find_package(Vulkan REQUIRED)" << std::endl <<
 		"set(CMAKE_CXX_STANDARD 20)" << std::endl <<
 		"set(CMAKE_CXX_STANDARD_REQUIRED ON)" << std::endl <<
@@ -1388,7 +1385,7 @@ void EditorApplication::run_project()
 	console->log_important("run project");
 
 	// call executable, pass in project path as argument for the runtime, so it knows what to run
-	console->run_command("cd " + _project->get_build_path().string() + " && cd " + _buildInfo.get_config_name() + " && call " + EXE_NAME);
+	console->run_command("cd " + _project->get_build_path().string() + " && cd " + _buildInfo.get_config_name() + " && call " + _project->get_name() + ".exe");
 }
 
 Mintye::EditorApplicationData::EditorApplicationData()
