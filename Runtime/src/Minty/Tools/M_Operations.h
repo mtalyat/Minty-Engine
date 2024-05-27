@@ -22,8 +22,32 @@ namespace Minty
 		/// <param name="path"></param>
 		void open(Path const& path);
 
+		/// <summary>
+		/// Copies the file to the target folder/file path.
+		/// </summary>
+		/// <param name="from"></param>
+		/// <param name="to"></param>
+		void copy(Path const& from, Path const& to);
+
+		/// <summary>
+		/// Copies all of the files with the given extension to the target path.
+		/// </summary>
+		/// <param name="from"></param>
+		/// <param name="extension"></param>
+		/// <param name="to"></param>
+		void copy_all(Path const& from, Path const& extension, Path const& to);
+
+		/// <summary>
+		/// Gets the environment variable, if it has been set.
+		/// </summary>
+		/// <param name="name"></param>
+		/// <returns></returns>
 		String get_environment_variable(String const& name);
 
+		/// <summary>
+		/// Gets the MINTY_PATH environment variable.
+		/// </summary>
+		/// <returns></returns>
 		Path get_minty_path();
 	}
 }

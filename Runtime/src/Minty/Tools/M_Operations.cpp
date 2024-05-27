@@ -75,6 +75,38 @@ void Minty::Operations::open(Path const& path)
 #endif
 }
 
+void Minty::Operations::copy(Path const& from, Path const& to)
+{
+	Path dest;
+	if (to.has_extension())
+	{
+		dest = to;
+	}
+	else
+	{
+		dest = to / from.filename();
+	}
+
+	try {
+		std::filesystem::copy(from, dest, std::filesystem::copy_options::overwrite_existing);
+	}
+	catch (std::filesystem::filesystem_error& e)
+	{
+		MINTY_ERROR_FORMAT("Failed to copy \"{}\" to \"{}\": \"{}\"", from.generic_string(), dest.generic_string(), e.what());
+	}
+}
+
+void Minty::Operations::copy_all(Path const& from, Path const& extension, Path const& to)
+{
+	for (auto entry : std::filesystem::directory_iterator(from))
+	{
+		if (extension.empty() || (entry.path().has_extension() && entry.path().extension() == extension))
+		{
+			Operations::copy(entry.path(), to);
+		}
+	}
+}
+
 String Minty::Operations::get_environment_variable(String const& name)
 {
 	char* buffer = nullptr;

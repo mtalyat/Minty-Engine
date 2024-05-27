@@ -89,7 +89,7 @@ namespace Minty
 
 		static Application* _instance;
 	public:
-		Application(ApplicationBuilder const& builder);
+		Application(ApplicationBuilder const& builder = {});
 
 		virtual ~Application();
 

@@ -913,8 +913,8 @@ void EditorApplication::generate_cmake()
 		file << "set(CMAKE_EXE_LINKER_FLAGS /NODEFAULTLIB:\\\"LIBCMT\\\")" << std::endl;
 	}
 
-	Path MintyPath = Operations::get_minty_path();
-	String stringMintyPath = MintyPath.generic_string();
+	Path mintyPath = Operations::get_minty_path();
+	String stringMintyPath = mintyPath.generic_string();
 
 	file <<
 		// add source files for project
@@ -925,20 +925,17 @@ void EditorApplication::generate_cmake()
 		"set_property(TARGET ${PROJECT_NAME} PROPERTY INTERPROCEDURAL_OPTIMIZATION_RELEASE TRUE)" << std::endl <<
 		"set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY \"MultiThreaded$<$<CONFIG:Debug>:Debug>\")" << std::endl <<
 		// include the runtime dir
-		"target_include_directories(${PROJECT_NAME} PRIVATE C:/Users/mitch/source/repos/Minty-Engine/Runtime PUBLIC ${VULKAN_INCLUDE_DIRS})" << std::endl <<
+		"target_include_directories(${PROJECT_NAME} PRIVATE " << stringMintyPath << "/Runtime/src PRIVATE " << stringMintyPath << "/Runtime/vendor PUBLIC ${VULKAN_INCLUDE_DIRS})" << std::endl <<
 		// copy any DLL's that the Runtime uses
 		"add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy C:/Libraries/Mono/lib/mono-2.0-sgen.dll ${CMAKE_CURRENT_BINARY_DIR}/" << _buildInfo.get_config_name() << "/mono-2.0-sgen.dll)" << std::endl <<
 		"add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy C:/Libraries/Mono/lib/MonoPosixHelper.dll ${CMAKE_CURRENT_BINARY_DIR}/" << _buildInfo.get_config_name() << "/MonoPosixHelper.dll)" << std::endl <<
 		"add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy C:/Libraries/Mono/lib/mscorlib.dll ${CMAKE_CURRENT_BINARY_DIR}/" << _buildInfo.get_config_name() << "/mscorlib.dll)" << std::endl <<
 		"add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy " << stringMintyPath << "/Libraries/MintyEngine/bin/" << _buildInfo.get_config_name() << "/MintyEngine.dll ${CMAKE_CURRENT_BINARY_DIR}/" << _buildInfo.get_config_name() << "/MintyEngine.dll)" << std::endl <<
 		"add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ../" << ASSEMBLY_DIRECTORY_NAME << "/bin/" << _buildInfo.get_config_name() << "/" << _project->get_name() << ".dll ${CMAKE_CURRENT_BINARY_DIR}/" << _buildInfo.get_config_name() << "/" << _project->get_name() << ".dll)" << std::endl <<
-		// copy all necessary engine data files
-		"file(GLOB DATA_FILES \"C:/Users/mitch/source/repos/Minty-Engine/Data/*.wrap\")" << std::endl <<
-		"file(COPY ${DATA_FILES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/" << _buildInfo.get_config_name() << ")" << std::endl <<
 		// include and link Vulkan
 		"include_directories(${Vulkan_INCLUDE_DIRS})" << std::endl <<
 		// target and link the MintyRuntime.lib
-		"target_link_libraries(${PROJECT_NAME} C:/Users/mitch/source/repos/Minty-Engine/Runtime/x64/" << _buildInfo.get_config_name() << "/MintyRuntime.lib)" << std::endl <<
+		"target_link_libraries(${PROJECT_NAME} " << stringMintyPath << "/Runtime/src/x64/" << _buildInfo.get_config_name() << "/MintyRuntime.lib)" << std::endl <<
 		// target and link the vulkan libs
 		"target_link_libraries(${PROJECT_NAME} ${Vulkan_LIBRARIES})";
 
@@ -1080,7 +1077,6 @@ void Mintye::EditorApplication::generate_application_data()
 	// assemblies copied by cmake
 	std::vector<String> assemblies =
 	{
-		"MintyEngine.dll",
 		std::format("{}.dll", _project->get_name()),
 	};
 
@@ -1110,6 +1106,9 @@ void Mintye::EditorApplication::generate_wraps()
 	// game assets
 	Wrap assetWrap(output / String("assets").append(EXTENSION_WRAP), ASSETS_DIRECTORY_NAME, static_cast<uint32_t>(_project->get_asset_count()), ASSETS_DIRECTORY_NAME);
 	_project->wrap_assets(assetWrap);
+
+	// built in assets
+	std::filesystem::copy("default.wrap", output / "default.wrap");
 }
 
 void Mintye::EditorApplication::generate_assembly()
@@ -1349,27 +1348,34 @@ void EditorApplication::build_project()
 				// https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-build
 				"cd " + assemblyPath + " && dotnet build -c " + configName + " /p:Platform=x64"
 				}, true);
-
-			// if not running cmake build, but scripts rebuilt, copy the DLL over manually, since the cmake is not doing it
-			if (_buildInfo.get_flag(BuildInfo::BuildFlags::Assembly | BuildInfo::BuildFlags::AssemblyBuild) && !_buildInfo.get_flag(BuildInfo::BuildFlags::Program))
-			{
-				console->log_info("Manually copying files");
-
-				String configName = _buildInfo.get_config_name();
-				String const& projectName = _project->get_name();
-				String source = std::format("{}/bin/{}/{}.dll", _project->get_assembly_path().generic_string(), configName, projectName);
-				String destination = std::format("{}/{}/{}.dll", _project->get_build_path().generic_string(), configName, projectName);
-
-				try {
-					std::filesystem::copy(source, destination, std::filesystem::copy_options::overwrite_existing);
-				}
-				catch (std::filesystem::filesystem_error& e)
-				{
-					console->log_error(std::format("Failed to copy assembly DLL: \"{}\"", e.what()));
-				}
-			}
 			});
 	}
+
+	// copy files over, always, for now, just to make sure everything is up to date
+	taskGroup->create([this, console]
+		{
+			console->log_important("\tcopying files...");
+
+			Path mintyPath = Operations::get_minty_path();
+
+			String configName = _buildInfo.get_config_name();
+			String const& projectName = _project->get_name();
+			String targetDir = std::format("{}/{}", _project->get_build_path().generic_string(), configName);
+
+			// MintyEngine.dll
+			String dllName = String(ASSEMBLY_ENGINE_NAME).append(".dll");
+			console->log_info("\t" + dllName);
+			Operations::copy(mintyPath / dllName, targetDir);
+
+			// Project dll
+			String source = std::format("{}/bin/{}/{}.dll", _project->get_assembly_path().generic_string(), configName, projectName);
+			console->log_info("\t" + Path(source).filename().string());
+			Operations::copy(source, targetDir);
+
+			// Wrap files
+			console->log_info("\tWrap files");
+			Operations::copy_all(mintyPath / "Data", EXTENSION_WRAP, targetDir);
+		});
 }
 
 void EditorApplication::run_project()
