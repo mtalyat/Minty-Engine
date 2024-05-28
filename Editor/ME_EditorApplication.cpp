@@ -986,23 +986,19 @@ void Mintye::EditorApplication::copy_files()
 {
 	// copy any DLL's that the Runtime uses
 
-	Path mintyPath = Operations::get_minty_path();
-
 	String configName = _buildInfo.get_config_name();
 	String const& projectName = _project->get_name();
 	String targetDir = std::format("{}/{}", _project->get_build_path().generic_string(), configName);
 
 	// Mono DLLs
 	log_info("\tMono DLLs");
-	Path monoPath = mintyPath / "Libraries" / "mono" / "lib";
-	Operations::copy(monoPath / "mono-2.0-sgen.dll", targetDir);
-	Operations::copy(monoPath / "MonoPosixHelper.dll", targetDir);
-	Operations::copy(monoPath / "mscorlib.dll", targetDir);
+	Operations::copy(_cwd / "mono-2.0-sgen.dll", targetDir);
+	Operations::copy(_cwd / "MonoPosixHelper.dll", targetDir);
+	Operations::copy(_cwd / "mscorlib.dll", targetDir);
 
 	// MintyEngine DLL
 	log_info("\tEngine DLL");
-	String dllName = String(ASSEMBLY_ENGINE_NAME).append(".dll");
-	Operations::copy(mintyPath / "Assembly" / "bin" / configName / dllName, targetDir);
+	Operations::copy(_cwd / String(ASSEMBLY_ENGINE_NAME).append(".dll"), targetDir);
 
 	// Project DLL
 	log_info("\tProject DLL");
@@ -1011,7 +1007,7 @@ void Mintye::EditorApplication::copy_files()
 
 	// Wrap files
 	log_info("\tWrap files");
-	Operations::copy_all(mintyPath / "Data", EXTENSION_WRAP, targetDir);
+	Operations::copy_all(_cwd, EXTENSION_WRAP, targetDir);
 }
 
 void Mintye::EditorApplication::log(Minty::String const& message)
