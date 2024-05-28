@@ -153,7 +153,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>..\vendor\mono\include;..\vendor\vulkan\include;..\vendor\glm\include;..\vendor\glfw\include;..\vendor\stb\include;C:\Libraries\ZLIB\include;.;..\vendor</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\vendor\mono\include;..\vendor\vulkan\include;..\vendor\glm\include;..\vendor\glfw\include;..\vendor\stb\include;..\vendor\zlib\include;.;..\vendor</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -171,7 +171,7 @@
       <AdditionalDependencies>mono-2.0-sgen.lib;vulkan-1.lib;glfw3_mt.lib;zlib-static.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>..\vendor\mono\lib;..\vendor\vulkan\lib;..\vendor\glfw\lib;C:\Libraries\ZLIB\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\vendor\mono\lib;..\vendor\vulkan\lib;..\vendor\glfw\lib;..\vendor\zlib\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
@@ -194,7 +194,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>..\vendor\mono\include;..\vendor\vulkan\include;..\vendor\glm\include;..\vendor\glfw\include;..\vendor\stb\include;C:\Libraries\ZLIB\include;.;..\vendor</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\vendor\mono\include;..\vendor\vulkan\include;..\vendor\glm\include;..\vendor\glfw\include;..\vendor\stb\include;..\vendor\zlib\include;.;..\vendor</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BufferSecurityCheck>true</BufferSecurityCheck>
     </ClCompile>
@@ -216,7 +216,7 @@
       </IgnoreSpecificDefaultLibraries>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
       <AdditionalDependencies>mono-2.0-sgen.lib;vulkan-1.lib;glfw3_mt.lib;zlib-static.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\vendor\mono\lib;..\vendor\vulkan\lib;..\vendor\glfw\lib;C:\Libraries\ZLIB\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\vendor\mono\lib;..\vendor\vulkan\lib;..\vendor\glfw\lib;..\vendor\zlib\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
     <PostBuildEvent>
       <Command>xcopy /y "C:\Libraries\Mono\lib\*.dll" "$(TargetDir)"</Command>
