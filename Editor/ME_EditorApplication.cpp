@@ -932,17 +932,11 @@ void EditorApplication::generate_cmake()
 		"set_property(TARGET ${PROJECT_NAME} PROPERTY INTERPROCEDURAL_OPTIMIZATION_RELEASE TRUE)" << std::endl <<
 		"set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY \"MultiThreaded$<$<CONFIG:Debug>:Debug>\")" << std::endl <<
 		// include the runtime dir
-		"target_include_directories(${PROJECT_NAME} PRIVATE " << stringMintyPath << "/Runtime/src PRIVATE " << stringMintyPath << "/Runtime/vendor PUBLIC ${VULKAN_INCLUDE_DIRS})" << std::endl <<
-		// copy any DLL's that the Runtime uses
-		"add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy C:/Libraries/Mono/lib/mono-2.0-sgen.dll ${CMAKE_CURRENT_BINARY_DIR}/" << _buildInfo.get_config_name() << "/mono-2.0-sgen.dll)" << std::endl <<
-		"add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy C:/Libraries/Mono/lib/MonoPosixHelper.dll ${CMAKE_CURRENT_BINARY_DIR}/" << _buildInfo.get_config_name() << "/MonoPosixHelper.dll)" << std::endl <<
-		"add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy C:/Libraries/Mono/lib/mscorlib.dll ${CMAKE_CURRENT_BINARY_DIR}/" << _buildInfo.get_config_name() << "/mscorlib.dll)" << std::endl <<
-		"add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy " << stringMintyPath << "/Libraries/MintyEngine/bin/" << _buildInfo.get_config_name() << "/MintyEngine.dll ${CMAKE_CURRENT_BINARY_DIR}/" << _buildInfo.get_config_name() << "/MintyEngine.dll)" << std::endl <<
-		"add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ../" << ASSEMBLY_DIRECTORY_NAME << "/bin/" << _buildInfo.get_config_name() << "/" << _project->get_name() << ".dll ${CMAKE_CURRENT_BINARY_DIR}/" << _buildInfo.get_config_name() << "/" << _project->get_name() << ".dll)" << std::endl <<
+		"target_include_directories(${PROJECT_NAME} PRIVATE " << stringMintyPath << "/Runtime PRIVATE " << stringMintyPath << "/Libraries PUBLIC ${VULKAN_INCLUDE_DIRS})" << std::endl <<
 		// include and link Vulkan
 		"include_directories(${Vulkan_INCLUDE_DIRS})" << std::endl <<
 		// target and link the MintyRuntime.lib
-		"target_link_libraries(${PROJECT_NAME} " << stringMintyPath << "/Runtime/src/x64/" << _buildInfo.get_config_name() << "/MintyRuntime.lib)" << std::endl <<
+		"target_link_libraries(${PROJECT_NAME} " << stringMintyPath << "/Runtime/x64/" << _buildInfo.get_config_name() << "/MintyRuntime.lib)" << std::endl <<
 		// target and link the vulkan libs
 		"target_link_libraries(${PROJECT_NAME} ${Vulkan_LIBRARIES})";
 
@@ -988,6 +982,38 @@ void EditorApplication::generate_main()
 	file.close();
 }
 
+void Mintye::EditorApplication::copy_files()
+{
+	// copy any DLL's that the Runtime uses
+
+	Path mintyPath = Operations::get_minty_path();
+
+	String configName = _buildInfo.get_config_name();
+	String const& projectName = _project->get_name();
+	String targetDir = std::format("{}/{}", _project->get_build_path().generic_string(), configName);
+
+	// Mono DLLs
+	log_info("\tMono DLLs");
+	Path monoPath = mintyPath / "Libraries" / "mono" / "lib";
+	Operations::copy(monoPath / "mono-2.0-sgen.dll", targetDir);
+	Operations::copy(monoPath / "MonoPosixHelper.dll", targetDir);
+	Operations::copy(monoPath / "mscorlib.dll", targetDir);
+
+	// MintyEngine DLL
+	log_info("\tEngine DLL");
+	String dllName = String(ASSEMBLY_ENGINE_NAME).append(".dll");
+	Operations::copy(mintyPath / "Assembly" / "bin" / configName / dllName, targetDir);
+
+	// Project DLL
+	log_info("\tProject DLL");
+	String source = std::format("{}/bin/{}/{}.dll", _project->get_assembly_path().generic_string(), configName, projectName);
+	Operations::copy(source, targetDir);
+
+	// Wrap files
+	log_info("\tWrap files");
+	Operations::copy_all(mintyPath / "Data", EXTENSION_WRAP, targetDir);
+}
+
 void Mintye::EditorApplication::log(Minty::String const& message)
 {
 	if (ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console"))
@@ -1021,6 +1047,18 @@ void Mintye::EditorApplication::log_error(Minty::String const& message)
 	else
 	{
 		MINTY_ERROR(message);
+	}
+}
+
+void Mintye::EditorApplication::log_info(Minty::String const& message)
+{
+	if (ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console"))
+	{
+		console->log_info(message);
+	}
+	else
+	{
+		MINTY_INFO(message);
 	}
 }
 
@@ -1363,25 +1401,7 @@ void EditorApplication::build_project()
 		{
 			console->log_important("\tcopying files...");
 
-			Path mintyPath = Operations::get_minty_path();
-
-			String configName = _buildInfo.get_config_name();
-			String const& projectName = _project->get_name();
-			String targetDir = std::format("{}/{}", _project->get_build_path().generic_string(), configName);
-
-			// MintyEngine.dll
-			String dllName = String(ASSEMBLY_ENGINE_NAME).append(".dll");
-			console->log_info("\t" + dllName);
-			Operations::copy(mintyPath / "Libraries" / "MintyEngine" / "bin" / configName / dllName, targetDir);
-
-			// Project dll
-			String source = std::format("{}/bin/{}/{}.dll", _project->get_assembly_path().generic_string(), configName, projectName);
-			console->log_info("\t" + Path(source).filename().string());
-			Operations::copy(source, targetDir);
-
-			// Wrap files
-			console->log_info("\tWrap files");
-			Operations::copy_all(mintyPath / "Data", EXTENSION_WRAP, targetDir);
+			copy_files();
 		});
 }
 

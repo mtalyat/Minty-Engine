@@ -200,7 +200,7 @@ namespace Mintye
 		/// <param name="info">The target info.</param>
 		void run_project();
 
-#pragma region File Generation
+#pragma region Files
 
 	private:
 		void generate_directory(Minty::Path const& path) const;
@@ -225,6 +225,11 @@ namespace Mintye
 		/// <param name="info"></param>
 		void generate_main();
 
+		/// <summary>
+		/// Copies all of the necessary files to run an exe.
+		/// </summary>
+		void copy_files();
+
 #pragma endregion
 
 #pragma endregion
@@ -237,6 +242,8 @@ namespace Mintye
 		void log_warning(Minty::String const& message);
 
 		void log_error(Minty::String const& message);
+
+		void log_info(Minty::String const& message);
 
 #pragma endregion
 
