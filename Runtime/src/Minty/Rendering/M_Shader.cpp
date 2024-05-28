@@ -337,15 +337,10 @@ DescriptorSet Minty::Shader::create_descriptor_set(uint32_t const set, bool cons
 	RenderEngine& renderer = RenderEngine::instance();
 	AssetEngine& assets = AssetEngine::instance();
 
-	Ref<Shader> thisRef = assets.at<Shader>(get_id());
-
 	if (set == DESCRIPTOR_SET_INVALID)
 	{
 		// invalid set, so just create an empty descriptor
-		return DescriptorSet(DescriptorSetBuilder
-			{
-				.shader = thisRef,
-			});
+		return DescriptorSet();
 	}
 
 	// create and allocate sets
@@ -353,7 +348,6 @@ DescriptorSet Minty::Shader::create_descriptor_set(uint32_t const set, bool cons
 	// get a pool for the set
 	DescriptorSetBuilder builder
 	{
-		.shader = thisRef,
 		.pool = take_pool(set),
 		.set = set, 
 	};
