@@ -119,6 +119,9 @@ void Minty::Application::run()
 			}
 		}
 	}
+
+	// sync up the renderer with the CPU to avoid errors
+	RenderEngine::instance().sync();
 }
 
 void Minty::Application::on_event(Event& event)
