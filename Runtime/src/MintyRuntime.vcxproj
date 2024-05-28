@@ -153,7 +153,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>..\vendor\mono\include;..\vendor\vulkan\include;C:\Libraries\GLM\glm;C:\Libraries\GLFW\glfw-3.3.8.bin.WIN64\include;C:\Libraries\STB;C:\Libraries\ZLIB\include;.;..\vendor;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\vendor\mono\include;..\vendor\vulkan\include;..\vendor\glm\include;C:\Libraries\GLFW\glfw-3.3.8.bin.WIN64\include;C:\Libraries\STB;C:\Libraries\ZLIB\include;.;..\vendor;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -194,7 +194,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>..\vendor\mono\include;..\vendor\vulkan\include;C:\Libraries\GLM\glm;C:\Libraries\GLFW\glfw-3.3.8.bin.WIN64\include;C:\Libraries\STB;C:\Libraries\ZLIB\include;.;..\vendor;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\vendor\mono\include;..\vendor\vulkan\include;..\vendor\glm\include;C:\Libraries\GLFW\glfw-3.3.8.bin.WIN64\include;C:\Libraries\STB;C:\Libraries\ZLIB\include;.;..\vendor;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BufferSecurityCheck>true</BufferSecurityCheck>
     </ClCompile>
