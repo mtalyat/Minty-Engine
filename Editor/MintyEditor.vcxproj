@@ -131,14 +131,14 @@
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\Runtime\vendor\vulkan\include;..\Runtime\vendor\glfw\include;..\Runtime\src;..\Runtime\vendor;..\Runtime\vendor\mono\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Libraries\vulkan\include;..\Libraries\glfw\include;..\Runtime;..\Libraries;..\Libraries\mono\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\Runtime\vendor\vulkan\lib;..\Runtime\vendor\glfw\lib;..\Runtime\vendor\mono\lib;..\Runtime\src\x64\$(ConfigurationName)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\Libraries\vulkan\lib;..\Libraries\glfw\lib;..\Libraries\mono\lib;..\Runtime\x64\$(ConfigurationName)</AdditionalLibraryDirectories>
       <AdditionalDependencies>glfw3_mt.lib;vulkan-1.lib;mono-2.0-sgen.lib;MintyRuntime.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/NODEFAULTLIB:MSVCRT %(AdditionalOptions)</AdditionalOptions>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
@@ -165,7 +165,7 @@ xcopy /y /e /i "$(ProjectDir)Templates\*" "$(TargetDir)Templates\"</Command>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
-      <AdditionalIncludeDirectories>..\Runtime\vendor\vulkan\include;..\Runtime\vendor\glfw\include;..\Runtime\src;..\Runtime\vendor;..\Runtime\vendor\mono\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Libraries\vulkan\include;..\Libraries\glfw\include;..\Runtime;..\Libraries;..\Libraries\mono\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BufferSecurityCheck>true</BufferSecurityCheck>
@@ -175,7 +175,7 @@ xcopy /y /e /i "$(ProjectDir)Templates\*" "$(TargetDir)Templates\"</Command>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>
-      <AdditionalLibraryDirectories>..\Runtime\vendor\vulkan\lib;..\Runtime\vendor\glfw\lib;..\Runtime\vendor\mono\lib;..\Runtime\src\x64\$(ConfigurationName)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\Libraries\vulkan\lib;..\Libraries\glfw\lib;..\Libraries\mono\lib;..\Runtime\x64\$(ConfigurationName)</AdditionalLibraryDirectories>
       <AdditionalDependencies>glfw3_mt.lib;vulkan-1.lib;mono-2.0-sgen.lib;MintyRuntime.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalOptions>/NODEFAULTLIB:MSVCRT %(AdditionalOptions)</AdditionalOptions>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>

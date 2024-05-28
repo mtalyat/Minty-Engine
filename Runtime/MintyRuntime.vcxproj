@@ -153,7 +153,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>..\vendor\mono\include;..\vendor\vulkan\include;..\vendor\glm\include;..\vendor\glfw\include;..\vendor\stb\include;..\vendor\zlib\include;.;..\vendor</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Libraries\mono\include;..\Libraries\vulkan\include;..\Libraries\glm\include;..\Libraries\glfw\include;..\Libraries\stb\include;..\Libraries\zlib\include;.;..\Libraries</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -171,7 +171,7 @@
       <AdditionalDependencies>mono-2.0-sgen.lib;vulkan-1.lib;glfw3_mt.lib;zlib-static.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Lib>
     <Lib>
-      <AdditionalLibraryDirectories>..\vendor\mono\lib;..\vendor\vulkan\lib;..\vendor\glfw\lib;..\vendor\zlib\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\Libraries\mono\lib;..\Libraries\vulkan\lib;..\Libraries\glfw\lib;..\Libraries\zlib\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
       <IgnoreSpecificDefaultLibraries>
       </IgnoreSpecificDefaultLibraries>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
@@ -194,7 +194,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>..\vendor\mono\include;..\vendor\vulkan\include;..\vendor\glm\include;..\vendor\glfw\include;..\vendor\stb\include;..\vendor\zlib\include;.;..\vendor</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>..\Libraries\mono\include;..\Libraries\vulkan\include;..\Libraries\glm\include;..\Libraries\glfw\include;..\Libraries\stb\include;..\Libraries\zlib\include;.;..\Libraries</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
       <BufferSecurityCheck>true</BufferSecurityCheck>
     </ClCompile>
@@ -216,7 +216,7 @@
       </IgnoreSpecificDefaultLibraries>
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
       <AdditionalDependencies>mono-2.0-sgen.lib;vulkan-1.lib;glfw3_mt.lib;zlib-static.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>..\vendor\mono\lib;..\vendor\vulkan\lib;..\vendor\glfw\lib;..\vendor\zlib\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>..\Libraries\mono\lib;..\Libraries\vulkan\lib;..\Libraries\glfw\lib;..\Libraries\zlib\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Lib>
     <PostBuildEvent>
       <Command>xcopy /y "C:\Libraries\Mono\lib\*.dll" "$(TargetDir)"</Command>
@@ -365,39 +365,39 @@
     <ClInclude Include="Platform\Windows\M_WindowsWindow.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\vendor\imguifiledialog\include\ImGuiFileDialog.cpp" />
-    <ClCompile Include="..\vendor\imgui\include\imgui.cpp" />
-    <ClCompile Include="..\vendor\imgui\include\imgui_demo.cpp" />
-    <ClCompile Include="..\vendor\imgui\include\imgui_draw.cpp" />
-    <ClCompile Include="..\vendor\imgui\include\imgui_impl_glfw.cpp" />
-    <ClCompile Include="..\vendor\imgui\include\imgui_impl_vulkan.cpp" />
-    <ClCompile Include="..\vendor\imgui\include\imgui_stdlib.cpp" />
-    <ClCompile Include="..\vendor\imgui\include\imgui_tables.cpp" />
-    <ClCompile Include="..\vendor\imgui\include\imgui_widgets.cpp" />
-    <ClCompile Include="..\vendor\soloud\include\dr_impl.cpp" />
-    <ClCompile Include="..\vendor\soloud\include\soloud.cpp" />
-    <ClCompile Include="..\vendor\soloud\include\soloud_audiosource.cpp" />
-    <ClCompile Include="..\vendor\soloud\include\soloud_bus.cpp" />
-    <ClCompile Include="..\vendor\soloud\include\soloud_core_3d.cpp" />
-    <ClCompile Include="..\vendor\soloud\include\soloud_core_basicops.cpp" />
-    <ClCompile Include="..\vendor\soloud\include\soloud_core_faderops.cpp" />
-    <ClCompile Include="..\vendor\soloud\include\soloud_core_filterops.cpp" />
-    <ClCompile Include="..\vendor\soloud\include\soloud_core_getters.cpp" />
-    <ClCompile Include="..\vendor\soloud\include\soloud_core_setters.cpp" />
-    <ClCompile Include="..\vendor\soloud\include\soloud_core_voicegroup.cpp" />
-    <ClCompile Include="..\vendor\soloud\include\soloud_core_voiceops.cpp" />
-    <ClCompile Include="..\vendor\soloud\include\soloud_fader.cpp" />
-    <ClCompile Include="..\vendor\soloud\include\soloud_fft.cpp" />
-    <ClCompile Include="..\vendor\soloud\include\soloud_fft_lut.cpp" />
-    <ClCompile Include="..\vendor\soloud\include\soloud_file.cpp" />
-    <ClCompile Include="..\vendor\soloud\include\soloud_filter.cpp" />
-    <ClCompile Include="..\vendor\soloud\include\soloud_miniaudio.cpp" />
-    <ClCompile Include="..\vendor\soloud\include\soloud_misc.cpp" />
-    <ClCompile Include="..\vendor\soloud\include\soloud_queue.cpp" />
-    <ClCompile Include="..\vendor\soloud\include\soloud_thread.cpp" />
-    <ClCompile Include="..\vendor\soloud\include\soloud_wav.cpp" />
-    <ClCompile Include="..\vendor\soloud\include\soloud_wavstream.cpp" />
-    <ClCompile Include="..\vendor\soloud\include\stb_vorbis.cpp" />
+    <ClCompile Include="..\Libraries\imguifiledialog\include\ImGuiFileDialog.cpp" />
+    <ClCompile Include="..\Libraries\imgui\include\imgui.cpp" />
+    <ClCompile Include="..\Libraries\imgui\include\imgui_demo.cpp" />
+    <ClCompile Include="..\Libraries\imgui\include\imgui_draw.cpp" />
+    <ClCompile Include="..\Libraries\imgui\include\imgui_impl_glfw.cpp" />
+    <ClCompile Include="..\Libraries\imgui\include\imgui_impl_vulkan.cpp" />
+    <ClCompile Include="..\Libraries\imgui\include\imgui_stdlib.cpp" />
+    <ClCompile Include="..\Libraries\imgui\include\imgui_tables.cpp" />
+    <ClCompile Include="..\Libraries\imgui\include\imgui_widgets.cpp" />
+    <ClCompile Include="..\Libraries\soloud\include\dr_impl.cpp" />
+    <ClCompile Include="..\Libraries\soloud\include\soloud.cpp" />
+    <ClCompile Include="..\Libraries\soloud\include\soloud_audiosource.cpp" />
+    <ClCompile Include="..\Libraries\soloud\include\soloud_bus.cpp" />
+    <ClCompile Include="..\Libraries\soloud\include\soloud_core_3d.cpp" />
+    <ClCompile Include="..\Libraries\soloud\include\soloud_core_basicops.cpp" />
+    <ClCompile Include="..\Libraries\soloud\include\soloud_core_faderops.cpp" />
+    <ClCompile Include="..\Libraries\soloud\include\soloud_core_filterops.cpp" />
+    <ClCompile Include="..\Libraries\soloud\include\soloud_core_getters.cpp" />
+    <ClCompile Include="..\Libraries\soloud\include\soloud_core_setters.cpp" />
+    <ClCompile Include="..\Libraries\soloud\include\soloud_core_voicegroup.cpp" />
+    <ClCompile Include="..\Libraries\soloud\include\soloud_core_voiceops.cpp" />
+    <ClCompile Include="..\Libraries\soloud\include\soloud_fader.cpp" />
+    <ClCompile Include="..\Libraries\soloud\include\soloud_fft.cpp" />
+    <ClCompile Include="..\Libraries\soloud\include\soloud_fft_lut.cpp" />
+    <ClCompile Include="..\Libraries\soloud\include\soloud_file.cpp" />
+    <ClCompile Include="..\Libraries\soloud\include\soloud_filter.cpp" />
+    <ClCompile Include="..\Libraries\soloud\include\soloud_miniaudio.cpp" />
+    <ClCompile Include="..\Libraries\soloud\include\soloud_misc.cpp" />
+    <ClCompile Include="..\Libraries\soloud\include\soloud_queue.cpp" />
+    <ClCompile Include="..\Libraries\soloud\include\soloud_thread.cpp" />
+    <ClCompile Include="..\Libraries\soloud\include\soloud_wav.cpp" />
+    <ClCompile Include="..\Libraries\soloud\include\soloud_wavstream.cpp" />
+    <ClCompile Include="..\Libraries\soloud\include\stb_vorbis.cpp" />
     <ClCompile Include="dllmain.cpp" />
     <ClCompile Include="Minty\Animation\M_Animation.cpp" />
     <ClCompile Include="Minty\Animation\M_AnimationSystem.cpp" />
