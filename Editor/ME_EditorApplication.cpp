@@ -381,6 +381,9 @@ void Mintye::EditorApplication::unload_scene()
 {
 	if (_sceneId != INVALID_UUID)
 	{
+		// sync with the renderer first, so we can free up resources
+		RenderEngine::instance().sync();
+
 		SceneManager& sceneManager = Application::instance().get_scene_manager();
 		sceneManager.unload();
 		sceneManager.destroy();
@@ -711,7 +714,11 @@ void Mintye::EditorApplication::draw_menu_bar()
 
 			if (ImGui::MenuItem("Exit"))
 			{
-				std::exit(0);
+				// close the application
+				close();
+				ImGui::EndMenu();
+				ImGui::EndMainMenuBar();
+				return;
 			}
 
 			ImGui::EndMenu();
