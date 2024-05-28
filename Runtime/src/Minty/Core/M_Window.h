@@ -16,8 +16,8 @@ namespace Minty
 	struct WindowBuilder
 	{
 		String title = MINTY_NAME;
-		int x = 0;
-		int y = 0;
+		int x = 100;
+		int y = 100;
 		unsigned int width = 960;
 		unsigned int height = 540;
 	};
