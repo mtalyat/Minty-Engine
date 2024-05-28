@@ -53,7 +53,7 @@ Minty::Application::Application(ApplicationBuilder const& builder)
 	_window->set_event_callback([this](Event& e) { on_event(e); });
 
 	// initialize things
-	RenderEngine::instance().init();
+	RenderEngine::instance().init(); 
 	Input::set_input_script(ScriptEngine::instance().find_class(SCRIPT_NAMESPACE_NAME, "Input"));
 
 	// create default layer
