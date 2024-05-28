@@ -42,7 +42,6 @@ namespace Minty
 
 	struct DescriptorSetBuilder
 	{
-		Shader* shader;
 		VkDescriptorPool pool;
 		uint32_t set;
 		std::array<VkDescriptorSet, MAX_FRAMES_IN_FLIGHT> descriptorSets;
@@ -59,7 +58,7 @@ namespace Minty
 
 	private:
 		// the shader this descriptor set came from
-		Shader* _shader;
+		//Ref<Shader> _shader;
 
 		// the pool these descriptor sets came from
 		VkDescriptorPool _descriptorPool;

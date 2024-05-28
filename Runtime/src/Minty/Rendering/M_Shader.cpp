@@ -2,6 +2,7 @@
 #include "Minty/Rendering/M_Shader.h"
 
 #include "Minty/Rendering/M_RenderEngine.h"
+#include "Minty/Assets/M_AssetEngine.h"
 
 #include "Minty/Math/M_Math.h"
 #include "Minty/Files/M_File.h"
@@ -51,7 +52,7 @@ uint32_t Minty::ShaderBuilder::get_uniform_constant_count(uint32_t const set) co
 
 Minty::Shader::Shader(ShaderBuilder const& builder)
 	: Asset(builder.id, builder.path)
-	, _descriptorSet(DescriptorSetBuilder{ .shader = this })
+	, _descriptorSet()
 {
 	for (auto const& pair : builder.pushConstantInfos)
 	{
@@ -334,13 +335,16 @@ std::array<VkDescriptorSet, MAX_FRAMES_IN_FLIGHT> Minty::Shader::create_descript
 DescriptorSet Minty::Shader::create_descriptor_set(uint32_t const set, bool const initialize)
 {
 	RenderEngine& renderer = RenderEngine::instance();
+	AssetEngine& assets = AssetEngine::instance();
+
+	Ref<Shader> thisRef = assets.at<Shader>(get_id());
 
 	if (set == DESCRIPTOR_SET_INVALID)
 	{
 		// invalid set, so just create an empty descriptor
 		return DescriptorSet(DescriptorSetBuilder
 			{
-				.shader = this,
+				.shader = thisRef,
 			});
 	}
 
@@ -349,9 +353,9 @@ DescriptorSet Minty::Shader::create_descriptor_set(uint32_t const set, bool cons
 	// get a pool for the set
 	DescriptorSetBuilder builder
 	{
-		.shader = this,
+		.shader = thisRef,
 		.pool = take_pool(set),
-		.set = set,
+		.set = set, 
 	};
 
 	builder.descriptorSets = create_descriptor_sets(builder.pool, set);

@@ -12,7 +12,6 @@ using namespace Minty;
 
 Minty::DescriptorSet::DescriptorSet(DescriptorSetBuilder const& builder)
 	: RenderObject()
-	, _shader(builder.shader)
 	, _descriptorPool(builder.pool)
 	, _set(builder.set)
 	, _descriptorSets(builder.descriptorSets)
@@ -71,7 +70,6 @@ void Minty::DescriptorSet::destroy()
 	//	}
 	//}
 
-	_shader = nullptr;
 	_descriptorPool = VK_NULL_HANDLE;
 	_set = 0;
 	_descriptors.clear();
