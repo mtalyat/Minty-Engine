@@ -1372,7 +1372,7 @@ void EditorApplication::build_project()
 			// MintyEngine.dll
 			String dllName = String(ASSEMBLY_ENGINE_NAME).append(".dll");
 			console->log_info("\t" + dllName);
-			Operations::copy(mintyPath / dllName, targetDir);
+			Operations::copy(mintyPath / "Libraries" / "MintyEngine" / "bin" / configName / dllName, targetDir);
 
 			// Project dll
 			String source = std::format("{}/bin/{}/{}.dll", _project->get_assembly_path().generic_string(), configName, projectName);
