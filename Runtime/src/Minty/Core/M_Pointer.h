@@ -93,6 +93,7 @@ namespace Minty
 			if (this != &other)
 			{
 				if (_counter) _counter->strongCount--;
+				MINTY_ASSERT(!_counter || _counter->strongCount >= 0);
 				_ptr = other._ptr;
 				_counter = other._counter;
 				if (_counter) _counter->strongCount++;
@@ -126,6 +127,7 @@ namespace Minty
 			if (_ptr == nullptr) return;
 
 			_counter->strongCount--;
+			MINTY_ASSERT(_counter->strongCount >= 0);
 
 			// no more owners, so delete the data
 			if (!_counter->strongCount)
@@ -214,6 +216,7 @@ namespace Minty
 			if (this != &other)
 			{
 				if (_counter) _counter->weakCount--;
+				MINTY_ASSERT(!_counter || _counter->weakCount >= 0);
 				_ptr = other._ptr;
 				_counter = other._counter;
 				if (_counter) _counter->weakCount++;
@@ -247,6 +250,7 @@ namespace Minty
 			if (_counter == nullptr) return;
 
 			_counter->weakCount--;
+			MINTY_ASSERT(_counter->weakCount >= 0);
 
 			// if no more strong and no more weak, delete counter
 			if (!_counter->strongCount && !_counter->weakCount)
