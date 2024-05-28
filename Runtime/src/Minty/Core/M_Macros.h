@@ -39,9 +39,9 @@
 #define MINTY_MAKE_VERSION(major, minor, patch) ((((uint32_t)(major)) << 22U) | (((uint32_t)(minor)) << 12U) | ((uint32_t)(patch)))    
 
 #ifdef MINTY_RELEASE
-#define MINTY_ABORT(message) { minty::Debug::log_error(std::format("FATAL ERROR: {}", MINTY_DEBUG_INFO(message))); }
+#define MINTY_ABORT(message) { minty::Debug::log_error(std::format("FATAL ERROR: {}", MINTY_DEBUG_INFO(message))); Minty::Debug::log_stack_trace(); }
 #else
-#define MINTY_ABORT(message) { Minty::Debug::log_error(std::format("FATAL ERROR: {}", MINTY_DEBUG_INFO(message))); throw std::runtime_error(message); }
+#define MINTY_ABORT(message) { Minty::Debug::log_error(std::format("FATAL ERROR: {}", MINTY_DEBUG_INFO(message))); Minty::Debug::log_stack_trace(); }
 #endif
 
 #ifdef MINTY_RELEASE

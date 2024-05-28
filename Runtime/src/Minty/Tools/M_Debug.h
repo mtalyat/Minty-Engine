@@ -12,4 +12,6 @@ namespace Minty::Debug
 	void log_info(String const& text);
 
 	void log_todo(String const& text);
+
+	void log_stack_trace();
 }

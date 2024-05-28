@@ -34,8 +34,8 @@ namespace Minty
 	class Counter
 	{
 	public:
-		int strongCount;
-		int weakCount;
+		int strongCount = 0;
+		int weakCount = 0;
 	};
 
 	template<typename T>
@@ -93,7 +93,7 @@ namespace Minty
 			if (this != &other)
 			{
 				if (_counter) _counter->strongCount--;
-				MINTY_ASSERT(!_counter || _counter->strongCount >= 0);
+				MINTY_ASSERT_FORMAT(!_counter || _counter->strongCount >= 0, "Owner counter invalid in copy ({}).", _counter->strongCount);
 				_ptr = other._ptr;
 				_counter = other._counter;
 				if (_counter) _counter->strongCount++;
@@ -109,6 +109,8 @@ namespace Minty
 		}
 		Owner& operator=(Owner&& other) noexcept {
 			if (this != &other) {
+				if (_counter) _counter->strongCount--;
+				MINTY_ASSERT_FORMAT(!_counter || _counter->strongCount >= 0, "Owner counter invalid in move ({}).", _counter->strongCount);
 				_ptr = other._ptr;
 				_counter = other._counter;
 				other._ptr = nullptr;
@@ -127,18 +129,18 @@ namespace Minty
 			if (_ptr == nullptr) return;
 
 			_counter->strongCount--;
-			MINTY_ASSERT(_counter->strongCount >= 0);
+			MINTY_ASSERT_FORMAT(_counter->strongCount >= 0, "Owner counter invalid in release ({}).", _counter->strongCount);
 
 			// no more owners, so delete the data
 			if (!_counter->strongCount)
 			{
 				delete _ptr;
-			}
 
-			// if no more weak references, also delete the counter
-			if (!_counter->weakCount)
-			{
-				delete _counter;
+				// if also no more weak references, also delete the counter
+				if (!_counter->weakCount)
+				{
+					delete _counter;
+				}
 			}
 
 			_ptr = nullptr;
@@ -216,7 +218,7 @@ namespace Minty
 			if (this != &other)
 			{
 				if (_counter) _counter->weakCount--;
-				MINTY_ASSERT(!_counter || _counter->weakCount >= 0);
+				MINTY_ASSERT_FORMAT(!_counter || _counter->weakCount >= 0, "Ref counter invalid in copy ({}).", _counter->weakCount);
 				_ptr = other._ptr;
 				_counter = other._counter;
 				if (_counter) _counter->weakCount++;
@@ -232,6 +234,8 @@ namespace Minty
 		}
 		Ref& operator=(Ref&& other) noexcept {
 			if (this != &other) {
+				if (_counter) _counter->weakCount--;
+				MINTY_ASSERT_FORMAT(!_counter || _counter->weakCount >= 0, "Ref counter invalid in move ({}).", _counter->weakCount);
 				_ptr = other._ptr;
 				_counter = other._counter;
 				other._ptr = nullptr;
@@ -250,7 +254,7 @@ namespace Minty
 			if (_counter == nullptr) return;
 
 			_counter->weakCount--;
-			MINTY_ASSERT(_counter->weakCount >= 0);
+			MINTY_ASSERT_FORMAT(_counter->weakCount >= 0, "Ref counter invalid in release ({}).", _counter->weakCount);
 
 			// if no more strong and no more weak, delete counter
 			if (!_counter->strongCount && !_counter->weakCount)
