@@ -1,0 +1,1 @@
+This is from the glfw 3.3.8 WIN64 lib-vc2022 folder.
