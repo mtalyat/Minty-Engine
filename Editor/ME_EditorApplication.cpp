@@ -990,6 +990,14 @@ void Mintye::EditorApplication::copy_files()
 	String const& projectName = _project->get_name();
 	String targetDir = std::format("{}/{}", _project->get_build_path().generic_string(), configName);
 
+	// Runtime DLL
+	//log_info("\tRuntime DLL");
+	//if (!_buildInfo.get_config())
+	//{
+	//	log_info("\tEngine Debug PDB");
+	//	Operations::copy(_cwd / String(ASSEMBLY_ENGINE_NAME).append(".pdb"), targetDir);
+	//}
+
 	// Mono DLLs
 	log_info("\tMono DLLs");
 	Operations::copy(_cwd / "mono-2.0-sgen.dll", targetDir);
@@ -1178,9 +1186,6 @@ void Mintye::EditorApplication::generate_assembly()
 	// get timestamp
 	const auto now = std::chrono::system_clock::now();
 
-	Path MintyPath = Operations::get_minty_path();
-	String stringMintyPath = MintyPath.string();
-
 	// write contents
 	file
 		<< "<?xml version=\"1.0\" encoding=\"utf-8\"?>" << std::endl
@@ -1218,9 +1223,9 @@ void Mintye::EditorApplication::generate_assembly()
 		<< "    <ErrorReport>prompt</ErrorReport>" << std::endl
 		<< "  </PropertyGroup>" << std::endl
 		<< "  <ItemGroup>" << std::endl
-		<< "    <Reference Include=\"MintyEngine, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL\">" << std::endl
+		<< "    <Reference Include=\"" << ASSEMBLY_ENGINE_NAME << ", Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL\">" << std::endl
 		<< "      <SpecificVersion>False</SpecificVersion>" << std::endl
-		<< "      <HintPath>" << stringMintyPath << "\\Libraries\\MintyEngine\\bin\\Debug\\MintyEngine.dll</HintPath>" << std::endl
+		<< "      <HintPath>..\\Build\\" << _buildInfo.get_config_name() << "\\" << ASSEMBLY_ENGINE_NAME << ".dll</HintPath>" << std::endl
 		<< "    </Reference>" << std::endl
 		<< "    <Reference Include=\"System\" />" << std::endl
 		<< "    <Reference Include=\"System.Core\" />" << std::endl

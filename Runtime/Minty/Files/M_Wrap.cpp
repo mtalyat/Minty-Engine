@@ -295,8 +295,10 @@ void Minty::Wrap::emplace(Path const& physicalPath, Path const& virtualPath, Com
     file.close();
 
     // create an entry for the new file
+    String source = relative_path(virtualPath).string();
+    MINTY_ASSERT(source.length() < WRAP_ENTRY_PATH_SIZE);
     Entry entry;
-    memcpy(entry.path, relative_path(virtualPath).string().c_str(), WRAP_ENTRY_PATH_SIZE);
+    memcpy(entry.path, source.c_str(), std::min(static_cast<size_t>(WRAP_ENTRY_PATH_SIZE - 1), source.size()));
     entry.path[WRAP_ENTRY_PATH_SIZE - 1] = '\0';
     entry.compressionLevel = static_cast<Byte>(compressionLevel);
     entry.uncompressedSize = static_cast<uint32_t>(fileSize);

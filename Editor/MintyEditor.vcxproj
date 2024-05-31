@@ -149,6 +149,7 @@
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>xcopy /y "$(ProjectDir)..\Runtime\x64\$(Configuration)\*.dll" "$(TargetDir)"
+xcopy /y "$(ProjectDir)..\Runtime\x64\$(Configuration)\*.pdb" "$(TargetDir)"
 for /r "$(ProjectDir)..\Data" %%f in (*.wrap) do xcopy /Y "%%f" "$(TargetDir)"
 xcopy /y "$(ProjectDir)Icon.png" "$(TargetDir)"
 xcopy /y "$(ProjectDir)..\Assembly\bin\$(Configuration)\MintyEngine.dll" "$(TargetDir)"
@@ -186,6 +187,7 @@ xcopy /y /e /i "$(ProjectDir)Templates\*" "$(TargetDir)Templates\"</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>xcopy /y "$(ProjectDir)..\Runtime\x64\$(Configuration)\*.dll" "$(TargetDir)"
+xcopy /y "$(ProjectDir)..\Runtime\x64\$(Configuration)\*.pdb" "$(TargetDir)"
 for /r "$(ProjectDir)..\Data" %%f in (*.wrap) do xcopy /Y "%%f" "$(TargetDir)"
 xcopy /y "$(ProjectDir)Icon.png" "$(TargetDir)"
 xcopy /y "$(ProjectDir)..\Assembly\bin\$(Configuration)\MintyEngine.dll" "$(TargetDir)"
