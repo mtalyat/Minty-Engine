@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "M_DefaultLayer.h"
 
+#include "Minty/Core/M_Application.h"
 #include "Minty/Events/M_Event.h"
 #include "Minty/Events/M_KeyEvent.h"
 #include "Minty/Events/M_MouseEvent.h"
@@ -53,7 +54,7 @@ void Minty::DefaultLayer::on_update(Time const& time)
 
 void Minty::DefaultLayer::on_event(Event& event)
 {
-	// forward event to scripts
+	// these events are always called
 	switch (event.get_event_type())
 	{
 	case EventType::WindowResize:
@@ -73,53 +74,61 @@ void Minty::DefaultLayer::on_event(Event& event)
 
 		break;
 	}
-	case EventType::Key:
-	{
-		KeyEvent& e = static_cast<KeyEvent&>(event);
-		Input::trigger_key(e.get_key(), e.get_key_action(), e.get_key_modifiers());
-		break;
 	}
-	case EventType::MouseButton:
+
+	// these events only called in normal run mode
+	if (Application::instance().get_mode() == ApplicationMode::Normal)
 	{
-		MouseButtonEvent& e = static_cast<MouseButtonEvent&>(event);
-		Input::trigger_mouse_button(e.get_button(), e.get_action(), e.get_key_modifiers());
-		break;
-	}
-	case EventType::MouseMoved:
-	{
-		MouseMovedEvent& e = static_cast<MouseMovedEvent&>(event);
-		Input::trigger_mouse_move(e.get_x(), e.get_y());
-		break;
-	}
-	case EventType::MouseScrolled:
-	{
-		MouseScrolledEvent& e = static_cast<MouseScrolledEvent&>(event);
-		Input::trigger_mouse_scroll(e.get_delta_x(), e.get_delta_y());
-		break;
-	}
-	case EventType::GamepadConnected:
-	{
-		GamepadConnectedEvent& e = static_cast<GamepadConnectedEvent&>(event);
-		Input::trigger_gamepad_connect(e.get_controller());
-		break;
-	}
-	case EventType::GamepadDisconnected:
-	{
-		GamepadDisconnectedEvent& e = static_cast<GamepadDisconnectedEvent&>(event);
-		Input::trigger_gamepad_disconnect(e.get_controller());
-		break;
-	}
-	case EventType::GamepadButton:
-	{
-		GamepadButtonEvent& e = static_cast<GamepadButtonEvent&>(event);
-		Input::trigger_gamepad_button(e.get_controller(), e.get_button(), e.get_action());
-		break;
-	}
-	case EventType::GamepadAxis:
-	{
-		GamepadAxisEvent& e = static_cast<GamepadAxisEvent&>(event);
-		Input::trigger_gamepad_axis(e.get_controller(), e.get_axis(), e.get_value());
-		break;
-	}
+		switch (event.get_event_type())
+		{
+		case EventType::Key:
+		{
+			KeyEvent& e = static_cast<KeyEvent&>(event);
+			Input::trigger_key(e.get_key(), e.get_key_action(), e.get_key_modifiers());
+			break;
+		}
+		case EventType::MouseButton:
+		{
+			MouseButtonEvent& e = static_cast<MouseButtonEvent&>(event);
+			Input::trigger_mouse_button(e.get_button(), e.get_action(), e.get_key_modifiers());
+			break;
+		}
+		case EventType::MouseMoved:
+		{
+			MouseMovedEvent& e = static_cast<MouseMovedEvent&>(event);
+			Input::trigger_mouse_move(e.get_x(), e.get_y());
+			break;
+		}
+		case EventType::MouseScrolled:
+		{
+			MouseScrolledEvent& e = static_cast<MouseScrolledEvent&>(event);
+			Input::trigger_mouse_scroll(e.get_delta_x(), e.get_delta_y());
+			break;
+		}
+		case EventType::GamepadConnected:
+		{
+			GamepadConnectedEvent& e = static_cast<GamepadConnectedEvent&>(event);
+			Input::trigger_gamepad_connect(e.get_controller());
+			break;
+		}
+		case EventType::GamepadDisconnected:
+		{
+			GamepadDisconnectedEvent& e = static_cast<GamepadDisconnectedEvent&>(event);
+			Input::trigger_gamepad_disconnect(e.get_controller());
+			break;
+		}
+		case EventType::GamepadButton:
+		{
+			GamepadButtonEvent& e = static_cast<GamepadButtonEvent&>(event);
+			Input::trigger_gamepad_button(e.get_controller(), e.get_button(), e.get_action());
+			break;
+		}
+		case EventType::GamepadAxis:
+		{
+			GamepadAxisEvent& e = static_cast<GamepadAxisEvent&>(event);
+			Input::trigger_gamepad_axis(e.get_controller(), e.get_axis(), e.get_value());
+			break;
+		}
+		}
 	}
 }

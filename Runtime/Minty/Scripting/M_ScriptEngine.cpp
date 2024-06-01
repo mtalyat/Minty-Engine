@@ -55,12 +55,19 @@ Minty::ScriptEngine::ScriptEngine()
 
 	_instance = this;
 
-	mono_set_dirs("C:/Program Files/Mono/lib", "C:/Program Files/Mono/etc");
+	Path currentPath = std::filesystem::current_path();
+	String currentPathString = currentPath.generic_string();
+
+	Console::test(currentPathString);
+
+	//mono_set_dirs("C:/Program Files/Mono/lib", "C:/Program Files/Mono/etc");
+	mono_set_dirs(currentPathString.c_str(), nullptr);
 
 	_rootDomain = mono_jit_init("MintyRuntime");
 	MINTY_ASSERT(_rootDomain != nullptr);
 
-	mono_set_assemblies_path("C:/Libraries/Mono/lib");
+	//mono_set_assemblies_path("C:/Libraries/Mono/lib");
+	mono_set_assemblies_path(currentPathString.c_str());
 
 	String appDomainName = "MintyDomain";
 	_appDomain = mono_domain_create_appdomain(appDomainName.data(), nullptr);

@@ -177,7 +177,7 @@
       <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
     </Lib>
     <PostBuildEvent>
-      <Command>xcopy /y "C:\Libraries\Mono\lib\*.dll" "$(TargetDir)"</Command>
+      <Command>xcopy /y "..\Libraries\Mono\lib\*.dll" "$(TargetDir)"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copy Mono to build output.</Message>
