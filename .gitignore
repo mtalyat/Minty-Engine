@@ -400,5 +400,6 @@ FodyWeavers.xsd
 # Management folder
 Management/
 
-# cmake
-Editor/cmake/
+# Minty Engine
+/Editor/mono/
+/Editor/Log.txt
