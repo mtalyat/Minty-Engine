@@ -3,7 +3,7 @@
 
 #include <filesystem>
 
-// for getenv
+// for getenv, system
 #include <cstdlib>
 
 #ifdef MINTY_WINDOWS
@@ -43,6 +43,11 @@ Path get_directory(Path const& path)
 	}
 }
 
+int Minty::Operations::system_command(String const& command)
+{
+	return system(command.c_str());
+}
+
 void Minty::Operations::open_directory(Path const& path)
 {
 	Path directory = get_directory(path);
@@ -50,13 +55,13 @@ void Minty::Operations::open_directory(Path const& path)
 	String pathString = directory.string();
 #ifdef MINTY_WINDOWS
 	std::replace(pathString.begin(), pathString.end(), '/', '\\');
-	system(std::format("start explorer \"{}\"", pathString).c_str());
+	system_command(std::format("start explorer \"{}\"", pathString).c_str());
 #elif defined(MINTY_APPLE)
 	std::replace(pathString.begin(), pathString.end(), '\\', '/');
-	system(std::format("xdg-open \"{}\"", pathString).c_str());
+	system_command(std::format("xdg-open \"{}\"", pathString).c_str());
 #elif defined(MINTY_LINUX)
 	std::replace(pathString.begin(), pathString.end(), '\\', '/');
-	system(std::format("open \"{}\"", pathString).c_str());
+	system_command(std::format("open \"{}\"", pathString).c_str());
 #endif
 }
 
@@ -65,17 +70,17 @@ void Minty::Operations::open(Path const& path)
 	String pathString = path.string();
 #ifdef MINTY_WINDOWS
 	std::replace(pathString.begin(), pathString.end(), '/', '\\');
-	system(std::format("start explorer \"{}\"", pathString).c_str());
+	system_command(std::format("start explorer \"{}\"", pathString).c_str());
 #elif defined(MINTY_APPLE)
 	std::replace(pathString.begin(), pathString.end(), '\\', '/');
-	system(std::format("xdg-open \"{}\"", pathString).c_str());
+	system_command(std::format("xdg-open \"{}\"", pathString).c_str());
 #elif defined(MINTY_LINUX)
 	std::replace(pathString.begin(), pathString.end(), '\\', '/');
-	system(std::format("open \"{}\"", pathString).c_str());
+	system_command(std::format("open \"{}\"", pathString).c_str());
 #endif
 }
 
-void Minty::Operations::copy(Path const& from, Path const& to)
+bool Minty::Operations::copy(Path const& from, Path const& to)
 {
 	Path dest;
 	if (to.has_extension())
@@ -93,18 +98,69 @@ void Minty::Operations::copy(Path const& from, Path const& to)
 	catch (std::filesystem::filesystem_error& e)
 	{
 		MINTY_ERROR_FORMAT("Failed to copy \"{}\" to \"{}\": \"{}\"", from.generic_string(), dest.generic_string(), e.what());
+		return false;
 	}
+
+	return true;
 }
 
-void Minty::Operations::copy_all(Path const& from, Path const& extension, Path const& to)
+bool Minty::Operations::copy_files(Path const& from, Path const& extension, Path const& to)
 {
-	for (auto entry : std::filesystem::directory_iterator(from))
+	for (auto const& entry : std::filesystem::directory_iterator(from))
 	{
 		if (extension.empty() || (entry.path().has_extension() && entry.path().extension() == extension))
 		{
-			Operations::copy(entry.path(), to);
+			if (!Operations::copy(entry.path(), to))
+			{
+				return false;
+			}
 		}
 	}
+
+	return true;
+}
+
+bool Minty::Operations::copy_all(Path const& from, Path const& to)
+{
+	try
+	{
+		if (!std::filesystem::exists(from))
+		{
+			MINTY_ERROR_FORMAT("Failed to copy_all, from \"{}\": Path does not exist.", from.generic_string());
+			return false;
+		}
+		else if (!std::filesystem::is_directory(from))
+		{
+			MINTY_ERROR_FORMAT("Failed to copy_all, from \"{}\": Path is not a directory.", from.generic_string());
+			return false;
+		}
+
+		// create dest if needed
+		if (!std::filesystem::exists(to))
+		{
+			std::filesystem::create_directories(to);
+		}
+
+		// copy over all of the files
+		for (auto const& entry : std::filesystem::recursive_directory_iterator(from))
+		{
+			Path const& path = entry.path();
+			String relativePathString = path.lexically_relative(from).string();
+			std::filesystem::copy(path, to / relativePathString, std::filesystem::copy_options::overwrite_existing);
+		}
+	}
+	catch (std::filesystem::filesystem_error& e)
+	{
+		MINTY_ERROR_FORMAT("Failed to copy_all \"{}\" to \"{}\": \"{}\"", from.generic_string(), to.generic_string(), e.what());
+		return false;
+	}
+	catch (std::exception& e)
+	{
+		MINTY_ERROR_FORMAT("Failed to copy_all \"{}\" to \"{}\": \"{}\"", from.generic_string(), to.generic_string(), e.what());
+		return false;
+	}
+
+	return true;
 }
 
 String Minty::Operations::get_environment_variable(String const& name)

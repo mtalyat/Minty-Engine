@@ -999,10 +999,11 @@ void Mintye::EditorApplication::copy_files()
 	//}
 
 	// Mono DLLs
-	log_info("\tMono DLLs");
+	log_info("\tMono Files");
 	Operations::copy(_cwd / "mono-2.0-sgen.dll", targetDir);
 	Operations::copy(_cwd / "MonoPosixHelper.dll", targetDir);
 	Operations::copy(_cwd / "mscorlib.dll", targetDir);
+	Operations::copy_all(_cwd / "mono", Path(targetDir) / "mono");
 
 	// MintyEngine DLL
 	log_info("\tEngine DLL");
@@ -1015,7 +1016,7 @@ void Mintye::EditorApplication::copy_files()
 
 	// Wrap files
 	log_info("\tWrap files");
-	Operations::copy_all(_cwd, EXTENSION_WRAP, targetDir);
+	Operations::copy_files(_cwd, EXTENSION_WRAP, targetDir);
 }
 
 void Mintye::EditorApplication::log(Minty::String const& message)

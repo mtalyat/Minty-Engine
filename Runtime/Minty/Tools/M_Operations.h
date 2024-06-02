@@ -11,6 +11,13 @@ namespace Minty
 	namespace Operations
 	{
 		/// <summary>
+		/// Runs a system command and returns the result code.
+		/// </summary>
+		/// <param name="command"></param>
+		/// <returns></returns>
+		int system_command(String const& command);
+
+		/// <summary>
 		/// Opens the directory at the given path.
 		/// </summary>
 		/// <param name="path"></param>
@@ -27,7 +34,7 @@ namespace Minty
 		/// </summary>
 		/// <param name="from"></param>
 		/// <param name="to"></param>
-		void copy(Path const& from, Path const& to);
+		bool copy(Path const& from, Path const& to);
 
 		/// <summary>
 		/// Copies all of the files with the given extension to the target path.
@@ -35,7 +42,14 @@ namespace Minty
 		/// <param name="from"></param>
 		/// <param name="extension"></param>
 		/// <param name="to"></param>
-		void copy_all(Path const& from, Path const& extension, Path const& to);
+		bool copy_files(Path const& from, Path const& extension, Path const& to);
+
+		/// <summary>
+		/// Copies all of the files and directories to the target path.
+		/// </summary>
+		/// <param name="from"></param>
+		/// <param name="to"></param>
+		bool copy_all(Path const& from, Path const& to);
 
 		/// <summary>
 		/// Gets the environment variable, if it has been set.

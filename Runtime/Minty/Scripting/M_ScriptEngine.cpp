@@ -58,8 +58,6 @@ Minty::ScriptEngine::ScriptEngine()
 	Path currentPath = std::filesystem::current_path();
 	String currentPathString = currentPath.generic_string();
 
-	Console::test(currentPathString);
-
 	//mono_set_dirs("C:/Program Files/Mono/lib", "C:/Program Files/Mono/etc");
 	mono_set_dirs(currentPathString.c_str(), nullptr);
 
