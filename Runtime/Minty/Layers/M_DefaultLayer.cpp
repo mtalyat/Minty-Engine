@@ -77,7 +77,7 @@ void Minty::DefaultLayer::on_event(Event& event)
 	}
 
 	// these events only called in normal run mode
-	if (/*Application::instance().get_mode() == ApplicationMode::Normal*/true)
+	if (Application::instance().get_mode() == ApplicationMode::Normal)
 	{
 		switch (event.get_event_type())
 		{
