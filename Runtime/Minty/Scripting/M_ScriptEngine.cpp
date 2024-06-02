@@ -59,7 +59,7 @@ Minty::ScriptEngine::ScriptEngine()
 	String currentPathString = currentPath.generic_string();
 
 	//mono_set_dirs("C:/Program Files/Mono/lib", "C:/Program Files/Mono/etc");
-	mono_set_dirs(currentPathString.c_str(), nullptr);
+	mono_set_dirs((currentPath / "mono" / "lib").string().c_str(), (currentPath / "mono" / "etc").string().c_str());
 
 	_rootDomain = mono_jit_init("MintyRuntime");
 	MINTY_ASSERT(_rootDomain != nullptr);

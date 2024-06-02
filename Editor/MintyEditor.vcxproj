@@ -144,7 +144,8 @@
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
     </Link>
     <PreBuildEvent>
-      <Command>xcopy /y /s /e /i "$(ProjectDir)..\Libraries\mono\lib\4.5" "$(ProjectDir)mono\4.5"
+      <Command>xcopy /y /s /e /i "$(ProjectDir)..\Libraries\mono\lib" "$(ProjectDir)mono\lib"
+xcopy /y /s /e /i "$(ProjectDir)..\Libraries\mono\etc" "$(ProjectDir)mono\etc"
 xcopy /y "$(ProjectDir)..\Assembly\bin\$(Configuration)\MintyEngine.dll" "$(ProjectDir)"
 xcopy /y "$(ProjectDir)..\Data\*.wrap" "$(ProjectDir)"
 xcopy /y "$(ProjectDir)..\Libraries\mono\lib\*.dll" "$(ProjectDir)"</Command>
