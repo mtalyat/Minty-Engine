@@ -156,7 +156,9 @@ xcopy /y "$(ProjectDir)..\Runtime\x64\$(Configuration)\*.pdb" "$(TargetDir)"
 for /r "$(ProjectDir)..\Data" %%f in (*.wrap) do xcopy /Y "%%f" "$(TargetDir)"
 xcopy /y "$(ProjectDir)Icon.png" "$(TargetDir)"
 xcopy /y "$(ProjectDir)..\Assembly\bin\$(Configuration)\MintyEngine.dll" "$(TargetDir)"
-xcopy /y /e /i "$(ProjectDir)Templates\*" "$(TargetDir)Templates\"</Command>
+xcopy /y /e /i "$(ProjectDir)Templates\*" "$(TargetDir)Templates\"
+xcopy /y /s /e /i "$(ProjectDir)mono\lib" "$(TargetDir)mono\lib"
+xcopy /y /s /e /i "$(ProjectDir)mono\etc" "$(TargetDir)mono\etc"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copy Minty Engine files.</Message>
@@ -185,8 +187,11 @@ xcopy /y /e /i "$(ProjectDir)Templates\*" "$(TargetDir)Templates\"</Command>
       <IgnoreAllDefaultLibraries>false</IgnoreAllDefaultLibraries>
     </Link>
     <PreBuildEvent>
-      <Command>
-      </Command>
+      <Command>xcopy /y /s /e /i "$(ProjectDir)..\Libraries\mono\lib" "$(ProjectDir)mono\lib"
+xcopy /y /s /e /i "$(ProjectDir)..\Libraries\mono\etc" "$(ProjectDir)mono\etc"
+xcopy /y "$(ProjectDir)..\Assembly\bin\$(Configuration)\MintyEngine.dll" "$(ProjectDir)"
+xcopy /y "$(ProjectDir)..\Data\*.wrap" "$(ProjectDir)"
+xcopy /y "$(ProjectDir)..\Libraries\mono\lib\*.dll" "$(ProjectDir)"</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>xcopy /y "$(ProjectDir)..\Runtime\x64\$(Configuration)\*.dll" "$(TargetDir)"
@@ -194,7 +199,9 @@ xcopy /y "$(ProjectDir)..\Runtime\x64\$(Configuration)\*.pdb" "$(TargetDir)"
 for /r "$(ProjectDir)..\Data" %%f in (*.wrap) do xcopy /Y "%%f" "$(TargetDir)"
 xcopy /y "$(ProjectDir)Icon.png" "$(TargetDir)"
 xcopy /y "$(ProjectDir)..\Assembly\bin\$(Configuration)\MintyEngine.dll" "$(TargetDir)"
-xcopy /y /e /i "$(ProjectDir)Templates\*" "$(TargetDir)Templates\"</Command>
+xcopy /y /e /i "$(ProjectDir)Templates\*" "$(TargetDir)Templates\"
+xcopy /y /s /e /i "$(ProjectDir)mono\lib" "$(TargetDir)mono\lib"
+xcopy /y /s /e /i "$(ProjectDir)mono\etc" "$(TargetDir)mono\etc"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copy Minty Engine files.</Message>
