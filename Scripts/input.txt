@@ -1,4 +1,20 @@
-enum Perspective {
-	Orthographic = 0,
-	Perspective = 1,
+enum AssetType {
+	None,
+	Meta,
+	Wrap,
+	Text,
+	Script,
+	AudioClip,
+	Animation,
+	Animator,
+	Texture,
+	ShaderCode,
+	ShaderModule,
+	Shader,
+	ShaderPass,
+	MaterialTemplate,
+	Material,
+	Sprite,
+	Mesh,
+	Scene,
 };

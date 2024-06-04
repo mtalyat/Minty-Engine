@@ -1,10 +1,10 @@
 #include "ME_GameWindow.h"
 
-mintye::GameWindow::GameWindow(EditorApplication& application)
+Mintye::GameWindow::GameWindow(EditorApplication& application)
 	: EditorWindow(application)
 {}
 
-void mintye::GameWindow::draw()
+void Mintye::GameWindow::draw()
 {
 	ImGui::SetNextWindowSize(ImVec2(400, 400), ImGuiCond_FirstUseEver);
 	if (!ImGui::Begin("Game", nullptr))
@@ -18,10 +18,10 @@ void mintye::GameWindow::draw()
 	ImGui::End();
 }
 
-void mintye::GameWindow::reset()
+void Mintye::GameWindow::reset()
 {
 }
 
-void mintye::GameWindow::refresh()
+void Mintye::GameWindow::refresh()
 {
 }

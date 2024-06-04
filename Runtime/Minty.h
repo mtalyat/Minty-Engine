@@ -10,149 +10,161 @@ access to the entire engine without needing include each file.
 */
 
 // ANIMATION
-#include "M_Animation.h"
-#include "M_AnimationSystem.h"
-#include "M_Animator.h"
-#include "M_AnimatorComponent.h"
+#include "Minty/Animation/M_Animation.h"
+#include "Minty/Animation/M_AnimationSystem.h"
+#include "Minty/Animation/M_Animator.h"
+#include "Minty/Animation/M_AnimatorComponent.h"
 
-// APPLICATION
-#include "M_Application.h"
-#include "M_RunMode.h"
-
-// ASSET
-#include "M_Asset.h"
-#include "M_AssetEngine.h"
+// ASSETS
+#include "Minty/Assets/M_Asset.h"
+#include "Minty/Assets/M_AssetEngine.h"
 
 // AUDIO
-#include "M_Audio.h"
-#include "M_AudioClip.h"
-#include "M_AudioEngine.h"
-#include "M_AudioListenerComponent.h"
-#include "M_AudioSourceComponent.h"
-#include "M_AudioSystem.h"
-
-// BUILTIN
-#include "M_Builtin.h"
-
-// CAMERA
-#include "M_Camera.h"
-#include "M_CameraComponent.h"
+#include "Minty/Audio/M_Audio.h"
+#include "Minty/Audio/M_AudioClip.h"
+#include "Minty/Audio/M_AudioEngine.h"
+#include "Minty/Audio/M_AudioListenerComponent.h"
+#include "Minty/Audio/M_AudioSourceComponent.h"
+#include "Minty/Audio/M_AudioSystem.h"
 
 // COMPONENTS
-#include "M_Component.h"
+#include "Minty/Components/M_Component.h"
+#include "Minty/Components/M_DestroyEntityComponent.h"
+#include "Minty/Components/M_DirtyComponent.h"
+#include "Minty/Components/M_EnabledComponent.h"
+#include "Minty/Components/M_NameComponent.h"
+#include "Minty/Components/M_RelationshipComponent.h"
+#include "Minty/Components/M_TagComponent.h"
+#include "Minty/Components/M_TransformComponent.h"
 
-#include "M_MeshComponent.h"
-#include "M_RelationshipComponent.h"
+// CORE
+#include "Minty/Core/M_Application.h"
+#include "Minty/Core/M_Base.h"
+#include "Minty/Core/M_Constants.h"
+#include "Minty/Core/M_Engine.h"
+#include "Minty/Core/M_Macros.h"
+#include "Minty/Core/M_Pointer.h"
+#include "Minty/Core/M_Window.h"
 
 // ENTITIES
-#include "M_EntityRegistry.h"
+#include "Minty/Entities/M_Entity.h"
+#include "Minty/Entities/M_EntityRegistry.h"
+
+// EVENTS
+#include "Minty/Events/M_Event.h"
 
 // FILES
-#include "M_File.h"
-#include "M_PhysicalFile.h"
-#include "M_VirtualFile.h"
-#include "M_Wrap.h"
-#include "M_Wrapper.h"
+#include "Minty/Files/M_File.h"
+#include "Minty/Files/M_PhysicalFile.h"
+#include "Minty/Files/M_VirtualFile.h"
+#include "Minty/Files/M_Wrap.h"
+#include "Minty/Files/M_Wrapper.h"
 
 // INPUT
-#include "M_CursorMode.h"
-#include "M_InputMap.h"
-#include "M_Key.h"
-#include "M_KeyAction.h"
-#include "M_KeyModifiers.h"
-#include "M_MouseButton.h"
+#include "Minty/Input/M_CursorMode.h"
+#include "Minty/Input/M_Gamepad.h"
+#include "Minty/Input/M_Key.h"
+#include "Minty/Input/M_KeyAction.h"
+#include "Minty/Input/M_KeyModifiers.h"
+#include "Minty/Input/M_MouseButton.h"
+
+// LAYERS
+#include "Minty/Layers/M_Layer.h"
+#include "Minty/Layers/M_DefaultLayer.h"
 
 // LIBRARIES
-#include "M_Vulkan.h"
-#include "M_GLM.hpp"
 #ifdef MINTY_IMGUI
-#include "M_ImGui.h"
+#include "Minty/Libraries/M_ImGui.h"
 #endif
-#include "M_TinyXML.h"
 
-// TASKS
-#include "M_Task.h"
+// MATH
+#include "Minty/Math/M_Math.h"
+
+// MULTITHREADING
+#include "Minty/Multithreading/M_Task.h"
 
 // RENDERING
-#include "M_CoordinateMode.h"
-#include "M_Material.h"
-#include "M_MaterialTemplate.h"
-#include "M_Mesh.h"
-#include "M_RenderableComponent.h"
-#include "M_RenderEngine.h"
-#include "M_Buffer.h"
-#include "M_DescriptorSet.h"
-#include "M_DrawCallObjectInfo.h"
-#include "M_RenderObject.h"
-#include "M_PushConstantInfo.h"
-#include "M_UniformConstantInfo.h"
-#include "M_RenderSystem.h"
-#include "M_Shader.h"
-#include "M_ShaderPass.h"
-#include "M_Sprite.h"
-#include "M_SpriteComponent.h"
-#include "M_Texture.h"
-#include "M_TextureAtlas.h"
-#include "M_Viewport.h"
+#include "Minty/Rendering/M_Buffer.h"
+#include "Minty/Rendering/M_Builtin.h"
+#include "Minty/Rendering/M_Camera.h"
+#include "Minty/Rendering/M_CameraComponent.h"
+#include "Minty/Rendering/M_CoordinateMode.h"
+#include "Minty/Rendering/M_DescriptorSet.h"
+#include "Minty/Rendering/M_DrawCallObjectInfo.h"
+#include "Minty/Rendering/M_Material.h"
+#include "Minty/Rendering/M_MaterialTemplate.h"
+#include "Minty/Rendering/M_Mesh.h"
+#include "Minty/Rendering/M_MeshComponent.h"
+#include "Minty/Rendering/M_PushConstantInfo.h"
+#include "Minty/Rendering/M_RenderableComponent.h"
+#include "Minty/Rendering/M_RenderEngine.h"
+#include "Minty/Rendering/M_RenderObject.h"
+#include "Minty/Rendering/M_RenderSystem.h"
+#include "Minty/Rendering/M_Shader.h"
+#include "Minty/Rendering/M_ShaderPass.h"
+#include "Minty/Rendering/M_Sprite.h"
+#include "Minty/Rendering/M_SpriteComponent.h"
+#include "Minty/Rendering/M_SpritePushData.h"
+#include "Minty/Rendering/M_Texture.h"
+#include "Minty/Rendering/M_TextureAtlas.h"
+#include "Minty/Rendering/M_UniformConstantInfo.h"
+#include "Minty/Rendering/M_Viewport.h"
 
 // SCENES
-#include "M_Scene.h"
-#include "M_SceneManager.h"
+#include "Minty/Scenes/M_Scene.h"
+#include "Minty/Scenes/M_SceneManager.h"
+#include "Minty/Scenes/M_SceneObject.h"
 
 // SCRIPTING
-#include "M_Accessibility.h"
-#include "M_ScriptAssembly.h"
-#include "M_ScriptClass.h"
-#include "M_ScriptComponent.h"
-#include "M_ScriptEngine.h"
-#include "M_ScriptObject.h"
-#include "M_ScriptSystem.h"
+#include "Minty/Scripting/M_Accessibility.h"
+#include "Minty/Scripting/M_ScriptArguments.h"
+#include "Minty/Scripting/M_ScriptAssembly.h"
+#include "Minty/Scripting/M_ScriptClass.h"
+#include "Minty/Scripting/M_ScriptComponent.h"
+#include "Minty/Scripting/M_ScriptEngine.h"
+#include "Minty/Scripting/M_ScriptObject.h"
+#include "Minty/Scripting/M_ScriptSystem.h"
 
 // SERIALIZATION
-#include "M_ISerializable.h"
-#include "M_Node.h"
-#include "M_Reader.h"
-#include "M_SerializationData.h"
-#include "M_Writer.h"
+#include "Minty/Serialization/M_ISerializable.h"
+#include "Minty/Serialization/M_Reader.h"
+#include "Minty/Serialization/M_SerializationData.h"
+#include "Minty/Serialization/M_Writer.h"
 
 // SYSTEMS
-#include "M_System.h"
-#include "M_SystemRegistry.h"
+#include "Minty/Systems/M_System.h"
+#include "Minty/Systems/M_SystemRegistry.h"
 
-// TRANSFORM
-#include "M_TransformComponent.h"
-#include "M_UITransformComponent.h"
+// TOOLS
+#include "Minty/Tools/M_Compression.h"
+#include "Minty/Tools/M_Console.h"
+#include "Minty/Tools/M_Debug.h"
+#include "Minty/Tools/M_Encoding.h"
+#include "Minty/Tools/M_Operations.h"
+#include "Minty/Tools/M_Parse.h"
+#include "Minty/Tools/M_Text.h"
 
-// USERINTERFACE
-#include "M_CanvasComponent.h"
-#include "M_UISystem.h"
+// TYPES
+#include "Minty/Types/M_Color.h"
+#include "Minty/Types/M_CommandLineParser.h"
+#include "Minty/Types/M_Dynamic.h"
+#include "Minty/Types/M_FiniteStateMachine.h"
+#include "Minty/Types/M_Logger.h"
+#include "Minty/Types/M_Matrix.h"
+#include "Minty/Types/M_Node.h"
+#include "Minty/Types/M_Object.h"
+#include "Minty/Types/M_Quaternion.h"
+#include "Minty/Types/M_Rect.h"
+#include "Minty/Types/M_RectF.h"
+#include "Minty/Types/M_Stopwatch.h"
+#include "Minty/Types/M_Time.h"
+#include "Minty/Types/M_TypeRegister.h"
+#include "Minty/Types/M_Types.h"
+#include "Minty/Types/M_UUID.h"
+#include "Minty/Types/M_Vector.h"
 
-// GENERAL
-#include "M_Base.h"
-#include "M_Color.h"
-#include "M_CommandLineParser.h"
-#include "M_Compression.h"
-#include "M_Console.h"
-#include "M_Constants.h"
-#include "M_Dynamic.h"
-#include "M_Encoding.h"
-#include "M_Event.h"
-#include "M_FiniteStateMachine.h"
-#include "M_Info.h"
-#include "M_Math.h"
-#include "M_Matrix.h"
-#include "M_Object.h"
-#include "M_Operations.h"
-#include "M_Parse.h"
-#include "M_Quaternion.h"
-#include "M_Rect.h"
-#include "M_RectF.h"
-#include "M_Register.h"
-#include "M_Runtime.h"
-#include "M_Stopwatch.h"
-#include "M_Text.h"
-#include "M_Time.h"
-#include "M_TypeRegister.h"
-#include "M_Types.h"
-#include "M_Vector.h"
-#include "M_Window.h"
+// UI
+#include "Minty/UI/M_CanvasComponent.h"
+#include "Minty/UI/M_UIPushData.h"
+#include "Minty/UI/M_UISystem.h"
+#include "Minty/UI/M_UITransformComponent.h"

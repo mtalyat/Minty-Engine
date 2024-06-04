@@ -1,7 +1,7 @@
 #pragma once
 #include "ME_Minty.h"
 
-namespace mintye
+namespace Mintye
 {
 	class Project;
 
@@ -70,7 +70,7 @@ namespace mintye
 
 		bool get_config() const;
 
-		minty::String const get_config_name() const;
+		Minty::String const get_config_name() const;
 
 #pragma endregion		
 	};

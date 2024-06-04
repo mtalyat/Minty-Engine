@@ -31,19 +31,18 @@
 #include <array>
 
 #define CMAKE_PATH "cmake"
-#define EditorApplication_NAME "TestProject"
-#define EXE_NAME std::string(EditorApplication_NAME).append(".exe")
-
 
 namespace fs = std::filesystem;
-using namespace mintye;
-using namespace minty;
-using namespace tinyxml2;
+using namespace Mintye;
+using namespace Minty;
 
-static constexpr char const* DATA_FILENAME = "data.minty";
+static constexpr char const* DATA_FILENAME = "data.Minty";
 
 EditorApplication::EditorApplication()
-	: Application()
+	: Application({
+		.renderEngine = new EditorApplicationRenderEngine(*this),
+		.mode = ApplicationMode::Edit,
+		})
 	, _data()
 	, _buildInfo()
 	, _project()
@@ -52,6 +51,9 @@ EditorApplication::EditorApplication()
 	, _cwd(std::filesystem::current_path())
 	, _editorWindows()
 {
+	// load data
+	load_data();
+
 	// create all the editor windows
 	// add to list so they get drawn and updated
 	_editorWindows.emplace("Console", new ConsoleWindow(*this));
@@ -60,50 +62,28 @@ EditorApplication::EditorApplication()
 	//_editorWindows.emplace("Game", new GameWindow(*this));
 	_editorWindows.emplace("Properties", new PropertiesWindow(*this));
 	_editorWindows.emplace("Assets", new AssetsWindow(*this));
+
+	set_window_title("");
+	Window& window = get_window();
+	window.set_icon("Icon.png");
+	window.maximize();
+
+	load_most_recent_project();
 }
 
-mintye::EditorApplication::~EditorApplication()
-{
+Mintye::EditorApplication::~EditorApplication()
+{	
+	unload_project();
+
+	save_data();
+
 	for (auto const& pair : _editorWindows)
 	{
 		delete pair.second;
 	}
 }
 
-void mintye::EditorApplication::init(RuntimeBuilder* b)
-{
-	// load data
-	load_data();
-
-	RuntimeBuilder builder
-	{
-		.renderEngine = new EditorApplicationRenderEngine(*this, get_runtime()),
-	};
-
-	Application::init(&builder);
-
-	// init the window
-	set_window_title("");
-	Window& window = get_window();
-	window.maximize();
-
-	load_assemblies({ "MintyEngine.dll" });
-
-	load_most_recent_project();
-}
-
-void mintye::EditorApplication::destroy()
-{
-	unload_project();
-
-	save_data();
-
-	reset_editor_windows();
-
-	Application::destroy();
-}
-
-void mintye::EditorApplication::draw()
+void Mintye::EditorApplication::draw()
 {
 	_taskFactory.update();
 
@@ -113,7 +93,7 @@ void mintye::EditorApplication::draw()
 	draw_editor_windows();
 }
 
-void mintye::EditorApplication::refresh()
+void Mintye::EditorApplication::refresh()
 {
 	if (_project)
 	{
@@ -126,29 +106,19 @@ void mintye::EditorApplication::refresh()
 	}
 }
 
-minty::Runtime* mintye::EditorApplication::create_runtime()
-{
-	return new Runtime(get_info(), RunMode::Edit);
-}
-
-minty::Window* mintye::EditorApplication::create_window()
-{
-	return new Window("", 1280, 720, "Icon.png");
-}
-
-void mintye::EditorApplication::cwd_application() const
+void Mintye::EditorApplication::cwd_application() const
 {
 	std::filesystem::current_path(_cwd);
 }
 
-void mintye::EditorApplication::cwd_project() const
+void Mintye::EditorApplication::cwd_project() const
 {
 	MINTY_ASSERT(_project != nullptr);
 
 	std::filesystem::current_path(_project->get_base_path());
 }
 
-void mintye::EditorApplication::load_data()
+void Mintye::EditorApplication::load_data()
 {
 	if (!std::filesystem::exists(DATA_FILENAME)) return;
 
@@ -157,7 +127,7 @@ void mintye::EditorApplication::load_data()
 	_data.deserialize(reader);
 }
 
-void mintye::EditorApplication::save_data() const
+void Mintye::EditorApplication::save_data() const
 {
 	Node dataNode;
 	Writer writer(dataNode);
@@ -165,7 +135,7 @@ void mintye::EditorApplication::save_data() const
 	File::write_node(DATA_FILENAME, dataNode);
 }
 
-void mintye::EditorApplication::set_project(Project* const project)
+void Mintye::EditorApplication::set_project(Project* const project)
 {
 	// set new project
 	_project = project;
@@ -177,13 +147,15 @@ void mintye::EditorApplication::set_project(Project* const project)
 	}
 }
 
-void mintye::EditorApplication::set_scene(minty::UUID const id)
+void Mintye::EditorApplication::set_scene(Minty::UUID const id)
 {
 	// set new scene
 	_sceneId = id;
 
 	// get the scene with the id, or null if empty id
-	Scene* scene = get_runtime().get_scene_manager().get_scene(id);
+	DefaultLayer& layer = get_default_layer();
+	SceneManager& sceneManager = layer.get_scene_manager();
+	Ref<Scene> scene = sceneManager.get_scene(id);
 
 	// set for all windows
 	for (auto const& pair : _editorWindows)
@@ -192,7 +164,7 @@ void mintye::EditorApplication::set_scene(minty::UUID const id)
 	}
 }
 
-void mintye::EditorApplication::set_window_title(minty::String const& subTitle)
+void Mintye::EditorApplication::set_window_title(Minty::String const& subTitle)
 {
 	Window& window = get_window();
 
@@ -206,12 +178,12 @@ void mintye::EditorApplication::set_window_title(minty::String const& subTitle)
 	}
 }
 
-void mintye::EditorApplication::new_project()
+void Mintye::EditorApplication::new_project()
 {
 	ImGui::OpenPopup("Create New Project");
 }
 
-void mintye::EditorApplication::open_project()
+void Mintye::EditorApplication::open_project()
 {
 	IGFD::FileDialogConfig config
 	{
@@ -220,7 +192,7 @@ void mintye::EditorApplication::open_project()
 	ImGuiFileDialog::Instance()->OpenDialog("open_project", "Choose project directory...", nullptr, config);
 }
 
-void mintye::EditorApplication::load_project(minty::Path const& path)
+void Mintye::EditorApplication::load_project(Minty::Path const& path)
 {
 	// if existing project, unload it
 	unload_project();
@@ -288,7 +260,7 @@ void mintye::EditorApplication::load_project(minty::Path const& path)
 	cwd_project();
 
 	// load assemblies
-	get_runtime().get_script_engine().load_assembly(std::format("{}/bin/Debug/{}.dll", ASSEMBLY_DIRECTORY_NAME, project->get_name()));
+	ScriptEngine::instance().load_assembly(std::format("{}/bin/Debug/{}.dll", ASSEMBLY_DIRECTORY_NAME, project->get_name()));
 
 	// load a scene, if any found
 	Path scenePath = project->find_asset(AssetType::Scene);
@@ -303,7 +275,7 @@ void mintye::EditorApplication::load_project(minty::Path const& path)
 	refresh();
 }
 
-void mintye::EditorApplication::unload_project()
+void Mintye::EditorApplication::unload_project()
 {
 	unload_scene();
 
@@ -320,7 +292,7 @@ void mintye::EditorApplication::unload_project()
 	cwd_application();
 }
 
-void mintye::EditorApplication::create_new_project(minty::String const& name, minty::Path const& path)
+void Mintye::EditorApplication::create_new_project(Minty::String const& name, Minty::Path const& path)
 {
 	ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console");
 
@@ -333,7 +305,7 @@ void mintye::EditorApplication::create_new_project(minty::String const& name, mi
 	console->log(std::format("Created new project: {}", fullPath.string()));
 }
 
-void mintye::EditorApplication::open_scene()
+void Mintye::EditorApplication::open_scene()
 {
 	IGFD::FileDialogConfig config
 	{
@@ -342,39 +314,39 @@ void mintye::EditorApplication::open_scene()
 	ImGuiFileDialog::Instance()->OpenDialog("open_scene", "Choose scene...", ".scene", config);
 }
 
-void mintye::EditorApplication::save_scene()
+void Mintye::EditorApplication::save_scene()
 {
 	MINTY_ASSERT(_sceneId.valid());
 
 	// get and serialize scene
-	Scene& scene = get_runtime().get_scene_manager().at_scene(_sceneId);
+	Ref<Scene> scene = Application::instance().get_default_layer().get_scene_manager().at_scene(_sceneId);
 	Node node("", to_string(_sceneId));
 	SerializationData data
 	{
-		.scene = &scene,
+		.scene = scene.get(),
 		.entity = NULL_ENTITY,
 	};
 	Writer writer(node, &data);
-	scene.serialize(writer);
+	scene->serialize(writer);
 
-	if (File::write_node(scene.get_path(), node))
+	if (File::write_node(scene->get_path(), node))
 	{
-		log(std::format("Saved scene \"{}\".", scene.get_name()));
+		log(std::format("Saved scene \"{}\".", scene->get_name()));
 	}
 	else
 	{
-		log_error(std::format("Failed to save scene \"{}\".", scene.get_name()));
+		log_error(std::format("Failed to save scene \"{}\".", scene->get_name()));
 	}
 }
 
-void mintye::EditorApplication::close_scene()
+void Mintye::EditorApplication::close_scene()
 {
 	MINTY_ASSERT(_sceneId.valid());
 
 	unload_scene();
 }
 
-void mintye::EditorApplication::load_scene(minty::Path const& path)
+void Mintye::EditorApplication::load_scene(Minty::Path const& path)
 {
 	ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console");
 
@@ -397,7 +369,7 @@ void mintye::EditorApplication::load_scene(minty::Path const& path)
 	}
 
 	// load new scene
-	SceneManager& sceneManager = get_runtime().get_scene_manager();
+	SceneManager& sceneManager = Application::instance().get_scene_manager();
 	set_scene(sceneManager.create_scene(path).get_id());
 	sceneManager.load_scene(_sceneId);
 	sceneManager.load();
@@ -405,11 +377,14 @@ void mintye::EditorApplication::load_scene(minty::Path const& path)
 	refresh();
 }
 
-void mintye::EditorApplication::unload_scene()
+void Mintye::EditorApplication::unload_scene()
 {
 	if (_sceneId != INVALID_UUID)
 	{
-		SceneManager& sceneManager = get_runtime().get_scene_manager();
+		// sync with the renderer first, so we can free up resources
+		RenderEngine::instance().sync();
+
+		SceneManager& sceneManager = Application::instance().get_scene_manager();
 		sceneManager.unload();
 		sceneManager.destroy();
 		set_scene(INVALID_UUID);
@@ -418,11 +393,11 @@ void mintye::EditorApplication::unload_scene()
 	}
 }
 
-void mintye::EditorApplication::copy_asset(UUID const id) const
+void Mintye::EditorApplication::copy_asset(UUID const id) const
 {
 	if (_sceneId.valid())
 	{
-		Scene const* scene = get_runtime().get_scene_manager().get_scene(_sceneId);
+		Ref<Scene> scene = Application::instance().get_scene_manager().get_scene(_sceneId);
 
 		MINTY_ASSERT(scene != nullptr);
 
@@ -445,7 +420,7 @@ void mintye::EditorApplication::copy_asset(UUID const id) const
 	MINTY_TODO("copy_asset for some asset");
 }
 
-bool mintye::EditorApplication::is_asset_copied(minty::String const& name) const
+bool Mintye::EditorApplication::is_asset_copied(Minty::String const& name) const
 {
 	if (!ImGui::GetClipboardText()) return false;
 
@@ -458,7 +433,7 @@ bool mintye::EditorApplication::is_asset_copied(minty::String const& name) const
 	return type == name;
 }
 
-void mintye::EditorApplication::open_asset(minty::Path const& path)
+void Mintye::EditorApplication::open_asset(Minty::Path const& path)
 {
 	if (Asset::get_type(path) == AssetType::Scene)
 	{
@@ -475,16 +450,14 @@ void mintye::EditorApplication::open_asset(minty::Path const& path)
 	}
 }
 
-minty::String mintye::EditorApplication::get_name(minty::UUID const id) const
+Minty::String Mintye::EditorApplication::get_name(Minty::UUID const id) const
 {
 	if (_project)
 	{
-		Runtime& runtime = get_runtime();
-
 		// check assets
-		AssetEngine& assets = runtime.get_asset_engine();
+		AssetEngine& assets = AssetEngine::instance();
 
-		if (Asset* asset = assets.get_asset(id))
+		if (Ref<Asset> asset = assets.get_asset(id))
 		{
 			return asset->get_name();
 		}
@@ -492,8 +465,8 @@ minty::String mintye::EditorApplication::get_name(minty::UUID const id) const
 		// not an asset, check entities
 		if (_sceneId.valid())
 		{
-			Scene& scene = runtime.get_scene_manager().at_scene(_sceneId);
-			EntityRegistry& registry = scene.get_entity_registry();
+			Ref<Scene> scene = Application::instance().get_scene_manager().at_scene(_sceneId);
+			EntityRegistry& registry = scene->get_entity_registry();
 
 			Entity entity = registry.find_by_id(id);
 
@@ -508,7 +481,7 @@ minty::String mintye::EditorApplication::get_name(minty::UUID const id) const
 	return "";
 }
 
-void mintye::EditorApplication::create_asset(minty::Path const& path)
+void Mintye::EditorApplication::create_asset(Minty::Path const& path)
 {
 	std::unordered_map<String, String> params
 	{
@@ -517,7 +490,7 @@ void mintye::EditorApplication::create_asset(minty::Path const& path)
 	create_asset(path, params);
 }
 
-void mintye::EditorApplication::create_directory(minty::Path const& path)
+void Mintye::EditorApplication::create_directory(Minty::Path const& path)
 {
 	if (!std::filesystem::create_directory(path))
 	{
@@ -530,7 +503,7 @@ void mintye::EditorApplication::create_directory(minty::Path const& path)
 	refresh();
 }
 
-void mintye::EditorApplication::create_asset(minty::Path const& path, std::unordered_map<minty::String, minty::String> const& params)
+void Mintye::EditorApplication::create_asset(Minty::Path const& path, std::unordered_map<Minty::String, Minty::String> const& params)
 {
 	cwd_application();
 
@@ -569,12 +542,12 @@ void mintye::EditorApplication::create_asset(minty::Path const& path, std::unord
 	refresh();
 }
 
-minty::Path mintye::EditorApplication::find_template(minty::Path const& extension)
+Minty::Path Mintye::EditorApplication::find_template(Minty::Path const& extension)
 {
 	// get the name of the file with the given extension
-	minty::Path fileName = Path(std::format("{}.txt", extension.string()));
+	Minty::Path fileName = Path(std::format("{}.txt", extension.string()));
 
-	minty::Path templateDirectory = std::filesystem::absolute("Templates");
+	Minty::Path templateDirectory = std::filesystem::absolute("Templates");
 
 	// check the templates folder
 	for (auto const& entry : std::filesystem::directory_iterator(templateDirectory))
@@ -589,17 +562,17 @@ minty::Path mintye::EditorApplication::find_template(minty::Path const& extensio
 	return Path();
 }
 
-void mintye::EditorApplication::save_project()
+void Mintye::EditorApplication::save_project()
 {
 
 }
 
-void mintye::EditorApplication::close_project()
+void Mintye::EditorApplication::close_project()
 {
 	unload_project();
 }
 
-void mintye::EditorApplication::load_most_recent_project()
+void Mintye::EditorApplication::load_most_recent_project()
 {
 	// if no recents, do nothing
 	auto const& recents = _data.get_recent_projects();
@@ -619,7 +592,7 @@ void mintye::EditorApplication::load_most_recent_project()
 	load_project(recent);
 }
 
-void mintye::EditorApplication::draw_dock_space()
+void Mintye::EditorApplication::draw_dock_space()
 {
 	static bool fullscreen = true;
 	static bool padding = false;
@@ -667,7 +640,7 @@ void mintye::EditorApplication::draw_dock_space()
 	ImGui::End();
 }
 
-void mintye::EditorApplication::draw_menu_bar()
+void Mintye::EditorApplication::draw_menu_bar()
 {
 	// dumb work around: cannot open a popup in a menu bar
 	// https://github.com/ocornut/imgui/issues/331
@@ -741,7 +714,11 @@ void mintye::EditorApplication::draw_menu_bar()
 
 			if (ImGui::MenuItem("Exit"))
 			{
-				std::exit(0);
+				// close the application
+				close();
+				ImGui::EndMenu();
+				ImGui::EndMainMenuBar();
+				return;
 			}
 
 			ImGui::EndMenu();
@@ -882,7 +859,7 @@ void EditorApplication::draw_commands()
 	ImGui::End();
 }
 
-void mintye::EditorApplication::draw_editor_windows()
+void Mintye::EditorApplication::draw_editor_windows()
 {
 	for (auto const& pair : _editorWindows)
 	{
@@ -890,7 +867,7 @@ void mintye::EditorApplication::draw_editor_windows()
 	}
 }
 
-void mintye::EditorApplication::reset_editor_windows()
+void Mintye::EditorApplication::reset_editor_windows()
 {
 	for (auto const& pair : _editorWindows)
 	{
@@ -931,7 +908,7 @@ void EditorApplication::generate_cmake()
 		// cmake version requirement
 		"cmake_minimum_required(VERSION 3.16)" << std::endl <<
 		// project name, c++ settings
-		"project(" << EditorApplication_NAME << " LANGUAGES CXX)" << std::endl <<
+		"project(" << _project->get_name() << " LANGUAGES CXX)" << std::endl <<
 		"find_package(Vulkan REQUIRED)" << std::endl <<
 		"set(CMAKE_CXX_STANDARD 20)" << std::endl <<
 		"set(CMAKE_CXX_STANDARD_REQUIRED ON)" << std::endl <<
@@ -955,20 +932,11 @@ void EditorApplication::generate_cmake()
 		"set_property(TARGET ${PROJECT_NAME} PROPERTY INTERPROCEDURAL_OPTIMIZATION_RELEASE TRUE)" << std::endl <<
 		"set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY \"MultiThreaded$<$<CONFIG:Debug>:Debug>\")" << std::endl <<
 		// include the runtime dir
-		"target_include_directories(${PROJECT_NAME} PRIVATE C:/Users/mitch/source/repos/Minty-Engine/Runtime PUBLIC ${VULKAN_INCLUDE_DIRS})" << std::endl <<
-		// copy any DLL's that the Runtime uses
-		"add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy C:/Libraries/Mono/lib/mono-2.0-sgen.dll ${CMAKE_CURRENT_BINARY_DIR}/" << _buildInfo.get_config_name() << "/mono-2.0-sgen.dll)" << std::endl <<
-		"add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy C:/Libraries/Mono/lib/MonoPosixHelper.dll ${CMAKE_CURRENT_BINARY_DIR}/" << _buildInfo.get_config_name() << "/MonoPosixHelper.dll)" << std::endl <<
-		"add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy C:/Libraries/Mono/lib/mscorlib.dll ${CMAKE_CURRENT_BINARY_DIR}/" << _buildInfo.get_config_name() << "/mscorlib.dll)" << std::endl <<
-		"add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy " << stringMintyPath << "/Libraries/MintyEngine/bin/" << _buildInfo.get_config_name() << "/MintyEngine.dll ${CMAKE_CURRENT_BINARY_DIR}/" << _buildInfo.get_config_name() << "/MintyEngine.dll)" << std::endl <<
-		"add_custom_command(TARGET ${PROJECT_NAME} POST_BUILD COMMAND ${CMAKE_COMMAND} -E copy ../" << ASSEMBLY_DIRECTORY_NAME << "/bin/" << _buildInfo.get_config_name() << "/" << _project->get_name() << ".dll ${CMAKE_CURRENT_BINARY_DIR}/" << _buildInfo.get_config_name() << "/" << _project->get_name() << ".dll)" << std::endl <<
-		// copy all necessary engine data files
-		"file(GLOB DATA_FILES \"C:/Users/mitch/source/repos/Minty-Engine/Data/*.wrap\")" << std::endl <<
-		"file(COPY ${DATA_FILES} DESTINATION ${CMAKE_CURRENT_BINARY_DIR}/" << _buildInfo.get_config_name() << ")" << std::endl <<
+		"target_include_directories(${PROJECT_NAME} PRIVATE " << stringMintyPath << "/Runtime PRIVATE " << stringMintyPath << "/Libraries PUBLIC ${VULKAN_INCLUDE_DIRS})" << std::endl <<
 		// include and link Vulkan
 		"include_directories(${Vulkan_INCLUDE_DIRS})" << std::endl <<
 		// target and link the MintyRuntime.lib
-		"target_link_libraries(${PROJECT_NAME} C:/Users/mitch/source/repos/Minty-Engine/Runtime/x64/" << _buildInfo.get_config_name() << "/MintyRuntime.lib)" << std::endl <<
+		"target_link_libraries(${PROJECT_NAME} " << stringMintyPath << "/Runtime/x64/" << _buildInfo.get_config_name() << "/MintyRuntime.lib)" << std::endl <<
 		// target and link the vulkan libs
 		"target_link_libraries(${PROJECT_NAME} ${Vulkan_LIBRARIES})";
 
@@ -1001,21 +969,57 @@ void EditorApplication::generate_main()
 	// get timestamp
 	const auto now = std::chrono::system_clock::now();
 
-	Info const& projectInfo = _project->get_info();
-
 	// write contents
 	file <<
 		"// " << std::format("{:%Y-%m-%d %H:%M:%OS}", now) << std::endl <<
 		"#include <Minty.h>" << std::endl <<
 		"int main(int argc, char const* argv[]) {" << std::endl <<
-		"\tminty::Application app;" << std::endl <<
-		"\treturn app.execute();" << std::endl <<
+		"\tMinty::Application app;" << std::endl <<
+		"\tapp.run();" << std::endl <<
+		"\treturn 0;" << std::endl <<
 		"}";
 
 	file.close();
 }
 
-void mintye::EditorApplication::log(minty::String const& message)
+void Mintye::EditorApplication::copy_files()
+{
+	// copy any DLL's that the Runtime uses
+
+	String configName = _buildInfo.get_config_name();
+	String const& projectName = _project->get_name();
+	String targetDir = std::format("{}/{}", _project->get_build_path().generic_string(), configName);
+
+	// Runtime DLL
+	//log_info("\tRuntime DLL");
+	//if (!_buildInfo.get_config())
+	//{
+	//	log_info("\tEngine Debug PDB");
+	//	Operations::copy(_cwd / String(ASSEMBLY_ENGINE_NAME).append(".pdb"), targetDir);
+	//}
+
+	// Mono DLLs
+	log_info("\tMono Files");
+	Operations::copy(_cwd / "mono-2.0-sgen.dll", targetDir);
+	Operations::copy(_cwd / "MonoPosixHelper.dll", targetDir);
+	Operations::copy(_cwd / "mscorlib.dll", targetDir);
+	Operations::copy_all(_cwd / "mono", Path(targetDir) / "mono");
+
+	// MintyEngine DLL
+	log_info("\tEngine DLL");
+	Operations::copy(_cwd / String(ASSEMBLY_ENGINE_NAME).append(".dll"), targetDir);
+
+	// Project DLL
+	log_info("\tProject DLL");
+	String source = std::format("{}/bin/{}/{}.dll", _project->get_assembly_path().generic_string(), configName, projectName);
+	Operations::copy(source, targetDir);
+
+	// Wrap files
+	log_info("\tWrap files");
+	Operations::copy_files(_cwd, EXTENSION_WRAP, targetDir);
+}
+
+void Mintye::EditorApplication::log(Minty::String const& message)
 {
 	if (ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console"))
 	{
@@ -1027,7 +1031,7 @@ void mintye::EditorApplication::log(minty::String const& message)
 	}
 }
 
-void mintye::EditorApplication::log_warning(minty::String const& message)
+void Mintye::EditorApplication::log_warning(Minty::String const& message)
 {
 	if (ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console"))
 	{
@@ -1039,7 +1043,7 @@ void mintye::EditorApplication::log_warning(minty::String const& message)
 	}
 }
 
-void mintye::EditorApplication::log_error(minty::String const& message)
+void Mintye::EditorApplication::log_error(Minty::String const& message)
 {
 	if (ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console"))
 	{
@@ -1051,12 +1055,24 @@ void mintye::EditorApplication::log_error(minty::String const& message)
 	}
 }
 
-void mintye::EditorApplication::generate_directory(minty::Path const& path) const
+void Mintye::EditorApplication::log_info(Minty::String const& message)
+{
+	if (ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console"))
+	{
+		console->log_info(message);
+	}
+	else
+	{
+		MINTY_INFO(message);
+	}
+}
+
+void Mintye::EditorApplication::generate_directory(Minty::Path const& path) const
 {
 	fs::create_directories(path);
 }
 
-void mintye::EditorApplication::generate_directories(Path const& basePath) const
+void Mintye::EditorApplication::generate_directories(Path const& basePath) const
 {
 	// create all default project necessary directories
 	generate_directory(basePath);
@@ -1069,7 +1085,7 @@ void mintye::EditorApplication::generate_directories(Path const& basePath) const
 	//generate_directory(basePath / BUILD_DIRECTORY_NAME / "Release");
 }
 
-void mintye::EditorApplication::generate_application_data()
+void Mintye::EditorApplication::generate_application_data()
 {
 	ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console");
 
@@ -1092,8 +1108,6 @@ void mintye::EditorApplication::generate_application_data()
 		return;
 	}
 
-	Info const& projectInfo = _project->get_info();
-
 	// TODO: use Writer, save the node
 
 	// write contents
@@ -1113,7 +1127,6 @@ void mintye::EditorApplication::generate_application_data()
 	// assemblies copied by cmake
 	std::vector<String> assemblies =
 	{
-		"MintyEngine.dll",
 		std::format("{}.dll", _project->get_name()),
 	};
 
@@ -1125,7 +1138,7 @@ void mintye::EditorApplication::generate_application_data()
 	file.close();
 }
 
-void mintye::EditorApplication::generate_wraps()
+void Mintye::EditorApplication::generate_wraps()
 {
 	// TODO: split into multile wrap files if needed
 
@@ -1143,9 +1156,12 @@ void mintye::EditorApplication::generate_wraps()
 	// game assets
 	Wrap assetWrap(output / String("assets").append(EXTENSION_WRAP), ASSETS_DIRECTORY_NAME, static_cast<uint32_t>(_project->get_asset_count()), ASSETS_DIRECTORY_NAME);
 	_project->wrap_assets(assetWrap);
+
+	// built in assets
+	std::filesystem::copy("default.wrap", output / "default.wrap");
 }
 
-void mintye::EditorApplication::generate_assembly()
+void Mintye::EditorApplication::generate_assembly()
 {
 	ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console");
 
@@ -1170,11 +1186,6 @@ void mintye::EditorApplication::generate_assembly()
 
 	// get timestamp
 	const auto now = std::chrono::system_clock::now();
-
-	Info const& projectInfo = _project->get_info();
-
-	Path mintyPath = Operations::get_minty_path();
-	String stringMintyPath = mintyPath.string();
 
 	// write contents
 	file
@@ -1213,9 +1224,9 @@ void mintye::EditorApplication::generate_assembly()
 		<< "    <ErrorReport>prompt</ErrorReport>" << std::endl
 		<< "  </PropertyGroup>" << std::endl
 		<< "  <ItemGroup>" << std::endl
-		<< "    <Reference Include=\"MintyEngine, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL\">" << std::endl
+		<< "    <Reference Include=\"" << ASSEMBLY_ENGINE_NAME << ", Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL\">" << std::endl
 		<< "      <SpecificVersion>False</SpecificVersion>" << std::endl
-		<< "      <HintPath>" << stringMintyPath << "\\Libraries\\MintyEngine\\bin\\Debug\\MintyEngine.dll</HintPath>" << std::endl
+		<< "      <HintPath>..\\Build\\" << _buildInfo.get_config_name() << "\\" << ASSEMBLY_ENGINE_NAME << ".dll</HintPath>" << std::endl
 		<< "    </Reference>" << std::endl
 		<< "    <Reference Include=\"System\" />" << std::endl
 		<< "    <Reference Include=\"System.Core\" />" << std::endl
@@ -1384,27 +1395,16 @@ void EditorApplication::build_project()
 				// https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-build
 				"cd " + assemblyPath + " && dotnet build -c " + configName + " /p:Platform=x64"
 				}, true);
-
-			// if not running cmake build, but scripts rebuilt, copy the DLL over manually, since the cmake is not doing it
-			if (_buildInfo.get_flag(BuildInfo::BuildFlags::Assembly | BuildInfo::BuildFlags::AssemblyBuild) && !_buildInfo.get_flag(BuildInfo::BuildFlags::Program))
-			{
-				console->log_info("Manually copying files");
-
-				String configName = _buildInfo.get_config_name();
-				String const& projectName = _project->get_name();
-				String source = std::format("{}/bin/{}/{}.dll", _project->get_assembly_path().generic_string(), configName, projectName);
-				String destination = std::format("{}/{}/{}.dll", _project->get_build_path().generic_string(), configName, projectName);
-
-				try {
-					std::filesystem::copy(source, destination, std::filesystem::copy_options::overwrite_existing);
-				}
-				catch (std::filesystem::filesystem_error& e)
-				{
-					console->log_error(std::format("Failed to copy assembly DLL: \"{}\"", e.what()));
-				}
-			}
 			});
 	}
+
+	// copy files over, always, for now, just to make sure everything is up to date
+	taskGroup->create([this, console]
+		{
+			console->log_important("\tcopying files...");
+
+			copy_files();
+		});
 }
 
 void EditorApplication::run_project()
@@ -1420,15 +1420,15 @@ void EditorApplication::run_project()
 	console->log_important("run project");
 
 	// call executable, pass in project path as argument for the runtime, so it knows what to run
-	console->run_command("cd " + _project->get_build_path().string() + " && cd " + _buildInfo.get_config_name() + " && call " + EXE_NAME);
+	console->run_command("cd " + _project->get_build_path().string() + " && cd " + _buildInfo.get_config_name() + " && call " + _project->get_name() + ".exe");
 }
 
-mintye::EditorApplicationData::EditorApplicationData()
-	: minty::Object()
+Mintye::EditorApplicationData::EditorApplicationData()
+	: Minty::Object()
 	, _recentProjects()
 {}
 
-void mintye::EditorApplicationData::emplace_recent_project(minty::Path const& path)
+void Mintye::EditorApplicationData::emplace_recent_project(Minty::Path const& path)
 {
 	Path newPath = std::filesystem::absolute(path);
 
@@ -1462,7 +1462,7 @@ void mintye::EditorApplicationData::emplace_recent_project(minty::Path const& pa
 	}
 }
 
-void mintye::EditorApplicationData::erase_recent_project(minty::Path const& path)
+void Mintye::EditorApplicationData::erase_recent_project(Minty::Path const& path)
 {
 	// if the path is in the list, remove and move to front
 	for (size_t i = 0; i < _recentProjects.size(); i++)
@@ -1477,17 +1477,17 @@ void mintye::EditorApplicationData::erase_recent_project(minty::Path const& path
 	}
 }
 
-std::vector<minty::Path> const& mintye::EditorApplicationData::get_recent_projects() const
+std::vector<Minty::Path> const& Mintye::EditorApplicationData::get_recent_projects() const
 {
 	return _recentProjects;
 }
 
-void mintye::EditorApplicationData::serialize(minty::Writer& writer) const
+void Mintye::EditorApplicationData::serialize(Minty::Writer& writer) const
 {
 	writer.write("recentProjects", _recentProjects);
 }
 
-void mintye::EditorApplicationData::deserialize(minty::Reader const& reader)
+void Mintye::EditorApplicationData::deserialize(Minty::Reader const& reader)
 {
 	reader.read_vector("recentProjects", _recentProjects);
 }

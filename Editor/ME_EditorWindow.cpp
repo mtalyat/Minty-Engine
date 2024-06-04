@@ -2,42 +2,38 @@
 
 #include "ME_EditorApplication.h"
 
-using namespace mintye;
+using namespace Minty;
+using namespace Mintye;
 
-mintye::EditorWindow::EditorWindow(EditorApplication& application)
+Mintye::EditorWindow::EditorWindow(EditorApplication& application)
 	: _application(&application)
 {}
 
-mintye::EditorWindow::~EditorWindow()
+Mintye::EditorWindow::~EditorWindow()
 {
 }
 
-EditorApplication& mintye::EditorWindow::get_application() const
+EditorApplication& Mintye::EditorWindow::get_application() const
 {
 	return *_application;
 }
 
-minty::Runtime& mintye::EditorWindow::get_runtime() const
-{
-	return _application->get_runtime();
-}
-
-Project* mintye::EditorWindow::get_project() const
+Project* Mintye::EditorWindow::get_project() const
 {
 	return _project;
 }
 
-minty::Scene* mintye::EditorWindow::get_scene() const
+Minty::Ref<Minty::Scene> Mintye::EditorWindow::get_scene() const
 {
 	return _scene;
 }
 
-void mintye::EditorWindow::set_project(Project* const project)
+void Mintye::EditorWindow::set_project(Project* const project)
 {
 	_project = project;
 }
 
-void mintye::EditorWindow::set_scene(minty::Scene* const scene)
+void Mintye::EditorWindow::set_scene(Ref<Scene> const scene)
 {
 	_scene = scene;
 }

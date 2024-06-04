@@ -6,38 +6,38 @@
 #include <unordered_map>
 #include <vector>
 
-namespace mintye
+namespace Mintye
 {
 	class Project;
 	class EditorWindow;
 
 	class EditorApplicationData
-		: public minty::Object
+		: public Minty::Object
 	{
 	private:
 		static constexpr int MAX_RECENT_PROJECTS = 10;
-		std::vector<minty::Path> _recentProjects;
+		std::vector<Minty::Path> _recentProjects;
 
 	public:
 		EditorApplicationData();
 
 	public:
-		void emplace_recent_project(minty::Path const& path);
+		void emplace_recent_project(Minty::Path const& path);
 
-		void erase_recent_project(minty::Path const& path);
+		void erase_recent_project(Minty::Path const& path);
 
-		std::vector<minty::Path> const& get_recent_projects() const;
+		std::vector<Minty::Path> const& get_recent_projects() const;
 
 	public:
-		void serialize(minty::Writer& writer) const override;
-		void deserialize(minty::Reader const& reader) override;
+		void serialize(Minty::Writer& writer) const override;
+		void deserialize(Minty::Reader const& reader) override;
 	};
 
 	/// <summary>
 	/// Holds data and runs the game engine application.
 	/// </summary>
 	class EditorApplication
-		: public minty::Application
+		: public Minty::Application
 	{
 	private:
 		constexpr static char const* NAME = "Minty Editor";
@@ -48,35 +48,25 @@ namespace mintye
 		// info needed for a loaded project:
 		Project* _project;
 		FileWatcher* _watcher;
-		minty::UUID _sceneId;
+		Minty::UUID _sceneId;
 
 		// starting working directory
-		minty::Path _cwd;
+		Minty::Path _cwd;
 
 		// editor windows to be drawn
-		std::unordered_map<minty::String, EditorWindow*> _editorWindows;
+		std::unordered_map<Minty::String, EditorWindow*> _editorWindows;
 
 		// tasks being ran (such as building)
-		minty::TaskFactory<void> _taskFactory;
+		Minty::TaskFactory<void> _taskFactory;
 	public:
 		EditorApplication();
 
 		~EditorApplication();
 
-	protected:
-		void init(minty::RuntimeBuilder* builder = nullptr) override;
-
-		void destroy() override;
-
 	public:
 		void draw();
 
 		void refresh();
-
-	protected:
-		minty::Runtime* create_runtime() override;
-
-		minty::Window* create_window() override;
 
 	private:
 		void cwd_application() const;
@@ -97,9 +87,9 @@ namespace mintye
 	private:
 		void set_project(Project* const project);
 
-		void set_scene(minty::UUID const sceneId);
+		void set_scene(Minty::UUID const sceneId);
 
-		void set_window_title(minty::String const& subTitle);
+		void set_window_title(Minty::String const& subTitle);
 
 #pragma endregion
 
@@ -118,7 +108,7 @@ namespace mintye
 
 	public:
 		template<typename T>
-		T* find_editor_window(minty::String const& name);
+		T* find_editor_window(Minty::String const& name);
 
 #pragma endregion
 
@@ -135,11 +125,11 @@ namespace mintye
 
 		void load_most_recent_project();
 
-		void load_project(minty::Path const& path);
+		void load_project(Minty::Path const& path);
 
 		void unload_project();
 
-		void create_new_project(minty::String const& name, minty::Path const& path);
+		void create_new_project(Minty::String const& name, Minty::Path const& path);
 
 #pragma endregion
 
@@ -152,7 +142,7 @@ namespace mintye
 
 		void close_scene();
 
-		void load_scene(minty::Path const& path);
+		void load_scene(Minty::Path const& path);
 
 		void unload_scene();
 
@@ -161,31 +151,31 @@ namespace mintye
 #pragma region Assets
 
 	public:
-		void copy_asset(minty::UUID const id) const;
+		void copy_asset(Minty::UUID const id) const;
 
-		bool is_asset_copied(minty::String const& name) const;
+		bool is_asset_copied(Minty::String const& name) const;
 
 		/// <summary>
 		/// Opens the asset in the editor, or in the system if the editor does not support it
 		/// </summary>
 		/// <param name="path"></param>
-		void open_asset(minty::Path const& path);
+		void open_asset(Minty::Path const& path);
 
 		/// <summary>
 		/// Gets the name of the thing with the given ID. Could be an Entity or Asset.
 		/// </summary>
 		/// <param name="id"></param>
 		/// <returns></returns>
-		minty::String get_name(minty::UUID const id) const;
+		Minty::String get_name(Minty::UUID const id) const;
 
-		void create_asset(minty::Path const& path);
+		void create_asset(Minty::Path const& path);
 
-		void create_directory(minty::Path const& path);
+		void create_directory(Minty::Path const& path);
 
 	private:
-		void create_asset(minty::Path const& path, std::unordered_map<minty::String, minty::String> const& params);
+		void create_asset(Minty::Path const& path, std::unordered_map<Minty::String, Minty::String> const& params);
 
-		minty::Path find_template(minty::Path const& extension);
+		Minty::Path find_template(Minty::Path const& extension);
 
 #pragma endregion
 
@@ -210,12 +200,12 @@ namespace mintye
 		/// <param name="info">The target info.</param>
 		void run_project();
 
-#pragma region File Generation
+#pragma region Files
 
 	private:
-		void generate_directory(minty::Path const& path) const;
+		void generate_directory(Minty::Path const& path) const;
 
-		void generate_directories(minty::Path const& basePath) const;
+		void generate_directories(Minty::Path const& basePath) const;
 
 		void generate_application_data();
 
@@ -235,6 +225,11 @@ namespace mintye
 		/// <param name="info"></param>
 		void generate_main();
 
+		/// <summary>
+		/// Copies all of the necessary files to run an exe.
+		/// </summary>
+		void copy_files();
+
 #pragma endregion
 
 #pragma endregion
@@ -242,18 +237,20 @@ namespace mintye
 #pragma region Logging
 
 	public:
-		void log(minty::String const& message);
+		void log(Minty::String const& message);
 
-		void log_warning(minty::String const& message);
+		void log_warning(Minty::String const& message);
 
-		void log_error(minty::String const& message);
+		void log_error(Minty::String const& message);
+
+		void log_info(Minty::String const& message);
 
 #pragma endregion
 
 	};
 
 	template<typename T>
-	T* EditorApplication::find_editor_window(minty::String const& name)
+	T* EditorApplication::find_editor_window(Minty::String const& name)
 	{
 		auto found = _editorWindows.find(name);
 

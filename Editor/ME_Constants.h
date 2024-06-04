@@ -2,7 +2,7 @@
 
 #include <filesystem>
 
-namespace mintye
+namespace Mintye
 {
 	constexpr static char const* ASSETS_DIRECTORY_NAME = "Assets";
 	constexpr static char const* BUILD_DIRECTORY_NAME = "Build";

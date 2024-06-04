@@ -10,6 +10,7 @@
 
 int main(int argc, char const* argv[])
 {
-	mintye::EditorApplication app;
-	return app.execute();
+	Mintye::EditorApplication app;
+	app.run();
+	return 0;
 }

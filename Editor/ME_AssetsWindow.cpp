@@ -6,11 +6,11 @@
 #include "ME_ImGuiHelper.h"
 #include <filesystem>
 
-using namespace minty;
-using namespace mintye;
+using namespace Minty;
+using namespace Mintye;
 namespace fs = std::filesystem;
 
-mintye::AssetsWindow::AssetsWindow(EditorApplication& application)
+Mintye::AssetsWindow::AssetsWindow(EditorApplication& application)
 	: EditorWindow(application)
 	, _path()
 	, _directories()
@@ -20,7 +20,7 @@ mintye::AssetsWindow::AssetsWindow(EditorApplication& application)
 	set_path("");
 }
 
-void mintye::AssetsWindow::set_project(Project* const project)
+void Mintye::AssetsWindow::set_project(Project* const project)
 {
 	// set the project
 	EditorWindow::set_project(project);
@@ -29,7 +29,7 @@ void mintye::AssetsWindow::set_project(Project* const project)
 	set_path("");
 }
 
-void mintye::AssetsWindow::draw()
+void Mintye::AssetsWindow::draw()
 {
 	Project* project = get_project();
 
@@ -79,7 +79,7 @@ void mintye::AssetsWindow::draw()
 			// create new file in the currently selected folder, if it does not exist
 			Path path = get_project()->get_base_path() / _path / newAssetName;
 
-			AssetEngine& assets = get_runtime().get_asset_engine();
+			AssetEngine& assets = AssetEngine::instance();
 
 			if (!assets.exists(path))
 			{
@@ -130,7 +130,7 @@ void mintye::AssetsWindow::draw()
 			// create new file in the currently selected folder, if it does not exist
 			Path path = get_project()->get_base_path() / _path / newDirectoryName;
 
-			AssetEngine& assets = get_runtime().get_asset_engine();
+			AssetEngine& assets = AssetEngine::instance();
 
 			// creating new directory
 			get_application().create_directory(path);
@@ -200,7 +200,7 @@ void mintye::AssetsWindow::draw()
 		ImGui::Dummy(spacing);
 	}
 
-	Scene* scene = get_scene();
+	Ref<Scene> scene = get_scene();
 
 	// draw files
 	for (auto const& fileData : _files)
@@ -245,7 +245,7 @@ void mintye::AssetsWindow::draw()
 			{
 				// check for any dependents first
 				// if something depends on this asset, do not remove it, log something about needing it
-				AssetEngine& assets = get_runtime().get_asset_engine();
+				AssetEngine& assets = AssetEngine::instance();
 				EntityRegistry& registry = scene->get_entity_registry();
 
 				// get the ID
@@ -253,12 +253,12 @@ void mintye::AssetsWindow::draw()
 				MINTY_ASSERT(id.valid());
 
 				// get the asset
-				Asset const* asset = assets.get_asset(id);
+				Ref<Asset> asset = assets.get_asset(id);
 				MINTY_ASSERT(asset != nullptr);
 
 				// get dependents
-				std::vector<Asset*> dependentAssets = assets.get_dependents(*asset);
-				std::vector<Entity> dependentEntities = registry.get_dependents(*asset);
+				std::vector<Ref<Asset>> dependentAssets = assets.get_dependents(asset);
+				std::vector<Entity> dependentEntities = registry.get_dependents(asset);
 
 				// register only if none
 				if (dependentAssets.empty() && dependentEntities.empty())
@@ -271,7 +271,7 @@ void mintye::AssetsWindow::draw()
 					// something else depends on this
 					std::vector<String> assetStrings;
 					assetStrings.reserve(dependentAssets.size());
-					for (Asset* const asset : dependentAssets)
+					for (Ref<Asset> asset : dependentAssets)
 					{
 						assetStrings.push_back(asset->get_name());
 					}
@@ -305,19 +305,19 @@ void mintye::AssetsWindow::draw()
 	ImGui::End();
 }
 
-void mintye::AssetsWindow::reset()
+void Mintye::AssetsWindow::reset()
 {
 	// go back to the base folder
 	set_path("");
 }
 
-void mintye::AssetsWindow::refresh()
+void Mintye::AssetsWindow::refresh()
 {
 	// re-populate the editor files
 	set_path(_path);
 }
 
-void mintye::AssetsWindow::set_path(minty::Path const& path)
+void Mintye::AssetsWindow::set_path(Minty::Path const& path)
 {
 	// set the new path
 	_path = path;
@@ -340,7 +340,7 @@ void mintye::AssetsWindow::set_path(minty::Path const& path)
 		return;
 	}
 
-	Scene* scene = get_scene();
+	Ref<Scene> scene = get_scene();
 
 	static std::unordered_set<AssetType> cannotIncludeToScene
 	{
@@ -353,7 +353,7 @@ void mintye::AssetsWindow::set_path(minty::Path const& path)
 	{
 		// TODO: filter out directories and such
 
-		AssetEngine& assets = get_runtime().get_asset_engine();
+		AssetEngine& assets = AssetEngine::instance();
 
 		Wrapper const& wrapper = assets.get_wrapper();
 
@@ -410,7 +410,7 @@ void mintye::AssetsWindow::set_path(minty::Path const& path)
 	}
 }
 
-minty::Path mintye::AssetsWindow::get_path(minty::Path const& path) const
+Minty::Path Mintye::AssetsWindow::get_path(Minty::Path const& path) const
 {
 	return get_project()->get_base_path() / _path / path;
 }

@@ -2,26 +2,26 @@
 
 #include "ME_EditorApplication.h"
 
-using namespace minty;
-using namespace mintye;
+using namespace Minty;
+using namespace Mintye;
 
-mintye::EditorApplicationRenderEngine::EditorApplicationRenderEngine(EditorApplication& app, Runtime& runtime)
-	: RenderEngine(runtime)
+Mintye::EditorApplicationRenderEngine::EditorApplicationRenderEngine(EditorApplication& app)
+	: RenderEngine()
 	, _application(&app)
 	, _descriptorPool()
 	, _clearColor()
 	, _theme()
 { }
 
-mintye::EditorApplicationRenderEngine::~EditorApplicationRenderEngine()
+Mintye::EditorApplicationRenderEngine::~EditorApplicationRenderEngine()
 {
 	destroy();
 }
 
-void mintye::EditorApplicationRenderEngine::init(RenderEngineBuilder const& builder)
+void Mintye::EditorApplicationRenderEngine::init()
 {
 	// init normal stuff
-	RenderEngine::init(builder);
+	RenderEngine::init();
 	create_descriptor_pool();
 
 	// init ImGui
@@ -41,9 +41,9 @@ void mintye::EditorApplicationRenderEngine::init(RenderEngineBuilder const& buil
 	init_theme();
 
 	// Setup Platform/Renderer backends
-	ImGui_ImplGlfw_InitForVulkan(_window->get_raw(), true);
+	ImGui_ImplGlfw_InitForVulkan(static_cast<GLFWwindow*>(_window->get_native_window()), true);
 	ImGui_ImplVulkan_InitInfo initInfo = {};
-	initInfo.Instance = _instance;
+	initInfo.Instance = _vkInstance;
 	initInfo.PhysicalDevice = _physicalDevice;
 	initInfo.Device = _device;
 	//initInfo.QueueFamily = g_QueueFamily;
@@ -143,7 +143,7 @@ void mintye::EditorApplicationRenderEngine::init(RenderEngineBuilder const& buil
 	//_sceneDescriptorSet = ImGui_ImplVulkan_AddTexture(_sceneSampler, _sceneImageView, VK_IMAGE_LAYOUT_ATTACHMENT_OPTIMAL);
 }
 
-void mintye::EditorApplicationRenderEngine::destroy()
+void Mintye::EditorApplicationRenderEngine::destroy()
 {
 	//vkDestroyImage(_device, _sceneImage, nullptr);
 	//vkFreeMemory(_device, _sceneImageMemory, nullptr);
@@ -159,12 +159,12 @@ void mintye::EditorApplicationRenderEngine::destroy()
 	RenderEngine::destroy();
 }
 
-//VkDescriptorSet mintye::ApplicationRenderEngine::get_scene_descriptor_set() const
+//VkDescriptorSet Mintye::ApplicationRenderEngine::get_scene_descriptor_set() const
 //{
 //	return _sceneDescriptorSet;
 //}
 
-void mintye::EditorApplicationRenderEngine::init_theme()
+void Mintye::EditorApplicationRenderEngine::init_theme()
 {
 	ImGui::StyleColorsDark();
 	//ImGui::StyleColorsLight();
@@ -220,7 +220,7 @@ void mintye::EditorApplicationRenderEngine::init_theme()
 	_theme.apply(style);
 }
 
-void mintye::EditorApplicationRenderEngine::draw(VkCommandBuffer commandBuffer)
+void Mintye::EditorApplicationRenderEngine::draw(VkCommandBuffer commandBuffer)
 {
 	//// Resize swap chain?
 	//if (_window->is_resized())
@@ -279,7 +279,7 @@ void mintye::EditorApplicationRenderEngine::draw(VkCommandBuffer commandBuffer)
 	}
 }
 
-VkSurfaceFormatKHR mintye::EditorApplicationRenderEngine::choose_swap_surface_format(const std::vector<VkSurfaceFormatKHR>& availableFormats)
+VkSurfaceFormatKHR Mintye::EditorApplicationRenderEngine::choose_swap_surface_format(const std::vector<VkSurfaceFormatKHR>& availableFormats)
 {
 	//return RenderEngine::choose_swap_surface_format(availableFormats);
 	// same as overriden function, but we use UNORM
@@ -293,7 +293,7 @@ VkSurfaceFormatKHR mintye::EditorApplicationRenderEngine::choose_swap_surface_fo
 	return availableFormats[0];
 }
 
-void mintye::EditorApplicationRenderEngine::create_descriptor_pool()
+void Mintye::EditorApplicationRenderEngine::create_descriptor_pool()
 {
 	std::array<VkDescriptorPoolSize, 1> poolSizes{};
 	poolSizes[0].type = VK_DESCRIPTOR_TYPE_COMBINED_IMAGE_SAMPLER;

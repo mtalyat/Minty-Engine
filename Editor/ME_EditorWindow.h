@@ -2,19 +2,19 @@
 
 #include "ME_Minty.h"
 
-namespace mintye
+namespace Mintye
 {
 	class EditorApplication;
 	class Project;
 
 	class EditorWindow
-		: public minty::Object
+		: public Minty::Object
 	{
 	private:
 		EditorApplication* _application;
 		Project* _project;
-		minty::Engine* _engine;
-		minty::Scene* _scene;
+		Minty::Engine* _engine;
+		Minty::Ref<Minty::Scene> _scene;
 
 	public:
 		EditorWindow(EditorApplication& application);
@@ -24,16 +24,14 @@ namespace mintye
 	protected:
 		EditorApplication& get_application() const;
 
-		minty::Runtime& get_runtime() const;
-
 		Project* get_project() const;
 
-		minty::Scene* get_scene() const;
+		Minty::Ref<Minty::Scene> get_scene() const;
 
 	public:
 		virtual void set_project(Project* const project);
 
-		virtual void set_scene(minty::Scene* const scene);
+		virtual void set_scene(Minty::Ref<Minty::Scene> const scene);
 
 		/// <summary>
 		/// Draws the window using ImGui.
