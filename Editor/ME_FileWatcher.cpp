@@ -1,14 +1,14 @@
 #include "ME_FileWatcher.h"
 
-using namespace minty;
-using namespace mintye;
+using namespace Minty;
+using namespace Mintye;
 
-mintye::FileWatcher::FileWatcher(minty::Path const& directory, OnChangeFunc const& action)
+Mintye::FileWatcher::FileWatcher(Minty::Path const& directory, OnChangeFunc const& action)
 	: _directory(directory)
 	, _action(action)
 {}
 
-void mintye::FileWatcher::update()
+void Mintye::FileWatcher::update()
 {
 	// check for deletions
 	auto it = _files.begin();
@@ -48,12 +48,12 @@ void mintye::FileWatcher::update()
 	}
 }
 
-void mintye::FileWatcher::serialize(minty::Writer& writer) const
+void Mintye::FileWatcher::serialize(Minty::Writer& writer) const
 {
 	
 }
 
-void mintye::FileWatcher::deserialize(minty::Reader const& reader)
+void Mintye::FileWatcher::deserialize(Minty::Reader const& reader)
 {
 
 }

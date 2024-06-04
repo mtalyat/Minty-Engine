@@ -3,12 +3,12 @@
 #include "ME_Minty.h"
 #include "ME_Theme.h"
 
-namespace mintye
+namespace Mintye
 {
 	class EditorApplication;
 
 	class EditorApplicationRenderEngine
-		: public minty::RenderEngine
+		: public Minty::RenderEngine
 	{
 	private:
 		EditorApplication* _application;
@@ -23,12 +23,12 @@ namespace mintye
 		//VkDescriptorSet _sceneDescriptorSet;
 
 	public:
-		EditorApplicationRenderEngine(EditorApplication& app, minty::Runtime& runtime);
+		EditorApplicationRenderEngine(EditorApplication& app);
 
 		~EditorApplicationRenderEngine();
 
 	public:
-		void init(minty::RenderEngineBuilder const& builder) override;
+		void init() override;
 
 		void destroy() override;
 
@@ -45,5 +45,8 @@ namespace mintye
 
 	private:
 		void create_descriptor_pool();
+
+	public:
+		static EditorApplicationRenderEngine& instance() { return static_cast<EditorApplicationRenderEngine&>(RenderEngine::instance()); }
 	};
 }

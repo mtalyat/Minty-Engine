@@ -1,24 +1,24 @@
 #include "ME_Theme.h"
 
-using namespace minty;
-using namespace mintye;
+using namespace Minty;
+using namespace Mintye;
 
-mintye::Theme::Theme()
+Mintye::Theme::Theme()
 	: _colors(new Color[ImGuiCol_COUNT])
 {}
 
-mintye::Theme::~Theme()
+Mintye::Theme::~Theme()
 {
 	if (_colors) delete[] _colors;
 }
 
-mintye::Theme::Theme(Theme const& other)
+Mintye::Theme::Theme(Theme const& other)
 	: _colors(new Color[ImGuiCol_COUNT])
 {
 	memcpy(_colors, other._colors, sizeof(Color) * ImGuiCol_COUNT);
 }
 
-Theme& mintye::Theme::operator=(Theme const& other)
+Theme& Mintye::Theme::operator=(Theme const& other)
 {
 	if (this != &other)
 	{
@@ -33,11 +33,11 @@ Theme& mintye::Theme::operator=(Theme const& other)
 	return *this;
 }
 
-mintye::Theme::Theme(Theme&& other) noexcept
+Mintye::Theme::Theme(Theme&& other) noexcept
 	: _colors(std::move(other._colors))
 {}
 
-Theme& mintye::Theme::operator=(Theme&& other) noexcept
+Theme& Mintye::Theme::operator=(Theme&& other) noexcept
 {
 	if (this != &other)
 	{
@@ -49,12 +49,12 @@ Theme& mintye::Theme::operator=(Theme&& other) noexcept
 	return *this;
 }
 
-Color& mintye::Theme::operator[](ImGuiCol_ const col)
+Color& Mintye::Theme::operator[](ImGuiCol_ const col)
 {
 	return _colors[col];
 }
 
-void mintye::Theme::copy(ImGuiStyle const& style)
+void Mintye::Theme::copy(ImGuiStyle const& style)
 {
 	ImVec4 color;
 	for (int i = 0; i < ImGuiCol_COUNT; i++)
@@ -64,7 +64,7 @@ void mintye::Theme::copy(ImGuiStyle const& style)
 	}
 }
 
-void mintye::Theme::apply(ImGuiStyle& style) const
+void Mintye::Theme::apply(ImGuiStyle& style) const
 {
 	Color color;
 	for (int i = 0; i < ImGuiCol_COUNT; i++)

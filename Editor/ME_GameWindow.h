@@ -1,7 +1,7 @@
 #pragma once
 #include "ME_EditorWindow.h"
 
-namespace mintye
+namespace Mintye
 {
 	class GameWindow
 		: public EditorWindow

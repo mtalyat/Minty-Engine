@@ -5,10 +5,10 @@
 #include <unordered_set>
 #include <functional>
 
-namespace mintye
+namespace Mintye
 {
 	class FileWatcher
-		: public minty::Object
+		: public Minty::Object
 	{
 	public:
 		enum class FileStatus
@@ -18,7 +18,7 @@ namespace mintye
 			Deleted,
 		};
 
-		typedef std::function<void(minty::Path const&, FileStatus const)> OnChangeFunc;
+		typedef std::function<void(Minty::Path const&, FileStatus const)> OnChangeFunc;
 
 	private:
 		struct FileData
@@ -27,13 +27,13 @@ namespace mintye
 		};
 
 	private:
-		minty::Path _directory;
+		Minty::Path _directory;
 		OnChangeFunc _action;
-		std::unordered_map<minty::Path, FileData> _files;
-		std::unordered_set<minty::Path> _changed;
+		std::unordered_map<Minty::Path, FileData> _files;
+		std::unordered_set<Minty::Path> _changed;
 
 	public:
-		FileWatcher(minty::Path const& directory, OnChangeFunc const& action);
+		FileWatcher(Minty::Path const& directory, OnChangeFunc const& action);
 
 		/// <summary>
 		/// Checks the directory for changes.
@@ -41,7 +41,7 @@ namespace mintye
 		void update();
 
 	public:
-		void serialize(minty::Writer& writer) const override;
-		void deserialize(minty::Reader const& reader) override;
+		void serialize(Minty::Writer& writer) const override;
+		void deserialize(Minty::Reader const& reader) override;
 	};
 }
