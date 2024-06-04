@@ -15,6 +15,20 @@ The Minty Engine provides a powerful game editor, which allows for easy and effi
 
 This game engine was started as a result of the [2023 Unity pricing model change](https://www.theverge.com/2023/9/12/23870547/unit-price-change-game-development). The goal is to have a functioning multi-purpose game engine, except that its free to use, and always will be.
 
+## Features
+
+* Vulkan-based rendering engine
+* Entity component system
+* C# scripting
+* Audio engine
+* Asset manager
+* Model loading
+* Scene management
+* 3D, 2D, and UI rendering
+* Visual editor
+* Multiple build modes (debug/release)
+* Support for Dear ImGUI
+
 ## Goals
 
 ### Performance
