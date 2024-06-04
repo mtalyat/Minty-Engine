@@ -38,27 +38,34 @@ Minty::Application::Application(ApplicationBuilder const& builder)
 
 	_instance = this;
 
-	// create engines
-	push_engine(CREATE_DEFAULT_ENGINE_IF_NEEDED(AssetEngine, assetEngine));
-	push_engine(CREATE_DEFAULT_ENGINE_IF_NEEDED(AudioEngine, audioEngine));
-	push_engine(CREATE_DEFAULT_ENGINE_IF_NEEDED(RenderEngine, renderEngine));
-	push_engine(CREATE_DEFAULT_ENGINE_IF_NEEDED(ScriptEngine, scriptEngine));
+	try
+	{
+		// create engines
+		push_engine(CREATE_DEFAULT_ENGINE_IF_NEEDED(AssetEngine, assetEngine));
+		push_engine(CREATE_DEFAULT_ENGINE_IF_NEEDED(AudioEngine, audioEngine));
+		push_engine(CREATE_DEFAULT_ENGINE_IF_NEEDED(RenderEngine, renderEngine));
+		push_engine(CREATE_DEFAULT_ENGINE_IF_NEEDED(ScriptEngine, scriptEngine));
 
-	// load scripts
-	load_assemblies();
-	ScriptLink::link();
+		// load scripts
+		load_assemblies();
+		ScriptLink::link();
 
-	// create window
-	_window = Window::create();
-	_window->set_event_callback([this](Event& e) { on_event(e); });
+		// create window
+		_window = Window::create();
+		_window->set_event_callback([this](Event& e) { on_event(e); });
 
-	// initialize things
-	RenderEngine::instance().init(); 
-	Input::set_input_script(ScriptEngine::instance().find_class(SCRIPT_NAMESPACE_NAME, "Input"));
+		// initialize things
+		RenderEngine::instance().init();
+		Input::set_input_script(ScriptEngine::instance().find_class(SCRIPT_NAMESPACE_NAME, "Input"));
 
-	// create default layer
-	_defaultLayer = new DefaultLayer();
-	_layerManager.push_layer(_defaultLayer);
+		// create default layer
+		_defaultLayer = new DefaultLayer();
+		_layerManager.push_layer(_defaultLayer);
+	}
+	catch (std::exception& e)
+	{
+		MINTY_ABORT(std::format("An exception occured while building the application: \"{}\"", e.what()));
+	}
 }
 
 #undef CREATE_DEFAULT_ENGINE_IF_NEEDED
@@ -99,29 +106,36 @@ void Minty::Application::run()
 	MINTY_ASSERT(!_running);
 	_running = true;
 
-	load_starting_scene();
-
-	reset_time();
-
-	while (_running)
+	try
 	{
-		// record time
-		update_time();
+		load_starting_scene();
 
-		_window->on_update();
+		reset_time();
 
-		if (!_minimized)
+		while (_running)
 		{
-			// update all layers
-			for (Layer* layer : _layerManager)
+			// record time
+			update_time();
+
+			_window->on_update();
+
+			if (!_minimized)
 			{
-				layer->on_update(_time);
+				// update all layers
+				for (Layer* layer : _layerManager)
+				{
+					layer->on_update(_time);
+				}
 			}
 		}
-	}
 
-	// sync up the renderer with the CPU to avoid errors
-	RenderEngine::instance().sync();
+		// sync up the renderer with the CPU to avoid errors
+		RenderEngine::instance().sync();
+	}
+	catch (std::exception& e)
+	{
+		MINTY_ABORT(std::format("An exception occured while running the application: \"{}\"", e.what()));
+	}
 }
 
 void Minty::Application::on_event(Event& event)
