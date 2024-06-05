@@ -192,6 +192,14 @@ void Mintye::EditorApplication::open_project()
 	ImGuiFileDialog::Instance()->OpenDialog("open_project", "Choose project directory...", nullptr, config);
 }
 
+void Mintye::EditorApplication::open_project_directory() const
+{
+	if (_project)
+	{
+		Operations::open_directory(_project->get_build_path());
+	}
+}
+
 void Mintye::EditorApplication::load_project(Minty::Path const& path)
 {
 	// if existing project, unload it
@@ -849,6 +857,10 @@ void EditorApplication::draw_commands()
 	if (ImGui::Button("Run"))
 	{
 		run_project();
+	}
+	if (ImGui::Button("Open"))
+	{
+		open_project_directory();
 	}
 
 	if (disabled)

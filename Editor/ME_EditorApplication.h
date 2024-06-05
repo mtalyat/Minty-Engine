@@ -119,6 +119,8 @@ namespace Mintye
 
 		void open_project();
 
+		void open_project_directory() const;
+
 		void save_project();
 
 		void close_project();
