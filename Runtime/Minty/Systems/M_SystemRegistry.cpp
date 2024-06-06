@@ -7,11 +7,26 @@
 #include "Minty/Serialization/M_Reader.h"
 #include "Minty/Serialization/M_Writer.h"
 
+#include "M_AllSystems.h"
+
 #include <sstream>
 
 namespace Minty
 {
 	std::map<String const, SystemRegistry::SystemFunc const> SystemRegistry::_systemTypes = std::map<String const, SystemRegistry::SystemFunc const>();
+
+	SystemRegistry::SystemRegistry(Scene& scene)
+		: SceneObject(scene)
+		, _orderedSystems()
+		, _allSystems()
+		, _typeLookup()
+	{
+		emplace(new AnimationSystem(scene));
+		emplace(new AudioSystem(scene));
+		emplace(new RenderSystem(scene));
+		emplace(new ScriptSystem(scene));
+		emplace(new UISystem(scene));
+	}
 
 	SystemRegistry::~SystemRegistry()
 	{
@@ -178,49 +193,10 @@ namespace Minty
 	}
 
 	void SystemRegistry::serialize(Writer& writer) const
-	{
-		// create reverse lookup for names
-		std::map<System* const, String> lookup;
-
-		for (auto const& pair : _allSystems)
-		{
-			lookup.emplace(pair.second, pair.first);
-		}
-
-		// write all systems:
-		// name: priority
-
-		for (auto const& pair : _orderedSystems)
-		{
-			for (System* const system : pair.second)
-			{
-				String systemPriority = "";
-				if (pair.first)
-				{
-					systemPriority = std::to_string(pair.first);
-				}
-				Node systemNode(lookup.at(system), systemPriority);
-				Writer systemWriter(systemNode, writer.get_data());
-				system->serialize(systemWriter);
-
-				writer.write(systemNode);
-			}
-		}
-	}
+	{}
 
 	void SystemRegistry::deserialize(Reader const& reader)
-	{
-		// read each one and set as we go, by name
-		for (auto const& child : reader.get_node().get_children())
-		{
-			// create the system
-			System* system = emplace_by_name(child.get_name(), child.to_int());
-
-			// deserialize the system
-			Reader systemReader(child, reader.get_data());
-			system->deserialize(systemReader);
-		}
-	}
+	{}
 
 	String to_string(SystemRegistry const& value)
 	{

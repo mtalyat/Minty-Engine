@@ -361,6 +361,7 @@
     <ClInclude Include="Minty\UI\M_UIPushData.h" />
     <ClInclude Include="Minty\UI\M_UISystem.h" />
     <ClInclude Include="Minty\UI\M_UITransformComponent.h" />
+    <ClInclude Include="M_AllSystems.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Platform\Windows\M_WindowsWindow.h" />
   </ItemGroup>

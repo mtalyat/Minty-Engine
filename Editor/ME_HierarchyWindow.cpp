@@ -28,46 +28,6 @@ void Mintye::HierarchyWindow::draw()
 		return;
 	}
 
-	// split 50/50 into systems and entities, for now
-	float windowHeight = ImGui::GetContentRegionAvail().y - ImGui::GetStyle().ItemSpacing.y;
-	float splitHeight = windowHeight * 0.5f;
-
-	// draw systems
-	SystemRegistry& systemRegistry = scene->get_system_registry();
-	if (ImGui::BeginChild("HierarchySystems", ImVec2(0.0f, std::min(200.0f, splitHeight)), true))
-	{
-		ImGui::Text(std::format("Systems ({})", systemRegistry.size()).c_str());
-		ImGui::Separator();
-
-		// do a checkbox for each system
-		// if it has the system, check, if not, no check
-		// clicking the check will add/remove the system
-
-		size_t i = 0;
-
-		for (auto const& systemName : _registeredSystems)
-		{
-			bool checked = systemRegistry.find<System const>(systemName);
-
-			if (ImGui::Checkbox(std::format("{}##system{}", systemName, i).c_str(), &checked))
-			{
-				if (checked)
-				{
-					// add system
-					systemRegistry.emplace_by_name(systemName);
-				}
-				else
-				{
-					// remove system
-					systemRegistry.erase_by_name(systemName);
-				}
-			}
-
-			i++;
-		}
-	}
-	ImGui::EndChild();
-
 	// if clicked in window, reset the clicked Entity
 	if (ImGui::IsWindowHovered())
 	{
@@ -84,99 +44,95 @@ void Mintye::HierarchyWindow::draw()
 
 	// draw entities
 	EntityRegistry& entityRegistry = scene->get_entity_registry();
-	if (ImGui::BeginChild("HierarchyEntities", ImVec2(0.0f, 0.0f), true))
+	ImGui::Text(std::format("Entities ({})", entityRegistry.size()).c_str());
+	ImGui::Separator();
+
+	// keep track of the parents, keep indenting based on the number of parents
+	std::vector<Entity> familyStack;
+	std::unordered_set<Entity> familySet;
+
+	size_t i = 0;
+
+	for (auto [entity, relationship] : entityRegistry.view<RelationshipComponent const>().each())
 	{
-		ImGui::Text(std::format("Entities ({})", entityRegistry.size()).c_str());
-		ImGui::Separator();
+		// family
 
-		// keep track of the parents, keep indenting based on the number of parents
-		std::vector<Entity> familyStack;
-		std::unordered_set<Entity> familySet;
-
-		size_t i = 0;
-
-		for (auto [entity, relationship] : entityRegistry.view<RelationshipComponent const>().each())
+		// if not the same parent, determine what to do...
+		if (familySet.contains(relationship.parent))
 		{
-			// family
+			// the parent is part of this line
 
-			// if not the same parent, determine what to do...
-			if (familySet.contains(relationship.parent))
+			// go back until we get to the parent
+			while (familyStack.back() != relationship.parent)
 			{
-				// the parent is part of this line
-
-				// go back until we get to the parent
-				while (familyStack.back() != relationship.parent)
-				{
-					familySet.erase(familyStack.back());
-					familyStack.pop_back();
-				}
+				familySet.erase(familyStack.back());
+				familyStack.pop_back();
 			}
-			else if (relationship.parent == NULL_ENTITY)
-			{
-				// no parent, but possibly children
-				familyStack.clear();
-				familySet.clear();
-			}
-			else
-			{
-				// else, out of order
-				MINTY_WARN("Entity out of order.");
+		}
+		else if (relationship.parent == NULL_ENTITY)
+		{
+			// no parent, but possibly children
+			familyStack.clear();
+			familySet.clear();
+		}
+		else
+		{
+			// else, out of order
+			MINTY_WARN("Entity out of order.");
 
-				familyStack.clear();
-				familySet.clear();
-			}
+			familyStack.clear();
+			familySet.clear();
+		}
 
-			// add self to stack
-			familyStack.push_back(entity);
-			familySet.emplace(entity);
+		// add self to stack
+		familyStack.push_back(entity);
+		familySet.emplace(entity);
 
-			// on left click, select
-			// print with indent
-			String name = std::format("{}##entity{}", String((familyStack.size() - 1) << 1, ' ').append(entityRegistry.get_name_safe(entity)), i);
-			if (ImGui::Selectable(name.c_str(), entity == _selected))
-			{
-				set_selected(entity);
-			}
+		// on left click, select
+		// print with indent
+		String name = std::format("{}##entity{}", String((familyStack.size() - 1) << 1, ' ').append(entityRegistry.get_name_safe(entity)), i);
+		if (ImGui::Selectable(name.c_str(), entity == _selected))
+		{
+			set_selected(entity);
+		}
 
-			// on right click, set clicked
-			if (ImGui::IsItemClicked(ImGuiMouseButton_Right) && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem))
+		// on right click, set clicked
+		if (ImGui::IsItemClicked(ImGuiMouseButton_Right) && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem))
+		{
+			set_clicked(entity);
+			MINTY_LOG_FORMAT("Clicked entity: \"{}\"", entityRegistry.get_name_safe(entity));
+
+			ImGui::OpenPopup("ButtonContext");
+		}
+
+		i++;
+	}
+
+	for (auto [entity] : entityRegistry.view<Entity>().each())
+	{
+		if (!entityRegistry.valid(entity) || entityRegistry.all_of<RelationshipComponent>(entity)) continue;
+
+		// no parents, print at bottom
+
+		// on left click, select
+		String name = std::format("{}##entity{}", entityRegistry.get_name_safe(entity), i);
+		if (ImGui::Selectable(name.c_str(), entity == _selected))
+		{
+			set_selected(entity);
+		}
+
+		// on right click, set clicked
+		// on double click, focus
+		if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem))
+		{
+			if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
 			{
 				set_clicked(entity);
-				MINTY_LOG_FORMAT("Clicked entity: \"{}\"", entityRegistry.get_name_safe(entity));
-
-				//ImGui::OpenPopup("ButtonContext");
 			}
-
-			i++;
 		}
 
-		for (auto [entity] : entityRegistry.view<Entity>().each())
-		{
-			if (!entityRegistry.valid(entity) || entityRegistry.all_of<RelationshipComponent>(entity)) continue;
-
-			// no parents, print at bottom
-
-			// on left click, select
-			String name = std::format("{}##entity{}", entityRegistry.get_name_safe(entity), i);
-			if (ImGui::Selectable(name.c_str(), entity == _selected))
-			{
-				set_selected(entity);
-			}
-
-			// on right click, set clicked
-			// on double click, focus
-			if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem))
-			{
-				if (ImGui::IsItemClicked(ImGuiMouseButton_Right))
-				{
-					set_clicked(entity);
-				}
-			}
-
-			i++;
-		}
+		i++;
 	}
-	ImGui::EndChild();
 
 	// right-click pop up menu
 	// Right-click on the button to open the context menu

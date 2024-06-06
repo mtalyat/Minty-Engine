@@ -33,8 +33,7 @@ namespace Minty
 		/// <summary>
 		/// Creates an empty SystemRegistry.
 		/// </summary>
-		SystemRegistry(Scene& scene)
-			: SceneObject(scene) {}
+		SystemRegistry(Scene& scene);
 
 		~SystemRegistry();
 
