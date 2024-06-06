@@ -148,7 +148,7 @@
 xcopy /y /s /e /i "$(ProjectDir)..\Libraries\mono\etc" "$(ProjectDir)mono\etc"
 xcopy /y "$(ProjectDir)..\Assembly\bin\$(Configuration)\MintyEngine.dll" "$(ProjectDir)"
 xcopy /y "$(ProjectDir)..\Data\*.wrap" "$(ProjectDir)"
-xcopy /y "$(ProjectDir)..\Libraries\mono\lib\$(Configuration)*.dll" "$(ProjectDir)"</Command>
+xcopy /y "$(ProjectDir)..\Libraries\mono\lib\$(Configuration)\*.dll" "$(ProjectDir)"</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>xcopy /y "$(ProjectDir)..\Runtime\x64\$(Configuration)\*.dll" "$(TargetDir)"
@@ -191,7 +191,7 @@ xcopy /y /s /e /i "$(ProjectDir)mono\etc" "$(TargetDir)mono\etc"</Command>
 xcopy /y /s /e /i "$(ProjectDir)..\Libraries\mono\etc" "$(ProjectDir)mono\etc"
 xcopy /y "$(ProjectDir)..\Assembly\bin\$(Configuration)\MintyEngine.dll" "$(ProjectDir)"
 xcopy /y "$(ProjectDir)..\Data\*.wrap" "$(ProjectDir)"
-xcopy /y "$(ProjectDir)..\Libraries\mono\lib\$(Configuration)*.dll" "$(ProjectDir)"</Command>
+xcopy /y "$(ProjectDir)..\Libraries\mono\lib\$(Configuration)\*.dll" "$(ProjectDir)"</Command>
     </PreBuildEvent>
     <PostBuildEvent>
       <Command>xcopy /y "$(ProjectDir)..\Runtime\x64\$(Configuration)\*.dll" "$(TargetDir)"

@@ -2,6 +2,7 @@
 
 #include "Minty/Types/M_Types.h"
 #include "Minty/Core/M_Macros.h"
+#include <unordered_set>
 
 namespace Minty
 {
@@ -50,6 +51,15 @@ namespace Minty
 		/// <param name="from"></param>
 		/// <param name="to"></param>
 		bool copy_all(Path const& from, Path const& to);
+
+		/// <summary>
+		/// Copies all of the files that are included in the names set.
+		/// </summary>
+		/// <param name="from"></param>
+		/// <param name="to"></param>
+		/// <param name="names"></param>
+		/// <returns></returns>
+		bool copy_some(Path const& from, Path const& to, std::unordered_set<String> const& names);
 
 		/// <summary>
 		/// Gets the environment variable, if it has been set.

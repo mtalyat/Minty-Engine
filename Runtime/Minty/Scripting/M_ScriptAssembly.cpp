@@ -11,6 +11,7 @@ using namespace Minty;
 
 Minty::ScriptAssembly::ScriptAssembly(Path const& path, bool const referenceOnly)
 	: _path(path)
+	, _refOnly(referenceOnly)
 	, _assembly()
 	, _image()
 	, _classes()
@@ -59,6 +60,13 @@ Minty::ScriptAssembly::ScriptAssembly(Path const& path, bool const referenceOnly
 		MINTY_INFO_FORMAT("Found {}::{}.", name, fullName);
 		_classes.emplace(fullName, ScriptClass(namespaceName, className, *this)).first->second;
 	}
+
+	// print dependencies for now
+	MINTY_INFO("Dependencies:");
+	for (String const& name : get_dependencies())
+	{
+		MINTY_INFO(name);
+	}
 }
 
 Minty::ScriptAssembly::~ScriptAssembly()
@@ -68,11 +76,6 @@ Minty::ScriptAssembly::~ScriptAssembly()
 	_path = "";
 	_assembly = nullptr;
 	_classes.clear();
-}
-
-String Minty::ScriptAssembly::get_name() const
-{
-	return _path.stem().string();
 }
 
 ScriptClass const* Minty::ScriptAssembly::get_class(String const& namespaceName, String const& className) const
@@ -118,4 +121,25 @@ ScriptClass const* Minty::ScriptAssembly::search_for_class(String const& name) c
 	}
 
 	return nullptr;
+}
+
+std::unordered_set<String> Minty::ScriptAssembly::get_dependencies() const
+{
+	std::unordered_set<String> results;
+
+	// always include System
+	results.emplace("System");
+
+	int count = mono_image_get_table_rows(_image, MONO_TABLE_ASSEMBLYREF);
+
+	for (int i = 0; i < count; i++)
+	{
+		uint32_t cols[MONO_ASSEMBLYREF_SIZE];
+		mono_metadata_decode_row(mono_image_get_table_info(_image, MONO_TABLE_ASSEMBLYREF), i, cols, MONO_ASSEMBLYREF_SIZE);
+
+		const char* name = mono_metadata_string_heap(_image, cols[MONO_ASSEMBLYREF_NAME]);
+		results.emplace(name);
+	}
+
+	return results;
 }

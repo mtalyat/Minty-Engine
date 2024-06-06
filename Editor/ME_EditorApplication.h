@@ -119,6 +119,8 @@ namespace Mintye
 
 		void open_project();
 
+		void open_project_directory() const;
+
 		void save_project();
 
 		void close_project();
@@ -130,6 +132,8 @@ namespace Mintye
 		void unload_project();
 
 		void create_new_project(Minty::String const& name, Minty::Path const& path);
+
+		Minty::Path get_project_dll_path() const;
 
 #pragma endregion
 
