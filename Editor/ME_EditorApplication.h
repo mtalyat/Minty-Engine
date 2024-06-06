@@ -133,6 +133,8 @@ namespace Mintye
 
 		void create_new_project(Minty::String const& name, Minty::Path const& path);
 
+		Minty::Path get_project_dll_path() const;
+
 #pragma endregion
 
 #pragma region Scene

@@ -143,7 +143,13 @@ ScriptAssembly const* Minty::ScriptEngine::find_assembly(String const& namespace
 
 void Minty::ScriptEngine::reload_assembly(String const& name)
 {
-	MINTY_TODO("reload assembly");
+	ScriptAssembly const* assembly = get_assembly(name);
+
+	Path path = assembly->get_path();
+	bool refOnly = assembly->is_reference_only();
+
+	unload_assembly(assembly->get_name());
+	load_assembly(path, refOnly);
 }
 
 void Minty::ScriptEngine::unload_assembly(String const& name)

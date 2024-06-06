@@ -144,9 +144,20 @@ bool Minty::Operations::copy_all(Path const& from, Path const& to)
 		// copy over all of the files
 		for (auto const& entry : std::filesystem::recursive_directory_iterator(from))
 		{
+			// skip non-files
+			if (!entry.is_regular_file()) continue;
+
 			Path const& path = entry.path();
-			String relativePathString = path.lexically_relative(from).string();
-			std::filesystem::copy(path, to / relativePathString, std::filesystem::copy_options::overwrite_existing);
+			Path destination = to / path.lexically_relative(from);
+
+			// create directory if needed
+			Path directory = destination.parent_path();
+			if (!std::filesystem::exists(directory))
+			{
+				std::filesystem::create_directories(directory);
+			}
+
+			std::filesystem::copy(path, destination, std::filesystem::copy_options::overwrite_existing);
 		}
 	}
 	catch (std::filesystem::filesystem_error& e)
@@ -157,6 +168,67 @@ bool Minty::Operations::copy_all(Path const& from, Path const& to)
 	catch (std::exception& e)
 	{
 		MINTY_ERROR_FORMAT("Failed to copy_all \"{}\" to \"{}\": \"{}\"", from.generic_string(), to.generic_string(), e.what());
+		return false;
+	}
+
+	return true;
+}
+
+bool Minty::Operations::copy_some(Path const& from, Path const& to, std::unordered_set<String> const& names)
+{
+	try
+	{
+		if (!std::filesystem::exists(from))
+		{
+			MINTY_ERROR_FORMAT("Failed to copy_some, from \"{}\": Path does not exist.", from.generic_string());
+			return false;
+		}
+		else if (!std::filesystem::is_directory(from))
+		{
+			MINTY_ERROR_FORMAT("Failed to copy_some, from \"{}\": Path is not a directory.", from.generic_string());
+			return false;
+		}
+
+		// create dest if needed
+		if (!std::filesystem::exists(to))
+		{
+			std::filesystem::create_directories(to);
+		}
+
+		// copy over all of the files
+		for (auto const& entry : std::filesystem::recursive_directory_iterator(from))
+		{
+			// skip non-files
+			if (!entry.is_regular_file()) continue;
+
+			Path const& path = entry.path();
+
+			// skip any files not in names set
+			if (!names.contains(path.stem().string()))
+			{
+				continue;
+			}
+
+			Path destination = to / path.lexically_relative(from);
+
+			// create directory if needed
+			Path directory = destination.parent_path();
+			if (!std::filesystem::exists(directory))
+			{
+				std::filesystem::create_directories(directory);
+			}
+
+			std::filesystem::copy(path, destination, std::filesystem::copy_options::overwrite_existing);
+		}
+	}
+	catch (std::filesystem::filesystem_error& e)
+	{
+		MINTY_ERROR_FORMAT("Failed to copy_some \"{}\" to \"{}\": \"{}\"", from.generic_string(), to.generic_string(), e.what());
+		return false;
+	}
+	catch (std::exception& e)
+	{
+		MINTY_ERROR_FORMAT("Failed to copy_some \"{}\" to \"{}\": \"{}\"", from.generic_string(), to.generic_string(), e.what());
 		return false;
 	}
 

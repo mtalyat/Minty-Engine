@@ -268,7 +268,7 @@ void Mintye::EditorApplication::load_project(Minty::Path const& path)
 	cwd_project();
 
 	// load assemblies
-	ScriptEngine::instance().load_assembly(std::format("{}/bin/Debug/{}.dll", ASSEMBLY_DIRECTORY_NAME, project->get_name()));
+	ScriptEngine::instance().load_assembly(get_project_dll_path());
 
 	// load a scene, if any found
 	Path scenePath = project->find_asset(AssetType::Scene);
@@ -311,6 +311,13 @@ void Mintye::EditorApplication::create_new_project(Minty::String const& name, Mi
 
 	// done
 	console->log(std::format("Created new project: {}", fullPath.string()));
+}
+
+Minty::Path Mintye::EditorApplication::get_project_dll_path() const
+{
+	MINTY_ASSERT(_project);
+
+	return Path(std::format("{}/bin/{}/{}.dll", ASSEMBLY_DIRECTORY_NAME, _buildInfo.get_config_name(), _project->get_name()));
 }
 
 void Mintye::EditorApplication::open_scene()
@@ -1015,7 +1022,18 @@ void Mintye::EditorApplication::copy_files()
 	Operations::copy(_cwd / "mono-2.0-sgen.dll", targetDir);
 	Operations::copy(_cwd / "MonoPosixHelper.dll", targetDir);
 	Operations::copy(_cwd / "mscorlib.dll", targetDir);
-	Operations::copy_all(_cwd / "mono", Path(targetDir) / "mono");
+
+	// get all dependencies
+	std::unordered_set<String> dependencies;
+	{
+		ScriptAssembly const* assembly = ScriptEngine::instance().get_assembly(_project->get_name());
+		ScriptAssembly const* engineAssembly = ScriptEngine::instance().get_assembly(ASSEMBLY_ENGINE_NAME);
+		dependencies = assembly->get_dependencies();
+		std::unordered_set<String> engineDependencies = engineAssembly->get_dependencies();
+		dependencies.insert(engineDependencies.begin(), engineDependencies.end());
+	}
+	
+	Operations::copy_some(_cwd / "mono", Path(targetDir) / "mono", dependencies);
 
 	// MintyEngine DLL
 	log_info("\tEngine DLL");
