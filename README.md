@@ -5,6 +5,8 @@ A dynamic and advanced game engine.
 
 NOTE: This project is in development. More info on how to use, etc. will come in due time.
 
+For how to install the engine (for engine development, or for game development), check out the [installation guide](https://github.com/mtalyat/Minty-Engine/wiki/Installation).
+
 # Editor
 
 The Minty Engine provides a powerful game editor, which allows for easy and efficient game development.
