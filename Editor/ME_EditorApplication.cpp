@@ -289,6 +289,8 @@ void Mintye::EditorApplication::unload_project()
 
 	if (_project)
 	{
+		ScriptEngine::instance().unload_assembly(_project->get_name());
+
 		delete _project;
 		set_project(nullptr);
 

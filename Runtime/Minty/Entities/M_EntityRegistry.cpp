@@ -1222,7 +1222,7 @@ void Minty::EntityRegistry::register_script(String const& name)
 			MINTY_ASSERT_FORMAT(script != nullptr, "No script with name {} found.", name);
 
 			// add a script object to it
-			ID id = component->scripts.emplace(name, engine.create_object_component(UUID(), registry.get_id(entity), *script));
+			ID id = component->scripts.emplace(name, engine.create_object_component(UUID::create(), registry.get_id(entity), *script));
 			ScriptObject& scriptObject = component->scripts.at(id);
 
 			if (Application::instance().get_mode() == ApplicationMode::Normal)
