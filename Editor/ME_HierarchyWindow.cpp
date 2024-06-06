@@ -100,7 +100,7 @@ void Mintye::HierarchyWindow::draw()
 		if (ImGui::IsItemClicked(ImGuiMouseButton_Right) && ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenBlockedByActiveItem))
 		{
 			set_clicked(entity);
-			MINTY_LOG_FORMAT("Clicked entity: \"{}\"", entityRegistry.get_name_safe(entity));
+			//MINTY_LOG_FORMAT("Clicked entity: \"{}\"", entityRegistry.get_name_safe(entity));
 
 			ImGui::OpenPopup("ButtonContext");
 		}
