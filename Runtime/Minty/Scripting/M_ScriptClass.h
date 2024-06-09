@@ -51,7 +51,7 @@ namespace Minty
 
 		bool try_invoke(String const& name, ScriptArguments& arguments) const;
 
-		ScriptObject create_object(UUID const id = UUID()) const;
+		ScriptObject create_object(UUID const id = UUID::create()) const;
 
 		bool has_method(String const& name) const;
 

@@ -34,6 +34,8 @@ void Mintye::HierarchyWindow::draw()
 		if (ImGui::IsMouseClicked(ImGuiMouseButton_Right))
 		{
 			set_clicked(NULL_ENTITY);
+
+			ImGui::OpenPopup("ButtonContext");
 		}
 
 		if (ImGui::IsMouseClicked(ImGuiMouseButton_Left))

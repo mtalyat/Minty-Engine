@@ -84,7 +84,7 @@ void Minty::Scene::load()
 	_systems->load();
 
 	AssetEngine& assets = AssetEngine::instance();
-	
+
 	// read scene data from disk
 	Node node = assets.read_file_node(get_path());
 	SerializationData data =
@@ -132,27 +132,71 @@ void Minty::Scene::sort()
 {
 	EntityRegistry const* er = _entities;
 
-	// sort relationships
-	_entities->sort<RelationshipComponent>([er](Entity const left, Entity const right)
+	// compute ancestors
+	std::unordered_map<Entity, std::pair<std::unordered_set<Entity>, std::vector<Entity>>> ancestors;
+	for (auto const& [entity, relationship] : _entities->view<RelationshipComponent const>().each())
+	{
+		ancestors.emplace(entity, std::pair{ std::unordered_set<Entity>(), std::vector<Entity>{ entity } });
+
+		// skip if no parent
+		if (relationship.parent == NULL_ENTITY) continue;
+
+		// add parent
+		std::unordered_set<Entity>& set = ancestors.at(entity).first;
+		std::vector<Entity>& list = ancestors.at(entity).second;
+
+		// all all ancestors to set
+		Entity ancestor = relationship.parent;
+		while (ancestor != NULL_ENTITY)
 		{
-			RelationshipComponent const& leftR = er->get<RelationshipComponent>(left);
-			RelationshipComponent const& rightR = er->get<RelationshipComponent>(right);
+			set.emplace(ancestor);
+			list.push_back(ancestor);
 
-			if (rightR.parent == left) return true;
+			// get next parent up
+			ancestor = _entities->get_parent(ancestor);
+		}
+	}
 
-			if (leftR.next == right) return true;
-
-			if (leftR.parent == rightR.parent && leftR.index < rightR.index) return true;
-
-			// check for grandparents
-			Entity parent = er->get_parent(rightR.parent);
-			while (parent != NULL_ENTITY)
+	// sort relationships
+	_entities->sort<RelationshipComponent>([er, &ancestors](Entity const left, Entity const right)
+		{
+			if (ancestors.at(right).first.contains(left))
 			{
-				if (left == parent) return true;
-
-				parent = er->get_parent(parent);
+				// right is an ancestor of left
+				return true;
+			}
+			else if (ancestors.at(left).first.contains(right))
+			{
+				// left is an ancestor of right
+				return false;
 			}
 
+			// check ancestors if they are related
+			for (Entity eLeft : ancestors.at(left).second)
+			{
+				RelationshipComponent const& eLeftRelationship = er->get<RelationshipComponent>(eLeft);
+				for (Entity eRight : ancestors.at(right).second)
+				{
+					RelationshipComponent const& eRightRelationship = er->get<RelationshipComponent>(eRight);
+
+					if (eLeftRelationship.parent == eRightRelationship.parent)
+					{
+						// if null, go by ID value, if not null, go by sibling index
+						// if null, all sibling indices are zero, so sorting breaks
+						if (eLeftRelationship.parent == NULL_ENTITY)
+						{
+							return eLeft < eRight;
+						}
+						else
+						{
+							return eLeftRelationship.index < eRightRelationship.index;
+						}
+					}
+				}
+			}
+
+			// default ordering: should not be here
+			MINTY_WARN_FORMAT("Scene sort: Used default sort for {} and {}.", er->get_name(left), er->get_name(right));
 			return left < right;
 		});
 }
@@ -179,7 +223,7 @@ void Minty::Scene::unload()
 void Minty::Scene::finalize()
 {
 	// update all the dirty tags
-	
+
 	// sort the hierarchy
 	sort();
 
@@ -206,7 +250,7 @@ void Minty::Scene::finalize()
 		// no parent
 		transform.globalMatrix = transform.get_local_matrix();
 	}
-	
+
 	// update dirty transform group with no relationships
 	for (auto [entity, dirty, transform] : _entities->view<DirtyComponent const, TransformComponent>(entt::exclude<RelationshipComponent>).each())
 	{
@@ -231,7 +275,7 @@ void Minty::Scene::finalize()
 			UITransformComponent& parentTransform = _entities->get<UITransformComponent>(relationship.parent);
 			transform.update_global_rect(parentTransform.globalRect);
 		}
-		else if(CanvasComponent* canvas = _entities->try_get<CanvasComponent>(entity))
+		else if (CanvasComponent* canvas = _entities->try_get<CanvasComponent>(entity))
 		{
 			// canvas
 			transform.update_global_rect(canvas->toRect());
@@ -306,7 +350,7 @@ void Minty::Scene::unregister_asset(Path const& path)
 			_loadedAssets.erase(data.id);
 		}
 	}
-	
+
 	_unloadedAssets.erase(_unloadedAssets.begin() + data.index);
 	_registeredAssets.erase(path);
 

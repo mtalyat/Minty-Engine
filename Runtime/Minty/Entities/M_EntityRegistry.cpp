@@ -68,7 +68,7 @@ Minty::EntityRegistry::~EntityRegistry()
 
 Entity Minty::EntityRegistry::create()
 {
-	return create(UUID());
+	return create(UUID::create());
 }
 
 Entity Minty::EntityRegistry::create(UUID const uuid)
@@ -82,7 +82,7 @@ Entity Minty::EntityRegistry::create(UUID const uuid)
 
 Entity Minty::EntityRegistry::create(String const& name)
 {
-	return create(name, UUID());
+	return create(name, UUID::create());
 }
 
 Entity Minty::EntityRegistry::create(String const& name, UUID const uuid)
@@ -1098,7 +1098,7 @@ Entity Minty::EntityRegistry::clone(Entity const entity)
 	Node data = serialize_entity(entity);
 
 	// change its id
-	data.set_data(to_string(UUID()));
+	data.set_data(to_string(UUID::create()));
 
 	// deserialize
 	Entity clone = deserialize_entity(data);
@@ -1348,7 +1348,7 @@ void Minty::EntityRegistry::serialize(Writer& writer) const
 		entityId = get_id(entity);
 
 		// if id is empty, generate one
-		if (!entityId) entityId = UUID();
+		if (!entityId) entityId = UUID::create();
 
 		// if no name, just print ID
 		if (entityName.empty())
@@ -1387,7 +1387,7 @@ void Minty::EntityRegistry::serialize(Writer& writer) const
 		entityId = get_id(entity);
 
 		// if id is empty, generate one
-		if (!entityId) entityId = UUID();
+		if (!entityId) entityId = UUID::create();
 
 		// if no name, just print ID
 		if (entityName.empty())
@@ -1456,7 +1456,7 @@ Entity Minty::EntityRegistry::deserialize_entity(Node const& entityNode)
 		value = "";
 
 		// generate a new ID
-		id = UUID();
+		id = UUID::create();
 	}
 
 	// create entity in registry
