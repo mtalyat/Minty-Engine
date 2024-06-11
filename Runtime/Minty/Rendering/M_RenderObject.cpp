@@ -16,7 +16,7 @@ RenderSystem* Minty::RenderObject::get_render_system() const
 {
 	Ref<Scene> scene = Application::instance().get_default_layer().get_scene_manager().get_loaded_scene();
 
-	if (scene)
+	if (scene.get())
 	{
 		return scene->get_system_registry().find<RenderSystem>();
 	}

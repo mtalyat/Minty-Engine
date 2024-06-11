@@ -85,7 +85,7 @@ void Minty::SceneManager::load_scene(UUID const id)
 	}
 
 	// if scene already loaded, unload it
-	if (_loaded && _loadedScene)
+	if (is_scene_loaded())
 	{
 		_loadedScene->unload();
 	}
@@ -95,7 +95,7 @@ void Minty::SceneManager::load_scene(UUID const id)
 	set_working_scene(scene);
 
 	// load event
-	if (_loaded && _loadedScene)
+	if (is_scene_loaded())
 	{
 		_loadedScene->load();
 	}
@@ -103,7 +103,7 @@ void Minty::SceneManager::load_scene(UUID const id)
 
 void Minty::SceneManager::unload_scene()
 {
-	if (_loadedScene)
+	if (_loadedScene.get())
 	{
 		_loadedScene->unload();
 		set_loaded_scene(nullptr);
@@ -150,7 +150,7 @@ void Minty::SceneManager::load()
 	_loaded = true;
 
 	// load active scene
-	if (_loadedScene)
+	if (_loadedScene.get())
 	{
 		_loadedScene->load();
 	}
@@ -159,7 +159,7 @@ void Minty::SceneManager::load()
 void Minty::SceneManager::update(Time const time)
 {
 	// update all active scenes if loaded
-	if (_loaded && _loadedScene)
+	if (is_scene_loaded())
 	{
 		_loadedScene->update(time);
 	}
@@ -168,7 +168,7 @@ void Minty::SceneManager::update(Time const time)
 void Minty::SceneManager::fixed_update(Time const time)
 {
 	// fixed update all active scenes if loaded
-	if (_loaded && _loadedScene)
+	if (is_scene_loaded())
 	{
 		_loadedScene->fixed_update(time);
 	}
@@ -185,7 +185,7 @@ void Minty::SceneManager::unload()
 	// mark as unloaded
 	_loaded = false;
 
-	if (_loadedScene)
+	if (_loadedScene.get())
 	{
 		_loadedScene->unload();
 	}
@@ -194,7 +194,7 @@ void Minty::SceneManager::unload()
 void Minty::SceneManager::finalize()
 {
 	// finalize all active scenes if loaded
-	if (_loaded && _loadedScene)
+	if (is_scene_loaded())
 	{
 		_loadedScene->finalize();
 	}

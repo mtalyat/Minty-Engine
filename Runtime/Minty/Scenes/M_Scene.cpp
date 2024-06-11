@@ -319,8 +319,9 @@ void Minty::Scene::register_asset(Path const& path)
 	if (_loaded)
 	{
 		AssetEngine& assets = AssetEngine::instance();
+		Ref<Asset> asset = assets.load_asset(path);
 
-		if (Ref<Asset> asset = assets.load_asset(path))
+		if (asset.get())
 		{
 			_loadedAssets.emplace(asset->get_id());
 			data.id = asset->get_id();
@@ -370,7 +371,8 @@ void Minty::Scene::load_registered_assets()
 
 	for (auto const& path : _unloadedAssets)
 	{
-		if (Ref<Asset> asset = assets.load_asset(path))
+		Ref<Asset> asset = assets.load_asset(path);
+		if (asset.get())
 		{
 			AssetData& data = _registeredAssets.at(path);
 

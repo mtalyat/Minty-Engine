@@ -30,6 +30,12 @@ namespace Minty
 		bool is_loaded() const { return _loaded; }
 
 		/// <summary>
+		/// Checks if this SceneManager is loaded, and if there is a scene loaded.
+		/// </summary>
+		/// <returns></returns>
+		bool is_scene_loaded() const { return _loaded && _loadedScene.get(); }
+
+		/// <summary>
 		/// Creates and loads an empty Scene.
 		/// </summary>
 		/// <param name="path">The path to the .scene file.</param>

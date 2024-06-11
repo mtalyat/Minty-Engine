@@ -16,7 +16,7 @@ void Minty::SpriteComponent::serialize(Writer& writer) const
 	SerializationData const* data = static_cast<SerializationData const*>(writer.get_data());
 	RenderSystem const* renderSystem = data->scene->get_system_registry().find<RenderSystem>();
 
-	writer.write("sprite", sprite ? sprite->get_id() : UUID(INVALID_UUID));
+	writer.write("sprite", sprite.get() ? sprite->get_id() : UUID(INVALID_UUID));
 	writer.write("size", size);
 	writer.write("layer", layer);
 	writer.write("order", order);

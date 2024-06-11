@@ -21,12 +21,12 @@ void Minty::MeshComponent::serialize(Writer& writer) const
 	switch (type)
 	{
 		case MeshType::Custom:
-			writer.write("mesh", mesh ? mesh->get_id() : UUID(INVALID_UUID));
+			writer.write("mesh", mesh.get() ? mesh->get_id() : UUID(INVALID_UUID));
 			break;
 		default:
 			break;
 	}
-	writer.write("material", material ? material->get_id() : UUID(INVALID_UUID));
+	writer.write("material", material.get() ? material->get_id() : UUID(INVALID_UUID));
 }
 
 void Minty::MeshComponent::deserialize(Reader const& reader)

@@ -207,7 +207,7 @@ void Mintye::AssetsWindow::draw()
 	{
 		String name = fileData.path.string();
 
-		if (scene && fileData.canIncludeInScene)
+		if (scene.get() && fileData.canIncludeInScene)
 		{
 			if (fileData.includedInScene)
 			{
@@ -235,7 +235,7 @@ void Mintye::AssetsWindow::draw()
 		}
 
 		// if right clicked, toggle inclusion in the scene
-		if (scene && fileData.canIncludeInScene && ImGui::IsItemClicked(ImGuiMouseButton_Right))
+		if (scene.get() && fileData.canIncludeInScene && ImGui::IsItemClicked(ImGuiMouseButton_Right))
 		{
 			// inverse selection
 
@@ -254,40 +254,47 @@ void Mintye::AssetsWindow::draw()
 
 				// get the asset
 				Ref<Asset> asset = assets.get_asset(id);
-				MINTY_ASSERT(asset != nullptr);
 
-				// get dependents
-				std::vector<Ref<Asset>> dependentAssets = assets.get_dependents(asset);
-				std::vector<Entity> dependentEntities = registry.get_dependents(asset);
-
-				// register only if none
-				if (dependentAssets.empty() && dependentEntities.empty())
+				// ignore if not loaded
+				if (asset == nullptr)
 				{
-					// no dependents
+					// no dependencies, and not loaded, so just unregister it
 					scene->unregister_asset(projectPath);
-				}
-				else
+				} else
 				{
-					// something else depends on this
-					std::vector<String> assetStrings;
-					assetStrings.reserve(dependentAssets.size());
-					for (Ref<Asset> asset : dependentAssets)
-					{
-						assetStrings.push_back(asset->get_name());
-					}
-					std::vector<String> entityStrings;
-					entityStrings.reserve(dependentEntities.size());
-					for (Entity const entity : dependentEntities)
-					{
-						entityStrings.push_back(registry.get_name(entity));
-					}
+					// get dependents
+					std::vector<Ref<Asset>> dependentAssets = assets.get_dependents(asset);
+					std::vector<Entity> dependentEntities = registry.get_dependents(asset);
 
-					get_application().log_error(
-						std::format("Cannot unregister \"{}\". There are dependents: Assets: {}, Entities: {}",
-							projectPath.filename().string(),
-							assetStrings.empty() ? "(none)" : Text::join(assetStrings),
-							entityStrings.empty() ? "(none)" : Text::join(entityStrings)
-						));
+					// register only if none
+					if (dependentAssets.empty() && dependentEntities.empty())
+					{
+						// no dependents
+						scene->unregister_asset(projectPath);
+					}
+					else
+					{
+						// something else depends on this
+						std::vector<String> assetStrings;
+						assetStrings.reserve(dependentAssets.size());
+						for (Ref<Asset> asset : dependentAssets)
+						{
+							assetStrings.push_back(asset->get_name());
+						}
+						std::vector<String> entityStrings;
+						entityStrings.reserve(dependentEntities.size());
+						for (Entity const entity : dependentEntities)
+						{
+							entityStrings.push_back(registry.get_name(entity));
+						}
+
+						get_application().log_error(
+							std::format("Cannot unregister \"{}\". There are dependents: Assets: {}, Entities: {}",
+								projectPath.filename().string(),
+								assetStrings.empty() ? "(none)" : Text::join(assetStrings),
+								entityStrings.empty() ? "(none)" : Text::join(entityStrings)
+							));
+					}
 				}
 			}
 			else
@@ -373,7 +380,7 @@ void Mintye::AssetsWindow::set_path(Minty::Path const& path)
 					{
 						.path = entry.path,
 						.canIncludeInScene = !cannotIncludeToScene.contains(Asset::get_type(entry.path)),
-						.includedInScene = scene && scene->is_registered(Path(wrap.get_base_path()) / entry.path),
+						.includedInScene = scene.get() && scene->is_registered(Path(wrap.get_base_path()) / entry.path),
 					});
 			}
 		}
@@ -401,7 +408,7 @@ void Mintye::AssetsWindow::set_path(Minty::Path const& path)
 				_files.push_back(FileData{
 					.path = entry.path().filename(),
 					.canIncludeInScene = !cannotIncludeToScene.contains(Asset::get_type(entry.path())),
-					.includedInScene = scene && scene->is_registered(get_path(entry.path()).lexically_relative(project->get_base_path())),
+					.includedInScene = scene.get() && scene->is_registered(get_path(entry.path()).lexically_relative(project->get_base_path())),
 					});
 			}
 		}

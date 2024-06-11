@@ -273,7 +273,7 @@ void Minty::RenderEngine::set_loaded_scene(Ref<Scene> const scene)
 
 	_scene = scene;
 
-	if (scene)
+	if (scene.get())
 	{
 		_renderSystem = scene->get_system_registry().find<RenderSystem>();
 		_registry = &scene->get_entity_registry();
@@ -1108,7 +1108,7 @@ void Minty::RenderEngine::draw_scene(VkCommandBuffer commandBuffer)
 			canvasEntity = ui.canvas;
 
 			// TODO: make safer
-			if (sprite.sprite)
+			if (sprite.sprite.get())
 			{
 				Ref<Shader> shader = sprite.sprite->get_material()->get_template()->get_shader_passes().front()->get_shader();
 

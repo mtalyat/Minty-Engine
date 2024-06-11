@@ -2,32 +2,6 @@
 
 namespace Minty
 {
-	/*template<typename T>
-	using Scope = std::unique_ptr<T>;
-
-	template<typename T, typename... Args>
-	constexpr Scope<T> create_scope(Args&& ... args)
-	{
-		return std::make_unique<T>(std::forward<Args>(args)...);
-	}
-
-	template<typename T>
-	using Ref = std::shared_ptr<T>;
-
-	template<typename T, typename... Args>
-	constexpr Ref<T> create_ref(Args&&... args)
-	{
-		return std::make_shared<T>(std::forward<Args>(args)...);
-	}
-
-	template<typename T>
-	constexpr T* ref_to_pointer(Ref<T> const ref)
-	{
-		return ref.get();
-	}*/
-
-	// https://stackoverflow.com/questions/5671241/how-does-weak-ptr-work
-
 	/// <summary>
 	/// Holds smart pointer count data for weak and strong references.
 	/// </summary>
@@ -147,17 +121,27 @@ namespace Minty
 			_counter = nullptr;
 		}
 
-		bool operator==(Owner<T> const& other) const { return _ptr == other._ptr; }
-		bool operator==(T* const other) const { return _ptr == other; }
-		bool operator==(Ref<T> const& other) const { return _ptr == other._ptr; }
-		bool operator!=(Owner<T> const& other) const { return _ptr != other._ptr; }
-		bool operator!=(T* const other) const { return _ptr != other; }
-		bool operator!=(Ref<T> const& other) const { return _ptr != other._ptr; }
-		bool operator<(Owner<T> const& other) const { return _ptr < other._ptr; }
-		bool operator<(T* const other) const { return _ptr < other; }
-		bool operator<(Ref<T> const& other) const { return _ptr < other._ptr; }
+		template<typename U>
+		bool operator==(Owner<U> const& other) const { return _ptr == other.get(); }
+		template<typename U>
+		bool operator==(U* const other) const { return _ptr == other; }
+		template<typename U>
+		bool operator==(Ref<U> const& other) const { return _ptr == other.get(); }
+		bool operator==(std::nullptr_t const other) const { return _ptr == other; }
+		template<typename U>
+		bool operator!=(Owner<U> const& other) const { return !(*this == other); }
+		template<typename U>
+		bool operator!=(U* const other) const { return !(*this == other); }
+		template<typename U>
+		bool operator!=(Ref<U> const& other) const { return !(*this == other); }
+		bool operator!=(std::nullptr_t const other) const { return !(*this == other); }
+		template<typename U>
+		bool operator<(Owner<U> const& other) const { return _ptr < other.get(); }
+		template<typename U>
+		bool operator<(U* const other) const { return _ptr < other; }
+		template<typename U>
+		bool operator<(Ref<U> const& other) const { return _ptr < other.get(); }
 		bool operator!() const { return !static_cast<bool>(_counter->strongCount); }
-		operator bool() const { return static_cast<bool>(_counter->strongCount); }
 
 		T* get() const { return _ptr; }
 		T& operator*() const { return *get(); }
@@ -266,17 +250,27 @@ namespace Minty
 			_counter = nullptr;
 		}
 
-		bool operator==(Owner<T> const& other) const { return _ptr == other._ptr; }
-		bool operator==(T* const other) const { return _ptr == other; }
-		bool operator==(Ref<T> const& other) const { return _ptr == other._ptr; }
-		bool operator!=(Owner<T> const& other) const { return _ptr != other._ptr; }
-		bool operator!=(T* const other) const { return _ptr != other; }
-		bool operator!=(Ref<T> const& other) const { return _ptr != other._ptr; }
-		bool operator<(Owner<T> const& other) const { return _ptr < other._ptr; }
-		bool operator<(T* const other) const { return _ptr < other; }
-		bool operator<(Ref<T> const& other) const { return _ptr < other._ptr; }
+		template<typename U>
+		bool operator==(Owner<U> const& other) const { return _ptr == other.get(); }
+		template<typename U>
+		bool operator==(U* const other) const { return _ptr == other; }
+		template<typename U>
+		bool operator==(Ref<U> const& other) const { return _ptr == other.get(); }
+		bool operator==(std::nullptr_t const other) const { return _ptr == other; }
+		template<typename U>
+		bool operator!=(Owner<U> const& other) const { return !(*this == other); }
+		template<typename U>
+		bool operator!=(U* const other) const { return !(*this == other); }
+		template<typename U>
+		bool operator!=(Ref<U> const& other) const { return !(*this == other); }
+		bool operator!=(std::nullptr_t const other) const { return !(*this == other); }
+		template<typename U>
+		bool operator<(Owner<U> const& other) const { return _ptr < other.get(); }
+		template<typename U>
+		bool operator<(U* const other) const { return _ptr < other; }
+		template<typename U>
+		bool operator<(Ref<U> const& other) const { return _ptr < other.get(); }
 		bool operator!() const { return !_counter || !_counter->strongCount; }
-		operator bool() const { return _counter && static_cast<bool>(_counter->strongCount); }
 
 		T* get() const
 		{

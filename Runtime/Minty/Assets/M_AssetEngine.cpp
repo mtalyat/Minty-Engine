@@ -833,7 +833,7 @@ void Minty::AssetEngine::unload_all()
 	Ref<Asset> asset;
 	for (auto const id : ids)
 	{
-		if (asset = get_asset(id))
+		if (asset == get_asset(id))
 		{
 			erase(id);
 		}

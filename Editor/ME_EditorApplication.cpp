@@ -473,8 +473,9 @@ Minty::String Mintye::EditorApplication::get_name(Minty::UUID const id) const
 	{
 		// check assets
 		AssetEngine& assets = AssetEngine::instance();
+		Ref<Asset> asset = assets.get_asset(id);
 
-		if (Ref<Asset> asset = assets.get_asset(id))
+		if (asset.get())
 		{
 			return asset->get_name();
 		}

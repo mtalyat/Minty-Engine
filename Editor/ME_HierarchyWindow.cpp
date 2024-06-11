@@ -158,7 +158,7 @@ void Mintye::HierarchyWindow::reset()
 
 void Mintye::HierarchyWindow::refresh()
 {
-	if(get_scene()) get_scene()->finalize();
+	if(get_scene().get()) get_scene()->finalize();
 }
 
 void Mintye::HierarchyWindow::set_project(Project* const project)

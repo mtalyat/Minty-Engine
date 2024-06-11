@@ -36,7 +36,7 @@ void Minty::AnimationSystem::update(Time const time)
 			// reset animation state data
 			
 			// get the animation so it can be used
-			if (animatorComponent.animation)
+			if (animatorComponent.animation.get())
 			{
 				animatorComponent.animation->reset(entity, get_scene());
 			}
