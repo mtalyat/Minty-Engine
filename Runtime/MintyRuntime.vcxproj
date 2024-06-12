@@ -295,6 +295,7 @@
     <ClInclude Include="Minty\Rendering\M_CoordinateMode.h" />
     <ClInclude Include="Minty\Rendering\M_DescriptorSet.h" />
     <ClInclude Include="Minty\Rendering\M_DrawCallObjectInfo.h" />
+    <ClInclude Include="Minty\Rendering\M_Font.h" />
     <ClInclude Include="Minty\Rendering\M_Material.h" />
     <ClInclude Include="Minty\Rendering\M_MaterialTemplate.h" />
     <ClInclude Include="Minty\Rendering\M_Mesh.h" />
@@ -436,6 +437,7 @@
     <ClCompile Include="Minty\Rendering\M_CameraComponent.cpp" />
     <ClCompile Include="Minty\Rendering\M_CoordinateMode.cpp" />
     <ClCompile Include="Minty\Rendering\M_DescriptorSet.cpp" />
+    <ClCompile Include="Minty\Rendering\M_Font.cpp" />
     <ClCompile Include="Minty\Rendering\M_Material.cpp" />
     <ClCompile Include="Minty\Rendering\M_MaterialTemplate.cpp" />
     <ClCompile Include="Minty\Rendering\M_Mesh.cpp" />
