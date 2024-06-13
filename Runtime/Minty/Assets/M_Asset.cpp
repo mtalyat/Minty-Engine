@@ -64,6 +64,9 @@ AssetType Minty::Asset::get_type(Path const& assetPath)
 		{ ".animator", AssetType::Animator },
 
 		{ EXTENSION_WRAP, AssetType::Wrap },
+
+		{ ".fnt", AssetType::FontVariant },
+		{ ".font", AssetType::Font }
 	};
 
 	auto found = types.find(assetPath.extension());
