@@ -4,21 +4,24 @@
 using namespace Minty;
 
 Minty::FontVariant::FontVariant(FontVariantBuilder const& builder)
-	: _size(builder.size)
+	: Asset(builder.id, builder.path)
+	, _size(builder.size)
 	, _bold(builder.bold)
 	, _italic(builder.italic)
 	, _textures(builder.textures)
 	, _characters(builder.characters)
 	, _kernings(builder.kernings)
-{
-	
-}
+{ }
 
 Minty::Font::Font(FontBuilder const& builder)
-	: _name(builder.name)
+	: Asset(builder.id, builder.path)
+	, _name(builder.name)
 	, _variants()
 {
-	// add each variant with an appropriate ID
+	for (auto const variant : builder.variants)
+	{
+		emplace(variant);
+	}
 }
 
 void Minty::Font::emplace(Ref<FontVariant> const variant)

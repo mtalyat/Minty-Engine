@@ -785,6 +785,7 @@ Ref<FontVariant> Minty::AssetEngine::load_font_variant(Path const& path)
 		{
 			// textures to load
 			Path directoryPath = path.parent_path();
+			std::vector<void*> dependencyTextures;
 
 			for (String const& part : parts)
 			{
@@ -797,11 +798,15 @@ Ref<FontVariant> Minty::AssetEngine::load_font_variant(Path const& path)
 				else if (part.starts_with("file="))
 				{
 					// ignore " "
-					String name = part.substr(6, part.length() - 8);
-					Ref<Texture> texture = load_texture(directoryPath / name);
+					String name = part.substr(6, part.length() - 7);
+					UUID textureId = read_id(directoryPath / name);
+					Ref<Texture> texture = get<Texture>(textureId);
 					builder.textures.push_back(texture);
+					dependencyTextures.push_back(texture.get());
 				}
 			}
+
+			CHECK_DEPENDENCIES(path.stem().string(), dependencyTextures);
 		}
 	}
 
@@ -825,6 +830,7 @@ Ref<Font> Minty::AssetEngine::load_font(Path const& path)
 	};
 
 	// read variants list, they should already be loaded
+	std::vector<void*> variantDependencies;
 	std::vector<UUID> variants;
 	if (reader.try_read_vector<UUID>("variants", variants))
 	{
@@ -833,8 +839,11 @@ Ref<Font> Minty::AssetEngine::load_font(Path const& path)
 			Ref<FontVariant> variant = get<FontVariant>(id);
 			MINTY_ASSERT(variant != nullptr);
 			builder.variants.push_back(variant);
+			variantDependencies.push_back(variant.get());
 		}
 	}
+
+	CHECK_DEPENDENCIES(path.stem().string(), variantDependencies);
 
 	return create<Font>(builder);
 }
