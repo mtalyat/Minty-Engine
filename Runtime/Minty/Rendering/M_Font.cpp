@@ -42,3 +42,15 @@ Ref<FontVariant> Minty::Font::get(font_size_t const size, bool const bold, bool 
 
 	return _variants.at(id);
 }
+
+std::vector<Ref<FontVariant>> Minty::Font::get_variants() const
+{
+	std::vector<Ref<FontVariant>> results;
+
+	for (auto const& [_, variant] : _variants)
+	{
+		results.push_back(variant);
+	}
+
+	return results;
+}

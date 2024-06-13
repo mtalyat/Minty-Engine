@@ -79,6 +79,7 @@ namespace Minty
 		font_size_t get_size() const { return _size; }
 		bool is_bold() const { return _bold; }
 		bool is_italic() const { return _italic; }
+		std::vector<Ref<Texture>> const& get_textures() const { return _textures; }
 	};
 
 	/// <summary>
@@ -116,6 +117,8 @@ namespace Minty
 		Ref<FontVariant> at(font_size_t const size, bool const bold, bool const italic) const;
 
 		Ref<FontVariant> get(font_size_t const size, bool const bold, bool const italic) const;
+
+		std::vector<Ref<FontVariant>> get_variants() const;
 
 	private:
 		font_variant_id_t create_font_id(font_size_t const size, bool const bold, bool const italic) const { return size | (static_cast<int>(bold) << sizeof(font_size_t)) | (static_cast<int>(bold) << (sizeof(font_size_t) + 1)); }

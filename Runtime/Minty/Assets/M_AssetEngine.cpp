@@ -174,6 +174,10 @@ Ref<Asset> Minty::AssetEngine::load_asset(Path const& path)
 		return load_shader_pass(path);
 	case AssetType::Shader:
 		return load_shader(path);
+	case AssetType::FontVariant:
+		return load_font_variant(path);
+	case AssetType::Font:
+		return load_font(path);
 	case AssetType::Mesh:
 		return load_mesh(path);
 	case AssetType::AudioClip:
@@ -1077,7 +1081,30 @@ std::vector<Ref<Asset>> Minty::AssetEngine::get_dependents(Ref<Asset> const asse
 				result.push_back(sprite);
 			}
 		}
+		// FontVariants use Textures
+		for (auto const font : get_by_type<FontVariant>())
+		{
+			for (Ref<Texture> const texture : font->get_textures())
+			{
+				if (texture == asset)
+				{
+					result.push_back(texture);
+				}
+			}
+		}
 		break;
+	case AssetType::FontVariant:
+		// Fonts use FontVariants
+		for (auto const font : get_by_type<Font>())
+		{
+			for (Ref<FontVariant> const variant : font->get_variants())
+			{
+				if (variant == asset)
+				{
+					result.push_back(variant);
+				}
+			}
+		}
 	}
 
 	return result;
