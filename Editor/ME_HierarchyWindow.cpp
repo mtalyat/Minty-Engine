@@ -213,7 +213,7 @@ Minty::Entity Mintye::HierarchyWindow::paste_entity()
 	if (Parse::try_uuid(node.get_data(), id) && registry.find_by_id(id) != NULL_ENTITY)
 	{
 		// already contains ID, so generate a new one
-		id = UUID();
+		id = UUID::create();
 		node.set_data(to_string(id));
 	}
 	return registry.deserialize_entity(node);
