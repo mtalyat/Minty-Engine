@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Minty/Core/M_Base.h"
+#include "Minty/Assets/M_Asset.h"
 #include "Minty/Rendering/M_Texture.h"
 #include <vector>
 #include <unordered_map>
@@ -30,6 +30,10 @@ namespace Minty
 	/// </summary>
 	struct FontVariantBuilder
 	{
+		UUID id = UUID::create();
+
+		Path path;
+
 		// INFO
 		font_size_t size = 0;
 		bool bold = false;
@@ -53,6 +57,7 @@ namespace Minty
 	/// Holds the data for one variant of a font (size, bold, italic, etc.)
 	/// </summary>
 	class FontVariant
+		: public Asset
 	{
 	private:
 		font_size_t _size = 0;
@@ -81,6 +86,10 @@ namespace Minty
 	/// </summary>
 	struct FontBuilder
 	{
+		UUID id = UUID::create();
+
+		Path path;
+
 		// INFO
 		String name = "";
 
@@ -91,6 +100,7 @@ namespace Minty
 	/// Represents a basic font that can be used to render text.
 	/// </summary>
 	class Font
+		: public Asset
 	{
 	private:
 		typedef unsigned long font_variant_id_t;

@@ -671,9 +671,15 @@ Ref<FontVariant> Minty::AssetEngine::load_font_variant(Path const& path)
 {
 	CHECK(path);
 
+	Node meta = read_file_meta(path);
+
 	std::vector<String> lines = read_file_lines(path);
 
-	FontVariantBuilder builder{};
+	FontVariantBuilder builder
+	{
+		.id = meta.to_uuid(),
+		.path = path
+	};
 
 	for (String const& line : lines)
 	{
@@ -804,10 +810,13 @@ Ref<Font> Minty::AssetEngine::load_font(Path const& path)
 	CHECK(path);
 
 	Node node = read_file_node(path);
+	Node meta = read_file_meta(path);
 	Reader reader(node);
 
 	FontBuilder builder
 	{
+		.id = meta.to_uuid(),
+		.path = path,
 		.name = reader.read_string("name")
 	};
 
