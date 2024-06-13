@@ -21,6 +21,8 @@ namespace Minty
 	class Material;
 	class Mesh;
 	class GenericAsset;
+	class Font;
+	class FontVariant;
 
 	class AudioClip;
 
@@ -144,6 +146,10 @@ namespace Minty
 		Ref<Mesh> load_mesh(Path const& path);
 
 		void load_mesh_obj(Path const& path, Mesh& mesh);
+
+		Ref<FontVariant> load_font_variant(Path const& path);
+
+		Ref<Font> load_font(Path const& path);
 
 		Ref<AudioClip> load_audio_clip(Path const& path);
 

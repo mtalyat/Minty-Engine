@@ -34,6 +34,8 @@ namespace Minty
 		MaterialTemplate,
 		Material,
 		Sprite,
+		FontVariant,
+		Font,
 		Mesh,
 		Scene,
 	};

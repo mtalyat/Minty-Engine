@@ -37,6 +37,21 @@ namespace Minty::Parse
 	bool try_byte(String const& string, Byte& value);
 
 	/// <summary>
+	/// Parses the given string into a char.
+	/// </summary>
+	/// <param name="string">The string to parse.</param>
+	/// <returns>The parsed value.</returns>
+	char to_char(String const& string);
+
+	/// <summary>
+	/// Attempts to parse the given string into a char.
+	/// </summary>
+	/// <param name="string">The string to parse.</param>
+	/// <param name="value">The parsed value.</param>
+	/// <returns>True if the parse was successful, otherwise false.</returns>
+	bool try_char(String const& string, char& value);
+
+	/// <summary>
 	/// Parses the given string into a short.
 	/// </summary>
 	/// <param name="string">The string to parse.</param>

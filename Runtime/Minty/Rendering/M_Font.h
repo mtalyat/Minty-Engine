@@ -45,6 +45,8 @@ namespace Minty
 
 		// KERNINGS
 		std::unordered_map<int, int> kernings;
+
+		void emplace_kerning(int const first, int const second, int const amount) { kernings.emplace((first << (sizeof(int) >> 1)) | second, amount); }
 	};
 
 	/// <summary>
@@ -82,7 +84,7 @@ namespace Minty
 		// INFO
 		String name = "";
 
-		std::vector<Owner<FontVariant>> variants;
+		std::vector<Ref<FontVariant>> variants;
 	};
 
 	/// <summary>
@@ -94,12 +96,12 @@ namespace Minty
 		typedef unsigned long font_variant_id_t;
 
 		String _name;
-		std::unordered_map<font_variant_id_t, Owner<FontVariant>> _variants;
+		std::unordered_map<font_variant_id_t, Ref<FontVariant>> _variants;
 
 	public:
 		Font(FontBuilder const& builder);
 
-		void emplace(Owner<FontVariant> const variant);
+		void emplace(Ref<FontVariant> const variant);
 
 		Ref<FontVariant> at(font_size_t const size, bool const bold, bool const italic) const;
 

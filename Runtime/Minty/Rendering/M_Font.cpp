@@ -21,7 +21,7 @@ Minty::Font::Font(FontBuilder const& builder)
 	// add each variant with an appropriate ID
 }
 
-void Minty::Font::emplace(Owner<FontVariant> const variant)
+void Minty::Font::emplace(Ref<FontVariant> const variant)
 {
 	font_variant_id_t id = create_font_id(variant->get_size(), variant->is_bold(), variant->is_italic());
 	_variants.emplace(id, variant);

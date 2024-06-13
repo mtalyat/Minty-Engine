@@ -11,6 +11,7 @@
 #include "Minty/Files/M_PhysicalFile.h"
 #include "Minty/Core/M_Application.h"
 #include "Minty/Scripting/M_ScriptEngine.h"
+#include "Minty/Tools/M_Text.h"
 
 // ASSETS:
 #include "Minty/Rendering/M_Texture.h"
@@ -25,6 +26,7 @@
 #include "Minty/Animation/M_Animation.h"
 #include "Minty/Animation/M_Animator.h"
 #include "Minty/Assets/M_GenericAsset.h"
+#include "Minty/Rendering/M_Font.h"
 
 #ifdef MINTY_RELEASE
 #define CHECK_MISSING_DEPENDENCIES(name, missing)
@@ -663,6 +665,165 @@ void Minty::AssetEngine::load_mesh_obj(Path const& path, Mesh& mesh)
 	// all vertices and indices populated
 	mesh.set_vertices(vertices);
 	mesh.set_indices(indices);
+}
+
+Ref<FontVariant> Minty::AssetEngine::load_font_variant(Path const& path)
+{
+	CHECK(path);
+
+	std::vector<String> lines = read_file_lines(path);
+
+	FontVariantBuilder builder{};
+
+	for (String const& line : lines)
+	{
+		// split by tabs
+		std::vector<String> parts = Text::split_words(line);
+
+		// determine what to do based on first word in line
+		if (line.starts_with("char "))
+		{
+			FontChar fontChar{};
+
+			for (String const& part : parts)
+			{
+				if (part.starts_with("id="))
+				{
+					fontChar.id = Parse::to_char(part.substr(3, part.length() - 3));
+				}
+				else if (part.starts_with("x="))
+				{
+					fontChar.x = Parse::to_int(part.substr(2, part.length() - 2));
+				}
+				else if (part.starts_with("y="))
+				{
+					fontChar.y = Parse::to_int(part.substr(2, part.length() - 2));
+				}
+				else if (part.starts_with("width="))
+				{
+					fontChar.width = Parse::to_int(part.substr(6, part.length() - 6));
+				}
+				else if (part.starts_with("height="))
+				{
+					fontChar.height = Parse::to_int(part.substr(7, part.length() - 7));
+				}
+				else if (part.starts_with("xoffset="))
+				{
+					fontChar.xOffset = Parse::to_int(part.substr(8, part.length() - 8));
+				}
+				else if (part.starts_with("yoffset="))
+				{
+					fontChar.yOffset = Parse::to_int(part.substr(8, part.length() - 8));
+				}
+				else if (part.starts_with("xadvance="))
+				{
+					fontChar.xAdvance = Parse::to_int(part.substr(9, part.length() - 9));
+				}
+				else if (part.starts_with("page="))
+				{
+					fontChar.textureIndex = Parse::to_int(part.substr(5, part.length() - 5));
+				}
+			}
+		}
+		else if (line.starts_with("kerning "))
+		{
+			int first = 0;
+			int second = 0;
+			int amount = 0;
+			for (String const& part : parts)
+			{
+				if (part.starts_with("first="))
+				{
+					first = Parse::to_int(part.substr(6, part.length() - 6));
+				}
+				else if (part.starts_with("second="))
+				{
+					second = Parse::to_int(part.substr(7, part.length() - 7));
+				}
+				else if (part.starts_with("amount="))
+				{
+					amount = Parse::to_int(part.substr(7, part.length() - 7));
+				}
+			}
+
+			// pack kerning into builder
+			builder.emplace_kerning(first, second, amount);
+		}
+		else if (line.starts_with("info "))
+		{
+			for (String const& part : parts)
+			{
+				if (part.starts_with("size="))
+				{
+					builder.size = Parse::to_uint(part.substr(5, part.length() - 5));
+				}
+				else if (part.starts_with("bold="))
+				{
+					builder.bold = static_cast<bool>(Parse::to_int(part.substr(5, part.length() - 5)));
+				}
+				else if (part.starts_with("italic="))
+				{
+					builder.italic = static_cast<bool>(Parse::to_int(part.substr(7, part.length() - 7)));
+				}
+			}
+		}
+		else if (line.starts_with("common "))
+		{
+
+		}
+		else if (line.starts_with("page "))
+		{
+			// textures to load
+			Path directoryPath = path.parent_path();
+
+			for (String const& part : parts)
+			{
+				if (part.starts_with("id="))
+				{
+					// ensure ID in correct order
+					size_t id = Parse::to_size(part.substr(3, part.length() - 3));
+					MINTY_ASSERT_FORMAT(id == builder.textures.size(), "Error loading font: \"{}\" has pages that are out of order.", path.generic_string());
+				}
+				else if (part.starts_with("file="))
+				{
+					// ignore " "
+					String name = part.substr(6, part.length() - 8);
+					Ref<Texture> texture = load_texture(directoryPath / name);
+					builder.textures.push_back(texture);
+				}
+			}
+		}
+	}
+
+	return create<FontVariant>(builder);
+}
+
+Ref<Font> Minty::AssetEngine::load_font(Path const& path)
+{
+	// read font file
+	CHECK(path);
+
+	Node node = read_file_node(path);
+	Reader reader(node);
+
+	FontBuilder builder
+	{
+		.name = reader.read_string("name")
+	};
+
+	// read variants list, they should already be loaded
+	std::vector<UUID> variants;
+	if (reader.try_read_vector<UUID>("variants", variants))
+	{
+		for (UUID const id : variants)
+		{
+			Ref<FontVariant> variant = get<FontVariant>(id);
+			MINTY_ASSERT(variant != nullptr);
+			builder.variants.push_back(variant);
+		}
+	}
+
+	return create<Font>(builder);
 }
 
 Ref <AudioClip> Minty::AssetEngine::load_audio_clip(Path const& path)

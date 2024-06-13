@@ -145,6 +145,12 @@ std::vector<String> Minty::Text::split(String const& string, String const& delim
 	return results;
 }
 
+std::vector<String> Minty::Text::split_words(String const& string)
+{
+	std::istringstream iss(string);
+	return std::vector<std::string>{std::istream_iterator<std::string>{iss}, std::istream_iterator<std::string>{}};
+}
+
 String Minty::Text::join(std::vector<String> const& list, String const& separator)
 {
 	return join(list, 0, list.size(), separator);
