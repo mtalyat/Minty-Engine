@@ -501,6 +501,9 @@
     <ClInclude Include="Minty\Rendering\M_Font.h">
       <Filter>Minty\Rendering</Filter>
     </ClInclude>
+    <ClInclude Include="M_TextComponent.h">
+      <Filter>Minty\Rendering</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -885,6 +888,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Minty\Rendering\M_Font.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="M_TextComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

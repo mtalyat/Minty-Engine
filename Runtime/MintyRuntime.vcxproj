@@ -363,6 +363,7 @@
     <ClInclude Include="Minty\UI\M_UISystem.h" />
     <ClInclude Include="Minty\UI\M_UITransformComponent.h" />
     <ClInclude Include="M_AllSystems.h" />
+    <ClInclude Include="M_TextComponent.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Platform\Windows\M_WindowsWindow.h" />
   </ItemGroup>
@@ -493,6 +494,7 @@
     <ClCompile Include="Minty\UI\M_CanvasComponent.cpp" />
     <ClCompile Include="Minty\UI\M_UISystem.cpp" />
     <ClCompile Include="Minty\UI\M_UITransformComponent.cpp" />
+    <ClCompile Include="M_TextComponent.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
