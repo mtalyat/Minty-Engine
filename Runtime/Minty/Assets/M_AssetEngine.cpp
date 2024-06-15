@@ -676,6 +676,7 @@ Ref<FontVariant> Minty::AssetEngine::load_font_variant(Path const& path)
 	CHECK(path);
 
 	Node meta = read_file_meta(path);
+	Reader reader(meta);
 
 	std::vector<String> lines = read_file_lines(path);
 
@@ -684,6 +685,9 @@ Ref<FontVariant> Minty::AssetEngine::load_font_variant(Path const& path)
 		.id = meta.to_uuid(),
 		.path = path
 	};
+
+	UUID materialTemplateId = reader.read_uuid("materialTemplate");
+	Ref<MaterialTemplate> materialTemplate = get<MaterialTemplate>(materialTemplateId);
 
 	for (String const& line : lines)
 	{
@@ -729,10 +733,6 @@ Ref<FontVariant> Minty::AssetEngine::load_font_variant(Path const& path)
 				{
 					fontChar.xAdvance = Parse::to_int(part.substr(9, part.length() - 9));
 				}
-				else if (part.starts_with("page="))
-				{
-					fontChar.textureIndex = Parse::to_int(part.substr(5, part.length() - 5));
-				}
 			}
 		}
 		else if (line.starts_with("kerning "))
@@ -757,7 +757,7 @@ Ref<FontVariant> Minty::AssetEngine::load_font_variant(Path const& path)
 			}
 
 			// pack kerning into builder
-			builder.emplace_kerning(first, second, amount);
+			builder.kernings.emplace(FontVariant::compact_kerning(first, second), amount);
 		}
 		else if (line.starts_with("info "))
 		{
@@ -787,22 +787,25 @@ Ref<FontVariant> Minty::AssetEngine::load_font_variant(Path const& path)
 			Path directoryPath = path.parent_path();
 			std::vector<void*> dependencyTextures;
 
+			MINTY_ASSERT_FORMAT(builder.material != nullptr, "FontVariants can only have one page (texture). Font: {}", path.generic_string());
+
 			for (String const& part : parts)
 			{
-				if (part.starts_with("id="))
-				{
-					// ensure ID in correct order
-					size_t id = Parse::to_size(part.substr(3, part.length() - 3));
-					MINTY_ASSERT_FORMAT(id == builder.textures.size(), "Error loading font: \"{}\" has pages that are out of order.", path.generic_string());
-				}
-				else if (part.starts_with("file="))
+				if (part.starts_with("file="))
 				{
 					// ignore " "
 					String name = part.substr(6, part.length() - 7);
 					UUID textureId = read_id(directoryPath / name);
 					Ref<Texture> texture = get<Texture>(textureId);
-					builder.textures.push_back(texture);
 					dependencyTextures.push_back(texture.get());
+
+					// create a material for the texture
+					MaterialBuilder materialBuilder
+					{
+						.materialTemplate = materialTemplate,
+					};
+					materialBuilder.values.emplace("texture", Dynamic(&textureId, sizeof(UUID*)));
+					builder.material = create<Material>(materialBuilder);
 				}
 			}
 
@@ -1093,12 +1096,9 @@ std::vector<Ref<Asset>> Minty::AssetEngine::get_dependents(Ref<Asset> const asse
 		// FontVariants use Textures
 		for (auto const font : get_by_type<FontVariant>())
 		{
-			for (Ref<Texture> const texture : font->get_textures())
+			if (font->get_texture() == asset)
 			{
-				if (texture == asset)
-				{
-					result.push_back(texture);
-				}
+				result.push_back(font->get_texture());
 			}
 		}
 		break;

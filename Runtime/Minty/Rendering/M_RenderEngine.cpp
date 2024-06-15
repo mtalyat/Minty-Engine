@@ -25,6 +25,7 @@
 #include "Minty/Rendering/M_CameraComponent.h"
 #include "Minty/Rendering/M_MeshComponent.h"
 #include "Minty/Rendering/M_RenderableComponent.h"
+#include "Minty/Rendering/M_TextComponent.h"
 #include "Minty/Components/M_RelationshipComponent.h"
 #include "Minty/Components/M_EnabledComponent.h"
 
@@ -1108,6 +1109,7 @@ void Minty::RenderEngine::draw_scene(VkCommandBuffer commandBuffer)
 			canvasEntity = ui.canvas;
 
 			// TODO: make safer
+			// update Canvas global constant
 			if (sprite.sprite.get())
 			{
 				Ref<Shader> shader = sprite.sprite->get_material()->get_template()->get_shader_passes().front()->get_shader();
@@ -1125,6 +1127,37 @@ void Minty::RenderEngine::draw_scene(VkCommandBuffer commandBuffer)
 		}
 
 		draw_ui(commandBuffer, ui, sprite);
+	}
+
+	// draw all of the UI texts in the scene
+	auto uiFontView = _registry->view<UITransformComponent const, TextComponent const, RenderableComponent const, EnabledComponent const>();
+	for (auto&& [entity, ui, text, renderable, enabled] : uiFontView.each())
+	{
+		// if new canvas, update shader values
+		if (ui.canvas != canvasEntity)
+		{
+			canvasEntity = ui.canvas;
+
+			// TODO: make safer
+			// update Canvas global constant
+			if (text.fontVariant != nullptr)
+			{
+				Ref<Shader> shader = text.fontVariant->get_material()->get_template()->get_shader_passes().front()->get_shader();
+
+				MINTY_ASSERT(shader != nullptr);
+
+				CanvasComponent* canvas = _registry->try_get<CanvasComponent>(canvasEntity);
+				CanvasBufferObject canvasBufferObject
+				{
+					.width = canvas ? canvas->referenceResolutionWidth : 0,
+					.height = canvas ? canvas->referenceResolutionHeight : 0,
+				};
+				shader->update_global_uniform_constant("canvas", &canvasBufferObject, sizeof(CanvasBufferObject), 0);
+			}
+		}
+
+		// render mesh with font and font material
+		draw_text(commandBuffer, ui, text);
 	}
 
 	// unbind any shaders used
@@ -1229,6 +1262,39 @@ void Minty::RenderEngine::draw_ui(VkCommandBuffer commandBuffer, UITransformComp
 		.width = uiComponent.globalRect.width,
 		.height = uiComponent.globalRect.height,
 		.color = spriteComponent.color.toVector(),
+		.anchorMode = static_cast<int>(uiComponent.anchorMode),
+	};
+	shader->update_push_constant(commandBuffer, &pushData, sizeof(UIPushData));
+
+	// draw
+	vkCmdDraw(commandBuffer, 6, 1, 0, 0);
+}
+
+void Minty::RenderEngine::draw_text(VkCommandBuffer commandBuffer, UITransformComponent const& uiComponent, TextComponent const& textComponent)
+{
+	// ignore if no mesh or font
+	if (textComponent.mesh == nullptr || textComponent.fontVariant == nullptr) return;
+
+	// get the mesh and material
+	Ref<Material> material = textComponent.fontVariant->get_material();
+	Ref<Mesh> mesh = textComponent.mesh;
+
+	// bind the material the sprite is using
+	bind(commandBuffer, material);
+
+	// TODO: make safer
+	Ref<Shader> shader = material->get_template()->get_shader_passes().front()->get_shader();
+
+	MINTY_ASSERT(shader != nullptr);
+
+	// update push data and draw
+	UIPushData pushData
+	{
+		.x = uiComponent.globalRect.x,
+		.y = uiComponent.globalRect.y,
+		.width = uiComponent.globalRect.width,
+		.height = uiComponent.globalRect.height,
+		.color = textComponent.color.toVector(),
 		.anchorMode = static_cast<int>(uiComponent.anchorMode),
 	};
 	shader->update_push_constant(commandBuffer, &pushData, sizeof(UIPushData));

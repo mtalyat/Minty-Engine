@@ -495,14 +495,14 @@
     <ClInclude Include="Minty\Core\M_Pointer.h">
       <Filter>Minty\Core</Filter>
     </ClInclude>
-    <ClInclude Include="M_AllSystems.h">
-      <Filter>Minty\Systems</Filter>
-    </ClInclude>
     <ClInclude Include="Minty\Rendering\M_Font.h">
       <Filter>Minty\Rendering</Filter>
     </ClInclude>
-    <ClInclude Include="M_TextComponent.h">
+    <ClInclude Include="Minty\Rendering\M_TextComponent.h">
       <Filter>Minty\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Systems\M_AllSystems.h">
+      <Filter>Minty\Systems</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -890,7 +890,7 @@
     <ClCompile Include="Minty\Rendering\M_Font.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="M_TextComponent.cpp">
+    <ClCompile Include="Minty\Rendering\M_TextComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

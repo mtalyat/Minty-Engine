@@ -15,8 +15,47 @@ void Minty::TextComponent::set_text(String const& newText)
 	if (newText != text)
 	{
 		text = newText;
-		regenerate_mesh();
+		dirty = true;
 	}
+}
+
+void Minty::TextComponent::set_size(font_size_t const newSize)
+{
+	if (newSize != size)
+	{
+		size = newSize;
+		dirty = true;
+	}
+}
+
+void Minty::TextComponent::set_bold(bool const newBold)
+{
+	if (newBold != bold)
+	{
+		bold = newBold;
+		dirty = true;
+	}
+}
+
+void Minty::TextComponent::set_italic(bool const newItalic)
+{
+	if (newItalic != italic)
+	{
+		italic = newItalic;
+		dirty = true;
+	}
+}
+
+bool Minty::TextComponent::try_regenerate_mesh()
+{
+	if (dirty)
+	{
+		regenerate_mesh();
+		dirty = false;
+		return true;
+	}
+
+	return false;
 }
 
 void Minty::TextComponent::regenerate_mesh()
@@ -33,8 +72,13 @@ void Minty::TextComponent::regenerate_mesh()
 	// if text is empty, do nothing
 	if (text.empty()) return;
 
-	// ensure there is a font variant for this size
-	Ref<FontVariant> variant = font->at(size, bold, italic);
+	// ensure there is a font variant for this size, and update it
+	if (font.get())
+	{
+		fontVariant = font->at(size, bold, italic);
+
+		MINTY_ASSERT_FORMAT(fontVariant != nullptr, "There is no FontVariant for font \"{}\", size={}, bold={}, italic={}.", font->get_name(), size, bold, italic);
+	}
 
 	// create mesh based on text
 	generate_mesh();

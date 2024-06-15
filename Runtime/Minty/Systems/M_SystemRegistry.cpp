@@ -7,7 +7,7 @@
 #include "Minty/Serialization/M_Reader.h"
 #include "Minty/Serialization/M_Writer.h"
 
-#include "M_AllSystems.h"
+#include "Minty/Systems/M_AllSystems.h"
 
 #include <sstream>
 

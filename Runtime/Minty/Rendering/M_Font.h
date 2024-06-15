@@ -1,7 +1,6 @@
 #pragma once
 
 #include "Minty/Assets/M_Asset.h"
-#include "Minty/Rendering/M_Texture.h"
 #include <vector>
 #include <unordered_map>
 
@@ -22,8 +21,10 @@ namespace Minty
 		int xOffset;
 		int yOffset;
 		int xAdvance;
-		unsigned int textureIndex;
 	};
+
+	class Texture;
+	class Material;
 
 	/// <summary>
 	/// Used to create a new FontVariant
@@ -42,19 +43,20 @@ namespace Minty
 		// COMMON
 
 		// PAGES
-		std::vector<Ref<Texture>> textures;
+		Ref<Texture> texture;
+		Ref<Material> material;
 
 		// CHARS
 		std::vector<FontChar> characters;
 
 		// KERNINGS
 		std::unordered_map<int, int> kernings;
-
-		void emplace_kerning(int const first, int const second, int const amount) { kernings.emplace((first << (sizeof(int) >> 1)) | second, amount); }
 	};
 
 	/// <summary>
-	/// Holds the data for one variant of a font (size, bold, italic, etc.)
+	/// Holds the data for one variant of a font (size, bold, italic, etc).
+	/// 
+	/// FontVariants currently limited to one texture only.
 	/// </summary>
 	class FontVariant
 		: public Asset
@@ -65,10 +67,11 @@ namespace Minty
 		bool _italic = false;
 
 		// PAGES
-		std::vector<Ref<Texture>> _textures;
+		Ref<Texture> _texture;
+		Ref<Material> _material;
 
 		// CHARS
-		std::vector<FontChar> _characters;
+		std::unordered_map<char, FontChar> _characters;
 
 		// KERNINGS
 		std::unordered_map<int, int> _kernings;
@@ -79,7 +82,12 @@ namespace Minty
 		font_size_t get_size() const { return _size; }
 		bool is_bold() const { return _bold; }
 		bool is_italic() const { return _italic; }
-		std::vector<Ref<Texture>> const& get_textures() const { return _textures; }
+		Ref<Texture> get_texture() const { return _texture; }
+		Ref<Material> get_material() const { return _material; }
+		FontChar const* get_char(char const ch) const;
+		int get_kerning(char const left, char const right) const;
+
+		static int compact_kerning(int const left, int const right) { return ((left & 0xffff) << 16) | (right & 0xffff); }
 	};
 
 	/// <summary>

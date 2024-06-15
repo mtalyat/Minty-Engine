@@ -54,6 +54,7 @@ namespace Minty
 	struct TransformComponent;
 	struct UITransformComponent;
 	struct SpriteComponent;
+	struct TextComponent;
 
 	struct TextureBuilder;
 
@@ -406,6 +407,8 @@ namespace Minty
 		void draw_sprite(VkCommandBuffer commandBuffer, TransformComponent const& transformComponent, SpriteComponent const& spriteComponent);
 
 		void draw_ui(VkCommandBuffer commandBuffer, UITransformComponent const& uiComponent, SpriteComponent const& spriteComponent);
+
+		void draw_text(VkCommandBuffer commandBuffer, UITransformComponent const& uiComponent, TextComponent const& textComponent);
 
 #pragma endregion
 

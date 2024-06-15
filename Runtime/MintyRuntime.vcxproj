@@ -311,6 +311,7 @@
     <ClInclude Include="Minty\Rendering\M_Sprite.h" />
     <ClInclude Include="Minty\Rendering\M_SpriteComponent.h" />
     <ClInclude Include="Minty\Rendering\M_SpritePushData.h" />
+    <ClInclude Include="Minty\Rendering\M_TextComponent.h" />
     <ClInclude Include="Minty\Rendering\M_Texture.h" />
     <ClInclude Include="Minty\Rendering\M_TextureAtlas.h" />
     <ClInclude Include="Minty\Rendering\M_UniformConstantInfo.h" />
@@ -331,6 +332,7 @@
     <ClInclude Include="Minty\Serialization\M_Reader.h" />
     <ClInclude Include="Minty\Serialization\M_SerializationData.h" />
     <ClInclude Include="Minty\Serialization\M_Writer.h" />
+    <ClInclude Include="Minty\Systems\M_AllSystems.h" />
     <ClInclude Include="Minty\Systems\M_System.h" />
     <ClInclude Include="Minty\Systems\M_SystemRegistry.h" />
     <ClInclude Include="Minty\Tools\M_Compression.h" />
@@ -362,8 +364,6 @@
     <ClInclude Include="Minty\UI\M_UIPushData.h" />
     <ClInclude Include="Minty\UI\M_UISystem.h" />
     <ClInclude Include="Minty\UI\M_UITransformComponent.h" />
-    <ClInclude Include="M_AllSystems.h" />
-    <ClInclude Include="M_TextComponent.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Platform\Windows\M_WindowsWindow.h" />
   </ItemGroup>
@@ -452,6 +452,7 @@
     <ClCompile Include="Minty\Rendering\M_ShaderPass.cpp" />
     <ClCompile Include="Minty\Rendering\M_Sprite.cpp" />
     <ClCompile Include="Minty\Rendering\M_SpriteComponent.cpp" />
+    <ClCompile Include="Minty\Rendering\M_TextComponent.cpp" />
     <ClCompile Include="Minty\Rendering\M_Texture.cpp" />
     <ClCompile Include="Minty\Rendering\M_TextureAtlas.cpp" />
     <ClCompile Include="Minty\Rendering\M_Viewport.cpp" />
@@ -494,7 +495,6 @@
     <ClCompile Include="Minty\UI\M_CanvasComponent.cpp" />
     <ClCompile Include="Minty\UI\M_UISystem.cpp" />
     <ClCompile Include="Minty\UI\M_UITransformComponent.cpp" />
-    <ClCompile Include="M_TextComponent.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

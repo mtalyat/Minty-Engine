@@ -8,10 +8,46 @@ Minty::FontVariant::FontVariant(FontVariantBuilder const& builder)
 	, _size(builder.size)
 	, _bold(builder.bold)
 	, _italic(builder.italic)
-	, _textures(builder.textures)
-	, _characters(builder.characters)
+	, _texture(builder.texture)
+	, _material(builder.material)
+	, _characters()
 	, _kernings(builder.kernings)
-{ }
+{
+	// add characters using ID as key
+	_characters.reserve(builder.characters.size());
+
+	for (auto const& ch : builder.characters)
+	{
+		_characters.emplace(ch.id, ch);
+	}
+}
+
+FontChar const* Minty::FontVariant::get_char(char const ch) const
+{
+	auto const found = _characters.find(ch);
+
+	if (found == _characters.end())
+	{
+		return nullptr;
+	}
+
+	return &found->second;
+}
+
+int Minty::FontVariant::get_kerning(char const left, char const right) const
+{
+	int kerningId = compact_kerning(left, right);
+	auto const found = _kernings.find(kerningId);
+
+	if (found == _kernings.end())
+	{
+		// default, do not adjust at all
+		return 0;
+	}
+
+	// adjust by some amount
+	return found->second;
+}
 
 Minty::Font::Font(FontBuilder const& builder)
 	: Asset(builder.id, builder.path)
