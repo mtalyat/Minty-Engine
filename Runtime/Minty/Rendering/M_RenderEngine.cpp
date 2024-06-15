@@ -1130,6 +1130,7 @@ void Minty::RenderEngine::draw_scene(VkCommandBuffer commandBuffer)
 	}
 
 	// draw all of the UI texts in the scene
+	canvasEntity = NULL_ENTITY;
 	auto uiFontView = _registry->view<UITransformComponent const, TextComponent const, RenderableComponent const, EnabledComponent const>();
 	for (auto&& [entity, ui, text, renderable, enabled] : uiFontView.each())
 	{

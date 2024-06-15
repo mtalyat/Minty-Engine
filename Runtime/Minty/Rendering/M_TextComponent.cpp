@@ -102,25 +102,36 @@ void Minty::TextComponent::generate_mesh()
 //	0, 1, 2, 0, 2, 3
 //};
 
-	// generate some for each character made
-
-	//std::vector<Vertex2D> vertices;
-	//std::vector<uint16_t> indices;
-
-	//// set mesh data
-	//mesh->set_vertices(vertices);
-	//mesh->set_indices(indices);
-
 	AssetEngine& assets = AssetEngine::instance();
 
 	// create new mesh
 	MINTY_ASSERT(mesh != nullptr);
 	MeshBuilder builder{};
 	mesh = assets.create<Mesh>(builder);
+	
+	// TEMP: rendering whole texture
+	// TODO: render appropriate letters
+	Vector2 const topLeft = Vector2(0.0f, 0.0f);
+	Vector2 const topRight = Vector2(0.0f, 0.0f);
+	Vector2 const bottomLeft = Vector2(0.0f, 0.0f);
+	Vector2 const bottomRight = Vector2(0.0f, 0.0f);
 
-	// TEMP
-	// TODO: generate mesh for text
-	Mesh::create_primitive_quad(*mesh);
+	std::vector<Vertex2D> vertices =
+	{
+		{ topLeft, topLeft },
+		{ topRight, topRight },
+		{ bottomRight, bottomRight },
+		{ bottomLeft, bottomLeft }
+	};
+
+	std::vector<uint16_t> indices =
+	{
+		0, 1, 2, 0, 2, 3
+	};
+
+	// set mesh data
+	mesh->set_vertices(vertices);
+	mesh->set_indices(indices);
 }
 
 void Minty::TextComponent::serialize(Writer& writer) const
