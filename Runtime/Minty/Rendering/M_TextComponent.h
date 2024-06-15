@@ -43,5 +43,9 @@ namespace Minty
 
 	private:
 		void generate_mesh();
+
+	public:
+		void serialize(Writer& writer) const override;
+		void deserialize(Reader const& reader) override;
 	};
 }

@@ -783,8 +783,6 @@ Ref<FontVariant> Minty::AssetEngine::load_font_variant(Path const& path)
 		}
 		else if (line.starts_with("page "))
 		{
-			MINTY_ASSERT_FORMAT(builder.material != nullptr, "FontVariants can only have one page (texture). Font: {}", path.generic_string());
-
 			// textures to load
 			Path directoryPath = path.parent_path();
 			std::vector<void*> dependencyTextures;

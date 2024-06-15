@@ -5,6 +5,8 @@
 #include "Minty/Rendering/M_Font.h"
 #include "Minty/Assets/M_AssetEngine.h"
 #include "Minty/Rendering/M_Builtin.h"
+#include "Minty/Serialization/M_Writer.h"
+#include "Minty/Serialization/M_Reader.h"
 
 using namespace Minty;
 using namespace Minty::Builtin;
@@ -119,4 +121,31 @@ void Minty::TextComponent::generate_mesh()
 	// TEMP
 	// TODO: generate mesh for text
 	Mesh::create_primitive_quad(*mesh);
+}
+
+void Minty::TextComponent::serialize(Writer& writer) const
+{
+	writer.write("text", text);
+	writer.write("color", color);
+	writer.write("size", size);
+	writer.write("bold", bold);
+	writer.write("italic", italic);
+	writer.write("font", font == nullptr ? UUID() : font->get_id());
+}
+
+void Minty::TextComponent::deserialize(Reader const& reader)
+{
+	reader.try_read_string("text", text);
+	reader.try_read_color("color", color);
+	reader.try_read_uint("size", size);
+	reader.try_read_bool("bold", bold);
+	reader.try_read_bool("italic", italic);
+
+	UUID fontId;
+	if (reader.try_read_uuid("font", fontId))
+	{
+		AssetEngine& assets = AssetEngine::instance();
+		font = assets.get<Font>(fontId);
+		fontVariant = nullptr;
+	}
 }
