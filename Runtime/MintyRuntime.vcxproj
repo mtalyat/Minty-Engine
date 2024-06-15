@@ -361,7 +361,6 @@
     <ClInclude Include="Minty\Types\M_UUID.h" />
     <ClInclude Include="Minty\Types\M_Vector.h" />
     <ClInclude Include="Minty\UI\M_CanvasComponent.h" />
-    <ClInclude Include="Minty\UI\M_UIPushData.h" />
     <ClInclude Include="Minty\UI\M_UISystem.h" />
     <ClInclude Include="Minty\UI\M_UITransformComponent.h" />
     <ClInclude Include="pch.h" />

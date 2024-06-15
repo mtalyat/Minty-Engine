@@ -4,7 +4,7 @@
 #include "Minty/Assets/M_AssetEngine.h"
 #include "Minty/Rendering/M_DrawCallObjectInfo.h"
 #include "Minty/Rendering/M_SpritePushData.h"
-#include "Minty/UI/M_UIPushData.h"
+#include "Minty/Rendering/M_Builtin.h"
 
 #include "Minty/Rendering/M_Camera.h"
 #include "Minty/Tools/M_Console.h"
@@ -1289,7 +1289,7 @@ void Minty::RenderEngine::draw_text(VkCommandBuffer commandBuffer, UITransformCo
 	MINTY_ASSERT(shader != nullptr);
 
 	// update push data and draw
-	UIPushData pushData
+	UITextPushData pushData
 	{
 		.x = uiComponent.globalRect.x,
 		.y = uiComponent.globalRect.y,
@@ -1298,7 +1298,7 @@ void Minty::RenderEngine::draw_text(VkCommandBuffer commandBuffer, UITransformCo
 		.color = textComponent.color.toVector(),
 		.anchorMode = static_cast<int>(uiComponent.anchorMode),
 	};
-	shader->update_push_constant(commandBuffer, &pushData, sizeof(UIPushData));
+	shader->update_push_constant(commandBuffer, &pushData, sizeof(UITextPushData));
 
 	// draw
 	vkCmdDraw(commandBuffer, 6, 1, 0, 0);

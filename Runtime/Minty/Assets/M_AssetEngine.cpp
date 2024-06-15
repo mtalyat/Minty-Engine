@@ -688,6 +688,13 @@ Ref<FontVariant> Minty::AssetEngine::load_font_variant(Path const& path)
 
 	UUID materialTemplateId = reader.read_uuid("materialTemplate");
 	Ref<MaterialTemplate> materialTemplate = get<MaterialTemplate>(materialTemplateId);
+	{
+		std::vector<void*> materialTemplateDependencies =
+		{
+			materialTemplate.get()
+		};
+		CHECK_DEPENDENCIES(path.stem().string(), materialTemplateDependencies);
+	}
 
 	for (String const& line : lines)
 	{
@@ -1091,12 +1098,16 @@ std::vector<Ref<Asset>> Minty::AssetEngine::get_dependents(Ref<Asset> const asse
 				result.push_back(sprite);
 			}
 		}
-		// FontVariants use Textures
+		// FontVariants use Textures and Material Templates
 		for (auto const font : get_by_type<FontVariant>())
 		{
 			if (font->get_texture() == asset)
 			{
 				result.push_back(font->get_texture());
+			}
+			else if (font->get_material().get() && (font->get_material()->get_template() == asset))
+			{
+				result.push_back(font->get_material()->get_template());
 			}
 		}
 		break;

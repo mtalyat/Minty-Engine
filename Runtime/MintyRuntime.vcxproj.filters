@@ -447,9 +447,6 @@
     <ClInclude Include="Minty\UI\M_CanvasComponent.h">
       <Filter>Minty\UI</Filter>
     </ClInclude>
-    <ClInclude Include="Minty\UI\M_UIPushData.h">
-      <Filter>Minty\UI</Filter>
-    </ClInclude>
     <ClInclude Include="Platform\Windows\M_WindowsWindow.h">
       <Filter>Platform\Windows</Filter>
     </ClInclude>
