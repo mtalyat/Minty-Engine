@@ -12,6 +12,8 @@
 #include "Minty/Rendering/M_CameraComponent.h"
 #include "Minty/Components/M_TransformComponent.h"
 #include "Minty/Components/M_EnabledComponent.h"
+#include "Minty/Rendering/M_TextComponent.h"
+
 #include "Minty/Rendering/M_DrawCallObjectInfo.h"
 
 #include "Minty/Serialization/M_Reader.h"
@@ -41,6 +43,17 @@ void Minty::RenderSystem::update(Time const time)
 		TransformComponent const& transformComponent = entityRegistry.get<TransformComponent>(_camera);
 
 		update_camera(camera, transformComponent);
+	}
+}
+
+void Minty::RenderSystem::finalize()
+{
+	EntityRegistry& entityRegistry = get_entity_registry();
+
+	// update all text if dirty
+	for (auto&& [entity, text] : entityRegistry.view<TextComponent>().each())
+	{
+		text.try_regenerate_mesh();
 	}
 }
 

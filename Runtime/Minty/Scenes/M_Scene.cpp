@@ -299,6 +299,9 @@ void Minty::Scene::finalize()
 	// remove all dirty tags
 	_entities->clear<DirtyComponent>();
 
+	// finalize systems
+	_systems->finalize();
+
 	// destroy all entities tagged with the destroy tag
 	_entities->destroy_queued();
 }

@@ -105,7 +105,7 @@ void Minty::TextComponent::generate_mesh()
 	AssetEngine& assets = AssetEngine::instance();
 
 	// create new mesh
-	MINTY_ASSERT(mesh != nullptr);
+	MINTY_ASSERT(mesh == nullptr);
 	MeshBuilder builder{};
 	mesh = assets.create<Mesh>(builder);
 	

@@ -69,6 +69,12 @@ namespace Minty
 		virtual void update(Time const time) {}
 
 		/// <summary>
+		/// Does frame cleanup work on the System.
+		/// </summary>
+		/// <param name="time"></param>
+		virtual void finalize() {}
+
+		/// <summary>
 		/// Does one fixed frame of work on the System.
 		/// </summary>
 		virtual void fixed_update(Time const time) {}

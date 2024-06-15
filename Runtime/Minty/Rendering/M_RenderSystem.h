@@ -38,6 +38,8 @@ namespace Minty
 		void reset() override {}
 
 		void update(Time const time) override;
+		
+		void finalize() override;
 
 	private:
 		/// <summary>

@@ -127,14 +127,14 @@ namespace Minty
 		bool operator==(U* const other) const { return get() == other; }
 		template<typename U>
 		bool operator==(Ref<U> const& other) const { return get() == other.get(); }
-		bool operator==(std::nullptr_t const other) const { return get() == other; }
+		bool operator==(std::nullptr_t const other) const { return get() == nullptr; }
 		template<typename U>
 		bool operator!=(Owner<U> const& other) const { return !(*this == other); }
 		template<typename U>
 		bool operator!=(U* const other) const { return !(*this == other); }
 		template<typename U>
 		bool operator!=(Ref<U> const& other) const { return !(*this == other); }
-		bool operator!=(std::nullptr_t const other) const { return !(*this == other); }
+		bool operator!=(std::nullptr_t const other) const { return get() != nullptr; }
 		template<typename U>
 		bool operator<(Owner<U> const& other) const { return get() < other.get(); }
 		template<typename U>
@@ -256,14 +256,14 @@ namespace Minty
 		bool operator==(U* const other) const { return get() == other; }
 		template<typename U>
 		bool operator==(Ref<U> const& other) const { return get() == other.get(); }
-		bool operator==(std::nullptr_t const other) const { return get() == other; }
+		bool operator==(std::nullptr_t const other) const { return get() == nullptr; }
 		template<typename U>
 		bool operator!=(Owner<U> const& other) const { return !(*this == other); }
 		template<typename U>
 		bool operator!=(U* const other) const { return !(*this == other); }
 		template<typename U>
 		bool operator!=(Ref<U> const& other) const { return !(*this == other); }
-		bool operator!=(std::nullptr_t const other) const { return !(*this == other); }
+		bool operator!=(std::nullptr_t const other) const { return get() != nullptr; }
 		template<typename U>
 		bool operator<(Owner<U> const& other) const { return get() < other.get(); }
 		template<typename U>

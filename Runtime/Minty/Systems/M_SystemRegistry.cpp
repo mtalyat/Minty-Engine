@@ -144,6 +144,17 @@ namespace Minty
 		}
 	}
 
+	void SystemRegistry::finalize()
+	{
+		for (auto& pair : _orderedSystems)
+		{
+			for (System* const system : pair.second)
+			{
+				system->finalize();
+			}
+		}
+	}
+
 	void SystemRegistry::fixed_update(Time const time)
 	{
 		for (auto& pair : _orderedSystems)
