@@ -809,7 +809,7 @@ Ref<FontVariant> Minty::AssetEngine::load_font_variant(Path const& path)
 					{
 						.materialTemplate = materialTemplate,
 					};
-					materialBuilder.values.emplace("texture", Dynamic(&textureId, sizeof(UUID*)));
+					materialBuilder.values.emplace("texture", Dynamic(&textureId, sizeof(UUID)));
 					builder.material = create<Material>(materialBuilder);
 				}
 			}
