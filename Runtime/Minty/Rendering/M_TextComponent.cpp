@@ -101,24 +101,6 @@ void Minty::TextComponent::generate_mesh()
 
 	MINTY_ASSERT_FORMAT(font != nullptr, "There is no Font for text \"{}\".", text);
 	MINTY_ASSERT_FORMAT(fontVariant != nullptr, "There is no FontVariant for font \"{}\" for text \"{}\", size={}, bold={}, italic={}.", font->get_name(), text, size, bold, italic);
-	
-	//Vector2 const topLeft = Vector2(0.0f, 0.0f);
-	//Vector2 const topRight = Vector2(1.0f, 0.0f);
-	//Vector2 const bottomLeft = Vector2(0.0f, 1.0f);
-	//Vector2 const bottomRight = Vector2(1.0f, 1.0f);
-
-	//std::vector<Vertex2D> vertices =
-	//{
-	//	{ topLeft, topLeft },
-	//	{ topRight, topRight },
-	//	{ bottomRight, bottomRight },
-	//	{ bottomLeft, bottomLeft }
-	//};
-
-	//std::vector<uint16_t> indices =
-	//{
-	//	0, 1, 2, 0, 2, 3
-	//};
 
 	std::vector<Vertex2D> vertices;
 	std::vector<uint16_t> indices;
