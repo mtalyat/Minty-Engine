@@ -121,7 +121,7 @@ bool Mintye::PropertiesWindow::input_node(Minty::Node& rootNode, bool const prin
 			}
 			float rightTextWidth = ImGui::CalcTextSize(idName.c_str()).x;
 			// add 10 so it is within the group box
-			if (ImGui::InputTextExpandOffset(std::format("{}##{}", idName, i).c_str(), buffer, BUFFER_SIZE, leftTextWidth, rightTextWidth + 10.0f))
+			if (ImGui::InputTextMultilineExpandOffset(std::format("{}##{}", idName, i).c_str(), buffer, BUFFER_SIZE, leftTextWidth, rightTextWidth + 10.0f))
 			{
 				pair.first->set_data(buffer);
 				modified = true;

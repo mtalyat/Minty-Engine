@@ -791,7 +791,13 @@ Ref<FontVariant> Minty::AssetEngine::load_font_variant(Path const& path)
 		}
 		else if (line.starts_with("common "))
 		{
-
+			for (String const& part : parts)
+			{
+				if (part.starts_with("lineHeight="))
+				{
+					builder.lineHeight = static_cast<float>(Parse::to_int(part.substr(11, part.length() - 11)));
+				}
+			}
 		}
 		else if (line.starts_with("page "))
 		{
@@ -830,6 +836,9 @@ Ref<FontVariant> Minty::AssetEngine::load_font_variant(Path const& path)
 			heightScale = 1.0f / builder.texture->get_height();
 		}
 	}
+
+	// apply scales to values that need it
+	builder.lineHeight *= heightScale;
 
 	return create<FontVariant>(builder);
 }

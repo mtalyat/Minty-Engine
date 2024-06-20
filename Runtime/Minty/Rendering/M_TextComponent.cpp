@@ -99,7 +99,8 @@ void Minty::TextComponent::generate_mesh()
 
 	if (text.empty()) return;
 
-	MINTY_ASSERT_FORMAT(fontVariant != nullptr, "There is no FontVariant for font \"{}\", size={}, bold={}, italic={}.", font->get_name(), size, bold, italic);
+	MINTY_ASSERT_FORMAT(font != nullptr, "There is no Font for text \"{}\".", text);
+	MINTY_ASSERT_FORMAT(fontVariant != nullptr, "There is no FontVariant for font \"{}\" for text \"{}\", size={}, bold={}, italic={}.", font->get_name(), text, size, bold, italic);
 	
 	//Vector2 const topLeft = Vector2(0.0f, 0.0f);
 	//Vector2 const topRight = Vector2(1.0f, 0.0f);
@@ -122,7 +123,8 @@ void Minty::TextComponent::generate_mesh()
 	std::vector<Vertex2D> vertices;
 	std::vector<uint16_t> indices;
 
-	float advance = 0.0f;
+	float xAdvance = 0.0f;
+	float yAdvance = 0.0f;
 	uint16_t index = 0;
 	float const width = static_cast<float>(fontVariant->get_texture()->get_width());
 	float const height = static_cast<float>(fontVariant->get_texture()->get_height());
@@ -131,12 +133,22 @@ void Minty::TextComponent::generate_mesh()
 
 	for (char c : text)
 	{
+		// special characters
+		switch (c)
+		{
+		case '\n':
+			yAdvance += fontVariant->get_line_height();
+			continue;
+		}
+
 		// get font character data
 		FontChar const* fc = fontVariant->get_char(c);
 
 		if (!fc)
 		{
 			MINTY_ERROR_FORMAT("There is no FontChar data for character \"{}\" in font \"{}\".", c, font->get_name());
+
+			last = c;
 
 			continue;
 		}
@@ -146,23 +158,23 @@ void Minty::TextComponent::generate_mesh()
 		Vector2 const offset(fc->xOffset, fc->yOffset);
 		
 		// adjust spacing for special cases
-		advance += fontVariant->get_kerning(last, c);
+		xAdvance += fontVariant->get_kerning(last, c);
 
 		// create vertices based on each char
 		vertices.push_back(Vertex2D{
-			.pos = Vector2(advance, 0.0f) + offset,
+			.pos = Vector2(xAdvance, 0.0f) + offset,
 			.coord = min
 			});
 		vertices.push_back(Vertex2D{
-			.pos = Vector2(advance + fc->width, 0.0f) + offset,
+			.pos = Vector2(xAdvance + fc->width, 0.0f) + offset,
 			.coord = Vector2(max.x, min.y)
 			});
 		vertices.push_back(Vertex2D{
-			.pos = Vector2(advance + fc->width, fc->height) + offset,
+			.pos = Vector2(xAdvance + fc->width, fc->height) + offset,
 			.coord = max
 			});
 		vertices.push_back(Vertex2D{
-			.pos = Vector2(advance, fc->height) + offset,
+			.pos = Vector2(xAdvance, fc->height) + offset,
 			.coord = Vector2(min.x, max.y)
 			});
 
@@ -176,7 +188,7 @@ void Minty::TextComponent::generate_mesh()
 		index += 4;
 
 		// advance the "cursor"
-		advance += fc->xAdvance;
+		xAdvance += fc->xAdvance;
 
 		// update new last char
 		last = c;

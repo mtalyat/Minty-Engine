@@ -135,6 +135,19 @@ bool ImGui::InputTextExpandOffset(char const* label, char* buf, size_t buf_size,
 	return ImGui::InputText(label, buf, buf_size, flags);
 }
 
+bool ImGui::InputTextMultilineExpand(char const* label, char* buf, size_t buf_size, float const widthPercent, ImGuiInputTextFlags flags)
+{
+	ImGui::SetNextItemWidth(ImGui::GetContentRegionAvail().x * widthPercent);
+	return ImGui::InputTextMultiline(label, buf, buf_size, ImVec2(), flags);
+}
+
+bool ImGui::InputTextMultilineExpandOffset(char const* label, char* buf, size_t buf_size, float const offsetLeft, float const offsetRight, float const widthPercent, ImGuiInputTextFlags flags)
+{
+	float avail = ImGui::GetContentRegionAvail().x;
+	ImGui::SetNextItemWidth((avail - offsetLeft - offsetRight) * widthPercent + offsetLeft);
+	return ImGui::InputTextMultiline(label, buf, buf_size, ImVec2(), flags);
+}
+
 bool ImGui::ButtonAlignedLeft(char const* label, ImVec2 const& size)
 {
 	ImVec2 pos = ImGui::GetCursorScreenPos();

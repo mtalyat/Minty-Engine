@@ -41,6 +41,7 @@ namespace Minty
 		bool italic = false;
 
 		// COMMON
+		float lineHeight = 0.0f;
 
 		// PAGES
 		Ref<Texture> texture;
@@ -62,9 +63,13 @@ namespace Minty
 		: public Asset
 	{
 	private:
-		font_size_t _size = 0;
-		bool _bold = false;
-		bool _italic = false;
+		// INFO
+		font_size_t _size;
+		bool _bold;
+		bool _italic;
+
+		// COMMON
+		float _lineHeight;
 
 		// PAGES
 		Ref<Texture> _texture;
@@ -82,6 +87,7 @@ namespace Minty
 		font_size_t get_size() const { return _size; }
 		bool is_bold() const { return _bold; }
 		bool is_italic() const { return _italic; }
+		float get_line_height() const { return _lineHeight; }
 		Ref<Texture> get_texture() const { return _texture; }
 		Ref<Material> get_material() const { return _material; }
 		FontChar const* get_char(char const ch) const;
