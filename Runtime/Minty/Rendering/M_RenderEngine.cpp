@@ -1283,6 +1283,12 @@ void Minty::RenderEngine::draw_text(VkCommandBuffer commandBuffer, UITransformCo
 	// bind the material the sprite is using
 	bind(commandBuffer, material);
 
+	// bind vertex data
+	VkBuffer vertexBuffers[] = { mesh->get_vertex_buffer()->get_buffer() };
+	VkDeviceSize offsets[] = { 0 };
+	vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+	vkCmdBindIndexBuffer(commandBuffer, mesh->get_index_buffer()->get_buffer(), 0, mesh->get_index_type());
+
 	// TODO: make safer
 	Ref<Shader> shader = material->get_template()->get_shader_passes().front()->get_shader();
 
@@ -1301,7 +1307,7 @@ void Minty::RenderEngine::draw_text(VkCommandBuffer commandBuffer, UITransformCo
 	shader->update_push_constant(commandBuffer, &pushData, sizeof(UITextPushData));
 
 	// draw
-	vkCmdDraw(commandBuffer, 6, 1, 0, 0);
+	vkCmdDrawIndexed(commandBuffer, mesh->get_index_count(), 1, 0, 0, 0);
 }
 
 bool RenderEngine::check_validation_layer_support()

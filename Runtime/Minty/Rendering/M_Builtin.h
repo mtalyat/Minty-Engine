@@ -25,13 +25,16 @@ namespace Minty::Builtin
 
 	struct Vertex2D
 	{
+		alignas(8)
 		Vector2 pos;
+		alignas(8)
 		Vector2 coord;
 	};
 
 	struct UIPushData
 	{
-		alignas(16) float x; // left
+		alignas(16) 
+		float x; // left
 		float y; // top
 		float width; // right
 		float height; // bottom

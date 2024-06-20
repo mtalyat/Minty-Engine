@@ -88,33 +88,22 @@ void Minty::TextComponent::regenerate_mesh()
 
 void Minty::TextComponent::generate_mesh()
 {
-	//std::vector<Vertex3D> vertices =
-//{
-//	// up
-//	{ leftTopBack, up, topRight },
-//	{ leftTopFront, up, bottomRight },
-//	{ rightTopFront, up, bottomLeft },
-//	{ rightTopBack, up, topLeft },
-//};
-
-//std::vector<uint16_t> indices =
-//{
-//	0, 1, 2, 0, 2, 3
-//};
-
 	AssetEngine& assets = AssetEngine::instance();
 
 	// create new mesh
 	MINTY_ASSERT(mesh == nullptr);
-	MeshBuilder builder{};
+	MeshBuilder builder
+	{
+		.path = "TextMesh"
+	};
 	mesh = assets.create<Mesh>(builder);
 	
 	// TEMP: rendering whole texture
 	// TODO: render appropriate letters
 	Vector2 const topLeft = Vector2(0.0f, 0.0f);
-	Vector2 const topRight = Vector2(0.0f, 0.0f);
-	Vector2 const bottomLeft = Vector2(0.0f, 0.0f);
-	Vector2 const bottomRight = Vector2(0.0f, 0.0f);
+	Vector2 const topRight = Vector2(1.0f, 0.0f);
+	Vector2 const bottomLeft = Vector2(0.0f, 1.0f);
+	Vector2 const bottomRight = Vector2(1.0f, 1.0f);
 
 	std::vector<Vertex2D> vertices =
 	{
@@ -146,11 +135,11 @@ void Minty::TextComponent::serialize(Writer& writer) const
 
 void Minty::TextComponent::deserialize(Reader const& reader)
 {
-	reader.try_read_string("text", text);
+	if (reader.try_read_string("text", text)) dirty = true;
 	reader.try_read_color("color", color);
-	reader.try_read_uint("size", size);
-	reader.try_read_bool("bold", bold);
-	reader.try_read_bool("italic", italic);
+	if (reader.try_read_uint("size", size)) dirty = true;
+	if (reader.try_read_bool("bold", bold)) dirty = true;
+	if (reader.try_read_bool("italic", italic)) dirty = true;
 
 	UUID fontId;
 	if (reader.try_read_uuid("font", fontId))
@@ -158,5 +147,6 @@ void Minty::TextComponent::deserialize(Reader const& reader)
 		AssetEngine& assets = AssetEngine::instance();
 		font = assets.get<Font>(fontId);
 		fontVariant = nullptr;
+		dirty = true;
 	}
 }
