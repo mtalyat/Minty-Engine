@@ -134,10 +134,22 @@ void Minty::TextComponent::generate_mesh()
 	for (char c : text)
 	{
 		// special characters
+		bool cont = true;
 		switch (c)
 		{
 		case '\n':
 			yAdvance += fontVariant->get_line_height();
+			xAdvance = 0;
+			break;
+		default:
+			cont = false;
+			break;
+		}
+
+		// if special character handled, skip, keep going
+		if (cont)
+		{
+			last = c;
 			continue;
 		}
 
@@ -162,19 +174,19 @@ void Minty::TextComponent::generate_mesh()
 
 		// create vertices based on each char
 		vertices.push_back(Vertex2D{
-			.pos = Vector2(xAdvance, 0.0f) + offset,
+			.pos = Vector2(xAdvance, yAdvance) + offset,
 			.coord = min
 			});
 		vertices.push_back(Vertex2D{
-			.pos = Vector2(xAdvance + fc->width, 0.0f) + offset,
+			.pos = Vector2(xAdvance + fc->width, yAdvance) + offset,
 			.coord = Vector2(max.x, min.y)
 			});
 		vertices.push_back(Vertex2D{
-			.pos = Vector2(xAdvance + fc->width, fc->height) + offset,
+			.pos = Vector2(xAdvance + fc->width, yAdvance +fc->height) + offset,
 			.coord = max
 			});
 		vertices.push_back(Vertex2D{
-			.pos = Vector2(xAdvance, fc->height) + offset,
+			.pos = Vector2(xAdvance, yAdvance + fc->height) + offset,
 			.coord = Vector2(min.x, max.y)
 			});
 
