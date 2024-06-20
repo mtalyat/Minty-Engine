@@ -14,13 +14,13 @@ namespace Minty
 	struct FontChar
 	{
 		char id;
-		unsigned int x;
-		unsigned int y;
-		unsigned int width;
-		unsigned int height;
-		int xOffset;
-		int yOffset;
-		int xAdvance;
+		float x;
+		float y;
+		float width;
+		float height;
+		float xOffset;
+		float yOffset;
+		float xAdvance;
 	};
 
 	class Texture;

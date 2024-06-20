@@ -696,6 +696,9 @@ Ref<FontVariant> Minty::AssetEngine::load_font_variant(Path const& path)
 		CHECK_DEPENDENCIES(path.stem().string(), materialTemplateDependencies);
 	}
 
+	float widthScale = 1.0f;
+	float heightScale = 1.0f;
+
 	for (String const& line : lines)
 	{
 		// split by tabs
@@ -714,33 +717,35 @@ Ref<FontVariant> Minty::AssetEngine::load_font_variant(Path const& path)
 				}
 				else if (part.starts_with("x="))
 				{
-					fontChar.x = Parse::to_int(part.substr(2, part.length() - 2));
+					fontChar.x = Parse::to_int(part.substr(2, part.length() - 2)) * widthScale;
 				}
 				else if (part.starts_with("y="))
 				{
-					fontChar.y = Parse::to_int(part.substr(2, part.length() - 2));
+					fontChar.y = Parse::to_int(part.substr(2, part.length() - 2)) * heightScale;
 				}
 				else if (part.starts_with("width="))
 				{
-					fontChar.width = Parse::to_int(part.substr(6, part.length() - 6));
+					fontChar.width = Parse::to_int(part.substr(6, part.length() - 6)) * widthScale;
 				}
 				else if (part.starts_with("height="))
 				{
-					fontChar.height = Parse::to_int(part.substr(7, part.length() - 7));
+					fontChar.height = Parse::to_int(part.substr(7, part.length() - 7)) * heightScale;
 				}
 				else if (part.starts_with("xoffset="))
 				{
-					fontChar.xOffset = Parse::to_int(part.substr(8, part.length() - 8));
+					fontChar.xOffset = Parse::to_int(part.substr(8, part.length() - 8)) * widthScale;
 				}
 				else if (part.starts_with("yoffset="))
 				{
-					fontChar.yOffset = Parse::to_int(part.substr(8, part.length() - 8));
+					fontChar.yOffset = Parse::to_int(part.substr(8, part.length() - 8)) * heightScale;
 				}
 				else if (part.starts_with("xadvance="))
 				{
-					fontChar.xAdvance = Parse::to_int(part.substr(9, part.length() - 9));
+					fontChar.xAdvance = Parse::to_int(part.substr(9, part.length() - 9)) * widthScale;
 				}
 			}
+
+			builder.characters.push_back(fontChar);
 		}
 		else if (line.starts_with("kerning "))
 		{
@@ -801,8 +806,8 @@ Ref<FontVariant> Minty::AssetEngine::load_font_variant(Path const& path)
 					// ignore " "
 					String name = part.substr(6, part.length() - 7);
 					UUID textureId = read_id(directoryPath / name);
-					Ref<Texture> texture = get<Texture>(textureId);
-					dependencyTextures.push_back(texture.get());
+					builder.texture = get<Texture>(textureId);
+					dependencyTextures.push_back(builder.texture.get());
 
 					// create a material for the texture
 					MaterialBuilder materialBuilder
@@ -815,6 +820,14 @@ Ref<FontVariant> Minty::AssetEngine::load_font_variant(Path const& path)
 			}
 
 			CHECK_DEPENDENCIES(path.stem().string(), dependencyTextures);
+
+			if (builder.texture == nullptr || !builder.texture->get_width() || !builder.texture->get_height())
+			{
+				break;
+			}
+
+			widthScale = 1.0f / builder.texture->get_width();
+			heightScale = 1.0f / builder.texture->get_height();
 		}
 	}
 

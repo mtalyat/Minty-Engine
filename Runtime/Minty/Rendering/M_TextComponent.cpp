@@ -5,6 +5,7 @@
 #include "Minty/Rendering/M_Font.h"
 #include "Minty/Assets/M_AssetEngine.h"
 #include "Minty/Rendering/M_Builtin.h"
+#include "Minty/Rendering/M_Texture.h"
 #include "Minty/Serialization/M_Writer.h"
 #include "Minty/Serialization/M_Reader.h"
 
@@ -78,8 +79,6 @@ void Minty::TextComponent::regenerate_mesh()
 	if (font.get())
 	{
 		fontVariant = font->at(size, bold, italic);
-
-		MINTY_ASSERT_FORMAT(fontVariant != nullptr, "There is no FontVariant for font \"{}\", size={}, bold={}, italic={}.", font->get_name(), size, bold, italic);
 	}
 
 	// create mesh based on text
@@ -97,26 +96,83 @@ void Minty::TextComponent::generate_mesh()
 		.path = "TextMesh"
 	};
 	mesh = assets.create<Mesh>(builder);
+
+	if (text.empty()) return;
+
+	MINTY_ASSERT_FORMAT(fontVariant != nullptr, "There is no FontVariant for font \"{}\", size={}, bold={}, italic={}.", font->get_name(), size, bold, italic);
 	
-	// TEMP: rendering whole texture
-	// TODO: render appropriate letters
-	Vector2 const topLeft = Vector2(0.0f, 0.0f);
-	Vector2 const topRight = Vector2(1.0f, 0.0f);
-	Vector2 const bottomLeft = Vector2(0.0f, 1.0f);
-	Vector2 const bottomRight = Vector2(1.0f, 1.0f);
+	//Vector2 const topLeft = Vector2(0.0f, 0.0f);
+	//Vector2 const topRight = Vector2(1.0f, 0.0f);
+	//Vector2 const bottomLeft = Vector2(0.0f, 1.0f);
+	//Vector2 const bottomRight = Vector2(1.0f, 1.0f);
 
-	std::vector<Vertex2D> vertices =
-	{
-		{ topLeft, topLeft },
-		{ topRight, topRight },
-		{ bottomRight, bottomRight },
-		{ bottomLeft, bottomLeft }
-	};
+	//std::vector<Vertex2D> vertices =
+	//{
+	//	{ topLeft, topLeft },
+	//	{ topRight, topRight },
+	//	{ bottomRight, bottomRight },
+	//	{ bottomLeft, bottomLeft }
+	//};
 
-	std::vector<uint16_t> indices =
+	//std::vector<uint16_t> indices =
+	//{
+	//	0, 1, 2, 0, 2, 3
+	//};
+
+	std::vector<Vertex2D> vertices;
+	std::vector<uint16_t> indices;
+
+	float advance = 0.0f;
+	uint16_t index = 0;
+	float const width = static_cast<float>(fontVariant->get_texture()->get_width());
+	float const height = static_cast<float>(fontVariant->get_texture()->get_height());
+
+	for (char c : text)
 	{
-		0, 1, 2, 0, 2, 3
-	};
+		// get font character data
+		FontChar const* fc = fontVariant->get_char(c);
+
+		if (!fc)
+		{
+			MINTY_ERROR_FORMAT("There is no FontChar data for character \"{}\" in font \"{}\".", c, font->get_name());
+
+			continue;
+		}
+
+		Vector2 const min(fc->x, fc->y);
+		Vector2 const max(fc->x + fc->width, fc->y + fc->height);
+		Vector2 const offset(fc->xOffset, fc->yOffset);
+
+		// create vertices based on each char
+		vertices.push_back(Vertex2D{
+			.pos = Vector2(advance, 0.0f) + offset,
+			.coord = min
+			});
+		vertices.push_back(Vertex2D{
+			.pos = Vector2(advance + fc->width, 0.0f) + offset,
+			.coord = Vector2(max.x, min.y)
+			});
+		vertices.push_back(Vertex2D{
+			.pos = Vector2(advance + fc->width, fc->height) + offset,
+			.coord = max
+			});
+		vertices.push_back(Vertex2D{
+			.pos = Vector2(advance, fc->height) + offset,
+			.coord = Vector2(min.x, max.y)
+			});
+
+		// create indices, always in the same order
+		indices.push_back(index);
+		indices.push_back(index + 1);
+		indices.push_back(index + 2);
+		indices.push_back(index);
+		indices.push_back(index + 2);
+		indices.push_back(index + 3);
+		index += 4;
+
+		// advance the "cursor"
+		advance += fc->xAdvance;
+	}
 
 	// set mesh data
 	mesh->set_vertices(vertices);
