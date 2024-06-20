@@ -174,3 +174,17 @@ String Minty::Text::join(std::vector<String> const& list, size_t const start, si
 
 	return out;
 }
+
+String Minty::Text::replace(String const& string, String const& oldText, String const& newText)
+{
+	String result = string;
+	String::size_type pos = 0;
+
+	// replace all instances of oldText with newText
+	while ((pos = result.find(oldText, pos)) != String::npos) {
+		result.replace(pos, oldText.length(), newText);
+		pos += newText.length();
+	}
+
+	return result;
+}

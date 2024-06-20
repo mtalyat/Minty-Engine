@@ -10,6 +10,11 @@
 
 using namespace Minty;
 
+inline String Minty::Node::get_data_safe() const
+{
+    return Text::replace(_data, "\n", "\\n");
+}
+
 String Minty::Node::get_node_string() const
 {
     if (has_data())
@@ -17,12 +22,12 @@ String Minty::Node::get_node_string() const
         if (has_name())
         {
             // name and data
-            return std::format("{}: {}", get_name(), get_data());
+            return std::format("{}: {}", get_name(), get_data_safe());
         }
         else
         {
             // only data
-            return std::format("- {}", get_data());
+            return std::format("- {}", get_data_safe());
         }
     }
     else
@@ -60,7 +65,7 @@ std::vector<String> Minty::Node::get_formatted(bool const toplevel) const
     // if the first line is a value only (ex. "- value"), switch to ": value" to signify an ID or whatever
     if (!result.empty() && !has_name() && has_data())
     {
-        result[0] = std::format(": {}", get_data());
+        result[0] = std::format(": {}", get_data_safe());
     }
 
     return result;
@@ -361,6 +366,7 @@ Node Minty::Node::parse(std::vector<String> const& lines)
             // bullet point, use "" as key and the whole line as the value
             key = "";
             value = line.substr(2, line.size() - 2);
+            value = Text::replace(value, "\\n", "\n");
             newNode.set_data(value);
         }
         else
@@ -389,6 +395,7 @@ Node Minty::Node::parse(std::vector<String> const& lines)
                     // nothing on other side of the ": "
                     value = "";
                 }
+                value = Text::replace(value, "\\n", "\n");
                 newNode.set_data(value);
             }
         }
