@@ -34,7 +34,7 @@ FontChar const* Minty::FontVariant::get_char(char const ch) const
 	return &found->second;
 }
 
-int Minty::FontVariant::get_kerning(char const left, char const right) const
+float Minty::FontVariant::get_kerning(char const left, char const right) const
 {
 	int kerningId = compact_kerning(left, right);
 	auto const found = _kernings.find(kerningId);
@@ -42,7 +42,7 @@ int Minty::FontVariant::get_kerning(char const left, char const right) const
 	if (found == _kernings.end())
 	{
 		// default, do not adjust at all
-		return 0;
+		return 0.0f;
 	}
 
 	// adjust by some amount

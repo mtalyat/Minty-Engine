@@ -127,6 +127,8 @@ void Minty::TextComponent::generate_mesh()
 	float const width = static_cast<float>(fontVariant->get_texture()->get_width());
 	float const height = static_cast<float>(fontVariant->get_texture()->get_height());
 
+	char last = '\0';
+
 	for (char c : text)
 	{
 		// get font character data
@@ -142,6 +144,9 @@ void Minty::TextComponent::generate_mesh()
 		Vector2 const min(fc->x, fc->y);
 		Vector2 const max(fc->x + fc->width, fc->y + fc->height);
 		Vector2 const offset(fc->xOffset, fc->yOffset);
+		
+		// adjust spacing for special cases
+		advance += fontVariant->get_kerning(last, c);
 
 		// create vertices based on each char
 		vertices.push_back(Vertex2D{
@@ -172,6 +177,9 @@ void Minty::TextComponent::generate_mesh()
 
 		// advance the "cursor"
 		advance += fc->xAdvance;
+
+		// update new last char
+		last = c;
 	}
 
 	// set mesh data

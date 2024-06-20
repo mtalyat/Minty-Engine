@@ -751,7 +751,7 @@ Ref<FontVariant> Minty::AssetEngine::load_font_variant(Path const& path)
 		{
 			int first = 0;
 			int second = 0;
-			int amount = 0;
+			float amount = 0;
 			for (String const& part : parts)
 			{
 				if (part.starts_with("first="))
@@ -764,7 +764,7 @@ Ref<FontVariant> Minty::AssetEngine::load_font_variant(Path const& path)
 				}
 				else if (part.starts_with("amount="))
 				{
-					amount = Parse::to_int(part.substr(7, part.length() - 7));
+					amount = Parse::to_int(part.substr(7, part.length() - 7)) * widthScale;
 				}
 			}
 

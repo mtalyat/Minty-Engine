@@ -50,7 +50,7 @@ namespace Minty
 		std::vector<FontChar> characters;
 
 		// KERNINGS
-		std::unordered_map<int, int> kernings;
+		std::unordered_map<int, float> kernings;
 	};
 
 	/// <summary>
@@ -74,7 +74,7 @@ namespace Minty
 		std::unordered_map<char, FontChar> _characters;
 
 		// KERNINGS
-		std::unordered_map<int, int> _kernings;
+		std::unordered_map<int, float> _kernings;
 
 	public:
 		FontVariant(FontVariantBuilder const& builder);
@@ -85,7 +85,7 @@ namespace Minty
 		Ref<Texture> get_texture() const { return _texture; }
 		Ref<Material> get_material() const { return _material; }
 		FontChar const* get_char(char const ch) const;
-		int get_kerning(char const left, char const right) const;
+		float get_kerning(char const left, char const right) const;
 
 		static int compact_kerning(int const left, int const right) { return ((left & 0xffff) << 16) | (right & 0xffff); }
 	};
