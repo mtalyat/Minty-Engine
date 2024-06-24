@@ -43,6 +43,7 @@ access to the entire engine without needing include each file.
 #include "Minty/Core/M_Constants.h"
 #include "Minty/Core/M_Engine.h"
 #include "Minty/Core/M_Macros.h"
+#include "Minty/Core/M_Meta.h"
 #include "Minty/Core/M_Pointer.h"
 #include "Minty/Core/M_Window.h"
 

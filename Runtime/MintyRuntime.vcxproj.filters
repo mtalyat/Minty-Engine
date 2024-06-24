@@ -501,6 +501,9 @@
     <ClInclude Include="Minty\Systems\M_AllSystems.h">
       <Filter>Minty\Systems</Filter>
     </ClInclude>
+    <ClInclude Include="Minty\Core\M_Meta.h">
+      <Filter>Minty\Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="dllmain.cpp">
@@ -888,6 +891,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Minty\Rendering\M_TextComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Core\M_Meta.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

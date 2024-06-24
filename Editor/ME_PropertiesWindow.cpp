@@ -82,6 +82,8 @@ bool Mintye::PropertiesWindow::input_node(Minty::Node& rootNode, bool const prin
 
 	size_t i = offset;
 
+	String className = rootNode.get_name();
+
 	while (!nodes.empty())
 	{
 		// get next node
@@ -108,7 +110,9 @@ bool Mintye::PropertiesWindow::input_node(Minty::Node& rootNode, bool const prin
 			memcpy(buffer, pair.first->get_data().c_str(), size);
 			buffer[size - 1] = '\0';
 
-			String text = std::format("{}{}: ", indentString, pair.first->get_name());
+			String memberName = pair.first->get_name();
+
+			String text = std::format("{}{}: ", indentString, memberName);
 			float leftTextWidth = ImGui::CalcTextSize(text.c_str()).x;
 			ImGui::Text(text.c_str());
 			ImGui::SameLine();
@@ -120,11 +124,25 @@ bool Mintye::PropertiesWindow::input_node(Minty::Node& rootNode, bool const prin
 				idName = get_application().get_name(id);
 			}
 			float rightTextWidth = ImGui::CalcTextSize(idName.c_str()).x;
-			// add 10 so it is within the group box
-			if (ImGui::InputTextMultilineExpandOffset(std::format("{}##{}", idName, i).c_str(), buffer, BUFFER_SIZE, leftTextWidth, rightTextWidth + 10.0f))
+			String label = std::format("{}##{}", idName, i);
+			MetaType metaType = MetaDatabase::get(className, memberName);
+			if (metaType == MetaType::MultilineString)
 			{
-				pair.first->set_data(buffer);
-				modified = true;
+				// add 10 so it is within the group box
+				if (ImGui::InputTextMultilineExpandOffset(label.c_str(), buffer, BUFFER_SIZE, leftTextWidth, rightTextWidth + 10.0f))
+				{
+					pair.first->set_data(buffer);
+					modified = true;
+				}
+			}
+			else
+			{
+				// add 10 so it is within the group box
+				if (ImGui::InputTextExpandOffset(label.c_str(), buffer, BUFFER_SIZE, leftTextWidth, rightTextWidth + 10.0f))
+				{
+					pair.first->set_data(buffer);
+					modified = true;
+				}
 			}
 		}
 
