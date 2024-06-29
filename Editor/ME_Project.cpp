@@ -209,7 +209,7 @@ void Project::refresh()
 				{
 					// create a new meta with a random ID, the rest can be populated later
 					// (ID is the most important for asset loading)
-					Node node("", to_string(UUID()));
+					Node node("", to_string(UUID::create()));
 					File::write_node(Asset::get_meta_path(path), node);
 				}
 

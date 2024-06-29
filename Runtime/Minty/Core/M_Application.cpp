@@ -17,6 +17,8 @@
 
 #include "Minty/Input/M_Input.h"
 
+#include "Minty/Core/M_Meta.h"
+
 using namespace Minty;
 
 #define CREATE_DEFAULT_ENGINE_IF_NEEDED(type, name) (builder.name ? builder.name : new type())
@@ -40,6 +42,9 @@ Minty::Application::Application(ApplicationBuilder const& builder)
 
 	try
 	{
+		// set up meta for reflection
+		MetaDatabase::init();
+		
 		// create engines
 		push_engine(CREATE_DEFAULT_ENGINE_IF_NEEDED(AssetEngine, assetEngine));
 		push_engine(CREATE_DEFAULT_ENGINE_IF_NEEDED(AudioEngine, audioEngine));

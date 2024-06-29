@@ -128,6 +128,22 @@ bool Minty::Parse::try_byte(String const& string, Byte& value)
     return false;
 }
 
+char Minty::Parse::to_char(String const& string)
+{
+    return static_cast<char>(std::stoi(string));
+}
+
+bool Minty::Parse::try_char(String const& string, char& value)
+{
+    if (is_unsigned_integer(string))
+    {
+        value = static_cast<char>(std::stoi(string));
+        return true;
+    }
+
+    return false;
+}
+
 short Minty::Parse::to_short(String const& string)
 {
     return static_cast<short>(std::stoi(string));

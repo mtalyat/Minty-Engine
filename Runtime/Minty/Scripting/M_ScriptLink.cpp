@@ -44,6 +44,7 @@
 #include "Minty/Rendering/M_RenderableComponent.h"
 #include "Minty/Scripting/M_ScriptComponent.h"
 #include "Minty/Rendering/M_SpriteComponent.h"
+#include "Minty/Rendering/M_TextComponent.h"
 #include "Minty/Components/M_TransformComponent.h"
 #include "Minty/UI/M_UITransformComponent.h"
 
@@ -761,6 +762,7 @@ void Minty::ScriptLink::link()
 	register_component<RenderableComponent>(ASSEMBLY_ENGINE_NAME, "Renderable", true);
 	register_component<ScriptComponent>(ASSEMBLY_ENGINE_NAME, "Script", true);
 	register_component<SpriteComponent>(ASSEMBLY_ENGINE_NAME, "Sprite", true);
+	register_component<TextComponent>(ASSEMBLY_ENGINE_NAME, "Text", true);
 	register_component<TransformComponent>(ASSEMBLY_ENGINE_NAME, "Transform", true);
 	register_component<UITransformComponent>(ASSEMBLY_ENGINE_NAME, "UITransform", true);
 

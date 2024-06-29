@@ -447,9 +447,6 @@
     <ClInclude Include="Minty\UI\M_CanvasComponent.h">
       <Filter>Minty\UI</Filter>
     </ClInclude>
-    <ClInclude Include="Minty\UI\M_UIPushData.h">
-      <Filter>Minty\UI</Filter>
-    </ClInclude>
     <ClInclude Include="Platform\Windows\M_WindowsWindow.h">
       <Filter>Platform\Windows</Filter>
     </ClInclude>
@@ -495,8 +492,17 @@
     <ClInclude Include="Minty\Core\M_Pointer.h">
       <Filter>Minty\Core</Filter>
     </ClInclude>
-    <ClInclude Include="M_AllSystems.h">
+    <ClInclude Include="Minty\Rendering\M_Font.h">
+      <Filter>Minty\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Rendering\M_TextComponent.h">
+      <Filter>Minty\Rendering</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Systems\M_AllSystems.h">
       <Filter>Minty\Systems</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Core\M_Meta.h">
+      <Filter>Minty\Core</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -879,6 +885,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\Libraries\imguifiledialog\include\ImGuiFileDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Rendering\M_Font.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Rendering\M_TextComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Core\M_Meta.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

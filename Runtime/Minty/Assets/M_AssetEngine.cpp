@@ -11,6 +11,7 @@
 #include "Minty/Files/M_PhysicalFile.h"
 #include "Minty/Core/M_Application.h"
 #include "Minty/Scripting/M_ScriptEngine.h"
+#include "Minty/Tools/M_Text.h"
 
 // ASSETS:
 #include "Minty/Rendering/M_Texture.h"
@@ -25,6 +26,7 @@
 #include "Minty/Animation/M_Animation.h"
 #include "Minty/Animation/M_Animator.h"
 #include "Minty/Assets/M_GenericAsset.h"
+#include "Minty/Rendering/M_Font.h"
 
 #ifdef MINTY_RELEASE
 #define CHECK_MISSING_DEPENDENCIES(name, missing)
@@ -172,6 +174,10 @@ Ref<Asset> Minty::AssetEngine::load_asset(Path const& path)
 		return load_shader_pass(path);
 	case AssetType::Shader:
 		return load_shader(path);
+	case AssetType::FontVariant:
+		return load_font_variant(path);
+	case AssetType::Font:
+		return load_font(path);
 	case AssetType::Mesh:
 		return load_mesh(path);
 	case AssetType::AudioClip:
@@ -420,6 +426,7 @@ Ref <ShaderPass> Minty::AssetEngine::load_shader_pass(Path const& path)
 	builder.cullMode = from_string_vk_cull_mode_flag_bits(reader.read_string("cullMode"));
 	builder.frontFace = from_string_vk_front_face(reader.read_string("frontFace"));
 	builder.lineWidth = reader.read_float("lineWidth", 1.0f);
+	builder.transparent = reader.read_bool("transparent", false);
 
 	std::vector<Node const*> nodes = node.find_all("binding");
 	for (auto const* child : nodes)
@@ -665,6 +672,213 @@ void Minty::AssetEngine::load_mesh_obj(Path const& path, Mesh& mesh)
 	mesh.set_indices(indices);
 }
 
+Ref<FontVariant> Minty::AssetEngine::load_font_variant(Path const& path)
+{
+	CHECK(path);
+
+	Node meta = read_file_meta(path);
+	Reader reader(meta);
+
+	std::vector<String> lines = read_file_lines(path);
+
+	FontVariantBuilder builder
+	{
+		.id = meta.to_uuid(),
+		.path = path
+	};
+
+	UUID materialTemplateId = reader.read_uuid("materialTemplate");
+	Ref<MaterialTemplate> materialTemplate = get<MaterialTemplate>(materialTemplateId);
+	{
+		std::vector<void*> materialTemplateDependencies =
+		{
+			materialTemplate.get()
+		};
+		CHECK_DEPENDENCIES(path.stem().string(), materialTemplateDependencies);
+	}
+
+	float widthScale = 1.0f;
+	float heightScale = 1.0f;
+
+	for (String const& line : lines)
+	{
+		// split by tabs
+		std::vector<String> parts = Text::split_words(line);
+
+		// determine what to do based on first word in line
+		if (line.starts_with("char "))
+		{
+			FontChar fontChar{};
+
+			for (String const& part : parts)
+			{
+				if (part.starts_with("id="))
+				{
+					fontChar.id = Parse::to_char(part.substr(3, part.length() - 3));
+				}
+				else if (part.starts_with("x="))
+				{
+					fontChar.x = Parse::to_int(part.substr(2, part.length() - 2)) * widthScale;
+				}
+				else if (part.starts_with("y="))
+				{
+					fontChar.y = Parse::to_int(part.substr(2, part.length() - 2)) * heightScale;
+				}
+				else if (part.starts_with("width="))
+				{
+					fontChar.width = Parse::to_int(part.substr(6, part.length() - 6)) * widthScale;
+				}
+				else if (part.starts_with("height="))
+				{
+					fontChar.height = Parse::to_int(part.substr(7, part.length() - 7)) * heightScale;
+				}
+				else if (part.starts_with("xoffset="))
+				{
+					fontChar.xOffset = Parse::to_int(part.substr(8, part.length() - 8)) * widthScale;
+				}
+				else if (part.starts_with("yoffset="))
+				{
+					fontChar.yOffset = Parse::to_int(part.substr(8, part.length() - 8)) * heightScale;
+				}
+				else if (part.starts_with("xadvance="))
+				{
+					fontChar.xAdvance = Parse::to_int(part.substr(9, part.length() - 9)) * widthScale;
+				}
+			}
+
+			builder.characters.push_back(fontChar);
+		}
+		else if (line.starts_with("kerning "))
+		{
+			int first = 0;
+			int second = 0;
+			float amount = 0;
+			for (String const& part : parts)
+			{
+				if (part.starts_with("first="))
+				{
+					first = Parse::to_int(part.substr(6, part.length() - 6));
+				}
+				else if (part.starts_with("second="))
+				{
+					second = Parse::to_int(part.substr(7, part.length() - 7));
+				}
+				else if (part.starts_with("amount="))
+				{
+					amount = Parse::to_int(part.substr(7, part.length() - 7)) * widthScale;
+				}
+			}
+
+			// pack kerning into builder
+			builder.kernings.emplace(FontVariant::compact_kerning(first, second), amount);
+		}
+		else if (line.starts_with("info "))
+		{
+			for (String const& part : parts)
+			{
+				if (part.starts_with("size="))
+				{
+					builder.size = Parse::to_uint(part.substr(5, part.length() - 5));
+				}
+				else if (part.starts_with("bold="))
+				{
+					builder.bold = static_cast<bool>(Parse::to_int(part.substr(5, part.length() - 5)));
+				}
+				else if (part.starts_with("italic="))
+				{
+					builder.italic = static_cast<bool>(Parse::to_int(part.substr(7, part.length() - 7)));
+				}
+			}
+		}
+		else if (line.starts_with("common "))
+		{
+			for (String const& part : parts)
+			{
+				if (part.starts_with("lineHeight="))
+				{
+					builder.lineHeight = static_cast<float>(Parse::to_int(part.substr(11, part.length() - 11)));
+				}
+			}
+		}
+		else if (line.starts_with("page "))
+		{
+			// textures to load
+			Path directoryPath = path.parent_path();
+			std::vector<void*> dependencyTextures;
+
+			for (String const& part : parts)
+			{
+				if (part.starts_with("file="))
+				{
+					// ignore " "
+					String name = part.substr(6, part.length() - 7);
+					UUID textureId = read_id(directoryPath / name);
+					builder.texture = get<Texture>(textureId);
+					dependencyTextures.push_back(builder.texture.get());
+
+					// create a material for the texture
+					MaterialBuilder materialBuilder
+					{
+						.materialTemplate = materialTemplate,
+					};
+					materialBuilder.values.emplace("texture", Dynamic(&textureId, sizeof(UUID)));
+					builder.material = create<Material>(materialBuilder);
+				}
+			}
+
+			CHECK_DEPENDENCIES(path.stem().string(), dependencyTextures);
+
+			if (builder.texture == nullptr || !builder.texture->get_width() || !builder.texture->get_height())
+			{
+				break;
+			}
+
+			widthScale = 1.0f / builder.texture->get_width();
+			heightScale = 1.0f / builder.texture->get_height();
+		}
+	}
+
+	// apply scales to values that need it
+	builder.lineHeight *= heightScale;
+
+	return create<FontVariant>(builder);
+}
+
+Ref<Font> Minty::AssetEngine::load_font(Path const& path)
+{
+	// read font file
+	CHECK(path);
+
+	Node node = read_file_node(path);
+	Node meta = read_file_meta(path);
+	Reader reader(node);
+
+	FontBuilder builder
+	{
+		.id = meta.to_uuid(),
+		.path = path,
+		.name = reader.read_string("name")
+	};
+
+	// read variants list, they should already be loaded
+	std::vector<void*> variantDependencies;
+	std::vector<UUID> variants;
+	if (reader.try_read_vector<UUID>("variants", variants))
+	{
+		for (UUID const id : variants)
+		{
+			Ref<FontVariant> variant = get<FontVariant>(id);
+			MINTY_ASSERT(variant != nullptr);
+			builder.variants.push_back(variant);
+			variantDependencies.push_back(variant.get());
+		}
+	}
+
+	CHECK_DEPENDENCIES(path.stem().string(), variantDependencies);
+
+	return create<Font>(builder);
+}
+
 Ref <AudioClip> Minty::AssetEngine::load_audio_clip(Path const& path)
 {
 	CHECK(path);
@@ -907,7 +1121,31 @@ std::vector<Ref<Asset>> Minty::AssetEngine::get_dependents(Ref<Asset> const asse
 				result.push_back(sprite);
 			}
 		}
+		// FontVariants use Textures and Material Templates
+		for (auto const font : get_by_type<FontVariant>())
+		{
+			if (font->get_texture() == asset)
+			{
+				result.push_back(font->get_texture());
+			}
+			else if (font->get_material().get() && (font->get_material()->get_template() == asset))
+			{
+				result.push_back(font->get_material()->get_template());
+			}
+		}
 		break;
+	case AssetType::FontVariant:
+		// Fonts use FontVariants
+		for (auto const font : get_by_type<Font>())
+		{
+			for (Ref<FontVariant> const variant : font->get_variants())
+			{
+				if (variant == asset)
+				{
+					result.push_back(variant);
+				}
+			}
+		}
 	}
 
 	return result;

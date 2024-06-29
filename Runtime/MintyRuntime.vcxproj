@@ -254,6 +254,7 @@
     <ClInclude Include="Minty\Core\M_Constants.h" />
     <ClInclude Include="Minty\Core\M_Engine.h" />
     <ClInclude Include="Minty\Core\M_Macros.h" />
+    <ClInclude Include="Minty\Core\M_Meta.h" />
     <ClInclude Include="Minty\Core\M_Pointer.h" />
     <ClInclude Include="Minty\Core\M_Window.h" />
     <ClInclude Include="Minty\Entities\M_Entity.h" />
@@ -295,6 +296,7 @@
     <ClInclude Include="Minty\Rendering\M_CoordinateMode.h" />
     <ClInclude Include="Minty\Rendering\M_DescriptorSet.h" />
     <ClInclude Include="Minty\Rendering\M_DrawCallObjectInfo.h" />
+    <ClInclude Include="Minty\Rendering\M_Font.h" />
     <ClInclude Include="Minty\Rendering\M_Material.h" />
     <ClInclude Include="Minty\Rendering\M_MaterialTemplate.h" />
     <ClInclude Include="Minty\Rendering\M_Mesh.h" />
@@ -310,6 +312,7 @@
     <ClInclude Include="Minty\Rendering\M_Sprite.h" />
     <ClInclude Include="Minty\Rendering\M_SpriteComponent.h" />
     <ClInclude Include="Minty\Rendering\M_SpritePushData.h" />
+    <ClInclude Include="Minty\Rendering\M_TextComponent.h" />
     <ClInclude Include="Minty\Rendering\M_Texture.h" />
     <ClInclude Include="Minty\Rendering\M_TextureAtlas.h" />
     <ClInclude Include="Minty\Rendering\M_UniformConstantInfo.h" />
@@ -330,6 +333,7 @@
     <ClInclude Include="Minty\Serialization\M_Reader.h" />
     <ClInclude Include="Minty\Serialization\M_SerializationData.h" />
     <ClInclude Include="Minty\Serialization\M_Writer.h" />
+    <ClInclude Include="Minty\Systems\M_AllSystems.h" />
     <ClInclude Include="Minty\Systems\M_System.h" />
     <ClInclude Include="Minty\Systems\M_SystemRegistry.h" />
     <ClInclude Include="Minty\Tools\M_Compression.h" />
@@ -358,10 +362,8 @@
     <ClInclude Include="Minty\Types\M_UUID.h" />
     <ClInclude Include="Minty\Types\M_Vector.h" />
     <ClInclude Include="Minty\UI\M_CanvasComponent.h" />
-    <ClInclude Include="Minty\UI\M_UIPushData.h" />
     <ClInclude Include="Minty\UI\M_UISystem.h" />
     <ClInclude Include="Minty\UI\M_UITransformComponent.h" />
-    <ClInclude Include="M_AllSystems.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Platform\Windows\M_WindowsWindow.h" />
   </ItemGroup>
@@ -415,6 +417,7 @@
     <ClCompile Include="Minty\Components\M_TagComponent.cpp" />
     <ClCompile Include="Minty\Components\M_TransformComponent.cpp" />
     <ClCompile Include="Minty\Core\M_Application.cpp" />
+    <ClCompile Include="Minty\Core\M_Meta.cpp" />
     <ClCompile Include="Minty\Core\M_Window.cpp" />
     <ClCompile Include="Minty\Entities\M_EntityRegistry.cpp" />
     <ClCompile Include="Minty\Files\M_File.cpp" />
@@ -436,6 +439,7 @@
     <ClCompile Include="Minty\Rendering\M_CameraComponent.cpp" />
     <ClCompile Include="Minty\Rendering\M_CoordinateMode.cpp" />
     <ClCompile Include="Minty\Rendering\M_DescriptorSet.cpp" />
+    <ClCompile Include="Minty\Rendering\M_Font.cpp" />
     <ClCompile Include="Minty\Rendering\M_Material.cpp" />
     <ClCompile Include="Minty\Rendering\M_MaterialTemplate.cpp" />
     <ClCompile Include="Minty\Rendering\M_Mesh.cpp" />
@@ -449,6 +453,7 @@
     <ClCompile Include="Minty\Rendering\M_ShaderPass.cpp" />
     <ClCompile Include="Minty\Rendering\M_Sprite.cpp" />
     <ClCompile Include="Minty\Rendering\M_SpriteComponent.cpp" />
+    <ClCompile Include="Minty\Rendering\M_TextComponent.cpp" />
     <ClCompile Include="Minty\Rendering\M_Texture.cpp" />
     <ClCompile Include="Minty\Rendering\M_TextureAtlas.cpp" />
     <ClCompile Include="Minty\Rendering\M_Viewport.cpp" />

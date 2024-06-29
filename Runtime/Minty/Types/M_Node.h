@@ -58,6 +58,8 @@ namespace Minty
 			return _data;
 		}
 
+		String get_data_safe() const;
+
 		void set_data(String const& data)
 		{
 			_data = data;

@@ -50,6 +50,10 @@ namespace Minty
 		/// The width of the line if the polygon mode is not fill.
 		/// </summary>
 		float lineWidth;
+		/// <summary>
+		/// When enabled, configuration is changed to support transparency.
+		/// </summary>
+		bool transparent;
 
 		/// <summary>
 		/// The vertex bindings.
@@ -79,6 +83,8 @@ namespace Minty
 
 		DescriptorSet _descriptorSet;
 
+		bool _transparent;
+
 	public:
 		/// <summary>
 		/// Creates an empty ShaderPass.
@@ -103,19 +109,25 @@ namespace Minty
 		/// Gets the Shader ID for this ShaderPass.
 		/// </summary>
 		/// <returns></returns>
-		Ref<Shader> get_shader() const;
+		Ref<Shader> get_shader() const { return _shader; }
 
 		/// <summary>
 		/// Gets the pipeline for this ShaderPass.
 		/// </summary>
 		/// <returns></returns>
-		VkPipeline get_pipeline() const;
+		VkPipeline get_pipeline() const { return _pipeline; }
 
 		/// <summary>
 		/// Gets the descriptor set for this ShaderPass.
 		/// </summary>
 		/// <returns></returns>
-		DescriptorSet const& get_descriptor_set() const;
+		DescriptorSet const& get_descriptor_set() const { return _descriptorSet; }
+
+		/// <summary>
+		/// Checks if this ShaderPass supports transparency.
+		/// </summary>
+		/// <returns></returns>
+		bool is_transparent() const { return _transparent; }
 
 	private:
 		// creates the graphics pipeline for this ShaderPass

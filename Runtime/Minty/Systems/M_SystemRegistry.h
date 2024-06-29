@@ -106,6 +106,12 @@ namespace Minty
 		void update(Time const time);
 
 		/// <summary>
+		/// Runs the finalize method on each System within this SystemRegistry.
+		/// </summary>
+		/// <param name="time"></param>
+		void finalize();
+
+		/// <summary>
 		/// Runs the fixedUpdate method on each System within this SystemRegistry.
 		/// </summary>
 		void fixed_update(Time const time);

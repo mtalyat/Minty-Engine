@@ -122,26 +122,26 @@ namespace Minty
 		}
 
 		template<typename U>
-		bool operator==(Owner<U> const& other) const { return _ptr == other.get(); }
+		bool operator==(Owner<U> const& other) const { return get() == other.get(); }
 		template<typename U>
-		bool operator==(U* const other) const { return _ptr == other; }
+		bool operator==(U* const other) const { return get() == other; }
 		template<typename U>
-		bool operator==(Ref<U> const& other) const { return _ptr == other.get(); }
-		bool operator==(std::nullptr_t const other) const { return _ptr == other; }
+		bool operator==(Ref<U> const& other) const { return get() == other.get(); }
+		bool operator==(std::nullptr_t const other) const { return get() == nullptr; }
 		template<typename U>
 		bool operator!=(Owner<U> const& other) const { return !(*this == other); }
 		template<typename U>
 		bool operator!=(U* const other) const { return !(*this == other); }
 		template<typename U>
 		bool operator!=(Ref<U> const& other) const { return !(*this == other); }
-		bool operator!=(std::nullptr_t const other) const { return !(*this == other); }
+		bool operator!=(std::nullptr_t const other) const { return get() != nullptr; }
 		template<typename U>
-		bool operator<(Owner<U> const& other) const { return _ptr < other.get(); }
+		bool operator<(Owner<U> const& other) const { return get() < other.get(); }
 		template<typename U>
-		bool operator<(U* const other) const { return _ptr < other; }
+		bool operator<(U* const other) const { return get() < other; }
 		template<typename U>
-		bool operator<(Ref<U> const& other) const { return _ptr < other.get(); }
-		bool operator!() const { return !static_cast<bool>(_counter->strongCount); }
+		bool operator<(Ref<U> const& other) const { return get() < other.get(); }
+		bool operator!() const { return !_counter || !static_cast<bool>(_counter->strongCount); }
 
 		T* get() const { return _ptr; }
 		T& operator*() const { return *get(); }
@@ -251,25 +251,25 @@ namespace Minty
 		}
 
 		template<typename U>
-		bool operator==(Owner<U> const& other) const { return _ptr == other.get(); }
+		bool operator==(Owner<U> const& other) const { return get() == other.get(); }
 		template<typename U>
-		bool operator==(U* const other) const { return _ptr == other; }
+		bool operator==(U* const other) const { return get() == other; }
 		template<typename U>
-		bool operator==(Ref<U> const& other) const { return _ptr == other.get(); }
-		bool operator==(std::nullptr_t const other) const { return _ptr == other; }
+		bool operator==(Ref<U> const& other) const { return get() == other.get(); }
+		bool operator==(std::nullptr_t const other) const { return get() == nullptr; }
 		template<typename U>
 		bool operator!=(Owner<U> const& other) const { return !(*this == other); }
 		template<typename U>
 		bool operator!=(U* const other) const { return !(*this == other); }
 		template<typename U>
 		bool operator!=(Ref<U> const& other) const { return !(*this == other); }
-		bool operator!=(std::nullptr_t const other) const { return !(*this == other); }
+		bool operator!=(std::nullptr_t const other) const { return get() != nullptr; }
 		template<typename U>
-		bool operator<(Owner<U> const& other) const { return _ptr < other.get(); }
+		bool operator<(Owner<U> const& other) const { return get() < other.get(); }
 		template<typename U>
-		bool operator<(U* const other) const { return _ptr < other; }
+		bool operator<(U* const other) const { return get() < other; }
 		template<typename U>
-		bool operator<(Ref<U> const& other) const { return _ptr < other.get(); }
+		bool operator<(Ref<U> const& other) const { return get() < other.get(); }
 		bool operator!() const { return !_counter || !_counter->strongCount; }
 
 		T* get() const

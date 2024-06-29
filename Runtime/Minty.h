@@ -43,6 +43,7 @@ access to the entire engine without needing include each file.
 #include "Minty/Core/M_Constants.h"
 #include "Minty/Core/M_Engine.h"
 #include "Minty/Core/M_Macros.h"
+#include "Minty/Core/M_Meta.h"
 #include "Minty/Core/M_Pointer.h"
 #include "Minty/Core/M_Window.h"
 
@@ -91,6 +92,7 @@ access to the entire engine without needing include each file.
 #include "Minty/Rendering/M_CoordinateMode.h"
 #include "Minty/Rendering/M_DescriptorSet.h"
 #include "Minty/Rendering/M_DrawCallObjectInfo.h"
+#include "Minty/Rendering/M_Font.h"
 #include "Minty/Rendering/M_Material.h"
 #include "Minty/Rendering/M_MaterialTemplate.h"
 #include "Minty/Rendering/M_Mesh.h"
@@ -105,6 +107,7 @@ access to the entire engine without needing include each file.
 #include "Minty/Rendering/M_Sprite.h"
 #include "Minty/Rendering/M_SpriteComponent.h"
 #include "Minty/Rendering/M_SpritePushData.h"
+#include "Minty/Rendering/M_TextComponent.h"
 #include "Minty/Rendering/M_Texture.h"
 #include "Minty/Rendering/M_TextureAtlas.h"
 #include "Minty/Rendering/M_UniformConstantInfo.h"
@@ -165,6 +168,5 @@ access to the entire engine without needing include each file.
 
 // UI
 #include "Minty/UI/M_CanvasComponent.h"
-#include "Minty/UI/M_UIPushData.h"
 #include "Minty/UI/M_UISystem.h"
 #include "Minty/UI/M_UITransformComponent.h"

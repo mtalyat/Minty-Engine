@@ -13,8 +13,5 @@ void main() {
     outColor = fragColor * texture(texSampler, fragTexCoord);
 
     // ignore invisible pixels
-    if(outColor.a == 0)
-    {
-        discard;
-    }
+    if(outColor.a == 0) discard;
 }

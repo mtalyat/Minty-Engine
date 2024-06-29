@@ -4,7 +4,7 @@
 #include "Minty/Assets/M_AssetEngine.h"
 #include "Minty/Rendering/M_DrawCallObjectInfo.h"
 #include "Minty/Rendering/M_SpritePushData.h"
-#include "Minty/UI/M_UIPushData.h"
+#include "Minty/Rendering/M_Builtin.h"
 
 #include "Minty/Rendering/M_Camera.h"
 #include "Minty/Tools/M_Console.h"
@@ -25,6 +25,7 @@
 #include "Minty/Rendering/M_CameraComponent.h"
 #include "Minty/Rendering/M_MeshComponent.h"
 #include "Minty/Rendering/M_RenderableComponent.h"
+#include "Minty/Rendering/M_TextComponent.h"
 #include "Minty/Components/M_RelationshipComponent.h"
 #include "Minty/Components/M_EnabledComponent.h"
 
@@ -1076,55 +1077,80 @@ void Minty::RenderEngine::draw_scene(VkCommandBuffer commandBuffer)
 		}
 	}
 
-	// sort sprites so they render in the correct order, since Z does not matter
-	_registry->sort<SpriteComponent>([](SpriteComponent const& left, SpriteComponent const& right)
-		{
-			return
-				left.layer > right.layer ||
-				(left.layer == right.layer && left.order > right.order);
-		});
-
 	// draw all world sprites in the scene
 	auto spriteView = _registry->view<RenderableComponent const, TransformComponent const, SpriteComponent const, EnabledComponent const>();
-	spriteView.use<SpriteComponent const>();
 	for (auto&& [entity, renderable, transform, sprite, enabled] : spriteView.each())
 	{
 		draw_sprite(commandBuffer, transform, sprite);
 	}
+
+	// sort sprites so they render in the correct order, since Z does not matter
+	_registry->sort<UITransformComponent>([](UITransformComponent const& left, UITransformComponent const& right)
+		{
+			return left.z < right.z;
+		});
 
 	// sort UITransforms so that it matches order of sprites for rendering
 	//_registry->sort<UITransformComponent, SpriteComponent>();
 
 	// draw all UI in scene
 	// keep track of the canvas being used
-	Entity canvasEntity = NULL_ENTITY;
-	auto uiSpriteView = _registry->view<RenderableComponent const, UITransformComponent const, SpriteComponent const, EnabledComponent const>();
-	uiSpriteView.use<SpriteComponent const>();
-	for (auto&& [entity, renderable, ui, sprite, enabled] : uiSpriteView.each())
+	Entity lastCanvas = NULL_ENTITY;
+	Ref<Shader> lastShader = nullptr;
+
+	AssetType type = AssetType::None;
+	Ref<Shader> shader = nullptr;
+	TextComponent* textComponent = nullptr;
+	SpriteComponent* spriteComponent = nullptr;
+
+	auto uiFontView = _registry->view<UITransformComponent const, RenderableComponent const, EnabledComponent const>();
+	for (auto&& [entity, ui, renderable, enabled] : uiFontView.each())
 	{
-		// if new canvas, update shader values
-		if (ui.canvas != canvasEntity)
+		if ((spriteComponent = _registry->try_get<SpriteComponent>(entity)) && spriteComponent->sprite.get())
 		{
-			canvasEntity = ui.canvas;
-
-			// TODO: make safer
-			if (sprite.sprite.get())
-			{
-				Ref<Shader> shader = sprite.sprite->get_material()->get_template()->get_shader_passes().front()->get_shader();
-
-				MINTY_ASSERT(shader != nullptr);
-
-				CanvasComponent* canvas = _registry->try_get<CanvasComponent>(canvasEntity);
-				CanvasBufferObject canvasBufferObject
-				{
-					.width = canvas ? canvas->referenceResolutionWidth : 0,
-					.height = canvas ? canvas->referenceResolutionHeight : 0,
-				};
-				shader->update_global_uniform_constant("canvas", &canvasBufferObject, sizeof(CanvasBufferObject), 0);
-			}
+			type = AssetType::Sprite;
+			shader = spriteComponent->sprite->get_material()->get_template()->get_shader_passes().front()->get_shader();
+		}
+		else if ((textComponent = _registry->try_get<TextComponent>(entity)) && textComponent->fontVariant.get())
+		{
+			type = AssetType::Text;
+			shader = textComponent->fontVariant->get_material()->get_template()->get_shader_passes().front()->get_shader();
+		}
+		else
+		{
+			continue;
 		}
 
-		draw_ui(commandBuffer, ui, sprite);
+		MINTY_ASSERT(shader != nullptr);
+
+		// if new canvas, update shader values
+		if (ui.canvas != lastCanvas || shader != lastShader)
+		{
+			lastCanvas = ui.canvas;
+			lastShader = shader;
+
+			// TODO: make safer
+			// update Canvas global constant
+
+			CanvasComponent* canvas = _registry->try_get<CanvasComponent>(lastCanvas);
+			CanvasBufferObject canvasBufferObject
+			{
+				.width = canvas ? canvas->referenceResolutionWidth : 0,
+				.height = canvas ? canvas->referenceResolutionHeight : 0,
+			};
+			shader->update_global_uniform_constant("canvas", &canvasBufferObject, sizeof(CanvasBufferObject), 0);
+		}
+
+		// render mesh with font and font material
+		switch (type)
+		{
+		case AssetType::Sprite:
+			draw_ui(commandBuffer, ui, *spriteComponent);
+			break;
+		case AssetType::Text:
+			draw_text(commandBuffer, ui, *textComponent);
+			break;
+		}
 	}
 
 	// unbind any shaders used
@@ -1235,6 +1261,45 @@ void Minty::RenderEngine::draw_ui(VkCommandBuffer commandBuffer, UITransformComp
 
 	// draw
 	vkCmdDraw(commandBuffer, 6, 1, 0, 0);
+}
+
+void Minty::RenderEngine::draw_text(VkCommandBuffer commandBuffer, UITransformComponent const& uiComponent, TextComponent const& textComponent)
+{
+	// ignore if no mesh or font
+	if (textComponent.mesh == nullptr || textComponent.fontVariant == nullptr) return;
+
+	// get the mesh and material
+	Ref<Material> material = textComponent.fontVariant->get_material();
+	Ref<Mesh> mesh = textComponent.mesh;
+
+	// bind the material the sprite is using
+	bind(commandBuffer, material);
+
+	// bind vertex data
+	VkBuffer vertexBuffers[] = { mesh->get_vertex_buffer()->get_buffer() };
+	VkDeviceSize offsets[] = { 0 };
+	vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+	vkCmdBindIndexBuffer(commandBuffer, mesh->get_index_buffer()->get_buffer(), 0, mesh->get_index_type());
+
+	// TODO: make safer
+	Ref<Shader> shader = material->get_template()->get_shader_passes().front()->get_shader();
+
+	MINTY_ASSERT(shader != nullptr);
+
+	// update push data and draw
+	UITextPushData pushData
+	{
+		.x = uiComponent.globalRect.x,
+		.y = uiComponent.globalRect.y,
+		.width = uiComponent.globalRect.width,
+		.height = uiComponent.globalRect.height,
+		.color = textComponent.color.toVector(),
+		.anchorMode = static_cast<int>(uiComponent.anchorMode),
+	};
+	shader->update_push_constant(commandBuffer, &pushData, sizeof(UITextPushData));
+
+	// draw
+	vkCmdDrawIndexed(commandBuffer, mesh->get_index_count(), 1, 0, 0, 0);
 }
 
 bool RenderEngine::check_validation_layer_support()

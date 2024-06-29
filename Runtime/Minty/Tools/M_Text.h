@@ -71,9 +71,18 @@ namespace Minty
 		/// <returns>A vector of strings, not including the delimiters.</returns>
 		std::vector<String> split(String const& string, String const& delimiter);
 
+		/// <summary>
+		/// Splits the string based on one or more spaces in a row.
+		/// </summary>
+		/// <param name="string">The string to split.</param>
+		/// <returns>A vector of strings, not including the spaces.</returns>
+		std::vector<String> split_words(String const& string);
+
 		String join(std::vector<String> const& list, String const& separator = ", ");
 
 		String join(std::vector<String> const& list, size_t const start, size_t const count, String const& separator = ", ");
+
+		String replace(String const& string, String const& oldText, String const& newText);
 
 		// https://stackoverflow.com/questions/216823/how-to-trim-a-stdstring
 		//void ltrim(std::string& s) {

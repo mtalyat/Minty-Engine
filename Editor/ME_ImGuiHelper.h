@@ -14,6 +14,10 @@ namespace ImGui
 	bool InputTextExpand(char const* label, char* buf, size_t buf_size, float const widthPercent = 1.0f, ImGuiInputTextFlags flags = 0);
 
 	bool InputTextExpandOffset(char const* label, char* buf, size_t buf_size, float const offsetLeft, float const offsetRight, float const widthPercent = 1.0f, ImGuiInputTextFlags flags = 0);
+	
+	bool InputTextMultilineExpand(char const* label, char* buf, size_t buf_size, float const widthPercent = 1.0f, ImGuiInputTextFlags flags = 0);
+
+	bool InputTextMultilineExpandOffset(char const* label, char* buf, size_t buf_size, float const offsetLeft, float const offsetRight, float const widthPercent = 1.0f, ImGuiInputTextFlags flags = 0);
 
 	bool ButtonAlignedLeft(char const* label, ImVec2 const& size);
 }

@@ -25,7 +25,39 @@ namespace Minty::Builtin
 
 	struct Vertex2D
 	{
+		alignas(8)
 		Vector2 pos;
+		alignas(8)
 		Vector2 coord;
+	};
+
+	struct UIPushData
+	{
+		alignas(16) 
+		float x; // left
+		float y; // top
+		float width; // right
+		float height; // bottom
+		Vector4 color;
+		alignas(16) int anchorMode;
+		int unused0, unused1, unused2;
+	};
+
+	struct CanvasBufferObject
+	{
+		alignas(16) int width;
+		int height;
+		int unused0, unused1;
+	};
+
+	struct UITextPushData
+	{
+		alignas(16) float x; // left
+		float y; // top
+		float width; // right
+		float height; // bottom
+		Vector4 color;
+		alignas(16) int anchorMode;
+		int unused0, unused1, unused2;
 	};
 }
