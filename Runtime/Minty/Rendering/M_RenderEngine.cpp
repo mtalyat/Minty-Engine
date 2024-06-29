@@ -1095,7 +1095,9 @@ void Minty::RenderEngine::draw_scene(VkCommandBuffer commandBuffer)
 
 	// draw all UI in scene
 	// keep track of the canvas being used
-	Entity canvasEntity = NULL_ENTITY;
+	Entity lastCanvas = NULL_ENTITY;
+	Ref<Shader> lastShader = nullptr;
+
 	AssetType type = AssetType::None;
 	Ref<Shader> shader = nullptr;
 	TextComponent* textComponent = nullptr;
@@ -1107,37 +1109,30 @@ void Minty::RenderEngine::draw_scene(VkCommandBuffer commandBuffer)
 		if ((spriteComponent = _registry->try_get<SpriteComponent>(entity)) && spriteComponent->sprite.get())
 		{
 			type = AssetType::Sprite;
+			shader = spriteComponent->sprite->get_material()->get_template()->get_shader_passes().front()->get_shader();
 		}
 		else if ((textComponent = _registry->try_get<TextComponent>(entity)) && textComponent->fontVariant.get())
 		{
 			type = AssetType::Text;
+			shader = textComponent->fontVariant->get_material()->get_template()->get_shader_passes().front()->get_shader();
 		}
 		else
 		{
 			continue;
 		}
 
+		MINTY_ASSERT(shader != nullptr);
+
 		// if new canvas, update shader values
-		if (ui.canvas != canvasEntity)
+		if (ui.canvas != lastCanvas || shader != lastShader)
 		{
-			canvasEntity = ui.canvas;
+			lastCanvas = ui.canvas;
+			lastShader = shader;
 
 			// TODO: make safer
 			// update Canvas global constant
 
-			switch (type)
-			{
-			case AssetType::Sprite:
-				shader = spriteComponent->sprite->get_material()->get_template()->get_shader_passes().front()->get_shader();
-				break;
-			case AssetType::Text:
-				shader = textComponent->fontVariant->get_material()->get_template()->get_shader_passes().front()->get_shader();
-				break;
-			}
-
-			MINTY_ASSERT(shader != nullptr);
-
-			CanvasComponent* canvas = _registry->try_get<CanvasComponent>(canvasEntity);
+			CanvasComponent* canvas = _registry->try_get<CanvasComponent>(lastCanvas);
 			CanvasBufferObject canvasBufferObject
 			{
 				.width = canvas ? canvas->referenceResolutionWidth : 0,
