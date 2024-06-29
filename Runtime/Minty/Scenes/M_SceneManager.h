@@ -40,13 +40,20 @@ namespace Minty
 		/// </summary>
 		/// <param name="path">The path to the .scene file.</param>
 		/// <returns>The ID of the new Scene.</returns>
-		Scene& create_scene(Path const& path);
+		Ref<Scene> create_scene(Path const& path);
 
 		/// <summary>
 		/// Destroys the Scene with the given ID.
 		/// </summary>
 		/// <param name="id">The ID of the Scene.</param>
 		bool destroy_scene(UUID const id);
+
+		/// <summary>
+		/// Checks if the Scene with the given ID has been created.
+		/// </summary>
+		/// <param name="id"></param>
+		/// <returns></returns>
+		bool is_created(UUID const id) const;
 
 		/// <summary>
 		/// Loads the Scene with the given ID. Unloads the current Scene first.

@@ -91,5 +91,11 @@ namespace MintyEngine
         #endregion
 
         #endregion
+
+        #region SceneManager
+
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void SceneManager_Load(string path);
+
+        #endregion
     }
 }

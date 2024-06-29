@@ -191,8 +191,8 @@ void Minty::Application::load_starting_scene()
 		if (Node const* scenes = node.find("scenes"))
 		{
 			SceneManager& sceneManager = _defaultLayer->get_scene_manager();
-			Scene& scene = sceneManager.create_scene(scenes->get_children().front().get_data());
-			sceneManager.load_scene(scene.get_id());
+			Ref<Scene> scene = sceneManager.create_scene(scenes->get_children().front().get_data());
+			sceneManager.load_scene(scene->get_id());
 		}
 	}
 }

@@ -387,7 +387,7 @@ void Mintye::EditorApplication::load_scene(Minty::Path const& path)
 
 	// load new scene
 	SceneManager& sceneManager = Application::instance().get_scene_manager();
-	set_scene(sceneManager.create_scene(path).get_id());
+	set_scene(sceneManager.create_scene(path)->get_id());
 	sceneManager.load_scene(_sceneId);
 	sceneManager.load();
 

@@ -9,10 +9,8 @@ namespace MintyEngine
     /// <summary>
     /// Represents a game object within the Scene that can have components and scripts attached to it.
     /// </summary>
-    public class Entity : Object
+    public class Entity : GameObject
     {
-        internal readonly ulong ID;
-
         public string Name
         {
             get => Runtime.Entity_GetName(ID);
@@ -40,16 +38,6 @@ namespace MintyEngine
         public int ChildCount
         {
             get => Runtime.Entity_GetChildCount(ID);
-        }
-
-        protected Entity()
-        {
-            ID = 0;
-        }
-
-        internal Entity(ulong id)
-        {
-            ID = id;
         }
 
         #region Component

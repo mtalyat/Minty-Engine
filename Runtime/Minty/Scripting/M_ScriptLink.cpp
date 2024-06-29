@@ -738,6 +738,43 @@ static void transform_get_forward(UUID id, Vector3* direction)
 
 #pragma endregion
 
+#pragma region SceneManager
+
+static void scene_manager_load(MonoString* string)
+{
+	// unload old, destroy old, create new, load it
+	SceneManager& sceneManager = util_get_scene_manager();
+
+	// get current
+	Ref<Scene> scene = sceneManager.get_loaded_scene();
+
+	// if a scene is loaded, unload and destroy it
+	if (scene != nullptr)
+	{
+		// unload current
+		sceneManager.unload_scene();
+
+		// destroy current
+		sceneManager.destroy_scene(scene->get_id());
+	}
+
+	// get path
+	ScriptEngine& scripts = ScriptEngine::instance();
+	String pathString = scripts.from_mono_string(string);
+	Path pathPath = Path(pathString);
+
+	// create new scene
+	scene = sceneManager.create_scene(pathPath);
+
+	// if successfully created, load it too
+	if (scene != nullptr)
+	{
+		sceneManager.load_scene(scene->get_id());
+	}
+}
+
+#pragma endregion
+
 void Minty::ScriptLink::link()
 {
 	// link all the classes
@@ -848,6 +885,11 @@ void Minty::ScriptLink::link()
 #pragma endregion
 
 #pragma endregion
+
+#pragma region SceneManager
+	ADD_INTERNAL_CALL("SceneManager_Load", scene_manager_load);
+#pragma endregion
+
 }
 
 #undef ADD_INTERNAL_CALL

@@ -17,16 +17,16 @@
 
 using namespace Minty;
 
-Scene& Minty::SceneManager::create_scene(Path const& path)
+Ref<Scene> Minty::SceneManager::create_scene(Path const& path)
 {
 	// load the data from the disk
 	AssetEngine& assets = AssetEngine::instance();
 	Node node = assets.read_file_node(path);
-	Node meta = assets.read_file_meta(path);
+	//Node meta = assets.read_file_meta(path);
 
 	SceneBuilder builder
 	{
-		.id = meta.to_uuid(),
+		//.id = meta.to_uuid(),
 		.path = path
 	};
 
@@ -38,7 +38,7 @@ Scene& Minty::SceneManager::create_scene(Path const& path)
 	assets.emplace(scene);
 
 	// all done
-	return *scene;
+	return scene;
 }
 
 bool Minty::SceneManager::destroy_scene(UUID const id)
@@ -68,6 +68,11 @@ bool Minty::SceneManager::destroy_scene(UUID const id)
 	}
 
 	return false;
+}
+
+bool Minty::SceneManager::is_created(UUID const id) const
+{
+	return AssetEngine::instance().contains(id);
 }
 
 void Minty::SceneManager::load_scene(UUID const id)
