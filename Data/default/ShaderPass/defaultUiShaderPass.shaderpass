@@ -4,6 +4,7 @@ polygonMode: FILL
 cullMode: NONE
 frontFace: CLOCKWISE
 lineWidth: 1
+transparent: TRUE
 stage: VERTEX_BIT
     path: BuiltIn/Shader/defaultUiVert.spv
 stage: FRAGMENT_BIT

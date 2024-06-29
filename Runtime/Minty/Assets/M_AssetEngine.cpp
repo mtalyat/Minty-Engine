@@ -426,6 +426,7 @@ Ref <ShaderPass> Minty::AssetEngine::load_shader_pass(Path const& path)
 	builder.cullMode = from_string_vk_cull_mode_flag_bits(reader.read_string("cullMode"));
 	builder.frontFace = from_string_vk_front_face(reader.read_string("frontFace"));
 	builder.lineWidth = reader.read_float("lineWidth", 1.0f);
+	builder.transparent = reader.read_bool("transparent", false);
 
 	std::vector<Node const*> nodes = node.find_all("binding");
 	for (auto const* child : nodes)

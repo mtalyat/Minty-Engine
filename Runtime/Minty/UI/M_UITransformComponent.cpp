@@ -166,6 +166,8 @@ void Minty::UITransformComponent::serialize(Writer& writer) const
 		writer.write("y", y);
 		writer.write("height", height);
 	}
+
+	writer.write("z", z);
 }
 
 void Minty::UITransformComponent::deserialize(Reader const& reader)
@@ -176,6 +178,8 @@ void Minty::UITransformComponent::deserialize(Reader const& reader)
 	reader.try_read_float("left", left);
 	reader.try_read_float("y", y);
 	reader.try_read_float("top", top);
+	reader.try_read_float("z", z);
+	reader.try_read_float("depth", depth);
 	reader.try_read_float("width", width);
 	reader.try_read_float("right", right);
 	reader.try_read_float("height", height);

@@ -13,6 +13,7 @@ Minty::ShaderPass::ShaderPass(ShaderPassBuilder const& builder)
 	, _shader(builder.shader)
 	, _pipeline()
 	, _descriptorSet(DescriptorSetBuilder())
+	, _transparent(builder.transparent)
 {
 	MINTY_ASSERT(builder.shader != nullptr);
 
@@ -31,21 +32,6 @@ void Minty::ShaderPass::destroy()
 	_shader = nullptr;
 	vkDestroyPipeline(RenderEngine::instance().get_device(), _pipeline, nullptr);
 	_descriptorSet.destroy();
-}
-
-Ref<Shader> Minty::ShaderPass::get_shader() const
-{
-	return _shader;
-}
-
-VkPipeline Minty::ShaderPass::get_pipeline() const
-{
-	return _pipeline;
-}
-
-DescriptorSet const& Minty::ShaderPass::get_descriptor_set() const
-{
-	return _descriptorSet;
 }
 
 void Minty::ShaderPass::create_pipeline(ShaderPassBuilder const& builder)
@@ -148,7 +134,7 @@ void Minty::ShaderPass::create_pipeline(ShaderPassBuilder const& builder)
 	{
 		.sType = VK_STRUCTURE_TYPE_PIPELINE_DEPTH_STENCIL_STATE_CREATE_INFO,
 		.depthTestEnable = VK_TRUE,
-		.depthWriteEnable = VK_TRUE,
+		.depthWriteEnable = builder.transparent ? VK_FALSE : VK_TRUE,
 		.depthCompareOp = VK_COMPARE_OP_LESS,
 		.depthBoundsTestEnable = VK_FALSE,
 		.stencilTestEnable = VK_FALSE,

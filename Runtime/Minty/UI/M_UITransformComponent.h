@@ -33,6 +33,8 @@ namespace Minty
 
 		union { float x, left; };
 		union { float y, top; };
+		union { float z, depth; };
+
 		union { float width, right; };
 		union { float height, bottom; };
 
