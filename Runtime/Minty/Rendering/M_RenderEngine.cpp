@@ -1266,7 +1266,7 @@ void Minty::RenderEngine::draw_ui(VkCommandBuffer commandBuffer, UITransformComp
 void Minty::RenderEngine::draw_text(VkCommandBuffer commandBuffer, UITransformComponent const& uiComponent, TextComponent const& textComponent)
 {
 	// ignore if no mesh or font
-	if (textComponent.mesh == nullptr || textComponent.fontVariant == nullptr) return;
+	if (textComponent.mesh == nullptr || textComponent.mesh->empty() || textComponent.fontVariant == nullptr) return;
 
 	// get the mesh and material
 	Ref<Material> material = textComponent.fontVariant->get_material();

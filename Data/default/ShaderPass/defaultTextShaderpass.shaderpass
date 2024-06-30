@@ -1,0 +1,22 @@
+shader: f86dd4a72fcb8d77
+primitiveTopology: TRIANGLE_LIST
+polygonMode: FILL
+cullMode: NONE
+frontFace: CLOCKWISE
+lineWidth: 1
+transparent: TRUE
+binding: 0
+    stride: 16
+    inputRate: VERTEX
+attribute: 0
+    binding: 0
+    format: R32G32_SFLOAT
+    offset: 0
+attribute: 1
+    binding: 0
+    format: R32G32_SFLOAT
+    offset: 8
+stage: VERTEX_BIT
+    path: BuiltIn/Shader/defaultTextShaderVert.spv
+stage: FRAGMENT_BIT
+    path: BuiltIn/Shader/defaultTextShaderFrag.spv

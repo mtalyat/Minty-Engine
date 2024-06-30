@@ -1,0 +1,6 @@
+pass: fe8efd471cff4236
+defaults
+    canvas
+        e 16
+    texture
+        0: 0

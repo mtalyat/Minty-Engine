@@ -99,8 +99,7 @@ void Minty::TextComponent::generate_mesh()
 
 	if (text.empty()) return;
 
-	MINTY_ASSERT_FORMAT(font != nullptr, "There is no Font for text \"{}\".", text);
-	MINTY_ASSERT_FORMAT(fontVariant != nullptr, "There is no FontVariant for font \"{}\" for text \"{}\", size={}, bold={}, italic={}.", font->get_name(), text, size, bold, italic);
+	if (font == nullptr || fontVariant == nullptr) return;
 
 	std::vector<Vertex2D> vertices;
 	std::vector<uint16_t> indices;
