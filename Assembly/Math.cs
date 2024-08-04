@@ -50,6 +50,8 @@ namespace MintyEngine
 
         public static float Atan2(float y, float x) => (float)SystemMath.Atan2(y, x);
 
+        public static float Sqrt(float value) => (float)SystemMath.Sqrt(value);
+
         public static float Round(float value) => (float)SystemMath.Round(value);
         public static int RoundToInt(float value) => (int)SystemMath.Round(value);
 
