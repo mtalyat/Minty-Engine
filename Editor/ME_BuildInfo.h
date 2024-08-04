@@ -68,7 +68,8 @@ namespace Mintye
 
 		void set_config(bool const release);
 
-		bool get_config() const;
+		bool is_release() const { return _release; }
+		bool is_debug() const { return !_release; }
 
 		Minty::String const get_config_name() const;
 

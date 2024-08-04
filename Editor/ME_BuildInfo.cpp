@@ -28,11 +28,6 @@ void Mintye::BuildInfo::set_config(bool const release)
 	_release = release;
 }
 
-bool Mintye::BuildInfo::get_config() const
-{
-	return _release;
-}
-
 String const Mintye::BuildInfo::get_config_name() const
 {
 	return _release ? "Release" : "Debug";

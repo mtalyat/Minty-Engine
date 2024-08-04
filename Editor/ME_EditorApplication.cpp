@@ -844,11 +844,11 @@ void EditorApplication::draw_commands()
 	}
 
 	// get debug mode
-	bool release = _buildInfo.get_config();
+	bool release = _buildInfo.is_release();
 	ImGui::Checkbox("Release", &release);
 
 	// if changed, re-build
-	if (release != _buildInfo.get_config())
+	if (release != _buildInfo.is_release())
 	{
 		_buildInfo.set_config(release);
 		_buildInfo.set_flag(BuildInfo::BuildFlags::All);
@@ -936,7 +936,7 @@ void EditorApplication::generate_cmake()
 		"set(CMAKE_CXX_STANDARD_REQUIRED ON)" << std::endl <<
 		"set(CMAKE_CXX_EXTENSIONS OFF)" << std::endl;
 
-	if (!_buildInfo.get_config())
+	if (!_buildInfo.is_release())
 	{
 		// only ignore if in debug mode
 		file << "set(CMAKE_EXE_LINKER_FLAGS /NODEFAULTLIB:\\\"LIBCMT\\\")" << std::endl;
@@ -993,13 +993,40 @@ void EditorApplication::generate_main()
 
 	// write contents
 	file <<
-		"// " << std::format("{:%Y-%m-%d %H:%M:%OS}", now) << std::endl <<
-		"#include <Minty.h>" << std::endl <<
-		"int main(int argc, char const* argv[]) {" << std::endl <<
-		"\tMinty::Application app;" << std::endl <<
-		"\tapp.run();" << std::endl <<
-		"\treturn 0;" << std::endl <<
-		"}";
+		"// " << std::format("{:%Y-%m-%d %H:%M:%OS}", now) << "\n" <<
+		"#include <Minty.h>\n" <<
+		"int main(int argc, char const* argv[]) {\n" <<
+		"\tMinty::Application app;" << std::endl;
+
+	if (_buildInfo.is_debug())
+	{
+		file << "\ttry {" << std::endl;
+	}
+
+	file <<
+		"\tapp.run();" << std::endl;
+
+	if (_buildInfo.is_debug())
+	{
+		file <<
+			"\t}\n" <<
+			"\tcatch (const std::runtime_error& e) {\n" <<
+			"\t\tstd::cout << \"Runtime error : \" << e.what() << std::endl;\n" <<
+			"\t\tMinty::Debug::log_stack_trace();\n" <<
+			"\t}\n" <<
+			"\tcatch (const std::exception& e) {\n" <<
+			"\t\tstd::cout << \"Exception: \" << e.what() << std::endl;\n" <<
+			"\t\tMinty::Debug::log_stack_trace();\n" <<
+			"\t}\n" <<
+			"\tcatch (...) {\n" <<
+			"\t\tstd::cout << \"Unknown exception caught\" << std::endl;\n" <<
+			"\t\tMinty::Debug::log_stack_trace();\n" <<
+			"\t}\n" << std::endl;
+	}
+
+	file <<
+		"\treturn 0;\n" <<
+		"}" << std::flush;
 
 	file.close();
 }
