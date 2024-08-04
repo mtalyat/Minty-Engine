@@ -1161,6 +1161,10 @@ void Mintye::EditorApplication::run_shortcuts()
 		{
 			reload_project();
 		}
+		if (_project && ImGui::IsKeyPressed(ImGuiKey_B))
+		{
+			build_project();
+		}
 	}
 	else
 	{
