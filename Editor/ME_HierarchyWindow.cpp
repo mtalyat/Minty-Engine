@@ -190,6 +190,9 @@ Minty::Entity Mintye::HierarchyWindow::create_entity()
 	registry.enable(entity);
 	registry.set_renderable(entity, true);
 
+	// add transform by default
+	registry.emplace<TransformComponent>(entity);
+
 	return entity;
 }
 
@@ -353,8 +356,11 @@ void Mintye::HierarchyWindow::draw_popup()
 		set_selected(newEntity);
 		get_scene()->sort();
 
-		// set parent as clicked
-		registry.set_parent(newEntity, _clicked);
+		// set parent as clicked, if there was one
+		if (_clicked != NULL_ENTITY)
+		{
+			registry.set_parent(newEntity, _clicked);
+		}
 
 		return;
 	}
