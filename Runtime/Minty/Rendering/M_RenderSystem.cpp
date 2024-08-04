@@ -29,20 +29,35 @@ void Minty::RenderSystem::update(Time const time)
 	// do nothing if no camera
 	if (_camera == NULL_ENTITY)
 	{
-		MINTY_WARN("There is no Camera to render to!");
+		MINTY_WARN("There is no Camera to render to.");
 		return;
 	}
 
 	// get camera transform
 	EntityRegistry& entityRegistry = get_entity_registry();
 
+	if (!entityRegistry.all_of<CameraComponent>(_camera))
+	{
+		MINTY_WARN("The Camera entity has no Camera component.");
+		return;
+	}
+
 	// update camera in renderer if it is enabled
 	if (entityRegistry.all_of<EnabledComponent>(_camera))
 	{
 		CameraComponent const& camera = entityRegistry.get<CameraComponent>(_camera);
-		TransformComponent const& transformComponent = entityRegistry.get<TransformComponent>(_camera);
+		TransformComponent const* transformComponent = entityRegistry.try_get<TransformComponent>(_camera);
 
-		update_camera(camera, transformComponent);
+		if (transformComponent)
+		{
+			update_camera(camera, *transformComponent);
+		}
+		else
+		{
+			// fake an empty transform component
+			TransformComponent temp;
+			update_camera(camera, temp);
+		}
 	}
 }
 
