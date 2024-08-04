@@ -42,5 +42,7 @@ namespace Minty
 
 		void serialize(Writer& writer) const override;
 		void deserialize(Reader const& reader) override;
+
+		static TransformComponent create_empty();
 	};
 }

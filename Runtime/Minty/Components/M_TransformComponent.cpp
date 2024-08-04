@@ -55,3 +55,10 @@ void Minty::TransformComponent::deserialize(Reader const& reader)
 	reader.try_read_object("rotation", localRotation);
 	reader.try_read_object("scale", localScale);
 }
+
+TransformComponent Minty::TransformComponent::create_empty()
+{
+	TransformComponent component = {};
+	component.globalMatrix = component.get_local_matrix();
+	return component;
+}

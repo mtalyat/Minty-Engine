@@ -16,6 +16,8 @@
 #include "Minty/UI/M_UITransformComponent.h"
 #include "Minty/Entities/M_EntityRegistry.h"
 
+#include "Minty/Serialization/M_Reader.h"
+
 void Minty::DefaultLayer::on_attach()
 {
 	// TODO: find and load first scene, in a better way
@@ -25,11 +27,22 @@ void Minty::DefaultLayer::on_attach()
 	if (assets.exists(applicationDataPath))
 	{
 		Node node = assets.read_file_node(applicationDataPath);
+		Reader reader(node);
 
-		//if (Node const* assemblies = node.find("assemblies"))
-		//{
+		std::vector<Path> scenePaths;
+		if (reader.try_read_vector("scenes", scenePaths))
+		{
+			// if no scenes listed, nothing can be ran
+			if (scenePaths.empty())
+			{
+				MINTY_ABORT("No scenes found.");
+				return;
+			}
 
-		//}
+			// load the first scene
+			Ref<Scene> startingScene = _sceneManager.create_scene(scenePaths.front());
+			_sceneManager.load_scene(startingScene->get_id());
+		}
 	}
 
 	_sceneManager.load();

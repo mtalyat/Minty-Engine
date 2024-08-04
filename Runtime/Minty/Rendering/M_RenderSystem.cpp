@@ -55,7 +55,7 @@ void Minty::RenderSystem::update(Time const time)
 		else
 		{
 			// fake an empty transform component
-			TransformComponent temp;
+			TransformComponent temp = TransformComponent::create_empty();
 			update_camera(camera, temp);
 		}
 	}
