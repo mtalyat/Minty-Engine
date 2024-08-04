@@ -87,6 +87,8 @@ void Mintye::EditorApplication::draw()
 {
 	_taskFactory.update();
 
+	run_shortcuts();
+
 	draw_dock_space();
 	draw_menu_bar();
 	draw_commands();
@@ -320,6 +322,15 @@ Minty::Path Mintye::EditorApplication::get_project_dll_path() const
 	MINTY_ASSERT(_project);
 
 	return Path(std::format("{}/bin/{}/{}.dll", ASSEMBLY_DIRECTORY_NAME, _buildInfo.get_config_name(), _project->get_name()));
+}
+
+void Mintye::EditorApplication::reload_project()
+{
+	if (!_project) return;
+
+	Path path = _project->get_base_path();
+	unload_project();
+	load_project(path);
 }
 
 void Mintye::EditorApplication::open_scene()
@@ -664,17 +675,6 @@ void Mintye::EditorApplication::draw_menu_bar()
 	// https://github.com/ocornut/imgui/issues/331
 
 	bool createNewProject = false;
-
-	bool ctrl = ImGui::GetIO().KeyCtrl;
-
-	if (_project && _sceneId.valid() && ctrl && ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_S), false))
-	{
-		save_scene();
-	}
-	if (_project && ctrl && ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_O), false))
-	{
-		open_scene();
-	}
 
 	if (ImGui::BeginMainMenuBar())
 	{
@@ -1140,6 +1140,31 @@ void Mintye::EditorApplication::log_info(Minty::String const& message)
 	else
 	{
 		MINTY_INFO(message);
+	}
+}
+
+void Mintye::EditorApplication::run_shortcuts()
+{
+	ImGuiIO& io = ImGui::GetIO();
+
+	if (io.KeyCtrl)
+	{
+		if (_project && _sceneId.valid() && ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_S), false))
+		{
+			save_scene();
+		}
+		if (_project && ImGui::IsKeyPressed(ImGui::GetKeyIndex(ImGuiKey_O), false))
+		{
+			open_scene();
+		}
+		if (_project && ImGui::IsKeyPressed(ImGuiKey_R))
+		{
+			reload_project();
+		}
+	}
+	else
+	{
+
 	}
 }
 

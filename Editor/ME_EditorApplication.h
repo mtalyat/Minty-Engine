@@ -135,6 +135,8 @@ namespace Mintye
 
 		Minty::Path get_project_dll_path() const;
 
+		void reload_project();
+
 #pragma endregion
 
 #pragma region Scene
@@ -248,6 +250,13 @@ namespace Mintye
 		void log_error(Minty::String const& message);
 
 		void log_info(Minty::String const& message);
+
+#pragma endregion
+
+#pragma region Shortcuts
+
+	private:
+		void run_shortcuts();
 
 #pragma endregion
 
