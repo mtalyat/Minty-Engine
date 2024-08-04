@@ -1,9 +1,11 @@
+#include "Minty/Tools/M_Debug.h"
+
 // CUSTOM MODIFICATIONS
 // define a custom assert macro to override the default one so we can see the message
 #ifndef ENTT_ASSERT
 #include <iostream>
 #include <cassert>
-#define ENTT_ASSERT(condition, message) if(!(condition)) { std::cerr << "EnTT failed assert: (" #condition ") " #message << std::endl; assert(condition); }
+#define ENTT_ASSERT(condition, message) if(!(condition)) { Minty::Debug::log_stack_trace(); std::cerr << "EnTT failed assert: (" #condition ") " #message << std::endl; assert(condition); }
 #endif
 
 // IWYU pragma: begin_exports
