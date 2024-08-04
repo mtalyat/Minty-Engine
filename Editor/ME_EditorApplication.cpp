@@ -1403,7 +1403,7 @@ void EditorApplication::build_project()
 
 	if (_taskFactory.contains("build"))
 	{
-		console->log_error("Cannot build project: last build has not finished.");
+		//console->log_error("Cannot build project: last build has not finished.");
 		return;
 	}
 

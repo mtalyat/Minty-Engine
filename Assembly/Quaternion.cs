@@ -34,24 +34,20 @@ namespace MintyEngine
 
             float x, y, z;
 
-            // Roll (Z-axis rotation)
-            float sinr_cosp = 2 * (_w * _z + _x * _y);
-            float cosr_cosp = 1 - 2 * (_y * _y + _z * _z);
-            z = Math.Atan2(sinr_cosp, cosr_cosp);
+            float sinrCosp = 2.0f * (_w * _x + _y + _z);
+            float cosrCosp = 1.0f - 2.0f * (_x * _x + _y * _y);
+            z = Math.Atan2(sinrCosp, cosrCosp);
 
-            // Pitch (X-axis rotation)
-            float sinp = 2 * (_w * _x - _z * _y);
-            if (Math.Abs(sinp) >= 1)
-                x = (Math.PI / 2.0f * Math.Sign(sinp));
-            else
-                x = Math.Asin(sinp);
+            float sinp = Math.Sqrt(1.0f + 2.0f * (_w * _y - _x * _z));
+            float cosp = Math.Sqrt(1.0f - 2.0f * (_w * _y - _x * _z));
+            x = 2.0f * Math.Atan2(sinp, cosp) - Math.PI * 0.5f;
 
-            // Yaw (Y-axis rotation)
-            float siny_cosp = 2 * (_w * _y + _z * _x);
-            float cosy_cosp = 1 - 2 * (_x * _x + _y * _y);
-            y = Math.Atan2(siny_cosp, cosy_cosp);
+            float sinyCosp = 2.0f * (_w * _z + _x + _y);
+            float cosyCosp = 1.0f - 2.0f * (_y * _y - _z * _z);
+            y = Math.Atan2(sinyCosp, cosyCosp);
 
-            return new Vector3(x, y, z);
+            // convert to degrees
+            return new Vector3(x, y, z) * Math.Rad2Deg;
         }
 
         public static Quaternion Identity()
@@ -63,6 +59,11 @@ namespace MintyEngine
 
         public static Quaternion FromEuler(float x, float y, float z)
         {
+            // convert to rads
+            x *= Math.Deg2Rad;
+            y *= Math.Deg2Rad;
+            z *= Math.Deg2Rad;
+
             // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
 
             float cr = Math.Cos(z * 0.5f);

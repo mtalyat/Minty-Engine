@@ -503,9 +503,17 @@ MonoObject* Minty::ScriptEngine::create_instance(MonoClass* const klass, std::ve
 	char const* name = mono_class_get_name(klass);
 	char const* nameSpace = mono_class_get_namespace(klass);
 
-	// get the constructor with the arguments
-	MonoMethod* ctor = mono_class_get_method_from_name(klass, ".ctor", static_cast<int>(values.size()));
-	MINTY_ASSERT(ctor != nullptr);
+	// get the constructor with the arguments, from parent class if necessary
+	int parameterCount = static_cast<int>(values.size());
+	MonoMethod* ctor = mono_class_get_method_from_name(klass, ".ctor", parameterCount);
+	MonoClass* parentKlass = mono_class_get_parent(klass);
+
+	while (ctor == nullptr && parentKlass != nullptr)
+	{
+		ctor = mono_class_get_method_from_name(parentKlass, ".ctor", parameterCount);
+		parentKlass = mono_class_get_parent(parentKlass);
+	}
+	MINTY_ASSERT_FORMAT(ctor != nullptr, "No constructor for {}.{} found with {} arguments.", nameSpace, name, values.size());
 
 	// call the constructor
 	invoke_method(instance, ctor, values);
@@ -655,9 +663,8 @@ ScriptObject& Minty::ScriptEngine::create_object_component(UUID id, UUID const e
 	MINTY_ASSERT(script.is_derived_from(*componentClass));
 
 	// get entity object
-	ScriptObject const* entity = get_object(entityId);
-	MINTY_ASSERT(entity != nullptr);
-	MonoObject* entityObject = entity->data();
+	ScriptObject& entity = get_or_create_entity(entityId);
+	MonoObject* entityObject = entity.data();
 	MINTY_ASSERT(entityObject != nullptr);
 
 	// spawn the object and save the entity to it
