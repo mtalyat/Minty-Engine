@@ -1,0 +1,15 @@
+texture: 151da98925b6ef8c
+material: be91bf757c0590c2
+coordinateMode: NORMALIZED
+min
+    x: 0
+    y: 0
+max
+    x: 1
+    y: 1
+pivot
+    x: 0.5
+    y: 0.5
+size
+    x: 1
+    y: 1
