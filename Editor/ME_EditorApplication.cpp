@@ -1028,24 +1028,40 @@ void Mintye::EditorApplication::copy_files()
 
 	// get all dependencies
 	std::unordered_set<String> dependencies;
+	
+	ScriptAssembly const* assembly = ScriptEngine::instance().get_assembly(_project->get_name());
+	if (assembly)
 	{
-		ScriptAssembly const* assembly = ScriptEngine::instance().get_assembly(_project->get_name());
-		ScriptAssembly const* engineAssembly = ScriptEngine::instance().get_assembly(ASSEMBLY_ENGINE_NAME);
-		dependencies = assembly->get_dependencies();
-		std::unordered_set<String> engineDependencies = engineAssembly->get_dependencies();
-		dependencies.insert(engineDependencies.begin(), engineDependencies.end());
+		std::unordered_set<String> temp = assembly->get_dependencies();
+		dependencies.insert(temp.begin(), temp.end());
+
+		// Project DLL
+		log_info("\tProject assembly");
+		String source = std::format("{}/bin/{}/{}.dll", _project->get_assembly_path().generic_string(), configName, projectName);
+		Operations::copy(source, targetDir);
+	}
+	else
+	{
+		MINTY_WARN("Project assembly not found on build.");
+	}
+
+	ScriptAssembly const* engineAssembly = ScriptEngine::instance().get_assembly(ASSEMBLY_ENGINE_NAME);
+	if (engineAssembly)
+	{
+		std::unordered_set<String> temp = engineAssembly->get_dependencies();
+		dependencies.insert(temp.begin(), temp.end());
+
+		// MintyEngine DLL
+		log_info("\tEngine assembly");
+		Operations::copy(_cwd / String(ASSEMBLY_ENGINE_NAME).append(".dll"), targetDir);
+	}
+	else
+	{
+		MINTY_WARN("Engine assembly not found on build.");
 	}
 	
+	// copy all dependencies
 	Operations::copy_some(_cwd / "mono", Path(targetDir) / "mono", dependencies);
-
-	// MintyEngine DLL
-	log_info("\tEngine DLL");
-	Operations::copy(_cwd / String(ASSEMBLY_ENGINE_NAME).append(".dll"), targetDir);
-
-	// Project DLL
-	log_info("\tProject DLL");
-	String source = std::format("{}/bin/{}/{}.dll", _project->get_assembly_path().generic_string(), configName, projectName);
-	Operations::copy(source, targetDir);
 
 	// Wrap files
 	log_info("\tWrap files");
