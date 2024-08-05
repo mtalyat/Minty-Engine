@@ -49,6 +49,16 @@ namespace MintyEngine
             return new Vector3(pitch * Math.Rad2Deg, yaw * Math.Rad2Deg, roll * Math.Rad2Deg);
         }
 
+        public static Quaternion operator *(Quaternion q1, Quaternion q2)
+        {
+            float x = q1.W * q2.X + q1.X * q2.W + q1.Y * q2.Z - q1.Z * q2.Y;
+            float y = q1.W * q2.Y - q1.X * q2.Z + q1.Y * q2.W + q1.Z * q2.X;
+            float z = q1.W * q2.Z + q1.X * q2.Y - q1.Y * q2.X + q1.Z * q2.W;
+            float w = q1.W * q2.W - q1.X * q2.X - q1.Y * q2.Y - q1.Z * q2.Z;
+
+            return new Quaternion(x, y, z, w);
+        }
+
         public static Quaternion Identity()
         {
             return new Quaternion(0.0f, 0.0f, 0.0f, 1.0f);
