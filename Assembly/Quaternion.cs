@@ -13,7 +13,7 @@ namespace MintyEngine
     /// </summary>
     public struct Quaternion
     {
-        private float _x, _y, _z, _w;
+        private readonly float _x, _y, _z, _w;
 
         public float X => _x;
         public float Y => _y;
@@ -32,22 +32,21 @@ namespace MintyEngine
         {
             // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
 
-            float x, y, z;
+            float roll, pitch, yaw;
 
-            float sinrCosp = 2.0f * (_w * _x + _y + _z);
+            float sinrCosp = 2.0f * (_w * _x + _y * _z);
             float cosrCosp = 1.0f - 2.0f * (_x * _x + _y * _y);
-            z = Math.Atan2(sinrCosp, cosrCosp);
+            pitch = (float)Math.Atan2(sinrCosp, cosrCosp);
 
-            float sinp = Math.Sqrt(1.0f + 2.0f * (_w * _y - _x * _z));
-            float cosp = Math.Sqrt(1.0f - 2.0f * (_w * _y - _x * _z));
-            x = 2.0f * Math.Atan2(sinp, cosp) - Math.PI * 0.5f;
+            float sinp = 2.0f * (_w * _y - _z * _x);
+            yaw = (float)(Math.Abs(sinp) >= 1.0f ? Math.CopySign(Math.PI * 0.5f, sinp) : Math.Asin(sinp));
 
-            float sinyCosp = 2.0f * (_w * _z + _x + _y);
-            float cosyCosp = 1.0f - 2.0f * (_y * _y - _z * _z);
-            y = Math.Atan2(sinyCosp, cosyCosp);
+            float sinyCosp = 2.0f * (_w * _z + _x * _y);
+            float cosyCosp = 1.0f - 2.0f * (_y * _y + _z * _z);
+            roll = (float)Math.Atan2(sinyCosp, cosyCosp);
 
-            // convert to degrees
-            return new Vector3(x, y, z) * Math.Rad2Deg;
+            // Convert to degrees
+            return new Vector3(pitch * Math.Rad2Deg, yaw * Math.Rad2Deg, roll * Math.Rad2Deg);
         }
 
         public static Quaternion Identity()
@@ -60,18 +59,18 @@ namespace MintyEngine
         public static Quaternion FromEuler(float x, float y, float z)
         {
             // convert to rads
-            x *= Math.Deg2Rad;
-            y *= Math.Deg2Rad;
-            z *= Math.Deg2Rad;
+            float roll = x * Math.Deg2Rad;
+            float pitch = y * Math.Deg2Rad;
+            float yaw = z * Math.Deg2Rad;
 
             // https://en.wikipedia.org/wiki/Conversion_between_quaternions_and_Euler_angles
 
-            float cr = Math.Cos(z * 0.5f);
-            float sr = Math.Sin(z * 0.5f);
-            float cp = Math.Cos(x * 0.5f);
-            float sp = Math.Sin(x * 0.5f);
-            float cy = Math.Cos(y * 0.5f);
-            float sy = Math.Sin(y * 0.5f);
+            float cp = (float)Math.Cos(pitch * 0.5f);
+            float sp = (float)Math.Sin(pitch * 0.5f);
+            float cy = (float)Math.Cos(yaw * 0.5f);
+            float sy = (float)Math.Sin(yaw * 0.5f);
+            float cr = (float)Math.Cos(roll * 0.5f);
+            float sr = (float)Math.Sin(roll * 0.5f);
 
             float qw = cr * cp * cy + sr * sp * sy;
             float qx = sr * cp * cy - cr * sp * sy;

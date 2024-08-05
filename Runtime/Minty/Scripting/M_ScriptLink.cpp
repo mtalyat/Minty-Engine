@@ -689,14 +689,14 @@ static void transform_get_local_rotation(UUID id, Vector4* rotation)
 {
 	TransformComponent& component = util_get_transform_component(id, false);
 
-	*rotation = Vector4(component.localRotation.y, component.localRotation.z, component.localRotation.x, component.localRotation.w);
+	*rotation = Vector4(component.localRotation.x, component.localRotation.y, component.localRotation.z, component.localRotation.w);
 }
 
 static void transform_set_local_rotation(UUID id, Vector4* rotation)
 {
 	TransformComponent& component = util_get_transform_component(id, true);
 
-	component.localRotation = Quaternion(rotation->w, rotation->y, rotation->z, rotation->x);
+	component.localRotation = Quaternion(rotation->w, rotation->x, rotation->y, rotation->z);
 }
 
 static void transform_get_local_scale(UUID id, Vector3* scale)

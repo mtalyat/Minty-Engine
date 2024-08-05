@@ -36,6 +36,11 @@ namespace MintyEngine
             return value < 0 ? -1 : (value > 0 ? 1 : 0);
         }
 
+        public static float CopySign(float value, float sign)
+        {
+            return sign >= 0 ? Abs(value) : -Abs(value);
+        }
+
         public static float Sin(float radians) => (float)SystemMath.Sin(radians);
 
         public static float Asin(float radians) => (float)SystemMath.Asin(radians);
