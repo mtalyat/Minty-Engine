@@ -240,8 +240,22 @@ void Minty::RenderEngine::set_camera(Vector3 const position, Quaternion const ro
 	case Perspective::Perspective:
 		proj = glm::perspective(camera.get_fov(), get_aspect_ratio(), camera.get_near(), camera.get_far());
 		break;
-	default: // (orthographic)
-		proj = Matrix4(1.0f);
+	case Perspective::Orthographic:
+	{
+		float orthoHeight = camera.get_size();
+		float orthoWidth = camera.get_size() * camera.get_aspect_ratio();
+		
+		float left = -orthoWidth * 0.5f;
+		float right = orthoWidth * 0.5f;
+		float bottom = -orthoHeight * 0.5f;
+		float top = orthoHeight * 0.5f;
+
+		proj = glm::ortho(left, right, bottom, top, camera.get_near(), camera.get_far());
+		break;
+	}
+	default:
+		MINTY_ERROR_FORMAT("Unrecognized Camera perspective: {}", static_cast<int>(camera.get_perspective()));
+		return;
 		break;
 	}
 

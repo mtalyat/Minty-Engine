@@ -33,6 +33,8 @@ Minty::Camera::Camera(CameraBuilder const& builder)
 	, _near(builder.nearPlane)
 	, _far(builder.farPlane)
 	, _color(builder.color)
+	, _aspectRatio(builder.aspectRatio)
+	, _size(builder.size)
 {}
 
 void Minty::Camera::serialize(Writer& writer) const
@@ -42,6 +44,8 @@ void Minty::Camera::serialize(Writer& writer) const
 	writer.write("near", _near);
 	writer.write("far", _far);
 	writer.write("color", _color);
+	writer.write("aspectRatio", _aspectRatio);
+	writer.write("size", _size);
 }
 
 void Minty::Camera::deserialize(Reader const& reader)
@@ -58,4 +62,6 @@ void Minty::Camera::deserialize(Reader const& reader)
 	reader.try_read_float("near", _near);
 	reader.try_read_float("far", _far);
 	reader.try_read_color("color", _color);
+	reader.try_read_float("aspectRatio", _aspectRatio);
+	reader.try_read_float("size", _size);
 }

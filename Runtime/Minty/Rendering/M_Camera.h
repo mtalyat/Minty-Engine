@@ -33,6 +33,8 @@ namespace Minty
 		float nearPlane = 0.1f;
 		float farPlane = 1000.0f;
 		Color color = Color::black();
+		float aspectRatio = 16.0f / 9.0f;
+		float size = 5.0f;
 	};
 
 	class Camera
@@ -44,6 +46,8 @@ namespace Minty
 		float _near;
 		float _far;
 		Color _color;
+		float _aspectRatio;
+		float _size;
 
 	public:
 		Camera(CameraBuilder const& builder = {});
@@ -61,6 +65,10 @@ namespace Minty
 
 		Color get_color() const { return _color; }
 
+		float get_aspect_ratio() const { return _aspectRatio; }
+
+		float get_size() const { return _size; }
+
 #pragma endregion
 
 #pragma region Set
@@ -75,6 +83,10 @@ namespace Minty
 		void set_far(float const farPlane) { _far = farPlane; }
 
 		void set_color(Color const color) { _color = color; }
+
+		void set_aspect_ratio(float const aspectRatio) { _aspectRatio = aspectRatio; }
+
+		void set_size(float const size) { _size = size; }
 
 #pragma endregion
 
