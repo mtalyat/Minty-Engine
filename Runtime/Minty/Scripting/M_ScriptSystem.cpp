@@ -79,6 +79,20 @@ void Minty::ScriptSystem::update(Time const time)
 	// unloading handled in finalize
 }
 
+void Minty::ScriptSystem::finalize()
+{
+	EntityRegistry& registry = get_entity_registry();
+
+	// finalize as per normal
+	for (auto [entity, script, onfinalize, enabled] : registry.view<ScriptComponent const, ScriptOnFinalizeComponent const, EnabledComponent const>().each())
+	{
+		for (auto const id : onfinalize.scriptIds)
+		{
+			script.scripts.at(id).invoke(SCRIPT_METHOD_NAME_ONFINALIZE);
+		}
+	}
+}
+
 void Minty::ScriptSystem::unload()
 {
 	EntityRegistry& registry = get_entity_registry();

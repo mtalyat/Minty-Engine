@@ -17,6 +17,8 @@ namespace Minty
 
 		void update(Time const time) override;
 
+		void finalize() override;
+
 		//void fixed_update() override;
 
 		void unload() override;

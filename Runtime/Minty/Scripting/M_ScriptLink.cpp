@@ -635,7 +635,40 @@ static void camera_set_far(UUID id, float value)
 	camera.camera.set_far(value);
 }
 
-static void camera_set_as_main(UUID id)
+static MonoObject* camera_get_main()
+{
+	Scene& scene = util_get_scene();
+	EntityRegistry& registry = scene.get_entity_registry();
+
+	// set main in render system
+	RenderSystem* renderSystem = scene.get_system_registry().find<RenderSystem>();
+	MINTY_ASSERT(renderSystem != nullptr);
+
+	Entity entity = renderSystem->get_camera();
+
+	if (entity == NULL_ENTITY)
+	{
+		return nullptr;
+	}
+
+	UUID id = registry.get_id(entity);
+
+	if (!registry.all_of<CameraComponent>(entity))
+	{
+		return nullptr;
+	}
+
+	CameraComponent& camera = registry.get<CameraComponent>(entity);
+
+	ScriptClass const* scriptClass = ScriptEngine::instance().find_class("MintyEngine.Camera");
+
+	MINTY_ASSERT(scriptClass);
+
+	ScriptObject const& componentObject = ScriptEngine::instance().get_or_create_component(camera.id, id, *scriptClass);
+	return componentObject.data();
+}
+
+static void camera_set_main(UUID id)
 {
 	MINTY_ASSERT(id.valid());
 
@@ -712,6 +745,50 @@ static void transform_set_local_scale(UUID id, Vector3* scale)
 
 	component.localScale = *scale;
 }
+
+static void transform_get_global_position(UUID id, Vector3* position)
+{
+	TransformComponent& component = util_get_transform_component(id, false);
+
+	*position = component.get_global_position();
+}
+
+//static void transform_set_global_position(UUID id, Vector3* position)
+//{
+//	TransformComponent& component = util_get_transform_component(id, true);
+//
+//	component.localPosition = *position;
+//}
+
+static void transform_get_global_rotation(UUID id, Vector4* rotation)
+{
+	TransformComponent& component = util_get_transform_component(id, false);
+
+	Quaternion rot = component.get_global_rotation();
+
+	*rotation = Vector4(rot.x, rot.y, rot.z, rot.w);
+}
+
+//static void transform_set_global_rotation(UUID id, Vector4* rotation)
+//{
+//	TransformComponent& component = util_get_transform_component(id, true);
+//
+//	component.localRotation = Quaternion(rotation->w, rotation->x, rotation->y, rotation->z);
+//}
+
+static void transform_get_global_scale(UUID id, Vector3* scale)
+{
+	TransformComponent& component = util_get_transform_component(id, false);
+
+	*scale = component.get_global_scale();
+}
+
+//static void transform_set_global_scale(UUID id, Vector3* scale)
+//{
+//	TransformComponent& component = util_get_transform_component(id, true);
+//
+//	component.localScale = *scale;
+//}
 
 static void transform_get_right(UUID id, Vector3* direction)
 {
@@ -867,7 +944,8 @@ void Minty::ScriptLink::link()
 	ADD_INTERNAL_CALL("Camera_SetNear", camera_set_near);
 	ADD_INTERNAL_CALL("Camera_GetFar", camera_get_far);
 	ADD_INTERNAL_CALL("Camera_SetFar", camera_set_far);
-	ADD_INTERNAL_CALL("Camera_SetAsMain", camera_set_as_main);
+	ADD_INTERNAL_CALL("Camera_GetMain", camera_get_main);
+	ADD_INTERNAL_CALL("Camera_SetMain", camera_set_main);
 	ADD_INTERNAL_CALL("Camera_GetColor", camera_get_color);
 	ADD_INTERNAL_CALL("Camera_SetColor", camera_set_color);
 #pragma endregion
@@ -879,6 +957,12 @@ void Minty::ScriptLink::link()
 	ADD_INTERNAL_CALL("Transform_SetLocalRotation", transform_set_local_rotation);
 	ADD_INTERNAL_CALL("Transform_GetLocalScale", transform_get_local_scale);
 	ADD_INTERNAL_CALL("Transform_SetLocalScale", transform_set_local_scale);
+	ADD_INTERNAL_CALL("Transform_GetGlobalPosition", transform_get_global_position);
+	//ADD_INTERNAL_CALL("Transform_SetGlobalPosition", transform_set_global_position);
+	ADD_INTERNAL_CALL("Transform_GetGlobalRotation", transform_get_global_rotation);
+	//ADD_INTERNAL_CALL("Transform_SetGlobalRotation", transform_set_global_rotation);
+	ADD_INTERNAL_CALL("Transform_GetGlobalScale", transform_get_global_scale);
+	//ADD_INTERNAL_CALL("Transform_SetGlobalScale", transform_set_global_scale);
 	ADD_INTERNAL_CALL("Transform_GetRight", transform_get_right);
 	ADD_INTERNAL_CALL("Transform_GetUp", transform_get_up);
 	ADD_INTERNAL_CALL("Transform_GetForward", transform_get_forward);

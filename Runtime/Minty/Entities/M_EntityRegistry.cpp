@@ -1240,6 +1240,7 @@ void Minty::EntityRegistry::register_script(String const& name)
 				registry.connect_event<ScriptOnLoadComponent>(entity, id, scriptObject, SCRIPT_METHOD_NAME_ONLOAD);
 				registry.connect_event<ScriptOnEnableComponent>(entity, id, scriptObject, SCRIPT_METHOD_NAME_ONENABLE);
 				registry.connect_event<ScriptOnUpdateComponent>(entity, id, scriptObject, SCRIPT_METHOD_NAME_ONUPDATE);
+				registry.connect_event<ScriptOnFinalizeComponent>(entity, id, scriptObject, SCRIPT_METHOD_NAME_ONFINALIZE);
 				registry.connect_event<ScriptOnDisableComponent>(entity, id, scriptObject, SCRIPT_METHOD_NAME_ONDISABLE);
 				registry.connect_event<ScriptOnUnloadComponent>(entity, id, scriptObject, SCRIPT_METHOD_NAME_ONUNLOAD);
 				registry.connect_event<ScriptOnDestroyComponent>(entity, id, scriptObject, SCRIPT_METHOD_NAME_ONDESTROY);

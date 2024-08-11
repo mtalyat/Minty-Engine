@@ -64,25 +64,36 @@ void load_descriptor_values(AssetEngine& engine, std::unordered_map<String, Dyna
 		{
 			// create list of ids from given texture names
 			size_t size = child->get_children().size();
-			UUID* ids = new UUID[size];
-			for (size_t i = 0; i < size; i++)
+			size_t count = size == 0 ? 1 : size;
+			UUID* ids = new UUID[count];
+			
+			if (size)
 			{
-				// if child with the index name exists, use that
-				if (Node const* c = child->find(std::to_string(i)))
+				// load multiple from children
+				for (size_t i = 0; i < size; i++)
 				{
-					// should be a texture name, so load that into ids
-					ids[i] = c->to_uuid();
+					// if child with the index name exists, use that
+					if (Node const* c = child->find(std::to_string(i)))
+					{
+						// should be a texture name, so load that into ids
+						ids[i] = c->to_uuid();
+					}
+					else
+					{
+						// if index name does not exist, show warning and set to ERROR_ID
+						MINTY_WARN_FORMAT("Failed to load_animation texture with index {} into descriptor named \"{}\".", i, info.name);
+						ids[i] = INVALID_UUID;
+					}
 				}
-				else
-				{
-					// if index name does not exist, show warning and set to ERROR_ID
-					MINTY_WARN_FORMAT("Failed to load_animation texture with index {} into descriptor named \"{}\".", i, info.name);
-					ids[i] = INVALID_UUID;
-				}
+			}
+			else
+			{
+				// load one from data
+				ids[0] = child->to_uuid();
 			}
 
 			// add to values
-			values.emplace(child->get_name(), Dynamic(ids, sizeof(UUID) * size));
+			values.emplace(child->get_name(), Dynamic(ids, sizeof(UUID) * count));
 			// done with original ids array
 			delete[] ids;
 

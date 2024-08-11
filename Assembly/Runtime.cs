@@ -73,7 +73,8 @@ namespace MintyEngine
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Camera_SetNear(ulong id, float perspective);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static float Camera_GetFar(ulong id);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Camera_SetFar(ulong id, float perspective);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Camera_SetAsMain(ulong id);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static object Camera_GetMain();
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Camera_SetMain(ulong id);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Camera_SetColor(ulong id, int color);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static int Camera_GetColor(ulong id);
         #endregion
@@ -85,6 +86,12 @@ namespace MintyEngine
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_SetLocalRotation(ulong id, in Vector4 position);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_GetLocalScale(ulong id, out Vector3 position);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_SetLocalScale(ulong id, in Vector3 position);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_GetGlobalPosition(ulong id, out Vector3 position);
+        //[MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_SetGlobalPosition(ulong id, in Vector3 position);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_GetGlobalRotation(ulong id, out Vector4 position);
+        //[MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_SetGlobalRotation(ulong id, in Vector4 position);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_GetGlobalScale(ulong id, out Vector3 position);
+        //[MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_SetGlobalScale(ulong id, in Vector3 position);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_GetRight(ulong id, out Vector3 position);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_GetUp(ulong id, out Vector3 position);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_GetForward(ulong id, out Vector3 position);

@@ -2,5 +2,4 @@ pass: fe8efd471cff4236
 defaults
     canvas
         e 16
-    texture
-        0: 0
+    texture: 99acc40b03220429

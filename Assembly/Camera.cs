@@ -47,6 +47,8 @@ namespace MintyEngine
         internal Camera()
         { }
 
-        public void SetAsMain() => Runtime.Camera_SetAsMain(Entity.ID);
+        public static void SetMain(Camera camera) => Runtime.Camera_SetMain(camera.Entity.ID);
+
+        public static Camera GetMain() => (Camera)Runtime.Camera_GetMain();
     }
 }

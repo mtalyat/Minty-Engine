@@ -71,6 +71,15 @@ namespace Minty
 		}
 	};
 
+	struct ScriptOnFinalizeComponent
+		: public ScriptEventComponent
+	{
+		char const* get_method_name() const override
+		{
+			return SCRIPT_METHOD_NAME_ONFINALIZE;
+		}
+	};
+
 	struct ScriptOnDisableComponent
 		: public ScriptEventComponent
 	{

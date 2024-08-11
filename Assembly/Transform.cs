@@ -38,6 +38,33 @@ namespace MintyEngine
             set => Runtime.Transform_SetLocalScale(Entity.ID, value);
         }
 
+        public Vector3 GlobalPosition
+        {
+            get
+            {
+                Runtime.Transform_GetGlobalPosition(Entity.ID, out Vector3 position);
+                return position;
+            }
+        }
+
+        public Quaternion GlobalRotation
+        {
+            get
+            {
+                Runtime.Transform_GetGlobalRotation(Entity.ID, out Vector4 rotation);
+                return new Quaternion(rotation.X, rotation.Y, rotation.Z, rotation.W);
+            }
+        }
+
+        public Vector3 GlobalScale
+        {
+            get
+            {
+                Runtime.Transform_GetGlobalScale(Entity.ID, out Vector3 scale);
+                return scale;
+            }
+        }
+
         public Vector3 Right
         {
             get

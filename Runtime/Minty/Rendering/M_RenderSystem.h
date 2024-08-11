@@ -51,10 +51,16 @@ namespace Minty
 
 	public:
 		/// <summary>
-		/// Sets the Camera that this RenderEngine is rendering from.
+		/// Sets the Camera that this RenderSystem is rendering to.
 		/// </summary>
 		/// <param name="entity">The entity to render from.</param>
 		void set_camera(Entity const entity) { _camera = entity; }
+
+		/// <summary>
+		/// Gets the Camera that this RenderSystem is rendering to.
+		/// </summary>
+		/// <returns></returns>
+		Entity get_camera() const { return _camera; }
 
 #pragma endregion
 	};

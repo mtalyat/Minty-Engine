@@ -41,6 +41,7 @@ namespace Minty
 	constexpr char const* SCRIPT_METHOD_NAME_ONLOAD = "OnLoad";
 	constexpr char const* SCRIPT_METHOD_NAME_ONENABLE = "OnEnable";
 	constexpr char const* SCRIPT_METHOD_NAME_ONUPDATE = "OnUpdate";
+	constexpr char const* SCRIPT_METHOD_NAME_ONFINALIZE= "OnFinalize";
 	constexpr char const* SCRIPT_METHOD_NAME_ONDISABLE = "OnDisable";
 	constexpr char const* SCRIPT_METHOD_NAME_ONUNLOAD = "OnUnload";
 	constexpr char const* SCRIPT_METHOD_NAME_ONDESTROY = "OnDestroy";
