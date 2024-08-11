@@ -81,7 +81,7 @@ void load_descriptor_values(AssetEngine& engine, std::unordered_map<String, Dyna
 					else
 					{
 						// if index name does not exist, show warning and set to ERROR_ID
-						MINTY_WARN_FORMAT("Failed to load_animation texture with index {} into descriptor named \"{}\".", i, info.name);
+						MINTY_WARN_FORMAT("Failed to load texture with index {} into descriptor named \"{}\".", i, info.name);
 						ids[i] = INVALID_UUID;
 					}
 				}
@@ -511,7 +511,27 @@ Ref <MaterialTemplate> Minty::AssetEngine::load_material_template(Path const& pa
 		Ref<ShaderPass> shaderPass = builder.shaderPasses.front();
 		Ref<Shader> shader = shaderPass->get_shader();
 
-		load_descriptor_values(*this, builder.defaultValues, *child, shader->get_uniform_constant_infos(DESCRIPTOR_SET_MATERIAL));
+		// get names of default values
+		auto children = child->get_children();
+		std::unordered_set<String> childrenNames;
+		for (auto const& c : children)
+		{
+			childrenNames.emplace(c.get_name());
+		}
+
+		// cross check names with uniform constants
+		auto uniformConstantValues = shader->get_uniform_constant_infos(DESCRIPTOR_SET_MATERIAL);
+
+		// check for missing default values
+		for (auto const& u : uniformConstantValues)
+		{
+			if (!childrenNames.contains(u.name))
+			{
+				Debug::log_warning(std::format("Material Template \"{}\" missing default value \"{}\".", path.generic_string(), u.name));
+			}
+		}
+
+		load_descriptor_values(*this, builder.defaultValues, *child, uniformConstantValues);
 	}
 
 	return create<MaterialTemplate>(builder);
@@ -543,6 +563,25 @@ Ref <Material> Minty::AssetEngine::load_material(Path const& path)
 		MINTY_ASSERT(shaderPass != nullptr);
 		Ref<Shader> shader = shaderPass->get_shader();
 		MINTY_ASSERT(shader != nullptr);
+
+		// cross check value names with uniform constants
+		auto uniformConstantValues = shader->get_uniform_constant_infos(DESCRIPTOR_SET_MATERIAL);
+
+		// get names of uniform constants
+		std::unordered_set<String> uniformNames;
+		for (auto const& u : uniformConstantValues)
+		{
+			uniformNames.emplace(u.name);
+		}
+
+		// check for unknown values
+		for (auto const& c : child->get_children())
+		{
+			if (!uniformNames.contains(c.get_name()))
+			{
+				Debug::log_warning(std::format("Material \"{}\" does not have an override in the Material Template for \"{}\".", path.generic_string(), c.get_name()));
+			}
+		}
 
 		load_descriptor_values(*this, builder.values, *child, shader->get_uniform_constant_infos(DESCRIPTOR_SET_MATERIAL));
 	}
