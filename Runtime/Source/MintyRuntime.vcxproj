@@ -1,0 +1,412 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>17.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{15b78cd1-bb94-4241-9cdd-88fcb81ede2c}</ProjectGuid>
+    <RootNamespace>MintyRuntime</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>StaticLibrary</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v143</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+    </ClCompile>
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir);.;..\..\Libraries\mono\include;..\..\Libraries\vulkan\include;..\..\Libraries\glm\include;..\..\Libraries\glfw\include;..\..\Libraries\stb\include;..\..\Libraries\zlib\include;..\..\Libraries\entt\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>mono-2.0-sgen.lib;vulkan-1.lib;glfw3_mt.lib;zlib-static.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\Libraries\mono\lib\$(Configuration);..\..\Libraries\vulkan\lib;..\..\Libraries\glfw\lib;..\..\Libraries\zlib\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
+      <AdditionalOptions>-ignore:4006 %(AdditionalOptions)</AdditionalOptions>
+    </Lib>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level3</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <PrecompiledHeader>Use</PrecompiledHeader>
+      <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
+      <LanguageStandard>stdcpp20</LanguageStandard>
+      <AdditionalIncludeDirectories>$(ProjectDir);.;..\..\Libraries\mono\include;..\..\Libraries\vulkan\include;..\..\Libraries\glm\include;..\..\Libraries\glfw\include;..\..\Libraries\stb\include;..\..\Libraries\zlib\include;..\..\Libraries\entt\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>
+      </SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+    <Lib>
+      <AdditionalDependencies>mono-2.0-sgen.lib;vulkan-1.lib;glfw3_mt.lib;zlib-static.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalLibraryDirectories>..\..\Libraries\mono\lib\$(Configuration);..\..\Libraries\vulkan\lib;..\..\Libraries\glfw\lib;..\..\Libraries\zlib\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <IgnoreAllDefaultLibraries>true</IgnoreAllDefaultLibraries>
+      <AdditionalOptions>-ignore:4006 %(AdditionalOptions)</AdditionalOptions>
+    </Lib>
+    <PostBuildEvent>
+      <Command>
+      </Command>
+    </PostBuildEvent>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="framework.h" />
+    <ClInclude Include="Minty.h" />
+    <ClInclude Include="Minty\Animation\Animation.h" />
+    <ClInclude Include="Minty\Animation\Animator.h" />
+    <ClInclude Include="Minty\Asset\Asset.h" />
+    <ClInclude Include="Minty\Asset\AssetManager.h" />
+    <ClInclude Include="Minty\Component\AllComponents.h" />
+    <ClInclude Include="Minty\Component\AnimatorComponent.h" />
+    <ClInclude Include="Minty\Component\CameraComponent.h" />
+    <ClInclude Include="Minty\Component\CanvasComponent.h" />
+    <ClInclude Include="Minty\Component\Component.h" />
+    <ClInclude Include="Minty\Component\DestroyComponent.h" />
+    <ClInclude Include="Minty\Component\DirtyComponent.h" />
+    <ClInclude Include="Minty\Component\EnabledComponent.h" />
+    <ClInclude Include="Minty\Component\MeshComponent.h" />
+    <ClInclude Include="Minty\Component\NameComponent.h" />
+    <ClInclude Include="Minty\Component\RelationshipComponent.h" />
+    <ClInclude Include="Minty\Component\RenderableComponent.h" />
+    <ClInclude Include="Minty\Component\ScriptComponent.h" />
+    <ClInclude Include="Minty\Component\ScriptEventComponent.h" />
+    <ClInclude Include="Minty\Component\ScriptObjectComponent.h" />
+    <ClInclude Include="Minty\Component\SpriteComponent.h" />
+    <ClInclude Include="Minty\Component\TagComponent.h" />
+    <ClInclude Include="Minty\Component\TransformComponent.h" />
+    <ClInclude Include="Minty\Component\UITransformComponent.h" />
+    <ClInclude Include="Minty\Core\Application.h" />
+    <ClInclude Include="Minty\Core\ApplicationInfo.h" />
+    <ClInclude Include="Minty\Core\ArgumentParser.h" />
+    <ClInclude Include="Minty\Core\Base.h" />
+    <ClInclude Include="Minty\Core\Color.h" />
+    <ClInclude Include="Minty\Core\Compression.h" />
+    <ClInclude Include="Minty\Core\Console.h" />
+    <ClInclude Include="Minty\Core\Constants.h" />
+    <ClInclude Include="Minty\Core\Encoding.h" />
+    <ClInclude Include="Minty\Core\Event.h" />
+    <ClInclude Include="Minty\Core\Linker.h" />
+    <ClInclude Include="Minty\Core\Macros.h" />
+    <ClInclude Include="Minty\Core\Math.h" />
+    <ClInclude Include="Minty\Core\Operations.h" />
+    <ClInclude Include="Minty\Core\Pack.h" />
+    <ClInclude Include="Minty\Core\Parse.h" />
+    <ClInclude Include="Minty\Core\Path.h" />
+    <ClInclude Include="Minty\Core\Pointer.h" />
+    <ClInclude Include="Minty\Core\Stopwatch.h" />
+    <ClInclude Include="Minty\Core\String.h" />
+    <ClInclude Include="Minty\Core\Time.h" />
+    <ClInclude Include="Minty\Core\ToString.h" />
+    <ClInclude Include="Minty\Core\Type.h" />
+    <ClInclude Include="Minty\Core\Types.h" />
+    <ClInclude Include="Minty\Core\UUID.h" />
+    <ClInclude Include="Minty\Core\Window.h" />
+    <ClInclude Include="Minty\Data\Array.h" />
+    <ClInclude Include="Minty\Data\Cargo.h" />
+    <ClInclude Include="Minty\Data\ConstantContainer.h" />
+    <ClInclude Include="Minty\Data\Container.h" />
+    <ClInclude Include="Minty\Data\DynamicContainer.h" />
+    <ClInclude Include="Minty\Data\List.h" />
+    <ClInclude Include="Minty\Data\Lookup.h" />
+    <ClInclude Include="Minty\Data\Register.h" />
+    <ClInclude Include="Minty\Data\StaticContainer.h" />
+    <ClInclude Include="Minty\Data\Variable.h" />
+    <ClInclude Include="Minty\Debug\Debug.h" />
+    <ClInclude Include="Minty\Debug\Logger.h" />
+    <ClInclude Include="Minty\Entity\Entity.h" />
+    <ClInclude Include="Minty\Entity\EntityRegistry.h" />
+    <ClInclude Include="Minty\Entity\EntitySerializationData.h" />
+    <ClInclude Include="Minty\File\File.h" />
+    <ClInclude Include="Minty\File\PhysicalFile.h" />
+    <ClInclude Include="Minty\File\VirtualFile.h" />
+    <ClInclude Include="Minty\File\Wrap.h" />
+    <ClInclude Include="Minty\File\Wrapper.h" />
+    <ClInclude Include="Minty\FSM\Conditional.h" />
+    <ClInclude Include="Minty\FSM\FiniteStateMachine.h" />
+    <ClInclude Include="Minty\Input\Gamepad.h" />
+    <ClInclude Include="Minty\Input\Key.h" />
+    <ClInclude Include="Minty\Input\Mouse.h" />
+    <ClInclude Include="Minty\Library\EnTT.h" />
+    <ClInclude Include="Minty\Library\GLFW.h" />
+    <ClInclude Include="Minty\Library\GLM.h" />
+    <ClInclude Include="Minty\Library\Mono.h" />
+    <ClInclude Include="Minty\Library\Stb.h" />
+    <ClInclude Include="Minty\Library\Vulkan.h" />
+    <ClInclude Include="Minty\Render\Buffer.h" />
+    <ClInclude Include="Minty\Render\Camera.h" />
+    <ClInclude Include="Minty\Render\Format.h" />
+    <ClInclude Include="Minty\Render\Image.h" />
+    <ClInclude Include="Minty\Render\Material.h" />
+    <ClInclude Include="Minty\Render\MaterialTemplate.h" />
+    <ClInclude Include="Minty\Render\Mesh.h" />
+    <ClInclude Include="Minty\Render\Perspective.h" />
+    <ClInclude Include="Minty\Render\Renderer.h" />
+    <ClInclude Include="Minty\Render\RenderTarget.h" />
+    <ClInclude Include="Minty\Render\Scissor.h" />
+    <ClInclude Include="Minty\Render\Shader.h" />
+    <ClInclude Include="Minty\Render\ShaderModule.h" />
+    <ClInclude Include="Minty\Render\Sprite.h" />
+    <ClInclude Include="Minty\Render\Surface.h" />
+    <ClInclude Include="Minty\Render\Texture.h" />
+    <ClInclude Include="Minty\Render\Viewport.h" />
+    <ClInclude Include="Minty\Scene\Scene.h" />
+    <ClInclude Include="Minty\Scene\SceneManager.h" />
+    <ClInclude Include="Minty\Scene\SceneObject.h" />
+    <ClInclude Include="Minty\Script\Accessibility.h" />
+    <ClInclude Include="Minty\Script\CS\CS.h" />
+    <ClInclude Include="Minty\Script\CS\CsLinker.h" />
+    <ClInclude Include="Minty\Script\CS\CsScriptAssembly.h" />
+    <ClInclude Include="Minty\Script\CS\CsScriptClass.h" />
+    <ClInclude Include="Minty\Script\CS\CsScriptEngine.h" />
+    <ClInclude Include="Minty\Script\CS\CsScriptField.h" />
+    <ClInclude Include="Minty\Script\CS\CsScriptMethod.h" />
+    <ClInclude Include="Minty\Script\CS\CsScriptObject.h" />
+    <ClInclude Include="Minty\Script\CS\CsScriptProperty.h" />
+    <ClInclude Include="Minty\Script\ScriptArguments.h" />
+    <ClInclude Include="Minty\Script\ScriptAssembly.h" />
+    <ClInclude Include="Minty\Script\ScriptClass.h" />
+    <ClInclude Include="Minty\Script\ScriptEngine.h" />
+    <ClInclude Include="Minty\Script\ScriptField.h" />
+    <ClInclude Include="Minty\Script\ScriptMethod.h" />
+    <ClInclude Include="Minty\Script\ScriptObject.h" />
+    <ClInclude Include="Minty\Script\ScriptProperty.h" />
+    <ClInclude Include="Minty\Serialize\Node.h" />
+    <ClInclude Include="Minty\Serialize\Reader.h" />
+    <ClInclude Include="Minty\Serialize\Serializable.h" />
+    <ClInclude Include="Minty\Serialize\Writer.h" />
+    <ClInclude Include="Minty\System\AllSystems.h" />
+    <ClInclude Include="Minty\System\AnimationSystem.h" />
+    <ClInclude Include="Minty\System\RenderSystem.h" />
+    <ClInclude Include="Minty\System\ScriptSystem.h" />
+    <ClInclude Include="Minty\System\System.h" />
+    <ClInclude Include="Minty\System\SystemRegistry.h" />
+    <ClInclude Include="Minty\UI\AnchorMode.h" />
+    <ClInclude Include="pch.h" />
+    <ClInclude Include="Platform\Vulkan\VulkanMesh.h" />
+    <ClInclude Include="Platform\Vulkan\VulkanBuffer.h" />
+    <ClInclude Include="Platform\Vulkan\VulkanImage.h" />
+    <ClInclude Include="Platform\Vulkan\VulkanRenderer.h" />
+    <ClInclude Include="Platform\Vulkan\VulkanRenderTarget.h" />
+    <ClInclude Include="Platform\Vulkan\VulkanScissor.h" />
+    <ClInclude Include="Platform\Vulkan\VulkanShader.h" />
+    <ClInclude Include="Platform\Vulkan\VulkanShaderModule.h" />
+    <ClInclude Include="Platform\Vulkan\VulkanSurface.h" />
+    <ClInclude Include="Platform\Vulkan\VulkanTexture.h" />
+    <ClInclude Include="Platform\Vulkan\VulkanViewport.h" />
+    <ClInclude Include="Platform\Windows\WindowsWindow.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="Minty\Animation\Animation.cpp" />
+    <ClCompile Include="Minty\Animation\Animator.cpp" />
+    <ClCompile Include="Minty\Asset\Asset.cpp" />
+    <ClCompile Include="Minty\Asset\AssetManager.cpp" />
+    <ClCompile Include="Minty\Component\AnimatorComponent.cpp" />
+    <ClCompile Include="Minty\Component\CameraComponent.cpp" />
+    <ClCompile Include="Minty\Component\RelationshipComponent.cpp" />
+    <ClCompile Include="Minty\Component\ScriptComponent.cpp" />
+    <ClCompile Include="Minty\Component\ScriptEventComponent.cpp" />
+    <ClCompile Include="Minty\Core\Application.cpp" />
+    <ClCompile Include="Minty\Core\ArgumentParser.cpp" />
+    <ClCompile Include="Minty\Core\Color.cpp" />
+    <ClCompile Include="Minty\Core\Compression.cpp" />
+    <ClCompile Include="Minty\Core\Console.cpp" />
+    <ClCompile Include="Minty\Core\Encoding.cpp" />
+    <ClCompile Include="Minty\Core\Linker.cpp" />
+    <ClCompile Include="Minty\Core\Math.cpp" />
+    <ClCompile Include="Minty\Core\Operations.cpp" />
+    <ClCompile Include="Minty\Core\Parse.cpp" />
+    <ClCompile Include="Minty\Core\Stopwatch.cpp" />
+    <ClCompile Include="Minty\Core\String.cpp" />
+    <ClCompile Include="Minty\Core\Time.cpp" />
+    <ClCompile Include="Minty\Core\Type.cpp" />
+    <ClCompile Include="Minty\Core\UUID.cpp" />
+    <ClCompile Include="Minty\Core\Window.cpp" />
+    <ClCompile Include="Minty\Data\Cargo.cpp" />
+    <ClCompile Include="Minty\Data\ConstantContainer.cpp" />
+    <ClCompile Include="Minty\Data\Container.cpp" />
+    <ClCompile Include="Minty\Data\DynamicContainer.cpp" />
+    <ClCompile Include="Minty\Data\StaticContainer.cpp" />
+    <ClCompile Include="Minty\Debug\Debug.cpp" />
+    <ClCompile Include="Minty\Debug\Logger.cpp" />
+    <ClCompile Include="Minty\Entity\EntityRegistry.cpp" />
+    <ClCompile Include="Minty\File\File.cpp" />
+    <ClCompile Include="Minty\File\PhysicalFile.cpp" />
+    <ClCompile Include="Minty\File\VirtualFile.cpp" />
+    <ClCompile Include="Minty\File\Wrap.cpp" />
+    <ClCompile Include="Minty\File\Wrapper.cpp" />
+    <ClCompile Include="Minty\FSM\FiniteStateMachine.cpp" />
+    <ClCompile Include="Minty\Render\Buffer.cpp" />
+    <ClCompile Include="Minty\Render\Camera.cpp" />
+    <ClCompile Include="Minty\Render\Image.cpp" />
+    <ClCompile Include="Minty\Render\Material.cpp" />
+    <ClCompile Include="Minty\Render\MaterialTemplate.cpp" />
+    <ClCompile Include="Minty\Render\Mesh.cpp" />
+    <ClCompile Include="Minty\Render\Renderer.cpp" />
+    <ClCompile Include="Minty\Render\RenderTarget.cpp" />
+    <ClCompile Include="Minty\Render\Scissor.cpp" />
+    <ClCompile Include="Minty\Render\Shader.cpp" />
+    <ClCompile Include="Minty\Render\ShaderModule.cpp" />
+    <ClCompile Include="Minty\Render\Sprite.cpp" />
+    <ClCompile Include="Minty\Render\Surface.cpp" />
+    <ClCompile Include="Minty\Render\Texture.cpp" />
+    <ClCompile Include="Minty\Render\Viewport.cpp" />
+    <ClCompile Include="Minty\Scene\Scene.cpp" />
+    <ClCompile Include="Minty\Scene\SceneManager.cpp" />
+    <ClCompile Include="Minty\Script\CS\CsLinker.cpp" />
+    <ClCompile Include="Minty\Script\CS\CsScriptAssembly.cpp" />
+    <ClCompile Include="Minty\Script\CS\CsScriptClass.cpp" />
+    <ClCompile Include="Minty\Script\CS\CsScriptEngine.cpp" />
+    <ClCompile Include="Minty\Script\CS\CsScriptField.cpp" />
+    <ClCompile Include="Minty\Script\CS\CsScriptMethod.cpp" />
+    <ClCompile Include="Minty\Script\CS\CsScriptObject.cpp" />
+    <ClCompile Include="Minty\Script\CS\CsScriptProperty.cpp" />
+    <ClCompile Include="Minty\Script\ScriptAssembly.cpp" />
+    <ClCompile Include="Minty\Script\ScriptClass.cpp" />
+    <ClCompile Include="Minty\Script\ScriptEngine.cpp" />
+    <ClCompile Include="Minty\Script\ScriptObject.cpp" />
+    <ClCompile Include="Minty\Serialize\Node.cpp" />
+    <ClCompile Include="Minty\Serialize\Reader.cpp" />
+    <ClCompile Include="Minty\Serialize\Writer.cpp" />
+    <ClCompile Include="Minty\System\AnimationSystem.cpp" />
+    <ClCompile Include="Minty\System\RenderSystem.cpp" />
+    <ClCompile Include="Minty\System\ScriptSystem.cpp" />
+    <ClCompile Include="Minty\System\SystemRegistry.cpp" />
+    <ClCompile Include="Minty\UI\AnchorMode.cpp" />
+    <ClCompile Include="pch.cpp">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">Create</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Platform\Vulkan\VulkanBuffer.cpp" />
+    <ClCompile Include="Platform\Vulkan\VulkanImage.cpp" />
+    <ClCompile Include="Platform\Vulkan\VulkanMesh.cpp" />
+    <ClCompile Include="Platform\Vulkan\VulkanRenderer.cpp" />
+    <ClCompile Include="Platform\Vulkan\VulkanRenderTarget.cpp" />
+    <ClCompile Include="Platform\Vulkan\VulkanScissor.cpp" />
+    <ClCompile Include="Platform\Vulkan\VulkanShader.cpp" />
+    <ClCompile Include="Platform\Vulkan\VulkanShaderModule.cpp" />
+    <ClCompile Include="Platform\Vulkan\VulkanSurface.cpp" />
+    <ClCompile Include="Platform\Vulkan\VulkanTexture.cpp" />
+    <ClCompile Include="Platform\Vulkan\VulkanViewport.cpp" />
+    <ClCompile Include="Platform\Windows\WindowsWindow.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

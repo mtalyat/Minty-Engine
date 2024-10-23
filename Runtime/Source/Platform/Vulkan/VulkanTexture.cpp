@@ -1,0 +1,19 @@
+#include "pch.h"
+#include "VulkanTexture.h"
+
+#include "Platform/Vulkan/VulkanRenderer.h"
+
+using namespace Minty;
+
+Minty::VulkanTexture::VulkanTexture(const TextureBuilder& builder)
+	: Texture(builder.id)
+	, m_image(static_cast<Owner<VulkanImage>>(builder.image))
+	, m_sampler(VK_NULL_HANDLE)
+{
+	m_sampler = VulkanRenderer::create_sampler();
+}
+
+Minty::VulkanTexture::~VulkanTexture()
+{
+	VulkanRenderer::destroy_sampler(m_sampler);
+}

@@ -4,10 +4,10 @@
 #include <iostream>
 #include <Minty.h>
 
-using namespace minty;
+using namespace Minty;
 
-typedef CommandLineParser::Parameter Param;
-typedef CommandLineParser::Argument Arg;
+typedef ArgumentParser::Parameter Param;
+typedef ArgumentParser::Argument Arg;
 
 void print_wrap_stats(Path const& path, std::vector<std::pair<String, String>> const& stats)
 {
@@ -46,7 +46,7 @@ void print_wrap_stats(Path const& path, std::vector<std::pair<String, String>> c
 
 int main(int argc, char const* argv[])
 {
-	CommandLineParser parser;
+	ArgumentParser parser;
 
 	parser.add_parameter(Param("file", 0));					// the path to the program
 	parser.add_parameter(Param("path", 1));					// the path to the file to wrap
@@ -160,7 +160,7 @@ int main(int argc, char const* argv[])
 	}
 	else
 	{
-		base = path;
+		base = "";
 	}
 
 	uint32_t version = 0;
@@ -247,9 +247,9 @@ int main(int argc, char const* argv[])
 
 	for (auto const& p : paths)
 	{
-		std::cout << "  " << p.generic_string() << "\n";
-
 		Path relativePath = p.lexically_relative(path);
+
+		std::cout << "  " << p.generic_string() << " -> " << (base / relativePath).generic_string() << "\n";
 
 		wrap->emplace(p, relativePath, compression);
 	}

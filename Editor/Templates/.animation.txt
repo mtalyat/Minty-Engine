@@ -1,9 +1,0 @@
-name: <NAME>
-length: 0.1
-loops: false
-entities
-components
-variables
-values
-steps
-reset
