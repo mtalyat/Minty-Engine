@@ -51,10 +51,5 @@ namespace MintyEngine
         {
             Runtime.Console_Error(obj.ToString());
         }
-
-        public static void Assert(bool condition, object obj)
-        {
-            if (!condition) Error(obj);
-        }
     }
 }
