@@ -1,0 +1,9 @@
+	enum class Conditional
+	{
+		Equal,
+		NotEqual,
+		GreaterThan,
+		GreaterThanOrEqualTo,
+		LessThan,
+		LessThanOrEqualTo,
+	};

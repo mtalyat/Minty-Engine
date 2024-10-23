@@ -1,0 +1,61 @@
+====================
+	ToString.h:
+====================
+
+template<>
+inline String to_string(Conditional const& obj)
+{
+	switch (obj)
+	{
+		case Conditional::Equal: return "Equal";
+		case Conditional::NotEqual: return "NotEqual";
+		case Conditional::GreaterThan: return "GreaterThan";
+		case Conditional::GreaterThanOrEqualTo: return "GreaterThanOrEqualTo";
+		case Conditional::LessThan: return "LessThan";
+		case Conditional::LessThanOrEqualTo: return "LessThanOrEqualTo";
+
+		default: return "";
+	}
+}
+
+====================
+	Parse.h
+====================
+
+Conditional to_conditional(String const& string);
+Bool try_conditional(String const& string, Conditional& value);
+
+template<>
+inline void parse_to(String const& string, Conditional& value)
+{
+    value = to_conditional(string);
+}
+
+template<>
+inline Bool parse_try(String const& string, Conditional& value)
+{
+    return try_conditional(string, value);
+}
+
+====================
+	Parse.cpp
+====================
+
+Conditional Minty::Parse::to_conditional(String const& string)
+{
+	if (string == "Equal") return Conditional::Equal;
+	if (string == "NotEqual") return Conditional::NotEqual;
+	if (string == "GreaterThan") return Conditional::GreaterThan;
+	if (string == "GreaterThanOrEqualTo") return Conditional::GreaterThanOrEqualTo;
+	if (string == "LessThan") return Conditional::LessThan;
+	if (string == "LessThanOrEqualTo") return Conditional::LessThanOrEqualTo;
+
+	return Conditional();
+}
+
+Bool Minty::Parse::try_conditional(String const& string, Conditional& value)
+{
+	value = to_conditional(string);
+	return value != Conditional();
+}
+
