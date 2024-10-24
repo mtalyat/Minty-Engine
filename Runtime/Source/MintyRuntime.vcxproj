@@ -297,6 +297,7 @@
     <ClInclude Include="Minty\System\SystemRegistry.h" />
     <ClInclude Include="Minty\UI\AnchorMode.h" />
     <ClInclude Include="pch.h" />
+    <ClInclude Include="Platform\Vulkan\VulkanMaterial.h" />
     <ClInclude Include="Platform\Vulkan\VulkanMesh.h" />
     <ClInclude Include="Platform\Vulkan\VulkanBuffer.h" />
     <ClInclude Include="Platform\Vulkan\VulkanImage.h" />
@@ -395,6 +396,7 @@
     </ClCompile>
     <ClCompile Include="Platform\Vulkan\VulkanBuffer.cpp" />
     <ClCompile Include="Platform\Vulkan\VulkanImage.cpp" />
+    <ClCompile Include="Platform\Vulkan\VulkanMaterial.cpp" />
     <ClCompile Include="Platform\Vulkan\VulkanMesh.cpp" />
     <ClCompile Include="Platform\Vulkan\VulkanRenderer.cpp" />
     <ClCompile Include="Platform\Vulkan\VulkanRenderTarget.cpp" />

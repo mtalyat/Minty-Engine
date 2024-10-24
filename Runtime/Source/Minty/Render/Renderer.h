@@ -34,7 +34,6 @@ namespace Minty
 		static std::unordered_map<MeshType, Ref<Mesh>> s_defaultMeshes;
 
 		static Ref<Shader> s_boundShader;
-		static Ref<MaterialTemplate> s_boundMaterialTemplate;
 		static Ref<Material> s_boundMaterial;
 		static Ref<Mesh> s_boundMesh;
 
@@ -88,9 +87,6 @@ namespace Minty
 	public:
 		// binds the shader to be used for rendering, returns false if already bound
 		static Bool bind_shader(Ref<Shader> const shader);
-
-		// binds the material template for rendering, returns false if already bound
-		static Bool bind_material_template(Ref<MaterialTemplate> const materialTemplate);
 
 		// binds the material for rendering, returns false if already bound
 		static Bool bind_material(Ref<Material> const material);

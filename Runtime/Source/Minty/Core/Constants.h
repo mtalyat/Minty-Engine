@@ -20,22 +20,6 @@ namespace Minty
 	// the number of frames passed to the GPU at one time
 	constexpr Size MAX_FRAMES_IN_FLIGHT = 2;
 
-	/// <summary>
-	/// Number of descriptor sets that can fit within a descriptor pool.
-	/// </summary>
-	constexpr int DESCRIPTOR_SETS_PER_POOL = 4;
-
-	/// <summary>
-	/// The number of descriptor sets in the engine.
-	/// </summary>
-	constexpr int DESCRIPTOR_SET_COUNT = 3;
-
-	constexpr unsigned int DESCRIPTOR_SET_INVALID = -1;
-
-	constexpr unsigned int DESCRIPTOR_SET_SHADER = 0;
-	constexpr unsigned int DESCRIPTOR_SET_SHADER_PASS = 1;
-	constexpr unsigned int DESCRIPTOR_SET_MATERIAL = 2;
-
 	constexpr char const* SCRIPT_METHOD_NAME_ONCREATE = "OnCreate";
 	constexpr char const* SCRIPT_METHOD_NAME_ONLOAD = "OnLoad";
 	constexpr char const* SCRIPT_METHOD_NAME_ONENABLE = "OnEnable";

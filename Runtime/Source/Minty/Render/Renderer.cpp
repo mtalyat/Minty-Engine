@@ -14,7 +14,6 @@ Color Minty::Renderer::s_color = Color::black();
 Ref<RenderTarget> Minty::Renderer::s_renderTarget = nullptr;
 std::unordered_map<MeshType, Ref<Mesh>> Minty::Renderer::s_defaultMeshes = {};
 Ref<Shader> Minty::Renderer::s_boundShader = nullptr;
-Ref<MaterialTemplate> Minty::Renderer::s_boundMaterialTemplate = nullptr;
 Ref<Material> Minty::Renderer::s_boundMaterial = nullptr;
 Ref<Mesh> Minty::Renderer::s_boundMesh = nullptr;
 
@@ -62,7 +61,6 @@ void Minty::Renderer::end_frame()
 	// unbind specific assets that need re-bound each frame
 	s_boundMesh = nullptr;
 	s_boundMaterial = nullptr;
-	s_boundMaterialTemplate = nullptr;
 	s_boundShader = nullptr;
 }
 
@@ -104,10 +102,10 @@ void Minty::Renderer::set_camera(Float3 const position, Quaternion const rotatio
 	// multiply together
 	Matrix4 transformMatrix = proj * view;
 
-	// update all shaders
-	for (auto const& shader : AssetManager::get_by_type<Shader>(AssetType::Shader))
+	// update all materials
+	for (auto const& material : AssetManager::get_by_type<Material>(AssetType::Material))
 	{
-		shader->set_input("camera", &transformMatrix);
+		material->set_input("camera", &transformMatrix);
 	}
 }
 
@@ -196,30 +194,14 @@ Bool Minty::Renderer::bind_shader(Ref<Shader> const shader)
 	s_boundShader = shader;
 	if(s_boundShader != nullptr) s_boundShader->on_bind();
 
-	// unset materials since they are shader specific
-	s_boundMaterialTemplate = nullptr;
-	s_boundMaterial = nullptr;
-
-	return true;
-}
-
-Bool Minty::Renderer::bind_material_template(Ref<MaterialTemplate> const materialTemplate)
-{
-	// return if already bound
-	if (s_boundMaterialTemplate == materialTemplate) return false;
-
-	s_boundMaterialTemplate = materialTemplate;
-	if(s_boundMaterialTemplate != nullptr) s_boundMaterialTemplate->on_bind();
-
-	// unset material since it is template specific
-	s_boundMaterial = nullptr;
-
 	return true;
 }
 
 Bool Minty::Renderer::bind_material(Ref<Material> const material)
 {
 	if (s_boundMaterial == material) return false;
+
+	MINTY_ASSERT_MESSAGE(material->get_template()->get_shader() == s_boundShader, "The Shader of the Material given to bind does not match the currently bound Shader.");
 
 	s_boundMaterial = material;
 	s_boundMaterial->on_bind();

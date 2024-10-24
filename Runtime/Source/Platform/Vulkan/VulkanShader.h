@@ -19,10 +19,10 @@ namespace Minty
 			uint32_t descriptorCount;
 		};
 
-		struct Frame
+		struct PoolData
 		{
-			std::vector<Owner<VulkanBuffer>> buffers;
-			VkDescriptorSet descriptorSet;
+			VkDescriptorPool pool;
+			UInt slotsUsed = 0;
 		};
 
 	private:
@@ -33,9 +33,9 @@ namespace Minty
 
 		VkDescriptorSetLayout m_descriptorSetLayout;
 		std::unordered_map<String, Size> m_descriptorNameToBufferIndex;
-		std::vector<Frame> m_frames;
+		std::unordered_map<VkDescriptorType, UInt> m_descriptorTypeCounts;
 
-		VkDescriptorPool m_descriptorPool;
+		std::vector<PoolData> m_pools;
 
 	public:
 		VulkanShader(const ShaderBuilder& builder);
@@ -46,11 +46,19 @@ namespace Minty
 		void on_bind() override;
 
 	public:
-		void set_input(const String& name, const void* const data) override;
-
-	public:
 		VkPipelineLayout get_layout() const { return m_pipelineLayout; }
 
 		VkPipeline get_pipeline() const { return m_pipeline; }
+
+		VkDescriptorSetLayout get_descriptor_set_layout() const { return m_descriptorSetLayout; }
+
+		VkDescriptorPool get_descriptor_pool(UInt const requestedSlots);
+
+		Bool contains_descriptor(String const& name) const { return m_descriptorNameToBufferIndex.contains(name); }
+
+		Size get_descriptor_buffer_index(String const& name) const { return m_descriptorNameToBufferIndex.at(name); }
+
+	private:
+		PoolData& create_descriptor_pool();
 	};
 }

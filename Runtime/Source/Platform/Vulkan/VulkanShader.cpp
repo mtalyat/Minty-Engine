@@ -5,6 +5,8 @@
 #include "Platform/Vulkan/VulkanRenderer.h"
 #include "Platform/Vulkan/VulkanTexture.h"
 
+using namespace Minty;
+
 Minty::VulkanShader::VulkanShader(const ShaderBuilder& builder)
 	: Minty::Shader::Shader(builder)
 	, m_pipelineLayout(VK_NULL_HANDLE)
@@ -12,8 +14,8 @@ Minty::VulkanShader::VulkanShader(const ShaderBuilder& builder)
 	, m_bindings()
 	, m_descriptorSetLayout(VK_NULL_HANDLE)
 	, m_descriptorNameToBufferIndex()
-	, m_frames(MAX_FRAMES_IN_FLIGHT)
-	, m_descriptorPool(VK_NULL_HANDLE)
+	, m_descriptorTypeCounts()
+	, m_pools()
 {
 	// split up inputs from push constants
 	std::vector<Minty::ShaderInput> descriptors;
@@ -35,7 +37,6 @@ Minty::VulkanShader::VulkanShader(const ShaderBuilder& builder)
 	}
 
 	// consolidate binding data, sum type counts, create descriptor buffers
-	std::unordered_map<VkDescriptorType, uint32_t> descriptorTypeCounts;
 	for (const ShaderInput& descriptor : descriptors)
 	{
 		MINTY_ASSERT_MESSAGE(descriptor.count != 0, "Cannot create a Descriptor with a count of 0.");
@@ -70,37 +71,22 @@ Minty::VulkanShader::VulkanShader(const ShaderBuilder& builder)
 		}
 
 		// add to type count
-		auto found2 = descriptorTypeCounts.find(descriptorType);
-
-		if (found2 == descriptorTypeCounts.end())
+		auto found2 = m_descriptorTypeCounts.find(descriptorType);
+		if (found2 == m_descriptorTypeCounts.end())
 		{
 			// new type
-			descriptorTypeCounts.emplace(descriptorType, descriptor.count);
+			m_descriptorTypeCounts.emplace(descriptorType, descriptor.count);
 		}
 		else
 		{
 			// exiting type
-			descriptorTypeCounts[found2->first] = found2->second + descriptor.count;
+			m_descriptorTypeCounts[found2->first] = found2->second + descriptor.count;
 		}
 
-		// create uniform buffers
+		// add name to lookup
 		if (descriptor.size > 0)
 		{
-			// add name to lookup
 			m_descriptorNameToBufferIndex.emplace(descriptor.name, m_descriptorNameToBufferIndex.size());
-
-			// create one buffer for each frame in flight
-			for (Size j = 0; j < MAX_FRAMES_IN_FLIGHT; j++)
-			{
-				// create uniform data buffers for each frame
-				Frame& frame = m_frames.at(j);
-				BufferBuilder bufferBuilder{};
-				bufferBuilder.frequent = descriptor.frequent;
-				bufferBuilder.size = descriptor.size;
-				bufferBuilder.usage = BufferUsage::UNIFORM;
-				bufferBuilder.data = nullptr;
-				frame.buffers.push_back(Owner<VulkanBuffer>(bufferBuilder));
-			}
 		}
 	}
 
@@ -357,135 +343,29 @@ Minty::VulkanShader::VulkanShader(const ShaderBuilder& builder)
 	if (vkCreateGraphicsPipelines(VulkanRenderer::get_device(), VK_NULL_HANDLE, 1, &pipelineInfo, nullptr, &m_pipeline) != VK_SUCCESS) {
 		throw std::runtime_error("Failed to create graphics pipeline.");
 	}
-
-	// create pool sizes
-	std::vector<VkDescriptorPoolSize> descriptorPoolSizes;
-	descriptorPoolSizes.reserve(descriptorTypeCounts.size());
-	for (const auto& [type, count] : descriptorTypeCounts)
-	{
-		VkDescriptorPoolSize poolSize{};
-		poolSize.type = type;
-		poolSize.descriptorCount = count * MAX_FRAMES_IN_FLIGHT; // scale by frames in flight
-		descriptorPoolSizes.push_back(poolSize);
-	}
-
-	// create pool
-	VkDescriptorPoolCreateInfo poolInfo{};
-	poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
-	poolInfo.poolSizeCount = static_cast<uint32_t>(descriptorPoolSizes.size());
-	poolInfo.pPoolSizes = descriptorPoolSizes.data();
-	poolInfo.maxSets = static_cast<uint32_t>(MAX_FRAMES_IN_FLIGHT);
-
-	if (vkCreateDescriptorPool(VulkanRenderer::get_device(), &poolInfo, nullptr, &m_descriptorPool) != VK_SUCCESS) {
-		throw std::runtime_error("Failed to create descriptor pool.");
-	}
-
-	// allocate descriptor sets for each frame
-	std::vector<VkDescriptorSetLayout> descriptorSetLayouts(MAX_FRAMES_IN_FLIGHT, m_descriptorSetLayout);
-	VkDescriptorSetAllocateInfo descriptorSetAllocInfo{};
-	descriptorSetAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-	descriptorSetAllocInfo.descriptorPool = m_descriptorPool;
-	descriptorSetAllocInfo.descriptorSetCount = static_cast<uint32_t>(descriptorSetLayouts.size());
-	descriptorSetAllocInfo.pSetLayouts = descriptorSetLayouts.data();
-
-	std::vector<VkDescriptorSet> descriptorSets(MAX_FRAMES_IN_FLIGHT);
-	if (vkAllocateDescriptorSets(VulkanRenderer::get_device(), &descriptorSetAllocInfo, descriptorSets.data()) != VK_SUCCESS) {
-		throw std::runtime_error("Failed to allocate descriptor sets.");
-	}
-
-	// distribute to frames
-	for (Size i = 0; i < m_frames.size(); i++)
-	{
-		m_frames[i].descriptorSet = descriptorSets.at(i);
-	}
-
-	// write to all the inputs
-	for (Frame& frame : m_frames)
-	{
-		std::vector<VkDescriptorBufferInfo> bufferInfos;
-		std::vector<VkDescriptorImageInfo> imageInfos;
-		bufferInfos.reserve(descriptors.size());
-		imageInfos.reserve(descriptors.size());
-
-		std::vector<VkWriteDescriptorSet> descriptorWrites;
-		descriptorWrites.reserve(descriptors.size());
-
-		for (const ShaderInput& descriptor : descriptors)
-		{
-			switch (descriptor.type)
-			{
-			case ShaderInputType::Sample:
-			case ShaderInputType::SampledImage:
-			case ShaderInputType::StorageImage:
-			case ShaderInputType::UniformTexelBuffer:
-			case ShaderInputType::StorageTexelBuffer:
-			case ShaderInputType::UniformBufferDynamic:
-			case ShaderInputType::StorageBufferDynamic:
-			{
-				MINTY_NOT_IMPLEMENTED();
-			}
-			break;
-			case ShaderInputType::CombinedImageSampler:
-			{
-				// ignore for now
-			}
-			break;
-			case ShaderInputType::UniformBuffer:
-			case ShaderInputType::StorageBuffer:
-			{
-				VkWriteDescriptorSet descriptorWrite{};
-				descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-				descriptorWrite.dstSet = frame.descriptorSet;
-				descriptorWrite.dstBinding = descriptor.binding;
-				descriptorWrite.dstArrayElement = 0; // if an array
-
-				descriptorWrite.descriptorType = VulkanRenderer::descriptor_type_to_vulkan(descriptor.type);
-				descriptorWrite.descriptorCount = 1; // how many to update
-
-				// buffer
-				//Ref<VulkanBuffer> vulkanBuffer = *static_cast<Ref<VulkanBuffer>*>(descriptor.value);
-				Ref<VulkanBuffer> vulkanBuffer = frame.buffers.at(m_descriptorNameToBufferIndex.at(descriptor.name));
-
-				VkDescriptorBufferInfo bufferInfo{};
-				bufferInfo.buffer = static_cast<VkBuffer>(vulkanBuffer->get_native());
-				bufferInfo.offset = 0;
-				bufferInfo.range = VK_WHOLE_SIZE;
-
-				bufferInfos.push_back(bufferInfo);
-				descriptorWrite.pBufferInfo = &bufferInfos.back();
-
-				descriptorWrites.push_back(descriptorWrite);
-
-			}
-			break;
-			}
-		}
-
-		vkUpdateDescriptorSets(VulkanRenderer::get_device(), static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
-	}
 }
 
 Minty::VulkanShader::~VulkanShader()
 {
-	m_frames.clear();
-
 	// TODO: utility
-	vkDestroyDescriptorPool(VulkanRenderer::get_device(), m_descriptorPool, nullptr);
-	vkDestroyDescriptorSetLayout(VulkanRenderer::get_device(), m_descriptorSetLayout, nullptr);
-	vkDestroyPipeline(VulkanRenderer::get_device(), m_pipeline, nullptr);
-	vkDestroyPipelineLayout(VulkanRenderer::get_device(), m_pipelineLayout, nullptr);
+
+	VkDevice device = VulkanRenderer::get_device();
+
+	for (auto const& data : m_pools)
+	{
+		vkDestroyDescriptorPool(device, data.pool, nullptr);
+	}
+	vkDestroyDescriptorSetLayout(device, m_descriptorSetLayout, nullptr);
+	vkDestroyPipeline(device, m_pipeline, nullptr);
+	vkDestroyPipelineLayout(device, m_pipelineLayout, nullptr);
 }
 
 void Minty::VulkanShader::on_bind()
 {
 	VkCommandBuffer commandBuffer = VulkanRenderer::get_command_buffer();
-	Frame& frame = m_frames.at(VulkanRenderer::get_current_frame_index());
 
 	// bind pipeline
 	VulkanRenderer::bind_pipeline(commandBuffer, m_pipeline);
-
-	// bind descriptor set(s)
-	VulkanRenderer::bind_descriptor_set(commandBuffer, m_pipelineLayout, frame.descriptorSet);
 
 	// bind viewport
 	Ref<VulkanViewport> vulkanViewport = static_cast<Ref<VulkanViewport>>(get_viewport());
@@ -496,63 +376,63 @@ void Minty::VulkanShader::on_bind()
 	VulkanRenderer::bind_scissor(commandBuffer, vulkanScissor->get_rect());
 }
 
-void Minty::VulkanShader::set_input(const String& name, const void* const data)
+static constexpr UInt DESCRIPTOR_POOL_SIZE = 20;
+
+VkDescriptorPool Minty::VulkanShader::get_descriptor_pool(UInt const requestedSlots)
 {
-	MINTY_ASSERT_FORMAT(has_input(name), "\"{}\" is not the name of any constant in this Shader.", name);
-	MINTY_ASSERT_MESSAGE(data != nullptr, "Cannot set_input to null.");
+	// error if requesting more than able to allocate in one pool
+	MINTY_ASSERT_FORMAT(requestedSlots <= DESCRIPTOR_POOL_SIZE, "Unable to create a pool that can fulfil {} slots. The maximum number of slots is {}.", requestedSlots, DESCRIPTOR_POOL_SIZE);
 
-	ShaderInput const& input = get_input(name);
-
-	switch (input.type)
+	// if no pools, create one
+	// if last pool does not have enough space, make a new one
+	// otherwise use last one
+	if (m_pools.empty() || m_pools.back().slotsUsed + requestedSlots > DESCRIPTOR_POOL_SIZE)
 	{
-	case ShaderInputType::UniformBuffer:
-	case ShaderInputType::StorageBuffer:
-	{
-		// get index of buffer
-		Size index = m_descriptorNameToBufferIndex.at(name);
-
-		// set data in buffers
-		for (Frame& frame : m_frames)
-		{
-			Ref<VulkanBuffer> buffer = frame.buffers.at(index);
-			buffer->set_data(data);
-		}
+		PoolData& data = create_descriptor_pool();
+		data.slotsUsed = requestedSlots;
+		return data.pool;
 	}
-	break;
-	case ShaderInputType::CombinedImageSampler:
+	else
 	{
-		// write to all the inputs
-		for (Frame& frame : m_frames)
-		{
-			VkDescriptorImageInfo imageInfo{};
-
-			// set write info
-			VkWriteDescriptorSet descriptorWrite{};
-			descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-			descriptorWrite.dstSet = frame.descriptorSet;
-			descriptorWrite.dstBinding = input.binding;
-			descriptorWrite.dstArrayElement = 0; // if an array
-			descriptorWrite.descriptorType = VulkanRenderer::descriptor_type_to_vulkan(input.type);
-			descriptorWrite.descriptorCount = 1; // how many to update
-
-			// get the texture
-			VulkanTexture const* vulkanTexture = *static_cast<VulkanTexture const* const*>(data);;
-
-			// create image info from the texture
-			imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-			imageInfo.imageView = vulkanTexture->get_view();
-			imageInfo.sampler = vulkanTexture->get_sampler();
-			descriptorWrite.pImageInfo = &imageInfo;
-
-			// push updates
-			vkUpdateDescriptorSets(VulkanRenderer::get_device(), 1, &descriptorWrite, 0, nullptr);
-		}
-	}
-	break;
-	case ShaderInputType::PushConstant:
-	{
-		vkCmdPushConstants(VulkanRenderer::get_command_buffer(), m_pipelineLayout, VulkanRenderer::shader_stage_to_vulkan(input.stage), input.offset, input.size, data);
-	}
-	break;
+		PoolData& data = m_pools.back();
+		data.slotsUsed += requestedSlots;
+		return data.pool;
 	}
 }
+
+Minty::VulkanShader::PoolData& Minty::VulkanShader::create_descriptor_pool()
+{
+	// scale by frames in flight and pool size
+	UInt const scale = static_cast<UInt>(MAX_FRAMES_IN_FLIGHT) * DESCRIPTOR_POOL_SIZE;
+
+	// create pool sizes
+	std::vector<VkDescriptorPoolSize> descriptorPoolSizes;
+	descriptorPoolSizes.reserve(m_descriptorTypeCounts.size());
+	for (const auto& [type, count] : m_descriptorTypeCounts)
+	{
+		VkDescriptorPoolSize poolSize{};
+		poolSize.type = type;
+		poolSize.descriptorCount = count * scale;
+		descriptorPoolSizes.push_back(poolSize);
+	}
+
+	// create pool
+	VkDescriptorPoolCreateInfo poolInfo{};
+	poolInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_POOL_CREATE_INFO;
+	poolInfo.poolSizeCount = static_cast<uint32_t>(descriptorPoolSizes.size());
+	poolInfo.pPoolSizes = descriptorPoolSizes.data();
+	poolInfo.maxSets = scale;
+
+	VkDescriptorPool descriptorPool;
+	if (vkCreateDescriptorPool(VulkanRenderer::get_device(), &poolInfo, nullptr, &descriptorPool) != VK_SUCCESS) {
+		throw std::runtime_error("Failed to create descriptor pool.");
+	}
+
+	// create data and add to references
+	PoolData data{};
+	data.pool = descriptorPool;
+	m_pools.push_back(data);
+	return m_pools.back();
+}
+
+

@@ -36,9 +36,7 @@ namespace Minty
 
 		Ref<Shader> get_shader() const { return m_shader; }
 
-		void on_bind();
-
-		// TODO: set value(s) function(s)
+		std::unordered_map<String, Cargo> const& get_values() const { return m_values; }
 
 	public:
 		static Owner<MaterialTemplate> create(const MaterialTemplateBuilder& builder = {});

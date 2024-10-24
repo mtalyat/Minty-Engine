@@ -37,9 +37,13 @@ namespace Minty
 		AssetType get_type() const override { return AssetType::Material; }
 
 		// binds this Material so it can be drawn with
-		void on_bind();
+		virtual void on_bind() = 0;
 
 		Ref<MaterialTemplate> get_template() const { return m_materialTemplate; }
+
+		std::unordered_map<String, Cargo> const& get_values() const { return m_values; }
+
+		virtual void set_input(String const& name, void const* const data) = 0;
 
 	public:
 		static Owner<Material> create(const MaterialBuilder& builder = {});

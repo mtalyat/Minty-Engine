@@ -72,7 +72,6 @@ void Minty::RenderSystem::update(Time const& time)
 
 		// bind assets
 		Renderer::bind_shader(shader);
-		Renderer::bind_material_template(materialTemplate);
 		Renderer::bind_material(material);
 
 		// get transform for entity
@@ -90,7 +89,7 @@ void Minty::RenderSystem::update(Time const& time)
 		}
 
 		// set transform
-		shader->set_input("object", &transformation);
+		material->set_input("object", &transformation);
 
 		// draw mesh
 		Renderer::bind_mesh(meshComp.mesh);

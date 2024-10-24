@@ -167,7 +167,7 @@ namespace Minty
 
 		ShaderInput const& get_input(String const& name) const { return m_inputs.at(name); }
 
-		virtual void set_input(const String& name, const void* const data) = 0;
+		std::vector<ShaderInput> get_inputs() const;
 
 	public:
 		AssetType get_type() const override { return AssetType::Shader; }

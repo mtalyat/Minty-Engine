@@ -322,7 +322,7 @@ namespace Minty
 
 #pragma endregion
 
-#pragma region Command Pool
+#pragma region Command PoolData
 
 	private:
 		static void create_command_pool(const uint32_t queueFamilyIndex);

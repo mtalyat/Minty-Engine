@@ -516,6 +516,9 @@
     <ClInclude Include="Minty\Data\Variable.h">
       <Filter>Header Files\Minty\Data</Filter>
     </ClInclude>
+    <ClInclude Include="Platform\Vulkan\VulkanMaterial.h">
+      <Filter>Header Files\Platform\Vulkan</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -783,6 +786,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Minty\Component\RelationshipComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\Vulkan\VulkanMaterial.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
