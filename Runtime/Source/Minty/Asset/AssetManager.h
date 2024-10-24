@@ -157,7 +157,7 @@ namespace Minty
 		static void erase_by_type(Ref<Asset> const asset);
 
 		template<typename T>
-		static Bool find_dependency(String const& thisName, Reader& reader, String const& name, Ref<T>& asset)
+		static Bool find_dependency(Path const& path, Reader& reader, String const& name, Ref<T>& asset)
 		{
 			UUID id{};
 
@@ -178,7 +178,7 @@ namespace Minty
 			}
 
 			// if asset id is valid but asset with id DNE, set to null
-			if (!check_dependency(thisName, name, id))
+			if (!check_dependency(path, name, id))
 			{
 				asset.release();
 				return false;
@@ -301,9 +301,9 @@ namespace Minty
 
 	private:
 		// checks for a dependency that another asset has while loading
-		static Bool check_dependency(String const& type, String const& name, const UUID id);
+		static Bool check_dependency(Path const& path, String const& name, const UUID id);
 
-		static void missing_dependency(String const& type, String const& name, UUID const id);
+		static void missing_dependency(Path const& path, String const& name, UUID const id);
 
 		static Ref<Animation> load_animation(const Path& path);
 
@@ -311,7 +311,7 @@ namespace Minty
 
 		static Owner<Image> load_image(const Path& path);
 
-		static Bool load_values(Reader& reader, std::unordered_map<String, Cargo>& values, Ref<Shader> const shader);
+		static Bool load_values(Reader& reader, std::unordered_map<String, Cargo>& values, Ref<Shader> const shader, Path const& path);
 
 		static Ref<Material> load_material(Path const& path);
 

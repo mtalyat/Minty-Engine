@@ -360,14 +360,14 @@ std::vector<String> Minty::AssetManager::read_file_lines(Path const& path)
 	return result;
 }
 
-Bool Minty::AssetManager::check_dependency(String const& type, String const& name, const UUID id)
+Bool Minty::AssetManager::check_dependency(Path const& path, String const& name, const UUID id)
 {
 	// missing dependency IF one of these:
 	// - does not contain dependency: ID DNE
 	// - does not contain dependency: no asset loaded with id
 	if (!id.valid() || !contains(id))
 	{
-		missing_dependency(type, name, id);
+		missing_dependency(path, name, id);
 		return false;
 	}
 
@@ -375,9 +375,9 @@ Bool Minty::AssetManager::check_dependency(String const& type, String const& nam
 	return true;
 }
 
-void Minty::AssetManager::missing_dependency(String const& type, String const& name, UUID const id)
+void Minty::AssetManager::missing_dependency(Path const& path, String const& name, UUID const id)
 {
-	Minty::Debug::log_error(std::format("Cannot load {}. Missing \"{}\" dependency with ID {}.", type, name, to_string(id)));
+	Minty::Debug::log_error(std::format("Cannot load \"{}\". Missing \"{}\" dependency with ID {}.", path.generic_string(), name, to_string(id)));
 }
 
 Ref<Animation> Minty::AssetManager::load_animation(const Path& path)
@@ -500,7 +500,7 @@ Owner<Image> Minty::AssetManager::load_image(const Path& path)
 	return Image::create(builder);
 }
 
-Bool Minty::AssetManager::load_values(Reader& reader, std::unordered_map<String, Cargo>& values, Ref<Shader> const shader)
+Bool Minty::AssetManager::load_values(Reader& reader, std::unordered_map<String, Cargo>& values, Ref<Shader> const shader, Path const& path)
 {
 	String inputName;
 	String valueName;
@@ -534,7 +534,7 @@ Bool Minty::AssetManager::load_values(Reader& reader, std::unordered_map<String,
 			{
 				// read ID, then get asset ref, copy pointer to container
 				Ref<Asset> asset{};
-				if (!find_dependency("MaterialTemplate", reader, valueName, asset))
+				if (!find_dependency(path, reader, valueName, asset))
 				{
 					return false;
 				}
@@ -565,7 +565,7 @@ Ref<Material> Minty::AssetManager::load_material(Path const& path)
 	Reader* reader;
 	if (open_reader(path, container, reader))
 	{
-		if (!find_dependency<MaterialTemplate>("Material", *reader, "Template", builder.materialTemplate))
+		if (!find_dependency<MaterialTemplate>(path, *reader, "Template", builder.materialTemplate))
 		{
 			close_reader(container, reader);
 			return Ref<Material>();
@@ -573,7 +573,7 @@ Ref<Material> Minty::AssetManager::load_material(Path const& path)
 
 		if (reader->indent("Values"))
 		{
-			if (!load_values(*reader, builder.values, builder.materialTemplate->get_shader()))
+			if (!load_values(*reader, builder.values, builder.materialTemplate->get_shader(), path))
 			{
 				close_reader(container, reader);
 				return Ref<Material>();
@@ -599,7 +599,7 @@ Ref<MaterialTemplate> Minty::AssetManager::load_material_template(Path const& pa
 	Reader* reader;
 	if (open_reader(path, container, reader))
 	{
-		if (!find_dependency<Shader>("MaterialTemplate", *reader, "Shader", builder.shader))
+		if (!find_dependency<Shader>(path, *reader, "Shader", builder.shader))
 		{
 			close_reader(container, reader);
 			return Ref<MaterialTemplate>();
@@ -607,7 +607,11 @@ Ref<MaterialTemplate> Minty::AssetManager::load_material_template(Path const& pa
 
 		if (reader->indent("Values"))
 		{
-			load_values(*reader, builder.values, builder.shader);
+			if (!load_values(*reader, builder.values, builder.shader, "MaterialTemplate"))
+			{
+				close_reader(container, reader);
+				return Ref<MaterialTemplate>();
+			}
 
 			reader->outdent();
 		}
@@ -798,12 +802,12 @@ Ref<Shader> Minty::AssetManager::load_shader(const Path& path)
 	// modules
 	if (reader->indent("Stages"))
 	{
-		if (!find_dependency<ShaderModule>("Shader", *reader, "Vertex", builder.vertexShaderModule))
+		if (!find_dependency<ShaderModule>(path, *reader, "Vertex", builder.vertexShaderModule))
 		{
 			close_reader(container, reader);
 			return Ref<Shader>();
 		}
-		if (!find_dependency<ShaderModule>("Shader", *reader, "Fragment", builder.fragmentShaderModule))
+		if (!find_dependency<ShaderModule>(path, *reader, "Fragment", builder.fragmentShaderModule))
 		{
 			close_reader(container, reader);
 			return Ref<Shader>();
@@ -813,12 +817,12 @@ Ref<Shader> Minty::AssetManager::load_shader(const Path& path)
 	}
 
 	// viewport and scissor
-	if (!find_dependency<Viewport>("Shader", *reader, "Viewport", builder.viewport))
+	if (!find_dependency<Viewport>(path, *reader, "Viewport", builder.viewport))
 	{
 		// default
 		builder.viewport = Renderer::get_viewport();
 	}
-	if (!find_dependency<Scissor>("Shader", *reader, "Scissor", builder.scissor))
+	if (!find_dependency<Scissor>(path, *reader, "Scissor", builder.scissor))
 	{
 		// default
 		builder.scissor = Renderer::get_scissor();
