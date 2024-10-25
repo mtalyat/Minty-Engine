@@ -1,12 +1,12 @@
 #pragma once
 #include "Minty/Core/Base.h"
 
+#include "Minty/Core/Type.h"
+
 #include <cstdint>
 
 namespace Minty
 {
-	constexpr static Size INVALID_UUID = 0;
-
 	/// <summary>
 	/// A Universally Unique IDentifier.
 	/// Generates a random number to use as a unique ID for each asset/entity.
@@ -18,7 +18,7 @@ namespace Minty
 	class UUID
 	{
 	private:
-		uint64_t _uuid;
+		ULong m_uuid;
 
 	public:
 		/// <summary>
@@ -30,24 +30,24 @@ namespace Minty
 		/// Creates a new UUID with the given value.
 		/// </summary>
 		/// <param name="uuid"></param>
-		UUID(uint64_t const uuid)
-			: _uuid(uuid) {}
+		UUID(ULong const uuid)
+			: m_uuid(uuid) {}
 
 		Bool valid() const
 		{
-			return _uuid > 0;
+			return m_uuid > 0;
 		}
 
-		uint64_t data() const
+		ULong data() const
 		{
-			return _uuid;
+			return m_uuid;
 		}
 
-		operator uint64_t() const { return _uuid; }
+		operator ULong() const { return m_uuid; }
 		Bool operator==(UUID const other) const;
 		Bool operator!=(UUID const other) const;
-		Bool operator==(uint64_t const other) const;
-		Bool operator!=(uint64_t const other) const;
+		Bool operator==(ULong const other) const;
+		Bool operator!=(ULong const other) const;
 
 		friend std::ostream& operator<<(std::ostream& stream, UUID const& object);
 		friend std::istream& operator>>(std::istream& stream, UUID& object);
@@ -63,7 +63,7 @@ namespace std
 	{
 		Minty::Size operator()(Minty::UUID const& uuid) const
 		{
-			return hash<uint64_t>()(static_cast<uint64_t>(uuid));
+			return hash<Minty::ULong>()(static_cast<Minty::ULong>(uuid));
 		}
 	};
 }

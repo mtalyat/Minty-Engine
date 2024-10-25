@@ -35,4 +35,6 @@ namespace Minty
 
 	using TypeID = std::type_index;
 	using TypeInfo = std::type_info;
+
+	using Handle = unsigned int;
 }

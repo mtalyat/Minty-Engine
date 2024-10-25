@@ -82,6 +82,9 @@
     <Filter Include="Header Files\Minty\Data">
       <UniqueIdentifier>{3d770cbf-87f5-452e-84ad-6215cb3468cc}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Minty\Audio\SoLoud">
+      <UniqueIdentifier>{697cc2b5-8cbe-4b33-8848-2ec335786136}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -519,6 +522,42 @@
     <ClInclude Include="Platform\Vulkan\VulkanMaterial.h">
       <Filter>Header Files\Platform\Vulkan</Filter>
     </ClInclude>
+    <ClInclude Include="Minty\Audio\AudioClip.h">
+      <Filter>Header Files\Minty\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Audio\SoLoud\SoLoudAudioClip.h">
+      <Filter>Header Files\Minty\Audio\SoLoud</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Audio\SoLoud\SoLoud.h">
+      <Filter>Header Files\Minty\Audio\SoLoud</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Library\SoLoud.h">
+      <Filter>Header Files\Minty\Library</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Audio\AudioEngine.h">
+      <Filter>Header Files\Minty\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Audio\SoLoud\SoLoudAudioEngine.h">
+      <Filter>Header Files\Minty\Audio\SoLoud</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Audio\AudioListener.h">
+      <Filter>Header Files\Minty\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Audio\AudioSource.h">
+      <Filter>Header Files\Minty\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Audio\Attenuation.h">
+      <Filter>Header Files\Minty\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Component\AudioListenerComponent.h">
+      <Filter>Header Files\Minty\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Component\AudioSourceComponent.h">
+      <Filter>Header Files\Minty\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\System\AudioSystem.h">
+      <Filter>Header Files\Minty\System</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -789,6 +828,96 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Platform\Vulkan\VulkanMaterial.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Audio\AudioClip.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Audio\SoLoud\SoLoudAudioClip.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Audio\AudioEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Audio\SoLoud\SoLoudAudioEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Component\AudioSourceComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\System\AudioSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\soloud\include\stb_vorbis.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_wavstream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_wav.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_thread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_queue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_miniaudio.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_misc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_filter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_file.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_fft_lut.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_fft.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_fader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_core_voiceops.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_core_setters.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_core_voicegroup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_core_filterops.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_core_getters.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_core_basicops.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_core_faderops.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_core_3d.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_bus.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_audiosource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\soloud\include\dr_impl.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

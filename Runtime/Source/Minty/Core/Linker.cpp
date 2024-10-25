@@ -15,7 +15,7 @@ void Minty::Linker::link()
 {
 	// systems
 	register_system<AnimationSystem>("Animation");
-	//register_system<AudioSystem>("Audio");
+	register_system<AudioSystem>("Audio");
 	register_system<RenderSystem>("Render");
 	register_system<ScriptSystem>("Script");
 	//register_system<UISystem>("UI");
@@ -23,8 +23,8 @@ void Minty::Linker::link()
 	// components
 	// ignore: Dirty, Destroy, etc. These are temporary components that should not be saved
 	register_component<AnimatorComponent>(MINTY_NAME_ENGINE, "Animator", true);
-	//register_component<AudioListenerComponent>(MINTY_NAME_ENGINE, "AudioListener", true);
-	//register_component<AudioSourceComponent>(MINTY_NAME_ENGINE, "AudioSource", true);
+	register_component<AudioListenerComponent>(MINTY_NAME_ENGINE, "AudioListener", true);
+	register_component<AudioSourceComponent>(MINTY_NAME_ENGINE, "AudioSource", true);
 	register_component<CameraComponent>(MINTY_NAME_ENGINE, "Camera", true);
 	register_component<CanvasComponent>(MINTY_NAME_ENGINE, "Canvas", true);
 	register_component<EnabledComponent>(MINTY_NAME_ENGINE, "Enabled", false);

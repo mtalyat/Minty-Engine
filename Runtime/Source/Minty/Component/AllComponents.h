@@ -3,6 +3,8 @@
 #include "Component.h"
 
 #include "AnimatorComponent.h"
+#include "AudioListenerComponent.h"
+#include "AudioSourceComponent.h"
 #include "CameraComponent.h"
 #include "CanvasComponent.h"
 #include "DestroyComponent.h"

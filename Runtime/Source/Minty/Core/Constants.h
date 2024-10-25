@@ -49,4 +49,7 @@ namespace Minty
 	constexpr char const* EXTENSION_APPLICATION_DATA = ".appdata";
 	constexpr char const* EXTENSION_META = ".meta";
 	constexpr char const* EXTENSION_WRAP = ".wrap";
+
+	constexpr ULong INVALID_UUID = 0;
+	constexpr UInt INVALID_HANDLE = UINT_MAX;
 }

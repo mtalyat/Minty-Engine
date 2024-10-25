@@ -12,22 +12,22 @@ static std::uniform_int_distribution<uint64_t> uniformDistribution;
 
 Bool Minty::UUID::operator==(UUID const other) const
 {
-	return _uuid == other._uuid;
+	return m_uuid == other.m_uuid;
 }
 
 Bool Minty::UUID::operator!=(UUID const other) const
 {
-	return _uuid != other._uuid;
+	return m_uuid != other.m_uuid;
 }
 
-Bool Minty::UUID::operator==(uint64_t const other) const
+Bool Minty::UUID::operator==(ULong const other) const
 {
-	return _uuid == other;
+	return m_uuid == other;
 }
 
-Bool Minty::UUID::operator!=(uint64_t const other) const
+Bool Minty::UUID::operator!=(ULong const other) const
 {
-	return _uuid != other;
+	return m_uuid != other;
 }
 
 UUID Minty::UUID::create()
@@ -37,12 +37,12 @@ UUID Minty::UUID::create()
 
 std::ostream& Minty::operator<<(std::ostream& stream, UUID const& object)
 {
-	stream << std::hex << object._uuid << std::dec;
+	stream << std::hex << object.m_uuid << std::dec;
 	return stream;
 }
 
 std::istream& Minty::operator>>(std::istream& stream, UUID& object)
 {
-	stream >> std::hex >> object._uuid >> std::dec;
+	stream >> std::hex >> object.m_uuid >> std::dec;
 	return stream;
 }

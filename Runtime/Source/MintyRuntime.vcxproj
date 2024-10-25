@@ -108,12 +108,12 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_LIB;%(PreprocessorDefinitions);NOMINMAX</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir);.;..\..\Libraries\mono\include;..\..\Libraries\vulkan\include;..\..\Libraries\glm\include;..\..\Libraries\glfw\include;..\..\Libraries\stb\include;..\..\Libraries\zlib\include;..\..\Libraries\entt\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);.;..\..\Libraries\mono\include;..\..\Libraries\vulkan\include;..\..\Libraries\glm\include;..\..\Libraries\glfw\include;..\..\Libraries\stb\include;..\..\Libraries\zlib\include;..\..\Libraries\entt\include;..\..\Libraries\soloud\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -138,12 +138,12 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_LIB;%(PreprocessorDefinitions);NOMINMAX</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir);.;..\..\Libraries\mono\include;..\..\Libraries\vulkan\include;..\..\Libraries\glm\include;..\..\Libraries\glfw\include;..\..\Libraries\stb\include;..\..\Libraries\zlib\include;..\..\Libraries\entt\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);.;..\..\Libraries\mono\include;..\..\Libraries\vulkan\include;..\..\Libraries\glm\include;..\..\Libraries\glfw\include;..\..\Libraries\stb\include;..\..\Libraries\zlib\include;..\..\Libraries\entt\include;..\..\Libraries\soloud\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -171,8 +171,18 @@
     <ClInclude Include="Minty\Animation\Animator.h" />
     <ClInclude Include="Minty\Asset\Asset.h" />
     <ClInclude Include="Minty\Asset\AssetManager.h" />
+    <ClInclude Include="Minty\Audio\Attenuation.h" />
+    <ClInclude Include="Minty\Audio\AudioClip.h" />
+    <ClInclude Include="Minty\Audio\AudioEngine.h" />
+    <ClInclude Include="Minty\Audio\AudioListener.h" />
+    <ClInclude Include="Minty\Audio\AudioSource.h" />
+    <ClInclude Include="Minty\Audio\SoLoud\SoLoud.h" />
+    <ClInclude Include="Minty\Audio\SoLoud\SoLoudAudioClip.h" />
+    <ClInclude Include="Minty\Audio\SoLoud\SoLoudAudioEngine.h" />
     <ClInclude Include="Minty\Component\AllComponents.h" />
     <ClInclude Include="Minty\Component\AnimatorComponent.h" />
+    <ClInclude Include="Minty\Component\AudioListenerComponent.h" />
+    <ClInclude Include="Minty\Component\AudioSourceComponent.h" />
     <ClInclude Include="Minty\Component\CameraComponent.h" />
     <ClInclude Include="Minty\Component\CanvasComponent.h" />
     <ClInclude Include="Minty\Component\Component.h" />
@@ -245,6 +255,7 @@
     <ClInclude Include="Minty\Library\GLFW.h" />
     <ClInclude Include="Minty\Library\GLM.h" />
     <ClInclude Include="Minty\Library\Mono.h" />
+    <ClInclude Include="Minty\Library\SoLoud.h" />
     <ClInclude Include="Minty\Library\Stb.h" />
     <ClInclude Include="Minty\Library\Vulkan.h" />
     <ClInclude Include="Minty\Render\Buffer.h" />
@@ -291,6 +302,7 @@
     <ClInclude Include="Minty\Serialize\Writer.h" />
     <ClInclude Include="Minty\System\AllSystems.h" />
     <ClInclude Include="Minty\System\AnimationSystem.h" />
+    <ClInclude Include="Minty\System\AudioSystem.h" />
     <ClInclude Include="Minty\System\RenderSystem.h" />
     <ClInclude Include="Minty\System\ScriptSystem.h" />
     <ClInclude Include="Minty\System\System.h" />
@@ -312,11 +324,40 @@
     <ClInclude Include="Platform\Windows\WindowsWindow.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Libraries\soloud\include\dr_impl.cpp" />
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud.cpp" />
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_audiosource.cpp" />
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_bus.cpp" />
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_core_3d.cpp" />
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_core_basicops.cpp" />
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_core_faderops.cpp" />
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_core_filterops.cpp" />
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_core_getters.cpp" />
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_core_setters.cpp" />
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_core_voicegroup.cpp" />
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_core_voiceops.cpp" />
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_fader.cpp" />
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_fft.cpp" />
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_fft_lut.cpp" />
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_file.cpp" />
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_filter.cpp" />
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_miniaudio.cpp" />
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_misc.cpp" />
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_queue.cpp" />
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_thread.cpp" />
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_wav.cpp" />
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_wavstream.cpp" />
+    <ClCompile Include="..\..\Libraries\soloud\include\stb_vorbis.cpp" />
     <ClCompile Include="Minty\Animation\Animation.cpp" />
     <ClCompile Include="Minty\Animation\Animator.cpp" />
     <ClCompile Include="Minty\Asset\Asset.cpp" />
     <ClCompile Include="Minty\Asset\AssetManager.cpp" />
+    <ClCompile Include="Minty\Audio\AudioClip.cpp" />
+    <ClCompile Include="Minty\Audio\AudioEngine.cpp" />
+    <ClCompile Include="Minty\Audio\SoLoud\SoLoudAudioClip.cpp" />
+    <ClCompile Include="Minty\Audio\SoLoud\SoLoudAudioEngine.cpp" />
     <ClCompile Include="Minty\Component\AnimatorComponent.cpp" />
+    <ClCompile Include="Minty\Component\AudioSourceComponent.cpp" />
     <ClCompile Include="Minty\Component\CameraComponent.cpp" />
     <ClCompile Include="Minty\Component\RelationshipComponent.cpp" />
     <ClCompile Include="Minty\Component\ScriptComponent.cpp" />
@@ -384,6 +425,7 @@
     <ClCompile Include="Minty\Serialize\Reader.cpp" />
     <ClCompile Include="Minty\Serialize\Writer.cpp" />
     <ClCompile Include="Minty\System\AnimationSystem.cpp" />
+    <ClCompile Include="Minty\System\AudioSystem.cpp" />
     <ClCompile Include="Minty\System\RenderSystem.cpp" />
     <ClCompile Include="Minty\System\ScriptSystem.cpp" />
     <ClCompile Include="Minty\System\SystemRegistry.cpp" />
