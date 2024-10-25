@@ -1000,3 +1000,19 @@ Bool Minty::Parse::try_conditional(String const& string, Conditional& value)
 	value = to_conditional(string);
 	return value != Conditional();
 }
+
+Attenuation Minty::Parse::to_attenuation(String const& string)
+{
+	if (string == "None") return Attenuation::None;
+	if (string == "InverseDistance") return Attenuation::InverseDistance;
+	if (string == "LinearDistance") return Attenuation::LinearDistance;
+	if (string == "ExponentialDistance") return Attenuation::ExponentialDistance;
+
+	return Attenuation();
+}
+
+Bool Minty::Parse::try_attenuation(String const& string, Attenuation& value)
+{
+	value = to_attenuation(string);
+	return value != Attenuation();
+}

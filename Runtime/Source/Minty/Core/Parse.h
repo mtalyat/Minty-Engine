@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Minty/Audio/Attenuation.h"
 #include "Minty/Core/Color.h"
 #include "Minty/Core/Math.h"
 #include "Minty/Core/String.h"
@@ -667,5 +668,20 @@ namespace Minty::Parse
 	inline Bool parse_try(String const& string, Conditional& value)
 	{
 		return try_conditional(string, value);
+	}
+
+	Attenuation to_attenuation(String const& string);
+	Bool try_attenuation(String const& string, Attenuation& value);
+
+	template<>
+	inline void parse_to(String const& string, Attenuation& value)
+	{
+		value = to_attenuation(string);
+	}
+
+	template<>
+	inline Bool parse_try(String const& string, Attenuation& value)
+	{
+		return try_attenuation(string, value);
 	}
 }

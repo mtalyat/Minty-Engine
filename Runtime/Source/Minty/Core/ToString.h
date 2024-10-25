@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Minty/Asset/Asset.h"
+#include "Minty/Audio/Attenuation.h"
 #include "Minty/Core/Color.h"
 #include "Minty/Core/Encoding.h"
 #include "Minty/Core/Macros.h"
@@ -585,6 +586,20 @@ namespace Minty
 		case Conditional::GreaterThanOrEqualTo: return ">=";
 		case Conditional::LessThan: return "<";
 		case Conditional::LessThanOrEqualTo: return "<=";
+
+		default: return "";
+		}
+	}
+
+	template<>
+	inline String to_string(Attenuation const& obj)
+	{
+		switch (obj)
+		{
+		case Attenuation::None: return "None";
+		case Attenuation::InverseDistance: return "InverseDistance";
+		case Attenuation::LinearDistance: return "LinearDistance";
+		case Attenuation::ExponentialDistance: return "ExponentialDistance";
 
 		default: return "";
 		}
