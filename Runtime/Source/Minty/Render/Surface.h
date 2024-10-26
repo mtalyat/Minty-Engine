@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Minty/Core/Pointer.h"
-#include "Minty/Core/Window.h"
+#include "Minty/Window/Window.h"
 
 namespace Minty
 {

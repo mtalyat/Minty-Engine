@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Minty/Core/WindowManager.h"
+#include "Minty/Window/WindowManager.h"
 
 namespace Minty
 {

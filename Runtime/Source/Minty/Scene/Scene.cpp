@@ -4,7 +4,7 @@
 #include "Minty/Asset/AssetManager.h"
 #include "Minty/Component/AllComponents.h"
 #include "Minty/Core/Application.h"
-#include "Minty/Core/Window.h"
+#include "Minty/Window/Window.h"
 #include "Minty/Asset/AssetManager.h"
 #include "Minty/Entity/EntityRegistry.h"
 #include "Minty/System/AllSystems.h"

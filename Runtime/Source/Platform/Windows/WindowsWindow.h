@@ -1,5 +1,5 @@
 #pragma once
-#include "Minty/Core/Window.h"
+#include "Minty/Window/Window.h"
 
 #include "Minty/Core/Types.h"
 #include "Minty/Library/GLFW.h"

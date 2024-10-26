@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Minty/Core/Window.h"
+#include "Minty/Window/Window.h"
 #include "Minty/Data/Register.h"
 
 namespace Minty

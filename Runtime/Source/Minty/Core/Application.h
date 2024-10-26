@@ -1,7 +1,7 @@
 #pragma once
 #include "Minty/Core/ApplicationInfo.h"
 #include "Minty/Core/Base.h"
-#include "Minty/Core/WindowManager.h"
+#include "Minty/Window/WindowManager.h"
 #include "Minty/Debug/Logger.h"
 #include "Minty/Scene/SceneManager.h"
 

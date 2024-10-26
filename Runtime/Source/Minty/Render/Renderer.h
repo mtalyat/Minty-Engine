@@ -3,7 +3,7 @@
 #include "Minty/Core/Color.h"
 #include "Minty/Core/Pointer.h"
 #include "Minty/Core/Types.h"
-#include "Minty/Core/Window.h"
+#include "Minty/Window/Window.h"
 #include "Minty/Render/Camera.h"
 #include "Minty/Render/Mesh.h"
 #include "Minty/Render/Material.h"

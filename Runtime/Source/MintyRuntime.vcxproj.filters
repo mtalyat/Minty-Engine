@@ -85,6 +85,9 @@
     <Filter Include="Header Files\Minty\Audio\SoLoud">
       <UniqueIdentifier>{697cc2b5-8cbe-4b33-8848-2ec335786136}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Minty\Window">
+      <UniqueIdentifier>{005cd715-b37e-4c43-8238-7fa23036a161}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -112,9 +115,6 @@
       <Filter>Header Files\Minty\Core</Filter>
     </ClInclude>
     <ClInclude Include="Minty\Core\Pointer.h">
-      <Filter>Header Files\Minty\Core</Filter>
-    </ClInclude>
-    <ClInclude Include="Minty\Core\Window.h">
       <Filter>Header Files\Minty\Core</Filter>
     </ClInclude>
     <ClInclude Include="Minty\Core\Application.h">
@@ -564,11 +564,14 @@
     <ClInclude Include="Minty\Core\Rect.h">
       <Filter>Header Files\Minty\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Minty\Core\WindowManager.h">
-      <Filter>Header Files\Minty\Core</Filter>
-    </ClInclude>
     <ClInclude Include="Platform\Windows\WindowsWindowManager.h">
       <Filter>Header Files\Platform\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Window\WindowManager.h">
+      <Filter>Header Files\Minty\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Window\Window.h">
+      <Filter>Header Files\Minty\Window</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -609,9 +612,6 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Minty\Core\Math.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="Minty\Core\Window.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Platform\Windows\WindowsWindow.cpp">
@@ -935,10 +935,13 @@
     <ClCompile Include="Minty\Input\Input.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Minty\Core\WindowManager.cpp">
+    <ClCompile Include="Platform\Windows\WindowsWindowManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Platform\Windows\WindowsWindowManager.cpp">
+    <ClCompile Include="Minty\Window\Window.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Window\WindowManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

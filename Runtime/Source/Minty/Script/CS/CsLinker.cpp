@@ -4,7 +4,7 @@
 #include "Minty/Core/Application.h"
 #include "Minty/Core/Linker.h"
 #include "Minty/Core/Math.h"
-#include "Minty/Core/Window.h"
+#include "Minty/Window/Window.h"
 #include "Minty/Component/AllComponents.h"
 #include "Minty/Scene/Scene.h"
 #include "Minty/Scene/SceneManager.h"

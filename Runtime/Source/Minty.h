@@ -40,7 +40,6 @@
 #include "Minty/Core/Type.h"
 #include "Minty/Core/Types.h"
 #include "Minty/Core/UUID.h"
-#include "Minty/Core/Window.h"
 
 // DEBUG
 #include "Minty/Debug/Debug.h"
@@ -109,3 +108,7 @@
 
 // UI
 #include "Minty/UI/AnchorMode.h"
+
+// WINDOW
+#include "Minty/Window/Window.h"
+#include "Minty/Window/WindowManager.h"

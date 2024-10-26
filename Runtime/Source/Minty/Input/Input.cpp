@@ -2,7 +2,7 @@
 #include "Input.h"
 
 #include "Minty/Core/Constants.h"
-#include "Minty/Core/WindowManager.h"
+#include "Minty/Window/WindowManager.h"
 #include "Minty/Script/ScriptArguments.h"
 
 using namespace Minty;

@@ -226,8 +226,6 @@
     <ClInclude Include="Minty\Core\Type.h" />
     <ClInclude Include="Minty\Core\Types.h" />
     <ClInclude Include="Minty\Core\UUID.h" />
-    <ClInclude Include="Minty\Core\Window.h" />
-    <ClInclude Include="Minty\Core\WindowManager.h" />
     <ClInclude Include="Minty\Data\Array.h" />
     <ClInclude Include="Minty\Data\Cargo.h" />
     <ClInclude Include="Minty\Data\ConstantContainer.h" />
@@ -311,6 +309,8 @@
     <ClInclude Include="Minty\System\System.h" />
     <ClInclude Include="Minty\System\SystemRegistry.h" />
     <ClInclude Include="Minty\UI\AnchorMode.h" />
+    <ClInclude Include="Minty\Window\Window.h" />
+    <ClInclude Include="Minty\Window\WindowManager.h" />
     <ClInclude Include="pch.h" />
     <ClInclude Include="Platform\Vulkan\VulkanMaterial.h" />
     <ClInclude Include="Platform\Vulkan\VulkanMesh.h" />
@@ -381,8 +381,6 @@
     <ClCompile Include="Minty\Core\Time.cpp" />
     <ClCompile Include="Minty\Core\Type.cpp" />
     <ClCompile Include="Minty\Core\UUID.cpp" />
-    <ClCompile Include="Minty\Core\Window.cpp" />
-    <ClCompile Include="Minty\Core\WindowManager.cpp" />
     <ClCompile Include="Minty\Data\Cargo.cpp" />
     <ClCompile Include="Minty\Data\ConstantContainer.cpp" />
     <ClCompile Include="Minty\Data\Container.cpp" />
@@ -436,6 +434,8 @@
     <ClCompile Include="Minty\System\ScriptSystem.cpp" />
     <ClCompile Include="Minty\System\SystemRegistry.cpp" />
     <ClCompile Include="Minty\UI\AnchorMode.cpp" />
+    <ClCompile Include="Minty\Window\Window.cpp" />
+    <ClCompile Include="Minty\Window\WindowManager.cpp" />
     <ClCompile Include="pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>

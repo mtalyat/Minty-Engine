@@ -8,7 +8,7 @@
 #include "Minty/Core/Pack.h"
 #include "Minty/Core/Pointer.h"
 #include "Minty/Core/Time.h"
-#include "Minty/Core/Window.h"
+#include "Minty/Window/Window.h"
 #include "Minty/Input/Input.h"
 #include "Minty/Render/Mesh.h"
 #include "Minty/Render/Renderer.h"
