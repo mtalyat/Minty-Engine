@@ -555,7 +555,7 @@ UUID Minty::Parse::to_uuid(String const& string)
 {
 	if (string.empty()) return INVALID_UUID;
 
-	uint64_t id;
+	Size id;
 	std::stringstream ss(string);
 	ss >> std::hex >> id;
 	return UUID(id);

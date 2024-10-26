@@ -33,6 +33,11 @@ namespace Minty
 			m_data.emplace(id, t);
 		}
 
+		void erase(UUID const id)
+		{
+			m_data.erase(id);
+		}
+
 		Bool contains(UUID const id) const
 		{
 			return m_data.contains(id);
@@ -73,6 +78,21 @@ namespace Minty
 		void set(UUID const id, T const& t)
 		{
 			m_data[id] = t;
+		}
+
+		void clear()
+		{
+			m_data.clear();
+		}
+
+		std::unordered_map<UUID, T>::iterator find(UUID const id)
+		{
+			return m_data.find(id);
+		}
+
+		std::unordered_map<UUID, T>::const_iterator find(UUID const id) const
+		{
+			return m_data.find(id);
 		}
 
 		std::unordered_map<UUID, T>::iterator begin()

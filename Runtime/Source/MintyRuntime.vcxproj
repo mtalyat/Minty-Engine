@@ -218,6 +218,7 @@
     <ClInclude Include="Minty\Core\Parse.h" />
     <ClInclude Include="Minty\Core\Path.h" />
     <ClInclude Include="Minty\Core\Pointer.h" />
+    <ClInclude Include="Minty\Core\Rect.h" />
     <ClInclude Include="Minty\Core\Stopwatch.h" />
     <ClInclude Include="Minty\Core\String.h" />
     <ClInclude Include="Minty\Core\Time.h" />
@@ -226,6 +227,7 @@
     <ClInclude Include="Minty\Core\Types.h" />
     <ClInclude Include="Minty\Core\UUID.h" />
     <ClInclude Include="Minty\Core\Window.h" />
+    <ClInclude Include="Minty\Core\WindowManager.h" />
     <ClInclude Include="Minty\Data\Array.h" />
     <ClInclude Include="Minty\Data\Cargo.h" />
     <ClInclude Include="Minty\Data\ConstantContainer.h" />
@@ -249,6 +251,7 @@
     <ClInclude Include="Minty\FSM\Conditional.h" />
     <ClInclude Include="Minty\FSM\FiniteStateMachine.h" />
     <ClInclude Include="Minty\Input\Gamepad.h" />
+    <ClInclude Include="Minty\Input\Input.h" />
     <ClInclude Include="Minty\Input\Key.h" />
     <ClInclude Include="Minty\Input\Mouse.h" />
     <ClInclude Include="Minty\Library\EnTT.h" />
@@ -322,6 +325,7 @@
     <ClInclude Include="Platform\Vulkan\VulkanTexture.h" />
     <ClInclude Include="Platform\Vulkan\VulkanViewport.h" />
     <ClInclude Include="Platform\Windows\WindowsWindow.h" />
+    <ClInclude Include="Platform\Windows\WindowsWindowManager.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\Libraries\soloud\include\dr_impl.cpp" />
@@ -378,6 +382,7 @@
     <ClCompile Include="Minty\Core\Type.cpp" />
     <ClCompile Include="Minty\Core\UUID.cpp" />
     <ClCompile Include="Minty\Core\Window.cpp" />
+    <ClCompile Include="Minty\Core\WindowManager.cpp" />
     <ClCompile Include="Minty\Data\Cargo.cpp" />
     <ClCompile Include="Minty\Data\ConstantContainer.cpp" />
     <ClCompile Include="Minty\Data\Container.cpp" />
@@ -392,6 +397,7 @@
     <ClCompile Include="Minty\File\Wrap.cpp" />
     <ClCompile Include="Minty\File\Wrapper.cpp" />
     <ClCompile Include="Minty\FSM\FiniteStateMachine.cpp" />
+    <ClCompile Include="Minty\Input\Input.cpp" />
     <ClCompile Include="Minty\Render\Buffer.cpp" />
     <ClCompile Include="Minty\Render\Camera.cpp" />
     <ClCompile Include="Minty\Render\Image.cpp" />
@@ -449,6 +455,7 @@
     <ClCompile Include="Platform\Vulkan\VulkanTexture.cpp" />
     <ClCompile Include="Platform\Vulkan\VulkanViewport.cpp" />
     <ClCompile Include="Platform\Windows\WindowsWindow.cpp" />
+    <ClCompile Include="Platform\Windows\WindowsWindowManager.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

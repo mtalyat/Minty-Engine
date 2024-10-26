@@ -21,9 +21,11 @@ namespace Minty
 		~CsScriptObject();
 
 	protected:
-		void initialize_fields(std::unordered_map<String, Owner<ScriptField>>& fields) override;
-		void initialize_properties(std::unordered_map<String, Owner<ScriptProperty>>& properties) override;
-		void initialize_methods(std::unordered_map<String, Owner<ScriptMethod>>& methods) override;
+		Owner<ScriptField> create_field(String const& name) override;
+
+		Owner<ScriptProperty> create_property(String const& name) override;
+
+		Owner<ScriptMethod> create_method(String const& name, Int const parameterCount) override;
 
 	public:
 		void* get_native() const override { return mp_object; }

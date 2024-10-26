@@ -2,6 +2,7 @@
 #include "CsScriptClass.h"
 
 #include "Minty/Script/CS/CsScriptAssembly.h"
+#include "Minty/Script/CS/CsScriptMethod.h"
 
 using namespace Minty;
 
@@ -37,4 +38,24 @@ Bool Minty::CsScriptClass::is_derived_from(Ref<ScriptClass> const klass) const
 
 	// if no more parents, returns null, otherise returns True
 	return static_cast<Bool>(current);
+}
+
+Owner<ScriptMethod> Minty::CsScriptClass::create_method(String const& name, Int const parameterCount)
+{
+	MonoClass* klass = mp_class;
+
+	ScriptMethodBuilder builder{};
+	builder.object = nullptr; // no object for static method
+
+	MonoMethod* method;
+	while (klass != nullptr)
+	{
+		if (method = mono_class_get_method_from_name(klass, name.c_str(), parameterCount))
+		{
+			return Owner<CsScriptMethod>(builder, method);
+		}
+
+		// check inherited values as well
+		klass = mono_class_get_parent(klass);
+	}
 }

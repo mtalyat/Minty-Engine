@@ -1,9 +1,7 @@
-	enum class Conditional
+	enum class Attenuation
 	{
-		Equal,
-		NotEqual,
-		GreaterThan,
-		GreaterThanOrEqualTo,
-		LessThan,
-		LessThanOrEqualTo,
+		None,
+		InverseDistance,
+		LinearDistance,
+		ExponentialDistance
 	};

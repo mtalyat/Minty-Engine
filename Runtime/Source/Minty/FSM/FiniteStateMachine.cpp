@@ -24,7 +24,7 @@ UUID Minty::FSM::Scope::find(String const& key) const
 
 void Minty::FSM::Scope::reset()
 {
-	for (size_t i = 0; i < m_values.size(); i++)
+	for (Size i = 0; i < m_values.size(); i++)
 	{
 		m_values.at(i) = 0;
 	}

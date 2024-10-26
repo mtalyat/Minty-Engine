@@ -9,6 +9,7 @@
 #include "Minty/Core/Pointer.h"
 #include "Minty/Core/Time.h"
 #include "Minty/Core/Window.h"
+#include "Minty/Input/Input.h"
 #include "Minty/Render/Mesh.h"
 #include "Minty/Render/Renderer.h"
 #include "Minty/Render/Shader.h"
@@ -28,7 +29,6 @@ Minty::Application::Application(const ApplicationBuilder& builder)
 	, m_info(builder.info)
 	, m_mode(builder.mode)
 	, m_logger(builder.logPath, true)
-	, m_window()
 	, m_sceneManager()
 	, m_workingScenes()
 {
@@ -37,12 +37,9 @@ Minty::Application::Application(const ApplicationBuilder& builder)
 	MINTY_ASSERT(sp_instance == nullptr);
 	sp_instance = this;
 
-	// create window
-	WindowBuilder windowBuilder{};
-	m_window = Window::create(windowBuilder);
-	m_window->set_event_callback([this](Event& e) { on_event(e); });
-
 	// initialize tools
+	WindowManagerBuilder windowManagerBuilder{};
+	WindowManager::initialize(windowManagerBuilder);
 
 	//  asset manager
 	AssetManagerBuilder assetManagerBuilder{};
@@ -50,14 +47,21 @@ Minty::Application::Application(const ApplicationBuilder& builder)
 	assetManagerBuilder.wraps = { "default.wrap", "game.wrap" };
 	AssetManager::initialize(assetManagerBuilder);
 
-	//  renderer
-	RendererBuilder rendererBuilder{};
-	rendererBuilder.window = m_window;
-	Renderer::initialize(rendererBuilder);
-
 	//	script engine
 	ScriptEngineBuilder scriptEngineBuilder{};
 	ScriptEngine::initialize(scriptEngineBuilder);
+
+	// window
+	WindowBuilder windowBuilder{};
+	windowBuilder.id = UUID::create();
+	windowBuilder.title = builder.info.name;
+	Ref<Window> window = WindowManager::create_window(windowBuilder);
+	window->set_event_callback([this](Event& e) { on_event(e); });
+
+	//  renderer
+	RendererBuilder rendererBuilder{};
+	rendererBuilder.window = window;
+	Renderer::initialize(rendererBuilder);
 
 	// load MintyEngine assembly
 	ScriptEngine::load_assembly(MINTY_NAME_ENGINE, "Lib/MintyEngine.dll", builder.mode == ApplicationMode::Edit);
@@ -116,6 +120,7 @@ Int Application::run()
 
 	Owner<RenderTarget> target = Renderer::create_render_target();
 	Renderer::set_render_target(target);
+	Ref<Window> window = WindowManager::get_main();
 
 	while (m_running)
 	{
@@ -144,7 +149,7 @@ Int Application::run()
 		}
 
 		// process window events
-		m_window->process();
+		window->process();
 
 		if (!m_minimized)
 		{
@@ -186,6 +191,84 @@ void Minty::Application::on_event(Event& event)
 	EventDispatcher dispatcher(event);
 	dispatcher.dispatch<WindowCloseEvent>(MINTY_BIND_EVENT_FUNCTION(Application::on_window_close));
 	dispatcher.dispatch<WindowResizeEvent>(MINTY_BIND_EVENT_FUNCTION(Application::on_window_resize));
+
+	// these events are always called
+	switch (event.get_event_type())
+	{
+	case EventType::WindowResize:
+	{
+		// TODO: move this out of this function into more natural place
+
+		Ref<Scene> scene = m_sceneManager.get_working_scene();
+		if (!scene) break;
+
+		//// resize UI elements
+		//EntityRegistry& registry = scene->get_entity_registry();
+
+		//for (auto [entity, transform] : registry.view<UITransformComponent>().each())
+		//{
+		//	registry.dirty(entity);
+		//}
+
+		break;
+	}
+	}
+
+	// these events only called in normal run mode
+	if (Application::instance().get_mode() == ApplicationMode::Normal)
+	{
+		switch (event.get_event_type())
+		{
+		case EventType::Key:
+		{
+			KeyEvent& e = static_cast<KeyEvent&>(event);
+			Input::trigger_key(e.get_key(), e.get_key_action(), e.get_key_modifiers());
+			break;
+		}
+		case EventType::MouseButton:
+		{
+			MouseButtonEvent& e = static_cast<MouseButtonEvent&>(event);
+			Input::trigger_mouse_button(e.get_button(), e.get_action(), e.get_key_modifiers());
+			break;
+		}
+		case EventType::MouseMoved:
+		{
+			MouseMovedEvent& e = static_cast<MouseMovedEvent&>(event);
+			Input::trigger_mouse_move(e.get_x(), e.get_y());
+			break;
+		}
+		case EventType::MouseScrolled:
+		{
+			MouseScrolledEvent& e = static_cast<MouseScrolledEvent&>(event);
+			Input::trigger_mouse_scroll(e.get_delta_x(), e.get_delta_y());
+			break;
+		}
+		case EventType::GamepadConnected:
+		{
+			GamepadConnectedEvent& e = static_cast<GamepadConnectedEvent&>(event);
+			Input::trigger_gamepad_connect(e.get_controller());
+			break;
+		}
+		case EventType::GamepadDisconnected:
+		{
+			GamepadDisconnectedEvent& e = static_cast<GamepadDisconnectedEvent&>(event);
+			Input::trigger_gamepad_disconnect(e.get_controller());
+			break;
+		}
+		case EventType::GamepadButton:
+		{
+			GamepadButtonEvent& e = static_cast<GamepadButtonEvent&>(event);
+			Input::trigger_gamepad_button(e.get_controller(), e.get_button(), e.get_action());
+			break;
+		}
+		case EventType::GamepadAxis:
+		{
+			GamepadAxisEvent& e = static_cast<GamepadAxisEvent&>(event);
+			Input::trigger_gamepad_axis(e.get_controller(), e.get_axis(), e.get_value());
+			break;
+		}
+		}
+	}
 }
 
 Bool Minty::Application::on_window_close(WindowCloseEvent& event)

@@ -54,13 +54,16 @@ void Minty::ScriptObject::deserialize(Reader& reader)
     }
 }
 
-Ref<ScriptField> Minty::ScriptObject::get_field(String const& name) const
+Ref<ScriptField> Minty::ScriptObject::get_field(String const& name)
 {
     auto found = m_fields.find(name);
 
     if (found == m_fields.end())
     {
-        return Ref<ScriptField>();
+        Owner<ScriptField> field = create_field(name);
+        Ref<ScriptField> ref = field.create_ref();
+        m_fields.emplace(name, std::move(field));
+        return ref;
     }
 
     return found->second.create_ref();
@@ -79,13 +82,16 @@ std::vector<Ref<ScriptField>> Minty::ScriptObject::get_fields() const
     return fields;
 }
 
-Ref<ScriptProperty> Minty::ScriptObject::get_property(String const& name) const
+Ref<ScriptProperty> Minty::ScriptObject::get_property(String const& name)
 {
     auto found = m_properties.find(name);
 
     if (found == m_properties.end())
     {
-        return Ref<ScriptProperty>();
+        Owner<ScriptProperty> prop = create_property(name);
+        Ref<ScriptProperty> ref = prop.create_ref();
+        m_properties.emplace(name, std::move(prop));
+        return ref;
     }
 
     return found->second.create_ref();
@@ -104,13 +110,16 @@ std::vector<Ref<ScriptProperty>> Minty::ScriptObject::get_properties() const
     return properties;
 }
 
-Ref<ScriptMethod> Minty::ScriptObject::get_method(String const& name) const
+Ref<ScriptMethod> Minty::ScriptObject::get_method(String const& name, Int const parameterCount)
 {
     auto found = m_methods.find(name);
 
     if (found == m_methods.end())
     {
-        return Ref<ScriptMethod>();
+        Owner<ScriptMethod> method = create_method(name, parameterCount);
+        Ref<ScriptMethod> ref = method.create_ref();
+        m_methods.emplace(name, std::move(method));
+        return ref;
     }
 
     return found->second.create_ref();
@@ -129,27 +138,27 @@ std::vector<Ref<ScriptMethod>> Minty::ScriptObject::get_methods() const
     return methods;
 }
 
-void Minty::ScriptObject::invoke(String const& name) const
+void Minty::ScriptObject::invoke(String const& name)
 {
-    Ref<ScriptMethod> method = get_method(name);
+    Ref<ScriptMethod> method = get_method(name, 0);
 
     MINTY_ASSERT_FORMAT(method != nullptr, "{} does not contain a method named \"{}\".", get_class()->get_full_name(), name);
 
     method->invoke();
 }
 
-void Minty::ScriptObject::invoke(String const& name, void** const argv, Size const argc) const
+void Minty::ScriptObject::invoke(String const& name, void** const argv, Size const argc)
 {
-    Ref<ScriptMethod> method = get_method(name);
+    Ref<ScriptMethod> method = get_method(name, static_cast<Int>(argc));
 
     MINTY_ASSERT_FORMAT(method != nullptr, "{} does not contain a method named \"{}\".", get_class()->get_full_name(), name);
 
     method->invoke(argv, argc);
 }
 
-Bool Minty::ScriptObject::try_invoke(String const& name) const
+Bool Minty::ScriptObject::try_invoke(String const& name)
 {
-    Ref<ScriptMethod> method = get_method(name);
+    Ref<ScriptMethod> method = get_method(name, 0);
 
     if (method == nullptr)
     {
@@ -161,9 +170,9 @@ Bool Minty::ScriptObject::try_invoke(String const& name) const
     return true;
 }
 
-Bool Minty::ScriptObject::try_invoke(String const& name, void** const argv, Size const argc) const
+Bool Minty::ScriptObject::try_invoke(String const& name, void** const argv, Size const argc)
 {
-    Ref<ScriptMethod> method = get_method(name);
+    Ref<ScriptMethod> method = get_method(name, static_cast<Int>(argc));
 
     if (method == nullptr)
     {
@@ -175,7 +184,7 @@ Bool Minty::ScriptObject::try_invoke(String const& name, void** const argv, Size
     return true;
 }
 
-void Minty::ScriptObject::set_field(String const& name, void* const value) const
+void Minty::ScriptObject::set_field(String const& name, void* const value)
 {
     Ref<ScriptField> field = get_field(name);
 
@@ -184,7 +193,7 @@ void Minty::ScriptObject::set_field(String const& name, void* const value) const
     field->set(value);
 }
 
-void Minty::ScriptObject::get_field(String const& name, void* const value) const
+void Minty::ScriptObject::get_field(String const& name, void* const value)
 {
     Ref<ScriptField> field = get_field(name);
 
@@ -193,7 +202,7 @@ void Minty::ScriptObject::get_field(String const& name, void* const value) const
     field->get(value);
 }
 
-void Minty::ScriptObject::set_property(String const& name, void** const value) const
+void Minty::ScriptObject::set_property(String const& name, void** const value)
 {
     Ref<ScriptProperty> prop = get_property(name);
 
@@ -202,7 +211,7 @@ void Minty::ScriptObject::set_property(String const& name, void** const value) c
     prop->set(value);
 }
 
-void Minty::ScriptObject::get_property(String const& name, void** const value) const
+void Minty::ScriptObject::get_property(String const& name, void** const value)
 {
     Ref<ScriptProperty> prop = get_property(name);
 

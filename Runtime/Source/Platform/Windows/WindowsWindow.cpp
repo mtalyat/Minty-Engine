@@ -11,7 +11,7 @@ using namespace Minty;
 
 static constexpr float JOYSTICK_THRESHOLD = 0.1f;
 
-static void error_callback(int error, char const* description)
+static void error_callback(Int error, char const* description)
 {
 	MINTY_ERROR_FORMAT("GLFW error ({}): {}", error, description);
 }
@@ -20,34 +20,16 @@ Minty::WindowsWindow::WindowsWindow(WindowBuilder const& builder)
 	: Window(builder)
 	, _window()
 	, _gamepads()
-	, _frameWidth(static_cast<int>(builder.width))
-	, _frameHeight(static_cast<int>(builder.height))
+	, _frameWidth(static_cast<Int>(builder.width))
+	, _frameHeight(static_cast<Int>(builder.height))
 	, _restoreX(builder.x)
 	, _restoreY(builder.y)
 {
-	// if no windows have been made yet, init glfw
-	if (_windows.empty())
-	{
-		if (!glfwInit())
-		{
-			MINTY_ERROR("Failed to initialize GLFW.");
-		}
-		glfwSetErrorCallback(error_callback);
-		glfwWindowHint(GLFW_CLIENT_API, GLFW_NO_API);
-	}
-
-	_window = glfwCreateWindow(static_cast<int>(builder.width), static_cast<int>(builder.height), builder.title.c_str(), nullptr, nullptr);
+	_window = glfwCreateWindow(static_cast<Int>(builder.width), static_cast<Int>(builder.height), builder.title.c_str(), nullptr, nullptr);
 
 	MINTY_ASSERT_FORMAT(_window, "Failed to create GLFW window \"{}\".", get_title());
 
-	if (_windows.empty() == 1)
-	{
-		_main = this;
-	}
-
-	register_window(this);
-
-	glfwSetWindowUserPointer(_window, &_data);
+	glfwSetWindowUserPointer(_window, &m_data);
 
 	if (builder.x >= 0 && builder.y >= 0)
 	{
@@ -61,13 +43,13 @@ Minty::WindowsWindow::WindowsWindow(WindowBuilder const& builder)
 	}
 
 	// set callbacks
-	glfwSetWindowSizeCallback(_window, [](GLFWwindow* window, int width, int height)
+	glfwSetWindowSizeCallback(_window, [](GLFWwindow* window, Int width, Int height)
 		{
 			WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
 			data.width = width;
 			data.height = height;
 
-			WindowResizeEvent event(static_cast<unsigned int>(width), static_cast<unsigned int>(height));
+			WindowResizeEvent event(static_cast<UInt>(width), static_cast<UInt>(height));
 			data.callback(event);
 		});
 
@@ -79,7 +61,7 @@ Minty::WindowsWindow::WindowsWindow(WindowBuilder const& builder)
 			data.callback(event);
 		});
 
-	glfwSetKeyCallback(_window, [](GLFWwindow* window, int key, int scancode, int action, int mods)
+	glfwSetKeyCallback(_window, [](GLFWwindow* window, Int key, Int scancode, Int action, Int mods)
 		{
 			WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
 
@@ -87,9 +69,9 @@ Minty::WindowsWindow::WindowsWindow(WindowBuilder const& builder)
 			data.callback(event);
 		});
 
-	//glfwSetCharCallback(_window, [](GLFWwindow* window, unsigned int keycode){});
+	//glfwSetCharCallback(_window, [](GLFWwindow* window, UInt keycode){});
 
-	glfwSetMouseButtonCallback(_window, [](GLFWwindow* window, int button, int action, int mods)
+	glfwSetMouseButtonCallback(_window, [](GLFWwindow* window, Int button, Int action, Int mods)
 		{
 			WindowData& data = *static_cast<WindowData*>(glfwGetWindowUserPointer(window));
 
@@ -123,18 +105,6 @@ Minty::WindowsWindow::~WindowsWindow()
 	}
 
 	glfwDestroyWindow(_window);
-
-	unregister_window(this);
-
-	if (_windows.empty())
-	{
-		glfwTerminate();
-	}
-
-	if (this == _main)
-	{
-		_main = nullptr;
-	}
 }
 
 void Minty::WindowsWindow::set_title(String const& title)
@@ -228,7 +198,7 @@ void Minty::WindowsWindow::process()
 	GLFWgamepadstate state;
 
 	// check for each controller
-	for (int i = 0; i <= GLFW_JOYSTICK_LAST; i++)
+	for (Int i = 0; i <= GLFW_JOYSTICK_LAST; i++)
 	{
 		if (glfwGetGamepadState(i, &state))
 		{
@@ -249,25 +219,25 @@ void Minty::WindowsWindow::process()
 
 				// trigger callback
 				GamepadConnectedEvent event(i);
-				_data.callback(event);
+				m_data.callback(event);
 			}
 
 			// get old data
 			GLFWgamepadstate* oldState = _gamepads.at(i).state;
 
 			// check button changes
-			for (int j = 0; j <= GLFW_GAMEPAD_BUTTON_LAST; j++)
+			for (Int j = 0; j <= GLFW_GAMEPAD_BUTTON_LAST; j++)
 			{
 				if (state.buttons[j] != oldState->buttons[j])
 				{
 					// trigger callback
 					GamepadButtonEvent event(i, static_cast<GamepadButton>(j), static_cast<KeyAction>(state.buttons[j]));
-					_data.callback(event);
+					m_data.callback(event);
 				}
 			}
 
 			// check axes changes
-			for (int j = 0; j <= GLFW_GAMEPAD_AXIS_LAST; j++)
+			for (Int j = 0; j <= GLFW_GAMEPAD_AXIS_LAST; j++)
 			{
 				// round to zero if needed, only for joysticks
 				if (j <= GLFW_GAMEPAD_AXIS_RIGHT_Y && Math::abs(state.axes[j]) < JOYSTICK_THRESHOLD)
@@ -280,7 +250,7 @@ void Minty::WindowsWindow::process()
 				{
 					// trigger callback
 					GamepadAxisEvent event(i, static_cast<GamepadAxis>(j), state.axes[j]);
-					_data.callback(event);
+					m_data.callback(event);
 				}
 			}
 
@@ -293,7 +263,7 @@ void Minty::WindowsWindow::process()
 
 			// trigger callback
 			GamepadDisconnectedEvent event(i);
-			_data.callback(event);
+			m_data.callback(event);
 
 			delete gamepad.state;
 			_gamepads.erase(i);
@@ -308,10 +278,10 @@ void Minty::WindowsWindow::poll_events() const
 
 void Minty::WindowsWindow::update_size()
 {
-	int width, height;
+	Int width, height;
 	glfwGetWindowSize(_window, &width, &height);
-	_data.width = static_cast<unsigned int>(width);
-	_data.height = static_cast<unsigned int>(height);
+	m_data.width = static_cast<UInt>(width);
+	m_data.height = static_cast<UInt>(height);
 }
 
 void Minty::WindowsWindow::save_restore_info()

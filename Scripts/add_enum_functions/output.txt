@@ -3,16 +3,14 @@
 ====================
 
 template<>
-inline String to_string(Conditional const& obj)
+inline String to_string(Attenuation const& obj)
 {
 	switch (obj)
 	{
-		case Conditional::Equal: return "Equal";
-		case Conditional::NotEqual: return "NotEqual";
-		case Conditional::GreaterThan: return "GreaterThan";
-		case Conditional::GreaterThanOrEqualTo: return "GreaterThanOrEqualTo";
-		case Conditional::LessThan: return "LessThan";
-		case Conditional::LessThanOrEqualTo: return "LessThanOrEqualTo";
+		case Attenuation::None: return "None";
+		case Attenuation::InverseDistance: return "InverseDistance";
+		case Attenuation::LinearDistance: return "LinearDistance";
+		case Attenuation::ExponentialDistance: return "ExponentialDistance";
 
 		default: return "";
 	}
@@ -22,40 +20,38 @@ inline String to_string(Conditional const& obj)
 	Parse.h
 ====================
 
-Conditional to_conditional(String const& string);
-Bool try_conditional(String const& string, Conditional& value);
+Attenuation to_attenuation(String const& string);
+Bool try_attenuation(String const& string, Attenuation& value);
 
 template<>
-inline void parse_to(String const& string, Conditional& value)
+inline void parse_to(String const& string, Attenuation& value)
 {
-    value = to_conditional(string);
+    value = to_attenuation(string);
 }
 
 template<>
-inline Bool parse_try(String const& string, Conditional& value)
+inline Bool parse_try(String const& string, Attenuation& value)
 {
-    return try_conditional(string, value);
+    return try_attenuation(string, value);
 }
 
 ====================
 	Parse.cpp
 ====================
 
-Conditional Minty::Parse::to_conditional(String const& string)
+Attenuation Minty::Parse::to_attenuation(String const& string)
 {
-	if (string == "Equal") return Conditional::Equal;
-	if (string == "NotEqual") return Conditional::NotEqual;
-	if (string == "GreaterThan") return Conditional::GreaterThan;
-	if (string == "GreaterThanOrEqualTo") return Conditional::GreaterThanOrEqualTo;
-	if (string == "LessThan") return Conditional::LessThan;
-	if (string == "LessThanOrEqualTo") return Conditional::LessThanOrEqualTo;
+	if (string == "None") return Attenuation::None;
+	if (string == "InverseDistance") return Attenuation::InverseDistance;
+	if (string == "LinearDistance") return Attenuation::LinearDistance;
+	if (string == "ExponentialDistance") return Attenuation::ExponentialDistance;
 
-	return Conditional();
+	return Attenuation();
 }
 
-Bool Minty::Parse::try_conditional(String const& string, Conditional& value)
+Bool Minty::Parse::try_attenuation(String const& string, Attenuation& value)
 {
-	value = to_conditional(string);
-	return value != Conditional();
+	value = to_attenuation(string);
+	return value != Attenuation();
 }
 

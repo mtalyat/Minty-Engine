@@ -18,7 +18,7 @@ namespace Minty
 	class UUID
 	{
 	private:
-		ULong m_uuid;
+		Size m_uuid;
 
 	public:
 		/// <summary>
@@ -30,7 +30,7 @@ namespace Minty
 		/// Creates a new UUID with the given value.
 		/// </summary>
 		/// <param name="uuid"></param>
-		UUID(ULong const uuid)
+		UUID(Size const uuid)
 			: m_uuid(uuid) {}
 
 		Bool valid() const
@@ -38,16 +38,16 @@ namespace Minty
 			return m_uuid > 0;
 		}
 
-		ULong data() const
+		Size data() const
 		{
 			return m_uuid;
 		}
 
-		operator ULong() const { return m_uuid; }
+		operator Size() const { return m_uuid; }
 		Bool operator==(UUID const other) const;
 		Bool operator!=(UUID const other) const;
-		Bool operator==(ULong const other) const;
-		Bool operator!=(ULong const other) const;
+		Bool operator==(Size const other) const;
+		Bool operator!=(Size const other) const;
 
 		friend std::ostream& operator<<(std::ostream& stream, UUID const& object);
 		friend std::istream& operator>>(std::istream& stream, UUID& object);

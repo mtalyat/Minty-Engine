@@ -38,14 +38,16 @@ static EntityRegistry& util_get_entity_registry()
 
 static Window& util_get_window(UUID const id)
 {
-	Window* window = Window::get_window(id);
-	MINTY_ASSERT(window);
-	return *window;
+	Ref<Window> window = WindowManager::get_window(id);
+	MINTY_ASSERT(window != nullptr);
+	return *window.get();
 }
 
 static Window& util_get_main_window()
 {
-	return Window::main();
+	Ref<Window> window = WindowManager::get_main();
+	MINTY_ASSERT(window != nullptr);
+	return *window.get();
 }
 
 static Entity util_get_entity(UUID id)
@@ -117,7 +119,7 @@ static void console_log(MonoString* string)
 	Console::log(CsScriptEngine::from_mono_string(string));
 }
 
-static void console_log_color(MonoString* string, int color)
+static void console_log_color(MonoString* string, Int color)
 {
 	Console::log_color(CsScriptEngine::from_mono_string(string), static_cast<Console::Color>(color));
 }
@@ -405,7 +407,7 @@ static void entity_set_parent(UUID id, UUID parentId)
 	registry.set_parent(entity, parentEntity);
 }
 
-static int entity_get_child_count(UUID id)
+static Int entity_get_child_count(UUID id)
 {
 	MINTY_ASSERT(id.valid());
 
@@ -419,10 +421,10 @@ static int entity_get_child_count(UUID id)
 
 	MINTY_ASSERT_MESSAGE(childCount <= INT_MAX, "Entity child count exceeded INT_MAX.");
 
-	return static_cast<int>(childCount);
+	return static_cast<Int>(childCount);
 }
 
-static MonoObject* entity_get_child(UUID id, int index)
+static MonoObject* entity_get_child(UUID id, Int index)
 {
 	MINTY_ASSERT(id.valid());
 
@@ -474,7 +476,7 @@ static MonoObject* window_get(UUID id)
 
 static MonoObject* window_get_main()
 {
-	return static_cast<MonoObject*>(window_get(Window::main().id()));
+	return static_cast<MonoObject*>(window_get(util_get_main_window().id()));
 }
 
 static MonoString* window_get_title(UUID id)
@@ -523,14 +525,14 @@ static void window_restore(UUID id)
 
 #pragma region Camera
 
-static int camera_get_perspective(UUID id)
+static Int camera_get_perspective(UUID id)
 {
 	CameraComponent& camera = util_get_camera_component(id);
 
-	return static_cast<int>(camera.camera.get_perspective());
+	return static_cast<Int>(camera.camera.get_perspective());
 }
 
-static void camera_set_perspective(UUID id, int value)
+static void camera_set_perspective(UUID id, Int value)
 {
 	CameraComponent& camera = util_get_camera_component(id);
 

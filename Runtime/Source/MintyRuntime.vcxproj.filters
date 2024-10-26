@@ -558,6 +558,18 @@
     <ClInclude Include="Minty\System\AudioSystem.h">
       <Filter>Header Files\Minty\System</Filter>
     </ClInclude>
+    <ClInclude Include="Minty\Input\Input.h">
+      <Filter>Header Files\Minty\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Core\Rect.h">
+      <Filter>Header Files\Minty\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Core\WindowManager.h">
+      <Filter>Header Files\Minty\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\Windows\WindowsWindowManager.h">
+      <Filter>Header Files\Platform\Windows</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -918,6 +930,15 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Libraries\soloud\include\dr_impl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Input\Input.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Core\WindowManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\Windows\WindowsWindowManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

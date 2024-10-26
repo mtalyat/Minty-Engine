@@ -1,7 +1,7 @@
 #pragma once
 #include "Minty/Core/ApplicationInfo.h"
 #include "Minty/Core/Base.h"
-#include "Minty/Core/Window.h"
+#include "Minty/Core/WindowManager.h"
 #include "Minty/Debug/Logger.h"
 #include "Minty/Scene/SceneManager.h"
 
@@ -62,8 +62,6 @@ namespace Minty
 		ApplicationInfo m_info;
 		ApplicationMode m_mode;
 		Logger m_logger;
-
-		Owner<Window> m_window;
 
 		SceneManager m_sceneManager;
 		std::vector<Ref<Scene>> m_workingScenes;

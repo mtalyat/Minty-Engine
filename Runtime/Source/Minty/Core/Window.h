@@ -18,6 +18,7 @@ namespace Minty
 
 	struct WindowBuilder
 	{
+		UUID id = {};
 		String title = MINTY_NAME;
 		int x = 100;
 		int y = 100;
@@ -29,6 +30,7 @@ namespace Minty
 	/// A window on the screen.
 	/// </summary>
 	class Window
+		: Source<Window>
 	{
 	public:
 		using EventCallbackFunction = std::function<void(Event&)>;
@@ -43,13 +45,10 @@ namespace Minty
 			Window::EventCallbackFunction callback;
 		};
 
-		static std::unordered_map<UUID, Window*> _windows;
-		static Window* _main;
+		UUID m_id;
+		WindowData m_data;
 
-		UUID _id;
-		WindowData _data;
-
-		ScriptClass const* _scriptClass;
+		Ref<ScriptClass> m_scriptClass;
 	protected:
 		Window(WindowBuilder const& builder);
 
@@ -57,17 +56,17 @@ namespace Minty
 		virtual ~Window() = default;
 
 	public:
-		UUID id() const { return _id; }
+		UUID id() const { return m_id; }
 
 		/// <summary>
 		/// Sets the title text of this Window.
 		/// </summary>
-		virtual void set_title(String const& title) { _data.title = title; }
+		virtual void set_title(String const& title) { m_data.title = title; }
 
 		/// <summary>
 		/// Gets the title text of this Window.
 		/// </summary>
-		String const& get_title() const { return _data.title; }
+		String const& get_title() const { return m_data.title; }
 
 		/// <summary>
 		/// Sets the icon of this Window.
@@ -134,13 +133,13 @@ namespace Minty
 		/// Gets the width of this Window.
 		/// </summary>
 		/// <returns></returns>
-		virtual int get_width() const { return _data.width; }
+		virtual int get_width() const { return m_data.width; }
 
 		/// <summary>
 		/// Gets the height of this Window.
 		/// </summary>
 		/// <returns></returns>
-		virtual int get_height() const { return _data.height; }
+		virtual int get_height() const { return m_data.height; }
 
 		/// <summary>
 		/// Processes all pending Window events.
@@ -151,7 +150,7 @@ namespace Minty
 		/// The function to call on an event.
 		/// </summary>
 		/// <param name="func"></param>
-		void set_event_callback(EventCallbackFunction const& func) { _data.callback = func; }
+		void set_event_callback(EventCallbackFunction const& func) { m_data.callback = func; }
 
 		/// <summary>
 		/// Returns a pointer to the native system window.
@@ -164,14 +163,6 @@ namespace Minty
 		/// </summary>
 		virtual void poll_events() const = 0;
 
-		static Window* get_window(UUID const id) { return _windows.at(id); }
-
-		static Window& main() { return *_main; }
-
 		static Owner<Window> create(WindowBuilder const& builder);
-
-	protected:
-		static void register_window(Window* window);
-		static void unregister_window(Window* window);
 	};
 }

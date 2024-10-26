@@ -155,7 +155,7 @@ AnimationStep Minty::Animation::parse_step(String const& string)
 		.variableIndex = get_split(3, parts, Animation::MAX_VARIABLE_INDEX),
 		.timeIndex = Animation::MAX_TIME_INDEX, // time set outside of this function
 		.valueIndex = get_split(4, parts, Animation::MAX_VALUE_INDEX),
-		.flags = static_cast<AnimationStepFlags>(get_split(0, parts, AnimationStepFlags::ANIMATION_STEP_FLAGS_NONE)),
+		.flags = static_cast<AnimationStepFlags>(get_split(0, parts, static_cast<Size>(AnimationStepFlags::None))),
 	};
 }
 
@@ -171,7 +171,7 @@ Animation::step_value_t Minty::Animation::compile_value(Size const valueIndex, A
 {
 	return
 		((valueIndex & MAX_VALUE_INDEX) << VALUE_OFFSET) |
-		((flags & MAX_FLAGS_INDEX) << FLAGS_OFFSET);
+		((static_cast<Size>(flags) & MAX_FLAGS_INDEX) << FLAGS_OFFSET);
 }
 
 void Minty::Animation::perform_step(step_key_t const key, step_time_t const time, step_value_t const value, Entity const thisEntity, Scene& scene) const
@@ -205,7 +205,7 @@ void Minty::Animation::perform_step(AnimationStep const& step, Entity const this
 	Component* component = registry.get_by_name(m_components.at(step.componentIndex), entity);
 
 	// determine what to do based on the flags
-	if (step.flags & ANIMATION_STEP_FLAGS_ADD_REMOVE)
+	if (static_cast<Bool>(step.flags & AnimationStepFlags::AddRemove))
 	{
 		// remove the component from the entity if it does contain it
 		if (component)

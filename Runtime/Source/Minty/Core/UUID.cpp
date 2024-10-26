@@ -8,7 +8,7 @@ using namespace Minty;
 
 static std::random_device randomDevice;
 static std::mt19937_64 randomEngine(randomDevice());
-static std::uniform_int_distribution<uint64_t> uniformDistribution;
+static std::uniform_int_distribution<Size> uniformDistribution;
 
 Bool Minty::UUID::operator==(UUID const other) const
 {
@@ -20,12 +20,12 @@ Bool Minty::UUID::operator!=(UUID const other) const
 	return m_uuid != other.m_uuid;
 }
 
-Bool Minty::UUID::operator==(ULong const other) const
+Bool Minty::UUID::operator==(Size const other) const
 {
 	return m_uuid == other;
 }
 
-Bool Minty::UUID::operator!=(ULong const other) const
+Bool Minty::UUID::operator!=(Size const other) const
 {
 	return m_uuid != other;
 }

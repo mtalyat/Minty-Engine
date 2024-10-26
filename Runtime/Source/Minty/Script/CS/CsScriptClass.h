@@ -24,6 +24,9 @@ namespace Minty
 
 		Bool is_derived_from(Ref<ScriptClass> const klass) const override;
 
+	protected:
+		Owner<ScriptMethod> create_method(String const& name, Int const parameterCount) override;
+
 	public:
 		MonoClass* get_class() const { return mp_class; }
 	};

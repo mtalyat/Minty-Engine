@@ -14,10 +14,6 @@ Minty::CsScriptObject::CsScriptObject(ScriptObjectBuilder const& builder)
 	, mp_object(nullptr)
 	, m_gcHandle(0)
 {
-	initialize_methods(m_methods);
-	initialize_fields(m_fields);
-	initialize_properties(m_properties);
-
 	// get script
 	Ref<CsScriptClass> scriptClass = static_cast<Ref<CsScriptClass>>(builder.klass);
 	MonoClass* klass = scriptClass->get_class();
@@ -39,10 +35,6 @@ Minty::CsScriptObject::CsScriptObject(ScriptObjectBuilder const& builder, Script
 	, mp_object(nullptr)
 	, m_gcHandle(0)
 {
-	initialize_methods(m_methods);
-	initialize_fields(m_fields);
-	initialize_properties(m_properties);
-
 	// get script
 	Ref<CsScriptClass> scriptClass = static_cast<Ref<CsScriptClass>>(builder.klass);
 	MonoClass* klass = scriptClass->get_class();
@@ -89,7 +81,7 @@ Minty::CsScriptObject::~CsScriptObject()
 	mono_gchandle_free(m_gcHandle);
 }
 
-void Minty::CsScriptObject::initialize_fields(std::unordered_map<String, Owner<ScriptField>>& fields)
+Owner<ScriptField> Minty::CsScriptObject::create_field(String const& name)
 {
 	Ref<ScriptClass> scriptClass = get_class();
 	MonoClass* klass = static_cast<MonoClass*>(scriptClass->get_native());
@@ -97,26 +89,22 @@ void Minty::CsScriptObject::initialize_fields(std::unordered_map<String, Owner<S
 	ScriptFieldBuilder builder{};
 	builder.object = create_ref();
 
-	void* iter;
 	MonoClassField* field;
-	String name;
-	Owner<ScriptField> scriptField;
 	while (klass != nullptr)
 	{
-		iter = nullptr;
-		while (field = mono_class_get_fields(klass, &iter))
+		if(field = mono_class_get_field_from_name(klass, name.c_str()))
 		{
-			name = String(mono_field_get_name(field));
-			scriptField = Owner<CsScriptField>(builder, field);
-			fields.emplace(name, std::move(scriptField));
+			return Owner<CsScriptField>(builder, field);
 		}
 
-		// get inherited values as well
+		// check inherited values as well
 		klass = mono_class_get_parent(klass);
 	}
+
+	return {};
 }
 
-void Minty::CsScriptObject::initialize_properties(std::unordered_map<String, Owner<ScriptProperty>>& properties)
+Owner<ScriptProperty> Minty::CsScriptObject::create_property(String const& name)
 {
 	Ref<ScriptClass> scriptClass = get_class();
 	MonoClass* klass = static_cast<MonoClass*>(scriptClass->get_native());
@@ -124,26 +112,22 @@ void Minty::CsScriptObject::initialize_properties(std::unordered_map<String, Own
 	ScriptPropertyBuilder builder{};
 	builder.object = create_ref();
 
-	void* iter;
 	MonoProperty* prop;
-	String name;
-	Owner<ScriptProperty> scriptProperty;
 	while (klass != nullptr)
 	{
-		iter = nullptr;
-		while (prop = mono_class_get_properties(klass, &iter))
+		if (prop = mono_class_get_property_from_name(klass, name.c_str()))
 		{
-			name = String(mono_property_get_name(prop));
-			scriptProperty = Owner<CsScriptProperty>(builder, prop);
-			properties.emplace(name, std::move(scriptProperty));
+			return Owner<CsScriptProperty>(builder, prop);
 		}
 
-		// get inherited values as well
+		// check inherited values as well
 		klass = mono_class_get_parent(klass);
 	}
+
+	return {};
 }
 
-void Minty::CsScriptObject::initialize_methods(std::unordered_map<String, Owner<ScriptMethod>>& methods)
+Owner<ScriptMethod> Minty::CsScriptObject::create_method(String const& name, Int const parameterCount)
 {
 	Ref<ScriptClass> scriptClass = get_class();
 	MonoClass* klass = static_cast<MonoClass*>(scriptClass->get_native());
@@ -151,21 +135,17 @@ void Minty::CsScriptObject::initialize_methods(std::unordered_map<String, Owner<
 	ScriptMethodBuilder builder{};
 	builder.object = create_ref();
 
-	void* iter;
 	MonoMethod* method;
-	String name;
-	Owner<ScriptMethod> scriptMethod;
 	while (klass != nullptr)
 	{
-		iter = nullptr;
-		while (method = mono_class_get_methods(klass, &iter))
+		if (method = mono_class_get_method_from_name(klass, name.c_str(), parameterCount))
 		{
-			name = String(mono_method_get_name(method));
-			scriptMethod = Owner<CsScriptMethod>(builder, method);
-			methods.emplace(name, std::move(scriptMethod));
+			return Owner<CsScriptMethod>(builder, method);
 		}
 
-		// get inherited values as well
+		// check inherited values as well
 		klass = mono_class_get_parent(klass);
 	}
+
+	return {};
 }

@@ -46,6 +46,8 @@ namespace Minty
 #pragma region Class
 
 	public:
+		static Ref<ScriptClass> find_class(String const& namespaceName, String const& className) { return find_class(get_full_name(namespaceName, className)); }
+
 		static Ref<ScriptClass> find_class(String const& fullName);
 
 		static Ref<ScriptClass> find_class(UUID const id);

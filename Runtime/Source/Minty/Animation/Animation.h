@@ -11,23 +11,59 @@ namespace Minty
 {
 	class Scene;
 
-	enum AnimationStepFlags
+	/// <summary>
+	/// Specifies what types of actions are taken by the Animator when the Animation step is acted upon.
+	/// </summary>
+	enum class AnimationStepFlags
 	{
-		ANIMATION_STEP_FLAGS_NONE = 0b0000,
-		ANIMATION_STEP_FLAGS_ADD_REMOVE = 0b0001,
-		ANIMATION_STEP_FLAGS_ALL = 0b0001,
+		None = 0b0000,
+		AddRemove = 0b0001,
+		All = 0b0001,
 	};
+
+	constexpr AnimationStepFlags operator|(AnimationStepFlags left, AnimationStepFlags right)
+	{
+		return static_cast<AnimationStepFlags>(static_cast<Int>(left) | static_cast<Int>(right));
+	}
+
+	constexpr AnimationStepFlags operator&(AnimationStepFlags left, AnimationStepFlags right)
+	{
+		return static_cast<AnimationStepFlags>(static_cast<Int>(left) & static_cast<Int>(right));
+	}
 
 	/// <summary>
 	/// Holds all of the indices required for a step, to different component values.
 	/// </summary>
 	struct AnimationStep
 	{
+		/// <summary>
+		/// The index to the Entity to act upon.
+		/// </summary>
 		Size entityIndex;
+
+		/// <summary>
+		/// The index to the Component to act upon.
+		/// </summary>
 		Size componentIndex;
+
+		/// <summary>
+		/// The index to the variable to act upon.
+		/// </summary>
 		Size variableIndex;
+
+		/// <summary>
+		/// The index to the time of when to act.
+		/// </summary>
 		Size timeIndex;
+
+		/// <summary>
+		/// The index to the value to use upon reaching the set time.
+		/// </summary>
 		Size valueIndex;
+
+		/// <summary>
+		/// The flags to use on this step.
+		/// </summary>
 		AnimationStepFlags flags;
 	};
 
@@ -36,6 +72,9 @@ namespace Minty
 	/// </summary>
 	struct AnimationBuilder
 	{
+		/// <summary>
+		/// The Asset ID.
+		/// </summary>
 		UUID id;
 
 		/// <summary>
@@ -107,9 +146,9 @@ namespace Minty
 		constexpr static Size MAX_TIME_INDEX = 0xffffffff;
 		constexpr static Size MAX_VALUE_INDEX = 0xfffffff;
 		constexpr static Size MAX_FLAGS_INDEX = 0xf;
-		typedef UInt step_key_t;
-		typedef UInt step_time_t;
-		typedef UInt step_value_t;
+		using step_key_t = UInt;
+		using step_time_t = UInt;
+		using step_value_t = UInt;
 		constexpr static step_key_t INVALID_STEP_KEY = (MAX_ENTITY_INDEX << ENTITY_OFFSET) | (MAX_COMPONENT_INDEX << COMPONENT_OFFSET) | (MAX_VARIABLE_INDEX | VARIABLE_OFFSET);
 		constexpr static step_time_t INVALID_STEP_TIME = (MAX_TIME_INDEX << TIME_OFFSET);
 		constexpr static step_value_t INVALID_STEP_VALUE = (MAX_VALUE_INDEX << VALUE_OFFSET) | (MAX_FLAGS_INDEX << FLAGS_OFFSET);

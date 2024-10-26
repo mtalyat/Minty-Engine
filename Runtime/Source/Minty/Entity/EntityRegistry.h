@@ -397,7 +397,7 @@ namespace Minty
 	template<class ScriptEvent>
 	Bool EntityRegistry::connect_event(Entity const entity, Ref<ScriptObject> const scriptObject, String const& name, Bool const trigger)
 	{
-		Ref<ScriptMethod> scriptMethod = scriptObject->get_method(name);
+		Ref<ScriptMethod> scriptMethod = scriptObject->get_method(name, 0);
 		if (scriptMethod != nullptr)
 		{
 			Ref<ScriptClass> scriptClass = scriptObject->get_class();

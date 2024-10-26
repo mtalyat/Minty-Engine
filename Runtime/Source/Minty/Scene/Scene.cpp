@@ -229,7 +229,7 @@ void Minty::Scene::finalize()
 		transform.globalMatrix = transform.get_local_matrix();
 	}
 
-	Window& window = Window::main();
+	Ref<Window> window = WindowManager::get_main();
 	//RectF windowRect(0, 0, window.get_frame_width(), window.get_frame_height());
 
 	//// update dirty UI transforms
@@ -242,7 +242,6 @@ void Minty::Scene::finalize()
 	//	if (relationship.parent != NULL_ENTITY)
 	//	{
 	//		// parent
-
 	//		UITransformComponent& parentTransform = mp_entityRegistry->get<UITransformComponent>(relationship.parent);
 	//		transform.update_global_rect(parentTransform.globalRect);
 	//	}
@@ -254,7 +253,6 @@ void Minty::Scene::finalize()
 	//	else
 	//	{
 	//		// no parent, not a canvas
-
 	//		// set to not draw
 	//		transform.globalRect = RectF();
 	//	}

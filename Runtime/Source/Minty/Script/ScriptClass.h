@@ -25,6 +25,7 @@ namespace Minty
 	/// Represents a class within a Script.
 	/// </summary>
 	class ScriptClass
+		: public Source<ScriptClass>
 	{
 	private:
 		Ref<ScriptAssembly> m_assembly;
@@ -32,6 +33,9 @@ namespace Minty
 		UUID m_id;
 		String m_namespace;
 		String m_class;
+
+		// caches
+		std::unordered_map<String, Owner<ScriptMethod>> m_methods;
 
 	protected:
 		ScriptClass(ScriptClassBuilder const& builder)
@@ -61,6 +65,21 @@ namespace Minty
 		virtual Bool is_derived_from(Ref<ScriptClass> const klass) const = 0;
 
 		virtual void* get_native() const = 0;
+
+		Ref<ScriptMethod> get_method(String const& name, Int const parameterCount);
+
+		std::vector<Ref<ScriptMethod>> get_methods() const;
+
+		void invoke(String const& name);
+
+		void invoke(String const& name, void** const argv, Size const argc);
+
+		Bool try_invoke(String const& name);
+
+		Bool try_invoke(String const& name, void** const argv, Size const argc);
+
+	protected:
+		virtual Owner<ScriptMethod> create_method(String const& name, Int const parameterCount) = 0;
 
 	public:
 		static Owner<ScriptClass> create(ScriptClassBuilder const& builder);
