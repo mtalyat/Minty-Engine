@@ -403,6 +403,7 @@ Management/
 # Minty Engine
 /Editor/mono/
 /Editor/Log.txt
+!Runtime/Source/Minty/[Dd]ebug/
 
 # VSCode
 .vscode
