@@ -69,6 +69,13 @@ namespace Minty
 		String get_environment_variable(String const& name);
 
 		/// <summary>
+		/// Sets the environment variable to the given String.
+		/// </summary>
+		/// <param name="name"></param>
+		/// <param name="value"></param>
+		void set_environment_variable(String const& name, String const& value);
+
+		/// <summary>
 		/// Gets the MINTY_PATH environment variable.
 		/// </summary>
 		/// <returns></returns>

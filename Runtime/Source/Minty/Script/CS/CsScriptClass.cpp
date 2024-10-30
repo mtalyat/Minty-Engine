@@ -58,4 +58,6 @@ Owner<ScriptMethod> Minty::CsScriptClass::create_method(String const& name, Int 
 		// check inherited values as well
 		klass = mono_class_get_parent(klass);
 	}
+	
+	return {};
 }

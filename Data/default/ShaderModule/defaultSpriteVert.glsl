@@ -13,7 +13,7 @@ layout(push_constant) uniform SpriteObject
     vec2 minCoords;
     vec2 maxCoords;
     vec2 pivot;
-    vec2 size;
+    float scale;
 } object;
 
 layout(location = 0) out vec4 fragColor;
@@ -31,7 +31,7 @@ void main() {
         vec2(1.0, 1.0)
     };
     vec2 pos = vertices[gl_VertexIndex % 6];
-    gl_Position = camera.transform * object.transform * vec4((pos.x - object.pivot.x) * object.size.x, (pos.y - object.pivot.y) * object.size.y, 0.0, 1.0);
+    gl_Position = camera.transform * object.transform * vec4((pos.x - object.pivot.x) * object.scale, (pos.y - object.pivot.y) * object.scale, 0.0, 1.0);
     fragColor = object.color;
     fragTexCoord = pos * (object.maxCoords - object.minCoords) + object.minCoords;
 }

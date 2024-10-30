@@ -2,6 +2,7 @@
 #include "CsScriptEngine.h"
 
 #include "Minty/Core/Constants.h"
+#include "Minty/Core/Operations.h"
 
 using namespace Minty;
 
@@ -17,23 +18,42 @@ void Minty::CsScriptEngine::initialize(ScriptEngineBuilder const& builder)
 	Path configDir = currentPath / "mono" / "etc";
 	mono_set_dirs(assemblyDir.string().c_str(), configDir.string().c_str());
 
-	sp_rootDomain = mono_jit_init(MINTY_NAME_ENGINE);
+	// change MONO_PATH from system default to our custom mono files
+	Operations::set_environment_variable("MONO_PATH", assemblyDir.generic_string());
+
+#ifdef MINTY_DEBUG
+	// enable debugging properties
+	//Operations::set_environment_variable("MONO_LOG_LEVEL", "debug");
+	//Operations::set_environment_variable("MONO_LOG_MASK", "all");
+	//mono_jit_set_trace_options("-all");
+#endif // MINTY_DEBUG
+
+	sp_rootDomain = mono_jit_init(MINTY_NAME_DOMAIN_ROOT);
 	MINTY_ASSERT(sp_rootDomain != nullptr);
 
-	mono_set_assemblies_path(currentPathString.c_str());
+	mono_set_assemblies_path(assemblyDir.generic_string().c_str());
 
-	String domainName = MINTY_NAME_DOMAIN;
-	sp_appDomain = mono_domain_create_appdomain(domainName.data(), nullptr);
-	MINTY_ASSERT(sp_rootDomain != nullptr);
-	mono_domain_set(sp_appDomain, true);
+	String appDomainName = MINTY_NAME_DOMAIN_APP;
+	sp_appDomain = mono_domain_create_appdomain(appDomainName.data(), nullptr);
+	MINTY_ASSERT(sp_appDomain != nullptr);
+	mono_domain_set(sp_appDomain, false);
 }
 
 void Minty::CsScriptEngine::shutdown()
 {
-	mono_domain_unload(sp_appDomain);
+	mono_domain_set(sp_rootDomain, false);
 
-	sp_appDomain = nullptr;
-	sp_rootDomain = nullptr;
+	if (sp_appDomain)
+	{
+		mono_domain_unload(sp_appDomain);
+		sp_appDomain = nullptr;
+	}
+
+	if (sp_rootDomain)
+	{
+		mono_jit_cleanup(sp_rootDomain);
+		sp_rootDomain = nullptr;
+	}
 }
 
 String Minty::CsScriptEngine::get_exception_message(MonoObject* const exception)

@@ -121,8 +121,8 @@ for /r "$(ProjectDir)..\..\Data" %%f in (*.wrap) do xcopy /Y "%%f" "$(TargetDir)
 xcopy /y "$(ProjectDir)..\..\Assembly\bin\$(Configuration)\MintyEngine.dll" "$(TargetDir)\game\Lib"
 xcopy /y /s /e /i "$(ProjectDir)..\..\Libraries\mono\lib\$(Configuration)" "$(TargetDir)mono\lib"
 xcopy /y /s /e /i "$(ProjectDir)..\..\Libraries\mono\etc" "$(TargetDir)mono\etc"
-pushd $(TargetDir)
-cmd /k build_assets.bat
+pushd $(ProjectDir)
+cmd /k build_assets.bat $(Configuration)
 popd</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>
@@ -153,8 +153,8 @@ for /r "$(ProjectDir)..\..\Data" %%f in (*.wrap) do xcopy /Y "%%f" "$(TargetDir)
 xcopy /y "$(ProjectDir)..\..\Assembly\bin\$(Configuration)\MintyEngine.dll" "$(TargetDir)\game\Lib"
 xcopy /y /s /e /i "$(ProjectDir)..\..\Libraries\mono\lib\$(Configuration)" "$(TargetDir)mono\lib"
 xcopy /y /s /e /i "$(ProjectDir)..\..\Libraries\mono\etc" "$(TargetDir)mono\etc"
-pushd $(TargetDir)
-cmd /k build_assets.bat
+pushd $(ProjectDir)
+cmd /k build_assets.bat $(Configuration)
 popd</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>

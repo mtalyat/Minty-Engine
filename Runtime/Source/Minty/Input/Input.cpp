@@ -4,6 +4,7 @@
 #include "Minty/Core/Constants.h"
 #include "Minty/Window/WindowManager.h"
 #include "Minty/Script/ScriptArguments.h"
+#include "Minty/Script/ScriptEngine.h"
 
 using namespace Minty;
 
@@ -33,6 +34,16 @@ void Minty::Input::trigger_key(Key key, KeyAction action, KeyModifiers mods)
 		Size argc = 3;
 		s_script->invoke(SCRIPT_INPUT_TRIGGER_KEY, argv, argc);
 	}
+}
+
+void Minty::Input::initialize(InputBuilder const& builder)
+{
+	s_script = ScriptEngine::find_class(MINTY_NAME_SCRIPT_NAMESPACE, "Input");
+}
+
+void Minty::Input::shutdown()
+{
+	s_script = nullptr;
 }
 
 Float2 Minty::Input::get_mouse_position(Rect const bounds)

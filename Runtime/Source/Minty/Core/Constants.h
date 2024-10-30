@@ -6,7 +6,8 @@ namespace Minty
 {
 	constexpr Char const* MINTY_NAME_ENGINE = "MintyEngine";
 	constexpr Char const* MINTY_NAME_EDITOR = "MintyEditor";
-	constexpr Char const* MINTY_NAME_DOMAIN = "MintyDomain";
+	constexpr Char const* MINTY_NAME_DOMAIN_APP = "MintyAppDomain";
+	constexpr Char const* MINTY_NAME_DOMAIN_ROOT = "MintyRootDomain";
 	constexpr Char const* MINTY_NAME_SCRIPT_NAMESPACE = "MintyEngine";
 
 	constexpr Char const* MINTY_NAME = "Minty Engine";
@@ -52,4 +53,8 @@ namespace Minty
 
 	constexpr Size INVALID_UUID = 0;
 	constexpr UInt INVALID_HANDLE = UINT_MAX;
+
+	constexpr Size DEFAULT_SPRITE_MATERIAL_TEMPLATE = 0x35208f083bce255c;
+	constexpr Size DEFAULT_SPRITE_MATERIAL = 0x9cb43cb6719eedfa;
+	constexpr Size DEFAULT_TEXTURE = 0x151da98925b6ef8c;
 }

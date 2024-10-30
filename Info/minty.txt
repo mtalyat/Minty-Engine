@@ -1,0 +1,3 @@
+MintyName: Minty Engine
+MintyBuild: 0
+MintyVersion: 1.0.0

@@ -1,2 +1,0 @@
-wrap default --update
-pause

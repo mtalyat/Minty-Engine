@@ -19,6 +19,20 @@ void Minty::ScriptEngine::initialize(ScriptEngineBuilder const& builder)
 
 void Minty::ScriptEngine::shutdown()
 {
+	// destroy all scripting references and objects
+	s_objects.clear();
+	std::vector<String> assemblyNames;
+	assemblyNames.reserve(s_assemblies.size());
+	for (auto const& [name, assm] : s_assemblies)
+	{
+		assemblyNames.push_back(name);
+	}
+	for (auto const& name : assemblyNames)
+	{
+		unload_assembly(name);
+	}
+	s_assemblies.clear();
+
 	// shutdown all script engines
 	CsScriptEngine::shutdown();
 }
@@ -38,14 +52,14 @@ Ref<ScriptAssembly> Minty::ScriptEngine::load_assembly(String const& name, Path 
 	// add to references
 	s_assemblies.emplace(name, std::move(scriptAssembly));
 
+	Debug::log_info(std::format("Loaded assembly \"{}\" from \"{}\"{}.", name, path.generic_string(), referenceOnly ? " (reference only)" : ""));
+
 	return scriptAssemblyRef;
 }
 
 void Minty::ScriptEngine::unload_assembly(String const& name)
 {
 	MINTY_ASSERT_FORMAT(s_assemblies.contains(name), "No assembly with the name \"{}\" is currently loaded.", name);
-
-	Ref<ScriptAssembly> assembly = s_assemblies.at(name).create_ref();
 
 	// remove from references
 	s_assemblies.erase(name);

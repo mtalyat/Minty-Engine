@@ -12,6 +12,7 @@
 #include "Minty/Render/MaterialTemplate.h"
 #include "Minty/Render/ShaderModule.h"
 #include "Minty/Render/Texture.h"
+#include "Minty/Render/Sprite.h"
 #include "Minty/Scene/Scene.h"
 #include "Minty/Serialize/Reader.h"
 #include "Minty/Serialize/Writer.h"
@@ -322,6 +323,8 @@ namespace Minty
 		static Ref<Shader> load_shader(const Path& path);
 
 		static Ref<ShaderModule> load_shader_module(const Path& path);
+
+		static Ref<Sprite> load_sprite(Path const& path);
 
 		static Ref<Texture> load_texture(const Path& path);
 	};

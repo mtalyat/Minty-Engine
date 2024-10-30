@@ -217,7 +217,7 @@ void Minty::VulkanMaterial::set_input(String const& name, void const* const data
 			descriptorWrite.descriptorCount = 1; // how many to update
 
 			// get the texture
-			VulkanTexture const* vulkanTexture = *static_cast<VulkanTexture const* const*>(data);;
+			VulkanTexture const* vulkanTexture = *static_cast<VulkanTexture const* const*>(data);
 
 			// create image info from the texture
 			imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;

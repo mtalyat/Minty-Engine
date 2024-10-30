@@ -11,6 +11,11 @@
 
 namespace Minty
 {
+	struct InputBuilder
+	{
+
+	};
+
 	class ScriptClass;
 
 	class Input
@@ -22,13 +27,15 @@ namespace Minty
 		static std::unordered_map<MouseButton, KeyAction> s_mouseButtons;
 
 	public:
+		static void initialize(InputBuilder const& builder);
+
+		static void shutdown();
+
 		static Float2 get_mouse_position() { return s_mousePosition; }
 
 		static Float2 get_mouse_position(Rect const bounds);
 
 		static KeyAction get_mouse_button(MouseButton const button);
-
-		static void set_input_script(Ref<ScriptClass> const inputScript) { s_script = inputScript; }
 
 		static void trigger_key(Key key, KeyAction action, KeyModifiers mods);
 

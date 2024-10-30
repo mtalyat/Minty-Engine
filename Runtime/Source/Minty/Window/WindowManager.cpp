@@ -21,16 +21,16 @@ void Minty::WindowManager::initialize(WindowManagerBuilder const& builder)
 
 void Minty::WindowManager::shutdown()
 {
-#if defined(MINTY_WINDOWS)
-	WindowsWindowManager::shutdown();
-#endif
-
 	// close all windows
 	for (auto const& [id, window] : s_windows)
 	{
 		window->close();
 	}
 	s_windows.clear();
+
+#if defined(MINTY_WINDOWS)
+	WindowsWindowManager::shutdown();
+#endif
 }
 
 Ref<Window> Minty::WindowManager::create_window(WindowBuilder const& builder)

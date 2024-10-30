@@ -149,6 +149,8 @@ Ref<Asset> Minty::AssetManager::load_asset(const Path& path)
 		return load_shader(path);
 	case AssetType::ShaderModule:
 		return load_shader_module(path);
+	case AssetType::Sprite:
+		return load_sprite(path);
 	case AssetType::Texture:
 		return load_texture(path);
 	default:
@@ -842,6 +844,34 @@ Ref<ShaderModule> Minty::AssetManager::load_shader_module(const Path& path)
 	builder.path = path;
 
 	return create_existing<ShaderModule>(path, builder);
+}
+
+Ref<Sprite> Minty::AssetManager::load_sprite(Path const& path)
+{
+	MINTY_ASSERT_ASSET_PATH(path);
+
+	SpriteBuilder builder{};
+	builder.id = read_id(path);
+
+	Container* container;
+	Reader* reader;
+	open_reader(path, container, reader);
+
+	if (!find_dependency(path, *reader, "texture", builder.texture))
+	{
+		// default
+		builder.texture = get<Texture>(DEFAULT_TEXTURE);
+
+		MINTY_ASSERT_MESSAGE(builder.texture != nullptr, "Default Texture not loaded.");
+	}
+	reader->read("offset", builder.offset);
+	reader->read("size", builder.size);
+	reader->read("pivot", builder.pivot);
+	reader->read("ppu", builder.pixelsPerUnit);
+
+	close_reader(container, reader);
+
+	return create_existing<Sprite>(path, builder);
 }
 
 Ref<Texture> Minty::AssetManager::load_texture(const Path& path)
