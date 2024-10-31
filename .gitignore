@@ -397,15 +397,15 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 
-# Management folder
-Management/
-
 # Minty Engine
 /Editor/mono/
 /Editor/Log.txt
 !Runtime/Source/Minty/[Dd]ebug/
 !Libraries/mono/lib/Debug/
-!Libraries/mono/lib/Release/
+!Libraries/mono/lib/Release/\
+
+# Wrap
+*.wrap
 
 # VSCode
 .vscode
