@@ -25,6 +25,8 @@ Bool Minty::StaticContainer::resize(Size const newSize)
 	mp_data = newData;
 	m_size = newSize;
 	m_capacity = newSize;
+
+	return true;
 }
 
 Bool Minty::StaticContainer::append(void const* const data, Size const size)
