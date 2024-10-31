@@ -1,0 +1,26 @@
+Assets
+	- "Defaults/Texture/default.png"
+	- "Defaults/ShaderModule/defaultFrag.spv"
+	- "Defaults/ShaderModule/defaultVert.spv"
+	- "Defaults/Shader/default.shader"
+	- "Defaults/MaterialTemplate/default.materialtemplate"
+	- "Defaults/Material/default.material"
+Systems
+	Render
+Entities
+	Camera
+		Transform
+			position: (0, 0, 0)
+			scale: (1, 1, 1)
+		Camera
+			color: Black
+		Enabled
+	Cube: 66bac7821a8bdf33
+		Transform
+			position: (0, 0, 0)
+			rotation: (0, 0, 0)
+		Mesh
+			type: Cube
+			material: decef49af1cbe3d9
+		Enabled
+		Renderable
