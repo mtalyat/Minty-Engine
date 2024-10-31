@@ -1,0 +1,194 @@
+- dafa7731f963397b
+	assets: 
+		- "Assets/Scripts/CameraController.cs"
+		- "Assets/Scripts/Link.cs"
+		- "Assets/Scripts/PlayerController.cs"
+		- "Assets/Scripts/Session.cs"
+		- "Assets/Scripts/TestScript.cs"
+		- "Assets/Audio/blinking-forest.wav"
+		- "Assets/Audio/cow-bells.wav"
+		- "Assets/Audio/ding.wav"
+		- "Assets/Audio/dong.wav"
+		- "Assets/Resources/Models/pumpkin_tex.jpg"
+		- "Assets/Textures/brian.png"
+		- "Assets/Textures/death.png"
+		- "Assets/Textures/oak_planks.png"
+		- "Assets/Textures/pattern.png"
+		- "Assets/Textures/texture.jpg"
+		- "Assets/Textures/x.png"
+		- "BuiltIn\\Font\\Default\\defaultFont_0.png"
+		- "BuiltIn/Texture/square.png"
+		- "BuiltIn/Shader/defaultShader.shader"
+		- "BuiltIn\\Shader\\defaultSpriteShader.shader"
+		- "BuiltIn\\Shader\\defaultTextShader.shader"
+		- "BuiltIn\\Shader\\defaultUiShader.shader"
+		- "BuiltIn/ShaderPass/defaultShaderPass.shaderpass"
+		- "BuiltIn\\ShaderPass\\defaultSpriteShaderPass.shaderpass"
+		- "BuiltIn\\ShaderPass\\defaultTextShaderpass.shaderpass"
+		- "BuiltIn\\ShaderPass\\defaultUiShaderPass.shaderpass"
+		- "BuiltIn/MaterialTemplate/defaultMaterialTemplate.materialtemplate"
+		- "BuiltIn\\MaterialTemplate\\defaultSpriteMaterialTemplate.materialtemplate"
+		- "BuiltIn\\MaterialTemplate\\defaultTextMaterialTemplate.materialtemplate"
+		- "BuiltIn\\MaterialTemplate\\defaultUiMaterialTemplate.materialtemplate"
+		- "Assets\\Materials\\pumpkinMat.material"
+		- "Assets\\Materials\\xSpriteMaterial.material"
+		- "BuiltIn/Material/defaultMaterial.material"
+		- "BuiltIn\\Material\\defaultSpriteMaterial.material"
+		- "BuiltIn\\Material\\defaultUiMaterial.material"
+		- "Assets\\Sprites\\brian.sprite"
+		- "Assets\\Sprites\\defaultSprite.sprite"
+		- "Assets\\Sprites\\defaultUiSprite.sprite"
+		- "Assets\\Sprites\\x.sprite"
+		- "BuiltIn\\Font\\Default\\defaultFont.fnt"
+		- "BuiltIn\\Font\\Default\\defaultFont.font"
+		- "Assets\\Resources\\Models\\pumpkin.obj"
+	systems: 
+	entities: 
+		Canvas: d2b000d091cd782b
+			UITransform: 
+				anchorMode: All
+				left: 0
+				right: 0
+				top: 0
+				bottom: 0
+				z: 0
+			Canvas: 
+				resolutionWidth: 1920
+				resolutionHeight: 1080
+			Enabled: 
+			Relationship: 
+				parent: 0
+		Background: 941b3575c55377bc
+			UITransform: 
+				anchorMode: All
+				left: 0
+				right: 0
+				top: 0
+				bottom: 0
+				z: -100
+			Enabled: 
+			Relationship: 
+				parent: d2b000d091cd782b
+			Sprite: 
+				sprite: 51156c5dc9972f6b
+				size: (1, 1)
+				color: #ffaaffff
+		Red Box: b7761f2bc863d61c
+			UITransform: 
+				anchorMode: TopLeft
+				x: 100
+				width: 100
+				y: 100
+				height: 100
+				z: 100
+			Script: 
+				- c5bbd244d3aafdbf
+			Enabled: 
+			Relationship: 
+				parent: d2b000d091cd782b
+			Sprite: 
+				sprite: 51156c5dc9972f6b
+				size: (1, 1)
+				color: #ff0000ff
+			Renderable: 
+		Blue Box: 5e4e62ad4a8f49db
+			UITransform: 
+				anchorMode: BottomCenter
+				x: -200
+				width: 400
+				y: -140
+				height: 120
+				z: 0
+			Script: 
+				- c5bbd244d3aafdbf
+			Enabled: 
+			Relationship: 
+				parent: d2b000d091cd782b
+			Sprite: 
+				sprite: 51156c5dc9972f6b
+				size: (1, 1)
+				color: #0000ffff
+			Renderable: 
+		Text: ae2f189d1e765a2
+			UITransform: 
+				anchorMode: TopLeft
+				x: 100
+				width: 1000
+				y: 100
+				height: 1000
+				z: 100
+			Enabled: 
+			Relationship: 
+				parent: d2b000d091cd782b
+			Renderable: 
+			Text: 
+				text: Testing 123 Hello there!\nThis is a multiline box!
+				color: #ffffffff
+				size: 32
+				bold: 0
+				italic: 0
+				font: 3dfa98f93b7e7243
+		Pumpkin: 5c3a5ea711a4ac04
+			Transform: 
+				position: (4, 0, 0)
+				rotation: (0, 0, 0)
+				scale: (1, 1, 1)
+			Enabled: 
+			Relationship: 
+				parent: 0
+			Renderable: 
+			Mesh: 
+				type: CUSTOM
+				mesh: 52f965f9df54cfb2
+				material: 8c8461f5850a0ca0
+		Shape: b620841e2d57dd79
+			Transform: 
+				position: (0, -2, 0)
+				rotation: (0, 0, 0)
+				scale: (2, 2, 2)
+			Enabled: 
+			Relationship: 
+				parent: 0
+			Renderable: 
+			Mesh: 
+				type: PYRAMID
+				material: decef49af1cbe3d9
+		Camera: 389d6462e322993a
+			Transform: 
+				position: (0, 0, -4)
+				rotation: (0, 0, 0)
+				scale: (1, 1, 1)
+			Script: 
+				- c5bbd244d3aafdbf
+			Enabled: 
+			Relationship: 
+				parent: 0
+			Camera: 
+				perspective: PERSPECTIVE
+				fov: 60
+				near: 0.1
+				far: 100
+				color: #000000ff
+			AudioListener: 
+		Font Test Sprite: ad451c056f75ebf5
+			Transform: 
+				position: (0, -1, 0)
+				rotation: (0, 0, 0)
+				scale: (1, 1, 1)
+			Enabled: 
+			Sprite: 
+				sprite: 0
+				size: (1, 1)
+				color: #ffffffff
+			Renderable: 
+		Sprite: 1d14d58de210ad53
+			Transform: 
+				position: (0, 0, 0)
+				rotation: (0, 0, 0)
+				scale: (1, 1, 1)
+			Enabled: 
+			Sprite: 
+				sprite: 6fe2e95b986a93ad
+				size: (1, 1)
+				color: #ffffffff
+			Renderable: 
