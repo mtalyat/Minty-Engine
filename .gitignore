@@ -402,7 +402,10 @@ FodyWeavers.xsd
 /Editor/Log.txt
 !Runtime/Source/Minty/[Dd]ebug/
 !Libraries/mono/lib/Debug/
-!Libraries/mono/lib/Release/\
+!Libraries/mono/lib/Release/
+
+# Ignore any log files
+*/Log.txt
 
 # Wrap
 *.wrap

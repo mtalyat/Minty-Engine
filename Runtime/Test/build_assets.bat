@@ -1,38 +1,23 @@
-:: Expects $1 to be Configuration (Debug/Runtime)
-
+:: Builds all of the assets for a given configuration, given through the first command line argument
 @echo off
 
 :: Get info && Build default files
-pushd %~dp0..\..\Data\
-call build_default.bat
-popd
+call ..\..\Scripts\Build\build_default.bat
 
 :: Target dir
 set TARGET_DIR=%~dp0x64\%1\
-echo %TARGET_DIR%
 
-:: Copy to build
-copy %~dp0..\..\Data\default.wrap %TARGET_DIR%
+:: Assets dir
+set ASSETS_DIR=%~dp0Game
+
+:: Copy default wrap to build
+copy %MINTY_PATH%Data\Default.wrap %TARGET_DIR%
+echo Wrapped "%MINTY_PATH%Data\Default.wrap" to "%TARGET_DIR%".
 
 :: Build shaders in assets
-::      Set path to compiler
-set GLSLC="glslc"
+call %MINTY_PATH%Scripts/Build/compile_shaders.bat %ASSETS_DIR%
 
-::      Path to target directory
-
-::      Compile all shaders
-for /r "%TARGET_DIR%game" %%f in (*.glsl *.frag *.vert) do (
-    set "input_file=%%f"
-    set "output_file=%%~dpnf.spv"
-
-    call echo Compiling "%%input_file%%" to "%%output_file%%".
-    call %GLSLC% "%%input_file%%" -o "%%output_file%%"
-
-    if %errorlevel% neq 0 (
-        call echo Failed to compile "%%input_file%%".
-    )
-)
-
-:: Wrap files
-call wrap %%TARGET_DIR%%game -v %%MintyBuild%%
-popd
+:: Wrap files to configuration directory
+call %wrap% %%ASSETS_DIR%% -v %%MintyBuild%% -n Game
+move %~dp0Game.wrap %TARGET_DIR%
+echo Wrapped "%ASSETS_DIR%" to "%TARGET_DIR%".

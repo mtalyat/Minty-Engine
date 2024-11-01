@@ -42,7 +42,7 @@ Minty::Application::Application(const ApplicationBuilder& builder)
 	//  asset manager
 	AssetManagerBuilder assetManagerBuilder{};
 	assetManagerBuilder.mode = AssetMode::ReadAll;
-	assetManagerBuilder.wraps = { "default.wrap", "game.wrap" };
+	assetManagerBuilder.wraps = { "Default.wrap", "Game.wrap" };
 	AssetManager::initialize(assetManagerBuilder);
 
 	//	script engine
