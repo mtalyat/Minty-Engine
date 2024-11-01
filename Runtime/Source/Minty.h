@@ -9,6 +9,11 @@
 #include "Minty/Asset/AssetManager.h"
 
 // AUDIO
+#include "Minty/Audio/Attenuation.h"
+#include "Minty/Audio/AudioClip.h"
+#include "Minty/Audio/AudioEngine.h"
+#include "Minty/Audio/AudioListener.h"
+#include "Minty/Audio/AudioSource.h"
 
 // COMPONENT
 #include "Minty/Component/AllComponents.h"
