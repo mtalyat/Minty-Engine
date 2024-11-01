@@ -10,7 +10,7 @@ Systems
 Entities
 	Camera
 		Transform
-			position: (0, 0, 0)
+			position: (0, 0, 2)
 			scale: (1, 1, 1)
 		Camera
 			color: Black
