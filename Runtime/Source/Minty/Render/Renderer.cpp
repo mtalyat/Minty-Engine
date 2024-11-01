@@ -13,6 +13,7 @@ Ref<Window> Minty::Renderer::s_window = nullptr;
 Color Minty::Renderer::s_color = Color::black();
 Ref<RenderTarget> Minty::Renderer::s_renderTarget = nullptr;
 std::unordered_map<MeshType, Ref<Mesh>> Minty::Renderer::s_defaultMeshes = {};
+std::unordered_map <UUID, Ref<Material>> Minty::Renderer::s_spriteMaterials = {};
 Ref<Shader> Minty::Renderer::s_boundShader = nullptr;
 Ref<Material> Minty::Renderer::s_boundMaterial = nullptr;
 Ref<Mesh> Minty::Renderer::s_boundMesh = nullptr;
@@ -179,6 +180,35 @@ Ref<Mesh> Minty::Renderer::get_or_create_mesh(MeshType const type)
 	return mesh;
 }
 
+Ref<Material> Minty::Renderer::get_or_create_sprite_material(Ref<Texture> const spriteTexture)
+{
+	MINTY_ASSERT_MESSAGE(spriteTexture != nullptr, "Cannot get or create a Material for a null Sprite Texture.");
+
+	auto found = s_spriteMaterials.find(spriteTexture->id());
+
+	if (found == s_spriteMaterials.end())
+	{
+		// create new
+		MaterialBuilder materialBuilder{};
+		materialBuilder.id = UUID::create();
+		materialBuilder.materialTemplate = AssetManager::get<MaterialTemplate>(DEFAULT_SPRITE_MATERIAL_TEMPLATE);
+
+		Cargo cargo{};
+		cargo.emplace("texture", Type::Asset, spriteTexture.get());
+		materialBuilder.values.emplace("texture", std::move(cargo));
+
+		Ref<Material> material = AssetManager::create<Material>(materialBuilder);
+
+		// add to list
+		s_spriteMaterials.emplace(spriteTexture->id(), material);
+
+		return material;
+	}
+
+	// use existing
+	return found->second;
+}
+
 Owner<RenderTarget> Minty::Renderer::create_render_target()
 {
 #if defined(MINTY_VULKAN)
@@ -224,4 +254,11 @@ void Minty::Renderer::draw(Ref<Mesh> const mesh)
 	MINTY_ASSERT_MESSAGE(mesh != nullptr, "Cannot draw a null Mesh.");
 
 	draw_indices(mesh->get_index_count());
+}
+
+void Minty::Renderer::draw(Ref<Sprite> const sprite)
+{
+	MINTY_ASSERT_MESSAGE(sprite != nullptr, "Cannot draw a null Sprite.");
+
+	draw_vertices(6);
 }

@@ -38,31 +38,40 @@ Minty::CsScriptAssembly::CsScriptAssembly(ScriptAssemblyBuilder const& builder)
 
 		AssetManager::close_reader(container, reader);
 	}
-	
+
 	// read file contents
 	std::vector<Char> fileData = AssetManager::read_file_chars(builder.path);
 
 	// load assembly image
 	MonoImageOpenStatus status;
-	MonoImage* loadImage = mono_image_open_from_data_full(fileData.data(), static_cast<uint32_t>(fileData.size()), 1, &status, builder.referenceOnly);
+	mp_image = mono_image_open_from_data_with_name(fileData.data(), static_cast<uint32_t>(fileData.size()), true, &status, builder.referenceOnly, name.c_str());
 
 	// check for error
-	if (status != MONO_IMAGE_OK)
+	if (status != MONO_IMAGE_OK || !mp_image)
 	{
 		// get error message
 		char const* errorMessage = mono_image_strerror(status);
-		MINTY_ABORT(std::format("ScriptEngine::load_mono_assembly(): Mono error: \"{}\"", errorMessage));
+		MINTY_ABORT(std::format("ScriptEngine::load_mono_assembly(): Mono error while loading assembly image: \"{}\"", errorMessage));
 
 		return;
 	}
 
 	// load the assembly
-	mp_assembly = mono_assembly_load_from_full(loadImage, builder.path.string().c_str(), &status, builder.referenceOnly);
-	mono_image_close(loadImage);
+	mp_assembly = mono_assembly_load_from_full(mp_image, builder.path.string().c_str(), &status, builder.referenceOnly);
+
+	if (status != MONO_IMAGE_OK || !mp_assembly)
+	{
+		// get error message
+		char const* errorMessage = mono_image_strerror(status);
+		MINTY_ABORT(std::format("ScriptEngine::load_mono_assembly(): Mono error while loading assembly: \"{}\"", errorMessage));
+
+		mono_image_close(mp_image);
+
+		return;
+	}
 
 	// load all of the classes from the assembly
-	MonoImage* image = mono_assembly_get_image(mp_assembly);
-	const MonoTableInfo* tableInfo = mono_image_get_table_info(image, MONO_TABLE_TYPEDEF);
+	const MonoTableInfo* tableInfo = mono_image_get_table_info(mp_image, MONO_TABLE_TYPEDEF);
 	int rows = mono_table_info_get_rows(tableInfo);
 
 	String className;
@@ -74,8 +83,8 @@ Minty::CsScriptAssembly::CsScriptAssembly(ScriptAssemblyBuilder const& builder)
 		// get the mono class
 		uint32_t cols[MONO_TYPEDEF_SIZE];
 		mono_metadata_decode_row(tableInfo, i, cols, MONO_TYPEDEF_SIZE);
-		className = mono_metadata_string_heap(image, cols[MONO_TYPEDEF_NAME]);
-		namespaceName = mono_metadata_string_heap(image, cols[MONO_TYPEDEF_NAMESPACE]);
+		className = mono_metadata_string_heap(mp_image, cols[MONO_TYPEDEF_NAME]);
+		namespaceName = mono_metadata_string_heap(mp_image, cols[MONO_TYPEDEF_NAMESPACE]);
 		fullName = ScriptEngine::get_full_name(namespaceName, className);
 
 		auto found = nameToId.find(fullName);
@@ -117,9 +126,8 @@ Minty::CsScriptAssembly::CsScriptAssembly(ScriptAssemblyBuilder const& builder)
 
 Minty::CsScriptAssembly::~CsScriptAssembly()
 {
-}
-
-MonoImage* Minty::CsScriptAssembly::get_image() const
-{
-	return mono_assembly_get_image(mp_assembly);
+	if (mp_image)
+	{
+		mono_image_close(mp_image);
+	}
 }

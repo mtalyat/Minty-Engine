@@ -1,0 +1,6 @@
+fsm
+    states
+        default: 1b19ad67ab84b5e6
+            value
+                value: UUID 6b94ffa6f8694d71
+    start: 1b19ad67ab84b5e6

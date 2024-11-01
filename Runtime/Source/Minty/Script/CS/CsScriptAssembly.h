@@ -10,6 +10,7 @@ namespace Minty
 	{
 	private:
 		MonoAssembly* mp_assembly;
+		MonoImage* mp_image;
 
 	public:
 		CsScriptAssembly(ScriptAssemblyBuilder const& builder);
@@ -22,6 +23,6 @@ namespace Minty
 	public:
 		MonoAssembly* get_assembly() const { return mp_assembly; }
 
-		MonoImage* get_image() const;
+		MonoImage* get_image() const { return mp_image; }
 	};
 }

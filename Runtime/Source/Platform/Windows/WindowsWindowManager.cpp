@@ -16,6 +16,7 @@ void Minty::WindowsWindowManager::initialize(WindowManagerBuilder const& builder
 	if (!glfwInit())
 	{
 		MINTY_ERROR("Failed to initialize GLFW.");
+		return;
 	}
 
 	// set error handling

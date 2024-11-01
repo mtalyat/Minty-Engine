@@ -11,6 +11,8 @@
 #include "Minty/Render/RenderTarget.h"
 #include "Minty/Render/Scissor.h"
 #include "Minty/Render/Shader.h"
+#include "Minty/Render/Sprite.h"
+#include "Minty/Render/Texture.h"
 #include "Minty/Render/Viewport.h"
 
 namespace Minty
@@ -31,7 +33,9 @@ namespace Minty
 		static Color s_color;
 
 		static Ref<RenderTarget> s_renderTarget;
+
 		static std::unordered_map<MeshType, Ref<Mesh>> s_defaultMeshes;
+		static std::unordered_map <UUID, Ref<Material>> s_spriteMaterials;
 
 		static Ref<Shader> s_boundShader;
 		static Ref<Material> s_boundMaterial;
@@ -70,6 +74,8 @@ namespace Minty
 
 		static Ref<Mesh> get_or_create_mesh(MeshType const type);
 
+		static Ref<Material> get_or_create_sprite_material(Ref<Texture> const spriteTexture);
+
 		static Owner<RenderTarget> create_render_target();
 
 		static void set_render_target(const Ref<RenderTarget> renderTarget) { s_renderTarget = renderTarget; }
@@ -101,6 +107,8 @@ namespace Minty
 	public:
 		// draws the mesh to the screen
 		static void draw(Ref<Mesh> const mesh);
+
+		static void draw(Ref<Sprite> const sprite);
 
 #pragma endregion
 	};

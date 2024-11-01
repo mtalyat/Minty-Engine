@@ -5,6 +5,7 @@
 #include "Minty/Asset/AssetManager.h"
 #include "Minty/Component/AllComponents.h"
 #include "Minty/Core/Math.h"
+#include "Minty/Core/Pack.h"
 #include "Minty/Entity/EntityRegistry.h"
 #include "Minty/Library/GLM.h"
 #include "Minty/Render/Renderer.h"
@@ -94,6 +95,20 @@ void Minty::RenderSystem::update(Time const& time)
 		// draw mesh
 		Renderer::bind_mesh(meshComp.mesh);
 		Renderer::draw(meshComp.mesh);
+	}
+
+	// draw all world sprites in the scene
+	auto spriteView = entityRegistry.view<RenderableComponent const, TransformComponent const, SpriteComponent const, EnabledComponent const>();
+	for (auto&& [entity, renderable, transform, sprite, enabled] : spriteView.each())
+	{
+		// set push data
+		Float2 minCoords = sprite.sprite->get_offset();
+		Float2 maxCoords = minCoords + sprite.sprite->get_size();
+
+		Byte* data = pack_new(transform.globalMatrix, sprite.color, minCoords, maxCoords, sprite.sprite->get_pivot(), sprite.sprite->get_scale());
+
+		// draw mesh
+		Renderer::draw(sprite.sprite);
 	}
 }
 

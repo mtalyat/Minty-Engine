@@ -34,15 +34,29 @@ namespace Minty
 			m_slots.emplace(name, Slot{ name, type, ConstantContainer(sizeof_type(type)) });
 		}
 
-		void set(String const& name, Container const& container)
+		void set(String const& name, void const* const data, Size const size)
 		{
 			MINTY_ASSERT(m_slots.contains(name));
 
 			Slot& slot = m_slots.at(name);
 
 			// copy over data
-			Size size = Math::min(sizeof_type(slot.type), container.size());
-			slot.container.set(container.data(), size);
+			Size minSize = Math::min(sizeof_type(slot.type), size);
+			slot.container.set(data, minSize);
+		}
+
+		void emplace(String const& name, Type const type, void const* const data, Size const size = -1)
+		{
+			// add slot and set values
+			emplace_slot(name, type);
+			if (size == -1)
+			{
+				set(name, data, sizeof_type(type));
+			}
+			else
+			{
+				set(name, data, size);
+			}
 		}
 
 		Bool contains(String const& name) const { return m_slots.contains(name); }

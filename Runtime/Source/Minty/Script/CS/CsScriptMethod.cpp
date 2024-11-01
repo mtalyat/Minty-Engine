@@ -20,7 +20,11 @@ String Minty::CsScriptMethod::get_name() const
 void Minty::CsScriptMethod::invoke() const
 {
 	Ref<ScriptObject> scriptObject = get_object();
-	MonoObject* object = static_cast<MonoObject*>(scriptObject->get_native());
+	MonoObject* object = nullptr;
+	if (scriptObject != nullptr)
+	{
+		object = static_cast<MonoObject*>(scriptObject->get_native());
+	}
 
 	MonoObject* exception = nullptr;
 	mono_runtime_invoke(mp_method, object, nullptr, &exception);
@@ -34,10 +38,14 @@ void Minty::CsScriptMethod::invoke() const
 void Minty::CsScriptMethod::invoke(void** const argv, Size const argc) const
 {
 	Ref<ScriptObject> scriptObject = get_object();
-	MonoObject* object = static_cast<MonoObject*>(scriptObject->get_native());
+	MonoObject* object = nullptr;
+	if (scriptObject != nullptr)
+	{
+		object = static_cast<MonoObject*>(scriptObject->get_native());
+	}
 
 	MonoObject* exception;
-	mono_runtime_invoke(mp_method, object, nullptr, &exception);
+	mono_runtime_invoke(mp_method, object, argv, &exception);
 
 	if (exception)
 	{

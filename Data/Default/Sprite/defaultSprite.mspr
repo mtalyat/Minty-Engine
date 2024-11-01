@@ -1,0 +1,12 @@
+texture: 151da98925b6ef8c
+coordinateMode: NORMALIZED
+ppu: 16
+offset
+    x: 0
+    y: 0
+size
+    x: 1
+    y: 1
+pivot
+    x: 0.5
+    y: 0.5

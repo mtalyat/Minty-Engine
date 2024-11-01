@@ -264,6 +264,16 @@ String Minty::Operations::get_environment_variable(String const& name)
 	}
 }
 
+void Minty::Operations::set_environment_variable(String const& name, String const& value)
+{
+#if defined(MINTY_WINDOWS)
+	String temp = std::format("{}={}", name, value);
+	_putenv(temp.c_str());
+#else
+	MINTY_NOT_IMPLEMENTED();
+#endif
+}
+
 Path Minty::Operations::get_minty_path()
 {
 	return get_environment_variable("MINTY_PATH");

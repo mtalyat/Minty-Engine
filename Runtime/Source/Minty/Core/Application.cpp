@@ -38,18 +38,30 @@ Minty::Application::Application(const ApplicationBuilder& builder)
 	sp_instance = this;
 
 	// initialize tools
-	WindowManagerBuilder windowManagerBuilder{};
-	WindowManager::initialize(windowManagerBuilder);
 
 	//  asset manager
 	AssetManagerBuilder assetManagerBuilder{};
 	assetManagerBuilder.mode = AssetMode::ReadAll;
-	assetManagerBuilder.wraps = { "default.wrap", "game.wrap" };
+	assetManagerBuilder.wraps = { "Default.wrap", "Game.wrap" };
 	AssetManager::initialize(assetManagerBuilder);
 
 	//	script engine
 	ScriptEngineBuilder scriptEngineBuilder{};
 	ScriptEngine::initialize(scriptEngineBuilder);
+
+	// load Minty assembly
+	ScriptEngine::load_assembly(MINTY_NAME_ENGINE, "Lib/MintyEngine.dll", builder.mode == ApplicationMode::Edit);
+
+	// glue everything together
+	Linker::link();
+
+	// input
+	InputBuilder inputBuilder{};
+	Input::initialize(inputBuilder);
+
+	// window manager
+	WindowManagerBuilder windowManagerBuilder{};
+	WindowManager::initialize(windowManagerBuilder);
 
 	// window
 	WindowBuilder windowBuilder{};
@@ -62,19 +74,16 @@ Minty::Application::Application(const ApplicationBuilder& builder)
 	RendererBuilder rendererBuilder{};
 	rendererBuilder.window = window;
 	Renderer::initialize(rendererBuilder);
-
-	// load MintyEngine assembly
-	ScriptEngine::load_assembly(MINTY_NAME_ENGINE, "Lib/MintyEngine.dll", builder.mode == ApplicationMode::Edit);
-
-	// glue everything together
-	Linker::link();
 }
 
 Minty::Application::~Application()
 {
-	// shutdown tools, in reverse order
+	// shutdown tools
 	AssetManager::shutdown();
 	Renderer::shutdown();
+	Input::shutdown();
+	WindowManager::shutdown();
+	ScriptEngine::shutdown();
 
 	MINTY_ASSERT(sp_instance != nullptr);
 	sp_instance = nullptr;
