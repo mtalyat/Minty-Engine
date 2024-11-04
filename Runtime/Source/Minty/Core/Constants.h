@@ -54,7 +54,8 @@ namespace Minty
 	constexpr Size INVALID_UUID = 0;
 	constexpr UInt INVALID_HANDLE = UINT_MAX;
 
-	constexpr Size DEFAULT_SPRITE_MATERIAL_TEMPLATE = 0x35208f083bce255c;
-	constexpr Size DEFAULT_SPRITE_MATERIAL = 0x9cb43cb6719eedfa;
-	constexpr Size DEFAULT_TEXTURE = 0x151da98925b6ef8c;
+	// TODO: update with correct IDs
+	constexpr Size DEFAULT_SPRITE_MATERIAL_TEMPLATE = 0x0000000000000000;
+	constexpr Size DEFAULT_SPRITE_MATERIAL = 0x0000000000000000;
+	constexpr Size DEFAULT_TEXTURE = 0xdef0000000000000;
 }

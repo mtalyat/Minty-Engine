@@ -27,7 +27,7 @@ namespace Minty
 		ShaderCode,
 		ShaderModule,
 		Shader,
-		ShaderPass,
+		//ShaderPass,
 		MaterialTemplate,
 		Material,
 		Sprite,

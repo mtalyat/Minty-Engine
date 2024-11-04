@@ -869,7 +869,7 @@ AssetType Minty::Parse::to_asset_type(String const& string)
 	if (string == "ShaderCode") return AssetType::ShaderCode;
 	if (string == "ShaderModule") return AssetType::ShaderModule;
 	if (string == "Shader") return AssetType::Shader;
-	if (string == "ShaderPass") return AssetType::ShaderPass;
+	//if (string == "ShaderPass") return AssetType::ShaderPass;
 	if (string == "MaterialTemplate") return AssetType::MaterialTemplate;
 	if (string == "Material") return AssetType::Material;
 	if (string == "Sprite") return AssetType::Sprite;

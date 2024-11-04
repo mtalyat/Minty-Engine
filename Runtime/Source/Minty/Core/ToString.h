@@ -459,7 +459,7 @@ namespace Minty
 		case AssetType::ShaderCode: return "ShaderCode";
 		case AssetType::ShaderModule: return "ShaderModule";
 		case AssetType::Shader: return "Shader";
-		case AssetType::ShaderPass: return "ShaderPass";
+		//case AssetType::ShaderPass: return "ShaderPass";
 		case AssetType::MaterialTemplate: return "MaterialTemplate";
 		case AssetType::Material: return "Material";
 		case AssetType::Sprite: return "Sprite";

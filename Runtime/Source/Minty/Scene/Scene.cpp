@@ -343,6 +343,10 @@ void Minty::Scene::load_registered_assets()
 			m_loadedAssets.emplace(asset->id());
 			data.id = asset->id();
 		}
+		else
+		{
+			MINTY_ERROR_FORMAT("Failed to load Asset registered with Scene at \"{}\".", path.generic_string());
+		}
 	}
 }
 

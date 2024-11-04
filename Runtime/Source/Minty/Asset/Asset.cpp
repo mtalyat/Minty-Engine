@@ -26,15 +26,15 @@ AssetType Minty::Asset::get_type_from_path(const Path& path)
 		{ ".jpeg", AssetType::Texture },
 		{ ".png", AssetType::Texture },
 
-		{ ".sprite", AssetType::Sprite },
+		{ ".mspr", AssetType::Sprite },
 
-		{ ".material", AssetType::Material },
+		{ ".mmat", AssetType::Material },
 
-		{ ".materialtemplate", AssetType::MaterialTemplate },
+		{ ".mmtp", AssetType::MaterialTemplate },
 
-		{ ".shaderpass", AssetType::ShaderPass },
+		//{ ".shaderpass", AssetType::ShaderPass },
 
-		{ ".shader", AssetType::Shader },
+		{ ".msha", AssetType::Shader },
 
 		{ ".spv", AssetType::ShaderModule },
 
@@ -42,21 +42,21 @@ AssetType Minty::Asset::get_type_from_path(const Path& path)
 		{ ".frag", AssetType::ShaderCode },
 		{ ".vert", AssetType::ShaderCode },
 
-		{ ".scene", AssetType::Scene },
+		{ ".msce", AssetType::Scene },
 
 		{ ".obj", AssetType::Mesh },
 
 		{ ".wav", AssetType::AudioClip },
 		{ ".mp3", AssetType::AudioClip },
 
-		{ ".animation", AssetType::Animation },
+		{ ".mani", AssetType::Animation },
 
-		{ ".animator", AssetType::Animator },
+		{ ".manr", AssetType::Animator },
 
 		{ EXTENSION_WRAP, AssetType::Wrap },
 
 		{ ".fnt", AssetType::FontVariant },
-		{ ".font", AssetType::Font }
+		{ ".mfnt", AssetType::Font }
 	};
 
 	auto found = types.find(path.extension());

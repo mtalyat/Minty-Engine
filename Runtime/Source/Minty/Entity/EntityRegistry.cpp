@@ -1202,7 +1202,7 @@ void Minty::EntityRegistry::register_script(Ref<ScriptClass> const script)
 
 			if (Application::instance().get_mode() == ApplicationMode::Normal)
 			{
-				// call OnCreate
+				// call OnCreate, if system is being used
 				scriptObject->try_invoke(SCRIPT_METHOD_NAME_ONCREATE);
 
 				// call load and enable right now if the scene is already loaded, otherwise do it later

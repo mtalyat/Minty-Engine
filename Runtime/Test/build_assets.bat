@@ -18,6 +18,6 @@ echo Wrapped "%MINTY_PATH%Data\Default.wrap" to "%TARGET_DIR%".
 call %MINTY_PATH%Scripts/Build/compile_shaders.bat %ASSETS_DIR%
 
 :: Wrap files to configuration directory
-call %wrap% %%ASSETS_DIR%% -v %%MintyBuild%% -n Game
+call %wrap% %%ASSETS_DIR%% -v %%MintyBuild%%
 move %~dp0Game.wrap %TARGET_DIR%
 echo Wrapped "%ASSETS_DIR%" to "%TARGET_DIR%".

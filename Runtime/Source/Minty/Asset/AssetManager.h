@@ -158,13 +158,18 @@ namespace Minty
 		static void erase_by_type(Ref<Asset> const asset);
 
 		template<typename T>
-		static Bool find_dependency(Path const& path, Reader& reader, String const& name, Ref<T>& asset)
+		static Bool find_dependency(Path const& path, Reader& reader, String const& name, Ref<T>& asset, bool required)
 		{
 			UUID id{};
 
 			// if nothing read, set to null
 			if (!reader.read(name, id))
 			{
+				if (required)
+				{
+					Debug::log_error(std::format("Cannot load \"{}\". Missing \"{}\".", path.generic_string(), name));
+				}
+
 				asset.release();
 				return false;
 			}
@@ -174,13 +179,19 @@ namespace Minty
 			// if invalid id (0), set to null
 			if (!id.valid())
 			{
+				if (required)
+				{
+					Debug::log_error(std::format("Cannot load \"{}\". \"{}\"'s ID was invalid.", path.generic_string(), name));
+				}
+
 				asset.release();
 				return false;
 			}
 
 			// if asset id is valid but asset with id DNE, set to null
-			if (!check_dependency(path, name, id))
+			if (!id.valid() || !contains(id))
 			{
+				Debug::log_error(std::format("Cannot load \"{}\". \"{}\" requires a dependency that has not been loaded yet, with ID {}.", path.generic_string(), name, to_string(id)));
 				asset.release();
 				return false;
 			}
@@ -301,11 +312,6 @@ namespace Minty
 #pragma endregion
 
 	private:
-		// checks for a dependency that another asset has while loading
-		static Bool check_dependency(Path const& path, String const& name, const UUID id);
-
-		static void missing_dependency(Path const& path, String const& name, UUID const id);
-
 		static Ref<Animation> load_animation(const Path& path);
 
 		static Ref<Animator> load_animator(const Path& path);

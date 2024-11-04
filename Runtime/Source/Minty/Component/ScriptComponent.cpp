@@ -44,10 +44,17 @@ void Minty::ScriptComponent::deserialize(Reader& reader)
 		reader.read_name(i, idString);
 		id = Parse::to_uuid(idString);
 
-		MINTY_ASSERT_MESSAGE(id.valid(), "Invalid ID.");
-
-		// get class with the id
-		scriptClass = ScriptEngine::find_class(id);
+		// if not a valid ID, try to search by name
+		if (!id.valid())
+		{
+			// get class with the name
+			scriptClass = ScriptEngine::find_class(MINTY_NAME_SCRIPT_NAMESPACE, idString);
+		}
+		else
+		{
+			// get class with the id
+			scriptClass = ScriptEngine::find_class(id);
+		}
 
 		MINTY_ASSERT_FORMAT(scriptClass != nullptr, "No script found with ID \"{}\" ({}).", idString, to_string(id));
 
