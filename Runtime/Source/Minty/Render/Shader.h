@@ -71,6 +71,13 @@ namespace Minty
 		Point,
 	};
 
+	enum class ShaderInputRate
+	{
+		Undefined,
+		Vertex,
+		Instance
+	};
+
 	struct ShaderInput
 	{
 		UInt binding = 0;
@@ -89,11 +96,15 @@ namespace Minty
 	/// </summary>
 	struct ShaderAttribute
 	{
-		Type type; // type determines size, location determined by input order, offset uses both
+		UInt location; // location
+		Type type; // type determines size
+		// offset determined from location and size from types
 	};
 
 	struct ShaderBinding
 	{
+		UInt binding; // index of binding
+		ShaderInputRate rate; // vertex or instance
 		std::vector<ShaderAttribute> attributes; // individual attributes
 	};
 

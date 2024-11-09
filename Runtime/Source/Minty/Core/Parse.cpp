@@ -1016,3 +1016,32 @@ Bool Minty::Parse::try_attenuation(String const& string, Attenuation& value)
 	value = to_attenuation(string);
 	return value != Attenuation();
 }
+
+ShaderInputRate Minty::Parse::to_shader_input_rate(String const& string)
+{
+	if (string == "Undefined") return ShaderInputRate::Undefined;
+	if (string == "Vertex") return ShaderInputRate::Vertex;
+	if (string == "Instance") return ShaderInputRate::Instance;
+
+	return ShaderInputRate();
+}
+
+Bool Minty::Parse::try_shader_input_rate(String const& string, ShaderInputRate& value)
+{
+	value = to_shader_input_rate(string);
+	return value != ShaderInputRate();
+}
+
+CoordinateMode Minty::Parse::to_coordinate_mode(String const& string)
+{
+	if (string == "Normalized") return CoordinateMode::Normalized;
+	if (string == "Pixel") return CoordinateMode::Pixel;
+
+	return CoordinateMode();
+}
+
+Bool Minty::Parse::try_coordinate_mode(String const& string, CoordinateMode& value)
+{
+	value = to_coordinate_mode(string);
+	return value != CoordinateMode();
+}

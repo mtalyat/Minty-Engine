@@ -7,6 +7,7 @@
 #include "Minty/Core/Type.h"
 #include "Minty/Core/UUID.h"
 #include "Minty/FSM/Conditional.h"
+#include "Minty/Render/CoordinateMode.h"
 #include "Minty/Render/Perspective.h"
 #include "Minty/Render/Mesh.h"
 #include "Minty/Render/Shader.h"
@@ -683,5 +684,35 @@ namespace Minty::Parse
 	inline Bool parse_try(String const& string, Attenuation& value)
 	{
 		return try_attenuation(string, value);
+	}
+
+	ShaderInputRate to_shader_input_rate(String const& string);
+	Bool try_shader_input_rate(String const& string, ShaderInputRate& value);
+
+	template<>
+	inline void parse_to(String const& string, ShaderInputRate& value)
+	{
+		value = to_shader_input_rate(string);
+	}
+
+	template<>
+	inline Bool parse_try(String const& string, ShaderInputRate& value)
+	{
+		return try_shader_input_rate(string, value);
+	}
+
+	CoordinateMode to_coordinate_mode(String const& string);
+	Bool try_coordinate_mode(String const& string, CoordinateMode& value);
+
+	template<>
+	inline void parse_to(String const& string, CoordinateMode& value)
+	{
+		value = to_coordinate_mode(string);
+	}
+
+	template<>
+	inline Bool parse_try(String const& string, CoordinateMode& value)
+	{
+		return try_coordinate_mode(string, value);
 	}
 }

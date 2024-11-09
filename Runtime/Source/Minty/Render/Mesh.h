@@ -54,11 +54,11 @@ namespace Minty
 		// the type of mesh
 		MeshType type = MeshType::Empty;
 
-		const void* vertexData = nullptr;	// pointer to data
+		void* vertexData = nullptr;	// pointer to data
 		UInt vertexCount = 0;				// number of vertices
 		Size vertexStride = 0;				// size of a vertex in bytes
 
-		const void* indexData = nullptr;	// pointer to data
+		void* indexData = nullptr;	// pointer to data
 		UInt indexCount = 0;				// number of indices
 		Size indexStride = 0;				// size of one index in bytes
 	};

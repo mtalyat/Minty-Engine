@@ -573,6 +573,15 @@
     <ClInclude Include="Minty\Window\Window.h">
       <Filter>Header Files\Minty\Window</Filter>
     </ClInclude>
+    <ClInclude Include="Minty\Data\BaseContainer.h">
+      <Filter>Header Files\Minty\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Render\BufferContainer.h">
+      <Filter>Header Files\Minty\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Render\CoordinateMode.h">
+      <Filter>Header Files\Minty\Render</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -824,9 +833,6 @@
     <ClCompile Include="Minty\Data\ConstantContainer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Minty\Data\Container.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Minty\Data\DynamicContainer.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -942,6 +948,18 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Minty\Debug\Logger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Data\BaseContainer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Data\Container.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Render\BufferContainer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Component\SpriteComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

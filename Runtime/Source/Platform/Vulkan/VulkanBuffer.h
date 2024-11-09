@@ -12,7 +12,6 @@ namespace Minty
 		VkDeviceSize m_size;
 		VkBuffer m_buffer;
 		VkDeviceMemory m_memory;
-		Bool m_frequent;
 		void* m_mappedMemory;
 
 	public:
@@ -23,8 +22,10 @@ namespace Minty
 	public:
 		void set_data(const void* const data) override;
 		void get_data(void* const data) const override;
+		void* data() const override;
 		Size get_size() const override { return static_cast<Size>(m_size); }
 		void flush() const override;
 		void* get_native() const override { return m_buffer; }
+		Owner<Buffer> clone() const override;
 	};
 }

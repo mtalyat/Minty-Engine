@@ -110,6 +110,8 @@ namespace Minty
 
 		static void draw_vertices(const UInt vertexCount);
 
+		static void draw_instances(const UInt instanceCount, const UInt vertexCount = 0);
+
 		static void draw_indices(const UInt indexCount);
 
 		static void sync();
@@ -372,11 +374,13 @@ namespace Minty
 
 		static void bind_scissor(const VkCommandBuffer commandBuffer, const VkRect2D& scissor);
 
-		static void bind_vertex_buffer(const VkCommandBuffer commandBuffer, const VkBuffer buffer);
+		static void bind_vertex_buffer(const VkCommandBuffer commandBuffer, const VkBuffer buffer, UInt const binding = 0);
 
 		static void bind_index_buffer(const VkCommandBuffer commandBuffer, const VkBuffer buffer);
 
 		static void draw_vertices(const VkCommandBuffer commandBuffer, const uint32_t count);
+
+		static void draw_instances(const VkCommandBuffer commandBuffer, const uint32_t count, const uint32_t vertexCount);
 
 		static void draw_indices(const VkCommandBuffer commandBuffer, const uint32_t count);
 
@@ -482,6 +486,8 @@ namespace Minty
 		static VkFrontFace front_face_to_vulkan(const Minty::ShaderFrontFace frontFace);
 
 		static VkPolygonMode polygon_mode_to_vulkan(const Minty::ShaderPolygonMode mode);
+
+		static VkVertexInputRate input_rate_to_vulkan(const Minty::ShaderInputRate rate);
 
 #pragma endregion
 

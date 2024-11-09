@@ -1,46 +1,46 @@
 #pragma once
-#include "Minty/Data/Container.h"
+#include "Minty/Data/BaseContainer.h"
 
 namespace Minty
 {
 	// a dynamic container of bytes
 	class DynamicContainer
-		: public Container
+		: public BaseContainer
 	{
 	public:
 		DynamicContainer()
-			: Container()
+			: BaseContainer()
 		{}
 
 		DynamicContainer(Size const capacity)
-			: Container()
+			: BaseContainer()
 		{
 			reserve(capacity);
 		}
 
 		DynamicContainer(DynamicContainer const& other)
-			: Container(other)
+			: BaseContainer(other)
 		{}
 
 		DynamicContainer& operator=(DynamicContainer const& other)
 		{
 			if (this != &other)
 			{
-				Container::operator=(other);
+				BaseContainer::operator=(other);
 			}
 
 			return *this;
 		}
 
 		DynamicContainer(DynamicContainer&& other) noexcept
-			: Container(other)
+			: BaseContainer(other)
 		{}
 
 		DynamicContainer& operator=(DynamicContainer&& other) noexcept
 		{
 			if (this != &other)
 			{
-				Container::operator=(std::move(other));
+				BaseContainer::operator=(std::move(other));
 			}
 
 			return *this;

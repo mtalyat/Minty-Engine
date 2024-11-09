@@ -12,6 +12,13 @@
 
 using namespace Minty;
 
+struct SpriteBatch
+{
+	Ref<Material> material = nullptr;
+	Byte* data = nullptr;
+	Size count = 0;
+};
+
 void Minty::RenderSystem::update(Time const& time)
 {
 	// do nothing if no camera
@@ -99,16 +106,106 @@ void Minty::RenderSystem::update(Time const& time)
 
 	// draw all world sprites in the scene
 	auto spriteView = entityRegistry.view<RenderableComponent const, TransformComponent const, SpriteComponent const, EnabledComponent const>();
+	// pack them into a instance array
+	Size const instanceDataSize = sizeof(Float4) + sizeof(Float2) * 3 + sizeof(Float) + sizeof(Matrix4);
+#if defined(MINTY_DEBUG)
+	Size count = 0;
 	for (auto&& [entity, renderable, transform, sprite, enabled] : spriteView.each())
 	{
-		// set push data
-		Float2 minCoords = sprite.sprite->get_offset();
-		Float2 maxCoords = minCoords + sprite.sprite->get_size();
+		count += 1;
+	}
 
-		Byte* data = pack_new(transform.globalMatrix, sprite.color, minCoords, maxCoords, sprite.sprite->get_pivot(), sprite.sprite->get_scale());
+	if (count != spriteView.size_hint())
+	{
+		MINTY_ERROR_FORMAT("Estimated sprite count ({}) is not the same as the actual sprite count ({}).", spriteView.size_hint(), count);
+	}
+#else
+	Size count = spriteView.size_hint();
+#endif // MINTY_DEBUG
 
-		// draw mesh
-		Renderer::draw(sprite.sprite);
+	// ignore if no sprites to draw
+	if (count)
+	{
+		Size offset = 0;
+		Size dataSize = count * instanceDataSize;
+
+		std::vector<SpriteBatch> batches;
+		batches.reserve(10);
+		SpriteBatch batch{};
+
+		for (auto const& [entity, renderable, transform, spriteComp, enabled] : spriteView.each())
+		{
+			Ref<Sprite> sprite = spriteComp.sprite;
+
+			// skip if no sprite to draw
+			if (sprite == nullptr)
+			{
+				continue;
+			}
+
+			material = sprite->get_material();
+
+			// if a new material, queue up batch and reset
+			if (batch.material != material)
+			{
+				if (batch.material != nullptr)
+				{
+					batches.push_back(batch);
+				}
+				batch.material = sprite->get_material();
+				batch.data = new Byte[dataSize];
+				offset = 0;
+			}
+
+			Float4 instColor = spriteComp.color.toFloat4();
+			Float2 instOffset = sprite->get_offset();
+			Float2 instSize = sprite->get_size();
+			Float2 instPivot = sprite->get_pivot();
+			Float instScale = sprite->get_scale();
+			Float4 instTransform0 = transform.globalMatrix[0];
+			Float4 instTransform1 = transform.globalMatrix[1];
+			Float4 instTransform2 = transform.globalMatrix[2];
+			Float4 instTransform3 = transform.globalMatrix[3];
+
+			// pack all of the data into the instance array
+			pack_into(batch.data, offset, instColor);
+			pack_into(batch.data, offset, instOffset);
+			pack_into(batch.data, offset, instSize);
+			pack_into(batch.data, offset, instPivot);
+			pack_into(batch.data, offset, instScale);
+			pack_into(batch.data, offset, instTransform0);
+			pack_into(batch.data, offset, instTransform1);
+			pack_into(batch.data, offset, instTransform2);
+			pack_into(batch.data, offset, instTransform3);
+
+			batch.count += 1;
+		}
+
+		// pack last batch into queue as long as it has data
+		if (batch.material != nullptr)
+		{
+			batches.push_back(batch);
+		}
+
+		// render the batches
+		for (auto const& batch : batches)
+		{
+			// bind batch
+			Ref<MaterialTemplate> materialTemplate = batch.material->get_template();
+			Ref<Shader> shader = materialTemplate->get_shader();
+			Renderer::bind_shader(shader);
+			Renderer::bind_material(batch.material);
+
+			// update the instanced container with the data
+			m_instanceContainer.set(batch.data, batch.count * instanceDataSize);
+			Renderer::bind_vertex_buffer(m_instanceContainer.get_buffer());
+
+			// draw the sprites
+			Renderer::draw_instances(static_cast<UInt>(batch.count), 6); // 6 vertices per sprite, generated in the shader
+
+			// delete data
+			delete[] batch.data;
+		}
 	}
 }
 

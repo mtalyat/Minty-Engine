@@ -58,6 +58,7 @@ namespace Minty
 		static void sync();
 
 		static void draw_vertices(const UInt vertexCount);
+		static void draw_instances(const UInt instanceCount, const UInt vertexCount = 0);
 		static void draw_indices(const UInt indexCount);
 
 		/// <summary>
@@ -92,13 +93,17 @@ namespace Minty
 
 	public:
 		// binds the shader to be used for rendering, returns false if already bound
-		static Bool bind_shader(Ref<Shader> const shader);
+		static void bind_shader(Ref<Shader> const shader);
 
 		// binds the material for rendering, returns false if already bound
-		static Bool bind_material(Ref<Material> const material);
+		static void bind_material(Ref<Material> const material);
 
 		// binds the given mesh
-		static Bool bind_mesh(Ref<Mesh> const mesh);
+		static void bind_mesh(Ref<Mesh> const mesh);
+
+		static void bind_vertex_buffer(Ref<Buffer> const buffer, UInt const binding = 0);
+
+		static void bind_index_buffer(Ref<Buffer> const buffer);
 
 #pragma endregion
 
@@ -107,8 +112,6 @@ namespace Minty
 	public:
 		// draws the mesh to the screen
 		static void draw(Ref<Mesh> const mesh);
-
-		static void draw(Ref<Sprite> const sprite);
 
 #pragma endregion
 	};

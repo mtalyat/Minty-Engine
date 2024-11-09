@@ -277,6 +277,8 @@ Ref<Asset> Minty::AssetManager::get_asset(UUID const id)
 
 Ref<Asset> Minty::AssetManager::at_asset(UUID const id)
 {
+	MINTY_ASSERT(s_assets.contains(id));
+
 	return s_assets.at(id).asset.create_ref();
 }
 
@@ -758,18 +760,42 @@ Ref<Shader> Minty::AssetManager::load_shader(const Path& path)
 		// allot space for each binding
 		builder.vertexInput.bindings.resize(reader->size());
 
+		String name;
+		UInt binding = UINT_MAX;
+		UInt location;
 		for (Size i = 0; i < reader->size(); i++)
 		{
-			reader->indent(i);
-
 			ShaderBinding& shaderBinding = builder.vertexInput.bindings.at(i);
+
+			// read binding
+			if (!reader->read_name(i, name) || !Parse::try_uint(name, binding))
+			{
+				binding += 1;
+			}
+			shaderBinding.binding = binding;
+
+			// read rate
+			reader->read(i, shaderBinding.rate);
+
+			// read attributes
+			reader->indent(i);
 
 			// allot space for each attribute
 			shaderBinding.attributes.resize(reader->size());
 
+			// read each attribute
+			location = UINT_MAX;
 			for (Size j = 0; j < reader->size(); j++)
 			{
 				ShaderAttribute& shaderAttribute = shaderBinding.attributes.at(j);
+
+				// get attribute location
+				if (!reader->read_name(j, name) || !Parse::try_uint(name, location))
+				{
+					// set location to last location + 1
+					location += 1;
+				}
+				shaderAttribute.location = location;
 
 				// get attribute type
 				reader->read(j, shaderAttribute.type);
@@ -837,17 +863,18 @@ Ref<Sprite> Minty::AssetManager::load_sprite(Path const& path)
 	Reader* reader;
 	open_reader(path, container, reader);
 
-	if (!find_dependency(path, *reader, "texture", builder.texture, false))
+	if (!find_dependency(path, *reader, "Texture", builder.texture, false))
 	{
 		// default
 		builder.texture = get<Texture>(DEFAULT_TEXTURE);
 
 		MINTY_ASSERT_MESSAGE(builder.texture != nullptr, "Default Texture not loaded.");
 	}
-	reader->read("offset", builder.offset);
-	reader->read("size", builder.size);
-	reader->read("pivot", builder.pivot);
-	reader->read("ppu", builder.pixelsPerUnit);
+	reader->read("CoordinateMode", builder.coordinateMode);
+	reader->read("Offset", builder.offset);
+	reader->read("Size", builder.size);
+	reader->read("Pivot", builder.pivot);
+	reader->read("PPU", builder.pixelsPerUnit);
 
 	close_reader(container, reader);
 

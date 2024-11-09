@@ -10,9 +10,10 @@
 #include "Minty/Core/Type.h"
 #include "Minty/Core/UUID.h"
 #include "Minty/FSM/Conditional.h"
-#include "Minty/Render/Perspective.h"
+#include "Minty/Render/CoordinateMode.h"
 #include "Minty/Render/Format.h"
 #include "Minty/Render/Mesh.h"
+#include "Minty/Render/Perspective.h"
 #include "Minty/Render/Shader.h"
 #include "Minty/UI/AnchorMode.h"
 
@@ -600,6 +601,31 @@ namespace Minty
 		case Attenuation::InverseDistance: return "InverseDistance";
 		case Attenuation::LinearDistance: return "LinearDistance";
 		case Attenuation::ExponentialDistance: return "ExponentialDistance";
+
+		default: return "";
+		}
+	}
+
+	template<>
+	inline String to_string(ShaderInputRate const& obj)
+	{
+		switch (obj)
+		{
+		case ShaderInputRate::Undefined: return "Undefined";
+		case ShaderInputRate::Vertex: return "Vertex";
+		case ShaderInputRate::Instance: return "Instance";
+
+		default: return "";
+		}
+	}
+
+	template<>
+	inline String to_string(CoordinateMode const& obj)
+	{
+		switch (obj)
+		{
+		case CoordinateMode::Normalized: return "Normalized";
+		case CoordinateMode::Pixel: return "Pixel";
 
 		default: return "";
 		}

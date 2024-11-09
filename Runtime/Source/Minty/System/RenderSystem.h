@@ -4,13 +4,13 @@
 #include "Minty/Component/CameraComponent.h"
 #include "Minty/Component/TransformComponent.h"
 #include "Minty/Entity/Entity.h"
+#include "Minty/Render/BufferContainer.h"
 #include "Minty/Render/Texture.h"
 #include "Minty/Render/Sprite.h"
 #include "Minty/Render/Material.h"
 #include "Minty/Render/MaterialTemplate.h"
 #include "Minty/Render/Shader.h"
 #include "Minty/Render/Mesh.h"
-
 #include <unordered_map>
 #include <vector>
 
@@ -20,11 +20,15 @@ namespace Minty
 		: public System
 	{
 	private:
-		Entity m_camera = NULL_ENTITY;
+		Entity m_camera;
+		BufferContainer m_instanceContainer;
 
 	public:
 		RenderSystem(Scene& scene)
-			: System::System("Render", scene) {}
+			: System::System("Render", scene)
+			, m_camera(NULL_ENTITY)
+			, m_instanceContainer(BufferUsage::VERTEX)
+		{}
 
 		~RenderSystem() = default;
 

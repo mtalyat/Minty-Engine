@@ -1,19 +1,19 @@
 #pragma once
-#include "Minty/Data/Container.h"
+#include "Minty/Data/BaseContainer.h"
 
 namespace Minty
 {
 	// a static container of bytes
 	class StaticContainer
-		: public Container
+		: public BaseContainer
 	{
 	public:
 		StaticContainer()
-			: Container()
+			: BaseContainer()
 		{}
 
 		StaticContainer(Size const size)
-			: Container()
+			: BaseContainer()
 		{
 			if (size)
 			{
@@ -24,28 +24,28 @@ namespace Minty
 		}
 
 		StaticContainer(StaticContainer const& other)
-			: Container(other)
+			: BaseContainer(other)
 		{}
 
 		StaticContainer& operator=(StaticContainer const& other)
 		{
 			if (this != &other)
 			{
-				Container::operator=(other);
+				BaseContainer::operator=(other);
 			}
 
 			return *this;
 		}
 
 		StaticContainer(StaticContainer&& other) noexcept
-			: Container(other)
+			: BaseContainer(other)
 		{}
 
 		StaticContainer& operator=(StaticContainer&& other) noexcept
 		{
 			if (this != &other)
 			{
-				Container::operator=(std::move(other));
+				BaseContainer::operator=(std::move(other));
 			}
 
 			return *this;

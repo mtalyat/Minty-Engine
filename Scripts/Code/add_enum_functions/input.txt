@@ -1,7 +1,5 @@
-	enum class Attenuation
+	enum class CoordinateMode
 	{
-		None,
-		InverseDistance,
-		LinearDistance,
-		ExponentialDistance
+		Normalized,
+		Pixel
 	};

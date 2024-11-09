@@ -227,6 +227,7 @@
     <ClInclude Include="Minty\Core\Types.h" />
     <ClInclude Include="Minty\Core\UUID.h" />
     <ClInclude Include="Minty\Data\Array.h" />
+    <ClInclude Include="Minty\Data\BaseContainer.h" />
     <ClInclude Include="Minty\Data\Cargo.h" />
     <ClInclude Include="Minty\Data\ConstantContainer.h" />
     <ClInclude Include="Minty\Data\Container.h" />
@@ -260,7 +261,9 @@
     <ClInclude Include="Minty\Library\Stb.h" />
     <ClInclude Include="Minty\Library\Vulkan.h" />
     <ClInclude Include="Minty\Render\Buffer.h" />
+    <ClInclude Include="Minty\Render\BufferContainer.h" />
     <ClInclude Include="Minty\Render\Camera.h" />
+    <ClInclude Include="Minty\Render\CoordinateMode.h" />
     <ClInclude Include="Minty\Render\Format.h" />
     <ClInclude Include="Minty\Render\Image.h" />
     <ClInclude Include="Minty\Render\Material.h" />
@@ -366,6 +369,7 @@
     <ClCompile Include="Minty\Component\RelationshipComponent.cpp" />
     <ClCompile Include="Minty\Component\ScriptComponent.cpp" />
     <ClCompile Include="Minty\Component\ScriptEventComponent.cpp" />
+    <ClCompile Include="Minty\Component\SpriteComponent.cpp" />
     <ClCompile Include="Minty\Core\Application.cpp" />
     <ClCompile Include="Minty\Core\ArgumentParser.cpp" />
     <ClCompile Include="Minty\Core\Color.cpp" />
@@ -381,6 +385,7 @@
     <ClCompile Include="Minty\Core\Time.cpp" />
     <ClCompile Include="Minty\Core\Type.cpp" />
     <ClCompile Include="Minty\Core\UUID.cpp" />
+    <ClCompile Include="Minty\Data\BaseContainer.cpp" />
     <ClCompile Include="Minty\Data\Cargo.cpp" />
     <ClCompile Include="Minty\Data\ConstantContainer.cpp" />
     <ClCompile Include="Minty\Data\Container.cpp" />
@@ -397,6 +402,7 @@
     <ClCompile Include="Minty\FSM\FiniteStateMachine.cpp" />
     <ClCompile Include="Minty\Input\Input.cpp" />
     <ClCompile Include="Minty\Render\Buffer.cpp" />
+    <ClCompile Include="Minty\Render\BufferContainer.cpp" />
     <ClCompile Include="Minty\Render\Camera.cpp" />
     <ClCompile Include="Minty\Render\Image.cpp" />
     <ClCompile Include="Minty\Render\Material.cpp" />

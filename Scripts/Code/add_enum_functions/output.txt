@@ -3,14 +3,12 @@
 ====================
 
 template<>
-inline String to_string(Attenuation const& obj)
+inline String to_string(CoordinateMode const& obj)
 {
 	switch (obj)
 	{
-		case Attenuation::None: return "None";
-		case Attenuation::InverseDistance: return "InverseDistance";
-		case Attenuation::LinearDistance: return "LinearDistance";
-		case Attenuation::ExponentialDistance: return "ExponentialDistance";
+		case CoordinateMode::Normalized: return "Normalized";
+		case CoordinateMode::Pixel: return "Pixel";
 
 		default: return "";
 	}
@@ -20,38 +18,36 @@ inline String to_string(Attenuation const& obj)
 	Parse.h
 ====================
 
-Attenuation to_attenuation(String const& string);
-Bool try_attenuation(String const& string, Attenuation& value);
+CoordinateMode to_coordinate_mode(String const& string);
+Bool try_coordinate_mode(String const& string, CoordinateMode& value);
 
 template<>
-inline void parse_to(String const& string, Attenuation& value)
+inline void parse_to(String const& string, CoordinateMode& value)
 {
-    value = to_attenuation(string);
+    value = to_coordinate_mode(string);
 }
 
 template<>
-inline Bool parse_try(String const& string, Attenuation& value)
+inline Bool parse_try(String const& string, CoordinateMode& value)
 {
-    return try_attenuation(string, value);
+    return try_coordinate_mode(string, value);
 }
 
 ====================
 	Parse.cpp
 ====================
 
-Attenuation Minty::Parse::to_attenuation(String const& string)
+CoordinateMode Minty::Parse::to_coordinate_mode(String const& string)
 {
-	if (string == "None") return Attenuation::None;
-	if (string == "InverseDistance") return Attenuation::InverseDistance;
-	if (string == "LinearDistance") return Attenuation::LinearDistance;
-	if (string == "ExponentialDistance") return Attenuation::ExponentialDistance;
+	if (string == "Normalized") return CoordinateMode::Normalized;
+	if (string == "Pixel") return CoordinateMode::Pixel;
 
-	return Attenuation();
+	return CoordinateMode();
 }
 
-Bool Minty::Parse::try_attenuation(String const& string, Attenuation& value)
+Bool Minty::Parse::try_coordinate_mode(String const& string, CoordinateMode& value)
 {
-	value = to_attenuation(string);
-	return value != Attenuation();
+	value = to_coordinate_mode(string);
+	return value != CoordinateMode();
 }
 

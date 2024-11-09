@@ -26,10 +26,10 @@ CullMode: Back
 FrontFace: Clockwise
 LineWidth: 1
 Bindings
-    - 
-        - Float3
-        - Float3
-        - Float2
+    0: Vertex
+        0: Float3
+        1: Float3
+        2: Float2
 Stages
     Vertex: def0000000000003
     Fragment: def0000000000002

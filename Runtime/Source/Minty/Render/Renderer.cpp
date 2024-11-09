@@ -124,6 +124,13 @@ void Minty::Renderer::draw_vertices(const UInt vertexCount)
 #endif
 }
 
+void Minty::Renderer::draw_instances(const UInt instanceCount, const UInt vertexCount)
+{
+#if defined(MINTY_VULKAN)
+	VulkanRenderer::draw_instances(instanceCount, vertexCount);
+#endif
+}
+
 void Minty::Renderer::draw_indices(const UInt indexCount)
 {
 #if defined(MINTY_VULKAN)
@@ -194,7 +201,8 @@ Ref<Material> Minty::Renderer::get_or_create_sprite_material(Ref<Texture> const 
 		materialBuilder.materialTemplate = AssetManager::get<MaterialTemplate>(DEFAULT_SPRITE_MATERIAL_TEMPLATE);
 
 		Cargo cargo{};
-		cargo.emplace("texture", Type::Asset, spriteTexture.get());
+		Texture const* spriteTexturePtr = spriteTexture.get();
+		cargo.emplace("texture", Type::Asset, &spriteTexturePtr);
 		materialBuilder.values.emplace("texture", std::move(cargo));
 
 		Ref<Material> material = AssetManager::create<Material>(materialBuilder);
@@ -216,37 +224,38 @@ Owner<RenderTarget> Minty::Renderer::create_render_target()
 #endif
 }
 
-Bool Minty::Renderer::bind_shader(Ref<Shader> const shader)
+void Minty::Renderer::bind_shader(Ref<Shader> const shader)
 {
-	// return if already bound
-	if (s_boundShader == shader) return false;
-
 	s_boundShader = shader;
 	if(s_boundShader != nullptr) s_boundShader->on_bind();
-
-	return true;
 }
 
-Bool Minty::Renderer::bind_material(Ref<Material> const material)
+void Minty::Renderer::bind_material(Ref<Material> const material)
 {
-	if (s_boundMaterial == material) return false;
-
 	MINTY_ASSERT_MESSAGE(material->get_template()->get_shader() == s_boundShader, "The Shader of the Material given to bind does not match the currently bound Shader.");
 
 	s_boundMaterial = material;
 	s_boundMaterial->on_bind();
-
-	return true;
 }
 
-Bool Minty::Renderer::bind_mesh(Ref<Mesh> const mesh)
+void Minty::Renderer::bind_mesh(Ref<Mesh> const mesh)
 {
-	if (s_boundMesh == mesh) return false;
-
 	s_boundMesh = mesh;
 	s_boundMesh->on_bind();
+}
 
-	return true;
+void Minty::Renderer::bind_vertex_buffer(Ref<Buffer> const buffer, UInt const binding)
+{
+#if defined(MINTY_VULKAN)
+	VulkanRenderer::bind_vertex_buffer(VulkanRenderer::get_command_buffer(), static_cast<VkBuffer>(buffer->get_native()), binding);
+#endif
+}
+
+void Minty::Renderer::bind_index_buffer(Ref<Buffer> const buffer)
+{
+#if defined(MINTY_VULKAN)
+	VulkanRenderer::bind_index_buffer(VulkanRenderer::get_command_buffer(), static_cast<VkBuffer>(buffer->get_native()));
+#endif
 }
 
 void Minty::Renderer::draw(Ref<Mesh> const mesh)
@@ -254,11 +263,4 @@ void Minty::Renderer::draw(Ref<Mesh> const mesh)
 	MINTY_ASSERT_MESSAGE(mesh != nullptr, "Cannot draw a null Mesh.");
 
 	draw_indices(mesh->get_index_count());
-}
-
-void Minty::Renderer::draw(Ref<Sprite> const sprite)
-{
-	MINTY_ASSERT_MESSAGE(sprite != nullptr, "Cannot draw a null Sprite.");
-
-	draw_vertices(6);
 }

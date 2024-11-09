@@ -132,7 +132,7 @@ Minty::VulkanShader::VulkanShader(const ShaderBuilder& builder)
 		ShaderBinding const& binding = builder.vertexInput.bindings.at(i);
 		VkVertexInputBindingDescription& vertexInputBinding = vertexInputBindings.at(i);
 		vertexInputBinding.binding = static_cast<uint32_t>(i);
-		vertexInputBinding.inputRate = VkVertexInputRate::VK_VERTEX_INPUT_RATE_VERTEX; // TODO: instanced support
+		vertexInputBinding.inputRate = VulkanRenderer::input_rate_to_vulkan(binding.rate);
 
 		uint32_t offset = 0;
 
@@ -141,14 +141,51 @@ Minty::VulkanShader::VulkanShader(const ShaderBuilder& builder)
 		{
 			ShaderAttribute const& attribute = binding.attributes.at(j);
 			VkVertexInputAttributeDescription vertexInputAttribute{};
-			vertexInputAttribute.location = static_cast<uint32_t>(j);
-			vertexInputAttribute.binding = vertexInputBinding.binding;
-			vertexInputAttribute.format = VulkanRenderer::type_to_vulkan(attribute.type);
-			vertexInputAttribute.offset = offset;
 
-			offset += static_cast<uint32_t>(sizeof_type(attribute.type));
+			// treat matrices as multiple vectors
+			// all others have their own format
+			switch (attribute.type)
+			{
+			case Type::Matrix2:
+				MINTY_NOT_IMPLEMENTED();
+				break;
+			case Type::Matrix3:
+				MINTY_NOT_IMPLEMENTED();
+				break;
+			case Type::Matrix4:
+			{
+				uint32_t typeSize = static_cast<uint32_t>(sizeof(Float4));
+				VkFormat format = VulkanRenderer::type_to_vulkan(Type::Float4);
 
-			vertexInputAttributes.push_back(vertexInputAttribute);
+				for (Size k = 0; k < 4; k++)
+				{
+					vertexInputAttribute.location = static_cast<uint32_t>(j + k);
+					vertexInputAttribute.binding = vertexInputBinding.binding;
+					vertexInputAttribute.format = format;
+					vertexInputAttribute.offset = offset;
+
+					offset += typeSize;
+
+					vertexInputAttributes.push_back(vertexInputAttribute);
+				}
+
+				j += 4;
+
+				break;
+			}
+			default:
+			{
+				vertexInputAttribute.location = static_cast<uint32_t>(j);
+				vertexInputAttribute.binding = vertexInputBinding.binding;
+				vertexInputAttribute.format = VulkanRenderer::type_to_vulkan(attribute.type);
+				vertexInputAttribute.offset = offset;
+
+				offset += static_cast<uint32_t>(sizeof_type(attribute.type));
+
+				vertexInputAttributes.push_back(vertexInputAttribute);
+				break;
+			}
+			}
 		}
 
 		// final offset is effectively the stride

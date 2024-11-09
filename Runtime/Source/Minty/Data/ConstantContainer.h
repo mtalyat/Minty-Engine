@@ -1,5 +1,5 @@
 #pragma once
-#include "Minty/Data/Container.h"
+#include "Minty/Data/BaseContainer.h"
 
 namespace Minty
 {
@@ -7,15 +7,15 @@ namespace Minty
 	/// A ConstantContainer is a container with a fixed size.
 	/// </summary>
 	class ConstantContainer
-		: public Container
+		: public BaseContainer
 	{
 	public:
 		ConstantContainer()
-			: Container()
+			: BaseContainer()
 		{}
 
 		ConstantContainer(Size const size)
-			: Container()
+			: BaseContainer()
 		{
 			if (size)
 			{
@@ -26,7 +26,7 @@ namespace Minty
 		}
 
 		ConstantContainer(void const* const data, Size const size)
-			: Container()
+			: BaseContainer()
 		{
 			if (data && size)
 			{
@@ -38,28 +38,28 @@ namespace Minty
 		}
 
 		ConstantContainer(ConstantContainer const& other)
-			: Container(other)
+			: BaseContainer(other)
 		{}
 
 		ConstantContainer& operator=(ConstantContainer const& other)
 		{
 			if (this != &other)
 			{
-				Container::operator=(other);
+				BaseContainer::operator=(other);
 			}
 
 			return *this;
 		}
 
 		ConstantContainer(ConstantContainer&& other) noexcept
-			: Container(other)
+			: BaseContainer(other)
 		{}
 
 		ConstantContainer& operator=(ConstantContainer&& other) noexcept
 		{
 			if (this != &other)
 			{
-				Container::operator=(std::move(other));
+				BaseContainer::operator=(std::move(other));
 			}
 
 			return *this;

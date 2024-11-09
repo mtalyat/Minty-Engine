@@ -301,6 +301,13 @@ void Minty::VulkanRenderer::draw_vertices(const UInt vertexCount)
 	draw_vertices(frame.commandBuffer, vertexCount);
 }
 
+void Minty::VulkanRenderer::draw_instances(const UInt instanceCount, const UInt vertexCount)
+{
+	Frame& frame = get_current_frame();
+
+	draw_instances(frame.commandBuffer, instanceCount, vertexCount);
+}
+
 void Minty::VulkanRenderer::draw_indices(const UInt indexCount)
 {
 	Frame& frame = get_current_frame();
@@ -1431,11 +1438,11 @@ void Minty::VulkanRenderer::bind_scissor(const VkCommandBuffer commandBuffer, co
 	vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 }
 
-void Minty::VulkanRenderer::bind_vertex_buffer(const VkCommandBuffer commandBuffer, const VkBuffer buffer)
+void Minty::VulkanRenderer::bind_vertex_buffer(const VkCommandBuffer commandBuffer, const VkBuffer buffer, UInt const binding)
 {
 	VkBuffer vertexBuffers[] = { buffer };
 	VkDeviceSize offsets[] = { 0 };
-	vkCmdBindVertexBuffers(commandBuffer, 0, 1, vertexBuffers, offsets);
+	vkCmdBindVertexBuffers(commandBuffer, binding, 1, vertexBuffers, offsets);
 }
 
 void Minty::VulkanRenderer::bind_index_buffer(const VkCommandBuffer commandBuffer, const VkBuffer buffer)
@@ -1446,6 +1453,11 @@ void Minty::VulkanRenderer::bind_index_buffer(const VkCommandBuffer commandBuffe
 void Minty::VulkanRenderer::draw_vertices(const VkCommandBuffer commandBuffer, const uint32_t count)
 {
 	vkCmdDraw(commandBuffer, count, 1, 0, 0);
+}
+
+void Minty::VulkanRenderer::draw_instances(const VkCommandBuffer commandBuffer, const uint32_t count, const uint32_t vertexCount)
+{
+	vkCmdDraw(commandBuffer, vertexCount, count, 0, 0);
 }
 
 void Minty::VulkanRenderer::draw_indices(const VkCommandBuffer commandBuffer, const uint32_t count)
@@ -1733,7 +1745,7 @@ VkFormat Minty::VulkanRenderer::type_to_vulkan(const Minty::Type type)
 	case Type::UInt4:
 		return VkFormat::VK_FORMAT_R32G32B32A32_UINT;
 	default:
-		MINTY_ABORT("Unable to convert Type to VkFormat.");
+		MINTY_ABORT_FORMAT("Unable to convert Type \"{}\" to VkFormat.", to_string(type));
 	}
 }
 
@@ -1820,4 +1832,9 @@ VkPolygonMode Minty::VulkanRenderer::polygon_mode_to_vulkan(const Minty::ShaderP
 	case ShaderPolygonMode::Point: return VkPolygonMode::VK_POLYGON_MODE_POINT;
 	default: return VkPolygonMode::VK_POLYGON_MODE_FILL;
 	}
+}
+
+VkVertexInputRate Minty::VulkanRenderer::input_rate_to_vulkan(const Minty::ShaderInputRate rate)
+{
+	return static_cast<VkVertexInputRate>(static_cast<Int>(rate) - 1);
 }

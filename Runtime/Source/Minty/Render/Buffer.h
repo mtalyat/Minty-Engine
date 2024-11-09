@@ -24,8 +24,15 @@ namespace Minty
 
 	class Buffer
 	{
+	private:
+		Bool m_frequent;
+		BufferUsage m_usage;
+
 	protected:
-		Buffer() = default;
+		Buffer(BufferBuilder const& builder)
+			: m_frequent(builder.frequent)
+			, m_usage(builder.usage)
+		{}
 
 	public:
 		virtual ~Buffer() = default;
@@ -44,10 +51,20 @@ namespace Minty
 		virtual void get_data(void* const data) const = 0;
 
 		/// <summary>
+		/// If the Buffer is frequent, return the directly mapped memory.
+		/// </summary>
+		/// <returns></returns>
+		virtual void* data() const = 0;
+
+		/// <summary>
 		/// Gets the size of this Buffer in bytes.
 		/// </summary>
 		/// <returns></returns>
 		virtual Size get_size() const = 0;
+
+		inline Bool is_frequent() const { return m_frequent; }
+
+		inline BufferUsage get_usage() const { return m_usage; }
 
 		/// <summary>
 		/// Flushes this Buffer data from the cache.
@@ -55,6 +72,8 @@ namespace Minty
 		virtual void flush() const = 0;
 
 		virtual void* get_native() const = 0;
+
+		virtual Owner<Buffer> clone() const = 0;
 
 	public:
 		static Owner<Buffer> create(const BufferBuilder& builder = {});

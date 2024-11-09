@@ -4,78 +4,17 @@
 
 namespace Minty
 {
-	// a static container of bytes
+	// a container of bytes
 	class Container
 	{
-	protected:
-		Byte* mp_data;
-		Size m_capacity;
-		Size m_size;
-
 	public:
-		Container()
-			: mp_data(nullptr)
-			, m_capacity(0)
-			, m_size(0)
-		{}
+		Container() = default;
 
-		virtual ~Container()
-		{
-			reset();
-		}
-
-		Container(Container const& other)
-			: mp_data(new Byte[other.m_capacity])
-			, m_capacity(other.m_capacity)
-			, m_size(other.m_size)
-		{
-			memcpy(mp_data, other.mp_data, m_size);
-		}
-
-		Container& operator=(Container const& other)
-		{
-			if (this != &other)
-			{
-				if (mp_data) delete[] mp_data;
-
-				mp_data = new Byte[other.m_capacity];
-				m_capacity = other.m_capacity;
-				m_size = other.m_size;
-				memcpy(mp_data, other.mp_data, m_size);
-			}
-
-			return *this;
-		}
-
-		Container(Container&& other) noexcept
-			: mp_data(other.mp_data)
-			, m_capacity(other.m_capacity)
-			, m_size(other.m_size)
-		{
-			other.mp_data = nullptr;
-			other.m_capacity = 0;
-			other.m_size = 0;
-		}
-
-		Container& operator=(Container&& other) noexcept
-		{
-			if (this != &other)
-			{
-				mp_data = other.mp_data;
-				m_capacity = other.m_capacity;
-				m_size = other.m_size;
-
-				other.mp_data = nullptr;
-				other.m_capacity = 0;
-				other.m_size = 0;
-			}
-
-			return *this;
-		}
+		virtual ~Container() = default;
 
 	public:
 		// sets data at the given offset, if it fits
-		void set_at(void const* const data, Size const size, Size const index);
+		virtual void set_at(void const* const data, Size const size, Size const index) = 0;
 
 		// overrides all of the data in this Container
 		void set(void const* const data, Size const size);
@@ -84,31 +23,24 @@ namespace Minty
 		virtual Bool append(void const* const data, Size const size) = 0;
 
 		// clears all data from the container
-		void clear();
+		virtual void clear() = 0;
 
 		// resets the entire container
-		void reset();
+		virtual void reset() = 0;
 
 		// sets the new capacity
 		virtual Bool reserve(Size const newCapacity) = 0;
 
 		// sets the new size
-		virtual Bool resize(Size const newSize);
+		virtual Bool resize(Size const newSize) = 0;
 
 		// gets the raw data array pointer
-		void* data() const { return mp_data; }
+		virtual void* data() const = 0;
 
 		// gets the size of the data within the data array
-		Size size() const { return m_size; }
+		virtual Size size() const = 0;
 
 		// gets the size of the data array in bytes
-		Size capacity() const { return m_capacity; }
-
-		// gets the data as a specific type
-		template<typename T>
-		T get() const
-		{
-			return *static_cast<T*>(static_cast<void*>(mp_data));
-		}
+		virtual Size capacity() const = 0;
 	};
 }
