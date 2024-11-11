@@ -909,14 +909,36 @@ Bool Minty::Parse::try_mesh_type(String const& string, MeshType& value)
 AnchorMode Minty::Parse::to_anchor_mode(String const& string)
 {
 	if (string == "All") return AnchorMode::All;
-	if (string == "Top") return AnchorMode::Top;
-	if (string == "Middle") return AnchorMode::Middle;
-	if (string == "Bottom") return AnchorMode::Bottom;
-	if (string == "Left") return AnchorMode::Left;
-	if (string == "Center") return AnchorMode::Center;
-	if (string == "Right") return AnchorMode::Right;
 
-	return AnchorMode();
+	AnchorMode anchorMode = AnchorMode::Empty;
+
+	if (string.find("Top") != String::npos)
+	{
+		anchorMode = anchorMode | AnchorMode::Top;
+	}
+	else if (string.find("Middle") != String::npos)
+	{
+		anchorMode = anchorMode | AnchorMode::Middle;
+	}
+	else if (string.find("Bottom") != String::npos)
+	{
+		anchorMode = anchorMode | AnchorMode::Bottom;
+	}
+
+	if (string.find("Left") != String::npos)
+	{
+		anchorMode = anchorMode | AnchorMode::Left;
+	}
+	else if (string.find("Center") != String::npos)
+	{
+		anchorMode = anchorMode | AnchorMode::Center;
+	}
+	else if (string.find("Right") != String::npos)
+	{
+		anchorMode = anchorMode | AnchorMode::Right;
+	}
+
+	return anchorMode;
 }
 
 Bool Minty::Parse::try_anchor_mode(String const& string, AnchorMode& value)

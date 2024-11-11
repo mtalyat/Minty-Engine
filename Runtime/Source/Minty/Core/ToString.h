@@ -508,18 +508,40 @@ namespace Minty
 	template<>
 	inline String to_string(AnchorMode const& obj)
 	{
-		switch (obj)
+		if (obj == AnchorMode::All)
 		{
-		case AnchorMode::All: return "All";
-		case AnchorMode::Top: return "Top";
-		case AnchorMode::Middle: return "Middle";
-		case AnchorMode::Bottom: return "Bottom";
-		case AnchorMode::Left: return "Left";
-		case AnchorMode::Center: return "Center";
-		case AnchorMode::Right: return "Right";
-
-		default: return "";
+			return "All";
 		}
+
+		String string = "";
+
+		if (static_cast<Bool>(obj & AnchorMode::Top))
+		{
+			string += "Top";
+		}
+		else if (static_cast<Bool>(obj & AnchorMode::Middle))
+		{
+			string += "Middle";
+		}
+		else if (static_cast<Bool>(obj & AnchorMode::Bottom))
+		{
+			string += "Bottom";
+		}
+
+		if (static_cast<Bool>(obj & AnchorMode::Left))
+		{
+			string += "Left";
+		}
+		else if (static_cast<Bool>(obj & AnchorMode::Center))
+		{
+			string += "Center";
+		}
+		else if (static_cast<Bool>(obj & AnchorMode::Right))
+		{
+			string += "Right";
+		}
+
+		return string;
 	}
 
 	template<>

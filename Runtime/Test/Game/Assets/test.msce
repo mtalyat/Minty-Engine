@@ -32,13 +32,29 @@ Entities
 			resolution: (1920, 1080)
 		Enabled
 		Renderable
+		UITransform
+			anchor: All
 	UI Test
 		UITransform
 			anchor: TopLeft
 			x: 0
 			y: 0
-			width: 1000
-			height: 1000
+			width: 100
+			height: 100
+		Sprite:
+			sprite: def0000000000001
+			color: White
+		Relationship
+			parent: 6fc41b54e9ade453
+		Enabled
+		Renderable
+	UI Test 2
+		UITransform
+			anchor: BottomRight
+			x: -100
+			y: -100
+			width: 100
+			height: 100
 		Sprite:
 			sprite: def0000000000001
 			color: White
