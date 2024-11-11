@@ -199,6 +199,7 @@ void Minty::RenderSystem::update_3d_sprites()
 		}
 
 		// render the batches
+		Size index = 0;
 		for (auto const& batch : batchFactory)
 		{
 			// bind batch
@@ -209,11 +210,14 @@ void Minty::RenderSystem::update_3d_sprites()
 			Renderer::bind_material(material);
 
 			// update the instanced container with the data
-			m_3dSpriteInstanceContainer.set(batch.get_data(), batch.get_data_size());
-			Renderer::bind_vertex_buffer(m_3dSpriteInstanceContainer.get_buffer());
+			BufferContainer& container = m_instanceCargo.get_container(m_3dSpriteGroupId, index);
+			container.set(batch.get_data(), batch.get_data_size());
+			Renderer::bind_vertex_buffer(container.get_buffer());
 
 			// draw the sprites
 			Renderer::draw_instances(static_cast<UInt>(batch.get_count()), 6); // 6 vertices per sprite, generated in the shader
+
+			index++;
 		}
 	}
 }
@@ -307,6 +311,7 @@ void Minty::RenderSystem::update_ui()
 	}
 
 	// render each batch
+	Size index = 0;
 	for (auto const& batch : batchFactory)
 	{
 		// bind batch
@@ -317,10 +322,13 @@ void Minty::RenderSystem::update_ui()
 		Renderer::bind_material(material);
 
 		// update the instanced container with the data
-		m_uiSpriteInstanceContainer.set(batch.get_data(), batch.get_data_size());
-		Renderer::bind_vertex_buffer(m_uiSpriteInstanceContainer.get_buffer());
+		BufferContainer& container = m_instanceCargo.get_container(m_uiSpriteGroupId, index);
+		container.set(batch.get_data(), batch.get_data_size());
+		Renderer::bind_vertex_buffer(container.get_buffer());
 
 		// draw the sprites
 		Renderer::draw_instances(static_cast<UInt>(batch.get_count()), 6); // 6 vertices per sprite, generated in the shader
+
+		index++;
 	}
 }

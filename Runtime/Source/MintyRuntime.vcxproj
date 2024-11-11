@@ -264,6 +264,7 @@
     <ClInclude Include="Minty\Library\Stb.h" />
     <ClInclude Include="Minty\Library\Vulkan.h" />
     <ClInclude Include="Minty\Render\Buffer.h" />
+    <ClInclude Include="Minty\Render\BufferCargo.h" />
     <ClInclude Include="Minty\Render\BufferContainer.h" />
     <ClInclude Include="Minty\Render\Camera.h" />
     <ClInclude Include="Minty\Render\CoordinateMode.h" />
@@ -412,6 +413,7 @@
     <ClCompile Include="Minty\FSM\FiniteStateMachine.cpp" />
     <ClCompile Include="Minty\Input\Input.cpp" />
     <ClCompile Include="Minty\Render\Buffer.cpp" />
+    <ClCompile Include="Minty\Render\BufferCargo.cpp" />
     <ClCompile Include="Minty\Render\BufferContainer.cpp" />
     <ClCompile Include="Minty\Render\Camera.cpp" />
     <ClCompile Include="Minty\Render\Font.cpp" />

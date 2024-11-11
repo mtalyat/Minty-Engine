@@ -603,6 +603,9 @@
     <ClInclude Include="Minty\Render\Space.h">
       <Filter>Header Files\Minty\Render</Filter>
     </ClInclude>
+    <ClInclude Include="Minty\Render\BufferCargo.h">
+      <Filter>Header Files\Minty\Render</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -996,6 +999,9 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Minty\Component\CanvasComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Render\BufferCargo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

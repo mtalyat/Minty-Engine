@@ -1,6 +1,7 @@
 Assets
 	- "Defaults/Texture/defaultTexture.png"
 	- "Defaults/Texture/defaultTextureIcon.png"
+	- "Defaults/Texture/defaultTextureMint.png"
 	- "Defaults/ShaderModule/defaultModule.frag.spv"
 	- "Defaults/ShaderModule/defaultModule.vert.spv"
 	- "Defaults/Shader/defaultShader.msha"
@@ -16,6 +17,7 @@ Assets
 	- "Defaults/MaterialTemplate/defaultUiMaterialTemplate.mmtp"
 	- "Defaults/Sprite/defaultSprite.mspr"
 	- "Defaults/Sprite/defaultSpriteIcon.mspr"
+	- "Defaults/Sprite/defaultSpriteMint.mspr"
 Systems
 	Render
 Entities
@@ -56,7 +58,7 @@ Entities
 			width: 100
 			height: 100
 		Sprite:
-			sprite: def0000000000001
+			sprite: def000000000001a
 			color: White
 		Relationship
 			parent: 6fc41b54e9ade453

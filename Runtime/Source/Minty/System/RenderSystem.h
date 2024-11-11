@@ -4,7 +4,7 @@
 #include "Minty/Component/CameraComponent.h"
 #include "Minty/Component/TransformComponent.h"
 #include "Minty/Entity/Entity.h"
-#include "Minty/Render/BufferContainer.h"
+#include "Minty/Render/BufferCargo.h"
 #include "Minty/Render/Texture.h"
 #include "Minty/Render/Sprite.h"
 #include "Minty/Render/Material.h"
@@ -21,15 +21,17 @@ namespace Minty
 	{
 	private:
 		Entity m_camera;
-		BufferContainer m_3dSpriteInstanceContainer;
-		BufferContainer m_uiSpriteInstanceContainer;
+		BufferCargo m_instanceCargo;
+		UUID m_3dSpriteGroupId;
+		UUID m_uiSpriteGroupId;
 
 	public:
 		RenderSystem(Scene& scene)
 			: System::System("Render", scene)
 			, m_camera(NULL_ENTITY)
-			, m_3dSpriteInstanceContainer(BufferUsage::VERTEX)
-			, m_uiSpriteInstanceContainer(BufferUsage::VERTEX)
+			, m_instanceCargo(BufferUsage::VERTEX)
+			, m_3dSpriteGroupId(m_instanceCargo.create_group())
+			, m_uiSpriteGroupId(m_instanceCargo.create_group())
 		{}
 
 		~RenderSystem() = default;
