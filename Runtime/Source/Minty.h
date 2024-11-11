@@ -46,6 +46,21 @@
 #include "Minty/Core/Types.h"
 #include "Minty/Core/UUID.h"
 
+// DATA
+#include "Minty/Data/Array.h"
+#include "Minty/Data/BaseContainer.h"
+#include "Minty/Data/Batch.h"
+#include "Minty/Data/BatchFactory.h"
+#include "Minty/Data/Cargo.h"
+#include "Minty/Data/ConstantContainer.h"
+#include "Minty/Data/Container.h"
+#include "Minty/Data/DynamicContainer.h"
+#include "Minty/Data/List.h"
+#include "Minty/Data/Lookup.h"
+#include "Minty/Data/Register.h"
+#include "Minty/Data/StaticContainer.h"
+#include "Minty/Data/Variable.h"
+
 // DEBUG
 #include "Minty/Debug/Debug.h"
 #include "Minty/Debug/Logger.h"
