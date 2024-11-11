@@ -6,8 +6,7 @@
 using namespace Minty;
 
 Minty::VulkanTexture::VulkanTexture(const TextureBuilder& builder)
-	: Texture(builder.id)
-	, m_image(static_cast<Owner<VulkanImage>>(builder.image))
+	: Texture(builder)
 	, m_sampler(VK_NULL_HANDLE)
 {
 	m_sampler = VulkanRenderer::create_sampler();

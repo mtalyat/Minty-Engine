@@ -4,6 +4,7 @@ namespace Minty
 {
 	enum class AnchorMode : int
 	{
+		Empty = 0,
 		All = 0b00000000,
 		Top = 0b00000001,
 		Middle = 0b00000010,

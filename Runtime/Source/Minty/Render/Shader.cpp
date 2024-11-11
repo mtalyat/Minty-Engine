@@ -2,6 +2,7 @@
 #include "Shader.h"
 
 #include "Minty/Render/Renderer.h"
+#include "Minty/Render/Material.h"
 
 #if defined(MINTY_VULKAN)
 #include "Platform/Vulkan/VulkanShader.h"
@@ -22,6 +23,24 @@ std::vector<ShaderInput> Minty::Shader::get_inputs() const
 	}
 
 	return inputs;
+}
+
+void Minty::Shader::set_global_input(String const& name, void const* const data)
+{
+	for (Material* const material : m_materials)
+	{
+		material->set_input(name, data);
+	}
+}
+
+void Minty::Shader::register_material(Material& material)
+{
+	m_materials.emplace(&material);
+}
+
+void Minty::Shader::unregister_material(Material& material)
+{
+	m_materials.erase(&material);
 }
 
 Owner<Shader> Minty::Shader::create(const ShaderBuilder& builder)

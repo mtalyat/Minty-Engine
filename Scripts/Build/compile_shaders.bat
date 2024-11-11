@@ -11,5 +11,6 @@ for /r %1 %%f in (*.frag *.vert) do (
 
     if %errorlevel% neq 0 (
         call echo Failed to compile "%%input_file%%".
+        exit /b %errorlevel%
     )
 )

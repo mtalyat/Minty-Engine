@@ -103,10 +103,10 @@ void Minty::Renderer::set_camera(Float3 const position, Quaternion const rotatio
 	// multiply together
 	Matrix4 transformMatrix = proj * view;
 
-	// update all materials
+	// update all materials that have a camera
 	for (auto const& material : AssetManager::get_by_type<Material>(AssetType::Material))
 	{
-		material->set_input("camera", &transformMatrix);
+		material->try_set_input("camera", &transformMatrix);
 	}
 }
 
@@ -187,7 +187,7 @@ Ref<Mesh> Minty::Renderer::get_or_create_mesh(MeshType const type)
 	return mesh;
 }
 
-Ref<Material> Minty::Renderer::get_or_create_sprite_material(Ref<Texture> const spriteTexture)
+Ref<Material> Minty::Renderer::get_or_create_sprite_material(Ref<Texture> const spriteTexture, Space const space)
 {
 	MINTY_ASSERT_MESSAGE(spriteTexture != nullptr, "Cannot get or create a Material for a null Sprite Texture.");
 
@@ -198,7 +198,23 @@ Ref<Material> Minty::Renderer::get_or_create_sprite_material(Ref<Texture> const 
 		// create new
 		MaterialBuilder materialBuilder{};
 		materialBuilder.id = UUID::create();
-		materialBuilder.materialTemplate = AssetManager::get<MaterialTemplate>(DEFAULT_SPRITE_MATERIAL_TEMPLATE);
+
+		UUID templateId = {};
+
+		switch (space)
+		{
+		case Space::D3:
+			templateId = DEFAULT_SPRITE_MATERIAL_TEMPLATE;
+			break;
+		case Space::UI:
+			templateId = DEFAULT_UI_MATERIAL_TEMPLATE;
+			break;
+		default:
+			MINTY_NOT_IMPLEMENTED();
+			break;
+		}
+
+		materialBuilder.materialTemplate = AssetManager::get<MaterialTemplate>(templateId);
 
 		Cargo cargo{};
 		Texture const* spriteTexturePtr = spriteTexture.get();

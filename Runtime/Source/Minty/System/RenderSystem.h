@@ -21,13 +21,15 @@ namespace Minty
 	{
 	private:
 		Entity m_camera;
-		BufferContainer m_instanceContainer;
+		BufferContainer m_3dSpriteInstanceContainer;
+		BufferContainer m_uiSpriteInstanceContainer;
 
 	public:
 		RenderSystem(Scene& scene)
 			: System::System("Render", scene)
 			, m_camera(NULL_ENTITY)
-			, m_instanceContainer(BufferUsage::VERTEX)
+			, m_3dSpriteInstanceContainer(BufferUsage::VERTEX)
+			, m_uiSpriteInstanceContainer(BufferUsage::VERTEX)
 		{}
 
 		~RenderSystem() = default;
@@ -43,6 +45,31 @@ namespace Minty
 		/// Updates the Camera uniform buffer with the Camera info.
 		/// </summary>
 		void update_camera(CameraComponent const& camera, TransformComponent const& transform);
+
+		/// <summary>
+		/// Updates the Camera.
+		/// </summary>
+		void update_camera();
+
+		/// <summary>
+		/// Updates 3D mesh objects.
+		/// </summary>
+		void update_3d_meshes();
+
+		/// <summary>
+		/// Updates 3D sprite objects.
+		/// </summary>
+		void update_3d_sprites();
+
+		/// <summary>
+		/// Updates 3D space objects.
+		/// </summary>
+		void update_3d();
+
+		/// <summary>
+		/// Updates UI space objects.
+		/// </summary>
+		void update_ui();
 
 #pragma region Set
 

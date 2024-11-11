@@ -22,6 +22,12 @@ namespace Minty
 		// adds to the end of the data within this container, and reserves more space if needed
 		virtual Bool append(void const* const data, Size const size) = 0;
 
+		template<typename T>
+		Bool append_object(T const& data)
+		{
+			return append(&data, sizeof(T));
+		}
+
 		// clears all data from the container
 		virtual void clear() = 0;
 

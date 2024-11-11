@@ -1,3 +1,4 @@
-pass: 887b6e5f7599afdb
-defaults
-    texture: 151da98925b6ef8c
+Shader: def000000000000d
+Values
+    texture
+        texSampler: def0000000000000

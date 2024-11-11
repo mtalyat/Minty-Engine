@@ -4,7 +4,11 @@
 
 using namespace Minty;
 
-#define TEST 1
+#define EMPTY -1
+#define IDS 0
+#define NORMAL 1
+
+#define TEST NORMAL
 
 int main()
 {

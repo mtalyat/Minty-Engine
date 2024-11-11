@@ -727,14 +727,14 @@ Ref<Shader> Minty::AssetManager::load_shader(const Path& path)
 
 					// get type
 					reader->read(i, type);
+
+					// emplace slot
+					input.cargo.emplace_slot(name, type);
+
+					// add to total size
+					UInt typeSize = static_cast<UInt>(sizeof_type(type));
+					input.size += typeSize;
 				}
-
-				// emplace slot
-				input.cargo.emplace_slot(name, type);
-
-				// add to total size
-				UInt typeSize = static_cast<UInt>(sizeof_type(type));
-				input.size += typeSize;
 
 				// step out of Structure
 				reader->outdent();

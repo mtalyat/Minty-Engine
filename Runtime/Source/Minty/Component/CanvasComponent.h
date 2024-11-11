@@ -2,6 +2,7 @@
 #include "Minty/Component/Component.h"
 
 #include "Minty/Core/Math.h"
+#include "Minty/Core/Rect.h"
 
 namespace Minty
 {
@@ -10,14 +11,9 @@ namespace Minty
 	{
 		Int2 referenceResolution;
 
-		virtual void serialize(Writer& writer) const override
-		{
-			writer.write("resolution", referenceResolution);
-		}
+		Rect to_rect() const { return Rect(Float2(), static_cast<Float2>(referenceResolution)); }
 
-		virtual void deserialize(Reader& reader) override
-		{
-			reader.read("resolution", referenceResolution);
-		}
+		void serialize(Writer& writer) const override;
+		void deserialize(Reader& reader) override;
 	};
 }

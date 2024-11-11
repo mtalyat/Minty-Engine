@@ -10,10 +10,13 @@
 #include "Minty/Render/ShaderModule.h"
 #include "Minty/Render/Viewport.h"
 #include <unordered_map>
+#include <unordered_set>
 #include <vector>
 
 namespace Minty
 {
+	class Material;
+
 	enum class ShaderStage
 	{
 		Undefined,
@@ -144,6 +147,7 @@ namespace Minty
 		Ref<Scissor> m_scissor;
 
 		std::unordered_map<String, ShaderInput> m_inputs;
+		std::unordered_set<Material*> m_materials;
 
 	protected:
 		Shader(const ShaderBuilder& builder)
@@ -151,6 +155,7 @@ namespace Minty
 			, m_viewport(builder.viewport)
 			, m_scissor(builder.scissor)
 			, m_inputs()
+			, m_materials()
 		{
 			// copy inputs into map
 			for (ShaderInput const& input : builder.inputs)
@@ -179,6 +184,16 @@ namespace Minty
 		ShaderInput const& get_input(String const& name) const { return m_inputs.at(name); }
 
 		std::vector<ShaderInput> get_inputs() const;
+
+		/// <summary>
+		/// Sets the input for all Materials associated with this Shader.
+		/// </summary>
+		/// <param name="name"></param>
+		/// <param name="data"></param>
+		void set_global_input(String const& name, void const* const data);
+
+		void register_material(Material& material);
+		void unregister_material(Material& material);
 
 	public:
 		AssetType get_type() const override { return AssetType::Shader; }

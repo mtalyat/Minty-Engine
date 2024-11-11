@@ -57,5 +57,6 @@ namespace Minty
 	// TODO: update with correct IDs
 	constexpr Size DEFAULT_SPRITE_SHADER = 0xdef000000000000b;
 	constexpr Size DEFAULT_SPRITE_MATERIAL_TEMPLATE = 0xdef000000000000f;
+	constexpr Size DEFAULT_UI_MATERIAL_TEMPLATE = 0xdef0000000000011;
 	constexpr Size DEFAULT_TEXTURE = 0xdef0000000000000;
 }

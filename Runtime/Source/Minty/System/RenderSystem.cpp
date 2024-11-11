@@ -6,18 +6,12 @@
 #include "Minty/Component/AllComponents.h"
 #include "Minty/Core/Math.h"
 #include "Minty/Core/Pack.h"
+#include "Minty/Data/BatchFactory.h"
 #include "Minty/Entity/EntityRegistry.h"
 #include "Minty/Library/GLM.h"
 #include "Minty/Render/Renderer.h"
 
 using namespace Minty;
-
-struct SpriteBatch
-{
-	Ref<Material> material = nullptr;
-	Byte* data = nullptr;
-	Size count = 0;
-};
 
 void Minty::RenderSystem::update(Time const& time)
 {
@@ -37,6 +31,33 @@ void Minty::RenderSystem::update(Time const& time)
 		return;
 	}
 
+	update_camera();
+	update_3d();
+	// update 2d goes here
+	update_ui();
+}
+
+void Minty::RenderSystem::finalize()
+{
+	EntityRegistry& entityRegistry = get_entity_registry();
+
+	// update all dirty text
+	for (auto&& [entity, text] : entityRegistry.view<TextComponent>().each())
+	{
+		text.try_regenerate_mesh();
+	}
+}
+
+void Minty::RenderSystem::update_camera(CameraComponent const& camera, TransformComponent const& transform)
+{
+	Renderer::set_camera(transform.get_global_position(), transform.get_global_rotation(), camera.camera);
+}
+
+void Minty::RenderSystem::update_camera()
+{
+	// get camera transform
+	EntityRegistry& entityRegistry = get_entity_registry();
+
 	// update camera in renderer if it is enabled
 	if (entityRegistry.all_of<EnabledComponent>(m_camera))
 	{
@@ -54,6 +75,12 @@ void Minty::RenderSystem::update(Time const& time)
 			update_camera(camera, temp);
 		}
 	}
+}
+
+void Minty::RenderSystem::update_3d_meshes()
+{
+	// get camera transform
+	EntityRegistry& entityRegistry = get_entity_registry();
 
 	// draw all meshes
 	TransformComponent const* transformComponent;
@@ -103,35 +130,32 @@ void Minty::RenderSystem::update(Time const& time)
 		Renderer::bind_mesh(meshComp.mesh);
 		Renderer::draw(meshComp.mesh);
 	}
+}
+
+void Minty::RenderSystem::update_3d_sprites()
+{
+	// get camera transform
+	EntityRegistry& entityRegistry = get_entity_registry();
 
 	// draw all world sprites in the scene
 	auto spriteView = entityRegistry.view<RenderableComponent const, TransformComponent const, SpriteComponent const, EnabledComponent const>();
-	// pack them into a instance array
-	Size const instanceDataSize = sizeof(Float4) + sizeof(Float2) * 3 + sizeof(Float) + sizeof(Matrix4);
-#if defined(MINTY_DEBUG)
+
 	Size count = 0;
 	for (auto&& [entity, renderable, transform, sprite, enabled] : spriteView.each())
 	{
 		count += 1;
 	}
 
-	if (count != spriteView.size_hint())
-	{
-		MINTY_ERROR_FORMAT("Estimated sprite count ({}) is not the same as the actual sprite count ({}).", spriteView.size_hint(), count);
-	}
-#else
-	Size count = spriteView.size_hint();
-#endif // MINTY_DEBUG
-
 	// ignore if no sprites to draw
 	if (count)
 	{
-		Size offset = 0;
-		Size dataSize = count * instanceDataSize;
+		// pack them into a instance array
+		Size const dataSize = sizeof(Float4) + sizeof(Float2) * 3 + sizeof(Float) + sizeof(Matrix4);
+		Size const maxDataSize = count * dataSize;
 
-		std::vector<SpriteBatch> batches;
-		batches.reserve(10);
-		SpriteBatch batch{};
+		Ref<Material> material;
+
+		BatchFactory<1, Ref<Material>> batchFactory(maxDataSize);
 
 		for (auto const& [entity, renderable, transform, spriteComp, enabled] : spriteView.each())
 		{
@@ -143,19 +167,10 @@ void Minty::RenderSystem::update(Time const& time)
 				continue;
 			}
 
-			material = sprite->get_material();
-
-			// if a new material, queue up batch and reset
-			if (batch.material != material)
-			{
-				if (batch.material != nullptr)
-				{
-					batches.push_back(batch);
-				}
-				batch.material = sprite->get_material();
-				batch.data = new Byte[dataSize];
-				offset = 0;
-			}
+			// get the batch, based on the material
+			Ref<Texture> spriteTexture = sprite->get_texture();
+			material = Renderer::get_or_create_sprite_material(spriteTexture, Space::D3);
+			Batch<1, Ref<Material>>& batch = batchFactory.get_or_create_batch({ material });
 
 			Float4 instColor = spriteComp.color.toFloat4();
 			Float2 instOffset = sprite->get_offset();
@@ -168,59 +183,144 @@ void Minty::RenderSystem::update(Time const& time)
 			Float4 instTransform3 = transform.globalMatrix[3];
 
 			// pack all of the data into the instance array
-			pack_into(batch.data, offset, instColor);
-			pack_into(batch.data, offset, instOffset);
-			pack_into(batch.data, offset, instSize);
-			pack_into(batch.data, offset, instPivot);
-			pack_into(batch.data, offset, instScale);
-			pack_into(batch.data, offset, instTransform0);
-			pack_into(batch.data, offset, instTransform1);
-			pack_into(batch.data, offset, instTransform2);
-			pack_into(batch.data, offset, instTransform3);
+			DynamicContainer& batchContainer = batch.get_data_container();
+			batchContainer.append_object(instColor);
+			batchContainer.append_object(instOffset);
+			batchContainer.append_object(instSize);
+			batchContainer.append_object(instPivot);
+			batchContainer.append_object(instScale);
+			batchContainer.append_object(instTransform0);
+			batchContainer.append_object(instTransform1);
+			batchContainer.append_object(instTransform2);
+			batchContainer.append_object(instTransform3);
 
-			batch.count += 1;
-		}
-
-		// pack last batch into queue as long as it has data
-		if (batch.material != nullptr)
-		{
-			batches.push_back(batch);
+			// one more item stored inside the batch
+			batch.increment();
 		}
 
 		// render the batches
-		for (auto const& batch : batches)
+		for (auto const& batch : batchFactory)
 		{
 			// bind batch
-			Ref<MaterialTemplate> materialTemplate = batch.material->get_template();
+			Ref<Material> material = batch.get_object<Ref<Material>>(0);
+			Ref<MaterialTemplate> materialTemplate = material->get_template();
 			Ref<Shader> shader = materialTemplate->get_shader();
 			Renderer::bind_shader(shader);
-			Renderer::bind_material(batch.material);
+			Renderer::bind_material(material);
 
 			// update the instanced container with the data
-			m_instanceContainer.set(batch.data, batch.count * instanceDataSize);
-			Renderer::bind_vertex_buffer(m_instanceContainer.get_buffer());
+			m_3dSpriteInstanceContainer.set(batch.get_data(), batch.get_data_size());
+			Renderer::bind_vertex_buffer(m_3dSpriteInstanceContainer.get_buffer());
 
 			// draw the sprites
-			Renderer::draw_instances(static_cast<UInt>(batch.count), 6); // 6 vertices per sprite, generated in the shader
-
-			// delete data
-			delete[] batch.data;
+			Renderer::draw_instances(static_cast<UInt>(batch.get_count()), 6); // 6 vertices per sprite, generated in the shader
 		}
 	}
 }
 
-void Minty::RenderSystem::finalize()
+void Minty::RenderSystem::update_3d()
 {
-	//EntityRegistry& entityRegistry = get_entity_registry();
-
-	//// update all text if dirty
-	//for (auto&& [entity, text] : entityRegistry.view<TextComponent>().each())
-	//{
-	//	text.try_regenerate_mesh();
-	//}
+	update_3d_meshes();
+	update_3d_sprites();
 }
 
-void Minty::RenderSystem::update_camera(CameraComponent const& camera, TransformComponent const& transform)
+void Minty::RenderSystem::update_ui()
 {
-	Renderer::set_camera(transform.get_global_position(), transform.get_global_rotation(), camera.camera);
+	// get camera transform
+	EntityRegistry& entityRegistry = get_entity_registry();
+
+	// sort ui transforms so they render in the correct order, since z alone determines depth
+	entityRegistry.sort<UITransformComponent>([](UITransformComponent const& left, UITransformComponent const& right)
+		{
+			return left.z < right.z;
+		});
+
+	AssetType type = AssetType::None;
+	Ref<Material> material = nullptr;
+	Ref<Shader> shader = nullptr;
+	TextComponent* textComponent = nullptr;
+	SpriteComponent* spriteComponent = nullptr;
+
+	BatchFactory<2, Ref<Material>, Entity> batchFactory(256);
+
+	auto uiView = entityRegistry.view<UITransformComponent const, RenderableComponent const, EnabledComponent const>();
+	for (auto&& [entity, ui, renderable, enabled] : uiView.each())
+	{
+		if ((spriteComponent = entityRegistry.try_get<SpriteComponent>(entity)) && spriteComponent->sprite.get())
+		{
+			type = AssetType::Sprite;
+			Ref<Texture> spriteTexture = spriteComponent->sprite->get_texture();
+			material = Renderer::get_or_create_sprite_material(spriteTexture, Space::UI);
+		}
+		else if ((textComponent = entityRegistry.try_get<TextComponent>(entity)) && textComponent->fontVariant.get())
+		{
+			type = AssetType::Text;
+			material = textComponent->fontVariant->get_material();
+		}
+		else
+		{
+			// has UITransform but is not visible: missing Sprite or Text
+			continue;
+		}
+
+		MINTY_ASSERT(material != nullptr);
+		shader = material->get_template()->get_shader();
+		MINTY_ASSERT(shader != nullptr);
+
+		auto& batch = batchFactory.get_or_create_batch({ material, ui.canvas });
+		DynamicContainer& batchContainer = batch.get_data_container();
+
+		// update canvas data in new shader
+		if (batch.empty())
+		{
+			// update Canvas global constant
+			CanvasComponent* canvas = entityRegistry.try_get<CanvasComponent>(ui.canvas);
+			DynamicContainer canvasContainer(sizeof(Int) * 2);
+			if (canvas)
+			{
+				canvasContainer.append_object(canvas->referenceResolution.x);
+				canvasContainer.append_object(canvas->referenceResolution.y);
+			}
+			else
+			{
+				canvasContainer.append_object(0);
+				canvasContainer.append_object(0);
+			}
+			shader->set_global_input("canvas", canvasContainer.data());
+		}
+
+		// render mesh with font and font material
+		switch (type)
+		{
+		case AssetType::Sprite:
+			batchContainer.append_object(ui.globalRect.rect);
+			batchContainer.append_object(spriteComponent->sprite->get_uv());
+			batchContainer.append_object(spriteComponent->color.toFloat4());
+			break;
+		case AssetType::Text:
+			MINTY_TODO("Text rendering");
+			//draw_text(commandBuffer, ui, *textComponent);
+			break;
+		}
+
+		batch.increment();
+	}
+
+	// render each batch
+	for (auto const& batch : batchFactory)
+	{
+		// bind batch
+		Ref<Material> material = batch.get_object<Ref<Material>>(0);
+		Ref<MaterialTemplate> materialTemplate = material->get_template();
+		Ref<Shader> shader = materialTemplate->get_shader();
+		Renderer::bind_shader(shader);
+		Renderer::bind_material(material);
+
+		// update the instanced container with the data
+		m_uiSpriteInstanceContainer.set(batch.get_data(), batch.get_data_size());
+		Renderer::bind_vertex_buffer(m_uiSpriteInstanceContainer.get_buffer());
+
+		// draw the sprites
+		Renderer::draw_instances(static_cast<UInt>(batch.get_count()), 6); // 6 vertices per sprite, generated in the shader
+	}
 }

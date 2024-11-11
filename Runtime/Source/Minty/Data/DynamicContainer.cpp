@@ -13,26 +13,29 @@ Bool Minty::DynamicContainer::append(void const* const data, Size const size)
 	// if new size will surpass the capacity, double the capacity
 	Size newSize = m_size + size;
 
-	if (m_capacity)
+	if (newSize > m_capacity)
 	{
-		Size newCapacity;
-
-		// reserve double current capacity, or more if needed
-		if (newSize > (m_capacity << 1))
+		if (m_capacity)
 		{
-			newCapacity = newSize;
+			Size newCapacity;
+
+			// reserve double current capacity, or more if needed
+			if (newSize > (m_capacity << 1))
+			{
+				newCapacity = newSize;
+			}
+			else
+			{
+				newCapacity = m_capacity << 1;
+			}
+
+			reserve(newCapacity);
 		}
 		else
 		{
-			newCapacity = m_capacity << 1;
+			// no capacity yet, just allocate what is needed
+			reserve(newSize);
 		}
-
-		reserve(newCapacity);
-	}
-	else
-	{
-		// no capacity yet, just allocate what is needed
-		reserve(newSize);
 	}
 
 	Size index = m_size;

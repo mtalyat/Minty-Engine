@@ -24,14 +24,10 @@ namespace Minty
 		std::unordered_map<String, Cargo> m_values;
 
 	public:
-		Material(MaterialBuilder const& builder)
-			: Asset(builder.id)
-			, m_materialTemplate(builder.materialTemplate)
-			, m_values(builder.values)
-		{}
+		Material(MaterialBuilder const& builder);
 
 	public:
-		virtual ~Material() = default;
+		virtual ~Material();
 
 	public:
 		AssetType get_type() const override { return AssetType::Material; }
@@ -44,6 +40,8 @@ namespace Minty
 		std::unordered_map<String, Cargo> const& get_values() const { return m_values; }
 
 		virtual void set_input(String const& name, void const* const data) = 0;
+
+		Bool try_set_input(String const& name, void const* const data);
 
 	public:
 		static Owner<Material> create(const MaterialBuilder& builder = {});

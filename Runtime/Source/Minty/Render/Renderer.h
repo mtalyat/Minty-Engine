@@ -11,6 +11,7 @@
 #include "Minty/Render/RenderTarget.h"
 #include "Minty/Render/Scissor.h"
 #include "Minty/Render/Shader.h"
+#include "Minty/Render/Space.h"
 #include "Minty/Render/Sprite.h"
 #include "Minty/Render/Texture.h"
 #include "Minty/Render/Viewport.h"
@@ -75,7 +76,7 @@ namespace Minty
 
 		static Ref<Mesh> get_or_create_mesh(MeshType const type);
 
-		static Ref<Material> get_or_create_sprite_material(Ref<Texture> const spriteTexture);
+		static Ref<Material> get_or_create_sprite_material(Ref<Texture> const spriteTexture, Space const space);
 
 		static Owner<RenderTarget> create_render_target();
 

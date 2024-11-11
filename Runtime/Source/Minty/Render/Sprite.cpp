@@ -10,7 +10,6 @@ using namespace Minty;
 inline Minty::Sprite::Sprite(SpriteBuilder const& builder)
     : Asset(builder.id)
     , m_texture(builder.texture)
-    , m_material(Renderer::get_or_create_sprite_material(builder.texture))
     , m_coordinateMode(builder.coordinateMode)
     , m_offset()
     , m_size()

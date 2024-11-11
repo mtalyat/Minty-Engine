@@ -14,16 +14,24 @@ namespace Minty
 	class Texture
 		: public Asset
 	{
+	private:
+		Owner<Image> m_image;
+
 	protected:
-		Texture(UUID const id)
-			: Asset(id)
+		Texture(TextureBuilder const& builder)
+			: Asset(builder.id)
+			, m_image(builder.image)
 		{}
 
 	public:
 		virtual ~Texture() = default;
 
 	public:
-		virtual Ref<Image> get_image() const = 0;
+		Ref<Image> get_image() const { return m_image.create_ref(); }
+
+		UInt get_width() const { return m_image->get_width(); }
+
+		UInt get_height() const { return m_image->get_height(); }
 
 	public:
 		AssetType get_type() const override { return AssetType::Texture; }

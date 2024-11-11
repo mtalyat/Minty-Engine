@@ -198,6 +198,7 @@
     <ClInclude Include="Minty\Component\ScriptObjectComponent.h" />
     <ClInclude Include="Minty\Component\SpriteComponent.h" />
     <ClInclude Include="Minty\Component\TagComponent.h" />
+    <ClInclude Include="Minty\Component\TextComponent.h" />
     <ClInclude Include="Minty\Component\TransformComponent.h" />
     <ClInclude Include="Minty\Component\UITransformComponent.h" />
     <ClInclude Include="Minty\Core\Application.h" />
@@ -228,6 +229,8 @@
     <ClInclude Include="Minty\Core\UUID.h" />
     <ClInclude Include="Minty\Data\Array.h" />
     <ClInclude Include="Minty\Data\BaseContainer.h" />
+    <ClInclude Include="Minty\Data\Batch.h" />
+    <ClInclude Include="Minty\Data\BatchFactory.h" />
     <ClInclude Include="Minty\Data\Cargo.h" />
     <ClInclude Include="Minty\Data\ConstantContainer.h" />
     <ClInclude Include="Minty\Data\Container.h" />
@@ -264,6 +267,9 @@
     <ClInclude Include="Minty\Render\BufferContainer.h" />
     <ClInclude Include="Minty\Render\Camera.h" />
     <ClInclude Include="Minty\Render\CoordinateMode.h" />
+    <ClInclude Include="Minty\Render\Font.h" />
+    <ClInclude Include="Minty\Render\FontChar.h" />
+    <ClInclude Include="Minty\Render\FontVariant.h" />
     <ClInclude Include="Minty\Render\Format.h" />
     <ClInclude Include="Minty\Render\Image.h" />
     <ClInclude Include="Minty\Render\Material.h" />
@@ -275,6 +281,7 @@
     <ClInclude Include="Minty\Render\Scissor.h" />
     <ClInclude Include="Minty\Render\Shader.h" />
     <ClInclude Include="Minty\Render\ShaderModule.h" />
+    <ClInclude Include="Minty\Render\Space.h" />
     <ClInclude Include="Minty\Render\Sprite.h" />
     <ClInclude Include="Minty\Render\Surface.h" />
     <ClInclude Include="Minty\Render\Texture.h" />
@@ -366,10 +373,13 @@
     <ClCompile Include="Minty\Component\AnimatorComponent.cpp" />
     <ClCompile Include="Minty\Component\AudioSourceComponent.cpp" />
     <ClCompile Include="Minty\Component\CameraComponent.cpp" />
+    <ClCompile Include="Minty\Component\CanvasComponent.cpp" />
     <ClCompile Include="Minty\Component\RelationshipComponent.cpp" />
     <ClCompile Include="Minty\Component\ScriptComponent.cpp" />
     <ClCompile Include="Minty\Component\ScriptEventComponent.cpp" />
     <ClCompile Include="Minty\Component\SpriteComponent.cpp" />
+    <ClCompile Include="Minty\Component\TextComponent.cpp" />
+    <ClCompile Include="Minty\Component\UITransformComponent.cpp" />
     <ClCompile Include="Minty\Core\Application.cpp" />
     <ClCompile Include="Minty\Core\ArgumentParser.cpp" />
     <ClCompile Include="Minty\Core\Color.cpp" />
@@ -404,6 +414,8 @@
     <ClCompile Include="Minty\Render\Buffer.cpp" />
     <ClCompile Include="Minty\Render\BufferContainer.cpp" />
     <ClCompile Include="Minty\Render\Camera.cpp" />
+    <ClCompile Include="Minty\Render\Font.cpp" />
+    <ClCompile Include="Minty\Render\FontVariant.cpp" />
     <ClCompile Include="Minty\Render\Image.cpp" />
     <ClCompile Include="Minty\Render\Material.cpp" />
     <ClCompile Include="Minty\Render\MaterialTemplate.cpp" />

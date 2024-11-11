@@ -10,6 +10,10 @@ Assets
 	- "Defaults/ShaderModule/defaultSpriteModule.vert.spv"
 	- "Defaults/Shader/defaultSpriteShader.msha"
 	- "Defaults/MaterialTemplate/defaultSpriteMaterialTemplate.mmtp"
+	- "Defaults/ShaderModule/defaultUiModule.vert.spv"
+	- "Defaults/ShaderModule/defaultUiModule.frag.spv"
+	- "Defaults/Shader/defaultUiShader.msha"
+	- "Defaults/MaterialTemplate/defaultUiMaterialTemplate.mmtp"
 	- "Defaults/Sprite/defaultSprite.mspr"
 	- "Defaults/Sprite/defaultSpriteIcon.mspr"
 Systems
@@ -23,6 +27,25 @@ Entities
 		Camera
 			color: Black
 		Enabled
+	Canvas: 6fc41b54e9ade453
+		Canvas
+			resolution: (1920, 1080)
+		Enabled
+		Renderable
+	UI Test
+		UITransform
+			anchor: TopLeft
+			x: 0
+			y: 0
+			width: 1000
+			height: 1000
+		Sprite:
+			sprite: def0000000000001
+			color: White
+		Relationship
+			parent: 6fc41b54e9ade453
+		Enabled
+		Renderable
 	Sprite 0
 		Transform
 			position: (0, 0, 0)

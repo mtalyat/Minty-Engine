@@ -229,41 +229,41 @@ void Minty::Scene::finalize()
 		transform.globalMatrix = transform.get_local_matrix();
 	}
 
+	// update dirty UI transforms
+	auto uiView = mp_entityRegistry->view<DirtyComponent const, UITransformComponent, RelationshipComponent const>();
+	uiView.use<RelationshipComponent const>();
+	for (auto [entity, dirty, transform, relationship] : uiView.each())
+	{
+		// if parent, apply local to parent global for this global
+		// if no parent, set global to local
+		UITransformComponent* parentTransform = mp_entityRegistry->try_get<UITransformComponent>(relationship.parent);
+		if (parentTransform)
+		{
+			// parent exists, use its global rect
+			transform.update_global_rect(parentTransform->globalRect);
+		}
+		else if (CanvasComponent* canvas = mp_entityRegistry->try_get<CanvasComponent>(entity))
+		{
+			// entity is the canvas, use that
+			transform.update_global_rect(canvas->to_rect());
+		}
+		else
+		{
+			// no parent, not a canvas
+			// set to not draw
+			transform.globalRect = Rect();
+		}
+	}
+
 	Ref<Window> window = WindowManager::get_main();
-	//RectF windowRect(0, 0, window.get_frame_width(), window.get_frame_height());
+	Rect windowRect(0.0f, 0.0f, static_cast<Float>(window->get_frame_width()), static_cast<Float>(window->get_frame_height()));
 
-	//// update dirty UI transforms
-	//auto uiView = mp_entityRegistry->view<DirtyComponent const, UITransformComponent, RelationshipComponent const>();
-	//uiView.use<RelationshipComponent const>();
-	//for (auto [entity, dirty, transform, relationship] : uiView.each())
-	//{
-	//	// if parent, apply local to parent global for this global
-	//	// if no parent, set global to local
-	//	if (relationship.parent != NULL_ENTITY)
-	//	{
-	//		// parent
-	//		UITransformComponent& parentTransform = mp_entityRegistry->get<UITransformComponent>(relationship.parent);
-	//		transform.update_global_rect(parentTransform.globalRect);
-	//	}
-	//	else if (CanvasComponent* canvas = mp_entityRegistry->try_get<CanvasComponent>(entity))
-	//	{
-	//		// canvas
-	//		transform.update_global_rect(canvas->toRect());
-	//	}
-	//	else
-	//	{
-	//		// no parent, not a canvas
-	//		// set to not draw
-	//		transform.globalRect = RectF();
-	//	}
-	//}
-
-	//// update dirty UI transform group with no relationships
-	//for (auto [entity, dirty, transform] : mp_entityRegistry->view<DirtyComponent const, UITransformComponent>(entt::exclude<RelationshipComponent>).each())
-	//{
-	//	// no parent, set to self matrix
-	//	transform.update_global_rect(windowRect);
-	//}
+	// update dirty UI transform group with no relationships
+	for (auto [entity, dirty, transform] : mp_entityRegistry->view<DirtyComponent const, UITransformComponent>(entt::exclude<RelationshipComponent>).each())
+	{
+		// no parent, set to self matrix
+		transform.update_global_rect(windowRect);
+	}
 
 	// remove all dirty tags
 	mp_entityRegistry->clear<DirtyComponent>();

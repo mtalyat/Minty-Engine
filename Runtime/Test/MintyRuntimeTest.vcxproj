@@ -123,6 +123,7 @@ xcopy /y /s /e /i "$(ProjectDir)..\..\Libraries\mono\lib\$(Configuration)" "$(Ta
 xcopy /y /s /e /i "$(ProjectDir)..\..\Libraries\mono\etc" "$(TargetDir)mono\etc"
 pushd $(ProjectDir)
 cmd /k build_assets.bat $(Configuration)
+if %errorlevel% neq 0 exit /b %errorlevel%
 popd</Command>
     </PostBuildEvent>
   </ItemDefinitionGroup>

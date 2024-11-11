@@ -19,5 +19,6 @@
 #include "ScriptObjectComponent.h"
 #include "SpriteComponent.h"
 #include "TagComponent.h"
+#include "TextComponent.h"
 #include "TransformComponent.h"
 #include "UITransformComponent.h"

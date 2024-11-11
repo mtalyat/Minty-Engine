@@ -25,7 +25,6 @@ namespace Minty
 	{
 	private:
 		Ref<Texture> m_texture;
-		Ref<Material> m_material;
 		CoordinateMode m_coordinateMode;
 		// store offset, size, pivot as normalized, since that is what the shaders use
 		Float2 m_offset;
@@ -41,8 +40,6 @@ namespace Minty
 
 	public:
 		Ref<Texture> get_texture() const { return m_texture; }
-
-		Ref<Material> get_material() const { return m_material; }
 
 		CoordinateMode get_coordinate_mode() const { return m_coordinateMode; }
 
@@ -63,6 +60,8 @@ namespace Minty
 		void set_pixels_per_unit(Float const ppu);
 
 		Float get_scale() const { return m_scale; }
+
+		inline Float4 get_uv() const { return Float4(m_offset, m_size); }
 
 	public:
 		AssetType get_type() const override { return AssetType::Sprite; }

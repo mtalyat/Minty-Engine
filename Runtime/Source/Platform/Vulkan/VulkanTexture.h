@@ -10,7 +10,6 @@ namespace Minty
 		: public Texture
 	{
 	private:
-		Owner<VulkanImage> m_image;
 		VkSampler m_sampler;
 
 	public:
@@ -18,9 +17,7 @@ namespace Minty
 		~VulkanTexture();
 
 	public:
-		Ref<Image> get_image() const override { return m_image.create_ref(); }
-
-		VkImageView get_view() const { return m_image->get_view(); }
+		VkImageView get_view() const { return static_cast<Ref<VulkanImage>>(get_image())->get_view(); }
 
 		VkSampler get_sampler() const { return m_sampler; }
 	};

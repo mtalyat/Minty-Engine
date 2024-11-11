@@ -582,6 +582,27 @@
     <ClInclude Include="Minty\Render\CoordinateMode.h">
       <Filter>Header Files\Minty\Render</Filter>
     </ClInclude>
+    <ClInclude Include="Minty\Component\TextComponent.h">
+      <Filter>Header Files\Minty\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Render\Font.h">
+      <Filter>Header Files\Minty\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Render\FontChar.h">
+      <Filter>Header Files\Minty\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Render\FontVariant.h">
+      <Filter>Header Files\Minty\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Data\Batch.h">
+      <Filter>Header Files\Minty\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Data\BatchFactory.h">
+      <Filter>Header Files\Minty\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Render\Space.h">
+      <Filter>Header Files\Minty\Render</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -960,6 +981,21 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Minty\Component\SpriteComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Render\FontVariant.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Render\Font.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Component\TextComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Component\UITransformComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Component\CanvasComponent.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

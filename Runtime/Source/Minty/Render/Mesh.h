@@ -52,7 +52,7 @@ namespace Minty
 		UUID id = {};
 
 		// the type of mesh
-		MeshType type = MeshType::Empty;
+		MeshType type = MeshType::Custom;
 
 		void* vertexData = nullptr;	// pointer to data
 		UInt vertexCount = 0;				// number of vertices
