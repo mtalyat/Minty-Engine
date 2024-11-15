@@ -1,5 +1,6 @@
-	enum class CoordinateMode
+	enum class Space
 	{
-		Normalized,
-		Pixel
+		D3,
+		D2,
+		UI
 	};

@@ -23,7 +23,11 @@ MINTY_ASSERT_FORMAT(exists(path), "Asset path does not exist: \"{}\"", (path).ge
 MINTY_ASSERT_FORMAT(exists(Asset::get_meta_path(path)), "Asset meta path does not exist: \"{}\"", Asset::get_meta_path(path).generic_string());
 
 AssetMode Minty::AssetManager::s_mode = {};
+#if defined(MINTY_DEBUG)
+Bool Minty::AssetManager::s_savePaths = true;
+#else
 Bool Minty::AssetManager::s_savePaths = false;
+#endif // MINTY_DEBUG
 std::unordered_map<UUID, AssetManager::AssetData> Minty::AssetManager::s_assets = {};
 std::unordered_map<AssetType, std::unordered_set<Ref<Asset>>> Minty::AssetManager::s_assetsByType = {};
 Wrapper Minty::AssetManager::s_wrapper = {};
@@ -143,6 +147,10 @@ Ref<Asset> Minty::AssetManager::load_asset(const Path& path)
 		return load_material(path);
 	case AssetType::MaterialTemplate:
 		return load_material_template(path);
+	case AssetType::Font:
+		return load_font(path);
+	case AssetType::FontVariant:
+		return load_font_variant(path);
 	case AssetType::Scene:
 		return load_scene(path);
 	case AssetType::Shader:
@@ -453,6 +461,199 @@ Ref<Animator> Minty::AssetManager::load_animator(const Path& path)
 	return create_existing<Animator>(path, builder);
 }
 
+Ref<Font> Minty::AssetManager::load_font(Path const& path)
+{
+	// read font file
+	MINTY_ASSERT_ASSET_PATH(path);
+
+	FontBuilder builder{};
+	builder.id = read_id(path);
+
+	Container* container;
+	Reader* reader;
+	open_reader(path, container, reader);
+
+	reader->read("Name", builder.name);
+
+	// read variants
+	std::vector<UUID> variantIds;
+	if (reader->read("Variants", variantIds))
+	{
+		for (UUID const id : variantIds)
+		{
+			if (!contains(id))
+			{
+				MINTY_ERROR_FORMAT("Unable to find FontVariant with id \"{}\".", to_string(id));
+				continue;
+			}
+
+			builder.variants.push_back(get<FontVariant>(id));
+		}
+	}
+
+	close_reader(container, reader);
+
+	return create_existing<Font>(path, builder);
+}
+
+Ref<FontVariant> Minty::AssetManager::load_font_variant(Path const& path)
+{
+	MINTY_ASSERT_ASSET_PATH(path);
+
+	FontVariantBuilder builder{};
+
+	// open meta as normal file
+	Path metaPath = Asset::get_meta_path(path);
+
+	Container* container = nullptr;
+	Reader* reader = nullptr;
+	if (open_reader(metaPath, container, reader))
+	{
+		// read ID
+		Node const& root = reader->get_current_node();
+		String rootDataString = root.get_data_as_string();
+		builder.id = Parse::to_uuid(rootDataString);
+
+		close_reader(container, reader);
+	}
+
+	// read fnt file
+	std::vector<String> lines = read_file_lines(path);
+	Float widthScale = 1.0f;
+	Float heightScale = 1.0f;
+	for (String const& line : lines)
+	{
+		// split by tabs
+		std::vector<String> parts = split_words(line);
+
+		// determine what to do based on first word in line
+		if (line.starts_with("char "))
+		{
+			FontChar fontChar{};
+
+			for (String const& part : parts)
+			{
+				if (part.starts_with("id="))
+				{
+					fontChar.id = Parse::to_char(part.substr(3, part.length() - 3));
+				}
+				else if (part.starts_with("x="))
+				{
+					fontChar.x = Parse::to_int(part.substr(2, part.length() - 2)) * widthScale;
+				}
+				else if (part.starts_with("y="))
+				{
+					fontChar.y = Parse::to_int(part.substr(2, part.length() - 2)) * heightScale;
+				}
+				else if (part.starts_with("width="))
+				{
+					fontChar.width = Parse::to_int(part.substr(6, part.length() - 6)) * widthScale;
+				}
+				else if (part.starts_with("height="))
+				{
+					fontChar.height = Parse::to_int(part.substr(7, part.length() - 7)) * heightScale;
+				}
+				else if (part.starts_with("xoffset="))
+				{
+					fontChar.xOffset = Parse::to_int(part.substr(8, part.length() - 8)) * widthScale;
+				}
+				else if (part.starts_with("yoffset="))
+				{
+					fontChar.yOffset = Parse::to_int(part.substr(8, part.length() - 8)) * heightScale;
+				}
+				else if (part.starts_with("xadvance="))
+				{
+					fontChar.xAdvance = Parse::to_int(part.substr(9, part.length() - 9)) * widthScale;
+				}
+			}
+
+			builder.characters.push_back(fontChar);
+		}
+		else if (line.starts_with("kerning "))
+		{
+			int first = 0;
+			int second = 0;
+			float amount = 0;
+			for (String const& part : parts)
+			{
+				if (part.starts_with("first="))
+				{
+					first = Parse::to_int(part.substr(6, part.length() - 6));
+				}
+				else if (part.starts_with("second="))
+				{
+					second = Parse::to_int(part.substr(7, part.length() - 7));
+				}
+				else if (part.starts_with("amount="))
+				{
+					amount = Parse::to_int(part.substr(7, part.length() - 7)) * widthScale;
+				}
+			}
+
+			// pack kerning into builder
+			builder.kernings.emplace(FontVariant::compact_kerning(first, second), amount);
+		}
+		else if (line.starts_with("info "))
+		{
+			for (String const& part : parts)
+			{
+				if (part.starts_with("size="))
+				{
+					builder.size = Parse::to_uint(part.substr(5, part.length() - 5));
+				}
+				else if (part.starts_with("bold="))
+				{
+					builder.bold = static_cast<bool>(Parse::to_int(part.substr(5, part.length() - 5)));
+				}
+				else if (part.starts_with("italic="))
+				{
+					builder.italic = static_cast<bool>(Parse::to_int(part.substr(7, part.length() - 7)));
+				}
+			}
+		}
+		else if (line.starts_with("common "))
+		{
+			for (String const& part : parts)
+			{
+				if (part.starts_with("lineHeight="))
+				{
+					builder.lineHeight = static_cast<float>(Parse::to_int(part.substr(11, part.length() - 11)));
+				}
+			}
+		}
+		else if (line.starts_with("page "))
+		{
+			// textures to load
+			Path directoryPath = path.parent_path();
+			std::vector<void*> dependencyTextures;
+
+			for (String const& part : parts)
+			{
+				if (part.starts_with("file="))
+				{
+					// ignore " "
+					String name = part.substr(6, part.length() - 7);
+					UUID textureId = read_id(directoryPath / name);
+					builder.texture = get<Texture>(textureId);
+					dependencyTextures.push_back(builder.texture.get());
+				}
+			}
+
+			//CHECK_DEPENDENCIES(path.stem().string(), dependencyTextures);
+
+			if (builder.texture == nullptr || !builder.texture->get_width() || !builder.texture->get_height())
+			{
+				break;
+			}
+
+			widthScale = 1.0f / builder.texture->get_width();
+			heightScale = 1.0f / builder.texture->get_height();
+		}
+	}
+
+	return create_existing<FontVariant>(path, builder);
+}
+
 Owner<Image> Minty::AssetManager::load_image(const Path& path)
 {
 	MINTY_ASSERT_ASSET_PATH(path);
@@ -493,7 +694,7 @@ Bool Minty::AssetManager::load_values(Reader& reader, std::unordered_map<String,
 	{
 		reader.read_name(i, inputName);
 
-		MINTY_ASSERT_FORMAT(shader->has_input(inputName), "Shader does not have an input with the name \"{}\".", inputName);
+		MINTY_ASSERT_FORMAT(shader->has_input(inputName), "Shader does not have an input with the name \"{}\". Shader: \"{}\". Asset: \"{}\".", inputName, get_path(shader->id()).generic_string(), path.generic_string());
 
 		// reference input from shader settings, to ensure this matches shader
 		ShaderInput const& input = shader->get_input(inputName);
@@ -514,7 +715,93 @@ Bool Minty::AssetManager::load_values(Reader& reader, std::unordered_map<String,
 
 			// if pointer: get asset
 			// if not: read directly
-			if (slot.type == Type::Asset)
+			switch (slot.type)
+			{
+			case Type::Bool:
+				reader.read_to_container<Bool>(j, slot.container);
+				break;
+			case Type::Bool2:
+				reader.read_to_container<Bool2>(j, slot.container);
+				break;
+			case Type::Bool3:
+				reader.read_to_container<Bool3>(j, slot.container);
+				break;
+			case Type::Bool4:
+				reader.read_to_container<Bool4>(j, slot.container);
+				break;
+			case Type::Char:
+				reader.read_to_container<Char>(j, slot.container);
+				break;
+			case Type::Byte:
+				reader.read_to_container<Byte>(j, slot.container);
+				break;
+			case Type::Short:
+				reader.read_to_container<Short>(j, slot.container);
+				break;
+			case Type::UShort:
+				reader.read_to_container<UShort>(j, slot.container);
+				break;
+			case Type::Int:
+				reader.read_to_container<Int>(j, slot.container);
+				break;
+			case Type::Int2:
+				reader.read_to_container<Int2>(j, slot.container);
+				break;
+			case Type::Int3:
+				reader.read_to_container<Int3>(j, slot.container);
+				break;
+			case Type::Int4:
+				reader.read_to_container<Int4>(j, slot.container);
+				break;
+			case Type::UInt:
+				reader.read_to_container<UInt>(j, slot.container);
+				break;
+			case Type::UInt2:
+				reader.read_to_container<UInt2>(j, slot.container);
+				break;
+			case Type::UInt3:
+				reader.read_to_container<UInt3>(j, slot.container);
+				break;
+			case Type::UInt4:
+				reader.read_to_container<UInt4>(j, slot.container);
+				break;
+			case Type::Long:
+				reader.read_to_container<Long>(j, slot.container);
+				break;
+			case Type::ULong:
+				reader.read_to_container<ULong>(j, slot.container);
+				break;
+			case Type::Size:
+				reader.read_to_container<Size>(j, slot.container);
+				break;
+			case Type::Float:
+				reader.read_to_container<Float>(j, slot.container);
+				break;
+			case Type::Float2:
+				reader.read_to_container<Float2>(j, slot.container);
+				break;
+			case Type::Float3:
+				reader.read_to_container<Float3>(j, slot.container);
+				break;
+			case Type::Float4:
+				reader.read_to_container<Float4>(j, slot.container);
+				break;
+			case Type::Double:
+				reader.read_to_container<Double>(j, slot.container);
+				break;
+			case Type::Matrix2:
+				reader.read_to_container<Matrix2>(j, slot.container);
+				break;
+			case Type::Matrix3:
+				reader.read_to_container<Matrix3>(j, slot.container);
+				break;
+			case Type::Matrix4:
+				reader.read_to_container<Matrix4>(j, slot.container);
+				break;
+			case Type::Quaternion:
+				reader.read_to_container<Quaternion>(j, slot.container);
+				break;
+			case Type::Asset:
 			{
 				// read ID, then get asset ref, copy pointer to container
 				Ref<Asset> asset{};
@@ -524,11 +811,13 @@ Bool Minty::AssetManager::load_values(Reader& reader, std::unordered_map<String,
 				}
 				Asset* assetPtr = asset.get();
 				slot.container.set(&assetPtr, sizeof(assetPtr));
+				break;
 			}
-			else
-			{
-				// read value directly into container
-				reader.read_to_container(j, slot.container, slot.type);
+			case Type::UUID:
+				reader.read_to_container<UUID>(j, slot.container);
+				break;
+			default:
+				MINTY_ABORT_FORMAT("Failed to load value with type \"{}\". Functionality not yet implemented.", to_string(slot.type));
 			}
 		}
 
@@ -591,7 +880,7 @@ Ref<MaterialTemplate> Minty::AssetManager::load_material_template(Path const& pa
 
 		if (reader->indent("Values"))
 		{
-			if (!load_values(*reader, builder.values, builder.shader, "MaterialTemplate"))
+			if (!load_values(*reader, builder.values, builder.shader, path))
 			{
 				close_reader(container, reader);
 				return Ref<MaterialTemplate>();

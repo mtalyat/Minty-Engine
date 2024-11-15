@@ -169,7 +169,7 @@ void Minty::RenderSystem::update_3d_sprites()
 
 			// get the batch, based on the material
 			Ref<Texture> spriteTexture = sprite->get_texture();
-			material = Renderer::get_or_create_sprite_material(spriteTexture, Space::D3);
+			material = Renderer::get_or_create_default_material(spriteTexture, AssetType::Sprite, Space::D3);
 			Batch<1, Ref<Material>>& batch = batchFactory.get_or_create_batch({ material });
 
 			Float4 instColor = spriteComp.color.toFloat4();
@@ -228,44 +228,17 @@ void Minty::RenderSystem::update_3d()
 	update_3d_sprites();
 }
 
-void Minty::RenderSystem::update_ui()
+void Minty::RenderSystem::update_ui_sprites()
 {
-	// get camera transform
 	EntityRegistry& entityRegistry = get_entity_registry();
 
-	// sort ui transforms so they render in the correct order, since z alone determines depth
-	entityRegistry.sort<UITransformComponent>([](UITransformComponent const& left, UITransformComponent const& right)
-		{
-			return left.z < right.z;
-		});
-
-	AssetType type = AssetType::None;
 	Ref<Material> material = nullptr;
 	Ref<Shader> shader = nullptr;
-	TextComponent* textComponent = nullptr;
-	SpriteComponent* spriteComponent = nullptr;
-
 	BatchFactory<2, Ref<Material>, Entity> batchFactory(256);
 
-	auto uiView = entityRegistry.view<UITransformComponent const, RenderableComponent const, EnabledComponent const>();
-	for (auto&& [entity, ui, renderable, enabled] : uiView.each())
+	for (auto const& [entity, ui, renderable, enabled, spriteComp] : entityRegistry.view<UITransformComponent const, RenderableComponent const, EnabledComponent const, SpriteComponent const>().each())
 	{
-		if ((spriteComponent = entityRegistry.try_get<SpriteComponent>(entity)) && spriteComponent->sprite.get())
-		{
-			type = AssetType::Sprite;
-			Ref<Texture> spriteTexture = spriteComponent->sprite->get_texture();
-			material = Renderer::get_or_create_sprite_material(spriteTexture, Space::UI);
-		}
-		else if ((textComponent = entityRegistry.try_get<TextComponent>(entity)) && textComponent->fontVariant.get())
-		{
-			type = AssetType::Text;
-			material = textComponent->fontVariant->get_material();
-		}
-		else
-		{
-			// has UITransform but is not visible: missing Sprite or Text
-			continue;
-		}
+		material = Renderer::get_or_create_default_material(spriteComp.sprite->get_texture(), AssetType::Sprite, Space::UI);
 
 		MINTY_ASSERT(material != nullptr);
 		shader = material->get_template()->get_shader();
@@ -293,19 +266,9 @@ void Minty::RenderSystem::update_ui()
 			shader->set_global_input("canvas", canvasContainer.data());
 		}
 
-		// render mesh with font and font material
-		switch (type)
-		{
-		case AssetType::Sprite:
-			batchContainer.append_object(ui.globalRect.rect);
-			batchContainer.append_object(spriteComponent->sprite->get_uv());
-			batchContainer.append_object(spriteComponent->color.toFloat4());
-			break;
-		case AssetType::Text:
-			MINTY_TODO("Text rendering");
-			//draw_text(commandBuffer, ui, *textComponent);
-			break;
-		}
+		batchContainer.append_object(ui.globalRect.rect);
+		batchContainer.append_object(spriteComp.sprite->get_uv());
+		batchContainer.append_object(spriteComp.color.toFloat4());
 
 		batch.increment();
 	}
@@ -331,4 +294,62 @@ void Minty::RenderSystem::update_ui()
 
 		index++;
 	}
+}
+
+void Minty::RenderSystem::update_ui_text()
+{
+	EntityRegistry& entityRegistry = get_entity_registry();
+
+	Ref<Material> material = nullptr;
+	Ref<Shader> shader = nullptr;
+
+	BatchFactory<2, Ref<Material>, Entity> batchFactory(256);
+
+	Byte pushData[sizeof(Float4) * 2];
+	Size pushDataOffset;
+
+	for (auto&& [entity, ui, renderable, enabled, textComp] : entityRegistry.view<UITransformComponent const, RenderableComponent const, EnabledComponent const, TextComponent const>().each())
+	{
+		// skip if null font or no mesh
+		if (textComp.font == nullptr || textComp.fontVariant == nullptr || textComp.mesh == nullptr)
+		{
+			continue;
+		}
+
+		material = textComp.fontVariant->get_material();
+
+		MINTY_ASSERT(material != nullptr);
+		shader = material->get_template()->get_shader();
+		MINTY_ASSERT(shader != nullptr);
+
+		// update push constant info
+		pushDataOffset = 0;
+		pack_into<Float4>(pushData, pushDataOffset, ui.globalRect.rect);
+		pack_into<Float4>(pushData, pushDataOffset, textComp.color.toFloat4());
+		material->set_input("push", pushData);
+
+		// bind shader and material
+		Renderer::bind_shader(shader);
+		Renderer::bind_material(material);
+
+		// bind mesh
+		Renderer::bind_mesh(textComp.mesh);
+
+		// draw the mesh
+		Renderer::draw(textComp.mesh);
+	}
+}
+
+void Minty::RenderSystem::update_ui()
+{
+	EntityRegistry& entityRegistry = get_entity_registry();
+
+	// sort ui transforms so they render in the correct order, since z alone determines depth
+	entityRegistry.sort<UITransformComponent>([](UITransformComponent const& left, UITransformComponent const& right)
+		{
+			return left.z < right.z;
+		});
+
+	update_ui_sprites();
+	update_ui_text();
 }

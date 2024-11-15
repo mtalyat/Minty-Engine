@@ -139,19 +139,23 @@ namespace Minty
 		Bool read(Size const index, void* const data, Type const type) const;
 		Bool read(String const& name, void* const data, Type const type) const;
 
-		Bool read_to_container(Size const index, Container& container, Type const type)
+		template<typename T>
+		Bool read_to_container(Size const index, Container& container)
 		{
-			MINTY_ASSERT_MESSAGE(container.size() >= sizeof_type(type), "Cannot read to container. It is too small.");
+			container.resize(sizeof(T));
 
-			TypeID typeId = typeid_type(type);
-			return read(index, *static_cast<decltype(typeId)*>(container.data()));
+			MINTY_ASSERT_MESSAGE(container.size() >= sizeof(T), "Cannot read to container. It is too small.");
+
+			return read(index, *static_cast<T*>(container.data()));
 		}
-		Bool read_to_container(String const& name, Container& container, Type const type)
+		template<typename T>
+		Bool read_to_container(String const& name, Container& container)
 		{
-			MINTY_ASSERT_MESSAGE(container.size() >= sizeof_type(type), "Cannot read to container. It is too small.");
+			container.resize(sizeof(T));
 
-			TypeID typeId = typeid_type(type);
-			return read(name, *static_cast<decltype(typeId)*>(container.data()));
+			MINTY_ASSERT_MESSAGE(container.size() >= sizeof(T), "Cannot read to container. It is too small.");
+
+			return read(name, *static_cast<T*>(container.data()));
 		}
 
 	public:

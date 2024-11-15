@@ -3,12 +3,13 @@
 ====================
 
 template<>
-inline String to_string(CoordinateMode const& obj)
+inline String to_string(Space const& obj)
 {
 	switch (obj)
 	{
-		case CoordinateMode::Normalized: return "Normalized";
-		case CoordinateMode::Pixel: return "Pixel";
+		case Space::D3: return "D3";
+		case Space::D2: return "D2";
+		case Space::UI: return "UI";
 
 		default: return "";
 	}
@@ -18,36 +19,37 @@ inline String to_string(CoordinateMode const& obj)
 	Parse.h
 ====================
 
-CoordinateMode to_coordinate_mode(String const& string);
-Bool try_coordinate_mode(String const& string, CoordinateMode& value);
+Space to_space(String const& string);
+Bool try_space(String const& string, Space& value);
 
 template<>
-inline void parse_to(String const& string, CoordinateMode& value)
+inline void parse_to(String const& string, Space& value)
 {
-    value = to_coordinate_mode(string);
+    value = to_space(string);
 }
 
 template<>
-inline Bool parse_try(String const& string, CoordinateMode& value)
+inline Bool parse_try(String const& string, Space& value)
 {
-    return try_coordinate_mode(string, value);
+    return try_space(string, value);
 }
 
 ====================
 	Parse.cpp
 ====================
 
-CoordinateMode Minty::Parse::to_coordinate_mode(String const& string)
+Space Minty::Parse::to_space(String const& string)
 {
-	if (string == "Normalized") return CoordinateMode::Normalized;
-	if (string == "Pixel") return CoordinateMode::Pixel;
+	if (string == "D3") return Space::D3;
+	if (string == "D2") return Space::D2;
+	if (string == "UI") return Space::UI;
 
-	return CoordinateMode();
+	return Space();
 }
 
-Bool Minty::Parse::try_coordinate_mode(String const& string, CoordinateMode& value)
+Bool Minty::Parse::try_space(String const& string, Space& value)
 {
-	value = to_coordinate_mode(string);
-	return value != CoordinateMode();
+	value = to_space(string);
+	return value != Space();
 }
 

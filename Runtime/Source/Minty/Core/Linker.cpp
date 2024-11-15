@@ -34,7 +34,7 @@ void Minty::Linker::link()
 	register_component<RenderableComponent>(MINTY_NAME_ENGINE, "Renderable", true);
 	register_component<ScriptComponent>(MINTY_NAME_ENGINE, "Script", true);
 	register_component<SpriteComponent>(MINTY_NAME_ENGINE, "Sprite", true);
-	//register_component<TextComponent>(MINTY_NAME_ENGINE, "Text", true);
+	register_component<TextComponent>(MINTY_NAME_ENGINE, "Text", true);
 	register_component<TagComponent>(MINTY_NAME_ENGINE, "Tag", true);
 	register_component<TransformComponent>(MINTY_NAME_ENGINE, "Transform", true);
 	register_component<UITransformComponent>(MINTY_NAME_ENGINE, "UITransform", true);

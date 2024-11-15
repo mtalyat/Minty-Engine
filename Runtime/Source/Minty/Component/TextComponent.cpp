@@ -155,11 +155,11 @@ void Minty::TextComponent::generate_mesh()
 
 		// create indices, always in the same order
 		indices.append_object(index);
-		indices.append_object(index + 1);
-		indices.append_object(index + 2);
+		indices.append_object(static_cast<UShort>(index + 1));
+		indices.append_object(static_cast<UShort>(index + 2));
 		indices.append_object(index);
-		indices.append_object(index + 2);
-		indices.append_object(index + 3);
+		indices.append_object(static_cast<UShort>(index + 2));
+		indices.append_object(static_cast<UShort>(index + 3));
 
 		index += 4;
 
@@ -170,13 +170,17 @@ void Minty::TextComponent::generate_mesh()
 		last = c;
 	}
 
+	UInt vertexCount = index;
+	UInt indexCount = (index * 3) >> 1; // 6 indices for every 4 vertices (simplified to *3 and /2)
+
 	// create the new mesh
+	MINTY_LOG_FORMAT("TEXT GENERATED. Text = \"{}\", Vertex Count = {}, Index Count = {}.", text, vertexCount, indexCount);
 	MeshBuilder builder{};
 	builder.id = UUID::create();
-	builder.vertexCount = index;
+	builder.vertexCount = vertexCount;
 	builder.vertexData = vertices.data();
 	builder.vertexStride = sizeof(Float2) * 2;
-	builder.indexCount = (index * 3) >> 2; // 6 indices for every 4 vertices
+	builder.indexCount = indexCount;
 	builder.indexData = indices.data();
 	builder.indexStride = sizeof(UShort);
 	mesh = AssetManager::create<Mesh>(builder);

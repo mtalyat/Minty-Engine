@@ -36,7 +36,7 @@ namespace Minty
 		static Ref<RenderTarget> s_renderTarget;
 
 		static std::unordered_map<MeshType, Ref<Mesh>> s_defaultMeshes;
-		static std::unordered_map <UUID, Ref<Material>> s_spriteMaterials;
+		static std::unordered_map <UInt, Ref<Material>> s_defaultMaterials;
 
 		static Ref<Shader> s_boundShader;
 		static Ref<Material> s_boundMaterial;
@@ -76,7 +76,11 @@ namespace Minty
 
 		static Ref<Mesh> get_or_create_mesh(MeshType const type);
 
-		static Ref<Material> get_or_create_sprite_material(Ref<Texture> const spriteTexture, Space const space);
+	private:
+		static UInt get_default_material_id(AssetType const type, Space const space);
+
+	public:
+		static Ref<Material> get_or_create_default_material(Ref<Texture> const texture, AssetType const type, Space const space);
 
 		static Owner<RenderTarget> create_render_target();
 

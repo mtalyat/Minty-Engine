@@ -1,17 +1,36 @@
-push: object
-    stageFlags: VERTEX_BIT
-    offset: 0
-    size: 48
-uniform: canvas
-    type: UNIFORM_BUFFER
-    stageFlags: VERTEX_BIT
-    set: 0
-    binding: 0
-    size: 16
-uniform: texture
-    type: COMBINED_IMAGE_SAMPLER
-    stageFlags: FRAGMENT_BIT
-    set: 2
-    binding: 0
-    count: 1
-    size: 8
+Inputs
+    push
+        Type: PushConstant
+        Stage: Vertex
+        Structure
+            position: Float4
+            color: Float4
+    canvas
+        Type: UniformBuffer
+        Stage: Vertex
+        Set: 0
+        Binding: 0
+        Frequent: true
+        Structure
+            width: Int
+            height: Int
+    texture
+        Type: CombinedImageSampler
+        Stage: Fragment
+        Set: 0
+        Binding: 1
+        Frequent: false
+        Structure
+            texSampler: Asset
+PrimitiveTopology: TriangleList
+PolygonMode: Fill
+CullMode: None
+FrontFace: Clockwise
+LineWidth: 1
+Bindings
+    0: Vertex
+        0: Float2
+        1: Float2
+Stages
+    Vertex: def0000000000007
+    Fragment: def0000000000006

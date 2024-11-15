@@ -47,3 +47,8 @@ std::vector<Ref<FontVariant>> Minty::Font::get_variants() const
 
 	return results;
 }
+
+Owner<Font> Minty::Font::create(FontBuilder const& builder)
+{
+	return Owner<Font>(builder);
+}

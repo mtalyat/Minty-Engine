@@ -13,7 +13,7 @@ Ref<Window> Minty::Renderer::s_window = nullptr;
 Color Minty::Renderer::s_color = Color::black();
 Ref<RenderTarget> Minty::Renderer::s_renderTarget = nullptr;
 std::unordered_map<MeshType, Ref<Mesh>> Minty::Renderer::s_defaultMeshes = {};
-std::unordered_map <UUID, Ref<Material>> Minty::Renderer::s_spriteMaterials = {};
+std::unordered_map <UInt, Ref<Material>> Minty::Renderer::s_defaultMaterials = {};
 Ref<Shader> Minty::Renderer::s_boundShader = nullptr;
 Ref<Material> Minty::Renderer::s_boundMaterial = nullptr;
 Ref<Mesh> Minty::Renderer::s_boundMesh = nullptr;
@@ -187,49 +187,76 @@ Ref<Mesh> Minty::Renderer::get_or_create_mesh(MeshType const type)
 	return mesh;
 }
 
-Ref<Material> Minty::Renderer::get_or_create_sprite_material(Ref<Texture> const spriteTexture, Space const space)
+UInt Minty::Renderer::get_default_material_id(AssetType const type, Space const space)
 {
-	MINTY_ASSERT_MESSAGE(spriteTexture != nullptr, "Cannot get or create a Material for a null Sprite Texture.");
+	return (static_cast<UShort>(type) << (sizeof(UShort) << 3)) | static_cast<UShort>(space);
+}
 
-	auto found = s_spriteMaterials.find(spriteTexture->id());
+Ref<Material> Minty::Renderer::get_or_create_default_material(Ref<Texture> const texture, AssetType const type, Space const space)
+{
+	MINTY_ASSERT_MESSAGE(texture != nullptr, "Cannot get or create a Material for a null Sprite Texture.");
 
-	if (found == s_spriteMaterials.end())
+	UInt id = get_default_material_id(type, space);
+
+	auto found = s_defaultMaterials.find(id);
+
+	if (found == s_defaultMaterials.end())
 	{
-		// create new
-		MaterialBuilder materialBuilder{};
-		materialBuilder.id = UUID::create();
+		// new material
+		MaterialBuilder builder{};
+		builder.id = UUID::create();
 
-		UUID templateId = {};
-
-		switch (space)
+		UUID templateId{};
+		
+		switch (type)
 		{
-		case Space::D3:
-			templateId = DEFAULT_SPRITE_MATERIAL_TEMPLATE;
+		case AssetType::Sprite:
+			switch (space)
+			{
+			case Space::D3:
+				templateId = DEFAULT_SPRITE_MATERIAL_TEMPLATE;
+				break;
+			case Space::UI:
+				templateId = DEFAULT_UI_MATERIAL_TEMPLATE;
+				break;
+			default:
+				MINTY_ERROR_FORMAT("Invalid Space for AssetType Sprite: \"{}\".", to_string(space));
+				break;
+			}
 			break;
-		case Space::UI:
-			templateId = DEFAULT_UI_MATERIAL_TEMPLATE;
+		case AssetType::FontVariant:
+			switch (space)
+			{
+			case Space::UI:
+				templateId = DEFAULT_TEXT_MATERIAL_TEMPLATE;
+				break;
+			default:
+				MINTY_ERROR_FORMAT("Invalid Space for AssetType FontVariant: \"{}\".", to_string(space));
+				break;
+			}
 			break;
 		default:
-			MINTY_NOT_IMPLEMENTED();
+			MINTY_ABORT_FORMAT("Cannot create a default Mesh for the type \"{}\".", to_string(type));
 			break;
 		}
 
-		materialBuilder.materialTemplate = AssetManager::get<MaterialTemplate>(templateId);
+		builder.materialTemplate = AssetManager::get<MaterialTemplate>(templateId);
 
+		// set texture
 		Cargo cargo{};
-		Texture const* spriteTexturePtr = spriteTexture.get();
+		Texture const* spriteTexturePtr = texture.get();
 		cargo.emplace("texture", Type::Asset, &spriteTexturePtr);
-		materialBuilder.values.emplace("texture", std::move(cargo));
+		builder.values.emplace("texture", std::move(cargo));
 
-		Ref<Material> material = AssetManager::create<Material>(materialBuilder);
+		Ref<Material> material = AssetManager::create<Material>(builder);
 
 		// add to list
-		s_spriteMaterials.emplace(spriteTexture->id(), material);
+		s_defaultMaterials.emplace(id, material);
 
 		return material;
 	}
 
-	// use existing
+	// old material
 	return found->second;
 }
 

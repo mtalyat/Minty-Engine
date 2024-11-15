@@ -18,6 +18,13 @@ Assets
 	- "Defaults/Sprite/defaultSprite.mspr"
 	- "Defaults/Sprite/defaultSpriteIcon.mspr"
 	- "Defaults/Sprite/defaultSpriteMint.mspr"
+	- "Defaults/Font/Default/defaultFont_0.png"
+	- "Defaults/ShaderModule/defaultTextModule.vert.spv"
+	- "Defaults/ShaderModule/defaultTextModule.frag.spv"
+	- "Defaults/Shader/defaultTextShader.msha"
+	- "Defaults/MaterialTemplate/defaultTextMaterialTemplate.mmtp"
+	- "Defaults/Font/Default/defaultFont.fnt"
+	- "Defaults/Font/Default/defaultFont.mfnt"
 Systems
 	Render
 Entities
@@ -36,13 +43,31 @@ Entities
 		Renderable
 		UITransform
 			anchor: All
-	UI Test
+	Text Test
+		UITransform
+			anchor: TopLeft
+			x: 200
+			y: 200
+			width: 3000
+			height: 4000
+		Text
+			text: Minty Time!
+			color: White
+			font: def0000000000015
+			fontSize: 32
+			bold: false
+			italic: false
+		Relationship
+			parent: 6fc41b54e9ade453
+		Enabled
+		Renderable
+	UI TopLeft
 		UITransform
 			anchor: TopLeft
 			x: 0
 			y: 0
-			width: 100
-			height: 100
+			width: 200
+			height: 200
 		Sprite:
 			sprite: def0000000000001
 			color: White
@@ -50,13 +75,13 @@ Entities
 			parent: 6fc41b54e9ade453
 		Enabled
 		Renderable
-	UI Test 2
+	UI TopRight
 		UITransform
-			anchor: BottomRight
-			x: -100
-			y: -100
-			width: 100
-			height: 100
+			anchor: TopRight
+			x: -200
+			y: 0
+			width: 200
+			height: 200
 		Sprite:
 			sprite: def000000000001a
 			color: White
@@ -64,803 +89,87 @@ Entities
 			parent: 6fc41b54e9ade453
 		Enabled
 		Renderable
-	Sprite 0
-		Transform
-			position: (0, 0, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 1
-		Transform
-			position: (1, 0, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 2
-		Transform
-			position: (2, 0, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 3
-		Transform
-			position: (3, 0, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 4
-		Transform
-			position: (4, 0, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 5
-		Transform
-			position: (5, 0, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 6
-		Transform
-			position: (6, 0, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 7
-		Transform
-			position: (7, 0, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 8
-		Transform
-			position: (8, 0, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 9
-		Transform
-			position: (9, 0, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 10
-		Transform
-			position: (0, 1, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 11
-		Transform
-			position: (1, 1, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 12
-		Transform
-			position: (2, 1, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 13
-		Transform
-			position: (3, 1, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 14
-		Transform
-			position: (4, 1, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 15
-		Transform
-			position: (5, 1, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 16
-		Transform
-			position: (6, 1, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 17
-		Transform
-			position: (7, 1, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 18
-		Transform
-			position: (8, 1, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 19
-		Transform
-			position: (9, 1, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 20
-		Transform
-			position: (0, 2, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 21
-		Transform
-			position: (1, 2, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 22
-		Transform
-			position: (2, 2, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 23
-		Transform
-			position: (3, 2, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 24
-		Transform
-			position: (4, 2, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 25
-		Transform
-			position: (5, 2, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 26
-		Transform
-			position: (6, 2, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 27
-		Transform
-			position: (7, 2, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 28
-		Transform
-			position: (8, 2, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 29
-		Transform
-			position: (9, 2, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 30
-		Transform
-			position: (0, 3, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 31
-		Transform
-			position: (1, 3, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 32
-		Transform
-			position: (2, 3, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 33
-		Transform
-			position: (3, 3, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 34
-		Transform
-			position: (4, 3, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 35
-		Transform
-			position: (5, 3, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 36
-		Transform
-			position: (6, 3, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 37
-		Transform
-			position: (7, 3, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 38
-		Transform
-			position: (8, 3, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 39
-		Transform
-			position: (9, 3, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 40
-		Transform
-			position: (0, 4, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 41
-		Transform
-			position: (1, 4, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 42
-		Transform
-			position: (2, 4, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 43
-		Transform
-			position: (3, 4, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 44
-		Transform
-			position: (4, 4, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 45
-		Transform
-			position: (5, 4, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 46
-		Transform
-			position: (6, 4, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 47
-		Transform
-			position: (7, 4, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 48
-		Transform
-			position: (8, 4, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 49
-		Transform
-			position: (9, 4, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 50
-		Transform
-			position: (0, 5, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 51
-		Transform
-			position: (1, 5, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 52
-		Transform
-			position: (2, 5, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 53
-		Transform
-			position: (3, 5, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 54
-		Transform
-			position: (4, 5, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 55
-		Transform
-			position: (5, 5, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 56
-		Transform
-			position: (6, 5, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 57
-		Transform
-			position: (7, 5, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 58
-		Transform
-			position: (8, 5, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 59
-		Transform
-			position: (9, 5, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 60
-		Transform
-			position: (0, 6, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 61
-		Transform
-			position: (1, 6, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 62
-		Transform
-			position: (2, 6, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 63
-		Transform
-			position: (3, 6, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 64
-		Transform
-			position: (4, 6, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 65
-		Transform
-			position: (5, 6, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 66
-		Transform
-			position: (6, 6, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 67
-		Transform
-			position: (7, 6, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 68
-		Transform
-			position: (8, 6, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 69
-		Transform
-			position: (9, 6, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 70
-		Transform
-			position: (0, 7, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 71
-		Transform
-			position: (1, 7, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 72
-		Transform
-			position: (2, 7, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 73
-		Transform
-			position: (3, 7, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 74
-		Transform
-			position: (4, 7, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 75
-		Transform
-			position: (5, 7, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 76
-		Transform
-			position: (6, 7, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 77
-		Transform
-			position: (7, 7, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 78
-		Transform
-			position: (8, 7, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 79
-		Transform
-			position: (9, 7, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 80
-		Transform
-			position: (0, 8, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 81
-		Transform
-			position: (1, 8, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 82
-		Transform
-			position: (2, 8, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 83
-		Transform
-			position: (3, 8, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 84
-		Transform
-			position: (4, 8, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 85
-		Transform
-			position: (5, 8, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 86
-		Transform
-			position: (6, 8, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 87
-		Transform
-			position: (7, 8, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 88
-		Transform
-			position: (8, 8, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 89
-		Transform
-			position: (9, 8, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 90
-		Transform
-			position: (0, 9, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 91
-		Transform
-			position: (1, 9, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 92
-		Transform
-			position: (2, 9, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 93
-		Transform
-			position: (3, 9, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 94
-		Transform
-			position: (4, 9, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 95
-		Transform
-			position: (5, 9, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 96
-		Transform
-			position: (6, 9, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 97
-		Transform
-			position: (7, 9, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 98
-		Transform
-			position: (8, 9, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
-		Enabled
-		Renderable
-	Sprite 99
-		Transform
-			position: (9, 9, 0)
-		Sprite
-			sprite: def0000000000019
-			color: White
+	UI BottomRight
+		UITransform
+			anchor: BottomRight
+			x: -200
+			y: -200
+			width: 200
+			height: 200
+		Sprite:
+			sprite: def000000000001a
+			color: White
+		Relationship
+			parent: 6fc41b54e9ade453
+		Enabled
+		Renderable
+	UI BottomLeft
+		UITransform
+			anchor: BottomLeft
+			x: 0
+			y: -200
+			width: 200
+			height: 200
+		Sprite:
+			sprite: def000000000001a
+			color: White
+		Relationship
+			parent: 6fc41b54e9ade453
+		Enabled
+		Renderable
+	UI Top
+		UITransform
+			anchor: Top
+			left: 200
+			right: 200
+			y: 0
+			height: 200
+		Sprite:
+			sprite: def000000000001a
+			color: White
+		Relationship
+			parent: 6fc41b54e9ade453
+		Enabled
+		Renderable
+	UI Bottom
+		UITransform
+			anchor: Bottom
+			left: 200
+			right: 200
+			y: -200
+			height: 200
+		Sprite:
+			sprite: def000000000001a
+			color: White
+		Relationship
+			parent: 6fc41b54e9ade453
+		Enabled
+		Renderable
+	UI Left
+		UITransform
+			anchor: Left
+			x: 0
+			width: 200
+			top: 200
+			bottom: 200
+		Sprite:
+			sprite: def000000000001a
+			color: White
+		Relationship
+			parent: 6fc41b54e9ade453
+		Enabled
+		Renderable
+	UI Right
+		UITransform
+			anchor: Right
+			x: -200
+			width: 200
+			top: 200
+			bottom: 200
+		Sprite:
+			sprite: def000000000001a
+			color: White
+		Relationship
+			parent: 6fc41b54e9ade453
 		Enabled
 		Renderable

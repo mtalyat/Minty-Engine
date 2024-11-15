@@ -43,7 +43,11 @@ Bool Minty::Material::try_set_input(String const& name, void const* const data)
 	if (shader->has_input(name))
 	{
 		set_input(name, data);
+
+		return true;
 	}
+
+	return false;
 }
 
 Owner<Material> Minty::Material::create(const MaterialBuilder& builder)

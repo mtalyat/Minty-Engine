@@ -7,6 +7,8 @@
 #include "Minty/Core/Types.h"
 #include "Minty/Core/UUID.h"
 #include "Minty/File/Wrapper.h"
+#include "Minty/Render/Font.h"
+#include "Minty/Render/FontVariant.h"
 #include "Minty/Render/Image.h"
 #include "Minty/Render/Material.h"
 #include "Minty/Render/MaterialTemplate.h"
@@ -315,6 +317,10 @@ namespace Minty
 		static Ref<Animation> load_animation(const Path& path);
 
 		static Ref<Animator> load_animator(const Path& path);
+
+		static Ref<Font> load_font(Path const& path);
+
+		static Ref<FontVariant> load_font_variant(Path const& path);
 
 		static Owner<Image> load_image(const Path& path);
 

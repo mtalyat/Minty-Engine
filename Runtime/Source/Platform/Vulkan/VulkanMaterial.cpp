@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "VulkanMaterial.h"
 
+#include "Minty/Asset/AssetManager.h"
 #include "Platform/Vulkan/VulkanRenderer.h"
 #include "Platform/Vulkan/VulkanShader.h"
 #include "Platform/Vulkan/VulkanTexture.h"
@@ -179,7 +180,7 @@ void Minty::VulkanMaterial::set_input(String const& name, void const* const data
 	Ref<VulkanShader> shader = static_cast<Ref<VulkanShader>>(materialTemplate->get_shader());
 	MINTY_ASSERT(shader != nullptr);
 
-	MINTY_ASSERT_FORMAT(shader->has_input(name), "\"{}\" is not the name of any constant in this Shader.", name);
+	MINTY_ASSERT_FORMAT(shader->has_input(name), "\"{}\" is not the name of any constant in this Shader. Shader: \"{}\". Material: \"{}\".", name, AssetManager::get_path(shader->id()).generic_string(), AssetManager::get_path(id()).generic_string());
 	MINTY_ASSERT_MESSAGE(data != nullptr, "Cannot set_input to null.");
 
 	ShaderInput const& input = shader->get_input(name);

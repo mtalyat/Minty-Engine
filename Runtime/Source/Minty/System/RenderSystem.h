@@ -69,6 +69,16 @@ namespace Minty
 		void update_3d();
 
 		/// <summary>
+		/// Updates UI space sprite objects.
+		/// </summary>
+		void update_ui_sprites();
+
+		/// <summary>
+		/// Updates UI space text objects.
+		/// </summary>
+		void update_ui_text();
+
+		/// <summary>
 		/// Updates UI space objects.
 		/// </summary>
 		void update_ui();

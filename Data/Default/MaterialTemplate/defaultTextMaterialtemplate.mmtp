@@ -1,5 +1,7 @@
-pass: fe8efd471cff4236
-defaults
+Shader: def000000000000c
+Values
     canvas
-        e 16
-    texture: 99acc40b03220429
+        width: 1920
+        height: 1080
+    texture
+        texSampler: def0000000000013

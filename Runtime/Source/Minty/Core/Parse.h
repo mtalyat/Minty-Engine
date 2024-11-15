@@ -11,6 +11,7 @@
 #include "Minty/Render/Perspective.h"
 #include "Minty/Render/Mesh.h"
 #include "Minty/Render/Shader.h"
+#include "Minty/Render/Space.h"
 #include "Minty/UI/AnchorMode.h"
 #include <string>
 
@@ -119,13 +120,13 @@ namespace Minty::Parse
 	template<typename T>
 	void parse_to(String const& string, T& value)
 	{
-		MINTY_ABORT("parse_to not implemented for the given type.");
+		MINTY_ABORT_FORMAT("parse_to not implemented for \"{}\".", typeid(T).name());
 	}
 
 	template<typename T>
 	Bool parse_try(String const& string, T& value)
 	{
-		MINTY_ABORT("parse_try not implemented for the given type.");
+		MINTY_ABORT_FORMAT("parse_try not implemented for \"{}\".", typeid(T).name());
 	}
 
 	template<>
@@ -714,5 +715,20 @@ namespace Minty::Parse
 	inline Bool parse_try(String const& string, CoordinateMode& value)
 	{
 		return try_coordinate_mode(string, value);
+	}
+
+	Space to_space(String const& string);
+	Bool try_space(String const& string, Space& value);
+
+	template<>
+	inline void parse_to(String const& string, Space& value)
+	{
+		value = to_space(string);
+	}
+
+	template<>
+	inline Bool parse_try(String const& string, Space& value)
+	{
+		return try_space(string, value);
 	}
 }

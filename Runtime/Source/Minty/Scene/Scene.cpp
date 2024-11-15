@@ -277,7 +277,7 @@ void Minty::Scene::finalize()
 
 void Minty::Scene::register_asset(Path const& path)
 {
-	MINTY_ASSERT(!m_registeredAssets.contains(path));
+	MINTY_ASSERT_FORMAT(!m_registeredAssets.contains(path), "Asset already registered: \"{}\".", path.generic_string());
 
 	AssetData data
 	{

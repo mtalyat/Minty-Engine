@@ -8,13 +8,13 @@
 #include "Minty/Core/Math.h"
 #include "Minty/Core/String.h"
 #include "Minty/Core/Type.h"
-#include "Minty/Core/UUID.h"
 #include "Minty/FSM/Conditional.h"
 #include "Minty/Render/CoordinateMode.h"
 #include "Minty/Render/Format.h"
 #include "Minty/Render/Mesh.h"
 #include "Minty/Render/Perspective.h"
 #include "Minty/Render/Shader.h"
+#include "Minty/Render/Space.h"
 #include "Minty/UI/AnchorMode.h"
 
 namespace Minty
@@ -648,6 +648,19 @@ namespace Minty
 		{
 		case CoordinateMode::Normalized: return "Normalized";
 		case CoordinateMode::Pixel: return "Pixel";
+
+		default: return "";
+		}
+	}
+
+	template<>
+	inline String to_string(Space const& obj)
+	{
+		switch (obj)
+		{
+		case Space::D3: return "D3";
+		case Space::D2: return "D2";
+		case Space::UI: return "UI";
 
 		default: return "";
 		}

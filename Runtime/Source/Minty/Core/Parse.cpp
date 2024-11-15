@@ -1067,3 +1067,18 @@ Bool Minty::Parse::try_coordinate_mode(String const& string, CoordinateMode& val
 	value = to_coordinate_mode(string);
 	return value != CoordinateMode();
 }
+
+Space Minty::Parse::to_space(String const& string)
+{
+	if (string == "D3") return Space::D3;
+	if (string == "D2") return Space::D2;
+	if (string == "UI") return Space::UI;
+
+	return Space();
+}
+
+Bool Minty::Parse::try_space(String const& string, Space& value)
+{
+	value = to_space(string);
+	return value != Space();
+}

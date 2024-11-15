@@ -1,6 +1,8 @@
 #include "pch.h"
 #include "FontVariant.h"
 
+#include "Minty/Render/Renderer.h"
+
 using namespace Minty;
 
 Minty::FontVariant::FontVariant(FontVariantBuilder const& builder)
@@ -10,7 +12,7 @@ Minty::FontVariant::FontVariant(FontVariantBuilder const& builder)
 	, m_italic(builder.italic)
 	, m_lineHeight(builder.lineHeight)
 	, m_texture(builder.texture)
-	, m_material(builder.material)
+	, m_material(Renderer::get_or_create_default_material(builder.texture, AssetType::FontVariant, Space::UI))
 	, m_characters()
 	, m_kernings(builder.kernings)
 {
@@ -48,4 +50,9 @@ Float Minty::FontVariant::get_kerning(Char const left, Char const right) const
 
 	// adjust by some amount
 	return found->second;
+}
+
+Owner<FontVariant> Minty::FontVariant::create(FontVariantBuilder const& builder)
+{
+	return Owner<FontVariant>(builder);
 }
