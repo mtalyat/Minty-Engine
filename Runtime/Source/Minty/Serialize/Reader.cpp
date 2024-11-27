@@ -6,7 +6,7 @@
 
 using namespace Minty;
 
-void Minty::FileReaderBehavior::read_data(void* const data, const Size size)
+void Minty::FileReaderBehavior::read_data(void* const data, Size const size)
 {
 	mp_file->read(data, size);
 }
@@ -18,7 +18,7 @@ std::vector<Byte> Minty::FileReaderBehavior::read_all()
 	return fileData;
 }
 
-void Minty::MemoryReaderBehavior::read_data(void* const data, const Size size)
+void Minty::MemoryReaderBehavior::read_data(void* const data, Size const size)
 {
 	// read from current index
 	Byte* memoryData = static_cast<Byte*>(mp_data->data());
@@ -44,175 +44,175 @@ std::vector<Byte> Minty::MemoryReaderBehavior::read_all()
 	return memoryData;
 }
 
-Bool Minty::TextReaderBehavior::read_bool_from_buffer(const void* const data, const Size size) const
+Bool Minty::TextReaderBehavior::read_bool_from_buffer(const void* const data, Size const size) const
 {
 	if (!size) return {};
 
 	String text = read_string_from_buffer(data, size);
 	return Parse::to_bool(text);
 }
-Bool2 Minty::TextReaderBehavior::read_bool2_from_buffer(const void* const data, const Size size) const
+Bool2 Minty::TextReaderBehavior::read_bool2_from_buffer(const void* const data, Size const size) const
 {
 	if (!size) return {};
 
 	String text = read_string_from_buffer(data, size);
 	return Parse::to_bool2(text);
 }
-Bool3 Minty::TextReaderBehavior::read_bool3_from_buffer(const void* const data, const Size size) const
+Bool3 Minty::TextReaderBehavior::read_bool3_from_buffer(const void* const data, Size const size) const
 {
 	if (!size) return {};
 
 	String text = read_string_from_buffer(data, size);
 	return Parse::to_bool3(text);
 }
-Bool4 Minty::TextReaderBehavior::read_bool4_from_buffer(const void* const data, const Size size) const
+Bool4 Minty::TextReaderBehavior::read_bool4_from_buffer(const void* const data, Size const size) const
 {
 	if (!size) return {};
 
 	String text = read_string_from_buffer(data, size);
 	return Parse::to_bool4(text);
 }
-Char Minty::TextReaderBehavior::read_char_from_buffer(const void* const data, const Size size) const
+Char Minty::TextReaderBehavior::read_char_from_buffer(const void* const data, Size const size) const
 {
 	if (!size) return {};
 
 	String text = read_string_from_buffer(data, size);
 	return Parse::to_char(text);
 }
-Byte Minty::TextReaderBehavior::read_byte_from_buffer(const void* const data, const Size size) const
+Byte Minty::TextReaderBehavior::read_byte_from_buffer(const void* const data, Size const size) const
 {
 	if (!size) return {};
 
 	String text = read_string_from_buffer(data, size);
 	return Parse::to_byte(text);
 }
-Short Minty::TextReaderBehavior::read_short_from_buffer(const void* const data, const Size size) const
+Short Minty::TextReaderBehavior::read_short_from_buffer(const void* const data, Size const size) const
 {
 	if (!size) return {};
 
 	String text = read_string_from_buffer(data, size);
 	return Parse::to_short(text);
 }
-UShort Minty::TextReaderBehavior::read_ushort_from_buffer(const void* const data, const Size size) const
+UShort Minty::TextReaderBehavior::read_ushort_from_buffer(const void* const data, Size const size) const
 {
 	if (!size) return {};
 
 	String text = read_string_from_buffer(data, size);
 	return Parse::to_ushort(text);
 }
-Int Minty::TextReaderBehavior::read_int_from_buffer(const void* const data, const Size size) const
+Int Minty::TextReaderBehavior::read_int_from_buffer(const void* const data, Size const size) const
 {
 	if (!size) return {};
 
 	String text = read_string_from_buffer(data, size);
 	return Parse::to_int(text);
 }
-Int2 Minty::TextReaderBehavior::read_int2_from_buffer(const void* const data, const Size size) const
+Int2 Minty::TextReaderBehavior::read_int2_from_buffer(const void* const data, Size const size) const
 {
 	if (!size) return {};
 
 	String text = read_string_from_buffer(data, size);
 	return Parse::to_int2(text);
 }
-Int3 Minty::TextReaderBehavior::read_int3_from_buffer(const void* const data, const Size size) const
+Int3 Minty::TextReaderBehavior::read_int3_from_buffer(const void* const data, Size const size) const
 {
 	if (!size) return {};
 
 	String text = read_string_from_buffer(data, size);
 	return Parse::to_int3(text);
 }
-Int4 Minty::TextReaderBehavior::read_int4_from_buffer(const void* const data, const Size size) const
+Int4 Minty::TextReaderBehavior::read_int4_from_buffer(const void* const data, Size const size) const
 {
 	if (!size) return {};
 
 	String text = read_string_from_buffer(data, size);
 	return Parse::to_int4(text);
 }
-UInt Minty::TextReaderBehavior::read_uint_from_buffer(const void* const data, const Size size) const
+UInt Minty::TextReaderBehavior::read_uint_from_buffer(const void* const data, Size const size) const
 {
 	if (!size) return {};
 
 	String text = read_string_from_buffer(data, size);
 	return Parse::to_uint(text);
 }
-UInt2 Minty::TextReaderBehavior::read_uint2_from_buffer(const void* const data, const Size size) const
+UInt2 Minty::TextReaderBehavior::read_uint2_from_buffer(const void* const data, Size const size) const
 {
 	if (!size) return {};
 
 	String text = read_string_from_buffer(data, size);
 	return Parse::to_uint2(text);
 }
-UInt3 Minty::TextReaderBehavior::read_uint3_from_buffer(const void* const data, const Size size) const
+UInt3 Minty::TextReaderBehavior::read_uint3_from_buffer(const void* const data, Size const size) const
 {
 	if (!size) return {};
 
 	String text = read_string_from_buffer(data, size);
 	return Parse::to_uint3(text);
 }
-UInt4 Minty::TextReaderBehavior::read_uint4_from_buffer(const void* const data, const Size size) const
+UInt4 Minty::TextReaderBehavior::read_uint4_from_buffer(const void* const data, Size const size) const
 {
 	if (!size) return {};
 
 	String text = read_string_from_buffer(data, size);
 	return Parse::to_uint4(text);
 }
-Long Minty::TextReaderBehavior::read_long_from_buffer(const void* const data, const Size size) const
+Long Minty::TextReaderBehavior::read_long_from_buffer(const void* const data, Size const size) const
 {
 	if (!size) return {};
 
 	String text = read_string_from_buffer(data, size);
 	return Parse::to_long(text);
 }
-ULong Minty::TextReaderBehavior::read_ulong_from_buffer(const void* const data, const Size size) const
+ULong Minty::TextReaderBehavior::read_ulong_from_buffer(const void* const data, Size const size) const
 {
 	if (!size) return {};
 
 	String text = read_string_from_buffer(data, size);
 	return Parse::to_ulong(text);
 }
-Size Minty::TextReaderBehavior::read_size_from_buffer(const void* const data, const Size size) const
+Size Minty::TextReaderBehavior::read_size_from_buffer(const void* const data, Size const size) const
 {
 	if (!size) return {};
 
 	String text = read_string_from_buffer(data, size);
 	return Parse::to_size(text);
 }
-Float Minty::TextReaderBehavior::read_float_from_buffer(const void* const data, const Size size) const
+Float Minty::TextReaderBehavior::read_float_from_buffer(const void* const data, Size const size) const
 {
 	if (!size) return {};
 
 	String text = read_string_from_buffer(data, size);
 	return Parse::to_float(text);
 }
-Float2 Minty::TextReaderBehavior::read_float2_from_buffer(const void* const data, const Size size) const
+Float2 Minty::TextReaderBehavior::read_float2_from_buffer(const void* const data, Size const size) const
 {
 	if (!size) return {};
 
 	String text = read_string_from_buffer(data, size);
 	return Parse::to_float2(text);
 }
-Float3 Minty::TextReaderBehavior::read_float3_from_buffer(const void* const data, const Size size) const
+Float3 Minty::TextReaderBehavior::read_float3_from_buffer(const void* const data, Size const size) const
 {
 	if (!size) return {};
 
 	String text = read_string_from_buffer(data, size);
 	return Parse::to_float3(text);
 }
-Float4 Minty::TextReaderBehavior::read_float4_from_buffer(const void* const data, const Size size) const
+Float4 Minty::TextReaderBehavior::read_float4_from_buffer(const void* const data, Size const size) const
 {
 	if (!size) return {};
 
 	String text = read_string_from_buffer(data, size);
 	return Parse::to_float4(text);
 }
-Double Minty::TextReaderBehavior::read_double_from_buffer(const void* const data, const Size size) const
+Double Minty::TextReaderBehavior::read_double_from_buffer(const void* const data, Size const size) const
 {
 	if (!size) return {};
 
 	String text = read_string_from_buffer(data, size);
 	return Parse::to_double(text);
 }
-String Minty::TextReaderBehavior::read_string_from_buffer(const void* const data, const Size size) const
+String Minty::TextReaderBehavior::read_string_from_buffer(const void* const data, Size const size) const
 {
 	if (!size) return "";
 
@@ -220,14 +220,14 @@ String Minty::TextReaderBehavior::read_string_from_buffer(const void* const data
 	memcpy(text.data(), data, size);
 	return String(text.data());
 }
-UUID Minty::TextReaderBehavior::read_uuid_from_buffer(const void* const data, const Size size) const
+UUID Minty::TextReaderBehavior::read_uuid_from_buffer(const void* const data, Size const size) const
 {
 	if (!size) return {};
 
 	String text = read_string_from_buffer(data, size);
 	return Parse::to_uuid(text);
 }
-Type Minty::TextReaderBehavior::read_type_from_buffer(const void* const data, const Size size) const
+Type Minty::TextReaderBehavior::read_type_from_buffer(const void* const data, Size const size) const
 {
 	if (!size) return {};
 
@@ -235,7 +235,7 @@ Type Minty::TextReaderBehavior::read_type_from_buffer(const void* const data, co
 	return Parse::to_type(text);
 }
 
-void* Minty::TextReaderBehavior::read_typed_from_buffer(const void* const data, const Size size, Type const type) const
+void* Minty::TextReaderBehavior::read_typed_from_buffer(const void* const data, Size const size, Type const type) const
 {
 	if (!size) return nullptr;
 
@@ -432,7 +432,7 @@ void* Minty::TextReaderBehavior::read_typed_from_buffer(const void* const data, 
 	return output;
 }
 
-Variable Minty::TextReaderBehavior::read_variable_from_buffer(const void* const data, const Size size) const
+Variable Minty::TextReaderBehavior::read_variable_from_buffer(const void* const data, Size const size) const
 {
 	if (!size) return{};
 
@@ -469,7 +469,7 @@ Variable Minty::TextReaderBehavior::read_variable_from_buffer(const void* const 
 	return var;
 }
 
-Node Minty::TextReaderBehavior::read_node(const void* const data, const Size size) const
+Node Minty::TextReaderBehavior::read_node(const void* const data, Size const size) const
 {
 	// get contents of file as text for parsing
 	std::vector<Char> contents(size + 1);

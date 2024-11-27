@@ -4,14 +4,14 @@
 namespace Minty
 {
 	template<typename T>
-	void pack_into(Byte* const data, Size& offset, const T& value)
+	void pack_into(Byte* const data, Size& offset, T const& value)
 	{
 		memcpy(data + offset, &value, sizeof(T));
 		offset += sizeof(T);
 	}
 
 	template<typename... Args>
-	void pack(Byte* const data, const Size size, const Args&... args)
+	void pack(Byte* const data, Size const size, const Args&... args)
 	{
 		Size offset = 0;
 		(pack_into(data, offset, args), ...);

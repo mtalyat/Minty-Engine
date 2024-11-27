@@ -163,6 +163,11 @@ namespace Minty
 		/// </summary>
 		virtual void poll_events() const = 0;
 
+		/// <summary>
+		/// Waits for the events for the Window.
+		/// </summary>
+		virtual void wait_events() const = 0;
+
 		static Owner<Window> create(WindowBuilder const& builder);
 	};
 }

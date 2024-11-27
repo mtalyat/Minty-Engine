@@ -33,7 +33,7 @@
 #include "Minty/Core/Linker.h"
 #include "Minty/Core/Macros.h"
 #include "Minty/Core/Math.h"
-#include "Minty/Core/Operations.h"
+#include "Minty/Core/Operation.h"
 #include "Minty/Core/Pack.h"
 #include "Minty/Core/Parse.h"
 #include "Minty/Core/Path.h"
@@ -75,6 +75,11 @@
 #include "Minty/File/VirtualFile.h"
 #include "Minty/File/Wrap.h"
 #include "Minty/File/Wrapper.h"
+
+// GUI
+#include "Minty/GUI/Enums.h"
+#include "Minty/GUI/GUI.h"
+#include "Minty/GUI/Theme.h"
 
 // INPUT
 #include "Minty/Input/Gamepad.h"
@@ -125,6 +130,9 @@
 // SYSTEM
 #include "Minty/System/AllSystems.h"
 #include "Minty/System/SystemRegistry.h"
+
+// THREAD
+#include "Minty/Thread/Task.h"
 
 // UI
 #include "Minty/UI/AnchorMode.h"

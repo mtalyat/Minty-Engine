@@ -37,6 +37,6 @@ namespace Minty
 		AssetType get_type() const override { return AssetType::Texture; }
 
 	public:
-		static Owner<Texture> create(const TextureBuilder& builder = {});
+		static Owner<Texture> create(TextureBuilder const& builder = {});
 	};
 }

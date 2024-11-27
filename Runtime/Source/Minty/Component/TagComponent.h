@@ -16,14 +16,8 @@ namespace Minty
 		/// </summary>
 		String tag = "";
 
-		void serialize(Writer& writer) const override
-		{
-			writer.write("tag", tag);
-		}
+		void serialize(Writer& writer) const override;
 
-		void deserialize(Reader& reader) override
-		{
-			reader.read("tag", tag);
-		}
+		void deserialize(Reader& reader) override;
 	};
 }

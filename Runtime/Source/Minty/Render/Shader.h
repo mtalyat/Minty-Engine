@@ -150,7 +150,7 @@ namespace Minty
 		std::unordered_set<Material*> m_materials;
 
 	protected:
-		Shader(const ShaderBuilder& builder)
+		Shader(ShaderBuilder const& builder)
 			: Asset(builder.id)
 			, m_viewport(builder.viewport)
 			, m_scissor(builder.scissor)
@@ -175,9 +175,9 @@ namespace Minty
 
 		Ref<Scissor> get_scissor() const { return m_scissor; }
 
-		void set_viewport(const Ref<Viewport> viewport) { m_viewport = viewport; }
+		void set_viewport(Ref<Viewport> const viewport) { m_viewport = viewport; }
 
-		void set_scissor(const Ref<Scissor> scissor) { m_scissor = scissor; }
+		void set_scissor(Ref<Scissor> const scissor) { m_scissor = scissor; }
 
 		Bool has_input(String const& name) const { return m_inputs.contains(name); }
 
@@ -199,6 +199,6 @@ namespace Minty
 		AssetType get_type() const override { return AssetType::Shader; }
 
 	public:
-		static Owner<Shader> create(const ShaderBuilder& builder = {});
+		static Owner<Shader> create(ShaderBuilder const& builder = {});
 	};
 }

@@ -1,5 +1,5 @@
 #include "pch.h"
-#include "Operations.h"
+#include "Operation.h"
 
 #include <filesystem>
 
@@ -43,12 +43,12 @@ Path get_directory(Path const& path)
 	}
 }
 
-int Minty::Operations::system_command(String const& command)
+int Minty::Operation::system_command(String const& command)
 {
 	return system(command.c_str());
 }
 
-void Minty::Operations::open_directory(Path const& path)
+void Minty::Operation::open_directory(Path const& path)
 {
 	Path directory = get_directory(path);
 
@@ -65,7 +65,7 @@ void Minty::Operations::open_directory(Path const& path)
 #endif
 }
 
-void Minty::Operations::open(Path const& path)
+void Minty::Operation::open(Path const& path)
 {
 	String pathString = path.string();
 #ifdef MINTY_WINDOWS
@@ -80,7 +80,7 @@ void Minty::Operations::open(Path const& path)
 #endif
 }
 
-Bool Minty::Operations::copy(Path const& from, Path const& to)
+Bool Minty::Operation::copy(Path const& from, Path const& to)
 {
 	Path dest;
 	if (to.has_extension())
@@ -104,13 +104,13 @@ Bool Minty::Operations::copy(Path const& from, Path const& to)
 	return true;
 }
 
-Bool Minty::Operations::copy_files(Path const& from, Path const& extension, Path const& to)
+Bool Minty::Operation::copy_files(Path const& from, Path const& extension, Path const& to)
 {
 	for (auto const& entry : std::filesystem::directory_iterator(from))
 	{
 		if (extension.empty() || (entry.path().has_extension() && entry.path().extension() == extension))
 		{
-			if (!Operations::copy(entry.path(), to))
+			if (!Operation::copy(entry.path(), to))
 			{
 				return false;
 			}
@@ -120,7 +120,7 @@ Bool Minty::Operations::copy_files(Path const& from, Path const& extension, Path
 	return true;
 }
 
-Bool Minty::Operations::copy_all(Path const& from, Path const& to)
+Bool Minty::Operation::copy_all(Path const& from, Path const& to)
 {
 	try
 	{
@@ -174,7 +174,7 @@ Bool Minty::Operations::copy_all(Path const& from, Path const& to)
 	return true;
 }
 
-Bool Minty::Operations::copy_some(Path const& from, Path const& to, std::unordered_set<String> const& names)
+Bool Minty::Operation::copy_some(Path const& from, Path const& to, std::unordered_set<String> const& names)
 {
 	try
 	{
@@ -235,7 +235,7 @@ Bool Minty::Operations::copy_some(Path const& from, Path const& to, std::unorder
 	return true;
 }
 
-String Minty::Operations::get_environment_variable(String const& name)
+String Minty::Operation::get_environment_variable(String const& name)
 {
 	char* buffer = nullptr;
 	Size bufferSize = 0;
@@ -264,7 +264,7 @@ String Minty::Operations::get_environment_variable(String const& name)
 	}
 }
 
-void Minty::Operations::set_environment_variable(String const& name, String const& value)
+void Minty::Operation::set_environment_variable(String const& name, String const& value)
 {
 #if defined(MINTY_WINDOWS)
 	String temp = std::format("{}={}", name, value);
@@ -274,7 +274,65 @@ void Minty::Operations::set_environment_variable(String const& name, String cons
 #endif
 }
 
-Path Minty::Operations::get_minty_path()
+Path Minty::Operation::get_minty_path()
 {
 	return get_environment_variable("MINTY_PATH");
+}
+
+String Minty::Operation::get_clipboard_text()
+{
+#if defined(MINTY_WINDOWS)
+	if (!OpenClipboard(nullptr)) {
+		return "";
+	}
+
+	HANDLE hData = GetClipboardData(CF_TEXT);
+	if (hData == nullptr) {
+		CloseClipboard();
+		return "";
+	}
+
+	Char* pszText = static_cast<Char*>(GlobalLock(hData));
+	if (pszText == nullptr) {
+		CloseClipboard();
+		return "";
+	}
+
+	String text(pszText);
+	GlobalUnlock(hData);
+	CloseClipboard();
+
+	return text;
+#else
+	MINTY_NOT_IMPLEMENTED();
+#endif
+}
+
+void Minty::Operation::set_clipboard_text(String const& text)
+{
+#if defined(MINTY_WINDOWS)
+	if (!OpenClipboard(nullptr)) {
+		return;
+	}
+
+	// Empty the clipboard before setting new data
+	EmptyClipboard();
+
+	// Allocate global memory for the text
+	HGLOBAL hMem = GlobalAlloc(GMEM_MOVEABLE, text.size() + 1);
+	if (hMem) {
+		Char* pMem = static_cast<Char*>(GlobalLock(hMem));
+		if (pMem) {
+			memcpy(pMem, text.c_str(), text.size() + 1);
+			GlobalUnlock(hMem);
+		}
+
+		// Set the clipboard data
+		SetClipboardData(CF_TEXT, hMem);
+	}
+
+	CloseClipboard();
+#else
+	MINTY_NOT_IMPLEMENTED();
+#endif
 }

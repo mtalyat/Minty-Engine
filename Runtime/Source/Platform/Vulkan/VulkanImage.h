@@ -24,11 +24,11 @@ namespace Minty
 		Bool m_immutable;
 
 	public:
-		VulkanImage(const ImageBuilder& builder);
+		VulkanImage(ImageBuilder const& builder);
 
-		VulkanImage(const ImageBuilder& builder, const VkImage image);
+		VulkanImage(ImageBuilder const& builder, VkImage const image);
 		
-		VulkanImage(const ImageBuilder& builder, const VkImage image, const VkDeviceMemory memory, const VkImageView imageView);
+		VulkanImage(ImageBuilder const& builder, VkImage const image, VkDeviceMemory const memory, VkImageView const imageView);
 
 		~VulkanImage();
 

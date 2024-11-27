@@ -658,7 +658,7 @@ Bool Minty::Parse::try_shader_descriptor_type(String const& string, ShaderInputT
 
 Format Minty::Parse::to_format(String const& string)
 {
-	if (string == "UNDEFINED") return Format::UNDEFINED;
+	if (string == "Undefined") return Format::Undefined;
 	if (string == "R4G4_UNORM_PACK8") return Format::R4G4_UNORM_PACK8;
 	if (string == "R4G4B4A4_UNORM_PACK16") return Format::R4G4B4A4_UNORM_PACK16;
 	if (string == "B4G4R4A4_UNORM_PACK16") return Format::B4G4R4A4_UNORM_PACK16;

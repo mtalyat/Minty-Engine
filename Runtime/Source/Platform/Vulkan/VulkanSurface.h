@@ -12,7 +12,7 @@ namespace Minty
 		VkSurfaceKHR m_surface;
 
 	public:
-		VulkanSurface(const SurfaceBuilder& builder);
+		VulkanSurface(SurfaceBuilder const& builder);
 		~VulkanSurface();
 	};
 }

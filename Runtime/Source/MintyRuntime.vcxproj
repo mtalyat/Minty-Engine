@@ -113,7 +113,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
       <LanguageStandard>stdcpp20</LanguageStandard>
-      <AdditionalIncludeDirectories>$(ProjectDir);.;..\..\Libraries\mono\include;..\..\Libraries\vulkan\include;..\..\Libraries\glm\include;..\..\Libraries\glfw\include;..\..\Libraries\stb\include;..\..\Libraries\zlib\include;..\..\Libraries\entt\include;..\..\Libraries\soloud\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir);.;..\..\Libraries\mono\include;..\..\Libraries\vulkan\include;..\..\Libraries\glm\include;..\..\Libraries\glfw\include;..\..\Libraries\stb\include;..\..\Libraries\zlib\include;..\..\Libraries\entt\include;..\..\Libraries\soloud\include;..\..\Libraries\imgui\include;..\..\Libraries\imguifiledialog\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
     </ClCompile>
     <Link>
@@ -209,12 +209,13 @@
     <ClInclude Include="Minty\Core\Compression.h" />
     <ClInclude Include="Minty\Core\Console.h" />
     <ClInclude Include="Minty\Core\Constants.h" />
+    <ClInclude Include="Minty\Core\Direction.h" />
     <ClInclude Include="Minty\Core\Encoding.h" />
     <ClInclude Include="Minty\Core\Event.h" />
     <ClInclude Include="Minty\Core\Linker.h" />
     <ClInclude Include="Minty\Core\Macros.h" />
     <ClInclude Include="Minty\Core\Math.h" />
-    <ClInclude Include="Minty\Core\Operations.h" />
+    <ClInclude Include="Minty\Core\Operation.h" />
     <ClInclude Include="Minty\Core\Pack.h" />
     <ClInclude Include="Minty\Core\Parse.h" />
     <ClInclude Include="Minty\Core\Path.h" />
@@ -252,6 +253,9 @@
     <ClInclude Include="Minty\File\Wrapper.h" />
     <ClInclude Include="Minty\FSM\Conditional.h" />
     <ClInclude Include="Minty\FSM\FiniteStateMachine.h" />
+    <ClInclude Include="Minty\GUI\GUI.h" />
+    <ClInclude Include="Minty\GUI\Enums.h" />
+    <ClInclude Include="Minty\GUI\Theme.h" />
     <ClInclude Include="Minty\Input\Gamepad.h" />
     <ClInclude Include="Minty\Input\Input.h" />
     <ClInclude Include="Minty\Input\Key.h" />
@@ -259,6 +263,7 @@
     <ClInclude Include="Minty\Library\EnTT.h" />
     <ClInclude Include="Minty\Library\GLFW.h" />
     <ClInclude Include="Minty\Library\GLM.h" />
+    <ClInclude Include="Minty\Library\ImGUI.h" />
     <ClInclude Include="Minty\Library\Mono.h" />
     <ClInclude Include="Minty\Library\SoLoud.h" />
     <ClInclude Include="Minty\Library\Stb.h" />
@@ -319,6 +324,7 @@
     <ClInclude Include="Minty\System\ScriptSystem.h" />
     <ClInclude Include="Minty\System\System.h" />
     <ClInclude Include="Minty\System\SystemRegistry.h" />
+    <ClInclude Include="Minty\Thread\Task.h" />
     <ClInclude Include="Minty\UI\AnchorMode.h" />
     <ClInclude Include="Minty\Window\Window.h" />
     <ClInclude Include="Minty\Window\WindowManager.h" />
@@ -339,6 +345,15 @@
     <ClInclude Include="Platform\Windows\WindowsWindowManager.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="..\..\Libraries\imguifiledialog\include\ImGuiFileDialog.cpp" />
+    <ClCompile Include="..\..\Libraries\imgui\include\imgui.cpp" />
+    <ClCompile Include="..\..\Libraries\imgui\include\imgui_demo.cpp" />
+    <ClCompile Include="..\..\Libraries\imgui\include\imgui_draw.cpp" />
+    <ClCompile Include="..\..\Libraries\imgui\include\imgui_impl_glfw.cpp" />
+    <ClCompile Include="..\..\Libraries\imgui\include\imgui_impl_vulkan.cpp" />
+    <ClCompile Include="..\..\Libraries\imgui\include\imgui_stdlib.cpp" />
+    <ClCompile Include="..\..\Libraries\imgui\include\imgui_tables.cpp" />
+    <ClCompile Include="..\..\Libraries\imgui\include\imgui_widgets.cpp" />
     <ClCompile Include="..\..\Libraries\soloud\include\dr_impl.cpp" />
     <ClCompile Include="..\..\Libraries\soloud\include\soloud.cpp" />
     <ClCompile Include="..\..\Libraries\soloud\include\soloud_audiosource.cpp" />
@@ -375,11 +390,15 @@
     <ClCompile Include="Minty\Component\AudioSourceComponent.cpp" />
     <ClCompile Include="Minty\Component\CameraComponent.cpp" />
     <ClCompile Include="Minty\Component\CanvasComponent.cpp" />
+    <ClCompile Include="Minty\Component\MeshComponent.cpp" />
+    <ClCompile Include="Minty\Component\NameComponent.cpp" />
     <ClCompile Include="Minty\Component\RelationshipComponent.cpp" />
     <ClCompile Include="Minty\Component\ScriptComponent.cpp" />
     <ClCompile Include="Minty\Component\ScriptEventComponent.cpp" />
     <ClCompile Include="Minty\Component\SpriteComponent.cpp" />
+    <ClCompile Include="Minty\Component\TagComponent.cpp" />
     <ClCompile Include="Minty\Component\TextComponent.cpp" />
+    <ClCompile Include="Minty\Component\TransformComponent.cpp" />
     <ClCompile Include="Minty\Component\UITransformComponent.cpp" />
     <ClCompile Include="Minty\Core\Application.cpp" />
     <ClCompile Include="Minty\Core\ArgumentParser.cpp" />
@@ -389,11 +408,12 @@
     <ClCompile Include="Minty\Core\Encoding.cpp" />
     <ClCompile Include="Minty\Core\Linker.cpp" />
     <ClCompile Include="Minty\Core\Math.cpp" />
-    <ClCompile Include="Minty\Core\Operations.cpp" />
+    <ClCompile Include="Minty\Core\Operation.cpp" />
     <ClCompile Include="Minty\Core\Parse.cpp" />
     <ClCompile Include="Minty\Core\Stopwatch.cpp" />
     <ClCompile Include="Minty\Core\String.cpp" />
     <ClCompile Include="Minty\Core\Time.cpp" />
+    <ClCompile Include="Minty\Core\ToString.cpp" />
     <ClCompile Include="Minty\Core\Type.cpp" />
     <ClCompile Include="Minty\Core\UUID.cpp" />
     <ClCompile Include="Minty\Data\BaseContainer.cpp" />
@@ -411,6 +431,7 @@
     <ClCompile Include="Minty\File\Wrap.cpp" />
     <ClCompile Include="Minty\File\Wrapper.cpp" />
     <ClCompile Include="Minty\FSM\FiniteStateMachine.cpp" />
+    <ClCompile Include="Minty\GUI\GUI.cpp" />
     <ClCompile Include="Minty\Input\Input.cpp" />
     <ClCompile Include="Minty\Render\Buffer.cpp" />
     <ClCompile Include="Minty\Render\BufferCargo.cpp" />

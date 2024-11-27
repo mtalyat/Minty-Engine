@@ -20,6 +20,8 @@ namespace Minty
 	public:
 		void* get_native() override { return mp_assembly; }
 
+		std::unordered_set<String> get_dependencies() const override;
+
 	public:
 		MonoAssembly* get_assembly() const { return mp_assembly; }
 

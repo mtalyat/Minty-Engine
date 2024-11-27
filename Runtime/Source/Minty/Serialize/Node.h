@@ -24,11 +24,11 @@ namespace Minty
 			: m_name(), m_data(), m_children(), m_lookup()
 		{}
 
-		Node(const String& name, const DynamicContainer& data)
+		Node(String const& name, DynamicContainer const& data)
 			: m_name(name), m_data(data), m_children(), m_lookup()
 		{}
 
-		Node(const String& name, const void* const data, const Size size)
+		Node(String const& name, const void* const data, Size const size)
 			: m_name(name), m_data(size), m_children(), m_lookup()
 		{
 			m_data.set(data, size);
@@ -73,25 +73,25 @@ namespace Minty
 			: m_name(other.m_name), m_data(other.m_data), m_children(other.m_children), m_lookup(other.m_lookup)
 		{}
 
-		const String& get_name() const { return m_name; }
+		String const& get_name() const { return m_name; }
 
-		void set_name(const String& name) { m_name = name; }
+		void set_name(String const& name) { m_name = name; }
 
-		const Container& get_data() const { return m_data; }
+		Container const& get_data() const { return m_data; }
 
 		String get_data_as_string() const;
 
-		void set_data(const void* const data, const Size size) { m_data.set(data, size); }
+		void set_data(const void* const data, Size const size) { m_data.set(data, size); }
 
 		void set_data(String const& data) { set_data(data.data(), data.size()); }
 
-		const Node& get_child(const Size index) const { return m_children.at(index); }
+		Node const& get_child(Size const index) const { return m_children.at(index); }
 
-		const Node& get_child(const String& name) const { return m_children.at(m_lookup.at(name)); }
+		Node const& get_child(String const& name) const { return m_children.at(m_lookup.at(name)); }
 
-		Bool has_child(const Size index) const { return index < m_children.size(); }
+		Bool has_child(Size const index) const { return index < m_children.size(); }
 
-		Bool has_child(const String& name) const { return m_lookup.contains(name); }
+		Bool has_child(String const& name) const { return m_lookup.contains(name); }
 
 		std::vector<Node>& get_children() { return m_children; }
 
@@ -101,7 +101,7 @@ namespace Minty
 
 		Bool has_children() const { return static_cast<Bool>(m_children.size()); }
 
-		Bool add_child(const String& name, const Node& node);
+		Bool add_child(String const& name, Node const& node);
 
 		void print() const;
 	};

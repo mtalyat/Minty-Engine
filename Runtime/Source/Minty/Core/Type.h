@@ -32,6 +32,7 @@ namespace Minty
 		Float4,
 		Double,
 		String,
+		MultilineString,
 		Matrix2,
 		Matrix3,
 		Matrix4,
@@ -40,9 +41,9 @@ namespace Minty
 		UUID,
 	};
 
-	Type type_typeid(const TypeID typeId);
+	Type type_typeid(TypeID const typeId);
 
-	TypeID typeid_type(const Type type);
+	TypeID typeid_type(Type const type);
 
-	Size sizeof_type(const Type type);
+	Size sizeof_type(Type const type);
 }

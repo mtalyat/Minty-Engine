@@ -19,7 +19,7 @@ namespace Minty
 	};
 
 	/// <summary>
-	/// Holds an audio clip.
+	/// Represents an audio file that can be played.
 	/// </summary>
 	class AudioClip
 		: public Asset

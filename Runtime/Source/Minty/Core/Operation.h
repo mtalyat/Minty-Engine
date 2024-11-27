@@ -9,7 +9,7 @@ namespace Minty
 	/// <summary>
 	/// Contains functions that perform various tasks on the current operating system.
 	/// </summary>
-	namespace Operations
+	namespace Operation
 	{
 		/// <summary>
 		/// Runs a system command and returns the result code.
@@ -80,5 +80,9 @@ namespace Minty
 		/// </summary>
 		/// <returns></returns>
 		Path get_minty_path();
+
+		String get_clipboard_text();
+
+		void set_clipboard_text(String const& text);
 	}
 }

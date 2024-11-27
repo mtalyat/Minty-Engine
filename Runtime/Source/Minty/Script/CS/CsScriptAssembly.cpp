@@ -131,3 +131,24 @@ Minty::CsScriptAssembly::~CsScriptAssembly()
 		mono_image_close(mp_image);
 	}
 }
+
+std::unordered_set<String> Minty::CsScriptAssembly::get_dependencies() const
+{
+	std::unordered_set<String> results;
+
+	// always include System
+	results.emplace("System");
+
+	int count = mono_image_get_table_rows(mp_image, MONO_TABLE_ASSEMBLYREF);
+
+	for (int i = 0; i < count; i++)
+	{
+		uint32_t cols[MONO_ASSEMBLYREF_SIZE];
+		mono_metadata_decode_row(mono_image_get_table_info(mp_image, MONO_TABLE_ASSEMBLYREF), i, cols, MONO_ASSEMBLYREF_SIZE);
+
+		const char* name = mono_metadata_string_heap(mp_image, cols[MONO_ASSEMBLYREF_NAME]);
+		results.emplace(name);
+	}
+
+	return results;
+}

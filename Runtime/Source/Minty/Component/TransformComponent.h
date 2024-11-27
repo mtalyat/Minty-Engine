@@ -5,9 +5,15 @@
 
 namespace Minty
 {
+	/// <summary>
+	/// Holds 3D space transform data for an Entity.
+	/// </summary>
 	struct TransformComponent
 		: public ScriptObjectComponent
 	{
+		/// <summary>
+		/// The matrix containing the global transform data.
+		/// </summary>
 		Matrix4 globalMatrix{};
 
 		/// <summary>
@@ -25,6 +31,10 @@ namespace Minty
 		/// </summary>
 		Float3 localScale = Float3(1.0f, 1.0f, 1.0f);
 
+		/// <summary>
+		/// Gets the local transform matrix.
+		/// </summary>
+		/// <returns></returns>
 		Matrix4 get_local_matrix() const { return glm::translate(Matrix4(1.0f), localPosition) * glm::mat4_cast(localRotation) * glm::scale(Matrix4(1.0f), localScale); }
 
 		Float3 get_global_position() const { return matrix4_get_position(globalMatrix); }
@@ -35,29 +45,10 @@ namespace Minty
 		Float3 get_up() const { return Float3(globalMatrix * Float4(0.0f, 1.0f, 0.0f, 0.0f)); }
 		Float3 get_right() const { return Float3(globalMatrix * Float4(1.0f, 0.0f, 0.0f, 0.0f)); }
 
-		static TransformComponent create_empty()
-		{
-			TransformComponent component{};
-			component.globalMatrix = component.get_local_matrix();
-			return component;
-		}
+		static TransformComponent create_empty();
 
-		void serialize(Writer& writer) const override
-		{
-			writer.write("position", localPosition);
-			writer.write("rotation", to_euler(localRotation));
-			writer.write("scale", localScale);
-		}
+		void serialize(Writer& writer) const override;
 
-		void deserialize(Reader& reader) override
-		{
-			reader.read("position", localPosition);
-			Float3 eulerAngles;
-			if (reader.read("rotation", eulerAngles))
-			{
-				localRotation = from_euler(eulerAngles);
-			}
-			reader.read("scale", localScale);
-		}
+		void deserialize(Reader& reader) override;
 	};
 }

@@ -12,11 +12,11 @@ namespace Minty
 		VkRect2D m_rect;
 
 	public:
-		VulkanScissor(const ScissorBuilder& builder);
+		VulkanScissor(ScissorBuilder const& builder);
 
 		~VulkanScissor() = default;
 
 	public:
-		const VkRect2D& get_rect() const { return m_rect; }
+		VkRect2D const& get_rect() const { return m_rect; }
 	};
 }

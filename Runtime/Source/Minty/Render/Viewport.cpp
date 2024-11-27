@@ -7,7 +7,7 @@
 
 using namespace Minty;
 
-Owner<Viewport> Minty::Viewport::create(const ViewportBuilder& builder)
+Owner<Viewport> Minty::Viewport::create(ViewportBuilder const& builder)
 {
 #if defined(MINTY_VULKAN)
 	return Owner<VulkanViewport>(builder);

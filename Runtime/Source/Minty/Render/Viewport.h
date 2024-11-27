@@ -11,10 +11,10 @@ namespace Minty
 	{
 		UUID id = {};
 
-		Int x = 0;
-		Int y = 0;
-		UInt width = 0;
-		UInt height = 0;
+		Float x = 0;
+		Float y = 0;
+		Float width = 0;
+		Float height = 0;
 		Float minDepth = 0.0f;
 		Float maxDepth = 1.0f;
 	};
@@ -34,9 +34,18 @@ namespace Minty
 		virtual ~Viewport() = default;
 
 	public:
+		virtual void set_x(Float const x) = 0;
+
+		virtual void set_y(Float const y) = 0;
+
+		virtual void set_width(Float const width) = 0;
+		
+		virtual void set_height(Float const height) = 0;
+
+	public:
 		AssetType get_type() const override { return AssetType::Viewport; }
 
 	public:
-		static Owner<Viewport> create(const ViewportBuilder& builder = {});
+		static Owner<Viewport> create(ViewportBuilder const& builder = {});
 	};
 }

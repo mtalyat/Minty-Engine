@@ -276,6 +276,11 @@ void Minty::WindowsWindow::poll_events() const
 	glfwPollEvents();
 }
 
+void Minty::WindowsWindow::wait_events() const
+{
+	glfwWaitEvents();
+}
+
 void Minty::WindowsWindow::update_size()
 {
 	Int width, height;

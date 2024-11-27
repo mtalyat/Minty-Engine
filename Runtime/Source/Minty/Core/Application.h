@@ -1,9 +1,15 @@
 #pragma once
+
+#include "Minty/Asset/AssetManager.h"
 #include "Minty/Core/ApplicationInfo.h"
 #include "Minty/Core/Base.h"
-#include "Minty/Window/WindowManager.h"
 #include "Minty/Debug/Logger.h"
+#include "Minty/GUI/GUI.h"
+#include "Minty/Input/Input.h"
+#include "Minty/Render/Renderer.h"
 #include "Minty/Scene/SceneManager.h"
+#include "Minty/Script/ScriptEngine.h"
+#include "Minty/Window/WindowManager.h"
 
 namespace Minty
 {
@@ -42,6 +48,13 @@ namespace Minty
 		String logPath = "log.txt";
 		ApplicationMode mode = ApplicationMode::Normal;
 		UInt targetFPS = 120;
+
+		AssetManagerBuilder assetManagerBuilder{};
+		ScriptEngineBuilder scriptEngineBuilder{};
+		InputBuilder inputBuilder{};
+		WindowManagerBuilder windowManagerBuilder{};
+		RendererBuilder rendererBuilder{};
+		GUIBuilder guiBuilder{};
 	};
 
 	/// <summary>
@@ -52,6 +65,7 @@ namespace Minty
 	private:
 		static Application* sp_instance;
 
+		Bool m_initialized;
 		Bool m_running;
 		Bool m_minimized;
 
@@ -61,14 +75,30 @@ namespace Minty
 
 		ApplicationInfo m_info;
 		ApplicationMode m_mode;
-		Logger m_logger;
+		Logger* mp_logger;
 
 		SceneManager m_sceneManager;
 		std::vector<Ref<Scene>> m_workingScenes;
 	public:
-		Application(const ApplicationBuilder& builder);
+		Application()
+			: m_initialized(false)
+			, m_running(false)
+			, m_minimized(false)
+			, m_time()
+			, m_targetFPS(0)
+			, m_info()
+			, m_mode()
+			, mp_logger(nullptr)
+			, m_sceneManager()
+			, m_workingScenes()
+		{}
 
-		~Application();
+		~Application()
+		{}
+
+		void initialize(ApplicationBuilder const& builder);
+
+		void shutdown();
 
 		Int run();
 
@@ -79,18 +109,30 @@ namespace Minty
 	public:
 		void on_event(Event& event);
 
+	protected:
+		// runs every update loop
+		virtual void update(Time const& time) {}
+
 	private:
 		Bool on_window_close(WindowCloseEvent& event);
 		Bool on_window_resize(WindowResizeEvent& event);
 
 #pragma endregion
 
+#pragma region Loading
+
+	private:
+		Bool load_initial_scene();
+
+#pragma endregion
+
+
 	public:
-		const ApplicationInfo& get_info() const { return m_info; }
+		ApplicationInfo const& get_info() const { return m_info; }
 
 		ApplicationMode get_mode() const { return m_mode; }
 
-		Logger& get_logger() { return m_logger; }
+		Logger& get_logger() const { return *mp_logger; }
 
 		SceneManager& get_scene_manager() { return m_sceneManager; }
 

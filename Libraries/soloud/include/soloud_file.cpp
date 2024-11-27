@@ -152,7 +152,7 @@ mFileHandle(fp)
 		return mOffset;
 	}
 
-	const unsigned char * MemoryFile::getMemPtr()
+	unsigned const char * MemoryFile::getMemPtr()
 	{
 		return mDataPtr;
 	}
@@ -171,7 +171,7 @@ mFileHandle(fp)
 		mDataOwned = false;
 	}
 
-	result MemoryFile::openMem(const unsigned char *aData, unsigned int aDataLength, bool aCopy, bool aTakeOwnership)
+	result MemoryFile::openMem(unsigned const char *aData, unsigned int aDataLength, bool aCopy, bool aTakeOwnership)
 	{
 		if (aData == NULL || aDataLength == 0)
 			return INVALID_PARAMETER;

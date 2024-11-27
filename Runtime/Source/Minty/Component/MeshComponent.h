@@ -9,6 +9,9 @@
 
 namespace Minty
 {
+	/// <summary>
+	/// Holds the Mesh for an Entity.
+	/// </summary>
 	struct MeshComponent
 		: public Component
 	{
@@ -27,50 +30,8 @@ namespace Minty
 		/// </summary>
 		Ref<Material> material = nullptr;
 
-		void serialize(Writer& writer) const override
-		{
-			writer.write("type", type);
-			if (mesh.get())
-			{
-				writer.write("mesh", mesh->id());
-			}
-			if (material.get())
-			{
-				writer.write("material", material->id());
-			}
-		}
+		void serialize(Writer& writer) const override;
 
-		void deserialize(Reader& reader) override
-		{
-			UUID temp;
-
-			if (reader.read("type", type))
-			{
-				mesh = Renderer::get_or_create_mesh(type);
-
-				// if null, must be custom
-				if (mesh == nullptr)
-				{
-					// type == Custom, load the custom Mesh
-					if (reader.read("mesh", temp))
-					{
-						mesh = AssetManager::get<Mesh>(temp);
-					}
-				}
-			}
-			else
-			{
-				// no type: assume custom Mesh
-				if (reader.read("mesh", temp))
-				{
-					mesh = AssetManager::get<Mesh>(temp);
-				}
-			}
-			
-			if (reader.read("material", temp))
-			{
-				material = AssetManager::get<Material>(temp);
-			}
-		}
+		void deserialize(Reader& reader) override;
 	};
 }

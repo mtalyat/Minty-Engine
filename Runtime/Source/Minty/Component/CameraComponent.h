@@ -10,6 +10,9 @@ namespace Minty
 	struct CameraComponent
 		: public ScriptObjectComponent
 	{
+		/// <summary>
+		/// The Camera data.
+		/// </summary>
 		Camera camera;
 
 		void serialize(Writer& writer) const override;

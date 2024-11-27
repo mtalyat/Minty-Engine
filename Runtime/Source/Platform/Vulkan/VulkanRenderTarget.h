@@ -14,12 +14,12 @@ namespace Minty
 		UInt2 m_size;
 
 	public:
-		VulkanRenderTarget(const RenderTargetBuilder& builder);
+		VulkanRenderTarget(RenderTargetBuilder const& builder);
 
 		~VulkanRenderTarget();
 
 	public:
-		void initialize(const RenderTargetBuilder& builder);
+		void initialize(RenderTargetBuilder const& builder);
 
 		void shutdown();
 
@@ -27,6 +27,6 @@ namespace Minty
 		UInt2 get_size() const override { return m_size; }
 
 	public:
-		VkFramebuffer get_framebuffer(const Size index) const { return m_framebuffers.at(index); }
+		VkFramebuffer get_framebuffer(Size const index) const { return m_framebuffers.at(index); }
 	};
 }

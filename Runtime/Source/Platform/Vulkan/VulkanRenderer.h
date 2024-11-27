@@ -68,6 +68,7 @@ namespace Minty
 		static VkQueue s_graphicsQueue; // queue for graphics operations
 		static VkQueue s_presentQueue; // queue for rendering to the screen
 		static VkSurfaceKHR s_surface;
+		static Format s_targetSwapchainFormat;
 		static VkSurfaceFormatKHR s_swapchainSurfaceFormat;
 		static VkExtent2D s_swapchainExtent;
 		static VkSwapchainKHR s_swapchain;
@@ -88,7 +89,7 @@ namespace Minty
 #pragma region Init
 
 	public:
-		static void initialize(const RendererBuilder& builder);
+		static void initialize(RendererBuilder const& builder);
 
 		static void shutdown();
 
@@ -104,15 +105,15 @@ namespace Minty
 #pragma region Rendering
 
 	public:
-		static int start_frame(const Ref<RenderTarget> renderTarget);
+		static int start_frame(Ref<RenderTarget> const renderTarget);
 
 		static void end_frame();
 
-		static void draw_vertices(const UInt vertexCount);
+		static void draw_vertices(UInt const vertexCount);
 
-		static void draw_instances(const UInt instanceCount, const UInt vertexCount = 0);
+		static void draw_instances(UInt const instanceCount, UInt const vertexCount = 0);
 
-		static void draw_indices(const UInt indexCount);
+		static void draw_indices(UInt const indexCount);
 
 		static void sync();
 
@@ -151,6 +152,8 @@ namespace Minty
 
 		static Size get_current_frame_index() { return s_currentFrame; }
 
+		static QueueFamilyIndices const& get_queue_family_indices() { return s_queueFamilyIndices; }
+
 	private:
 		static Frame& get_current_frame() { return s_frames.at(s_currentFrame); }
 
@@ -188,9 +191,9 @@ namespace Minty
 #pragma region Surface
 
 	private:
-		static VkSurfaceKHR create_surface(const Ref<Window> window);
+		static VkSurfaceKHR create_surface(Ref<Window> const window);
 
-		static void destroy_surface(const VkSurfaceKHR surface);
+		static void destroy_surface(VkSurfaceKHR const surface);
 
 #pragma endregion
 
@@ -199,22 +202,22 @@ namespace Minty
 	private:
 		static void select_physical_device();
 
-		static int rate_device_suitability(const VkPhysicalDevice physicalDevice);
+		static int rate_device_suitability(VkPhysicalDevice const physicalDevice);
 
-		static SwapChainSupportDetails query_swap_chain_support(const VkPhysicalDevice physicalDevice);
+		static SwapChainSupportDetails query_swap_chain_support(VkPhysicalDevice const physicalDevice);
 
-		static VkSurfaceFormatKHR select_swap_surface_format(const std::vector<VkSurfaceFormatKHR>& availableFormats, const VkFormat format = VK_FORMAT_B8G8R8A8_SRGB, const VkColorSpaceKHR colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR);
+		static VkSurfaceFormatKHR select_swap_surface_format(std::vector<VkSurfaceFormatKHR> const& availableFormats, VkFormat const format = VK_FORMAT_B8G8R8A8_SRGB, VkColorSpaceKHR const colorSpace = VK_COLOR_SPACE_SRGB_NONLINEAR_KHR);
 
-		static VkExtent2D select_swap_extent(const VkSurfaceCapabilitiesKHR& capabilities);
+		static VkExtent2D select_swap_extent(VkSurfaceCapabilitiesKHR const& capabilities);
 
-		static VkPresentModeKHR select_swap_present_mode(const std::vector<VkPresentModeKHR>& availablePresentModes, const VkPresentModeKHR presentMode = VK_PRESENT_MODE_MAILBOX_KHR);
+		static VkPresentModeKHR select_swap_present_mode(std::vector<VkPresentModeKHR> const& availablePresentModes, VkPresentModeKHR const presentMode = VK_PRESENT_MODE_MAILBOX_KHR);
 
 #pragma endregion
 
 #pragma region Queue Families
 
 	private:
-		static QueueFamilyIndices find_queue_families(const VkPhysicalDevice physicalDevice);
+		static QueueFamilyIndices find_queue_families(VkPhysicalDevice const physicalDevice);
 
 		static VkQueue get_device_queue(const uint32_t index);
 
@@ -234,55 +237,55 @@ namespace Minty
 #pragma region Swapchain
 
 	private:
-		static void create_swapchain(const VkSurfaceFormatKHR surfaceFormat, const VkExtent2D extent, const VkPresentModeKHR presentMode);
+		static void create_swapchain(VkSurfaceFormatKHR const surfaceFormat, VkExtent2D const extent, VkPresentModeKHR const presentMode);
 
 		static void destroy_swapchain();
 
 		static std::vector<VkImage> get_swapchain_images();
 
-		static VkResult get_next_swapchain_image(const VkSemaphore waitSemaphore, uint32_t& index);
+		static VkResult get_next_swapchain_image(VkSemaphore const waitSemaphore, uint32_t& index);
 
 #pragma endregion
 
 #pragma region Format
 
 	private:
-		static VkFormat find_supported_format(const std::vector<VkFormat>& candidates, const VkImageTiling tiling, const VkFormatFeatureFlags features);
+		static VkFormat find_supported_format(const std::vector<VkFormat>& candidates, VkImageTiling const tiling, VkFormatFeatureFlags const features);
 
 #pragma endregion
 
 #pragma region Image
 
 	public:
-		static VkImage create_image(const uint32_t width, const uint32_t height, const VkImageType type, const VkFormat format, const VkImageTiling tiling, const VkImageUsageFlags usage);
+		static VkImage create_image(const uint32_t width, const uint32_t height, VkImageType const type, VkFormat const format, VkImageTiling const tiling, VkImageUsageFlags const usage);
 
-		static void create_image_and_memory(const uint32_t width, const uint32_t height, const VkImageType type, const VkFormat format, const VkImageTiling tiling, const VkImageUsageFlags usage, const VkMemoryPropertyFlags memoryProperties, VkImage& image, VkDeviceMemory& memory);
+		static void create_image_and_memory(const uint32_t width, const uint32_t height, VkImageType const type, VkFormat const format, VkImageTiling const tiling, VkImageUsageFlags const usage, VkMemoryPropertyFlags const memoryProperties, VkImage& image, VkDeviceMemory& memory);
 
-		static void destroy_image(const VkImage image);
+		static void destroy_image(VkImage const image);
 
-		static void bind_image_memory(const VkImage image, const VkDeviceMemory memory);
+		static void bind_image_memory(VkImage const image, VkDeviceMemory const memory);
 
-		static void transition_image_layout(const VkImage image, const VkFormat format, const VkImageLayout oldLayout, const VkImageLayout newLayout);
+		static void transition_image_layout(VkImage const image, VkFormat const format, VkImageLayout const oldLayout, VkImageLayout const newLayout);
 
 #pragma endregion
 
 #pragma region Image View
 
 	public:
-		static VkImageView create_image_view(const VkImage image, const VkFormat format, const VkImageAspectFlags aspectFlags, const VkImageViewType viewType = VK_IMAGE_VIEW_TYPE_2D);
+		static VkImageView create_image_view(VkImage const image, VkFormat const format, VkImageAspectFlags const aspectFlags, VkImageViewType const viewType = VK_IMAGE_VIEW_TYPE_2D);
 
-		static std::vector<VkImageView> create_image_views(const std::vector<VkImage>& images, const VkFormat format, const VkImageAspectFlags aspectFlags, const VkImageViewType viewType = VK_IMAGE_VIEW_TYPE_2D);
+		static std::vector<VkImageView> create_image_views(const std::vector<VkImage>& images, VkFormat const format, VkImageAspectFlags const aspectFlags, VkImageViewType const viewType = VK_IMAGE_VIEW_TYPE_2D);
 
-		static void destroy_image_view(const VkImageView imageView);
+		static void destroy_image_view(VkImageView const imageView);
 
 #pragma endregion
 
 #pragma region Sampler
 
 	public:
-		static VkSampler create_sampler(const VkFilter magFilter = VK_FILTER_LINEAR, const VkFilter minFilter = VK_FILTER_LINEAR, const VkSamplerAddressMode addressMode = VK_SAMPLER_ADDRESS_MODE_REPEAT, const VkBorderColor borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK, const Bool normalizedCoordinates = true);
+		static VkSampler create_sampler(VkFilter const magFilter = VK_FILTER_LINEAR, VkFilter const minFilter = VK_FILTER_LINEAR, VkSamplerAddressMode const addressMode = VK_SAMPLER_ADDRESS_MODE_REPEAT, VkBorderColor const borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK, Bool const normalizedCoordinates = true);
 
-		static void destroy_sampler(const VkSampler sampler);
+		static void destroy_sampler(VkSampler const sampler);
 
 #pragma endregion
 
@@ -291,7 +294,12 @@ namespace Minty
 	private:
 		static VkFormat find_depth_format();
 
-		static Bool has_stencil_component(const VkFormat format);
+		static Bool has_stencil_component(VkFormat const format);
+
+		// creates the depth image for the framebuffers
+		static void create_depth_resources();
+
+		static void destroy_depth_resources();
 
 #pragma endregion
 
@@ -300,9 +308,9 @@ namespace Minty
 	public:
 		static VkShaderModule create_shader_module(const std::vector<Minty::Char>& code);
 
-		static VkShaderModule create_shader_module(const Path& path);
+		static VkShaderModule create_shader_module(Path const& path);
 
-		static void destroy_shader_module(const VkShaderModule shaderModule);
+		static void destroy_shader_module(VkShaderModule const shaderModule);
 
 #pragma endregion
 
@@ -318,9 +326,9 @@ namespace Minty
 #pragma region Frame Buffer
 
 	public:
-		static VkFramebuffer create_framebuffer(const VkRenderPass renderPass, const VkImageView attachment, const VkExtent2D extent);
+		static VkFramebuffer create_framebuffer(VkRenderPass const renderPass, VkImageView const attachment, VkExtent2D const extent);
 
-		static void destroy_framebuffer(const VkFramebuffer framebuffer);
+		static void destroy_framebuffer(VkFramebuffer const framebuffer);
 
 #pragma endregion
 
@@ -338,51 +346,51 @@ namespace Minty
 	public:
 		static VkCommandBuffer create_command_buffer();
 
-		static void destroy_command_buffer(const VkCommandBuffer commandBuffer);
+		static void destroy_command_buffer(VkCommandBuffer const commandBuffer);
 
-		static void begin_command_buffer(const VkCommandBuffer commandBuffer);
+		static void begin_command_buffer(VkCommandBuffer const commandBuffer);
 
-		static void begin_command_buffer_temp(const VkCommandBuffer commandBuffer);
+		static void begin_command_buffer_temp(VkCommandBuffer const commandBuffer);
 
-		static void end_command_buffer(const VkCommandBuffer commandBuffer);
+		static void end_command_buffer(VkCommandBuffer const commandBuffer);
 
 		static VkCommandBuffer begin_command_buffer_single();
 
-		static void end_command_buffer_single(VkCommandBuffer& commandBuffer, const VkQueue queue);
+		static void end_command_buffer_single(VkCommandBuffer& commandBuffer, VkQueue const queue);
 
-		static void reset_command_buffer(const VkCommandBuffer commandBuffer);
+		static void reset_command_buffer(VkCommandBuffer const commandBuffer);
 
 		// submit and presentation
-		static void submit_command_buffer(const VkCommandBuffer commandBuffer, const VkQueue queue, const VkSemaphore waitSemaphore, const VkSemaphore signalSemaphore, const VkFence inFlightFence);
+		static void submit_command_buffer(VkCommandBuffer const commandBuffer, VkQueue const queue, VkSemaphore const waitSemaphore, VkSemaphore const signalSemaphore, VkFence const inFlightFence);
 
-		static void submit_command_buffer(const Frame& frame, const VkQueue queue);
+		static void submit_command_buffer(Frame const& frame, VkQueue const queue);
 
-		static void submit_command_buffer(const VkCommandBuffer commandBuffer, const VkQueue queue);
+		static void submit_command_buffer(VkCommandBuffer const commandBuffer, VkQueue const queue);
 
 #pragma region Commands
 
 	public:
-		static void begin_render_pass(const VkCommandBuffer commandBuffer, const VkRenderPass renderPass, const VkFramebuffer framebuffer, const VkRect2D renderArea, const VkClearColorValue clearColor);
+		static void begin_render_pass(VkCommandBuffer const commandBuffer, VkRenderPass const renderPass, VkFramebuffer const framebuffer, VkRect2D const renderArea, VkClearColorValue const clearColor);
 
-		static void end_render_pass(const VkCommandBuffer commandBuffer);
+		static void end_render_pass(VkCommandBuffer const commandBuffer);
 
-		static void bind_pipeline(const VkCommandBuffer commandBuffer, const VkPipeline graphicsPipeline, const VkPipelineBindPoint bindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS);
+		static void bind_pipeline(VkCommandBuffer const commandBuffer, VkPipeline const graphicsPipeline, VkPipelineBindPoint const bindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS);
 
-		static void bind_descriptor_set(const VkCommandBuffer commandBuffer, const VkPipelineLayout graphicsPipelineLayout, const VkDescriptorSet descriptorSet);
+		static void bind_descriptor_set(VkCommandBuffer const commandBuffer, VkPipelineLayout const graphicsPipelineLayout, VkDescriptorSet const descriptorSet);
 
-		static void bind_viewport(const VkCommandBuffer commandBuffer, const VkViewport& viewport);
+		static void bind_viewport(VkCommandBuffer const commandBuffer, VkViewport const& viewport);
 
-		static void bind_scissor(const VkCommandBuffer commandBuffer, const VkRect2D& scissor);
+		static void bind_scissor(VkCommandBuffer const commandBuffer, VkRect2D const& scissor);
 
-		static void bind_vertex_buffer(const VkCommandBuffer commandBuffer, const VkBuffer buffer, UInt const binding = 0);
+		static void bind_vertex_buffer(VkCommandBuffer const commandBuffer, VkBuffer const buffer, UInt const binding = 0);
 
-		static void bind_index_buffer(const VkCommandBuffer commandBuffer, const VkBuffer buffer);
+		static void bind_index_buffer(VkCommandBuffer const commandBuffer, VkBuffer const buffer);
 
-		static void draw_vertices(const VkCommandBuffer commandBuffer, const uint32_t count);
+		static void draw_vertices(VkCommandBuffer const commandBuffer, const uint32_t count);
 
-		static void draw_instances(const VkCommandBuffer commandBuffer, const uint32_t count, const uint32_t vertexCount);
+		static void draw_instances(VkCommandBuffer const commandBuffer, const uint32_t count, const uint32_t vertexCount);
 
-		static void draw_indices(const VkCommandBuffer commandBuffer, const uint32_t count);
+		static void draw_indices(VkCommandBuffer const commandBuffer, const uint32_t count);
 
 #pragma endregion
 
@@ -393,11 +401,11 @@ namespace Minty
 	private:
 		static VkSemaphore create_semaphore();
 
-		static void destroy_semaphore(const VkSemaphore semaphore);
+		static void destroy_semaphore(VkSemaphore const semaphore);
 
 		static VkFence create_fence();
 
-		static void destroy_fence(const VkFence fence);
+		static void destroy_fence(VkFence const fence);
 
 		static void wait_for_fence(VkFence& fence);
 
@@ -408,28 +416,28 @@ namespace Minty
 #pragma region Presentation
 
 	private:
-		static VkResult present_frame(uint32_t& imageIndex, const VkSemaphore signalSemaphore);
+		static VkResult present_frame(uint32_t& imageIndex, VkSemaphore const signalSemaphore);
 
 #pragma endregion
 
 #pragma region Buffer
 
 	public:
-		static VkBuffer create_buffer(const VkDeviceSize size, const VkBufferUsageFlags usage);
+		static VkBuffer create_buffer(VkDeviceSize const size, VkBufferUsageFlags const usage);
 
-		static void create_buffer_and_memory(const VkDeviceSize size, const VkBufferUsageFlags usage, const VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& memory);
+		static void create_buffer_and_memory(VkDeviceSize const size, VkBufferUsageFlags const usage, VkMemoryPropertyFlags const properties, VkBuffer& buffer, VkDeviceMemory& memory);
 
-		static void destroy_buffer(const VkBuffer buffer);
+		static void destroy_buffer(VkBuffer const buffer);
 
-		static void destroy_buffer_and_memory(const VkBuffer buffer, const VkDeviceMemory memory);
+		static void destroy_buffer_and_memory(VkBuffer const buffer, VkDeviceMemory const memory);
 
-		static void get_buffer_memory_requirements(const VkBuffer buffer, VkMemoryRequirements& requirements);
+		static void get_buffer_memory_requirements(VkBuffer const buffer, VkMemoryRequirements& requirements);
 
-		static void bind_buffer_memory(const VkBuffer buffer, const VkDeviceMemory memory);
+		static void bind_buffer_memory(VkBuffer const buffer, VkDeviceMemory const memory);
 
-		static void copy_buffer_to_buffer(const VkQueue queue, const VkBuffer srcBuffer, const VkBuffer dstBuffer, const VkDeviceSize size);
+		static void copy_buffer_to_buffer(VkQueue const queue, VkBuffer const srcBuffer, VkBuffer const dstBuffer, VkDeviceSize const size);
 
-		static void copy_buffer_to_image(const VkQueue queue, const VkBuffer srcBuffer, const VkImage dstImage, const uint32_t width, const uint32_t height);
+		static void copy_buffer_to_image(VkQueue const queue, VkBuffer const srcBuffer, VkImage const dstImage, const uint32_t width, const uint32_t height);
 
 #pragma endregion
 
@@ -438,15 +446,15 @@ namespace Minty
 	public:
 		static uint32_t find_memory_type(uint32_t typeFilter, VkMemoryPropertyFlags properties);
 
-		static VkDeviceMemory allocate_memory(const VkDeviceSize size, const uint32_t memoryTypeIndex);
+		static VkDeviceMemory allocate_memory(VkDeviceSize const size, const uint32_t memoryTypeIndex);
 
-		static void free_memory(const VkDeviceMemory memory);
+		static void free_memory(VkDeviceMemory const memory);
 
-		static void* map_memory(const VkDeviceMemory memory, const VkDeviceSize offset, const VkDeviceSize size);
+		static void* map_memory(VkDeviceMemory const memory, VkDeviceSize const offset, VkDeviceSize const size);
 
-		static void unmap_memory(const VkDeviceMemory memory);
+		static void unmap_memory(VkDeviceMemory const memory);
 
-		static void set_memory(const VkDeviceMemory memory, const void* const data, const VkDeviceSize offset, const VkDeviceSize size);
+		static void set_memory(VkDeviceMemory const memory, const void* const data, VkDeviceSize const offset, VkDeviceSize const size);
 
 #pragma endregion
 

@@ -88,6 +88,12 @@
     <Filter Include="Header Files\Minty\Window">
       <UniqueIdentifier>{005cd715-b37e-4c43-8238-7fa23036a161}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Minty\Thread">
+      <UniqueIdentifier>{d5aa14b3-1e06-4f4e-83c1-6efc773c209b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Minty\GUI">
+      <UniqueIdentifier>{97336ed9-c394-43b3-9b34-6ef84cf7e060}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -324,7 +330,7 @@
     <ClInclude Include="Minty\Core\Type.h">
       <Filter>Header Files\Minty\Core</Filter>
     </ClInclude>
-    <ClInclude Include="Minty\Core\Operations.h">
+    <ClInclude Include="Minty\Core\Operation.h">
       <Filter>Header Files\Minty\Core</Filter>
     </ClInclude>
     <ClInclude Include="Minty\Serialize\Serializable.h">
@@ -606,6 +612,24 @@
     <ClInclude Include="Minty\Render\BufferCargo.h">
       <Filter>Header Files\Minty\Render</Filter>
     </ClInclude>
+    <ClInclude Include="Minty\Thread\Task.h">
+      <Filter>Header Files\Minty\Thread</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Library\ImGUI.h">
+      <Filter>Header Files\Minty\Library</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\GUI\GUI.h">
+      <Filter>Header Files\Minty\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\GUI\Theme.h">
+      <Filter>Header Files\Minty\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\GUI\Enums.h">
+      <Filter>Header Files\Minty\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Core\Direction.h">
+      <Filter>Header Files\Minty\Core</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -761,7 +785,7 @@
     <ClCompile Include="Minty\Core\Type.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Minty\Core\Operations.cpp">
+    <ClCompile Include="Minty\Core\Operation.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Minty\Script\CS\CsScriptEngine.cpp">
@@ -1002,6 +1026,51 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Minty\Render\BufferCargo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Core\ToString.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Component\MeshComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Component\NameComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Component\TagComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Component\TransformComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\imgui\include\imgui_draw.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\imgui\include\imgui_impl_glfw.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\imgui\include\imgui_demo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\imgui\include\imgui.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\imgui\include\imgui_widgets.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\imgui\include\imgui_tables.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\imgui\include\imgui_stdlib.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\imgui\include\imgui_impl_vulkan.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\imguifiledialog\include\ImGuiFileDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\GUI\GUI.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

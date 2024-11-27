@@ -41,18 +41,24 @@ def add_enum(lines):
     
     #   ToString
     output += header('ToString.h:')
-    temp = loop_with_values(f'\t\tcase {name}::{{0}}: return "{{0}}";\n')
-    output += f'''template<>
+    output += f'''String to_string({name} const obj);
+
+template<>
 inline String to_string({name} const& obj)
 {{
-	switch (obj)
+    return to_string(obj);
+}}'''
+    
+    output += header('ToString.cpp')
+    temp = loop_with_values(f'\t\tcase {name}::{{0}}: return "{{0}}";\n')
+    output += f'''String Minty::to_string({name} const obj)
+{{
+    switch (obj)
 	{{
 {temp}
 		default: return "";
 	}}
-}}
-
-'''
+}}'''
     
     #   Parse
     output += header('Parse.h')

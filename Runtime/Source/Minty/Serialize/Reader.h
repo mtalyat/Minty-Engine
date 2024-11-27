@@ -59,14 +59,14 @@ namespace Minty
 #pragma endregion
 
 	public:
-		virtual Bool indent(const Size index) = 0;
-		virtual Bool indent(const String& name) = 0;
+		virtual Bool indent(Size const index) = 0;
+		virtual Bool indent(String const& name) = 0;
 		virtual void outdent() = 0;
 		virtual Size depth() const = 0;
 		virtual Bool valid() const = 0;
-		virtual const Node& get_current_node() const = 0;
-		const String& name() const { return get_current_node().get_name(); }
-		const Container& data() const { return get_current_node().get_data(); }
+		virtual Node const& get_current_node() const = 0;
+		String const& name() const { return get_current_node().get_name(); }
+		Container const& data() const { return get_current_node().get_data(); }
 		virtual Owner<Reader> branch() const = 0;
 		virtual Owner<Reader> branch(String const& name) const = 0;
 		virtual Owner<Reader> branch(Size const index) const = 0;
@@ -133,8 +133,8 @@ namespace Minty
 		virtual Bool read_variable(Size const index, Variable& obj) const = 0;
 
 	public:
-		virtual Bool read_raw(Size const index, void* const data, const Size size) const = 0;
-		virtual Bool read_raw(String const& name, void* const data, const Size size) const = 0;
+		virtual Bool read_raw(Size const index, void* const data, Size const size) const = 0;
+		virtual Bool read_raw(String const& name, void* const data, Size const size) const = 0;
 
 		Bool read(Size const index, void* const data, Type const type) const;
 		Bool read(String const& name, void* const data, Type const type) const;
@@ -770,44 +770,44 @@ namespace Minty
 	class ReaderFormatBehavior
 	{
 	protected:
-		virtual Node read_node(const void* const data, const Size size) const = 0;
+		virtual Node read_node(const void* const data, Size const size) const = 0;
 
 	protected:
-		virtual Bool read_bool_from_buffer(const void* const data, const Size size) const = 0;
-		virtual Bool2 read_bool2_from_buffer(const void* const data, const Size size) const = 0;
-		virtual Bool3 read_bool3_from_buffer(const void* const data, const Size size) const = 0;
-		virtual Bool4 read_bool4_from_buffer(const void* const data, const Size size) const = 0;
-		virtual Char read_char_from_buffer(const void* const data, const Size size) const = 0;
-		virtual Byte read_byte_from_buffer(const void* const data, const Size size) const = 0;
-		virtual Short read_short_from_buffer(const void* const data, const Size size) const = 0;
-		virtual UShort read_ushort_from_buffer(const void* const data, const Size size) const = 0;
-		virtual Int read_int_from_buffer(const void* const data, const Size size) const = 0;
-		virtual Int2 read_int2_from_buffer(const void* const data, const Size size) const = 0;
-		virtual Int3 read_int3_from_buffer(const void* const data, const Size size) const = 0;
-		virtual Int4 read_int4_from_buffer(const void* const data, const Size size) const = 0;
-		virtual UInt read_uint_from_buffer(const void* const data, const Size size) const = 0;
-		virtual UInt2 read_uint2_from_buffer(const void* const data, const Size size) const = 0;
-		virtual UInt3 read_uint3_from_buffer(const void* const data, const Size size) const = 0;
-		virtual UInt4 read_uint4_from_buffer(const void* const data, const Size size) const = 0;
-		virtual Long read_long_from_buffer(const void* const data, const Size size) const = 0;
-		virtual ULong read_ulong_from_buffer(const void* const data, const Size size) const = 0;
-		virtual Size read_size_from_buffer(const void* const data, const Size size) const = 0;
-		virtual Float read_float_from_buffer(const void* const data, const Size size) const = 0;
-		virtual Float2 read_float2_from_buffer(const void* const data, const Size size) const = 0;
-		virtual Float3 read_float3_from_buffer(const void* const data, const Size size) const = 0;
-		virtual Float4 read_float4_from_buffer(const void* const data, const Size size) const = 0;
-		virtual Double read_double_from_buffer(const void* const data, const Size size) const = 0;
-		virtual String read_string_from_buffer(const void* const data, const Size size) const = 0;
-		virtual UUID read_uuid_from_buffer(const void* const data, const Size size) const = 0;
-		virtual Type read_type_from_buffer(const void* const data, const Size size) const = 0;
-		virtual void* read_typed_from_buffer(const void* const data, const Size size, Type const type) const = 0;
-		virtual Variable read_variable_from_buffer(const void* const data, const Size size) const = 0;
+		virtual Bool read_bool_from_buffer(const void* const data, Size const size) const = 0;
+		virtual Bool2 read_bool2_from_buffer(const void* const data, Size const size) const = 0;
+		virtual Bool3 read_bool3_from_buffer(const void* const data, Size const size) const = 0;
+		virtual Bool4 read_bool4_from_buffer(const void* const data, Size const size) const = 0;
+		virtual Char read_char_from_buffer(const void* const data, Size const size) const = 0;
+		virtual Byte read_byte_from_buffer(const void* const data, Size const size) const = 0;
+		virtual Short read_short_from_buffer(const void* const data, Size const size) const = 0;
+		virtual UShort read_ushort_from_buffer(const void* const data, Size const size) const = 0;
+		virtual Int read_int_from_buffer(const void* const data, Size const size) const = 0;
+		virtual Int2 read_int2_from_buffer(const void* const data, Size const size) const = 0;
+		virtual Int3 read_int3_from_buffer(const void* const data, Size const size) const = 0;
+		virtual Int4 read_int4_from_buffer(const void* const data, Size const size) const = 0;
+		virtual UInt read_uint_from_buffer(const void* const data, Size const size) const = 0;
+		virtual UInt2 read_uint2_from_buffer(const void* const data, Size const size) const = 0;
+		virtual UInt3 read_uint3_from_buffer(const void* const data, Size const size) const = 0;
+		virtual UInt4 read_uint4_from_buffer(const void* const data, Size const size) const = 0;
+		virtual Long read_long_from_buffer(const void* const data, Size const size) const = 0;
+		virtual ULong read_ulong_from_buffer(const void* const data, Size const size) const = 0;
+		virtual Size read_size_from_buffer(const void* const data, Size const size) const = 0;
+		virtual Float read_float_from_buffer(const void* const data, Size const size) const = 0;
+		virtual Float2 read_float2_from_buffer(const void* const data, Size const size) const = 0;
+		virtual Float3 read_float3_from_buffer(const void* const data, Size const size) const = 0;
+		virtual Float4 read_float4_from_buffer(const void* const data, Size const size) const = 0;
+		virtual Double read_double_from_buffer(const void* const data, Size const size) const = 0;
+		virtual String read_string_from_buffer(const void* const data, Size const size) const = 0;
+		virtual UUID read_uuid_from_buffer(const void* const data, Size const size) const = 0;
+		virtual Type read_type_from_buffer(const void* const data, Size const size) const = 0;
+		virtual void* read_typed_from_buffer(const void* const data, Size const size, Type const type) const = 0;
+		virtual Variable read_variable_from_buffer(const void* const data, Size const size) const = 0;
 	};
 
 	class ReaderStorageBehavior
 	{
 	protected:
-		virtual void read_data(void* const data, const Size size) = 0;
+		virtual void read_data(void* const data, Size const size) = 0;
 
 		virtual std::vector<Byte> read_all() = 0;
 	};
@@ -827,7 +827,7 @@ namespace Minty
 		{}
 
 	protected:
-		void read_data(void* const data, const Size size) override {}
+		void read_data(void* const data, Size const size) override {}
 
 		std::vector<Byte> read_all() override { return {}; }
 	};
@@ -849,7 +849,7 @@ namespace Minty
 		virtual ~FileReaderBehavior() = default;
 
 	protected:
-		void read_data(void* const data, const Size size) override;
+		void read_data(void* const data, Size const size) override;
 
 		std::vector<Byte> read_all() override;
 	};
@@ -870,7 +870,7 @@ namespace Minty
 		virtual ~MemoryReaderBehavior() = default;
 
 	protected:
-		void read_data(void* const data, const Size size) override;
+		void read_data(void* const data, Size const size) override;
 
 		std::vector<Byte> read_all() override;
 	};
@@ -890,38 +890,38 @@ namespace Minty
 		: private ReaderFormatBehavior
 	{
 	protected:
-		Node read_node(const void* const data, const Size size) const override;
+		Node read_node(const void* const data, Size const size) const override;
 
 	protected:
-		Bool read_bool_from_buffer(const void* const data, const Size size) const override;
-		Bool2 read_bool2_from_buffer(const void* const data, const Size size) const override;
-		Bool3 read_bool3_from_buffer(const void* const data, const Size size) const override;
-		Bool4 read_bool4_from_buffer(const void* const data, const Size size) const override;
-		Char read_char_from_buffer(const void* const data, const Size size) const override;
-		Byte read_byte_from_buffer(const void* const data, const Size size) const override;
-		Short read_short_from_buffer(const void* const data, const Size size) const override;
-		UShort read_ushort_from_buffer(const void* const data, const Size size) const override;
-		Int read_int_from_buffer(const void* const data, const Size size) const override;
-		Int2 read_int2_from_buffer(const void* const data, const Size size) const override;
-		Int3 read_int3_from_buffer(const void* const data, const Size size) const override;
-		Int4 read_int4_from_buffer(const void* const data, const Size size) const override;
-		UInt read_uint_from_buffer(const void* const data, const Size size) const override;
-		UInt2 read_uint2_from_buffer(const void* const data, const Size size) const override;
-		UInt3 read_uint3_from_buffer(const void* const data, const Size size) const override;
-		UInt4 read_uint4_from_buffer(const void* const data, const Size size) const override;
-		Long read_long_from_buffer(const void* const data, const Size size) const override;
-		ULong read_ulong_from_buffer(const void* const data, const Size size) const override;
-		Size read_size_from_buffer(const void* const data, const Size size) const override;
-		Float read_float_from_buffer(const void* const data, const Size size) const override;
-		Float2 read_float2_from_buffer(const void* const data, const Size size) const override;
-		Float3 read_float3_from_buffer(const void* const data, const Size size) const override;
-		Float4 read_float4_from_buffer(const void* const data, const Size size) const override;
-		Double read_double_from_buffer(const void* const data, const Size size) const override;
-		String read_string_from_buffer(const void* const data, const Size size) const override;
-		UUID read_uuid_from_buffer(const void* const data, const Size size) const override;
-		Type read_type_from_buffer(const void* const data, const Size size) const override;
-		void* read_typed_from_buffer(const void* const data, const Size size, Type const type) const override;
-		Variable read_variable_from_buffer(const void* const data, const Size size) const override;
+		Bool read_bool_from_buffer(const void* const data, Size const size) const override;
+		Bool2 read_bool2_from_buffer(const void* const data, Size const size) const override;
+		Bool3 read_bool3_from_buffer(const void* const data, Size const size) const override;
+		Bool4 read_bool4_from_buffer(const void* const data, Size const size) const override;
+		Char read_char_from_buffer(const void* const data, Size const size) const override;
+		Byte read_byte_from_buffer(const void* const data, Size const size) const override;
+		Short read_short_from_buffer(const void* const data, Size const size) const override;
+		UShort read_ushort_from_buffer(const void* const data, Size const size) const override;
+		Int read_int_from_buffer(const void* const data, Size const size) const override;
+		Int2 read_int2_from_buffer(const void* const data, Size const size) const override;
+		Int3 read_int3_from_buffer(const void* const data, Size const size) const override;
+		Int4 read_int4_from_buffer(const void* const data, Size const size) const override;
+		UInt read_uint_from_buffer(const void* const data, Size const size) const override;
+		UInt2 read_uint2_from_buffer(const void* const data, Size const size) const override;
+		UInt3 read_uint3_from_buffer(const void* const data, Size const size) const override;
+		UInt4 read_uint4_from_buffer(const void* const data, Size const size) const override;
+		Long read_long_from_buffer(const void* const data, Size const size) const override;
+		ULong read_ulong_from_buffer(const void* const data, Size const size) const override;
+		Size read_size_from_buffer(const void* const data, Size const size) const override;
+		Float read_float_from_buffer(const void* const data, Size const size) const override;
+		Float2 read_float2_from_buffer(const void* const data, Size const size) const override;
+		Float3 read_float3_from_buffer(const void* const data, Size const size) const override;
+		Float4 read_float4_from_buffer(const void* const data, Size const size) const override;
+		Double read_double_from_buffer(const void* const data, Size const size) const override;
+		String read_string_from_buffer(const void* const data, Size const size) const override;
+		UUID read_uuid_from_buffer(const void* const data, Size const size) const override;
+		Type read_type_from_buffer(const void* const data, Size const size) const override;
+		void* read_typed_from_buffer(const void* const data, Size const size, Type const type) const override;
+		Variable read_variable_from_buffer(const void* const data, Size const size) const override;
 	};
 
 	//class BinaryReaderBehavior
@@ -972,7 +972,7 @@ namespace Minty
 
 		// format implementation
 	public:
-		Bool indent(const Size index) override
+		Bool indent(Size const index) override
 		{
 			// update current node, if it exists
 			if (valid() && index < get_current_node().get_children_count())
@@ -987,7 +987,7 @@ namespace Minty
 
 			return false;
 		}
-		Bool indent(const String& name) override
+		Bool indent(String const& name) override
 		{
 			// update current node, if it exists
 			if (valid() && get_current_node().has_child(name))
@@ -1017,7 +1017,7 @@ namespace Minty
 		}
 		Size depth() const override { return m_depth; }
 		Bool valid() const override { return m_depth + 1 == m_nodeStack.size(); }
-		const Node& get_current_node() const override
+		Node const& get_current_node() const override
 		{
 			MINTY_ASSERT_MESSAGE(valid(), "There is no current node to get. The reader has indented into a node that does not exist.");
 			return *m_nodeStack.back();
@@ -1058,7 +1058,7 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(index))
 				{
 					obj = currentNode.get_child(index).get_name();
@@ -1074,10 +1074,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(name))
 				{
-					const Container& data = currentNode.get_child(name).get_data();
+					Container const& data = currentNode.get_child(name).get_data();
 					obj = this->read_bool_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1088,10 +1088,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(index))
 				{
-					const Container& data = currentNode.get_child(index).get_data();
+					Container const& data = currentNode.get_child(index).get_data();
 					obj = this->read_bool_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1103,10 +1103,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(name))
 				{
-					const Container& data = currentNode.get_child(name).get_data();
+					Container const& data = currentNode.get_child(name).get_data();
 					obj = this->read_bool2_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1117,10 +1117,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(index))
 				{
-					const Container& data = currentNode.get_child(index).get_data();
+					Container const& data = currentNode.get_child(index).get_data();
 					obj = this->read_bool2_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1132,10 +1132,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(name))
 				{
-					const Container& data = currentNode.get_child(name).get_data();
+					Container const& data = currentNode.get_child(name).get_data();
 					obj = this->read_bool3_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1146,10 +1146,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(index))
 				{
-					const Container& data = currentNode.get_child(index).get_data();
+					Container const& data = currentNode.get_child(index).get_data();
 					obj = this->read_bool3_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1161,10 +1161,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(name))
 				{
-					const Container& data = currentNode.get_child(name).get_data();
+					Container const& data = currentNode.get_child(name).get_data();
 					obj = this->read_bool4_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1175,10 +1175,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(index))
 				{
-					const Container& data = currentNode.get_child(index).get_data();
+					Container const& data = currentNode.get_child(index).get_data();
 					obj = this->read_bool4_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1190,10 +1190,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(name))
 				{
-					const Container& data = currentNode.get_child(name).get_data();
+					Container const& data = currentNode.get_child(name).get_data();
 					obj = this->read_char_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1204,10 +1204,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(index))
 				{
-					const Container& data = currentNode.get_child(index).get_data();
+					Container const& data = currentNode.get_child(index).get_data();
 					obj = this->read_char_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1219,10 +1219,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(name))
 				{
-					const Container& data = currentNode.get_child(name).get_data();
+					Container const& data = currentNode.get_child(name).get_data();
 					obj = this->read_byte_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1233,10 +1233,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(index))
 				{
-					const Container& data = currentNode.get_child(index).get_data();
+					Container const& data = currentNode.get_child(index).get_data();
 					obj = this->read_byte_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1248,10 +1248,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(name))
 				{
-					const Container& data = currentNode.get_child(name).get_data();
+					Container const& data = currentNode.get_child(name).get_data();
 					obj = this->read_short_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1262,10 +1262,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(index))
 				{
-					const Container& data = currentNode.get_child(index).get_data();
+					Container const& data = currentNode.get_child(index).get_data();
 					obj = this->read_short_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1277,10 +1277,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(name))
 				{
-					const Container& data = currentNode.get_child(name).get_data();
+					Container const& data = currentNode.get_child(name).get_data();
 					obj = this->read_ushort_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1291,10 +1291,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(index))
 				{
-					const Container& data = currentNode.get_child(index).get_data();
+					Container const& data = currentNode.get_child(index).get_data();
 					obj = this->read_ushort_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1306,10 +1306,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(name))
 				{
-					const Container& data = currentNode.get_child(name).get_data();
+					Container const& data = currentNode.get_child(name).get_data();
 					obj = this->read_int_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1320,10 +1320,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(index))
 				{
-					const Container& data = currentNode.get_child(index).get_data();
+					Container const& data = currentNode.get_child(index).get_data();
 					obj = this->read_int_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1335,10 +1335,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(name))
 				{
-					const Container& data = currentNode.get_child(name).get_data();
+					Container const& data = currentNode.get_child(name).get_data();
 					obj = this->read_int2_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1349,10 +1349,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(index))
 				{
-					const Container& data = currentNode.get_child(index).get_data();
+					Container const& data = currentNode.get_child(index).get_data();
 					obj = this->read_int2_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1364,10 +1364,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(name))
 				{
-					const Container& data = currentNode.get_child(name).get_data();
+					Container const& data = currentNode.get_child(name).get_data();
 					obj = this->read_int3_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1378,10 +1378,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(index))
 				{
-					const Container& data = currentNode.get_child(index).get_data();
+					Container const& data = currentNode.get_child(index).get_data();
 					obj = this->read_int3_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1393,10 +1393,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(name))
 				{
-					const Container& data = currentNode.get_child(name).get_data();
+					Container const& data = currentNode.get_child(name).get_data();
 					obj = this->read_int4_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1407,10 +1407,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(index))
 				{
-					const Container& data = currentNode.get_child(index).get_data();
+					Container const& data = currentNode.get_child(index).get_data();
 					obj = this->read_int4_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1422,10 +1422,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(name))
 				{
-					const Container& data = currentNode.get_child(name).get_data();
+					Container const& data = currentNode.get_child(name).get_data();
 					obj = this->read_uint_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1436,10 +1436,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(index))
 				{
-					const Container& data = currentNode.get_child(index).get_data();
+					Container const& data = currentNode.get_child(index).get_data();
 					obj = this->read_uint_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1451,10 +1451,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(name))
 				{
-					const Container& data = currentNode.get_child(name).get_data();
+					Container const& data = currentNode.get_child(name).get_data();
 					obj = this->read_uint2_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1465,10 +1465,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(index))
 				{
-					const Container& data = currentNode.get_child(index).get_data();
+					Container const& data = currentNode.get_child(index).get_data();
 					obj = this->read_uint2_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1480,10 +1480,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(name))
 				{
-					const Container& data = currentNode.get_child(name).get_data();
+					Container const& data = currentNode.get_child(name).get_data();
 					obj = this->read_uint3_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1494,10 +1494,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(index))
 				{
-					const Container& data = currentNode.get_child(index).get_data();
+					Container const& data = currentNode.get_child(index).get_data();
 					obj = this->read_uint3_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1509,10 +1509,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(name))
 				{
-					const Container& data = currentNode.get_child(name).get_data();
+					Container const& data = currentNode.get_child(name).get_data();
 					obj = this->read_uint4_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1523,10 +1523,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(index))
 				{
-					const Container& data = currentNode.get_child(index).get_data();
+					Container const& data = currentNode.get_child(index).get_data();
 					obj = this->read_uint4_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1538,10 +1538,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(name))
 				{
-					const Container& data = currentNode.get_child(name).get_data();
+					Container const& data = currentNode.get_child(name).get_data();
 					obj = this->read_long_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1552,10 +1552,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(index))
 				{
-					const Container& data = currentNode.get_child(index).get_data();
+					Container const& data = currentNode.get_child(index).get_data();
 					obj = this->read_long_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1567,10 +1567,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(name))
 				{
-					const Container& data = currentNode.get_child(name).get_data();
+					Container const& data = currentNode.get_child(name).get_data();
 					obj = this->read_ulong_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1581,10 +1581,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(index))
 				{
-					const Container& data = currentNode.get_child(index).get_data();
+					Container const& data = currentNode.get_child(index).get_data();
 					obj = this->read_ulong_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1596,10 +1596,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(name))
 				{
-					const Container& data = currentNode.get_child(name).get_data();
+					Container const& data = currentNode.get_child(name).get_data();
 					obj = this->read_size_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1610,10 +1610,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(index))
 				{
-					const Container& data = currentNode.get_child(index).get_data();
+					Container const& data = currentNode.get_child(index).get_data();
 					obj = this->read_size_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1625,10 +1625,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(name))
 				{
-					const Container& data = currentNode.get_child(name).get_data();
+					Container const& data = currentNode.get_child(name).get_data();
 					obj = this->read_float_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1639,10 +1639,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(index))
 				{
-					const Container& data = currentNode.get_child(index).get_data();
+					Container const& data = currentNode.get_child(index).get_data();
 					obj = this->read_float_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1654,10 +1654,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(name))
 				{
-					const Container& data = currentNode.get_child(name).get_data();
+					Container const& data = currentNode.get_child(name).get_data();
 					obj = this->read_float2_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1668,10 +1668,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(index))
 				{
-					const Container& data = currentNode.get_child(index).get_data();
+					Container const& data = currentNode.get_child(index).get_data();
 					obj = this->read_float2_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1683,10 +1683,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(name))
 				{
-					const Container& data = currentNode.get_child(name).get_data();
+					Container const& data = currentNode.get_child(name).get_data();
 					obj = this->read_float3_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1697,10 +1697,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(index))
 				{
-					const Container& data = currentNode.get_child(index).get_data();
+					Container const& data = currentNode.get_child(index).get_data();
 					obj = this->read_float3_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1712,10 +1712,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(name))
 				{
-					const Container& data = currentNode.get_child(name).get_data();
+					Container const& data = currentNode.get_child(name).get_data();
 					obj = this->read_float4_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1726,10 +1726,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(index))
 				{
-					const Container& data = currentNode.get_child(index).get_data();
+					Container const& data = currentNode.get_child(index).get_data();
 					obj = this->read_float4_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1741,10 +1741,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(name))
 				{
-					const Container& data = currentNode.get_child(name).get_data();
+					Container const& data = currentNode.get_child(name).get_data();
 					obj = this->read_double_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1755,10 +1755,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(index))
 				{
-					const Container& data = currentNode.get_child(index).get_data();
+					Container const& data = currentNode.get_child(index).get_data();
 					obj = this->read_double_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1770,10 +1770,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(name))
 				{
-					const Container& data = currentNode.get_child(name).get_data();
+					Container const& data = currentNode.get_child(name).get_data();
 					obj = this->read_string_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1784,10 +1784,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(index))
 				{
-					const Container& data = currentNode.get_child(index).get_data();
+					Container const& data = currentNode.get_child(index).get_data();
 					obj = this->read_string_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1799,10 +1799,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(name))
 				{
-					const Container& data = currentNode.get_child(name).get_data();
+					Container const& data = currentNode.get_child(name).get_data();
 					obj = this->read_uuid_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1813,10 +1813,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(index))
 				{
-					const Container& data = currentNode.get_child(index).get_data();
+					Container const& data = currentNode.get_child(index).get_data();
 					obj = this->read_uuid_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1828,10 +1828,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(name))
 				{
-					const Container& data = currentNode.get_child(name).get_data();
+					Container const& data = currentNode.get_child(name).get_data();
 					obj = this->read_type_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1842,10 +1842,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(index))
 				{
-					const Container& data = currentNode.get_child(index).get_data();
+					Container const& data = currentNode.get_child(index).get_data();
 					obj = this->read_type_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1857,10 +1857,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(name))
 				{
-					const Container& data = currentNode.get_child(name).get_data();
+					Container const& data = currentNode.get_child(name).get_data();
 					obj = this->read_variable_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1871,10 +1871,10 @@ namespace Minty
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(index))
 				{
-					const Container& data = currentNode.get_child(index).get_data();
+					Container const& data = currentNode.get_child(index).get_data();
 					obj = this->read_variable_from_buffer(data.data(), data.size());
 					return true;
 				}
@@ -1882,14 +1882,14 @@ namespace Minty
 			return false;
 		}
 
-		Bool read_raw(String const& name, void* const data, const Size size) const override
+		Bool read_raw(String const& name, void* const data, Size const size) const override
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(name))
 				{
-					const Container& nodeData = currentNode.get_child(name).get_data();
+					Container const& nodeData = currentNode.get_child(name).get_data();
 					memcpy(data, nodeData.data(), nodeData.size());
 					return true;
 				}
@@ -1897,14 +1897,14 @@ namespace Minty
 
 			return false;
 		}
-		Bool read_raw(Size const index, void* const data, const Size size) const override
+		Bool read_raw(Size const index, void* const data, Size const size) const override
 		{
 			if (valid())
 			{
-				const Node& currentNode = get_current_node();
+				Node const& currentNode = get_current_node();
 				if (currentNode.has_child(index))
 				{
-					const Container& nodeData = currentNode.get_child(index).get_data();
+					Container const& nodeData = currentNode.get_child(index).get_data();
 					memcpy(data, nodeData.data(), nodeData.size());
 					return true;
 				}

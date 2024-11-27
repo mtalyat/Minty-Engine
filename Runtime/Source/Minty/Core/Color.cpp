@@ -29,7 +29,7 @@ Color::Color(Color&& color) noexcept
 	color.a = 0;
 }
 
-Color& Color::operator=(const Color& color)
+Color& Color::operator=(Color const& color)
 {
 	r = color.r;
 	g = color.g;

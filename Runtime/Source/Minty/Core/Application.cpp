@@ -21,33 +21,29 @@ using namespace Minty;
 
 Application* Application::sp_instance = nullptr;
 
-Minty::Application::Application(const ApplicationBuilder& builder)
-	: m_running(false)
-	, m_minimized(false)
-	, m_time()
-	, m_targetFPS(builder.targetFPS)
-	, m_info(builder.info)
-	, m_mode(builder.mode)
-	, m_logger(builder.logPath, true)
-	, m_sceneManager()
-	, m_workingScenes()
+void Minty::Application::initialize(ApplicationBuilder const& builder)
 {
-	MINTY_ASSERT_MESSAGE(builder.targetFPS > 0, "Application target FPS must be above zero.");
+	MINTY_ASSERT_MESSAGE(!m_initialized, "Application is already initialized. Must shutdown before re-initializing.");
+
+	m_initialized = true;
 
 	MINTY_ASSERT(sp_instance == nullptr);
 	sp_instance = this;
 
+	// setup
+	MINTY_ASSERT_MESSAGE(builder.targetFPS > 0, "Application target FPS must be above zero.");
+	m_targetFPS = builder.targetFPS;
+	m_info = builder.info;
+	m_mode = builder.mode;
+	mp_logger = new Logger(builder.logPath);
+
 	// initialize tools
 
 	//  asset manager
-	AssetManagerBuilder assetManagerBuilder{};
-	assetManagerBuilder.mode = AssetMode::ReadAll;
-	assetManagerBuilder.wraps = { "Default.wrap", "Game.wrap" };
-	AssetManager::initialize(assetManagerBuilder);
+	AssetManager::initialize(builder.assetManagerBuilder);
 
 	//	script engine
-	ScriptEngineBuilder scriptEngineBuilder{};
-	ScriptEngine::initialize(scriptEngineBuilder);
+	ScriptEngine::initialize(builder.scriptEngineBuilder);
 
 	// load Minty assembly
 	ScriptEngine::load_assembly(MINTY_NAME_ENGINE, "Lib/MintyEngine.dll", builder.mode == ApplicationMode::Edit);
@@ -56,12 +52,10 @@ Minty::Application::Application(const ApplicationBuilder& builder)
 	Linker::link();
 
 	// input
-	InputBuilder inputBuilder{};
-	Input::initialize(inputBuilder);
+	Input::initialize(builder.inputBuilder);
 
 	// window manager
-	WindowManagerBuilder windowManagerBuilder{};
-	WindowManager::initialize(windowManagerBuilder);
+	WindowManager::initialize(builder.windowManagerBuilder);
 
 	// window
 	WindowBuilder windowBuilder{};
@@ -71,47 +65,44 @@ Minty::Application::Application(const ApplicationBuilder& builder)
 	window->set_event_callback([this](Event& e) { on_event(e); });
 
 	//  renderer
-	RendererBuilder rendererBuilder{};
+	RendererBuilder rendererBuilder = builder.rendererBuilder;
 	rendererBuilder.window = window;
 	Renderer::initialize(rendererBuilder);
+
+	// gui
+	GUI::initialize(builder.guiBuilder);
 }
 
-Minty::Application::~Application()
+void Minty::Application::shutdown()
 {
+	MINTY_ASSERT_MESSAGE(m_initialized, "Cannot shutdown an Application that has not yet been initialized.");
+
 	// shutdown tools
+	GUI::shutdown();
 	AssetManager::shutdown();
 	Renderer::shutdown();
 	Input::shutdown();
 	WindowManager::shutdown();
 	ScriptEngine::shutdown();
 
+	// destroy resources
+	delete mp_logger;
+	mp_logger = nullptr;
+
 	MINTY_ASSERT(sp_instance != nullptr);
 	sp_instance = nullptr;
+
+	m_initialized = false;
 }
 
 Int Application::run()
 {
+	MINTY_ASSERT_MESSAGE(m_initialized, "Attempting to run the Application when it has not yet been initialized.");
+
 	MINTY_ASSERT_MESSAGE(m_running == false, "Attempting to run the Application when it is already running.");
 	m_running = true;
 
-	// load the initial scene
-	Container* container;
-	Reader* reader;
-	AssetManager::open_reader("game.appdata", container, reader);
-
-	Path scenePath;
-	if (!reader->read("InitialScene", scenePath))
-	{
-		// no initialScene OR scene at path DNE
-		MINTY_ABORT("No initial Scene given.");
-	}
-
-	AssetManager::close_reader(container, reader);
-
-	MINTY_ASSERT_FORMAT(AssetManager::exists(scenePath), "No initial Scene found at path \"{}\".", scenePath.generic_string());
-
-	// load it
-	m_sceneManager.load(scenePath);
+	load_initial_scene();
 
 	// start time
 	TimePoint now = Time::now();
@@ -165,7 +156,16 @@ Int Application::run()
 			if (Renderer::start_frame())
 			{
 				// TODO: still run game code, just don't render
+				// TODO: quit on certain exit codes
 				// skip this frame
+				continue;
+			}
+
+			if (GUI::start_frame())
+			{
+				// TODO: quit on certain exit codes
+				// skip this frame
+				Renderer::end_frame();
 				continue;
 			}
 
@@ -174,6 +174,11 @@ Int Application::run()
 
 			// finalize scene
 			m_sceneManager.finalize();
+
+			// update application
+			update(m_time);
+
+			GUI::end_frame();
 
 			Renderer::end_frame();
 		}
@@ -192,6 +197,7 @@ Int Application::run()
 
 void Minty::Application::close()
 {
+	MINTY_ASSERT_MESSAGE(m_initialized, "Attempting to close the Application when it has not yet been initialized.");
 	m_running = false;
 }
 
@@ -278,6 +284,37 @@ void Minty::Application::on_event(Event& event)
 		}
 		}
 	}
+}
+
+Bool Minty::Application::load_initial_scene()
+{
+	// load the initial scene
+	Container* container;
+	Reader* reader;
+	if (!AssetManager::open_reader("game.appdata", container, reader))
+	{
+		// failed to open game.appdata
+		MINTY_WARN("Failed to open game.appdata.");
+		return false;
+	}
+
+	Path scenePath;
+	if (!reader->read("InitialScene", scenePath))
+	{
+		// no initial scene given
+		AssetManager::close_reader(container, reader);
+		return false;
+	}
+
+	AssetManager::close_reader(container, reader);
+
+	// if scene was given, make sure it exists
+	MINTY_ASSERT_FORMAT(AssetManager::exists(scenePath), "No initial Scene found at path \"{}\".", scenePath.generic_string());
+
+	// load the scene
+	m_sceneManager.load(scenePath);
+
+	return true;
 }
 
 Bool Minty::Application::on_window_close(WindowCloseEvent& event)

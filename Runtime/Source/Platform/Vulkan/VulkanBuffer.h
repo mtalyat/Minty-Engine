@@ -15,7 +15,7 @@ namespace Minty
 		void* m_mappedMemory;
 
 	public:
-		VulkanBuffer(const BufferBuilder& builder);
+		VulkanBuffer(BufferBuilder const& builder);
 
 		~VulkanBuffer();
 

@@ -6,22 +6,22 @@
 
 using namespace Minty;
 
-void Minty::FileWriterBehavior::write_data(const void* const data, const Size size)
+void Minty::FileWriterBehavior::write_data(const void* const data, Size const size)
 {
 	mp_file->write(data, size);
 }
 
-void Minty::MemoryWriterBehavior::write_data(const void* const data, const Size size)
+void Minty::MemoryWriterBehavior::write_data(const void* const data, Size const size)
 {
     mp_data->append(data, size);
 }
 
-void Minty::TextWriterBehavior::write_indent_to_buffer(const Size indent, std::vector<Byte>& buffer)
+void Minty::TextWriterBehavior::write_indent_to_buffer(Size const indent, std::vector<Byte>& buffer)
 {
 	write_string_to_buffer(String(indent, INDENT), buffer);
 }
 
-Bool Minty::TextWriterBehavior::write_name_to_buffer(const String& data, std::vector<Byte>& buffer)
+Bool Minty::TextWriterBehavior::write_name_to_buffer(String const& data, std::vector<Byte>& buffer)
 {
 	MINTY_ASSERT_MESSAGE(data.size() < 256, "A name cannot be longer than 255 bytes.");
 
@@ -54,7 +54,7 @@ void Minty::TextWriterBehavior::write_end_to_buffer(std::vector<Byte>& buffer)
 	write_string_to_buffer("\n", buffer);
 }
 
-void Minty::TextWriterBehavior::write_string_to_buffer(const String& data, std::vector<Byte>& buffer)
+void Minty::TextWriterBehavior::write_string_to_buffer(String const& data, std::vector<Byte>& buffer)
 {
 	// add string to buffer
 	Size offset = buffer.size();
@@ -62,112 +62,112 @@ void Minty::TextWriterBehavior::write_string_to_buffer(const String& data, std::
 	memcpy(buffer.data() + offset, data.data(), data.size());
 }
 
-void Minty::TextWriterBehavior::write_bool_to_buffer(const Bool data, std::vector<Byte>& buffer)
+void Minty::TextWriterBehavior::write_bool_to_buffer(Bool const data, std::vector<Byte>& buffer)
 {
     write_string_to_buffer(Minty::to_string(data), buffer);
 }
-void Minty::TextWriterBehavior::write_bool2_to_buffer(const Bool2 data, std::vector<Byte>& buffer)
+void Minty::TextWriterBehavior::write_bool2_to_buffer(Bool2 const data, std::vector<Byte>& buffer)
 {
     write_string_to_buffer(Minty::to_string(data), buffer);
 }
-void Minty::TextWriterBehavior::write_bool3_to_buffer(const Bool3 data, std::vector<Byte>& buffer)
+void Minty::TextWriterBehavior::write_bool3_to_buffer(Bool3 const data, std::vector<Byte>& buffer)
 {
     write_string_to_buffer(Minty::to_string(data), buffer);
 }
-void Minty::TextWriterBehavior::write_bool4_to_buffer(const Bool4 data, std::vector<Byte>& buffer)
+void Minty::TextWriterBehavior::write_bool4_to_buffer(Bool4 const data, std::vector<Byte>& buffer)
 {
     write_string_to_buffer(Minty::to_string(data), buffer);
 }
-void Minty::TextWriterBehavior::write_char_to_buffer(const Char data, std::vector<Byte>& buffer)
+void Minty::TextWriterBehavior::write_char_to_buffer(Char const data, std::vector<Byte>& buffer)
 {
     write_string_to_buffer(Minty::to_string(data), buffer);
 }
-void Minty::TextWriterBehavior::write_byte_to_buffer(const Byte data, std::vector<Byte>& buffer)
+void Minty::TextWriterBehavior::write_byte_to_buffer(Byte const data, std::vector<Byte>& buffer)
 {
     write_string_to_buffer(Minty::to_string(data), buffer);
 }
-void Minty::TextWriterBehavior::write_short_to_buffer(const Short data, std::vector<Byte>& buffer)
+void Minty::TextWriterBehavior::write_short_to_buffer(Short const data, std::vector<Byte>& buffer)
 {
     write_string_to_buffer(Minty::to_string(data), buffer);
 }
-void Minty::TextWriterBehavior::write_ushort_to_buffer(const UShort data, std::vector<Byte>& buffer)
+void Minty::TextWriterBehavior::write_ushort_to_buffer(UShort const data, std::vector<Byte>& buffer)
 {
     write_string_to_buffer(Minty::to_string(data), buffer);
 }
-void Minty::TextWriterBehavior::write_int_to_buffer(const Int data, std::vector<Byte>& buffer)
+void Minty::TextWriterBehavior::write_int_to_buffer(Int const data, std::vector<Byte>& buffer)
 {
     write_string_to_buffer(Minty::to_string(data), buffer);
 }
-void Minty::TextWriterBehavior::write_int2_to_buffer(const Int2 data, std::vector<Byte>& buffer)
+void Minty::TextWriterBehavior::write_int2_to_buffer(Int2 const data, std::vector<Byte>& buffer)
 {
     write_string_to_buffer(Minty::to_string(data), buffer);
 }
-void Minty::TextWriterBehavior::write_int3_to_buffer(const Int3 data, std::vector<Byte>& buffer)
+void Minty::TextWriterBehavior::write_int3_to_buffer(Int3 const data, std::vector<Byte>& buffer)
 {
     write_string_to_buffer(Minty::to_string(data), buffer);
 }
-void Minty::TextWriterBehavior::write_int4_to_buffer(const Int4 data, std::vector<Byte>& buffer)
+void Minty::TextWriterBehavior::write_int4_to_buffer(Int4 const data, std::vector<Byte>& buffer)
 {
     write_string_to_buffer(Minty::to_string(data), buffer);
 }
-void Minty::TextWriterBehavior::write_uint_to_buffer(const UInt data, std::vector<Byte>& buffer)
+void Minty::TextWriterBehavior::write_uint_to_buffer(UInt const data, std::vector<Byte>& buffer)
 {
     write_string_to_buffer(Minty::to_string(data), buffer);
 }
-void Minty::TextWriterBehavior::write_uint2_to_buffer(const UInt2 data, std::vector<Byte>& buffer)
+void Minty::TextWriterBehavior::write_uint2_to_buffer(UInt2 const data, std::vector<Byte>& buffer)
 {
     write_string_to_buffer(Minty::to_string(data), buffer);
 }
-void Minty::TextWriterBehavior::write_uint3_to_buffer(const UInt3 data, std::vector<Byte>& buffer)
+void Minty::TextWriterBehavior::write_uint3_to_buffer(UInt3 const data, std::vector<Byte>& buffer)
 {
     write_string_to_buffer(Minty::to_string(data), buffer);
 }
-void Minty::TextWriterBehavior::write_uint4_to_buffer(const UInt4 data, std::vector<Byte>& buffer)
+void Minty::TextWriterBehavior::write_uint4_to_buffer(UInt4 const data, std::vector<Byte>& buffer)
 {
     write_string_to_buffer(Minty::to_string(data), buffer);
 }
-void Minty::TextWriterBehavior::write_long_to_buffer(const Long data, std::vector<Byte>& buffer)
+void Minty::TextWriterBehavior::write_long_to_buffer(Long const data, std::vector<Byte>& buffer)
 {
     write_string_to_buffer(Minty::to_string(data), buffer);
 }
-void Minty::TextWriterBehavior::write_ulong_to_buffer(const ULong data, std::vector<Byte>& buffer)
+void Minty::TextWriterBehavior::write_ulong_to_buffer(ULong const data, std::vector<Byte>& buffer)
 {
     write_string_to_buffer(Minty::to_string(data), buffer);
 }
-void Minty::TextWriterBehavior::write_size_to_buffer(const Size data, std::vector<Byte>& buffer)
+void Minty::TextWriterBehavior::write_size_to_buffer(Size const data, std::vector<Byte>& buffer)
 {
     write_string_to_buffer(Minty::to_string(data), buffer);
 }
-void Minty::TextWriterBehavior::write_float_to_buffer(const Float data, std::vector<Byte>& buffer)
+void Minty::TextWriterBehavior::write_float_to_buffer(Float const data, std::vector<Byte>& buffer)
 {
     write_string_to_buffer(Minty::to_string(data), buffer);
 }
-void Minty::TextWriterBehavior::write_float2_to_buffer(const Float2 data, std::vector<Byte>& buffer)
+void Minty::TextWriterBehavior::write_float2_to_buffer(Float2 const data, std::vector<Byte>& buffer)
 {
     write_string_to_buffer(Minty::to_string(data), buffer);
 }
-void Minty::TextWriterBehavior::write_float3_to_buffer(const Float3 data, std::vector<Byte>& buffer)
+void Minty::TextWriterBehavior::write_float3_to_buffer(Float3 const data, std::vector<Byte>& buffer)
 {
     write_string_to_buffer(Minty::to_string(data), buffer);
 }
-void Minty::TextWriterBehavior::write_float4_to_buffer(const Float4 data, std::vector<Byte>& buffer)
+void Minty::TextWriterBehavior::write_float4_to_buffer(Float4 const data, std::vector<Byte>& buffer)
 {
     write_string_to_buffer(Minty::to_string(data), buffer);
 }
-void Minty::TextWriterBehavior::write_double_to_buffer(const Double data, std::vector<Byte>& buffer)
+void Minty::TextWriterBehavior::write_double_to_buffer(Double const data, std::vector<Byte>& buffer)
 {
     write_string_to_buffer(Minty::to_string(data), buffer);
 }
-void Minty::TextWriterBehavior::write_uuid_to_buffer(const UUID data, std::vector<Byte>& buffer)
+void Minty::TextWriterBehavior::write_uuid_to_buffer(UUID const data, std::vector<Byte>& buffer)
 {
     write_string_to_buffer(Minty::to_string(data), buffer);
 }
-void Minty::TextWriterBehavior::write_type_to_buffer(const Type data, std::vector<Byte>& buffer)
+void Minty::TextWriterBehavior::write_type_to_buffer(Type const data, std::vector<Byte>& buffer)
 {
     write_string_to_buffer(Minty::to_string(data), buffer);
 }
 
-void Minty::TextWriterBehavior::write_typed_to_buffer(const Type type, void const* const data, std::vector<Byte>& buffer)
+void Minty::TextWriterBehavior::write_typed_to_buffer(Type const type, void const* const data, std::vector<Byte>& buffer)
 {
     switch (type)
     {

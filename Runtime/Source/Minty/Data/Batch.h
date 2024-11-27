@@ -109,8 +109,8 @@ namespace Minty
 			Size hash = N;
 
 			// generate the hash once here, since it will never change throughout this object's lifetime
-			for (const auto& element : objects) {
-				std::visit([&](const auto& val) {
+			for (auto const& element : objects) {
+				std::visit([&](auto const& val) {
 					hash ^= std::hash<std::decay_t<decltype(val)>>{}(val)+0x9e3779b9 + (hash << 6) + (hash >> 2);
 					}, element);
 			}

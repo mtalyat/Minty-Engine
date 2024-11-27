@@ -18,7 +18,7 @@ Ref<Shader> Minty::Renderer::s_boundShader = nullptr;
 Ref<Material> Minty::Renderer::s_boundMaterial = nullptr;
 Ref<Mesh> Minty::Renderer::s_boundMesh = nullptr;
 
-void Minty::Renderer::initialize(const RendererBuilder& builder)
+void Minty::Renderer::initialize(RendererBuilder const& builder)
 {
 	MINTY_ASSERT(builder.window.get() != nullptr);
 
@@ -40,7 +40,7 @@ void Minty::Renderer::shutdown()
 	s_window = nullptr;
 }
 
-int Minty::Renderer::start_frame(const Ref<RenderTarget> tempRenderTarget)
+Int Minty::Renderer::start_frame(Ref<RenderTarget> const tempRenderTarget)
 {
 	MINTY_ASSERT_MESSAGE(s_renderTarget.get() != nullptr || tempRenderTarget.get() != nullptr, "Cannot start frame without a RenderTarget.");
 
@@ -104,7 +104,7 @@ void Minty::Renderer::set_camera(Float3 const position, Quaternion const rotatio
 	Matrix4 transformMatrix = proj * view;
 
 	// update all materials that have a camera
-	for (auto const& material : AssetManager::get_by_type<Material>(AssetType::Material))
+	for (auto const& material : AssetManager::get_by_type<Material>())
 	{
 		material->try_set_input("camera", &transformMatrix);
 	}
@@ -117,21 +117,21 @@ void Minty::Renderer::sync()
 #endif
 }
 
-void Minty::Renderer::draw_vertices(const UInt vertexCount)
+void Minty::Renderer::draw_vertices(UInt const vertexCount)
 {
 #if defined(MINTY_VULKAN)
 	VulkanRenderer::draw_vertices(vertexCount);
 #endif
 }
 
-void Minty::Renderer::draw_instances(const UInt instanceCount, const UInt vertexCount)
+void Minty::Renderer::draw_instances(UInt const instanceCount, UInt const vertexCount)
 {
 #if defined(MINTY_VULKAN)
 	VulkanRenderer::draw_instances(instanceCount, vertexCount);
 #endif
 }
 
-void Minty::Renderer::draw_indices(const UInt indexCount)
+void Minty::Renderer::draw_indices(UInt const indexCount)
 {
 #if defined(MINTY_VULKAN)
 	VulkanRenderer::draw_indices(indexCount);

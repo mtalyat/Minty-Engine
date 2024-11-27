@@ -18,7 +18,8 @@ namespace Minty
 		// the path to write to
 		Path m_path;
 
-		File* m_file;
+		// the file to write to at the path
+		File* mp_file;
 
 		// when true, on first flush, write instead of append
 		Bool m_firstTime;
@@ -27,8 +28,6 @@ namespace Minty
 		Bool m_autoFlush;
 
 	public:
-		Logger();
-
 		Logger(Path const& path);
 
 		Logger(Path const& path, Bool const autoFlush);

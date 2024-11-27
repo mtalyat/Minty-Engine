@@ -44,6 +44,6 @@ namespace Minty
 		Bool try_set_input(String const& name, void const* const data);
 
 	public:
-		static Owner<Material> create(const MaterialBuilder& builder = {});
+		static Owner<Material> create(MaterialBuilder const& builder = {});
 	};
 }

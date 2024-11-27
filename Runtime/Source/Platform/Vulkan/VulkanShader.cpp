@@ -7,7 +7,7 @@
 
 using namespace Minty;
 
-Minty::VulkanShader::VulkanShader(const ShaderBuilder& builder)
+Minty::VulkanShader::VulkanShader(ShaderBuilder const& builder)
 	: Minty::Shader::Shader(builder)
 	, m_pipelineLayout(VK_NULL_HANDLE)
 	, m_pipeline(VK_NULL_HANDLE)
@@ -37,7 +37,7 @@ Minty::VulkanShader::VulkanShader(const ShaderBuilder& builder)
 	}
 
 	// consolidate binding data, sum type counts, create descriptor buffers
-	for (const ShaderInput& descriptor : descriptors)
+	for (ShaderInput const& descriptor : descriptors)
 	{
 		MINTY_ASSERT_MESSAGE(descriptor.count != 0, "Cannot create a Descriptor with a count of 0.");
 		MINTY_ASSERT_MESSAGE(!descriptor.name.empty(), "Cannot create a Descriptor with no name.");
@@ -299,7 +299,7 @@ Minty::VulkanShader::VulkanShader(const ShaderBuilder& builder)
 		// find shader binding info
 		MINTY_ASSERT_FORMAT(m_bindings.contains(bindingIndex), "Missing ShaderBinding for binding: {}.", i);
 
-		const Binding& bindingInfo = m_bindings.at(bindingIndex);
+		Binding const& bindingInfo = m_bindings.at(bindingIndex);
 
 		binding.binding = bindingIndex;
 		binding.descriptorType = bindingInfo.descriptorType;

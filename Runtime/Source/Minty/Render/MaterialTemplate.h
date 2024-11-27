@@ -39,6 +39,6 @@ namespace Minty
 		std::unordered_map<String, Cargo> const& get_values() const { return m_values; }
 
 	public:
-		static Owner<MaterialTemplate> create(const MaterialTemplateBuilder& builder = {});
+		static Owner<MaterialTemplate> create(MaterialTemplateBuilder const& builder = {});
 	};
 }

@@ -87,7 +87,7 @@ namespace Minty
 
 		// casting
 		template<typename U>
-		Owner(const Owner<U>& other)
+		Owner(Owner<U> const& other)
 			: mp_ptr(static_cast<T*>(other.mp_ptr))
 			, mp_counter(other.mp_counter)
 		{
@@ -220,7 +220,7 @@ namespace Minty
 
 		// casting
 		template<typename U>
-		Ref(const Ref<U>& other) 
+		Ref(Ref<U> const& other) 
 			: mp_ptr(static_cast<T*>(const_cast<U*>(other.mp_ptr)))
 			, mp_counter(other.mp_counter)
 		{
@@ -228,12 +228,12 @@ namespace Minty
 		}
 
 		// implicit from Owner
-		Ref(const Owner<T>& owner)
+		Ref(Owner<T> const& owner)
 			: mp_ptr(owner.mp_ptr), mp_counter(owner.mp_counter)
 		{
 			if (mp_counter) mp_counter->weakCount++;
 		}
-		Ref& operator=(const Owner<T>& other)
+		Ref& operator=(Owner<T> const& other)
 		{
 			if (mp_counter) mp_counter->weakCount--;
 			MINTY_ASSERT_FORMAT(!mp_counter || mp_counter->weakCount >= 0, "Ref counter invalid in copy ({}).", mp_counter->weakCount);

@@ -21,6 +21,6 @@ namespace Minty
 		virtual ~Surface() = default;
 
 	public:
-		static Owner<Surface> create(const SurfaceBuilder& builder = {});
+		static Owner<Surface> create(SurfaceBuilder const& builder = {});
 	};
 }

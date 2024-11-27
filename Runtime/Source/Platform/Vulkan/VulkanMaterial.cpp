@@ -37,7 +37,7 @@ Minty::VulkanMaterial::VulkanMaterial(MaterialBuilder const& builder)
 
 	// initialize the frames
 	std::unordered_map<VkDescriptorType, uint32_t> descriptorTypeCounts;
-	for (const ShaderInput& descriptor : descriptors)
+	for (ShaderInput const& descriptor : descriptors)
 	{
 		MINTY_ASSERT_MESSAGE(descriptor.count != 0, "Cannot create a Descriptor with a count of 0.");
 		MINTY_ASSERT_MESSAGE(!descriptor.name.empty(), "Cannot create a Descriptor with no name.");
@@ -90,7 +90,7 @@ Minty::VulkanMaterial::VulkanMaterial(MaterialBuilder const& builder)
 			descriptorWrites.reserve(descriptors.size());
 
 			// create buffers
-			for (const ShaderInput& descriptor : descriptors)
+			for (ShaderInput const& descriptor : descriptors)
 			{
 				switch (descriptor.type)
 				{

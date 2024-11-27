@@ -180,7 +180,7 @@ extern unsigned int stb_vorbis_get_file_offset(stb_vorbis *f);
 // specification does not bound the size of an individual frame.
 
 extern stb_vorbis *stb_vorbis_open_pushdata(
-         const unsigned char * datablock, int datablock_length_in_bytes,
+         unsigned const char * datablock, int datablock_length_in_bytes,
          int *datablock_memory_consumed_in_bytes,
          int *error,
          const stb_vorbis_alloc *alloc_buffer);
@@ -195,7 +195,7 @@ extern stb_vorbis *stb_vorbis_open_pushdata(
 
 extern int stb_vorbis_decode_frame_pushdata(
          stb_vorbis *f,
-         const unsigned char *datablock, int datablock_length_in_bytes,
+         unsigned const char *datablock, int datablock_length_in_bytes,
          int *channels,             // place to write number of float * buffers
          float ***output,           // place to write float ** array of float * buffers
          int *samples               // place to write number of output samples
@@ -251,14 +251,14 @@ extern void stb_vorbis_flush_pushdata(stb_vorbis *f);
 extern int stb_vorbis_decode_filename(const char *filename, int *channels, int *sample_rate, short **output);
 #endif
 #if !defined(STB_VORBIS_NO_INTEGER_CONVERSION)
-extern int stb_vorbis_decode_memory(const unsigned char *mem, int len, int *channels, int *sample_rate, short **output);
+extern int stb_vorbis_decode_memory(unsigned const char *mem, int len, int *channels, int *sample_rate, short **output);
 #endif
 // decode an entire file and output the data interleaved into a malloc()ed
 // buffer stored in *output. The return value is the number of samples
 // decoded, or -1 if the file could not be opened or was not an ogg vorbis file.
 // When you're done with it, just free() the pointer returned in *output.
 
-extern stb_vorbis * stb_vorbis_open_memory(const unsigned char *data, int len,
+extern stb_vorbis * stb_vorbis_open_memory(unsigned const char *data, int len,
                                   int *error, const stb_vorbis_alloc *alloc_buffer);
 // create an ogg vorbis decoder from an ogg vorbis stream in memory (note
 // this must be the entire stream!). on failure, returns NULL and sets *error
@@ -4489,7 +4489,7 @@ int stb_vorbis_decode_frame_pushdata(
 }
 
 stb_vorbis *stb_vorbis_open_pushdata(
-         const unsigned char *data, int data_len, // the memory available for decoding
+         unsigned const char *data, int data_len, // the memory available for decoding
          int *data_used,              // only defined if result is not NULL
          int *error, const stb_vorbis_alloc *alloc)
 {
@@ -5072,7 +5072,7 @@ stb_vorbis * stb_vorbis_open_filename(const char *filename, int *error, const st
 }
 #endif // STB_VORBIS_NO_STDIO
 
-stb_vorbis * stb_vorbis_open_memory(const unsigned char *data, int len, int *error, const stb_vorbis_alloc *alloc)
+stb_vorbis * stb_vorbis_open_memory(unsigned const char *data, int len, int *error, const stb_vorbis_alloc *alloc)
 {
    stb_vorbis *f, p;
    if (data == NULL) return NULL;

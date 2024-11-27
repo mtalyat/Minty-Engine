@@ -7,7 +7,7 @@
 
 using namespace Minty;
 
-Owner<RenderTarget> Minty::RenderTarget::create(const RenderTargetBuilder& builder)
+Owner<RenderTarget> Minty::RenderTarget::create(RenderTargetBuilder const& builder)
 {
 #if defined(MINTY_VULKAN)
 	return Owner<VulkanRenderTarget>(builder);

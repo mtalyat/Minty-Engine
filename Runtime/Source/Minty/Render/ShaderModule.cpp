@@ -7,7 +7,7 @@
 
 using namespace Minty;
 
-Owner<ShaderModule> Minty::ShaderModule::create(const ShaderModuleBuilder& builder)
+Owner<ShaderModule> Minty::ShaderModule::create(ShaderModuleBuilder const& builder)
 {
 #if defined(MINTY_VULKAN)
 	return Owner<VulkanShaderModule>(builder);

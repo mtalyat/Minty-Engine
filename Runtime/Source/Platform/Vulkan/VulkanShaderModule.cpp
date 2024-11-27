@@ -6,7 +6,7 @@
 
 using namespace Minty;
 
-Minty::VulkanShaderModule::VulkanShaderModule(const ShaderModuleBuilder& builder)
+Minty::VulkanShaderModule::VulkanShaderModule(ShaderModuleBuilder const& builder)
 	: Minty::ShaderModule::ShaderModule(builder)
 	, m_module(nullptr)
 {

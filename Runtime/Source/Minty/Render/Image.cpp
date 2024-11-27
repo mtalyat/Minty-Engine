@@ -7,7 +7,7 @@
 
 using namespace Minty;
 
-Owner<Image> Minty::Image::create(const ImageBuilder& builder)
+Owner<Image> Minty::Image::create(ImageBuilder const& builder)
 {
 #if defined(MINTY_VULKAN)
 	return Owner<VulkanImage>(builder);

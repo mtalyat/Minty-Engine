@@ -19,7 +19,7 @@ String Minty::Node::get_data_as_string() const
     return String(data.data());
 }
 
-Bool Minty::Node::add_child(const String& name, const Node& node)
+Bool Minty::Node::add_child(String const& name, Node const& node)
 {
     if (!name.empty() && has_child(name))
     {

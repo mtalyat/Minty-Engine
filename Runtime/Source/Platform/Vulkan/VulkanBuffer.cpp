@@ -5,7 +5,7 @@
 
 using namespace Minty;
 
-Minty::VulkanBuffer::VulkanBuffer(const BufferBuilder& builder)
+Minty::VulkanBuffer::VulkanBuffer(BufferBuilder const& builder)
 	: Buffer(builder)
 	, m_size(static_cast<VkDeviceSize>(builder.size))
 	, m_buffer(VK_NULL_HANDLE)

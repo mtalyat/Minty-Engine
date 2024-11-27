@@ -7,7 +7,7 @@
 
 using namespace Minty;
 
-Owner<Buffer> Minty::Buffer::create(const BufferBuilder& builder)
+Owner<Buffer> Minty::Buffer::create(BufferBuilder const& builder)
 {
 #if defined(MINTY_VULKAN)
     return Owner<VulkanBuffer>(builder);

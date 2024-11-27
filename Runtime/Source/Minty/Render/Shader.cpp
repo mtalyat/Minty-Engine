@@ -43,7 +43,7 @@ void Minty::Shader::unregister_material(Material& material)
 	m_materials.erase(&material);
 }
 
-Owner<Shader> Minty::Shader::create(const ShaderBuilder& builder)
+Owner<Shader> Minty::Shader::create(ShaderBuilder const& builder)
 {
 #if defined(MINTY_VULKAN)
 	return Owner<VulkanShader>(builder);

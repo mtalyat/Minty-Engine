@@ -51,7 +51,10 @@ namespace Minty
 		/// <summary>
 		/// Creates an empty File object.
 		/// </summary>
-		File() = default;
+		File()
+			: m_path()
+			, m_flags()
+		{}
 
 		/// <summary>
 		/// Creates a File object and saves the given path and open flags.

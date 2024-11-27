@@ -12,7 +12,7 @@ namespace Minty
 		VkShaderModule m_module;
 
 	public:
-		VulkanShaderModule(const ShaderModuleBuilder& builder);
+		VulkanShaderModule(ShaderModuleBuilder const& builder);
 
 		~VulkanShaderModule();
 

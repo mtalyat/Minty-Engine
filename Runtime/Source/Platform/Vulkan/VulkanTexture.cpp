@@ -5,7 +5,7 @@
 
 using namespace Minty;
 
-Minty::VulkanTexture::VulkanTexture(const TextureBuilder& builder)
+Minty::VulkanTexture::VulkanTexture(TextureBuilder const& builder)
 	: Texture(builder)
 	, m_sampler(VK_NULL_HANDLE)
 {

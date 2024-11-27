@@ -7,7 +7,7 @@
 
 using namespace Minty;
 
-Owner<Texture> Minty::Texture::create(const TextureBuilder& builder)
+Owner<Texture> Minty::Texture::create(TextureBuilder const& builder)
 {
 #if defined(MINTY_VULKAN)
     return Owner<VulkanTexture>(builder);

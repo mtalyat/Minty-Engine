@@ -50,7 +50,7 @@ Bool Minty::Material::try_set_input(String const& name, void const* const data)
 	return false;
 }
 
-Owner<Material> Minty::Material::create(const MaterialBuilder& builder)
+Owner<Material> Minty::Material::create(MaterialBuilder const& builder)
 {
 #if defined(MINTY_VULKAN)
 	return Owner<VulkanMaterial>(builder);

@@ -24,6 +24,7 @@ VkDevice VulkanRenderer::s_device = VK_NULL_HANDLE;
 VkQueue VulkanRenderer::s_graphicsQueue = {};
 VkQueue VulkanRenderer::s_presentQueue = {};
 VkSurfaceKHR VulkanRenderer::s_surface = VK_NULL_HANDLE;
+Format VulkanRenderer::s_targetSwapchainFormat = Format::Undefined;
 VkSurfaceFormatKHR VulkanRenderer::s_swapchainSurfaceFormat = {};
 VkExtent2D VulkanRenderer::s_swapchainExtent = {};
 VkSwapchainKHR VulkanRenderer::s_swapchain = VK_NULL_HANDLE;
@@ -38,7 +39,7 @@ VkCommandPool VulkanRenderer::s_commandPool = VK_NULL_HANDLE;
 std::array<VulkanRenderer::Frame, MAX_FRAMES_IN_FLIGHT> VulkanRenderer::s_frames = {};
 Size VulkanRenderer::s_currentFrame = 0;
 
-void Minty::VulkanRenderer::initialize(const RendererBuilder& builder)
+void Minty::VulkanRenderer::initialize(RendererBuilder const& builder)
 {
 	// get application instance for the data
 	Application& application = Application::instance();
@@ -67,6 +68,7 @@ void Minty::VulkanRenderer::initialize(const RendererBuilder& builder)
 	s_presentQueue = get_device_queue(s_queueFamilyIndices.presentFamily.value());
 
 	// swapchain, images, etc.
+	s_targetSwapchainFormat = builder.targetSurfaceFormat;
 	s_swapchain = VK_NULL_HANDLE;
 	recreate_swapchain();
 
@@ -76,8 +78,8 @@ void Minty::VulkanRenderer::initialize(const RendererBuilder& builder)
 	// viewport
 	ViewportBuilder viewportBuilder{};
 	viewportBuilder.id = UUID::create();
-	viewportBuilder.width = s_swapchainExtent.width;
-	viewportBuilder.height = s_swapchainExtent.height;
+	viewportBuilder.width = static_cast<Float>(s_swapchainExtent.width);
+	viewportBuilder.height = static_cast<Float>(s_swapchainExtent.height);
 	s_viewport = AssetManager::create<Viewport>(viewportBuilder);
 
 	// scissor
@@ -91,19 +93,7 @@ void Minty::VulkanRenderer::initialize(const RendererBuilder& builder)
 	create_command_pool(s_queueFamilyIndices.graphicsFamily.value());
 
 	// depth testing
-	VkFormat depthFormat = find_depth_format();
-
-	ImageBuilder depthImageBuilder{};
-	depthImageBuilder.width = s_swapchainExtent.width;
-	depthImageBuilder.height = s_swapchainExtent.height;
-	depthImageBuilder.aspect = ImageAspect::Depth;
-	depthImageBuilder.format = static_cast<Format>(depthFormat);
-	depthImageBuilder.tiling = ImageTiling::Optimal;
-	depthImageBuilder.type = ImageType::D2;
-	depthImageBuilder.usage = ImageUsage::DepthStencil;
-	depthImageBuilder.immutable = true;
-
-	s_depthImage = Owner<VulkanImage>(depthImageBuilder);
+	create_depth_resources();
 
 	// frames
 	for (Frame& frame : s_frames)
@@ -178,23 +168,31 @@ void Minty::VulkanRenderer::destroy_frame(Frame& frame)
 
 void Minty::VulkanRenderer::recreate_swapchain()
 {
-	// recreate swapchains, if able
+	// if minimized, wait until no longer minimized
+	Ref<Window> window = WindowManager::get_main();
+	window->refresh();
+	while (window->get_frame_width() == 0 && window->get_frame_height() == 0)
+	{
+		window->refresh();
+		window->wait_events();
+	}
+
+	// wait for idle
+	sync();
+
+	// destroy old swapchain, if able
 	if (s_swapchain != VK_NULL_HANDLE)
 	{
-		// wait for idle
-		sync();
-
 		// destroy framebuffers (but not the targets)
 		for (VulkanRenderTarget* const renderTarget : s_renderTargets)
 		{
 			renderTarget->shutdown();
 		}
 
+		// destroy depth images, etc.
+		destroy_depth_resources();
+
 		// destroy images
-		for (const Owner<VulkanImage>& image : s_swapchainImages)
-		{
-			destroy_image_view(image->get_view());
-		}
 		s_swapchainImages.clear();
 
 		// destroy swapchain
@@ -203,22 +201,39 @@ void Minty::VulkanRenderer::recreate_swapchain()
 
 	// create swapchain and images
 	SwapChainSupportDetails swapchainSupport = query_swap_chain_support(s_physicalDevice);
-	s_swapchainSurfaceFormat = select_swap_surface_format(swapchainSupport.formats);
+	if (s_targetSwapchainFormat != Format::Undefined)
+	{
+		// aim for custom format
+		s_swapchainSurfaceFormat = select_swap_surface_format(swapchainSupport.formats, format_to_vulkan(s_targetSwapchainFormat));
+	}
+	else
+	{
+		// use default format
+		s_swapchainSurfaceFormat = select_swap_surface_format(swapchainSupport.formats);
+	}
 	VkPresentModeKHR presentMode = select_swap_present_mode(swapchainSupport.presentModes);
 	s_swapchainExtent = select_swap_extent(swapchainSupport.capabilities);
 	create_swapchain(s_swapchainSurfaceFormat, s_swapchainExtent, presentMode);
+
+	// create images from swapchain
 	std::vector<VkImage> swapchainImages = get_swapchain_images();
 	s_swapchainImages.reserve(swapchainImages.size());
 	std::vector<Ref<Image>> swapchainImageRefs;
 	swapchainImageRefs.reserve(swapchainImages.size());
 	ImageBuilder swapchainImageBuilder{};
+	swapchainImageBuilder.width = s_swapchainExtent.width;
+	swapchainImageBuilder.height = s_swapchainExtent.height;
 	swapchainImageBuilder.format = static_cast<Format>(s_swapchainSurfaceFormat.format);
+	swapchainImageBuilder.aspect = ImageAspect::Color;
 	for (Size i = 0; i < swapchainImages.size(); i++)
 	{
 		Owner<VulkanImage> image = Owner<VulkanImage>(swapchainImageBuilder, swapchainImages.at(i));
 		s_swapchainImages.push_back(image);
 		swapchainImageRefs.push_back(image.create_ref());
 	}
+
+	// create depth resources
+	create_depth_resources();
 
 	// re-init framebuffers using new images
 	RenderTargetBuilder renderTargetBuilder{};
@@ -229,7 +244,7 @@ void Minty::VulkanRenderer::recreate_swapchain()
 	}
 }
 
-int Minty::VulkanRenderer::start_frame(const Ref<RenderTarget> renderTarget)
+int Minty::VulkanRenderer::start_frame(Ref<RenderTarget> const renderTarget)
 {
 	Frame& frame = get_current_frame();
 
@@ -294,21 +309,21 @@ void Minty::VulkanRenderer::end_frame()
 	s_currentFrame = (s_currentFrame + 1ull) % MAX_FRAMES_IN_FLIGHT;
 }
 
-void Minty::VulkanRenderer::draw_vertices(const UInt vertexCount)
+void Minty::VulkanRenderer::draw_vertices(UInt const vertexCount)
 {
 	Frame& frame = get_current_frame();
 
 	draw_vertices(frame.commandBuffer, vertexCount);
 }
 
-void Minty::VulkanRenderer::draw_instances(const UInt instanceCount, const UInt vertexCount)
+void Minty::VulkanRenderer::draw_instances(UInt const instanceCount, UInt const vertexCount)
 {
 	Frame& frame = get_current_frame();
 
 	draw_instances(frame.commandBuffer, instanceCount, vertexCount);
 }
 
-void Minty::VulkanRenderer::draw_indices(const UInt indexCount)
+void Minty::VulkanRenderer::draw_indices(UInt const indexCount)
 {
 	Frame& frame = get_current_frame();
 
@@ -378,6 +393,7 @@ static VKAPI_ATTR VkBool32 VKAPI_CALL debugCallback(
 	if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_ERROR_BIT_EXT)
 	{
 		Debug::log_error(message);
+		Debug::log_stack_trace();
 	}
 	else if (messageSeverity & VK_DEBUG_UTILS_MESSAGE_SEVERITY_WARNING_BIT_EXT)
 	{
@@ -413,7 +429,7 @@ static Bool check_validation_layer_support()
 	{
 		Bool layerFound = false;
 
-		for (const auto& layerProperties : availableLayers)
+		for (auto const& layerProperties : availableLayers)
 		{
 			if (strcmp(layerName, layerProperties.layerName) == 0)
 			{
@@ -557,17 +573,17 @@ std::vector<VkExtensionProperties> Minty::VulkanRenderer::get_instance_extension
 	return extensions;
 }
 
-VkSurfaceKHR Minty::VulkanRenderer::create_surface(const Ref<Window> window)
+VkSurfaceKHR Minty::VulkanRenderer::create_surface(Ref<Window> const window)
 {
 	VK_ASSERT_RESULT_RETURN_OBJECT(VkSurfaceKHR, glfwCreateWindowSurface(s_instance, static_cast<GLFWwindow*>(window->get_native()), nullptr, &object), "Failed to create window surface.");
 }
 
-void Minty::VulkanRenderer::destroy_surface(const VkSurfaceKHR surface)
+void Minty::VulkanRenderer::destroy_surface(VkSurfaceKHR const surface)
 {
 	vkDestroySurfaceKHR(s_instance, surface, nullptr);
 }
 
-static Bool check_device_extension_support(const VkPhysicalDevice physicalDevice)
+static Bool check_device_extension_support(VkPhysicalDevice const physicalDevice)
 {
 	uint32_t extensionCount;
 	vkEnumerateDeviceExtensionProperties(physicalDevice, nullptr, &extensionCount, nullptr);
@@ -577,7 +593,7 @@ static Bool check_device_extension_support(const VkPhysicalDevice physicalDevice
 
 	std::set<String> requiredExtensions(deviceExtensions.begin(), deviceExtensions.end());
 
-	for (const auto& extension : availableExtensions)
+	for (auto const& extension : availableExtensions)
 	{
 		requiredExtensions.erase(extension.extensionName);
 	}
@@ -601,7 +617,7 @@ void Minty::VulkanRenderer::select_physical_device()
 	// find best candidate from devices
 	std::multimap<int, VkPhysicalDevice> candidates;
 
-	for (const auto& device : devices)
+	for (auto const& device : devices)
 	{
 		int score = rate_device_suitability(device);
 		candidates.insert(std::make_pair(score, device));
@@ -616,7 +632,7 @@ void Minty::VulkanRenderer::select_physical_device()
 	s_physicalDevice = candidates.rbegin()->second;
 }
 
-int Minty::VulkanRenderer::rate_device_suitability(const VkPhysicalDevice physicalDevice)
+int Minty::VulkanRenderer::rate_device_suitability(VkPhysicalDevice const physicalDevice)
 {
 	// check if device queues can handle what we want
 	QueueFamilyIndices queueFamilyIndices = find_queue_families(physicalDevice);
@@ -674,7 +690,7 @@ int Minty::VulkanRenderer::rate_device_suitability(const VkPhysicalDevice physic
 	//return score;
 }
 
-Minty::VulkanRenderer::SwapChainSupportDetails Minty::VulkanRenderer::query_swap_chain_support(const VkPhysicalDevice physicalDevice)
+Minty::VulkanRenderer::SwapChainSupportDetails Minty::VulkanRenderer::query_swap_chain_support(VkPhysicalDevice const physicalDevice)
 {
 	SwapChainSupportDetails details;
 
@@ -701,9 +717,9 @@ Minty::VulkanRenderer::SwapChainSupportDetails Minty::VulkanRenderer::query_swap
 	return details;
 }
 
-VkSurfaceFormatKHR Minty::VulkanRenderer::select_swap_surface_format(const std::vector<VkSurfaceFormatKHR>& availableFormats, const VkFormat format, const VkColorSpaceKHR colorSpace)
+VkSurfaceFormatKHR Minty::VulkanRenderer::select_swap_surface_format(std::vector<VkSurfaceFormatKHR> const& availableFormats, VkFormat const format, VkColorSpaceKHR const colorSpace)
 {
-	for (const auto& availableFormat : availableFormats)
+	for (auto const& availableFormat : availableFormats)
 	{
 		if (availableFormat.format == format && availableFormat.colorSpace == colorSpace)
 		{
@@ -714,7 +730,7 @@ VkSurfaceFormatKHR Minty::VulkanRenderer::select_swap_surface_format(const std::
 	return availableFormats.at(0);
 }
 
-VkExtent2D Minty::VulkanRenderer::select_swap_extent(const VkSurfaceCapabilitiesKHR& capabilities)
+VkExtent2D Minty::VulkanRenderer::select_swap_extent(VkSurfaceCapabilitiesKHR const& capabilities)
 {
 	if (capabilities.currentExtent.width != std::numeric_limits<uint32_t>::max())
 	{
@@ -740,9 +756,9 @@ VkExtent2D Minty::VulkanRenderer::select_swap_extent(const VkSurfaceCapabilities
 	}
 }
 
-VkPresentModeKHR Minty::VulkanRenderer::select_swap_present_mode(const std::vector<VkPresentModeKHR>& availablePresentModes, const VkPresentModeKHR presentMode)
+VkPresentModeKHR Minty::VulkanRenderer::select_swap_present_mode(std::vector<VkPresentModeKHR> const& availablePresentModes, VkPresentModeKHR const presentMode)
 {
-	for (const auto& availablePresentMode : availablePresentModes)
+	for (auto const& availablePresentMode : availablePresentModes)
 	{
 		if (availablePresentMode == presentMode)
 		{
@@ -753,7 +769,7 @@ VkPresentModeKHR Minty::VulkanRenderer::select_swap_present_mode(const std::vect
 	return VK_PRESENT_MODE_FIFO_KHR;
 }
 
-Minty::VulkanRenderer::QueueFamilyIndices Minty::VulkanRenderer::find_queue_families(const VkPhysicalDevice physicalDevice)
+Minty::VulkanRenderer::QueueFamilyIndices Minty::VulkanRenderer::find_queue_families(VkPhysicalDevice const physicalDevice)
 {
 	QueueFamilyIndices queueFamilyIndices;
 
@@ -764,7 +780,7 @@ Minty::VulkanRenderer::QueueFamilyIndices Minty::VulkanRenderer::find_queue_fami
 	vkGetPhysicalDeviceQueueFamilyProperties(physicalDevice, &queueFamilyCount, queueFamilies.data());
 
 	int i = 0;
-	for (const auto& queueFamily : queueFamilies)
+	for (auto const& queueFamily : queueFamilies)
 	{
 		// check graphics family
 		if (queueFamily.queueFlags & VK_QUEUE_GRAPHICS_BIT)
@@ -852,7 +868,7 @@ void Minty::VulkanRenderer::wait_until_device_idle()
 	vkDeviceWaitIdle(s_device);
 }
 
-void Minty::VulkanRenderer::create_swapchain(const VkSurfaceFormatKHR surfaceFormat, const VkExtent2D extent, const VkPresentModeKHR presentMode)
+void Minty::VulkanRenderer::create_swapchain(VkSurfaceFormatKHR const surfaceFormat, VkExtent2D const extent, VkPresentModeKHR const presentMode)
 {
 	SwapChainSupportDetails swapchainSupport = query_swap_chain_support(s_physicalDevice);
 
@@ -926,7 +942,7 @@ std::vector<VkImage> Minty::VulkanRenderer::get_swapchain_images()
 	return images;
 }
 
-VkResult Minty::VulkanRenderer::get_next_swapchain_image(const VkSemaphore waitSemaphore, uint32_t& index)
+VkResult Minty::VulkanRenderer::get_next_swapchain_image(VkSemaphore const waitSemaphore, uint32_t& index)
 {
 	VkResult result = vkAcquireNextImageKHR(s_device, s_swapchain, UINT64_MAX, waitSemaphore, VK_NULL_HANDLE, &index);
 
@@ -939,7 +955,7 @@ VkResult Minty::VulkanRenderer::get_next_swapchain_image(const VkSemaphore waitS
 	return result;
 }
 
-VkFormat Minty::VulkanRenderer::find_supported_format(const std::vector<VkFormat>& candidates, const VkImageTiling tiling, const VkFormatFeatureFlags features)
+VkFormat Minty::VulkanRenderer::find_supported_format(const std::vector<VkFormat>& candidates, VkImageTiling const tiling, VkFormatFeatureFlags const features)
 {
 	for (VkFormat format : candidates) {
 		VkFormatProperties props;
@@ -956,7 +972,7 @@ VkFormat Minty::VulkanRenderer::find_supported_format(const std::vector<VkFormat
 	VK_ASSERT_FAIL("Failed to find supported format.");
 }
 
-VkImage Minty::VulkanRenderer::create_image(const uint32_t width, const uint32_t height, const VkImageType type, const VkFormat format, const VkImageTiling tiling, const VkImageUsageFlags usage)
+VkImage Minty::VulkanRenderer::create_image(const uint32_t width, const uint32_t height, VkImageType const type, VkFormat const format, VkImageTiling const tiling, VkImageUsageFlags const usage)
 {
 	// create image from builder
 	VkImageCreateInfo imageInfo{};
@@ -980,7 +996,7 @@ VkImage Minty::VulkanRenderer::create_image(const uint32_t width, const uint32_t
 	VK_ASSERT_RESULT_RETURN_OBJECT(VkImage, vkCreateImage(s_device, &imageInfo, nullptr, &object), "Failed to create image.");
 }
 
-void Minty::VulkanRenderer::create_image_and_memory(const uint32_t width, const uint32_t height, const VkImageType type, const VkFormat format, const VkImageTiling tiling, const VkImageUsageFlags usage, const VkMemoryPropertyFlags memoryProperties, VkImage& image, VkDeviceMemory& memory)
+void Minty::VulkanRenderer::create_image_and_memory(const uint32_t width, const uint32_t height, VkImageType const type, VkFormat const format, VkImageTiling const tiling, VkImageUsageFlags const usage, VkMemoryPropertyFlags const memoryProperties, VkImage& image, VkDeviceMemory& memory)
 {
 	image = create_image(width, height, type, format, tiling, usage);
 
@@ -992,17 +1008,17 @@ void Minty::VulkanRenderer::create_image_and_memory(const uint32_t width, const 
 	bind_image_memory(image, memory);
 }
 
-void Minty::VulkanRenderer::destroy_image(const VkImage image)
+void Minty::VulkanRenderer::destroy_image(VkImage const image)
 {
 	vkDestroyImage(s_device, image, nullptr);
 }
 
-void Minty::VulkanRenderer::bind_image_memory(const VkImage image, const VkDeviceMemory memory)
+void Minty::VulkanRenderer::bind_image_memory(VkImage const image, VkDeviceMemory const memory)
 {
 	VK_ASSERT_RESULT(vkBindImageMemory(s_device, image, memory, 0), "Failed to bind image memory.");
 }
 
-void Minty::VulkanRenderer::transition_image_layout(const VkImage image, const VkFormat format, const VkImageLayout oldLayout, const VkImageLayout newLayout)
+void Minty::VulkanRenderer::transition_image_layout(VkImage const image, VkFormat const format, VkImageLayout const oldLayout, VkImageLayout const newLayout)
 {
 	VkCommandBuffer commandBuffer = begin_command_buffer_single();
 
@@ -1052,7 +1068,7 @@ void Minty::VulkanRenderer::transition_image_layout(const VkImage image, const V
 	end_command_buffer_single(commandBuffer, s_graphicsQueue);
 }
 
-VkImageView Minty::VulkanRenderer::create_image_view(const VkImage image, const VkFormat format, const VkImageAspectFlags aspectFlags, const VkImageViewType viewType)
+VkImageView Minty::VulkanRenderer::create_image_view(VkImage const image, VkFormat const format, VkImageAspectFlags const aspectFlags, VkImageViewType const viewType)
 {
 	VkImageViewCreateInfo createInfo{};
 	createInfo.sType = VK_STRUCTURE_TYPE_IMAGE_VIEW_CREATE_INFO;
@@ -1075,7 +1091,7 @@ VkImageView Minty::VulkanRenderer::create_image_view(const VkImage image, const 
 	VK_ASSERT_RESULT_RETURN_OBJECT(VkImageView, vkCreateImageView(s_device, &createInfo, nullptr, &object), "Failed to create image view.");
 }
 
-std::vector<VkImageView> Minty::VulkanRenderer::create_image_views(const std::vector<VkImage>& images, const VkFormat format, const VkImageAspectFlags aspectFlags, const VkImageViewType viewType)
+std::vector<VkImageView> Minty::VulkanRenderer::create_image_views(const std::vector<VkImage>& images, VkFormat const format, VkImageAspectFlags const aspectFlags, VkImageViewType const viewType)
 {
 	std::vector<VkImageView> imageViews(images.size());
 
@@ -1087,12 +1103,12 @@ std::vector<VkImageView> Minty::VulkanRenderer::create_image_views(const std::ve
 	return imageViews;
 }
 
-void Minty::VulkanRenderer::destroy_image_view(const VkImageView imageView)
+void Minty::VulkanRenderer::destroy_image_view(VkImageView const imageView)
 {
 	vkDestroyImageView(s_device, imageView, nullptr);
 }
 
-VkSampler Minty::VulkanRenderer::create_sampler(const VkFilter magFilter, const VkFilter minFilter, const VkSamplerAddressMode addressMode, const VkBorderColor borderColor, const Bool normalizedCoordinates)
+VkSampler Minty::VulkanRenderer::create_sampler(VkFilter const magFilter, VkFilter const minFilter, VkSamplerAddressMode const addressMode, VkBorderColor const borderColor, Bool const normalizedCoordinates)
 {
 	VkSamplerCreateInfo samplerInfo{};
 	samplerInfo.sType = VK_STRUCTURE_TYPE_SAMPLER_CREATE_INFO;
@@ -1136,7 +1152,7 @@ VkSampler Minty::VulkanRenderer::create_sampler(const VkFilter magFilter, const 
 	VK_ASSERT_RESULT_RETURN_OBJECT(VkSampler, vkCreateSampler(s_device, &samplerInfo, nullptr, &object), "Failed to create image sampler.");
 }
 
-void Minty::VulkanRenderer::destroy_sampler(const VkSampler sampler)
+void Minty::VulkanRenderer::destroy_sampler(VkSampler const sampler)
 {
 	vkDestroySampler(s_device, sampler, nullptr);
 }
@@ -1150,9 +1166,31 @@ VkFormat Minty::VulkanRenderer::find_depth_format()
 	);
 }
 
-Bool Minty::VulkanRenderer::has_stencil_component(const VkFormat format)
+Bool Minty::VulkanRenderer::has_stencil_component(VkFormat const format)
 {
 	return format == VK_FORMAT_D32_SFLOAT_S8_UINT || format == VK_FORMAT_D24_UNORM_S8_UINT;
+}
+
+void Minty::VulkanRenderer::create_depth_resources()
+{
+	VkFormat depthFormat = find_depth_format();
+
+	ImageBuilder depthImageBuilder{};
+	depthImageBuilder.width = s_swapchainExtent.width;
+	depthImageBuilder.height = s_swapchainExtent.height;
+	depthImageBuilder.aspect = ImageAspect::Depth;
+	depthImageBuilder.format = static_cast<Format>(depthFormat);
+	depthImageBuilder.tiling = ImageTiling::Optimal;
+	depthImageBuilder.type = ImageType::D2;
+	depthImageBuilder.usage = ImageUsage::DepthStencil;
+	depthImageBuilder.immutable = true;
+
+	s_depthImage = Owner<VulkanImage>(depthImageBuilder);
+}
+
+void Minty::VulkanRenderer::destroy_depth_resources()
+{
+	s_depthImage = nullptr;
 }
 
 VkShaderModule Minty::VulkanRenderer::create_shader_module(const std::vector<Minty::Char>& code)
@@ -1167,13 +1205,13 @@ VkShaderModule Minty::VulkanRenderer::create_shader_module(const std::vector<Min
 	VK_ASSERT_RESULT_RETURN_OBJECT(VkShaderModule, vkCreateShaderModule(s_device, &createInfo, nullptr, &object), "Failed to create shader module.");
 }
 
-VkShaderModule Minty::VulkanRenderer::create_shader_module(const Path& path)
+VkShaderModule Minty::VulkanRenderer::create_shader_module(Path const& path)
 {
 	std::vector<Minty::Char> code = AssetManager::read_file_chars(path);
 	return create_shader_module(code);
 }
 
-void Minty::VulkanRenderer::destroy_shader_module(const VkShaderModule shaderModule)
+void Minty::VulkanRenderer::destroy_shader_module(VkShaderModule const shaderModule)
 {
 	MINTY_ASSERT(shaderModule != VK_NULL_HANDLE);
 
@@ -1255,7 +1293,7 @@ void Minty::VulkanRenderer::destroy_render_pass()
 	vkDestroyRenderPass(s_device, s_renderPass, nullptr);
 }
 
-VkFramebuffer Minty::VulkanRenderer::create_framebuffer(const VkRenderPass renderPass, const VkImageView attachment, const VkExtent2D extent)
+VkFramebuffer Minty::VulkanRenderer::create_framebuffer(VkRenderPass const renderPass, VkImageView const attachment, VkExtent2D const extent)
 {
 	std::array<VkImageView, 2> attachments{};
 	attachments[0] = attachment;
@@ -1273,7 +1311,7 @@ VkFramebuffer Minty::VulkanRenderer::create_framebuffer(const VkRenderPass rende
 	VK_ASSERT_RESULT_RETURN_OBJECT(VkFramebuffer, vkCreateFramebuffer(s_device, &framebufferInfo, nullptr, &object), "Failed to create framebuffer.");
 }
 
-void Minty::VulkanRenderer::destroy_framebuffer(const VkFramebuffer framebuffer)
+void Minty::VulkanRenderer::destroy_framebuffer(VkFramebuffer const framebuffer)
 {
 	vkDestroyFramebuffer(s_device, framebuffer, nullptr);
 }
@@ -1305,12 +1343,12 @@ VkCommandBuffer Minty::VulkanRenderer::create_command_buffer()
 	VK_ASSERT_RESULT_RETURN_OBJECT(VkCommandBuffer, vkAllocateCommandBuffers(s_device, &allocInfo, &object), "Failed to allocate command buffers.");
 }
 
-void Minty::VulkanRenderer::destroy_command_buffer(const VkCommandBuffer commandBuffer)
+void Minty::VulkanRenderer::destroy_command_buffer(VkCommandBuffer const commandBuffer)
 {
 	vkFreeCommandBuffers(s_device, s_commandPool, 1, &commandBuffer);
 }
 
-void Minty::VulkanRenderer::begin_command_buffer(const VkCommandBuffer commandBuffer)
+void Minty::VulkanRenderer::begin_command_buffer(VkCommandBuffer const commandBuffer)
 {
 	VkCommandBufferBeginInfo beginInfo{};
 	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -1318,7 +1356,7 @@ void Minty::VulkanRenderer::begin_command_buffer(const VkCommandBuffer commandBu
 	VK_ASSERT_RESULT(vkBeginCommandBuffer(commandBuffer, &beginInfo), "Failed to begin recording command buffer.");
 }
 
-void Minty::VulkanRenderer::begin_command_buffer_temp(const VkCommandBuffer commandBuffer)
+void Minty::VulkanRenderer::begin_command_buffer_temp(VkCommandBuffer const commandBuffer)
 {
 	VkCommandBufferBeginInfo beginInfo{};
 	beginInfo.sType = VK_STRUCTURE_TYPE_COMMAND_BUFFER_BEGIN_INFO;
@@ -1327,7 +1365,7 @@ void Minty::VulkanRenderer::begin_command_buffer_temp(const VkCommandBuffer comm
 	VK_ASSERT_RESULT(vkBeginCommandBuffer(commandBuffer, &beginInfo), "Failed to begin recording temp command buffer.");
 }
 
-void Minty::VulkanRenderer::end_command_buffer(const VkCommandBuffer commandBuffer)
+void Minty::VulkanRenderer::end_command_buffer(VkCommandBuffer const commandBuffer)
 {
 	VK_ASSERT_RESULT(vkEndCommandBuffer(commandBuffer), "Failed to record command buffer.");
 }
@@ -1341,7 +1379,7 @@ VkCommandBuffer Minty::VulkanRenderer::begin_command_buffer_single()
 	return commandBuffer;
 }
 
-void Minty::VulkanRenderer::end_command_buffer_single(VkCommandBuffer& commandBuffer, const VkQueue queue)
+void Minty::VulkanRenderer::end_command_buffer_single(VkCommandBuffer& commandBuffer, VkQueue const queue)
 {
 	end_command_buffer(commandBuffer);
 
@@ -1351,12 +1389,12 @@ void Minty::VulkanRenderer::end_command_buffer_single(VkCommandBuffer& commandBu
 	destroy_command_buffer(commandBuffer);
 }
 
-void Minty::VulkanRenderer::reset_command_buffer(const VkCommandBuffer commandBuffer)
+void Minty::VulkanRenderer::reset_command_buffer(VkCommandBuffer const commandBuffer)
 {
 	vkResetCommandBuffer(commandBuffer, 0);
 }
 
-void Minty::VulkanRenderer::submit_command_buffer(const VkCommandBuffer commandBuffer, const VkQueue queue, const VkSemaphore waitSemaphore, const VkSemaphore signalSemaphore, const VkFence inFlightFence)
+void Minty::VulkanRenderer::submit_command_buffer(VkCommandBuffer const commandBuffer, VkQueue const queue, VkSemaphore const waitSemaphore, VkSemaphore const signalSemaphore, VkFence const inFlightFence)
 {
 	VkSubmitInfo submitInfo{};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -1377,12 +1415,12 @@ void Minty::VulkanRenderer::submit_command_buffer(const VkCommandBuffer commandB
 	VK_ASSERT_RESULT(vkQueueSubmit(queue, 1, &submitInfo, inFlightFence), "Failed to submit draw command buffer.");
 }
 
-void Minty::VulkanRenderer::submit_command_buffer(const Frame& frame, const VkQueue queue)
+void Minty::VulkanRenderer::submit_command_buffer(Frame const& frame, VkQueue const queue)
 {
 	submit_command_buffer(frame.commandBuffer, queue, frame.imageAvailableSemaphore, frame.renderFinishedSemaphore, frame.inFlightFence);
 }
 
-void Minty::VulkanRenderer::submit_command_buffer(const VkCommandBuffer commandBuffer, const VkQueue queue)
+void Minty::VulkanRenderer::submit_command_buffer(VkCommandBuffer const commandBuffer, VkQueue const queue)
 {
 	VkSubmitInfo submitInfo{};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -1392,7 +1430,7 @@ void Minty::VulkanRenderer::submit_command_buffer(const VkCommandBuffer commandB
 	VK_ASSERT_RESULT(vkQueueSubmit(queue, 1, &submitInfo, VK_NULL_HANDLE), "Failed to submit command buffer.");
 }
 
-void Minty::VulkanRenderer::begin_render_pass(const VkCommandBuffer commandBuffer, const VkRenderPass renderPass, const VkFramebuffer framebuffer, const VkRect2D renderArea, const VkClearColorValue clearColor)
+void Minty::VulkanRenderer::begin_render_pass(VkCommandBuffer const commandBuffer, VkRenderPass const renderPass, VkFramebuffer const framebuffer, VkRect2D const renderArea, VkClearColorValue const clearColor)
 {
 	VkRenderPassBeginInfo renderPassInfo{};
 	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_BEGIN_INFO;
@@ -1413,54 +1451,54 @@ void Minty::VulkanRenderer::begin_render_pass(const VkCommandBuffer commandBuffe
 	vkCmdBeginRenderPass(commandBuffer, &renderPassInfo, VK_SUBPASS_CONTENTS_INLINE);
 }
 
-void Minty::VulkanRenderer::end_render_pass(const VkCommandBuffer commandBuffer)
+void Minty::VulkanRenderer::end_render_pass(VkCommandBuffer const commandBuffer)
 {
 	vkCmdEndRenderPass(commandBuffer);
 }
 
-void Minty::VulkanRenderer::bind_pipeline(const VkCommandBuffer commandBuffer, const VkPipeline graphicsPipeline, const VkPipelineBindPoint bindPoint)
+void Minty::VulkanRenderer::bind_pipeline(VkCommandBuffer const commandBuffer, VkPipeline const graphicsPipeline, VkPipelineBindPoint const bindPoint)
 {
 	vkCmdBindPipeline(commandBuffer, bindPoint, graphicsPipeline);
 }
 
-void Minty::VulkanRenderer::bind_descriptor_set(const VkCommandBuffer commandBuffer, const VkPipelineLayout graphicsPipelineLayout, const VkDescriptorSet descriptorSet)
+void Minty::VulkanRenderer::bind_descriptor_set(VkCommandBuffer const commandBuffer, VkPipelineLayout const graphicsPipelineLayout, VkDescriptorSet const descriptorSet)
 {
 	vkCmdBindDescriptorSets(commandBuffer, VK_PIPELINE_BIND_POINT_GRAPHICS, graphicsPipelineLayout, 0, 1, &descriptorSet, 0, nullptr);
 }
 
-void Minty::VulkanRenderer::bind_viewport(const VkCommandBuffer commandBuffer, const VkViewport& viewport)
+void Minty::VulkanRenderer::bind_viewport(VkCommandBuffer const commandBuffer, VkViewport const& viewport)
 {
 	vkCmdSetViewport(commandBuffer, 0, 1, &viewport);
 }
 
-void Minty::VulkanRenderer::bind_scissor(const VkCommandBuffer commandBuffer, const VkRect2D& scissor)
+void Minty::VulkanRenderer::bind_scissor(VkCommandBuffer const commandBuffer, VkRect2D const& scissor)
 {
 	vkCmdSetScissor(commandBuffer, 0, 1, &scissor);
 }
 
-void Minty::VulkanRenderer::bind_vertex_buffer(const VkCommandBuffer commandBuffer, const VkBuffer buffer, UInt const binding)
+void Minty::VulkanRenderer::bind_vertex_buffer(VkCommandBuffer const commandBuffer, VkBuffer const buffer, UInt const binding)
 {
 	VkBuffer vertexBuffers[] = { buffer };
 	VkDeviceSize offsets[] = { 0 };
 	vkCmdBindVertexBuffers(commandBuffer, binding, 1, vertexBuffers, offsets);
 }
 
-void Minty::VulkanRenderer::bind_index_buffer(const VkCommandBuffer commandBuffer, const VkBuffer buffer)
+void Minty::VulkanRenderer::bind_index_buffer(VkCommandBuffer const commandBuffer, VkBuffer const buffer)
 {
 	vkCmdBindIndexBuffer(commandBuffer, buffer, 0, VK_INDEX_TYPE_UINT16);
 }
 
-void Minty::VulkanRenderer::draw_vertices(const VkCommandBuffer commandBuffer, const uint32_t count)
+void Minty::VulkanRenderer::draw_vertices(VkCommandBuffer const commandBuffer, const uint32_t count)
 {
 	vkCmdDraw(commandBuffer, count, 1, 0, 0);
 }
 
-void Minty::VulkanRenderer::draw_instances(const VkCommandBuffer commandBuffer, const uint32_t count, const uint32_t vertexCount)
+void Minty::VulkanRenderer::draw_instances(VkCommandBuffer const commandBuffer, const uint32_t count, const uint32_t vertexCount)
 {
 	vkCmdDraw(commandBuffer, vertexCount, count, 0, 0);
 }
 
-void Minty::VulkanRenderer::draw_indices(const VkCommandBuffer commandBuffer, const uint32_t count)
+void Minty::VulkanRenderer::draw_indices(VkCommandBuffer const commandBuffer, const uint32_t count)
 {
 	vkCmdDrawIndexed(commandBuffer, count, 1, 0, 0, 0);
 }
@@ -1473,7 +1511,7 @@ VkSemaphore Minty::VulkanRenderer::create_semaphore()
 	VK_ASSERT_RESULT_RETURN_OBJECT(VkSemaphore, vkCreateSemaphore(s_device, &semaphoreInfo, nullptr, &object), "Failed to create semaphore.");
 }
 
-void Minty::VulkanRenderer::destroy_semaphore(const VkSemaphore semaphore)
+void Minty::VulkanRenderer::destroy_semaphore(VkSemaphore const semaphore)
 {
 	vkDestroySemaphore(s_device, semaphore, nullptr);
 }
@@ -1487,7 +1525,7 @@ VkFence Minty::VulkanRenderer::create_fence()
 	VK_ASSERT_RESULT_RETURN_OBJECT(VkFence, vkCreateFence(s_device, &fenceInfo, nullptr, &object), "Failed to create fence.");
 }
 
-void Minty::VulkanRenderer::destroy_fence(const VkFence fence)
+void Minty::VulkanRenderer::destroy_fence(VkFence const fence)
 {
 	vkDestroyFence(s_device, fence, nullptr);
 }
@@ -1502,7 +1540,7 @@ void Minty::VulkanRenderer::reset_fence(VkFence& fence)
 	vkResetFences(s_device, 1, &fence);
 }
 
-VkResult Minty::VulkanRenderer::present_frame(uint32_t& imageIndex, const VkSemaphore signalSemaphore)
+VkResult Minty::VulkanRenderer::present_frame(uint32_t& imageIndex, VkSemaphore const signalSemaphore)
 {
 	VkPresentInfoKHR presentInfo{};
 	presentInfo.sType = VK_STRUCTURE_TYPE_PRESENT_INFO_KHR;
@@ -1534,7 +1572,7 @@ VkResult Minty::VulkanRenderer::present_frame(uint32_t& imageIndex, const VkSema
 	return result;
 }
 
-VkBuffer Minty::VulkanRenderer::create_buffer(const VkDeviceSize size, const VkBufferUsageFlags usage)
+VkBuffer Minty::VulkanRenderer::create_buffer(VkDeviceSize const size, VkBufferUsageFlags const usage)
 {
 	VkBufferCreateInfo bufferInfo{};
 	bufferInfo.sType = VK_STRUCTURE_TYPE_BUFFER_CREATE_INFO;
@@ -1545,7 +1583,7 @@ VkBuffer Minty::VulkanRenderer::create_buffer(const VkDeviceSize size, const VkB
 	VK_ASSERT_RESULT_RETURN_OBJECT(VkBuffer, vkCreateBuffer(s_device, &bufferInfo, nullptr, &object), "Failed to create buffer.");
 }
 
-void Minty::VulkanRenderer::create_buffer_and_memory(const VkDeviceSize size, const VkBufferUsageFlags usage, const VkMemoryPropertyFlags properties, VkBuffer& buffer, VkDeviceMemory& memory)
+void Minty::VulkanRenderer::create_buffer_and_memory(VkDeviceSize const size, VkBufferUsageFlags const usage, VkMemoryPropertyFlags const properties, VkBuffer& buffer, VkDeviceMemory& memory)
 {
 	// create buffer
 	buffer = create_buffer(size, usage);
@@ -1562,28 +1600,28 @@ void Minty::VulkanRenderer::create_buffer_and_memory(const VkDeviceSize size, co
 	bind_buffer_memory(buffer, memory);
 }
 
-void Minty::VulkanRenderer::destroy_buffer(const VkBuffer buffer)
+void Minty::VulkanRenderer::destroy_buffer(VkBuffer const buffer)
 {
 	vkDestroyBuffer(s_device, buffer, nullptr);
 }
 
-void Minty::VulkanRenderer::destroy_buffer_and_memory(const VkBuffer buffer, const VkDeviceMemory memory)
+void Minty::VulkanRenderer::destroy_buffer_and_memory(VkBuffer const buffer, VkDeviceMemory const memory)
 {
 	destroy_buffer(buffer);
 	free_memory(memory);
 }
 
-void Minty::VulkanRenderer::get_buffer_memory_requirements(const VkBuffer buffer, VkMemoryRequirements& requirements)
+void Minty::VulkanRenderer::get_buffer_memory_requirements(VkBuffer const buffer, VkMemoryRequirements& requirements)
 {
 	vkGetBufferMemoryRequirements(s_device, buffer, &requirements);
 }
 
-void Minty::VulkanRenderer::bind_buffer_memory(const VkBuffer buffer, const VkDeviceMemory memory)
+void Minty::VulkanRenderer::bind_buffer_memory(VkBuffer const buffer, VkDeviceMemory const memory)
 {
 	VK_ASSERT_RESULT(vkBindBufferMemory(s_device, buffer, memory, 0), "Failed to bind memory to buffer.");
 }
 
-void Minty::VulkanRenderer::copy_buffer_to_buffer(const VkQueue queue, const VkBuffer srcBuffer, const VkBuffer dstBuffer, const VkDeviceSize size)
+void Minty::VulkanRenderer::copy_buffer_to_buffer(VkQueue const queue, VkBuffer const srcBuffer, VkBuffer const dstBuffer, VkDeviceSize const size)
 {
 	// get command buffer
 	VkCommandBuffer commandBuffer = begin_command_buffer_single();
@@ -1597,7 +1635,7 @@ void Minty::VulkanRenderer::copy_buffer_to_buffer(const VkQueue queue, const VkB
 	end_command_buffer_single(commandBuffer, queue);
 }
 
-void Minty::VulkanRenderer::copy_buffer_to_image(const VkQueue queue, const VkBuffer srcBuffer, const VkImage dstImage, const uint32_t width, const uint32_t height)
+void Minty::VulkanRenderer::copy_buffer_to_image(VkQueue const queue, VkBuffer const srcBuffer, VkImage const dstImage, const uint32_t width, const uint32_t height)
 {
 	VkCommandBuffer commandBuffer = begin_command_buffer_single();
 
@@ -1642,7 +1680,7 @@ uint32_t Minty::VulkanRenderer::find_memory_type(uint32_t typeFilter, VkMemoryPr
 	throw std::runtime_error("Failed to find suitable memory type.");
 }
 
-VkDeviceMemory Minty::VulkanRenderer::allocate_memory(const VkDeviceSize size, const uint32_t memoryTypeIndex)
+VkDeviceMemory Minty::VulkanRenderer::allocate_memory(VkDeviceSize const size, const uint32_t memoryTypeIndex)
 {
 	VkMemoryAllocateInfo allocateInfo{};
 	allocateInfo.sType = VK_STRUCTURE_TYPE_MEMORY_ALLOCATE_INFO;
@@ -1652,22 +1690,22 @@ VkDeviceMemory Minty::VulkanRenderer::allocate_memory(const VkDeviceSize size, c
 	VK_ASSERT_RESULT_RETURN_OBJECT(VkDeviceMemory, vkAllocateMemory(s_device, &allocateInfo, nullptr, &object), "Failed to allocate buffer memory.");
 }
 
-void Minty::VulkanRenderer::free_memory(const VkDeviceMemory memory)
+void Minty::VulkanRenderer::free_memory(VkDeviceMemory const memory)
 {
 	vkFreeMemory(s_device, memory, nullptr);
 }
 
-void* Minty::VulkanRenderer::map_memory(const VkDeviceMemory memory, const VkDeviceSize offset, const VkDeviceSize size)
+void* Minty::VulkanRenderer::map_memory(VkDeviceMemory const memory, VkDeviceSize const offset, VkDeviceSize const size)
 {
 	VK_ASSERT_RESULT_RETURN_OBJECT(void*, vkMapMemory(s_device, memory, offset, size, 0, &object), "Failed to map memory.");
 }
 
-void Minty::VulkanRenderer::unmap_memory(const VkDeviceMemory memory)
+void Minty::VulkanRenderer::unmap_memory(VkDeviceMemory const memory)
 {
 	vkUnmapMemory(s_device, memory);
 }
 
-void Minty::VulkanRenderer::set_memory(const VkDeviceMemory memory, const void* const data, const VkDeviceSize offset, const VkDeviceSize size)
+void Minty::VulkanRenderer::set_memory(VkDeviceMemory const memory, const void* const data, VkDeviceSize const offset, VkDeviceSize const size)
 {
 	void* dest = map_memory(memory, offset, size);
 	memcpy(dest, data, size);

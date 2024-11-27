@@ -23,25 +23,22 @@ MINTY_ASSERT_FORMAT(exists(path), "Asset path does not exist: \"{}\"", (path).ge
 MINTY_ASSERT_FORMAT(exists(Asset::get_meta_path(path)), "Asset meta path does not exist: \"{}\"", Asset::get_meta_path(path).generic_string());
 
 AssetMode Minty::AssetManager::s_mode = {};
-#if defined(MINTY_DEBUG)
-Bool Minty::AssetManager::s_savePaths = true;
-#else
 Bool Minty::AssetManager::s_savePaths = false;
-#endif // MINTY_DEBUG
 std::unordered_map<UUID, AssetManager::AssetData> Minty::AssetManager::s_assets = {};
 std::unordered_map<AssetType, std::unordered_set<Ref<Asset>>> Minty::AssetManager::s_assetsByType = {};
 Wrapper Minty::AssetManager::s_wrapper = {};
 
-void Minty::AssetManager::initialize(const AssetManagerBuilder& builder)
+void Minty::AssetManager::initialize(AssetManagerBuilder const& builder)
 {
 	// set values
 	s_mode = builder.mode;
 	s_assets = {};
 	s_assetsByType = {};
 	s_wrapper = {};
+	s_savePaths = builder.savePaths;
 
 	// load all of the wrap files given in the builder
-	for (const Path& path : builder.wraps)
+	for (Path const& path : builder.wraps)
 	{
 		s_wrapper.emplace(path);
 	}
@@ -52,7 +49,7 @@ void Minty::AssetManager::shutdown()
 	unload_all();
 }
 
-File* Minty::AssetManager::open(const Path& path)
+File* Minty::AssetManager::open(Path const& path)
 {
 	File* file = nullptr;
 
@@ -71,7 +68,7 @@ File* Minty::AssetManager::open(const Path& path)
 	return file;
 }
 
-Bool Minty::AssetManager::open_reader(const Path& path, Container*& container, Reader*& reader)
+Bool Minty::AssetManager::open_reader(Path const& path, Container*& container, Reader*& reader)
 {
 	std::vector<Char> data = read_file_chars(path);
 
@@ -93,7 +90,7 @@ void Minty::AssetManager::close_reader(Container*& container, Reader*& reader)
 	container = nullptr;
 }
 
-UUID Minty::AssetManager::read_id(const Path& path)
+UUID Minty::AssetManager::read_id(Path const& path)
 {
 	Path metaPath = Asset::get_meta_path(path);
 
@@ -114,7 +111,7 @@ UUID Minty::AssetManager::read_id(const Path& path)
 	return UUID();
 }
 
-Bool Minty::AssetManager::exists(const Path& path)
+Bool Minty::AssetManager::exists(Path const& path)
 {
 	switch (s_mode)
 	{
@@ -129,7 +126,7 @@ Bool Minty::AssetManager::exists(const Path& path)
 	}
 }
 
-Ref<Asset> Minty::AssetManager::load_asset(const Path& path)
+Ref<Asset> Minty::AssetManager::load_asset(Path const& path)
 {
 	// get the asset type
 	AssetType type = Asset::get_type_from_path(path);
@@ -205,7 +202,7 @@ void Minty::AssetManager::erase_by_type(Ref<Asset> const asset)
 	}
 }
 
-void Minty::AssetManager::unload(const UUID id)
+void Minty::AssetManager::unload(UUID const id)
 {
 	auto found = s_assets.find(id);
 
@@ -242,7 +239,7 @@ void Minty::AssetManager::unload_all()
 	s_assetsByType.clear();
 }
 
-void Minty::AssetManager::emplace(const Path& path, const Owner<Asset> asset)
+void Minty::AssetManager::emplace(Path const& path, Owner<Asset> const asset)
 {
 	MINTY_ASSERT_MESSAGE(asset.get() != nullptr, "Cannot emplace a null asset into the AssetManager.");
 	MINTY_ASSERT_FORMAT(!s_assets.contains(asset->id()), "An asset with the ID {} already exists and is loaded.", to_string(asset->id()));
@@ -262,7 +259,7 @@ void Minty::AssetManager::emplace(const Path& path, const Owner<Asset> asset)
 	asset->initialize();
 }
 
-Bool Minty::AssetManager::erase(const UUID id)
+Bool Minty::AssetManager::erase(UUID const id)
 {
 	MINTY_ASSERT(s_assets.contains(id));
 	Ref<Asset> asset = s_assets.at(id).asset.create_ref();
@@ -283,15 +280,14 @@ Ref<Asset> Minty::AssetManager::get_asset(UUID const id)
 	return found->second.asset.create_ref();
 }
 
-Ref<Asset> Minty::AssetManager::at_asset(UUID const id)
-{
-	MINTY_ASSERT(s_assets.contains(id));
-
-	return s_assets.at(id).asset.create_ref();
-}
-
 Path Minty::AssetManager::get_path(UUID const id)
 {
+	if (!s_savePaths)
+	{
+		Debug::log_warning(std::format("AssetManager is not saving paths. ID: {}", to_string(id)));
+		return Path();
+	}
+
 	auto found = s_assets.find(id);
 
 	if (found == s_assets.end())
@@ -302,9 +298,88 @@ Path Minty::AssetManager::get_path(UUID const id)
 	return found->second.path;
 }
 
-Bool Minty::AssetManager::contains(const UUID id)
+String Minty::AssetManager::get_name(UUID const id)
+{
+	return get_path(id).stem().string();
+}
+
+Bool Minty::AssetManager::contains(UUID const id)
 {
 	return s_assets.contains(id);
+}
+
+std::vector<Ref<Asset>> Minty::AssetManager::get_dependents(Ref<Asset> const asset)
+{
+	std::vector<Ref<Asset>> result;
+
+	// get type
+	AssetType type = asset->get_type();
+
+	// check based on the type
+	// some types inherently have no dependents
+	switch (type)
+	{
+	case AssetType::Shader:
+		// MaterialTemplates use Shaders
+		for (auto const materialTemplate : get_by_type<MaterialTemplate>())
+		{
+			if (materialTemplate->get_shader() == asset)
+			{
+				// the materialTemplate uses this shader
+				result.push_back(materialTemplate);
+			}
+		}
+		break;
+	case AssetType::MaterialTemplate:
+		// Materials use MaterialTemplates
+		for (auto const material : get_by_type<Material>())
+		{
+			if (material->get_template() == asset)
+			{
+				result.push_back(material);
+			}
+		}
+		break;
+	case AssetType::Material:
+		// TODO: models depend on materials?
+		break;
+	case AssetType::Texture:
+		// Sprites use Textures
+		for (auto const sprite : get_by_type<Sprite>())
+		{
+			if (sprite->get_texture() == asset)
+			{
+				result.push_back(sprite);
+			}
+		}
+		// FontVariants use Textures and Material Templates
+		for (auto const font : get_by_type<FontVariant>())
+		{
+			if (font->get_texture() == asset)
+			{
+				result.push_back(font->get_texture());
+			}
+			else if (font->get_material().get() && (font->get_material()->get_template() == asset))
+			{
+				result.push_back(font->get_material()->get_template());
+			}
+		}
+		break;
+	case AssetType::FontVariant:
+		// Fonts use FontVariants
+		for (auto const font : get_by_type<Font>())
+		{
+			for (Ref<FontVariant> const variant : font->get_variants())
+			{
+				if (variant == asset)
+				{
+					result.push_back(variant);
+				}
+			}
+		}
+	}
+
+	return result;
 }
 
 String Minty::AssetManager::read_file(Path const& path)
@@ -372,7 +447,7 @@ std::vector<String> Minty::AssetManager::read_file_lines(Path const& path)
 	return result;
 }
 
-Ref<Animation> Minty::AssetManager::load_animation(const Path& path)
+Ref<Animation> Minty::AssetManager::load_animation(Path const& path)
 {
 	MINTY_ASSERT_ASSET_PATH(path);
 
@@ -441,7 +516,7 @@ Ref<Animation> Minty::AssetManager::load_animation(const Path& path)
 	return create_existing<Animation>(path, builder);
 }
 
-Ref<Animator> Minty::AssetManager::load_animator(const Path& path)
+Ref<Animator> Minty::AssetManager::load_animator(Path const& path)
 {
 	MINTY_ASSERT_ASSET_PATH(path);
 
@@ -654,7 +729,7 @@ Ref<FontVariant> Minty::AssetManager::load_font_variant(Path const& path)
 	return create_existing<FontVariant>(path, builder);
 }
 
-Owner<Image> Minty::AssetManager::load_image(const Path& path)
+Owner<Image> Minty::AssetManager::load_image(Path const& path)
 {
 	MINTY_ASSERT_ASSET_PATH(path);
 
@@ -952,7 +1027,7 @@ Ref<Scene> Minty::AssetManager::load_scene(Path const& path)
 	return create_existing<Scene>(path, builder);
 }
 
-Ref<Shader> Minty::AssetManager::load_shader(const Path& path)
+Ref<Shader> Minty::AssetManager::load_shader(Path const& path)
 {
 	MINTY_ASSERT_ASSET_PATH(path);
 
@@ -1029,7 +1104,7 @@ Ref<Shader> Minty::AssetManager::load_shader(const Path& path)
 				reader->outdent();
 			}
 
-			// adjust offset if push const, so next push const is aligned
+			// adjust offset if push const, so next push is const aligned
 			if (input.type == ShaderInputType::PushConstant)
 			{
 				offset += input.size;
@@ -1130,7 +1205,7 @@ Ref<Shader> Minty::AssetManager::load_shader(const Path& path)
 	return create_existing<Shader>(path, builder);
 }
 
-Ref<ShaderModule> Minty::AssetManager::load_shader_module(const Path& path)
+Ref<ShaderModule> Minty::AssetManager::load_shader_module(Path const& path)
 {
 	MINTY_ASSERT_ASSET_PATH(path);
 
@@ -1170,7 +1245,7 @@ Ref<Sprite> Minty::AssetManager::load_sprite(Path const& path)
 	return create_existing<Sprite>(path, builder);
 }
 
-Ref<Texture> Minty::AssetManager::load_texture(const Path& path)
+Ref<Texture> Minty::AssetManager::load_texture(Path const& path)
 {
 	MINTY_ASSERT_ASSET_PATH(path);
 

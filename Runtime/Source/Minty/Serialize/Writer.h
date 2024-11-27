@@ -64,37 +64,37 @@ namespace Minty
 
 	protected:
 		virtual void write_empty(String const& name) = 0;
-		virtual void write_bool(String const& name, const Bool& obj) = 0;
-		virtual void write_bool2(String const& name, const Bool2& obj) = 0;
-		virtual void write_bool3(String const& name, const Bool3& obj) = 0;
-		virtual void write_bool4(String const& name, const Bool4& obj) = 0;
-		virtual void write_char(String const& name, const Char& obj) = 0;
-		virtual void write_byte(String const& name, const Byte& obj) = 0;
-		virtual void write_short(String const& name, const Short& obj) = 0;
-		virtual void write_ushort(String const& name, const UShort& obj) = 0;
-		virtual void write_int(String const& name, const Int& obj) = 0;
-		virtual void write_int2(String const& name, const Int2& obj) = 0;
-		virtual void write_int3(String const& name, const Int3& obj) = 0;
-		virtual void write_int4(String const& name, const Int4& obj) = 0;
-		virtual void write_uint(String const& name, const UInt& obj) = 0;
-		virtual void write_uint2(String const& name, const UInt2& obj) = 0;
-		virtual void write_uint3(String const& name, const UInt3& obj) = 0;
-		virtual void write_uint4(String const& name, const UInt4& obj) = 0;
-		virtual void write_long(String const& name, const Long& obj) = 0;
-		virtual void write_ulong(String const& name, const ULong& obj) = 0;
-		virtual void write_size(String const& name, const Size& obj) = 0;
-		virtual void write_float(String const& name, const Float& obj) = 0;
-		virtual void write_float2(String const& name, const Float2& obj) = 0;
-		virtual void write_float3(String const& name, const Float3& obj) = 0;
-		virtual void write_float4(String const& name, const Float4& obj) = 0;
-		virtual void write_double(String const& name, const Double& obj) = 0;
-		virtual void write_string(String const& name, const String& obj) = 0;
-		virtual void write_uuid(String const& name, const UUID& obj) = 0;
-		virtual void write_type(String const& name, const Type& obj) = 0;
-		virtual void write_variable(String const& name, const Variable& obj) = 0;
+		virtual void write_bool(String const& name, Bool const& obj) = 0;
+		virtual void write_bool2(String const& name, Bool2 const& obj) = 0;
+		virtual void write_bool3(String const& name, Bool3 const& obj) = 0;
+		virtual void write_bool4(String const& name, Bool4 const& obj) = 0;
+		virtual void write_char(String const& name, Char const& obj) = 0;
+		virtual void write_byte(String const& name, Byte const& obj) = 0;
+		virtual void write_short(String const& name, Short const& obj) = 0;
+		virtual void write_ushort(String const& name, UShort const& obj) = 0;
+		virtual void write_int(String const& name, Int const& obj) = 0;
+		virtual void write_int2(String const& name, Int2 const& obj) = 0;
+		virtual void write_int3(String const& name, Int3 const& obj) = 0;
+		virtual void write_int4(String const& name, Int4 const& obj) = 0;
+		virtual void write_uint(String const& name, UInt const& obj) = 0;
+		virtual void write_uint2(String const& name, UInt2 const& obj) = 0;
+		virtual void write_uint3(String const& name, UInt3 const& obj) = 0;
+		virtual void write_uint4(String const& name, UInt4 const& obj) = 0;
+		virtual void write_long(String const& name, Long const& obj) = 0;
+		virtual void write_ulong(String const& name, ULong const& obj) = 0;
+		virtual void write_size(String const& name, Size const& obj) = 0;
+		virtual void write_float(String const& name, Float const& obj) = 0;
+		virtual void write_float2(String const& name, Float2 const& obj) = 0;
+		virtual void write_float3(String const& name, Float3 const& obj) = 0;
+		virtual void write_float4(String const& name, Float4 const& obj) = 0;
+		virtual void write_double(String const& name, Double const& obj) = 0;
+		virtual void write_string(String const& name, String const& obj) = 0;
+		virtual void write_uuid(String const& name, UUID const& obj) = 0;
+		virtual void write_type(String const& name, Type const& obj) = 0;
+		virtual void write_variable(String const& name, Variable const& obj) = 0;
 
 	public:
-		virtual void write_raw(String const& name, const void* const data, const Size size) = 0;
+		virtual void write_raw(String const& name, const void* const data, Size const size) = 0;
 
 		void write(String const& name, const void* const data, Type const type);
 
@@ -106,7 +106,7 @@ namespace Minty
 		void write(String const& name) { write_empty(name); }
 
 		template<typename T, typename std::enable_if<!std::is_base_of<Serializable, T>::value, int>::type = 0>
-		void write(String const& name, const T& data)
+		void write(String const& name, T const& data)
 		{
 			// TODO: custom read for enums
 
@@ -115,148 +115,148 @@ namespace Minty
 		}
 
 		template<typename T, typename std::enable_if<std::is_base_of<Serializable, T>::value, int>::type = 0>
-		void write(String const& name, const T& data)
+		void write(String const& name, T const& data)
 		{
 			write_object(name, data);
 		}
 
 		template<>
-		void write(String const& name, const Bool& data)
+		void write(String const& name, Bool const& data)
 		{
 			write_bool(name, data);
 		}
 		template<>
-		void write(String const& name, const Bool2& data)
+		void write(String const& name, Bool2 const& data)
 		{
 			write_bool2(name, data);
 		}
 		template<>
-		void write(String const& name, const Bool3& data)
+		void write(String const& name, Bool3 const& data)
 		{
 			write_bool3(name, data);
 		}
 		template<>
-		void write(String const& name, const Bool4& data)
+		void write(String const& name, Bool4 const& data)
 		{
 			write_bool4(name, data);
 		}
 		template<>
-		void write(String const& name, const Char& data)
+		void write(String const& name, Char const& data)
 		{
 			write_char(name, data);
 		}
 		template<>
-		void write(String const& name, const Byte& data)
+		void write(String const& name, Byte const& data)
 		{
 			write_byte(name, data);
 		}
 		template<>
-		void write(String const& name, const Short& data)
+		void write(String const& name, Short const& data)
 		{
 			write_short(name, data);
 		}
 		template<>
-		void write(String const& name, const UShort& data)
+		void write(String const& name, UShort const& data)
 		{
 			write_ushort(name, data);
 		}
 		template<>
-		void write(String const& name, const Int& data)
+		void write(String const& name, Int const& data)
 		{
 			write_int(name, data);
 		}
 		template<>
-		void write(String const& name, const Int2& data)
+		void write(String const& name, Int2 const& data)
 		{
 			write_int2(name, data);
 		}
 		template<>
-		void write(String const& name, const Int3& data)
+		void write(String const& name, Int3 const& data)
 		{
 			write_int3(name, data);
 		}
 		template<>
-		void write(String const& name, const Int4& data)
+		void write(String const& name, Int4 const& data)
 		{
 			write_int4(name, data);
 		}
 		template<>
-		void write(String const& name, const UInt& data)
+		void write(String const& name, UInt const& data)
 		{
 			write_uint(name, data);
 		}
 		template<>
-		void write(String const& name, const UInt2& data)
+		void write(String const& name, UInt2 const& data)
 		{
 			write_uint2(name, data);
 		}
 		template<>
-		void write(String const& name, const UInt3& data)
+		void write(String const& name, UInt3 const& data)
 		{
 			write_uint3(name, data);
 		}
 		template<>
-		void write(String const& name, const UInt4& data)
+		void write(String const& name, UInt4 const& data)
 		{
 			write_uint4(name, data);
 		}
 		template<>
-		void write(String const& name, const Long& data)
+		void write(String const& name, Long const& data)
 		{
 			write_long(name, data);
 		}
 		template<>
-		void write(String const& name, const ULong& data)
+		void write(String const& name, ULong const& data)
 		{
 			write_ulong(name, data);
 		}
 		template<>
-		void write(String const& name, const Size& data)
+		void write(String const& name, Size const& data)
 		{
 			write_size(name, data);
 		}
 		template<>
-		void write(String const& name, const Float& data)
+		void write(String const& name, Float const& data)
 		{
 			write_float(name, data);
 		}
 		template<>
-		void write(String const& name, const Float2& data)
+		void write(String const& name, Float2 const& data)
 		{
 			write_float2(name, data);
 		}
 		template<>
-		void write(String const& name, const Float3& data)
+		void write(String const& name, Float3 const& data)
 		{
 			write_float3(name, data);
 		}
 		template<>
-		void write(String const& name, const Float4& data)
+		void write(String const& name, Float4 const& data)
 		{
 			write_float4(name, data);
 		}
 		template<>
-		void write(String const& name, const Double& data)
+		void write(String const& name, Double const& data)
 		{
 			write_double(name, data);
 		}
 		template<>
-		void write(String const& name, const String& data)
+		void write(String const& name, String const& data)
 		{
 			write_string(name, data);
 		}
 		template<>
-		void write(String const& name, const UUID& data)
+		void write(String const& name, UUID const& data)
 		{
 			write_uuid(name, data);
 		}
 		template<>
-		void write(String const& name, const Type& data)
+		void write(String const& name, Type const& data)
 		{
 			write_type(name, data);
 		}
 		template<>
-		void write(String const& name, const Variable& data)
+		void write(String const& name, Variable const& data)
 		{
 			write_variable(name, data);
 		}
@@ -350,7 +350,7 @@ namespace Minty
 		}
 
 		template<typename T>
-		void write(String const& name, const Register<T>& data)
+		void write(String const& name, Register<T> const& data)
 		{
 			indent(name);
 
@@ -365,7 +365,7 @@ namespace Minty
 		}
 
 		template<typename T>
-		void write(String const& name, const Lookup<T>& data)
+		void write(String const& name, Lookup<T> const& data)
 		{
 			indent(name);
 
@@ -395,52 +395,70 @@ namespace Minty
 	class WriterFormatBehavior
 	{
 	protected:
-		virtual void write_indent_to_buffer(const Size indent, std::vector<Byte>& buffer) = 0;
-		virtual Bool write_name_to_buffer(const String& data, std::vector<Byte>& buffer) = 0;
+		virtual void write_indent_to_buffer(Size const indent, std::vector<Byte>& buffer) = 0;
+		virtual Bool write_name_to_buffer(String const& data, std::vector<Byte>& buffer) = 0;
 		virtual void write_separator_to_buffer(std::vector<Byte>& buffer) = 0;
 		virtual void write_space_to_buffer(std::vector<Byte>& buffer) = 0;
 		virtual void write_end_to_buffer(std::vector<Byte>& buffer) = 0;
 
 	protected:
-		virtual void write_bool_to_buffer(const Bool data, std::vector<Byte>& buffer) = 0;
-		virtual void write_bool2_to_buffer(const Bool2 data, std::vector<Byte>& buffer) = 0;
-		virtual void write_bool3_to_buffer(const Bool3 data, std::vector<Byte>& buffer) = 0;
-		virtual void write_bool4_to_buffer(const Bool4 data, std::vector<Byte>& buffer) = 0;
-		virtual void write_char_to_buffer(const Char data, std::vector<Byte>& buffer) = 0;
-		virtual void write_byte_to_buffer(const Byte data, std::vector<Byte>& buffer) = 0;
-		virtual void write_short_to_buffer(const Short data, std::vector<Byte>& buffer) = 0;
-		virtual void write_ushort_to_buffer(const UShort data, std::vector<Byte>& buffer) = 0;
-		virtual void write_int_to_buffer(const Int data, std::vector<Byte>& buffer) = 0;
-		virtual void write_int2_to_buffer(const Int2 data, std::vector<Byte>& buffer) = 0;
-		virtual void write_int3_to_buffer(const Int3 data, std::vector<Byte>& buffer) = 0;
-		virtual void write_int4_to_buffer(const Int4 data, std::vector<Byte>& buffer) = 0;
-		virtual void write_uint_to_buffer(const UInt data, std::vector<Byte>& buffer) = 0;
-		virtual void write_uint2_to_buffer(const UInt2 data, std::vector<Byte>& buffer) = 0;
-		virtual void write_uint3_to_buffer(const UInt3 data, std::vector<Byte>& buffer) = 0;
-		virtual void write_uint4_to_buffer(const UInt4 data, std::vector<Byte>& buffer) = 0;
-		virtual void write_long_to_buffer(const Long data, std::vector<Byte>& buffer) = 0;
-		virtual void write_ulong_to_buffer(const ULong data, std::vector<Byte>& buffer) = 0;
-		virtual void write_size_to_buffer(const Size data, std::vector<Byte>& buffer) = 0;
-		virtual void write_float_to_buffer(const Float data, std::vector<Byte>& buffer) = 0;
-		virtual void write_float2_to_buffer(const Float2 data, std::vector<Byte>& buffer) = 0;
-		virtual void write_float3_to_buffer(const Float3 data, std::vector<Byte>& buffer) = 0;
-		virtual void write_float4_to_buffer(const Float4 data, std::vector<Byte>& buffer) = 0;
-		virtual void write_double_to_buffer(const Double data, std::vector<Byte>& buffer) = 0;
-		virtual void write_string_to_buffer(const String& data, std::vector<Byte>& buffer) = 0;
-		virtual void write_uuid_to_buffer(const UUID data, std::vector<Byte>& buffer) = 0;
-		virtual void write_type_to_buffer(const Type data, std::vector<Byte>& buffer) = 0;
-		virtual void write_typed_to_buffer(const Type type, void const* const data, std::vector<Byte>& buffer) = 0;
+		virtual void write_bool_to_buffer(Bool const data, std::vector<Byte>& buffer) = 0;
+		virtual void write_bool2_to_buffer(Bool2 const data, std::vector<Byte>& buffer) = 0;
+		virtual void write_bool3_to_buffer(Bool3 const data, std::vector<Byte>& buffer) = 0;
+		virtual void write_bool4_to_buffer(Bool4 const data, std::vector<Byte>& buffer) = 0;
+		virtual void write_char_to_buffer(Char const data, std::vector<Byte>& buffer) = 0;
+		virtual void write_byte_to_buffer(Byte const data, std::vector<Byte>& buffer) = 0;
+		virtual void write_short_to_buffer(Short const data, std::vector<Byte>& buffer) = 0;
+		virtual void write_ushort_to_buffer(UShort const data, std::vector<Byte>& buffer) = 0;
+		virtual void write_int_to_buffer(Int const data, std::vector<Byte>& buffer) = 0;
+		virtual void write_int2_to_buffer(Int2 const data, std::vector<Byte>& buffer) = 0;
+		virtual void write_int3_to_buffer(Int3 const data, std::vector<Byte>& buffer) = 0;
+		virtual void write_int4_to_buffer(Int4 const data, std::vector<Byte>& buffer) = 0;
+		virtual void write_uint_to_buffer(UInt const data, std::vector<Byte>& buffer) = 0;
+		virtual void write_uint2_to_buffer(UInt2 const data, std::vector<Byte>& buffer) = 0;
+		virtual void write_uint3_to_buffer(UInt3 const data, std::vector<Byte>& buffer) = 0;
+		virtual void write_uint4_to_buffer(UInt4 const data, std::vector<Byte>& buffer) = 0;
+		virtual void write_long_to_buffer(Long const data, std::vector<Byte>& buffer) = 0;
+		virtual void write_ulong_to_buffer(ULong const data, std::vector<Byte>& buffer) = 0;
+		virtual void write_size_to_buffer(Size const data, std::vector<Byte>& buffer) = 0;
+		virtual void write_float_to_buffer(Float const data, std::vector<Byte>& buffer) = 0;
+		virtual void write_float2_to_buffer(Float2 const data, std::vector<Byte>& buffer) = 0;
+		virtual void write_float3_to_buffer(Float3 const data, std::vector<Byte>& buffer) = 0;
+		virtual void write_float4_to_buffer(Float4 const data, std::vector<Byte>& buffer) = 0;
+		virtual void write_double_to_buffer(Double const data, std::vector<Byte>& buffer) = 0;
+		virtual void write_string_to_buffer(String const& data, std::vector<Byte>& buffer) = 0;
+		virtual void write_uuid_to_buffer(UUID const data, std::vector<Byte>& buffer) = 0;
+		virtual void write_type_to_buffer(Type const data, std::vector<Byte>& buffer) = 0;
+		virtual void write_typed_to_buffer(Type const type, void const* const data, std::vector<Byte>& buffer) = 0;
 	};
 
 	class WriterStorageBehavior
 	{
 	protected:
-		virtual void write_data(const void* const data, const Size size) = 0;
+		virtual void write_data(const void* const data, Size const size) = 0;
 	};
 
 #pragma endregion
 
 #pragma region Behaviors
+
+	// TODO:
+	//class NodeWriterBehavior
+	//	: private WriterStorageBehavior
+	//{
+	//private:
+	//	Node* mp_rootNode;
+
+	//public:
+	//	NodeWriterBehavior(void* const node)
+	//		: mp_node(static_cast<Node*>(node))
+	//	{}
+
+	//	virtual ~NodeWriterBehavior() = default;
+
+	//protected:
+	//	void write_data(void const* const data, Size const size) override;
+	//};
 
 	/// <summary>
 	/// Reads data from a file stream.
@@ -459,7 +477,7 @@ namespace Minty
 		virtual ~FileWriterBehavior() = default;
 
 	protected:
-		void write_data(const void* const data, const Size size) override;
+		void write_data(const void* const data, Size const size) override;
 	};
 
 	class MemoryWriterBehavior
@@ -476,7 +494,7 @@ namespace Minty
 		virtual ~MemoryWriterBehavior() = default;
 
 	protected:
-		void write_data(const void* const data, const Size size) override;
+		void write_data(const void* const data, Size const size) override;
 	};
 
 	/// <summary>
@@ -486,41 +504,41 @@ namespace Minty
 		: private WriterFormatBehavior
 	{
 	protected:
-		void write_indent_to_buffer(const Size indent, std::vector<Byte>& buffer) override;
-		Bool write_name_to_buffer(const String& data, std::vector<Byte>& buffer) override;
+		void write_indent_to_buffer(Size const indent, std::vector<Byte>& buffer) override;
+		Bool write_name_to_buffer(String const& data, std::vector<Byte>& buffer) override;
 		void write_separator_to_buffer(std::vector<Byte>& buffer) override;
 		void write_space_to_buffer(std::vector<Byte>& buffer) override;
 		void write_end_to_buffer(std::vector<Byte>& buffer) override;
 
 	protected:
-		void write_bool_to_buffer(const Bool data, std::vector<Byte>& buffer) override;
-		void write_bool2_to_buffer(const Bool2 data, std::vector<Byte>& buffer) override;
-		void write_bool3_to_buffer(const Bool3 data, std::vector<Byte>& buffer) override;
-		void write_bool4_to_buffer(const Bool4 data, std::vector<Byte>& buffer) override;
-		void write_char_to_buffer(const Char data, std::vector<Byte>& buffer) override;
-		void write_byte_to_buffer(const Byte data, std::vector<Byte>& buffer) override;
-		void write_short_to_buffer(const Short data, std::vector<Byte>& buffer) override;
-		void write_ushort_to_buffer(const UShort data, std::vector<Byte>& buffer) override;
-		void write_int_to_buffer(const Int data, std::vector<Byte>& buffer) override;
-		void write_int2_to_buffer(const Int2 data, std::vector<Byte>& buffer) override;
-		void write_int3_to_buffer(const Int3 data, std::vector<Byte>& buffer) override;
-		void write_int4_to_buffer(const Int4 data, std::vector<Byte>& buffer) override;
-		void write_uint_to_buffer(const UInt data, std::vector<Byte>& buffer) override;
-		void write_uint2_to_buffer(const UInt2 data, std::vector<Byte>& buffer) override;
-		void write_uint3_to_buffer(const UInt3 data, std::vector<Byte>& buffer) override;
-		void write_uint4_to_buffer(const UInt4 data, std::vector<Byte>& buffer) override;
-		void write_long_to_buffer(const Long data, std::vector<Byte>& buffer) override;
-		void write_ulong_to_buffer(const ULong data, std::vector<Byte>& buffer) override;
-		void write_size_to_buffer(const Size data, std::vector<Byte>& buffer) override;
-		void write_float_to_buffer(const Float data, std::vector<Byte>& buffer) override;
-		void write_float2_to_buffer(const Float2 data, std::vector<Byte>& buffer) override;
-		void write_float3_to_buffer(const Float3 data, std::vector<Byte>& buffer) override;
-		void write_float4_to_buffer(const Float4 data, std::vector<Byte>& buffer) override;
-		void write_double_to_buffer(const Double data, std::vector<Byte>& buffer) override;
-		void write_string_to_buffer(const String& data, std::vector<Byte>& buffer) override;
-		void write_uuid_to_buffer(const UUID data, std::vector<Byte>& buffer) override;
-		void write_type_to_buffer(const Type data, std::vector<Byte>& buffer) override;
-		void write_typed_to_buffer(const Type type, void const* const data, std::vector<Byte>& buffer) override;
+		void write_bool_to_buffer(Bool const data, std::vector<Byte>& buffer) override;
+		void write_bool2_to_buffer(Bool2 const data, std::vector<Byte>& buffer) override;
+		void write_bool3_to_buffer(Bool3 const data, std::vector<Byte>& buffer) override;
+		void write_bool4_to_buffer(Bool4 const data, std::vector<Byte>& buffer) override;
+		void write_char_to_buffer(Char const data, std::vector<Byte>& buffer) override;
+		void write_byte_to_buffer(Byte const data, std::vector<Byte>& buffer) override;
+		void write_short_to_buffer(Short const data, std::vector<Byte>& buffer) override;
+		void write_ushort_to_buffer(UShort const data, std::vector<Byte>& buffer) override;
+		void write_int_to_buffer(Int const data, std::vector<Byte>& buffer) override;
+		void write_int2_to_buffer(Int2 const data, std::vector<Byte>& buffer) override;
+		void write_int3_to_buffer(Int3 const data, std::vector<Byte>& buffer) override;
+		void write_int4_to_buffer(Int4 const data, std::vector<Byte>& buffer) override;
+		void write_uint_to_buffer(UInt const data, std::vector<Byte>& buffer) override;
+		void write_uint2_to_buffer(UInt2 const data, std::vector<Byte>& buffer) override;
+		void write_uint3_to_buffer(UInt3 const data, std::vector<Byte>& buffer) override;
+		void write_uint4_to_buffer(UInt4 const data, std::vector<Byte>& buffer) override;
+		void write_long_to_buffer(Long const data, std::vector<Byte>& buffer) override;
+		void write_ulong_to_buffer(ULong const data, std::vector<Byte>& buffer) override;
+		void write_size_to_buffer(Size const data, std::vector<Byte>& buffer) override;
+		void write_float_to_buffer(Float const data, std::vector<Byte>& buffer) override;
+		void write_float2_to_buffer(Float2 const data, std::vector<Byte>& buffer) override;
+		void write_float3_to_buffer(Float3 const data, std::vector<Byte>& buffer) override;
+		void write_float4_to_buffer(Float4 const data, std::vector<Byte>& buffer) override;
+		void write_double_to_buffer(Double const data, std::vector<Byte>& buffer) override;
+		void write_string_to_buffer(String const& data, std::vector<Byte>& buffer) override;
+		void write_uuid_to_buffer(UUID const data, std::vector<Byte>& buffer) override;
+		void write_type_to_buffer(Type const data, std::vector<Byte>& buffer) override;
+		void write_typed_to_buffer(Type const type, void const* const data, std::vector<Byte>& buffer) override;
 	};
 
 	//class BinaryWriterBehavior
@@ -584,7 +602,7 @@ namespace Minty
 			this->write_data(buffer.data(), buffer.size());
 		}
 
-		void write_bool(String const& name, const Bool& obj) override
+		void write_bool(String const& name, Bool const& obj) override
 		{
 			// write to memory buffer
 			std::vector<Byte> buffer;
@@ -601,7 +619,7 @@ namespace Minty
 			this->write_data(buffer.data(), buffer.size());
 		}
 
-		void write_bool2(String const& name, const Bool2& obj) override
+		void write_bool2(String const& name, Bool2 const& obj) override
 		{
 			// write to memory buffer
 			std::vector<Byte> buffer;
@@ -618,7 +636,7 @@ namespace Minty
 			this->write_data(buffer.data(), buffer.size());
 		}
 
-		void write_bool3(String const& name, const Bool3& obj) override
+		void write_bool3(String const& name, Bool3 const& obj) override
 		{
 			// write to memory buffer
 			std::vector<Byte> buffer;
@@ -635,7 +653,7 @@ namespace Minty
 			this->write_data(buffer.data(), buffer.size());
 		}
 
-		void write_bool4(String const& name, const Bool4& obj) override
+		void write_bool4(String const& name, Bool4 const& obj) override
 		{
 			// write to memory buffer
 			std::vector<Byte> buffer;
@@ -652,7 +670,7 @@ namespace Minty
 			this->write_data(buffer.data(), buffer.size());
 		}
 
-		void write_char(String const& name, const Char& obj) override
+		void write_char(String const& name, Char const& obj) override
 		{
 			// write to memory buffer
 			std::vector<Byte> buffer;
@@ -669,7 +687,7 @@ namespace Minty
 			this->write_data(buffer.data(), buffer.size());
 		}
 
-		void write_byte(String const& name, const Byte& obj) override
+		void write_byte(String const& name, Byte const& obj) override
 		{
 			// write to memory buffer
 			std::vector<Byte> buffer;
@@ -686,7 +704,7 @@ namespace Minty
 			this->write_data(buffer.data(), buffer.size());
 		}
 
-		void write_short(String const& name, const Short& obj) override
+		void write_short(String const& name, Short const& obj) override
 		{
 			// write to memory buffer
 			std::vector<Byte> buffer;
@@ -703,7 +721,7 @@ namespace Minty
 			this->write_data(buffer.data(), buffer.size());
 		}
 
-		void write_ushort(String const& name, const UShort& obj) override
+		void write_ushort(String const& name, UShort const& obj) override
 		{
 			// write to memory buffer
 			std::vector<Byte> buffer;
@@ -720,7 +738,7 @@ namespace Minty
 			this->write_data(buffer.data(), buffer.size());
 		}
 
-		void write_int(String const& name, const Int& obj) override
+		void write_int(String const& name, Int const& obj) override
 		{
 			// write to memory buffer
 			std::vector<Byte> buffer;
@@ -737,7 +755,7 @@ namespace Minty
 			this->write_data(buffer.data(), buffer.size());
 		}
 
-		void write_int2(String const& name, const Int2& obj) override
+		void write_int2(String const& name, Int2 const& obj) override
 		{
 			// write to memory buffer
 			std::vector<Byte> buffer;
@@ -754,7 +772,7 @@ namespace Minty
 			this->write_data(buffer.data(), buffer.size());
 		}
 
-		void write_int3(String const& name, const Int3& obj) override
+		void write_int3(String const& name, Int3 const& obj) override
 		{
 			// write to memory buffer
 			std::vector<Byte> buffer;
@@ -771,7 +789,7 @@ namespace Minty
 			this->write_data(buffer.data(), buffer.size());
 		}
 
-		void write_int4(String const& name, const Int4& obj) override
+		void write_int4(String const& name, Int4 const& obj) override
 		{
 			// write to memory buffer
 			std::vector<Byte> buffer;
@@ -788,7 +806,7 @@ namespace Minty
 			this->write_data(buffer.data(), buffer.size());
 		}
 
-		void write_uint(String const& name, const UInt& obj) override
+		void write_uint(String const& name, UInt const& obj) override
 		{
 			// write to memory buffer
 			std::vector<Byte> buffer;
@@ -805,7 +823,7 @@ namespace Minty
 			this->write_data(buffer.data(), buffer.size());
 		}
 
-		void write_uint2(String const& name, const UInt2& obj) override
+		void write_uint2(String const& name, UInt2 const& obj) override
 		{
 			// write to memory buffer
 			std::vector<Byte> buffer;
@@ -822,7 +840,7 @@ namespace Minty
 			this->write_data(buffer.data(), buffer.size());
 		}
 
-		void write_uint3(String const& name, const UInt3& obj) override
+		void write_uint3(String const& name, UInt3 const& obj) override
 		{
 			// write to memory buffer
 			std::vector<Byte> buffer;
@@ -839,7 +857,7 @@ namespace Minty
 			this->write_data(buffer.data(), buffer.size());
 		}
 
-		void write_uint4(String const& name, const UInt4& obj) override
+		void write_uint4(String const& name, UInt4 const& obj) override
 		{
 			// write to memory buffer
 			std::vector<Byte> buffer;
@@ -856,7 +874,7 @@ namespace Minty
 			this->write_data(buffer.data(), buffer.size());
 		}
 
-		void write_long(String const& name, const Long& obj) override
+		void write_long(String const& name, Long const& obj) override
 		{
 			// write to memory buffer
 			std::vector<Byte> buffer;
@@ -873,7 +891,7 @@ namespace Minty
 			this->write_data(buffer.data(), buffer.size());
 		}
 
-		void write_ulong(String const& name, const ULong& obj) override
+		void write_ulong(String const& name, ULong const& obj) override
 		{
 			// write to memory buffer
 			std::vector<Byte> buffer;
@@ -890,7 +908,7 @@ namespace Minty
 			this->write_data(buffer.data(), buffer.size());
 		}
 
-		void write_size(String const& name, const Size& obj) override
+		void write_size(String const& name, Size const& obj) override
 		{
 			// write to memory buffer
 			std::vector<Byte> buffer;
@@ -907,7 +925,7 @@ namespace Minty
 			this->write_data(buffer.data(), buffer.size());
 		}
 
-		void write_float(String const& name, const Float& obj) override
+		void write_float(String const& name, Float const& obj) override
 		{
 			// write to memory buffer
 			std::vector<Byte> buffer;
@@ -924,7 +942,7 @@ namespace Minty
 			this->write_data(buffer.data(), buffer.size());
 		}
 
-		void write_float2(String const& name, const Float2& obj) override
+		void write_float2(String const& name, Float2 const& obj) override
 		{
 			// write to memory buffer
 			std::vector<Byte> buffer;
@@ -941,7 +959,7 @@ namespace Minty
 			this->write_data(buffer.data(), buffer.size());
 		}
 
-		void write_float3(String const& name, const Float3& obj) override
+		void write_float3(String const& name, Float3 const& obj) override
 		{
 			// write to memory buffer
 			std::vector<Byte> buffer;
@@ -958,7 +976,7 @@ namespace Minty
 			this->write_data(buffer.data(), buffer.size());
 		}
 
-		void write_float4(String const& name, const Float4& obj) override
+		void write_float4(String const& name, Float4 const& obj) override
 		{
 			// write to memory buffer
 			std::vector<Byte> buffer;
@@ -975,7 +993,7 @@ namespace Minty
 			this->write_data(buffer.data(), buffer.size());
 		}
 
-		void write_double(String const& name, const Double& obj) override
+		void write_double(String const& name, Double const& obj) override
 		{
 			// write to memory buffer
 			std::vector<Byte> buffer;
@@ -992,7 +1010,7 @@ namespace Minty
 			this->write_data(buffer.data(), buffer.size());
 		}
 
-		void write_string(String const& name, const String& obj) override
+		void write_string(String const& name, String const& obj) override
 		{
 			if (obj.empty())
 			{
@@ -1017,7 +1035,7 @@ namespace Minty
 			this->write_data(buffer.data(), buffer.size());
 		}
 
-		void write_uuid(String const& name, const UUID& obj) override
+		void write_uuid(String const& name, UUID const& obj) override
 		{
 			// write to memory buffer
 			std::vector<Byte> buffer;
@@ -1034,7 +1052,7 @@ namespace Minty
 			this->write_data(buffer.data(), buffer.size());
 		}
 
-		void write_type(String const& name, const Type& obj) override
+		void write_type(String const& name, Type const& obj) override
 		{
 			// write to memory buffer
 			std::vector<Byte> buffer;
@@ -1051,7 +1069,7 @@ namespace Minty
 			this->write_data(buffer.data(), buffer.size());
 		}
 
-		void write_variable(String const& name, const Variable& obj) override
+		void write_variable(String const& name, Variable const& obj) override
 		{
 			// write to memory buffer
 			std::vector<Byte> buffer;
@@ -1072,7 +1090,7 @@ namespace Minty
 			this->write_data(buffer.data(), buffer.size());
 		}
 	public:
-		void write_raw(String const& name, const void* const data, const Size size) override
+		void write_raw(String const& name, const void* const data, Size const size) override
 		{
 			// write to memory buffer
 			std::vector<Byte> buffer;

@@ -9,7 +9,7 @@
 
 using namespace Minty;
 
-Minty::Mesh::Mesh(const MeshBuilder& builder)
+Minty::Mesh::Mesh(MeshBuilder const& builder)
     : Asset(builder.id)
 	, m_vertexData()
     , m_vertexStride(0)
@@ -47,7 +47,7 @@ Minty::Mesh::Mesh(const MeshBuilder& builder)
 	}
 }
 
-void Minty::Mesh::initialize_custom(const MeshBuilder& builder)
+void Minty::Mesh::initialize_custom(MeshBuilder const& builder)
 {
 	m_vertexData = ConstantContainer(builder.vertexData, builder.vertexCount * builder.vertexStride);
 	m_vertexStride = builder.vertexStride;
@@ -548,7 +548,7 @@ void Minty::Mesh::initialize_cylinder()
 
 #undef DEFAULT_VERTEX_SIZE
 
-Owner<Mesh> Minty::Mesh::create(const MeshBuilder& builder)
+Owner<Mesh> Minty::Mesh::create(MeshBuilder const& builder)
 {
 #if defined(MINTY_VULKAN)
     return Owner<VulkanMesh>(builder);

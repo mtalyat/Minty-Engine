@@ -3,7 +3,7 @@
 
 #include "Platform/Vulkan/VulkanRenderer.h"
 
-Minty::VulkanImage::VulkanImage(const ImageBuilder& builder)
+Minty::VulkanImage::VulkanImage(ImageBuilder const& builder)
 	: m_image(VK_NULL_HANDLE)
 	, m_view(VK_NULL_HANDLE)
 	, m_memory(VK_NULL_HANDLE)
@@ -34,22 +34,22 @@ Minty::VulkanImage::VulkanImage(const ImageBuilder& builder)
 	}
 }
 
-Minty::VulkanImage::VulkanImage(const ImageBuilder& builder, const VkImage image)
+Minty::VulkanImage::VulkanImage(ImageBuilder const& builder, VkImage const image)
 	: m_image(image)
 	, m_view(VK_NULL_HANDLE)
 	, m_memory(VK_NULL_HANDLE)
 	, m_format(builder.format)
 	, m_layout(VK_IMAGE_LAYOUT_UNDEFINED)
 	, m_ownImage(false)
-	, m_width(0)
-	, m_height(0)
+	, m_width(builder.width)
+	, m_height(builder.height)
 	, m_size(0)
 	, m_immutable(builder.immutable)
 {
 	m_view = VulkanRenderer::create_image_view(m_image, VulkanRenderer::format_to_vulkan(builder.format), VulkanRenderer::image_aspect_to_vulkan(builder.aspect));
 }
 
-Minty::VulkanImage::VulkanImage(const ImageBuilder& builder, const VkImage image, const VkDeviceMemory memory, const VkImageView imageView)
+Minty::VulkanImage::VulkanImage(ImageBuilder const& builder, VkImage const image, VkDeviceMemory const memory, VkImageView const imageView)
 	: m_image(image)
 	, m_view(imageView)
 	, m_memory(memory)

@@ -17,7 +17,7 @@ void Minty::SpriteComponent::deserialize(Reader& reader)
 	UUID temp;
 	if (reader.read("sprite", temp))
 	{
-		sprite = AssetManager::at<Sprite>(temp);
+		sprite = AssetManager::get<Sprite>(temp);
 	}
 	reader.read("color", color);
 }

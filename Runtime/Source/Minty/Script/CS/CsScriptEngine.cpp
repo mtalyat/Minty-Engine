@@ -2,7 +2,7 @@
 #include "CsScriptEngine.h"
 
 #include "Minty/Core/Constants.h"
-#include "Minty/Core/Operations.h"
+#include "Minty/Core/Operation.h"
 
 using namespace Minty;
 
@@ -19,12 +19,12 @@ void Minty::CsScriptEngine::initialize(ScriptEngineBuilder const& builder)
 	mono_set_dirs(assemblyDir.string().c_str(), configDir.string().c_str());
 
 	// change MONO_PATH from system default to our custom mono files
-	Operations::set_environment_variable("MONO_PATH", assemblyDir.generic_string());
+	Operation::set_environment_variable("MONO_PATH", assemblyDir.generic_string());
 
 #ifdef MINTY_DEBUG
 	// enable debugging properties
-	//Operations::set_environment_variable("MONO_LOG_LEVEL", "debug");
-	//Operations::set_environment_variable("MONO_LOG_MASK", "all");
+	//Operation::set_environment_variable("MONO_LOG_LEVEL", "debug");
+	//Operation::set_environment_variable("MONO_LOG_MASK", "all");
 	//mono_jit_set_trace_options("-all");
 #endif // MINTY_DEBUG
 

@@ -3,7 +3,7 @@
 
 using namespace Minty;
 
-Minty::VulkanScissor::VulkanScissor(const ScissorBuilder& builder)
+Minty::VulkanScissor::VulkanScissor(ScissorBuilder const& builder)
 	: Scissor(builder)
 	, m_rect({
 		{ builder.x, builder.y },

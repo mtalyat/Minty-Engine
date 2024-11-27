@@ -7,6 +7,7 @@
 #include "Minty/Core/UUID.h"
 
 #include "Minty/Script/ScriptClass.h"
+#include <unordered_set>
 
 namespace Minty
 {
@@ -55,6 +56,8 @@ namespace Minty
 		Ref<ScriptClass> get_class(String const& fullName) const;
 
 		Ref<ScriptClass> get_class(UUID const id) const;
+
+		virtual std::unordered_set<String> get_dependencies() const = 0;
 
 	public:
 		static Owner<ScriptAssembly> create(ScriptAssemblyBuilder const& builder);

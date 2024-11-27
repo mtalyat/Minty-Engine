@@ -5,7 +5,7 @@
 
 using namespace Minty;
 
-Minty::VulkanMesh::VulkanMesh(const MeshBuilder& builder)
+Minty::VulkanMesh::VulkanMesh(MeshBuilder const& builder)
 	: Minty::Mesh::Mesh(builder)
 {}
 

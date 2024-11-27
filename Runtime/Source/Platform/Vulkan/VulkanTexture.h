@@ -13,7 +13,7 @@ namespace Minty
 		VkSampler m_sampler;
 
 	public:
-		VulkanTexture(const TextureBuilder& builder);
+		VulkanTexture(TextureBuilder const& builder);
 		~VulkanTexture();
 
 	public:

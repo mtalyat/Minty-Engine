@@ -18,7 +18,7 @@ namespace Minty
 		: public Asset
 	{
 	public:
-		ShaderModule(const ShaderModuleBuilder& builder)
+		ShaderModule(ShaderModuleBuilder const& builder)
 			: Asset::Asset(builder.id)
 		{}
 
@@ -28,6 +28,6 @@ namespace Minty
 
 		virtual void* get_native() const = 0;
 
-		static Owner<ShaderModule> create(const ShaderModuleBuilder& builder = {});
+		static Owner<ShaderModule> create(ShaderModuleBuilder const& builder = {});
 	};
 }

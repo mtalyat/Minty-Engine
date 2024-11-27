@@ -19,15 +19,32 @@ namespace Minty
 	struct ScriptEventComponent
 		: public Component
 	{
-		// a list of event methods to call when appropriate
+		/// <summary>
+		/// A list of event methods to call, when appropriate.
+		/// </summary>
 		Lookup<Ref<ScriptMethod>> scriptMethods;
 
+		/// <summary>
+		/// Invoke all Methods in this event.
+		/// </summary>
 		void invoke() const;
 
+		/// <summary>
+		/// Invoke only the Methods with the given ID.
+		/// </summary>
+		/// <param name="id"></param>
 		void invoke(UUID const id) const;
 
+		/// <summary>
+		/// Invoke only the Methods with the given name.
+		/// </summary>
+		/// <param name="name"></param>
 		void invoke(String const& name) const;
 
+		/// <summary>
+		/// Gets the corresponding method name for this event.
+		/// </summary>
+		/// <returns></returns>
 		virtual Char const* get_method_name() const = 0;
 	};
 

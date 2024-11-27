@@ -20,8 +20,20 @@ namespace Minty
 {
 	struct RendererBuilder
 	{
+		/// <summary>
+		/// The Window to render to.
+		/// </summary>
 		Ref<Window> window;
+
+		/// <summary>
+		/// The starting clear color for the Renderer.
+		/// </summary>
 		Color clearColor = Color::black();
+
+		/// <summary>
+		/// Used to determine the format of all surfaces. Set to undefined to use the default format (B8G8R8A8_SRGB).
+		/// </summary>
+		Format targetSurfaceFormat = Format::Undefined;
 	};
 
 	/// <summary>
@@ -47,10 +59,10 @@ namespace Minty
 		~Renderer() = default;
 
 	public:
-		static void initialize(const RendererBuilder& builder);
+		static void initialize(RendererBuilder const& builder);
 		static void shutdown();
 
-		static int start_frame(const Ref<RenderTarget> tempRenderTarget = nullptr);
+		static Int start_frame(Ref<RenderTarget> const tempRenderTarget = nullptr);
 		static void end_frame();
 
 		// sets the currently active camera
@@ -58,9 +70,9 @@ namespace Minty
 
 		static void sync();
 
-		static void draw_vertices(const UInt vertexCount);
-		static void draw_instances(const UInt instanceCount, const UInt vertexCount = 0);
-		static void draw_indices(const UInt indexCount);
+		static void draw_vertices(UInt const vertexCount);
+		static void draw_instances(UInt const instanceCount, UInt const vertexCount = 0);
+		static void draw_indices(UInt const indexCount);
 
 		/// <summary>
 		/// On a significant event that alters the rendering environment (Window resize, etc.), refresh all data in the Renderer.
@@ -84,7 +96,7 @@ namespace Minty
 
 		static Owner<RenderTarget> create_render_target();
 
-		static void set_render_target(const Ref<RenderTarget> renderTarget) { s_renderTarget = renderTarget; }
+		static void set_render_target(Ref<RenderTarget> const renderTarget) { s_renderTarget = renderTarget; }
 
 		static Ref<Window> get_window() { return s_window; }
 

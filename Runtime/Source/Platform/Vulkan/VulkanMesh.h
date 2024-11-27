@@ -11,7 +11,7 @@ namespace Minty
 	private:
 
 	public:
-		VulkanMesh(const MeshBuilder& builder);
+		VulkanMesh(MeshBuilder const& builder);
 
 		~VulkanMesh() = default;
 

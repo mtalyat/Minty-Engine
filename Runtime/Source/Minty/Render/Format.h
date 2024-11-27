@@ -4,7 +4,7 @@ namespace Minty
 {
 	enum class Format
 	{
-        UNDEFINED = 0,
+        Undefined = 0,
         R4G4_UNORM_PACK8 = 1,
         R4G4B4A4_UNORM_PACK16 = 2,
         B4G4R4A4_UNORM_PACK16 = 3,

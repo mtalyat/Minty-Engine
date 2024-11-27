@@ -14,14 +14,8 @@ namespace Minty
 		/// </summary>
 		String name = "";
 
-		void serialize(Writer& writer) const override
-		{
-			writer.write("name", name);
-		}
+		void serialize(Writer& writer) const override;
 
-		void deserialize(Reader& reader) override
-		{
-			reader.read("name", name);
-		}
+		void deserialize(Reader& reader) override;
 	};
 }

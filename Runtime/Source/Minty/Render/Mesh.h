@@ -78,7 +78,7 @@ namespace Minty
 		Owner<Buffer> m_indexBuffer;
 
 	protected:
-		Mesh(const MeshBuilder& builder);
+		Mesh(MeshBuilder const& builder);
 
 	public:
 		virtual ~Mesh() = default;
@@ -97,7 +97,7 @@ namespace Minty
 
 
 	private:
-		void initialize_custom(const MeshBuilder& builder);
+		void initialize_custom(MeshBuilder const& builder);
 		void initialize_quad();
 		void initialize_cube();
 		void initialize_pyramid();
@@ -108,6 +108,6 @@ namespace Minty
 		AssetType get_type() const override { return AssetType::Mesh; }
 
 	public:
-		static Owner<Mesh> create(const MeshBuilder& builder = {});
+		static Owner<Mesh> create(MeshBuilder const& builder = {});
 	};
 }

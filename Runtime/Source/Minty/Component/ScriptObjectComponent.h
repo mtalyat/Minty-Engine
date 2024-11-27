@@ -8,7 +8,9 @@ namespace Minty
 	struct ScriptObjectComponent
 		: public Component
 	{
-		// ID to the script object that corresponds with this component
+		/// <summary>
+		/// ID to the script object that corresponds with this component.
+		/// </summary>
 		UUID id = INVALID_UUID;
 
 		virtual ~ScriptObjectComponent() = default;

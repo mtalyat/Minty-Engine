@@ -7,7 +7,7 @@
 
 using namespace Minty;
 
-Owner<Surface> Minty::Surface::create(const SurfaceBuilder& builder)
+Owner<Surface> Minty::Surface::create(SurfaceBuilder const& builder)
 {
 #if defined(MINTY_VULKAN)
 	return Owner<VulkanSurface>(builder);

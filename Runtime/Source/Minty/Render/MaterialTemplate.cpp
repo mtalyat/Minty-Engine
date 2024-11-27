@@ -5,7 +5,7 @@
 
 using namespace Minty;
 
-Owner<MaterialTemplate> Minty::MaterialTemplate::create(const MaterialTemplateBuilder& builder)
+Owner<MaterialTemplate> Minty::MaterialTemplate::create(MaterialTemplateBuilder const& builder)
 {
     return Owner<MaterialTemplate>(builder);
 }

@@ -7,7 +7,7 @@
 
 using namespace Minty;
 
-Type Minty::type_typeid(const TypeID typeId)
+Type Minty::type_typeid(TypeID const typeId)
 {
 	if (typeId == typeid(Bool))
 	{
@@ -135,7 +135,7 @@ Type Minty::type_typeid(const TypeID typeId)
 	}
 }
 
-TypeID Minty::typeid_type(const Type type)
+TypeID Minty::typeid_type(Type const type)
 {
 	switch (type)
 	{
@@ -202,7 +202,7 @@ TypeID Minty::typeid_type(const Type type)
 	}
 }
 
-Size Minty::sizeof_type(const Type type)
+Size Minty::sizeof_type(Type const type)
 {
 	switch (type)
 	{

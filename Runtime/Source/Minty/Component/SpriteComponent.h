@@ -10,9 +10,15 @@
 
 namespace Minty
 {
+	/// <summary>
+	/// Holds a Sprite for this Entity.
+	/// </summary>
 	struct SpriteComponent
 		: public Component
 	{
+		/// <summary>
+		/// A reference to the Sprite.
+		/// </summary>
 		Ref<Sprite> sprite = nullptr;
 
 		/// <summary>

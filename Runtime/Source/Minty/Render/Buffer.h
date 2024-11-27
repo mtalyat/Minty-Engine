@@ -76,6 +76,6 @@ namespace Minty
 		virtual Owner<Buffer> clone() const = 0;
 
 	public:
-		static Owner<Buffer> create(const BufferBuilder& builder = {});
+		static Owner<Buffer> create(BufferBuilder const& builder = {});
 	};
 }

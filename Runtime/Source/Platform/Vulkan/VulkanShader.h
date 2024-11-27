@@ -38,7 +38,7 @@ namespace Minty
 		std::vector<PoolData> m_pools;
 
 	public:
-		VulkanShader(const ShaderBuilder& builder);
+		VulkanShader(ShaderBuilder const& builder);
 
 		~VulkanShader();
 

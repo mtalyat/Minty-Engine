@@ -26,6 +26,6 @@ namespace Minty
 		virtual UInt2 get_size() const = 0;
 
 	public:
-		static Owner<RenderTarget> create(const RenderTargetBuilder& builder = {});
+		static Owner<RenderTarget> create(RenderTargetBuilder const& builder = {});
 	};
 }

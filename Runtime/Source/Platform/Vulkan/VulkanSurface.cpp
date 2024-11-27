@@ -7,7 +7,7 @@
 
 using namespace Minty;
 
-Minty::VulkanSurface::VulkanSurface(const SurfaceBuilder& builder)
+Minty::VulkanSurface::VulkanSurface(SurfaceBuilder const& builder)
 	: m_surface()
 {
 	MINTY_NOT_IMPLEMENTED();

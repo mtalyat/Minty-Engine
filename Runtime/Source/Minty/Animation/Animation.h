@@ -110,7 +110,6 @@ namespace Minty
 		/// <summary>
 		/// The steps within this Animation.
 		/// </summary>
-		//std::vector<std::pair<Float, AnimationStep>> steps;
 		std::map<Float, std::vector<AnimationStep>> steps;
 
 		/// <summary>
@@ -161,6 +160,9 @@ namespace Minty
 		/// </summary>
 		Float m_length;
 
+		/// <summary>
+		/// The flags describing the behavior of this Animation.
+		/// </summary>
 		Flags m_flags;
 
 		/// <summary>

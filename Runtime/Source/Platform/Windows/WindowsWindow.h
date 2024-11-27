@@ -45,6 +45,7 @@ namespace Minty
 		int get_frame_height() const override { return _frameHeight; }
 		void process() override;
 		void poll_events() const override;
+		void wait_events() const override;
 
 	private:
 		void update_size();

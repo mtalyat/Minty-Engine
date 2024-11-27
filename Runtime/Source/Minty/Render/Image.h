@@ -107,6 +107,6 @@ namespace Minty
 		virtual UInt get_height() const = 0;
 
 	public:
-		static Owner<Image> create(const ImageBuilder& builder = {});
+		static Owner<Image> create(ImageBuilder const& builder = {});
 	};
 }

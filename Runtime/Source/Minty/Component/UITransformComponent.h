@@ -7,6 +7,9 @@
 
 namespace Minty
 {
+	/// <summary>
+	/// Holds UI space transform data for an Entity.
+	/// </summary>
 	struct UITransformComponent
 		: public Component
 	{
