@@ -61,6 +61,9 @@ EditorApplication::EditorApplication()
 	builder.rendererBuilder.targetSurfaceFormat = Format::B8G8R8A8_UNORM;
 	initialize(builder);
 
+	// load gui theme
+	load_theme();
+
 	// load data
 	load_data();
 
@@ -1167,6 +1170,48 @@ void Mintye::EditorApplication::run_shortcuts()
 	{
 
 	}
+}
+
+void Mintye::EditorApplication::load_theme()
+{
+	Theme theme = GUI::create_theme();
+	theme[GuiColorID::Text] = Color(255, 255, 255);
+	theme[GuiColorID::TextDisabled] = Color(200, 200, 200);
+
+	theme[GuiColorID::WindowBg] = Color(31, 31, 31);
+	theme[GuiColorID::ChildBg] = Color(40, 40, 40);
+	theme[GuiColorID::PopupBg] = Color(35, 35, 35);
+	theme[GuiColorID::FrameBg] = Color(15, 15, 15);
+	theme[GuiColorID::FrameBgHovered] = Color(18, 18, 18);
+	theme[GuiColorID::FrameBgActive] = Color(18, 27, 18);
+
+	theme[GuiColorID::TitleBg] = Color(10, 10, 10);
+	theme[GuiColorID::TitleBgActive] = Color(43, 118, 43);
+
+	theme[GuiColorID::MenuBarBg] = Color(45, 55, 45);
+
+	theme[GuiColorID::CheckMark] = Color(76, 154, 76);
+
+	theme[GuiColorID::Button] = Color(55, 99, 55);
+	theme[GuiColorID::ButtonHovered] = Color(28, 54, 28);
+	theme[GuiColorID::ButtonActive] = Color(71, 127, 71);
+
+	theme[GuiColorID::Header] = Color(55, 99, 55);
+	theme[GuiColorID::HeaderHovered] = Color(38, 142, 38);
+	theme[GuiColorID::HeaderActive] = Color(48, 118, 48);
+
+	theme[GuiColorID::Tab] = Color(45, 83, 45);					// the color of the unselected tab in the focused window
+	theme[GuiColorID::TabHovered] = Color(63, 154, 63);			// the color of the tab being hovered over
+	theme[GuiColorID::TabActive] = Color(32, 83, 32);				// the color of the selected tab in the focused window
+	theme[GuiColorID::TabUnfocused] = Color(20, 28, 20);			// the color of the unselected tab in an unfocused window
+	theme[GuiColorID::TabUnfocusedActive] = Color(26, 66, 26);	// the color of the selected tab in an unfocused window
+
+	theme[GuiColorID::DockingPreview] = Color(94, 208, 94, 63);	// color when previewing a location to dock the window in
+	theme[GuiColorID::DockingEmptyBg] = Color(5, 5, 5, 0);		// color when nothing in the docked area
+
+	theme[GuiColorID::DragDropTarget] = Color(94, 208, 94, 63);
+
+	GUI::apply_theme(theme);
 }
 
 void Mintye::EditorApplication::generate_directory(Minty::Path const& path) const

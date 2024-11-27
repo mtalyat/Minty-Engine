@@ -49,7 +49,27 @@ namespace Minty
 
 		Color& operator[](GuiColorID const id)
 		{
-			return m_colors[static_cast<Size>(id)];
+			return m_colors.at(static_cast<Size>(id));
+		}
+
+		Color& at(GuiColorID const id)
+		{
+			return m_colors.at(static_cast<Size>(id));
+		}
+
+		Color& at(Size const index)
+		{
+			return m_colors.at(index);
+		}
+
+		Color const& at(GuiColorID const id) const
+		{
+			return m_colors.at(static_cast<Size>(id));
+		}
+
+		Color const& at(Size const index) const
+		{
+			return m_colors.at(index);
 		}
 	};
 }

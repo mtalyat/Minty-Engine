@@ -265,6 +265,13 @@ namespace Mintye
 
 #pragma endregion
 
+#pragma region Theme
+
+	private:
+		void load_theme();
+
+#pragma endregion
+
 	};
 
 	template<typename T>

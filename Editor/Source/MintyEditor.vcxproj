@@ -217,7 +217,6 @@ xcopy /y /s /e /i "$(ProjectDir)mono\etc" "$(TargetDir)mono\etc"</Command>
     <ClCompile Include="AssetUtility.cpp" />
     <ClCompile Include="Meta.cpp" />
     <ClCompile Include="ME_EditorApplication.cpp" />
-    <ClCompile Include="ME_EditorApplicationRenderEngine.cpp" />
     <ClCompile Include="ME_AssetsWindow.cpp" />
     <ClCompile Include="ME_BuildInfo.cpp" />
     <ClCompile Include="ME_ConsoleWindow.cpp" />
@@ -228,14 +227,12 @@ xcopy /y /s /e /i "$(ProjectDir)mono\etc" "$(TargetDir)mono\etc"</Command>
     <ClCompile Include="ME_Project.cpp" />
     <ClCompile Include="ME_PropertiesWindow.cpp" />
     <ClCompile Include="ME_SceneWindow.cpp" />
-    <ClCompile Include="ME_Theme.cpp" />
     <ClCompile Include="Program.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AssetUtility.h" />
     <ClInclude Include="Meta.h" />
     <ClInclude Include="ME_EditorApplication.h" />
-    <ClInclude Include="ME_EditorApplicationRenderEngine.h" />
     <ClInclude Include="ME_AssetsWindow.h" />
     <ClInclude Include="ME_BuildInfo.h" />
     <ClInclude Include="ME_ConsoleWindow.h" />
@@ -248,7 +245,6 @@ xcopy /y /s /e /i "$(ProjectDir)mono\etc" "$(TargetDir)mono\etc"</Command>
     <ClInclude Include="ME_Project.h" />
     <ClInclude Include="ME_PropertiesWindow.h" />
     <ClInclude Include="ME_SceneWindow.h" />
-    <ClInclude Include="ME_Theme.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>

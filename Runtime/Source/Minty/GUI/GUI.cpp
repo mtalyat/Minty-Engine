@@ -165,6 +165,12 @@ void Minty::GUI::initialize(GUIBuilder const& builder)
 
 	// set up style
 	ImGui::StyleColorsDark();
+	ImGuiStyle& style = ImGui::GetStyle();
+	if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable)
+	{
+		style.WindowRounding = 0.0f;
+		style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+	}
 
 	// init based on types
 	Ref<Window> mainWindow = WindowManager::get_main();
@@ -247,9 +253,6 @@ Int Minty::GUI::start_frame()
 	return 2;
 #endif // MINTY_WINDOWS
 	ImGui::NewFrame();
-
-	static Bool showDemoWindow = true;
-	ImGui::ShowDemoWindow(&showDemoWindow);
 
 	return 0;
 }
@@ -780,6 +783,35 @@ void Minty::GUI::push_style_variable(GuiStyleID const id, Float2 const& value)
 void Minty::GUI::pop_style_variable(Int const count)
 {
 	ImGui::PopStyleVar(count);
+}
+
+Theme Minty::GUI::create_theme()
+{
+	// create theme
+	Theme theme;
+
+	// copy values from style
+	ImGuiStyle& style = ImGui::GetStyle();
+	ImVec4 color;
+	for (Size i = 0; i < GUI_COLOR_ID_COUNT; i++)
+	{
+		color = style.Colors[i];
+		theme.at(i) = Color(color.x, color.y, color.z, color.w);
+	}
+
+	return theme;
+}
+
+void Minty::GUI::apply_theme(Theme const& theme)
+{
+	ImGuiStyle& style = ImGui::GetStyle();
+
+	Color color;
+	for (Size i = 0; i < GUI_COLOR_ID_COUNT; i++)
+	{
+		color = theme.at(i);
+		style.Colors[i] = ImVec4(color.rf(), color.gf(), color.bf(), color.af());
+	}
 }
 
 GuiViewport const& Minty::GUI::get_main_viewport()

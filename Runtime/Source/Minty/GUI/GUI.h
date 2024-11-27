@@ -262,6 +262,15 @@ namespace Minty
 
 #pragma endregion
 
+#pragma region Theme
+
+    public:
+        static Theme create_theme();
+
+        static void apply_theme(Theme const& theme);
+
+#pragma endregion
+
 #pragma region Viewport
 
         static GuiViewport const& get_main_viewport();
