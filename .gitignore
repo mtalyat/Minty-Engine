@@ -405,7 +405,7 @@ FodyWeavers.xsd
 !Libraries/mono/lib/Release/
 
 # Ignore any log files
-*/Log.txt
+Log.txt
 
 # Wrap
 *.wrap
