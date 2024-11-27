@@ -41,8 +41,9 @@ int main()
 	return 0;
 
 #elif TEST == 1
+	Application app;
 	ApplicationBuilder appBuilder{};
-	Application app(appBuilder);
+	app.initialize(appBuilder);
 
 	int result = 1;
 
@@ -218,8 +219,9 @@ int main()
 
 #elif TEST == 4
 
+	Application app;
 	ApplicationBuilder appBuilder{};
-	Application app(appBuilder);
+	app.initialize(appBuilder);
 
 	Ref<ShaderModule> vertexShaderModule = AssetManager::load<ShaderModule>("Assets/vert.spv");
 	Ref<ShaderModule> fragShaderModule = AssetManager::load<ShaderModule>("Assets/frag.spv");
@@ -230,178 +232,180 @@ int main()
 
 #elif TEST == 5
 
-ApplicationBuilder appBuilder{};
-Application application(appBuilder);
+	Application app;
+	ApplicationBuilder appBuilder{};
+	app.initialize(appBuilder);
 
-try
-{
-	SceneBuilder sceneBuilder{};
-	sceneBuilder.id = UUID::create();
+	try
+	{
+		SceneBuilder sceneBuilder{};
+		sceneBuilder.id = UUID::create();
 
-	Scene scene(sceneBuilder);
-	EntityRegistry& registry = scene.get_entity_registry();
+		Scene scene(sceneBuilder);
+		EntityRegistry& registry = scene.get_entity_registry();
 
-	Entity entity = registry.create();
+		Entity entity = registry.create();
 
-	NameComponent& nameComp = registry.emplace<NameComponent>(entity);
-	nameComp.name = "Test Entity";
+		NameComponent& nameComp = registry.emplace<NameComponent>(entity);
+		nameComp.name = "Test Entity";
 
-	TagComponent& tagComp = registry.emplace<TagComponent>(entity);
-	tagComp.tag = "Test Tag";
+		TagComponent& tagComp = registry.emplace<TagComponent>(entity);
+		tagComp.tag = "Test Tag";
 
-	registry.emplace<EnabledComponent>(entity);
+		registry.emplace<EnabledComponent>(entity);
 
-	DynamicContainer container{};
-	TextMemoryWriter writer(&container);
+		DynamicContainer container{};
+		TextMemoryWriter writer(&container);
 
-	registry.serialize_entity(writer, entity);
+		registry.serialize_entity(writer, entity);
 
-	Char eol = '\0';
-	container.append(&eol, sizeof(Char));
+		Char eol = '\0';
+		container.append(&eol, sizeof(Char));
 
-	String text(static_cast<Char const*>(container.data()));
+		String text(static_cast<Char const*>(container.data()));
 
-	// show results manually
+		// show results manually
 
-	Console::log("Serialization:");
-	Console::log(text);
+		Console::log("Serialization:");
+		Console::log(text);
 
-	// destroy existing entity so we know what we read in was from the stream
-	registry.destroy_immediate(entity);
+		// destroy existing entity so we know what we read in was from the stream
+		registry.destroy_immediate(entity);
 
-	// read entity
-	TextMemoryReader reader(&container);
-	entity = registry.deserialize_entity(reader);
+		// read entity
+		TextMemoryReader reader(&container);
+		entity = registry.deserialize_entity(reader);
 
-	// show results
-	Console::log("Deserialization:");
-	registry.print(entity);
-}
-catch (const std::runtime_error& error)
-{
-	String message = std::format("Runtime error: {}.", error.what());
-	MINTY_ABORT(message);
-	return EXIT_FAILURE;
-}
-catch (const std::exception& exception)
-{
-	String message = std::format("Runtime exception: {}.", exception.what());
-	MINTY_ABORT(message);
-	return EXIT_FAILURE;
-}
-catch (...)
-{
-	String message = "Unidentified exception.";
-	MINTY_ABORT(message);
-	return EXIT_FAILURE;
-}
+		// show results
+		Console::log("Deserialization:");
+		registry.print(entity);
+	}
+	catch (const std::runtime_error& error)
+	{
+		String message = std::format("Runtime error: {}.", error.what());
+		MINTY_ABORT(message);
+		return EXIT_FAILURE;
+	}
+	catch (const std::exception& exception)
+	{
+		String message = std::format("Runtime exception: {}.", exception.what());
+		MINTY_ABORT(message);
+		return EXIT_FAILURE;
+	}
+	catch (...)
+	{
+		String message = "Unidentified exception.";
+		MINTY_ABORT(message);
+		return EXIT_FAILURE;
+	}
 
-return 0;
+	return 0;
 
 #elif TEST == 6
 
-ApplicationBuilder appBuilder{};
-Application application(appBuilder);
+	Application app;
+	ApplicationBuilder appBuilder{};
+	app.initialize(appBuilder);
 
-try
-{
-	SceneBuilder sceneBuilder{};
-	sceneBuilder.id = UUID::create();
+	try
+	{
+		SceneBuilder sceneBuilder{};
+		sceneBuilder.id = UUID::create();
 
-	Scene scene(sceneBuilder);
-	SystemRegistry& registry = scene.get_system_registry();
+		Scene scene(sceneBuilder);
+		SystemRegistry& registry = scene.get_system_registry();
 
-	DynamicContainer container{};
-	TextMemoryWriter writer(&container);
+		DynamicContainer container{};
+		TextMemoryWriter writer(&container);
 
-	registry.serialize(writer);
+		registry.serialize(writer);
 
-	Console::log("Serialization:");
+		Console::log("Serialization:");
 
-	Char eol = '\0';
-	container.append(&eol, sizeof(Char));
-	String text = static_cast<const Char*>(container.data());
-	Console::log(text);
+		Char eol = '\0';
+		container.append(&eol, sizeof(Char));
+		String text = static_cast<const Char*>(container.data());
+		Console::log(text);
 
-	registry.clear();
+		registry.clear();
 
-	TextMemoryReader reader(&container);
-	registry.deserialize(reader);
+		TextMemoryReader reader(&container);
+		registry.deserialize(reader);
 
-	Console::log("Deserialization:");
+		Console::log("Deserialization:");
 
-	// serialize again to visually see it
-	container.clear();
-	writer = TextMemoryWriter(&container);
-	registry.serialize(writer);
+		// serialize again to visually see it
+		container.clear();
+		writer = TextMemoryWriter(&container);
+		registry.serialize(writer);
 
-	container.append(&eol, sizeof(Char));
-	text = static_cast<const Char*>(container.data());
-	Console::log(text);
-}
-catch (const std::runtime_error& error)
-{
-	String message = std::format("Runtime error: {}.", error.what());
-	MINTY_ABORT(message);
-	return EXIT_FAILURE;
-}
-catch (const std::exception& exception)
-{
-	String message = std::format("Runtime exception: {}.", exception.what());
-	MINTY_ABORT(message);
-	return EXIT_FAILURE;
-}
-catch (...)
-{
-	String message = "Unidentified exception.";
-	MINTY_ABORT(message);
-	return EXIT_FAILURE;
-}
+		container.append(&eol, sizeof(Char));
+		text = static_cast<const Char*>(container.data());
+		Console::log(text);
+	}
+	catch (const std::runtime_error& error)
+	{
+		String message = std::format("Runtime error: {}.", error.what());
+		MINTY_ABORT(message);
+		return EXIT_FAILURE;
+	}
+	catch (const std::exception& exception)
+	{
+		String message = std::format("Runtime exception: {}.", exception.what());
+		MINTY_ABORT(message);
+		return EXIT_FAILURE;
+	}
+	catch (...)
+	{
+		String message = "Unidentified exception.";
+		MINTY_ABORT(message);
+		return EXIT_FAILURE;
+	}
 
-return 0;
+	return 0;
 
 #elif TEST == 7
 
-ApplicationBuilder appBuilder{};
+	Application app;
+	ApplicationBuilder appBuilder{};
+	app.initialize(appBuilder);
 
-Application application(appBuilder);
+	try
+	{
+		Ref<Scene> scene = AssetManager::load<Scene>("Assets/test.scene");
 
-try
-{
-	Ref<Scene> scene = AssetManager::load<Scene>("Assets/test.scene");
+		DynamicContainer container{};
+		TextMemoryWriter writer(&container);
 
-	DynamicContainer container{};
-	TextMemoryWriter writer(&container);
+		scene->serialize(writer);
 
-	scene->serialize(writer);
+		Console::log(std::format("Scene: {}", to_string(scene->id())));
 
-	Console::log(std::format("Scene: {}", to_string(scene->id())));
+		Char eol = '\0';
+		container.append(&eol, sizeof(Char));
+		String text = static_cast<const Char*>(container.data());
+		Console::log(text);
+	}
+	catch (const std::runtime_error& error)
+	{
+		String message = std::format("Runtime error: {}.", error.what());
+		MINTY_ABORT(message);
+		return EXIT_FAILURE;
+	}
+	catch (const std::exception& exception)
+	{
+		String message = std::format("Runtime exception: {}.", exception.what());
+		MINTY_ABORT(message);
+		return EXIT_FAILURE;
+	}
+	catch (...)
+	{
+		String message = "Unidentified exception.";
+		MINTY_ABORT(message);
+		return EXIT_FAILURE;
+	}
 
-	Char eol = '\0';
-	container.append(&eol, sizeof(Char));
-	String text = static_cast<const Char*>(container.data());
-	Console::log(text);
-}
-catch (const std::runtime_error& error)
-{
-	String message = std::format("Runtime error: {}.", error.what());
-	MINTY_ABORT(message);
-	return EXIT_FAILURE;
-}
-catch (const std::exception& exception)
-{
-	String message = std::format("Runtime exception: {}.", exception.what());
-	MINTY_ABORT(message);
-	return EXIT_FAILURE;
-}
-catch (...)
-{
-	String message = "Unidentified exception.";
-	MINTY_ABORT(message);
-	return EXIT_FAILURE;
-}
-
-return 0;
+	return 0;
 
 #endif
 }
