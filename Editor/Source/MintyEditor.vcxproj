@@ -148,21 +148,21 @@
       </Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>:: Copy mono files over
-xcopy /y /s /e /i "$(ProjectDir)..\..\Libraries\mono\lib\$(Configuration)" "$(TargetDir)mono\lib\$(Configuration)"
-xcopy /y /s /e /i "$(ProjectDir)..\..\Libraries\mono\etc" "$(TargetDir)mono\etc"
-:: xcopy /y "$(ProjectDir)..\..\Libraries\mono\lib\$(Configuration)\*.dll" "$(TargetDir)Lib\"
-:: Copy assembly
+      <Command>echo Copy mono files over
+xcopy /y /s /e /i "$(ProjectDir)..\..\Libraries\mono\lib\$(Configuration)\*" "$(TargetDir)mono\lib\"
+xcopy /y /s /e /i "$(ProjectDir)..\..\Libraries\mono\etc" "$(TargetDir)mono\etc\"
+xcopy /y "$(ProjectDir)..\..\Libraries\mono\lib\$(Configuration)\*.dll" "$(TargetDir)"
+echo Copy assembly
 xcopy /y "$(ProjectDir)..\..\Assembly\bin\$(Configuration)\MintyEngine.dll" "$(TargetDir)Lib\"
 xcopy /y "$(ProjectDir)..\..\Assembly\bin\$(Configuration)\MintyEngine.pbd" "$(TargetDir)Lib\"
 xcopy /y "$(ProjectDir)..\..\Assembly\bin\$(Configuration)\MintyEngine.dll.meta" "$(TargetDir)Lib\"
-:: Copy default wrap(s)
+echo Copy default wrap(s)
 for /r "$(ProjectDir)..\..\Data" %%f in (*.wrap) do xcopy /Y "%%f" "$(TargetDir)"
-:: Copy icon
+echo Copy icon
 xcopy /y "$(ProjectDir)Icon.png" "$(TargetDir)"
-:: Copy templates
+echo Copy templates
 xcopy /y /e /i "$(ProjectDir)Templates\*" "$(TargetDir)Templates\"
-:: Copy runtime dlls
+echo Copy runtime dlls
 :: xcopy /y "$(ProjectDir)..\..\Runtime\$(Platform)\$(Configuration)\*.dll" "$(TargetDir)Lib\"
 :: xcopy /y "$(ProjectDir)..\..\Runtime\$(Platform)\$(Configuration)\*.pdb" "$(TargetDir)Lib\"</Command>
     </PostBuildEvent>
