@@ -70,9 +70,13 @@ File* Minty::AssetManager::open(Path const& path)
 
 Bool Minty::AssetManager::open_reader(Path const& path, Container*& container, Reader*& reader)
 {
-	std::vector<Char> data = read_file_chars(path);
+	if (!exists(path))
+	{
+		// return false if it does not exist at all
+		return false;
+	}
 
-	if (data.size() == 0) return false;
+	std::vector<Char> data = read_file_chars(path);
 
 	container = new ConstantContainer(data.size());
 	container->set(data.data(), data.size());
