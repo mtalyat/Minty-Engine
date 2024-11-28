@@ -2,7 +2,7 @@
 @echo off
 
 :: Setup
-call %~dp0..\Setup\setup.bat
+call %~dp0build_setup.bat
 
 :: Compile all shaders
 call %MINTY_PATH%Scripts\Build\compile_shaders.bat %MINTY_PATH%

@@ -1,19 +1,20 @@
+:: Run this script to perform all of the initial setup for a first time use on a machine.
 @echo off
 
-set MINTY_PATH=%~dp0..\..\
-set wrap=%MINTY_PATH%Wrapper\MintyWrapper\x64\Debug\MintyWrapper.exe
+:: Clear logs before running commands
+echo %date% %time% > "%~dp0setup.log"
 
-:: Define the configuration file path relative to this script's location
-set FILE=%MINTY_PATH%Info\minty.txt
+echo Update user files to run in the target directories.
+set DEFAULT_USER_PATH=%~dp0default_user.xml
+copy %DEFAULT_USER_PATH% %~dp0..\..\Assembly\Source\MintyEngine.vcxproj.user
+copy %DEFAULT_USER_PATH% %~dp0..\..\Runtime\Source\MintyRuntime.vcxproj.user
+copy %DEFAULT_USER_PATH% %~dp0..\..\Runtime\Test\MintyRuntimeTest.vcxproj.user
+copy %DEFAULT_USER_PATH% %~dp0..\..\Editor\Source\MintyEditor.vcxproj.user
 
-:: Function to parse config file and set variables
-:parse_config
-for /f "tokens=1* delims=: " %%A in (%FILE%) do (
-    set "key=%%A"
-    set "value=%%B"
-    :: Dynamically set variable with key name
-    call set "%%key%%=%%value%%"
-    call echo %%key%%=%%value%%
-)
-
-endlocal
+echo Building projects.
+set SETUP_BUILD_PATH=%~dp0\setup_build.bat
+call 
+call %SETUP_BUILD_PATH% %~dp0..\..\Assembly\Source\MintyEngine.sln
+call %SETUP_BUILD_PATH% %~dp0..\..\Runtime\Source\MintyRuntime.sln
+call %SETUP_BUILD_PATH% %~dp0..\..\Runtime\Test\MintyRuntimeTest.sln
+call %SETUP_BUILD_PATH% %~dp0..\..\Editor\Source\MintyEditor.sln
