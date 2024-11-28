@@ -69,4 +69,7 @@
     <Compile Include="Window.cs" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PostBuildEvent>copy $(ProjectDir)MintyEngine.dll.meta $(TargetDir)MintyEngine.dll.meta</PostBuildEvent>
+  </PropertyGroup>
 </Project>

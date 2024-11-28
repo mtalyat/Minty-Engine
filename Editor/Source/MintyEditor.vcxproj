@@ -153,9 +153,9 @@ xcopy /y /s /e /i "$(ProjectDir)..\..\Libraries\mono\lib\$(Configuration)\*" "$(
 xcopy /y /s /e /i "$(ProjectDir)..\..\Libraries\mono\etc" "$(TargetDir)mono\etc\"
 xcopy /y "$(ProjectDir)..\..\Libraries\mono\lib\$(Configuration)\*.dll" "$(TargetDir)"
 echo Copy assembly
-xcopy /y "$(ProjectDir)..\..\Assembly\bin\$(Configuration)\MintyEngine.dll" "$(TargetDir)Lib\"
-xcopy /y "$(ProjectDir)..\..\Assembly\bin\$(Configuration)\MintyEngine.pbd" "$(TargetDir)Lib\"
-xcopy /y "$(ProjectDir)..\..\Assembly\bin\$(Configuration)\MintyEngine.dll.meta" "$(TargetDir)Lib\"
+xcopy /y "$(ProjectDir)..\..\Assembly\Source\bin\$(Configuration)\MintyEngine.dll" "$(TargetDir)Lib\"
+xcopy /y "$(ProjectDir)..\..\Assembly\Source\bin\$(Configuration)\MintyEngine.pbd" "$(TargetDir)Lib\"
+xcopy /y "$(ProjectDir)..\..\Assembly\Source\bin\$(Configuration)\MintyEngine.dll.meta" "$(TargetDir)Lib\"
 echo Copy default wrap(s)
 for /r "$(ProjectDir)..\..\Data" %%f in (*.wrap) do xcopy /Y "%%f" "$(TargetDir)"
 echo Copy icon
@@ -200,14 +200,23 @@ xcopy /y "$(ProjectDir)..\Data\*.wrap" "$(ProjectDir)"
 xcopy /y "$(ProjectDir)..\Libraries\mono\lib\$(Configuration)\*.dll" "$(ProjectDir)"</Command>
     </PreBuildEvent>
     <PostBuildEvent>
-      <Command>xcopy /y "$(ProjectDir)..\Runtime\x64\$(Configuration)\*.dll" "$(TargetDir)"
-xcopy /y "$(ProjectDir)..\Runtime\x64\$(Configuration)\*.pdb" "$(TargetDir)"
-for /r "$(ProjectDir)..\Data" %%f in (*.wrap) do xcopy /Y "%%f" "$(TargetDir)"
+      <Command>echo Copy mono files over
+xcopy /y /s /e /i "$(ProjectDir)..\..\Libraries\mono\lib\$(Configuration)\*" "$(TargetDir)mono\lib\"
+xcopy /y /s /e /i "$(ProjectDir)..\..\Libraries\mono\etc" "$(TargetDir)mono\etc\"
+xcopy /y "$(ProjectDir)..\..\Libraries\mono\lib\$(Configuration)\*.dll" "$(TargetDir)"
+echo Copy assembly
+xcopy /y "$(ProjectDir)..\..\Assembly\Source\bin\$(Configuration)\MintyEngine.dll" "$(TargetDir)Lib\"
+xcopy /y "$(ProjectDir)..\..\Assembly\Source\bin\$(Configuration)\MintyEngine.pbd" "$(TargetDir)Lib\"
+xcopy /y "$(ProjectDir)..\..\Assembly\Source\bin\$(Configuration)\MintyEngine.dll.meta" "$(TargetDir)Lib\"
+echo Copy default wrap(s)
+for /r "$(ProjectDir)..\..\Data" %%f in (*.wrap) do xcopy /Y "%%f" "$(TargetDir)"
+echo Copy icon
 xcopy /y "$(ProjectDir)Icon.png" "$(TargetDir)"
-xcopy /y "$(ProjectDir)..\Assembly\bin\$(Configuration)\MintyEngine.dll" "$(TargetDir)"
+echo Copy templates
 xcopy /y /e /i "$(ProjectDir)Templates\*" "$(TargetDir)Templates\"
-xcopy /y /s /e /i "$(ProjectDir)mono\lib\$(Configuration)" "$(TargetDir)mono\lib"
-xcopy /y /s /e /i "$(ProjectDir)mono\etc" "$(TargetDir)mono\etc"</Command>
+echo Copy runtime dlls
+:: xcopy /y "$(ProjectDir)..\..\Runtime\$(Platform)\$(Configuration)\*.dll" "$(TargetDir)Lib\"
+:: xcopy /y "$(ProjectDir)..\..\Runtime\$(Platform)\$(Configuration)\*.pdb" "$(TargetDir)Lib\"</Command>
     </PostBuildEvent>
     <PostBuildEvent>
       <Message>Copy Minty Engine files.</Message>
