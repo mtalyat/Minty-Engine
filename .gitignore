@@ -399,13 +399,13 @@ FodyWeavers.xsd
 
 # Minty Engine
 /Editor/mono/
-/Editor/Log.txt
 !Runtime/Source/Minty/[Dd]ebug/
 !Libraries/mono/lib/Debug/
 !Libraries/mono/lib/Release/
 
 # Ignore any log files
 Log.txt
+*.log
 
 # Wrap
 *.wrap
