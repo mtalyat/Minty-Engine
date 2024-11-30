@@ -3,6 +3,7 @@
 
 #include "Minty/Core/ApplicationInfo.h"
 #include "Minty/Library/Vulkan.h"
+#include "Minty/Render/RenderAttachment.h"
 #include "Minty/Render/Shader.h"
 
 #include "Platform/Vulkan/VulkanImage.h"
@@ -26,8 +27,6 @@ namespace Minty
 		/// </summary>
 		struct Frame
 		{
-			VkCommandBuffer commandBuffer;
-
 			VkSemaphore imageAvailableSemaphore;
 			VkSemaphore renderFinishedSemaphore;
 			VkFence inFlightFence;
@@ -75,13 +74,12 @@ namespace Minty
 		static uint32_t s_imageIndex;
 
 		static std::vector<Owner<VulkanImage>> s_swapchainImages;
-		static VkRenderPass s_renderPass;
-		static std::unordered_set <VulkanRenderTarget*> s_renderTargets;
 		static Owner<VulkanImage> s_depthImage;
 		static Ref<VulkanViewport> s_viewport;
 		static Ref<VulkanScissor> s_scissor;
 
 		static VkCommandPool s_commandPool;
+		static VkCommandBuffer s_primaryCommandBuffer;
 		
 		static std::array<Frame, MAX_FRAMES_IN_FLIGHT> s_frames;
 		static Size s_currentFrame;
@@ -105,7 +103,7 @@ namespace Minty
 #pragma region Rendering
 
 	public:
-		static int start_frame(Ref<RenderTarget> const renderTarget);
+		static int start_frame();
 
 		static void end_frame();
 
@@ -118,10 +116,6 @@ namespace Minty
 		static void sync();
 
 		static void refresh();
-
-		static void register_target(VulkanRenderTarget* const renderTarget);
-
-		static void unregister_target(VulkanRenderTarget* const renderTarget);
 
 #pragma endregion
 
@@ -142,17 +136,15 @@ namespace Minty
 
 		static VkExtent2D get_swapchain_extent() { return s_swapchainExtent; }
 
-		static VkRenderPass get_render_pass() { return s_renderPass; }
-
 		static VkQueue get_graphics_queue() { return s_graphicsQueue; }
 
 		static VkCommandPool get_command_pool() { return s_commandPool; }
 
-		static VkCommandBuffer get_command_buffer() { return s_frames.at(s_currentFrame).commandBuffer; }
-
 		static Size get_current_frame_index() { return s_currentFrame; }
 
 		static QueueFamilyIndices const& get_queue_family_indices() { return s_queueFamilyIndices; }
+
+		static VkCommandBuffer get_command_buffer() { return s_primaryCommandBuffer; }
 
 	private:
 		static Frame& get_current_frame() { return s_frames.at(s_currentFrame); }
@@ -162,7 +154,7 @@ namespace Minty
 #pragma region Create
 
 	public:
-		static Owner<RenderTarget> create_render_target();
+		static Ref<RenderTarget> create_render_target(Ref<RenderPass> const& renderPass);
 
 #pragma endregion
 
@@ -291,15 +283,18 @@ namespace Minty
 
 #pragma region Depth
 
-	private:
+	public:
 		static VkFormat find_depth_format();
 
+	private:
 		static Bool has_stencil_component(VkFormat const format);
 
 		// creates the depth image for the framebuffers
 		static void create_depth_resources();
 
 		static void destroy_depth_resources();
+
+		static void recreate_depth_resources();
 
 #pragma endregion
 
@@ -317,16 +312,16 @@ namespace Minty
 #pragma region Render Pass
 
 	public:
-		static void create_render_pass();
+		static VkRenderPass create_render_pass(VkAttachmentDescription const* const colorAttachment, VkAttachmentDescription const* const depthAttachment);
 
-		static void destroy_render_pass();
+		static void destroy_render_pass(VkRenderPass const renderPass);
 
 #pragma endregion
 
 #pragma region Frame Buffer
 
 	public:
-		static VkFramebuffer create_framebuffer(VkRenderPass const renderPass, VkImageView const attachment, VkExtent2D const extent);
+		static VkFramebuffer create_framebuffer(VkRenderPass const renderPass, VkImageView const attachment, VkExtent2D const extent, Bool const useColorAttachment, Bool const useDepthAttachment);
 
 		static void destroy_framebuffer(VkFramebuffer const framebuffer);
 
@@ -361,9 +356,9 @@ namespace Minty
 		static void reset_command_buffer(VkCommandBuffer const commandBuffer);
 
 		// submit and presentation
-		static void submit_command_buffer(VkCommandBuffer const commandBuffer, VkQueue const queue, VkSemaphore const waitSemaphore, VkSemaphore const signalSemaphore, VkFence const inFlightFence);
+		static void submit_command_buffers(std::vector<VkCommandBuffer> const& commandBuffers, VkQueue const queue, VkSemaphore const waitSemaphore, VkSemaphore const signalSemaphore, VkFence const inFlightFence);
 
-		static void submit_command_buffer(Frame const& frame, VkQueue const queue);
+		static void submit_command_buffers(std::vector<VkCommandBuffer> const& commandBuffers, Frame const& frame, VkQueue const queue);
 
 		static void submit_command_buffer(VkCommandBuffer const commandBuffer, VkQueue const queue);
 
@@ -496,6 +491,12 @@ namespace Minty
 		static VkPolygonMode polygon_mode_to_vulkan(const Minty::ShaderPolygonMode mode);
 
 		static VkVertexInputRate input_rate_to_vulkan(const Minty::ShaderInputRate rate);
+
+		static VkAttachmentLoadOp attachment_load_to_vulkan(Minty::RenderAttachmentLoadOperation const operation);
+
+		static VkAttachmentStoreOp attachment_store_to_vulkan(Minty::RenderAttachmentStoreOperation const operation);
+
+		static VkAttachmentDescription attachment_to_vulkan(Minty::RenderAttachment const& attachment);
 
 #pragma endregion
 

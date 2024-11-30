@@ -91,7 +91,17 @@ namespace Minty
 	class Image
 	{
 	protected:
-		Image() = default;
+		Format m_format;
+		ImageType m_type;
+		ImageTiling m_tiling;
+		ImageAspect m_aspect;
+		ImageUsage m_usage;
+		UInt m_width;
+		UInt m_height;
+		Bool m_immutable;
+
+	protected:
+		Image(ImageBuilder const& builder);
 
 	public:
 		virtual ~Image() = default;
@@ -99,12 +109,27 @@ namespace Minty
 	public:
 		virtual void set_pixels(const Byte* const data) = 0;
 
-	public:
 		virtual void* get_native() const = 0;
 
-		virtual UInt get_width() const = 0;
+		virtual void resize(UInt const width, UInt const height, Format const format) = 0;
 
-		virtual UInt get_height() const = 0;
+		void resize(UInt const width, UInt const height) { resize(width, height, m_format); }
+
+		inline Format get_format() const { return m_format; }
+
+		inline ImageType get_type() const { return m_type; }
+
+		inline ImageTiling get_tiling() const { return m_tiling; }
+
+		inline ImageAspect get_aspect() const { return m_aspect; }
+
+		inline ImageUsage get_usage() const { return m_usage; }
+
+		inline UInt get_width() const { return m_width; }
+
+		inline UInt get_height() const { return m_height; }
+
+		inline Bool is_immutable() const { return m_immutable; }
 
 	public:
 		static Owner<Image> create(ImageBuilder const& builder = {});

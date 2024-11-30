@@ -8,6 +8,7 @@
 #include "Minty/Render/Mesh.h"
 #include "Minty/Render/Material.h"
 #include "Minty/Render/MaterialTemplate.h"
+#include "Minty/Render/RenderPass.h"
 #include "Minty/Render/RenderTarget.h"
 #include "Minty/Render/Scissor.h"
 #include "Minty/Render/Shader.h"
@@ -45,7 +46,7 @@ namespace Minty
 		static Ref<Window> s_window;
 		static Color s_color;
 
-		static Ref<RenderTarget> s_renderTarget;
+		static std::vector<Owner<RenderPass>> s_renderPasses;
 
 		static std::unordered_map<MeshType, Ref<Mesh>> s_defaultMeshes;
 		static std::unordered_map <UInt, Ref<Material>> s_defaultMaterials;
@@ -62,7 +63,7 @@ namespace Minty
 		static void initialize(RendererBuilder const& builder);
 		static void shutdown();
 
-		static Int start_frame(Ref<RenderTarget> const tempRenderTarget = nullptr);
+		static Int start_frame();
 		static void end_frame();
 
 		// sets the currently active camera
@@ -94,15 +95,25 @@ namespace Minty
 	public:
 		static Ref<Material> get_or_create_default_material(Ref<Texture> const texture, AssetType const type, Space const space);
 
-		static Owner<RenderTarget> create_render_target();
+		static Ref<RenderPass> create_render_pass(RenderPassBuilder const& builder);
 
-		static void set_render_target(Ref<RenderTarget> const renderTarget) { s_renderTarget = renderTarget; }
+		static void destroy_render_pass(Ref<RenderPass> const renderPass);
+
+		static std::vector<Owner<RenderPass>> const& get_render_passes() { return s_renderPasses; }
+
+		static Ref<RenderPass> get_render_pass() { return s_renderPasses.front().create_ref(); }
+
+		static Ref<RenderTarget> create_render_target(Ref<RenderPass> const& renderPass);
 
 		static Ref<Window> get_window() { return s_window; }
 
 		static Color get_color() { return s_color; }
 
 		static void set_color(Color const color) { s_color = color; }
+
+		static Format get_color_format();
+
+		static Format get_depth_format();
 
 #pragma endregion
 

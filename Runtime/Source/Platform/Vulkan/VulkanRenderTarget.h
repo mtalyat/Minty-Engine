@@ -19,12 +19,14 @@ namespace Minty
 		~VulkanRenderTarget();
 
 	public:
+		void reinitialize(RenderTargetBuilder const& builder) override;
+
+		UInt2 get_size() const override { return m_size; }
+
+	private:
 		void initialize(RenderTargetBuilder const& builder);
 
 		void shutdown();
-
-	public:
-		UInt2 get_size() const override { return m_size; }
 
 	public:
 		VkFramebuffer get_framebuffer(Size const index) const { return m_framebuffers.at(index); }

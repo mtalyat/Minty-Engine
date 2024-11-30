@@ -7,6 +7,7 @@
 #include "Minty/Core/Constants.h"
 #include "Minty/Debug/Debug.h"
 #include "Platform/Vulkan/VulkanViewport.h"
+#include "Platform/Vulkan/VulkanRenderPass.h"
 #include <array>
 #include <map>
 #include <set>
@@ -30,12 +31,11 @@ VkExtent2D VulkanRenderer::s_swapchainExtent = {};
 VkSwapchainKHR VulkanRenderer::s_swapchain = VK_NULL_HANDLE;
 uint32_t VulkanRenderer::s_imageIndex = 0;
 std::vector<Owner<VulkanImage>> VulkanRenderer::s_swapchainImages = {};
-VkRenderPass VulkanRenderer::s_renderPass = VK_NULL_HANDLE;
-std::unordered_set <VulkanRenderTarget*> VulkanRenderer::s_renderTargets = {};
 Owner<VulkanImage> VulkanRenderer::s_depthImage = nullptr;
 Ref<VulkanViewport> VulkanRenderer::s_viewport = nullptr;
 Ref<VulkanScissor> VulkanRenderer::s_scissor = nullptr;
 VkCommandPool VulkanRenderer::s_commandPool = VK_NULL_HANDLE;
+VkCommandBuffer VulkanRenderer::s_primaryCommandBuffer = VK_NULL_HANDLE;
 std::array<VulkanRenderer::Frame, MAX_FRAMES_IN_FLIGHT> VulkanRenderer::s_frames = {};
 Size VulkanRenderer::s_currentFrame = 0;
 
@@ -72,9 +72,6 @@ void Minty::VulkanRenderer::initialize(RendererBuilder const& builder)
 	s_swapchain = VK_NULL_HANDLE;
 	recreate_swapchain();
 
-	// renderpass
-	create_render_pass();
-
 	// viewport
 	ViewportBuilder viewportBuilder{};
 	viewportBuilder.id = UUID::create();
@@ -101,11 +98,6 @@ void Minty::VulkanRenderer::initialize(RendererBuilder const& builder)
 		initialize_frame(frame);
 	}
 
-	//VkImage depthImage;
-	//VkDeviceMemory depthImageMemory;
-	//create_image_and_memory(m_swapchainExtent.width, m_swapchainExtent.height, VK_IMAGE_TYPE_2D, depthFormat, VK_IMAGE_TILING_OPTIMAL, VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT, VK_MEMORY_PROPERTY_DEVICE_LOCAL_BIT, depthImage, depthImageMemory);
-	//VkImageView depthImageView = create_image_view(depthImage, depthFormat, VK_IMAGE_ASPECT_DEPTH_BIT);
-
 	// set current frame back to 0
 	s_currentFrame = 0;
 }
@@ -115,9 +107,6 @@ void Minty::VulkanRenderer::shutdown()
 	// wait until idle so it is safe to destroy stuff
 	sync();
 
-	// remove references to render targets
-	s_renderTargets.clear();
-
 	// destroy frames
 	for (Frame& frame : s_frames)
 	{
@@ -125,15 +114,13 @@ void Minty::VulkanRenderer::shutdown()
 	}
 
 	// destroy depth stencil
-	s_depthImage.release();
+	destroy_depth_resources();
 
 	// destroy images
 	s_swapchainImages.clear();
 
 	// destroy swapchain
 	destroy_swapchain();
-
-	destroy_render_pass();
 
 	destroy_command_pool();
 
@@ -149,9 +136,6 @@ void Minty::VulkanRenderer::shutdown()
 
 void Minty::VulkanRenderer::initialize_frame(Frame& frame)
 {
-	// command buffer (for rendering)
-	frame.commandBuffer = create_command_buffer();
-
 	// sync objects
 	frame.imageAvailableSemaphore = create_semaphore();
 	frame.renderFinishedSemaphore = create_semaphore();
@@ -160,7 +144,6 @@ void Minty::VulkanRenderer::initialize_frame(Frame& frame)
 
 void Minty::VulkanRenderer::destroy_frame(Frame& frame)
 {
-	destroy_command_buffer(frame.commandBuffer);
 	destroy_semaphore(frame.imageAvailableSemaphore);
 	destroy_semaphore(frame.renderFinishedSemaphore);
 	destroy_fence(frame.inFlightFence);
@@ -173,8 +156,8 @@ void Minty::VulkanRenderer::recreate_swapchain()
 	window->refresh();
 	while (window->get_frame_width() == 0 && window->get_frame_height() == 0)
 	{
-		window->refresh();
 		window->wait_events();
+		window->refresh();
 	}
 
 	// wait for idle
@@ -183,15 +166,6 @@ void Minty::VulkanRenderer::recreate_swapchain()
 	// destroy old swapchain, if able
 	if (s_swapchain != VK_NULL_HANDLE)
 	{
-		// destroy framebuffers (but not the targets)
-		for (VulkanRenderTarget* const renderTarget : s_renderTargets)
-		{
-			renderTarget->shutdown();
-		}
-
-		// destroy depth images, etc.
-		destroy_depth_resources();
-
 		// destroy images
 		s_swapchainImages.clear();
 
@@ -232,19 +206,38 @@ void Minty::VulkanRenderer::recreate_swapchain()
 		swapchainImageRefs.push_back(image.create_ref());
 	}
 
-	// create depth resources
-	create_depth_resources();
+	// recreate depth resources
+	if (s_depthImage == nullptr)
+	{
+		create_depth_resources();
+	}
+	else
+	{
+		recreate_depth_resources();
+	}
 
 	// re-init framebuffers using new images
 	RenderTargetBuilder renderTargetBuilder{};
 	renderTargetBuilder.images = swapchainImageRefs;
-	for (VulkanRenderTarget* const renderTarget : s_renderTargets)
+	for (auto const& renderPass : Renderer::get_render_passes())
 	{
-		renderTarget->initialize(renderTargetBuilder);
+		renderTargetBuilder.renderPass = renderPass.create_ref();
+		renderPass->reinitialize_render_targets(renderTargetBuilder);
+	}
+
+	// update window viewport and scissor
+	if (s_viewport != nullptr)
+	{
+		s_viewport->set_size(static_cast<Float>(s_swapchainExtent.width), static_cast<Float>(s_swapchainExtent.height));
+	}
+
+	if (s_scissor != nullptr)
+	{
+		s_scissor->set_size(static_cast<Float>(s_swapchainExtent.width), static_cast<Float>(s_swapchainExtent.height));
 	}
 }
 
-int Minty::VulkanRenderer::start_frame(Ref<RenderTarget> const renderTarget)
+int Minty::VulkanRenderer::start_frame()
 {
 	Frame& frame = get_current_frame();
 
@@ -262,23 +255,33 @@ int Minty::VulkanRenderer::start_frame(Ref<RenderTarget> const renderTarget)
 		return 1;
 	}
 
-	// set command buffer so it can be used
-	reset_command_buffer(frame.commandBuffer);
+	// for each render pass: start a command buffer and pass
+	std::vector<Owner<RenderPass>> const& renderPasses = Renderer::get_render_passes();
+	for (auto const& renderPass : renderPasses)
+	{
+		Ref<VulkanRenderPass> vulkanRenderPass = static_cast<Ref<VulkanRenderPass>>(renderPass.create_ref());
+		VkCommandBuffer commandBuffer = vulkanRenderPass->get_command_buffer();
 
-	// start recording command buffer:
+		// clear buffer
+		reset_command_buffer(commandBuffer);
 
-	// initialize reference values
-	Ref<VulkanRenderTarget> vulkanRenderTarget = static_cast<Ref<VulkanRenderTarget>>(renderTarget);
-	UInt2 targetSize = vulkanRenderTarget->get_size();
-	VkRect2D renderArea{ {0, 0}, {targetSize.x, targetSize.y } };
-	Color clearColor = Renderer::get_color();
-	VkClearColorValue clearValue = {{ clearColor.rf(), clearColor.gf(), clearColor.bf(), clearColor.af() }};
+		// start new buffer
+		begin_command_buffer(commandBuffer);
 
-	// start command buffer
-	begin_command_buffer(frame.commandBuffer);
+		// start pass
+		Ref<VulkanRenderTarget> activeTarget = static_cast<Ref<VulkanRenderTarget>>(renderPass->get_active());
+		UInt2 targetSize = activeTarget->get_size();
+		VkRect2D renderArea{ {0, 0}, {targetSize.x, targetSize.y } };
+		Color clearColor = Renderer::get_color();
+		VkClearColorValue clearValue = { { clearColor.rf(), clearColor.gf(), clearColor.bf(), clearColor.af() } };
+		begin_render_pass(commandBuffer, vulkanRenderPass->get_render_pass(), activeTarget->get_framebuffer(s_imageIndex), renderArea, clearValue);
+	}
 
-	// start render pass
-	begin_render_pass(frame.commandBuffer, s_renderPass, vulkanRenderTarget->get_framebuffer(s_imageIndex), renderArea, clearValue);
+	// set primary command buffer
+	if (!renderPasses.empty())
+	{
+		s_primaryCommandBuffer = static_cast<Ref<VulkanRenderPass>>(renderPasses.front().create_ref())->get_command_buffer();
+	}
 
 	return 0;
 }
@@ -286,17 +289,30 @@ int Minty::VulkanRenderer::start_frame(Ref<RenderTarget> const renderTarget)
 void Minty::VulkanRenderer::end_frame()
 {
 	Frame& frame = get_current_frame();
+	std::vector<Owner<RenderPass>> const& renderPasses = Renderer::get_render_passes();
+	std::vector<VkCommandBuffer> commandBuffers;
+	commandBuffers.reserve(renderPasses.size());
 
-	// end render pass
-	end_render_pass(frame.commandBuffer);
+	// for each render pass: end pass and command buffer, submit buffer
+	for (auto const& renderPass : renderPasses)
+	{
+		Ref<VulkanRenderPass> vulkanRenderPass = static_cast<Ref<VulkanRenderPass>>(renderPass.create_ref());
+		VkCommandBuffer commandBuffer = vulkanRenderPass->get_command_buffer();
 
-	// end command buffer
-	end_command_buffer(frame.commandBuffer);
+		// end pass
+		end_render_pass(commandBuffer);
 
-	// submit for drawing
-	submit_command_buffer(frame, s_graphicsQueue);
+		// end buffer
+		end_command_buffer(commandBuffer);
 
-	// present it to the screen
+		// keep track of command buffer for submission
+		commandBuffers.push_back(commandBuffer);
+	}
+
+	// submit command buffers all at once
+	submit_command_buffers(commandBuffers, frame, s_graphicsQueue);
+
+	// present to the screen
 	VkResult result = present_frame(s_imageIndex, frame.renderFinishedSemaphore);
 
 	// check for recreating swapchain
@@ -311,23 +327,17 @@ void Minty::VulkanRenderer::end_frame()
 
 void Minty::VulkanRenderer::draw_vertices(UInt const vertexCount)
 {
-	Frame& frame = get_current_frame();
-
-	draw_vertices(frame.commandBuffer, vertexCount);
+	draw_vertices(s_primaryCommandBuffer, vertexCount);
 }
 
 void Minty::VulkanRenderer::draw_instances(UInt const instanceCount, UInt const vertexCount)
 {
-	Frame& frame = get_current_frame();
-
-	draw_instances(frame.commandBuffer, instanceCount, vertexCount);
+	draw_instances(s_primaryCommandBuffer, instanceCount, vertexCount);
 }
 
 void Minty::VulkanRenderer::draw_indices(UInt const indexCount)
 {
-	Frame& frame = get_current_frame();
-
-	draw_indices(frame.commandBuffer, indexCount);
+	draw_indices(s_primaryCommandBuffer, indexCount);
 }
 
 void Minty::VulkanRenderer::sync()
@@ -340,22 +350,7 @@ void Minty::VulkanRenderer::refresh()
 	recreate_swapchain();
 }
 
-void Minty::VulkanRenderer::register_target(VulkanRenderTarget* const renderTarget)
-{
-	MINTY_ASSERT_MESSAGE(renderTarget, "Unable to register a null VulkanRenderTarget.");
-	MINTY_ASSERT_MESSAGE(!s_renderTargets.contains(renderTarget), "VulkanRenderInterface already contains the given VulkanRenderTarget.");
-
-	s_renderTargets.emplace(renderTarget);
-}
-
-void Minty::VulkanRenderer::unregister_target(VulkanRenderTarget* const renderTarget)
-{
-	MINTY_ASSERT_MESSAGE(s_renderTargets.contains(renderTarget), "VulkanRenderInterface does not contain the given VulkanRenderTarget.");
-
-	s_renderTargets.erase(renderTarget);
-}
-
-Owner<RenderTarget> Minty::VulkanRenderer::create_render_target()
+Ref<RenderTarget> Minty::VulkanRenderer::create_render_target(Ref<RenderPass> const& renderPass)
 {
 	std::vector<Ref<Image>> swapchainImageRefs(s_swapchainImages.size());
 	for (Size i = 0; i < swapchainImageRefs.size(); i++)
@@ -364,9 +359,10 @@ Owner<RenderTarget> Minty::VulkanRenderer::create_render_target()
 	}
 
 	RenderTargetBuilder builder{};
+	builder.renderPass = renderPass;
 	builder.images = swapchainImageRefs;
 
-	return Owner<VulkanRenderTarget>(builder);
+	return renderPass->create_render_target(builder);
 }
 
 ////////////////////// Utility
@@ -515,44 +511,44 @@ void Minty::VulkanRenderer::create_instance(const Minty::ApplicationInfo& applic
 {
 #ifdef MINTY_DEBUG
 	if (!check_validation_layer_support())
-    {
-        throw std::runtime_error("Validation layers requested, but not available.");
-    }
+	{
+		throw std::runtime_error("Validation layers requested, but not available.");
+	}
 #endif // MINTY_DEBUG
 
-    // Enter application info
-    VkApplicationInfo appInfo{};
-    appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
-    appInfo.pApplicationName = applicationInfo.name.c_str();
-    appInfo.applicationVersion = applicationInfo.version;
-    appInfo.pEngineName = MINTY_NAME;
-    appInfo.engineVersion = MINTY_VERSION;
-    appInfo.apiVersion = VK_API_VERSION_1_2;
+	// Enter application info
+	VkApplicationInfo appInfo{};
+	appInfo.sType = VK_STRUCTURE_TYPE_APPLICATION_INFO;
+	appInfo.pApplicationName = applicationInfo.name.c_str();
+	appInfo.applicationVersion = applicationInfo.version;
+	appInfo.pEngineName = MINTY_NAME;
+	appInfo.engineVersion = MINTY_VERSION;
+	appInfo.apiVersion = VK_API_VERSION_1_2;
 
-    // Enter args to create instance
-    VkInstanceCreateInfo createInfo{};
-    createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
-    createInfo.pApplicationInfo = &appInfo;
+	// Enter args to create instance
+	VkInstanceCreateInfo createInfo{};
+	createInfo.sType = VK_STRUCTURE_TYPE_INSTANCE_CREATE_INFO;
+	createInfo.pApplicationInfo = &appInfo;
 
-    std::vector<const char*> extensions = get_required_extensions();
+	std::vector<const char*> extensions = get_required_extensions();
 
-    createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
-    createInfo.ppEnabledExtensionNames = extensions.data();
+	createInfo.enabledExtensionCount = static_cast<uint32_t>(extensions.size());
+	createInfo.ppEnabledExtensionNames = extensions.data();
 
-    VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo{};
+	VkDebugUtilsMessengerCreateInfoEXT debugCreateInfo{};
 #ifdef MINTY_DEBUG
-    createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
-    createInfo.ppEnabledLayerNames = validationLayers.data();
+	createInfo.enabledLayerCount = static_cast<uint32_t>(validationLayers.size());
+	createInfo.ppEnabledLayerNames = validationLayers.data();
 
-    populateDebugMessengerCreateInfo(debugCreateInfo);
-    createInfo.pNext = static_cast<VkDebugUtilsMessengerCreateInfoEXT*>(&debugCreateInfo);
+	populateDebugMessengerCreateInfo(debugCreateInfo);
+	createInfo.pNext = static_cast<VkDebugUtilsMessengerCreateInfoEXT*>(&debugCreateInfo);
 #else
-    createInfo.enabledLayerCount = 0;
-    createInfo.pNext = nullptr;
+	createInfo.enabledLayerCount = 0;
+	createInfo.pNext = nullptr;
 #endif // MINTY_DEBUG
 
-    // create the VkInstance
-    VK_ASSERT_RESULT(vkCreateInstance(&createInfo, nullptr, &s_instance), "Failed to create instance.");
+	// create the VkInstance
+	VK_ASSERT_RESULT(vkCreateInstance(&createInfo, nullptr, &s_instance), "Failed to create instance.");
 }
 
 void Minty::VulkanRenderer::destroy_instance()
@@ -969,7 +965,7 @@ VkFormat Minty::VulkanRenderer::find_supported_format(const std::vector<VkFormat
 		}
 	}
 
-	VK_ASSERT_FAIL("Failed to find supported format.");
+	VK_ASSERT_FAIL("Failed to find supported depthFormat.");
 }
 
 VkImage Minty::VulkanRenderer::create_image(const uint32_t width, const uint32_t height, VkImageType const type, VkFormat const format, VkImageTiling const tiling, VkImageUsageFlags const usage)
@@ -1190,7 +1186,17 @@ void Minty::VulkanRenderer::create_depth_resources()
 
 void Minty::VulkanRenderer::destroy_depth_resources()
 {
-	s_depthImage = nullptr;
+	s_depthImage.release();
+}
+
+void Minty::VulkanRenderer::recreate_depth_resources()
+{
+	VkFormat vulkanDepthFormat = find_depth_format();
+
+	// TODO: convert to format in a safer way
+	Format depthFormat = static_cast<Format>(vulkanDepthFormat);
+
+	s_depthImage->resize(s_swapchainExtent.width, s_swapchainExtent.height, depthFormat);
 }
 
 VkShaderModule Minty::VulkanRenderer::create_shader_module(const std::vector<Minty::Char>& code)
@@ -1218,61 +1224,93 @@ void Minty::VulkanRenderer::destroy_shader_module(VkShaderModule const shaderMod
 	vkDestroyShaderModule(s_device, shaderModule, nullptr);
 }
 
-void Minty::VulkanRenderer::create_render_pass()
+VkRenderPass Minty::VulkanRenderer::create_render_pass(VkAttachmentDescription const* const colorAttachment, VkAttachmentDescription const* const depthAttachment)
 {
-	MINTY_ASSERT(s_renderPass == VK_NULL_HANDLE);
+	std::vector<VkAttachmentDescription> attachments;
+	attachments.reserve(2);
+	std::array<VkAttachmentReference, 2> attachmentRefs = {};
 
-	// color attachment
-	VkAttachmentDescription colorAttachment{};
-	colorAttachment.format = s_swapchainSurfaceFormat.format;
-	colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT; // adjust if multisampling
-	colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR; // determine what to do with previous data
-	colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE; // determine what to do with the current data
-	colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-	colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-	colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-	colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+	if (colorAttachment)
+	{
+		attachmentRefs[0].attachment = static_cast<uint32_t>(attachments.size());
+		attachmentRefs[0].layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+		attachments.push_back(*colorAttachment);
+	}
 
-	// color attachment ref
-	VkAttachmentReference colorAttachmentRef{};
-	colorAttachmentRef.attachment = 0;
-	colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+	if (depthAttachment)
+	{
+		attachmentRefs[1].attachment = static_cast<uint32_t>(attachments.size());
+		attachmentRefs[1].layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+		attachments.push_back(*depthAttachment);
+	}
 
-	// depth attachment
-	VkAttachmentDescription depthAttachment{};
-	depthAttachment.format = find_depth_format();
-	depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
-	depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
-	depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-	depthAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
-	depthAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-	depthAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-	depthAttachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+	//// color attachment
+	//VkAttachmentDescription colorAttachment{};
+	//colorAttachment.format = s_swapchainSurfaceFormat.format;
+	//colorAttachment.samples = VK_SAMPLE_COUNT_1_BIT; // adjust if multisampling
+	//colorAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR; // determine what to do with previous data
+	//colorAttachment.storeOp = VK_ATTACHMENT_STORE_OP_STORE; // determine what to do with the current data
+	//colorAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+	//colorAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+	//colorAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	//colorAttachment.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
 
-	// depth attachment ref
-	VkAttachmentReference depthAttachmentRef{};
-	depthAttachmentRef.attachment = 1;
-	depthAttachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+	//// color attachment ref
+	//VkAttachmentReference colorAttachmentRef{};
+	//colorAttachmentRef.attachment = 0;
+	//colorAttachmentRef.layout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
 
-	std::array<VkAttachmentDescription, 2> attachments = { colorAttachment, depthAttachment };
+	//// depth attachment
+	//VkAttachmentDescription depthAttachment{};
+	//depthAttachment.format = find_depth_format();
+	//depthAttachment.samples = VK_SAMPLE_COUNT_1_BIT;
+	//depthAttachment.loadOp = VK_ATTACHMENT_LOAD_OP_CLEAR;
+	//depthAttachment.storeOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+	//depthAttachment.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+	//depthAttachment.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+	//depthAttachment.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	//depthAttachment.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+
+	//// depth attachment ref
+	//VkAttachmentReference depthAttachmentRef{};
+	//depthAttachmentRef.attachment = 1;
+	//depthAttachmentRef.layout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
 
 	// subpass
 	VkSubpassDescription subpass{};
 	subpass.pipelineBindPoint = VK_PIPELINE_BIND_POINT_GRAPHICS;
-	subpass.colorAttachmentCount = 1;
-	subpass.pColorAttachments = &colorAttachmentRef;
-	subpass.pDepthStencilAttachment = &depthAttachmentRef;
+	subpass.colorAttachmentCount = 0;
+	subpass.pColorAttachments = nullptr;
+	subpass.pDepthStencilAttachment = nullptr;
 
 	// subpass dependency
 	VkSubpassDependency dependency{};
 	dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
 	dependency.dstSubpass = 0;
-
-	dependency.srcStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+	dependency.srcStageMask = 0;
 	dependency.srcAccessMask = 0;
+	dependency.dstStageMask = 0;
+	dependency.dstAccessMask = 0;
 
-	dependency.dstStageMask = VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT | VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
-	dependency.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT | VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+	// behave differently based on attachments
+	if (colorAttachment)
+	{
+		subpass.colorAttachmentCount = 1;
+		subpass.pColorAttachments = &attachmentRefs[0];
+		
+		dependency.srcStageMask |= VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+		dependency.dstStageMask |= VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
+		dependency.dstAccessMask |= VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+	}
+
+	if (depthAttachment)
+	{
+		subpass.pDepthStencilAttachment = &attachmentRefs[1];
+
+		dependency.srcStageMask |= VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+		dependency.dstStageMask |= VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
+		dependency.dstAccessMask |= VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
+	}
 
 	VkRenderPassCreateInfo renderPassInfo{};
 	renderPassInfo.sType = VK_STRUCTURE_TYPE_RENDER_PASS_CREATE_INFO;
@@ -1283,21 +1321,29 @@ void Minty::VulkanRenderer::create_render_pass()
 	renderPassInfo.dependencyCount = 1;
 	renderPassInfo.pDependencies = &dependency;
 
-	VK_ASSERT_RESULT(vkCreateRenderPass(s_device, &renderPassInfo, nullptr, &s_renderPass), "Failed to create render pass.");
+	VK_ASSERT_RESULT_RETURN_OBJECT(VkRenderPass, vkCreateRenderPass(s_device, &renderPassInfo, nullptr, &object), "Failed to create render pass.")
 }
 
-void Minty::VulkanRenderer::destroy_render_pass()
+void Minty::VulkanRenderer::destroy_render_pass(VkRenderPass const renderPass)
 {
-	MINTY_ASSERT(s_renderPass != VK_NULL_HANDLE);
+	MINTY_ASSERT(renderPass != VK_NULL_HANDLE);
 
-	vkDestroyRenderPass(s_device, s_renderPass, nullptr);
+	vkDestroyRenderPass(s_device, renderPass, nullptr);
 }
 
-VkFramebuffer Minty::VulkanRenderer::create_framebuffer(VkRenderPass const renderPass, VkImageView const attachment, VkExtent2D const extent)
+VkFramebuffer Minty::VulkanRenderer::create_framebuffer(VkRenderPass const renderPass, VkImageView const attachment, VkExtent2D const extent, Bool const useColorAttachment, Bool const useDepthAttachment)
 {
-	std::array<VkImageView, 2> attachments{};
-	attachments[0] = attachment;
-	attachments[1] = s_depthImage->get_view();
+	std::vector<VkImageView> attachments;
+	attachments.reserve(2);
+
+	if (useColorAttachment)
+	{
+		attachments.push_back(attachment);
+	}
+	if (useDepthAttachment)
+	{
+		attachments.push_back(s_depthImage->get_view());
+	}
 
 	VkFramebufferCreateInfo framebufferInfo{};
 	framebufferInfo.sType = VK_STRUCTURE_TYPE_FRAMEBUFFER_CREATE_INFO;
@@ -1394,7 +1440,7 @@ void Minty::VulkanRenderer::reset_command_buffer(VkCommandBuffer const commandBu
 	vkResetCommandBuffer(commandBuffer, 0);
 }
 
-void Minty::VulkanRenderer::submit_command_buffer(VkCommandBuffer const commandBuffer, VkQueue const queue, VkSemaphore const waitSemaphore, VkSemaphore const signalSemaphore, VkFence const inFlightFence)
+void Minty::VulkanRenderer::submit_command_buffers(std::vector<VkCommandBuffer> const& commandBuffers, VkQueue const queue, VkSemaphore const waitSemaphore, VkSemaphore const signalSemaphore, VkFence const inFlightFence)
 {
 	VkSubmitInfo submitInfo{};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -1405,8 +1451,8 @@ void Minty::VulkanRenderer::submit_command_buffer(VkCommandBuffer const commandB
 	submitInfo.pWaitSemaphores = waitSemaphores;
 	submitInfo.pWaitDstStageMask = waitStages;
 
-	submitInfo.commandBufferCount = 1;
-	submitInfo.pCommandBuffers = &commandBuffer;
+	submitInfo.commandBufferCount = static_cast<uint32_t>(commandBuffers.size());
+	submitInfo.pCommandBuffers = commandBuffers.data();
 
 	VkSemaphore signalSemaphores[] = { signalSemaphore };
 	submitInfo.signalSemaphoreCount = 1;
@@ -1415,9 +1461,9 @@ void Minty::VulkanRenderer::submit_command_buffer(VkCommandBuffer const commandB
 	VK_ASSERT_RESULT(vkQueueSubmit(queue, 1, &submitInfo, inFlightFence), "Failed to submit draw command buffer.");
 }
 
-void Minty::VulkanRenderer::submit_command_buffer(Frame const& frame, VkQueue const queue)
+void Minty::VulkanRenderer::submit_command_buffers(std::vector<VkCommandBuffer> const& commandBuffers, Frame const& frame, VkQueue const queue)
 {
-	submit_command_buffer(frame.commandBuffer, queue, frame.imageAvailableSemaphore, frame.renderFinishedSemaphore, frame.inFlightFence);
+	submit_command_buffers(commandBuffers, queue, frame.imageAvailableSemaphore, frame.renderFinishedSemaphore, frame.inFlightFence);
 }
 
 void Minty::VulkanRenderer::submit_command_buffer(VkCommandBuffer const commandBuffer, VkQueue const queue)
@@ -1875,4 +1921,42 @@ VkPolygonMode Minty::VulkanRenderer::polygon_mode_to_vulkan(const Minty::ShaderP
 VkVertexInputRate Minty::VulkanRenderer::input_rate_to_vulkan(const Minty::ShaderInputRate rate)
 {
 	return static_cast<VkVertexInputRate>(static_cast<Int>(rate) - 1);
+}
+
+VkAttachmentLoadOp Minty::VulkanRenderer::attachment_load_to_vulkan(Minty::RenderAttachmentLoadOperation const operation)
+{
+	return static_cast<VkAttachmentLoadOp>(operation);
+}
+
+VkAttachmentStoreOp Minty::VulkanRenderer::attachment_store_to_vulkan(Minty::RenderAttachmentStoreOperation const operation)
+{
+	return static_cast<VkAttachmentStoreOp>(operation);
+}
+
+VkAttachmentDescription Minty::VulkanRenderer::attachment_to_vulkan(Minty::RenderAttachment const& attachment)
+{
+	VkAttachmentDescription description{};
+
+	description.format = format_to_vulkan(attachment.format);
+	description.samples = VK_SAMPLE_COUNT_1_BIT;
+	description.loadOp = attachment_load_to_vulkan(attachment.loadOperation);
+	description.storeOp = attachment_store_to_vulkan(attachment.storeOperation);
+	description.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
+	description.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
+	description.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
+	
+	switch (attachment.type)
+	{
+	case RenderAttachmentType::Color:
+		description.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+		break;
+	case RenderAttachmentType::Depth:
+		description.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
+		break;
+	default:
+		description.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
+		break;
+	}
+
+	return description;
 }

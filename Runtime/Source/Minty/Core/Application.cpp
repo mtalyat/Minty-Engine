@@ -118,15 +118,31 @@ Int Application::run()
 	Size frames = 0;
 	TimePoint fpsTime = now;
 
-	Owner<RenderTarget> target = Renderer::create_render_target();
-	Renderer::set_render_target(target);
+	// create render pass and target
+	RenderPassBuilder renderPassBuilder{};
+	RenderAttachment colorAttachment{};
+	colorAttachment.type = RenderAttachmentType::Color;
+	colorAttachment.format = Renderer::get_color_format();
+	colorAttachment.loadOperation = RenderAttachmentLoadOperation::Clear;
+	colorAttachment.storeOperation = RenderAttachmentStoreOperation::Store;
+	renderPassBuilder.colorAttachment = &colorAttachment;
+	RenderAttachment depthAttachment{};
+	depthAttachment.type = RenderAttachmentType::Depth;
+	depthAttachment.format = Renderer::get_depth_format();
+	depthAttachment.loadOperation = RenderAttachmentLoadOperation::Clear;
+	depthAttachment.storeOperation = RenderAttachmentStoreOperation::DontCare;
+	renderPassBuilder.depthAttachment = &depthAttachment;
+	Ref<RenderPass> renderPass = Renderer::create_render_pass(renderPassBuilder);
+	Ref<RenderTarget> target = Renderer::create_render_target(renderPass);
+
+	// get window
 	Ref<Window> window = WindowManager::get_main();
 
 	while (m_running)
 	{
 		// get current time
 		now = Time::now();
-
+		
 		// sleep if needed
 		Float elapsed = Time::calculate_duration_seconds(end, now);
 		if (elapsed < fpsTargetTime)
@@ -151,37 +167,34 @@ Int Application::run()
 		// process window events
 		window->process();
 
-		if (!m_minimized)
+		if (Renderer::start_frame())
 		{
-			if (Renderer::start_frame())
-			{
-				// TODO: still run game code, just don't render
-				// TODO: quit on certain exit codes
-				// skip this frame
-				continue;
-			}
-
-			if (GUI::start_frame())
-			{
-				// TODO: quit on certain exit codes
-				// skip this frame
-				Renderer::end_frame();
-				continue;
-			}
-
-			// update scene
-			m_sceneManager.update(m_time);
-
-			// finalize scene
-			m_sceneManager.finalize();
-
-			// update application
-			update(m_time);
-
-			GUI::end_frame();
-
-			Renderer::end_frame();
+			// TODO: still run game code, just don't render
+			// TODO: quit on certain exit codes
+			// skip this frame
+			continue;
 		}
+
+		if (GUI::start_frame())
+		{
+			// TODO: quit on certain exit codes
+			// skip this frame
+			Renderer::end_frame();
+			continue;
+		}
+
+		// update scene
+		m_sceneManager.update(m_time);
+
+		// finalize scene
+		m_sceneManager.finalize();
+
+		// update application
+		update(m_time);
+
+		GUI::end_frame();
+
+		Renderer::end_frame();
 
 		frames++;
 	}

@@ -78,8 +78,16 @@ Bool Minty::AssetManager::open_reader(Path const& path, Container*& container, R
 
 	std::vector<Char> data = read_file_chars(path);
 
-	container = new ConstantContainer(data.size());
-	container->set(data.data(), data.size());
+	// create empty, or populate if not empty
+	if (data.empty())
+	{
+		container = new ConstantContainer();
+	}
+	else
+	{
+		container = new ConstantContainer(data.size());
+		container->set(data.data(), data.size());
+	}
 
 	reader = new TextMemoryReader(container);
 

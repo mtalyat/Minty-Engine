@@ -282,7 +282,9 @@
     <ClInclude Include="Minty\Render\MaterialTemplate.h" />
     <ClInclude Include="Minty\Render\Mesh.h" />
     <ClInclude Include="Minty\Render\Perspective.h" />
+    <ClInclude Include="Minty\Render\RenderAttachment.h" />
     <ClInclude Include="Minty\Render\Renderer.h" />
+    <ClInclude Include="Minty\Render\RenderPass.h" />
     <ClInclude Include="Minty\Render\RenderTarget.h" />
     <ClInclude Include="Minty\Render\Scissor.h" />
     <ClInclude Include="Minty\Render\Shader.h" />
@@ -334,6 +336,7 @@
     <ClInclude Include="Platform\Vulkan\VulkanBuffer.h" />
     <ClInclude Include="Platform\Vulkan\VulkanImage.h" />
     <ClInclude Include="Platform\Vulkan\VulkanRenderer.h" />
+    <ClInclude Include="Platform\Vulkan\VulkanRenderPass.h" />
     <ClInclude Include="Platform\Vulkan\VulkanRenderTarget.h" />
     <ClInclude Include="Platform\Vulkan\VulkanScissor.h" />
     <ClInclude Include="Platform\Vulkan\VulkanShader.h" />
@@ -444,6 +447,7 @@
     <ClCompile Include="Minty\Render\MaterialTemplate.cpp" />
     <ClCompile Include="Minty\Render\Mesh.cpp" />
     <ClCompile Include="Minty\Render\Renderer.cpp" />
+    <ClCompile Include="Minty\Render\RenderPass.cpp" />
     <ClCompile Include="Minty\Render\RenderTarget.cpp" />
     <ClCompile Include="Minty\Render\Scissor.cpp" />
     <ClCompile Include="Minty\Render\Shader.cpp" />
@@ -488,6 +492,7 @@
     <ClCompile Include="Platform\Vulkan\VulkanMaterial.cpp" />
     <ClCompile Include="Platform\Vulkan\VulkanMesh.cpp" />
     <ClCompile Include="Platform\Vulkan\VulkanRenderer.cpp" />
+    <ClCompile Include="Platform\Vulkan\VulkanRenderPass.cpp" />
     <ClCompile Include="Platform\Vulkan\VulkanRenderTarget.cpp" />
     <ClCompile Include="Platform\Vulkan\VulkanScissor.cpp" />
     <ClCompile Include="Platform\Vulkan\VulkanShader.cpp" />

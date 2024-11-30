@@ -3,6 +3,7 @@
 
 #include "Minty/Core/Constants.h"
 #include "Platform/Vulkan/VulkanRenderer.h"
+#include "Platform/Vulkan/VulkanRenderPass.h"
 #include "Platform/Vulkan/VulkanTexture.h"
 
 using namespace Minty;
@@ -369,7 +370,7 @@ Minty::VulkanShader::VulkanShader(ShaderBuilder const& builder)
 
 	pipelineInfo.layout = m_pipelineLayout;
 
-	pipelineInfo.renderPass = VulkanRenderer::get_render_pass();
+	pipelineInfo.renderPass = static_cast<Ref<VulkanRenderPass>>(Renderer::get_render_pass())->get_render_pass();
 	pipelineInfo.subpass = 0;
 
 	pipelineInfo.basePipelineHandle = VK_NULL_HANDLE;

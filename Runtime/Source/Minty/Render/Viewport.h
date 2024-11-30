@@ -42,6 +42,18 @@ namespace Minty
 		
 		virtual void set_height(Float const height) = 0;
 
+		inline void set_position(Float const x, Float const y)
+		{
+			set_x(x);
+			set_y(y);
+		}
+
+		inline void set_size(Float const width, Float const height)
+		{
+			set_width(width);
+			set_height(height);
+		}
+
 	public:
 		AssetType get_type() const override { return AssetType::Viewport; }
 

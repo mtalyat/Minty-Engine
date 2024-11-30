@@ -11,7 +11,7 @@ using namespace Minty;
 
 Ref<Window> Minty::Renderer::s_window = nullptr;
 Color Minty::Renderer::s_color = Color::black();
-Ref<RenderTarget> Minty::Renderer::s_renderTarget = nullptr;
+std::vector<Owner<RenderPass>> Renderer::s_renderPasses;
 std::unordered_map<MeshType, Ref<Mesh>> Minty::Renderer::s_defaultMeshes = {};
 std::unordered_map <UInt, Ref<Material>> Minty::Renderer::s_defaultMaterials = {};
 Ref<Shader> Minty::Renderer::s_boundShader = nullptr;
@@ -32,6 +32,9 @@ void Minty::Renderer::initialize(RendererBuilder const& builder)
 
 void Minty::Renderer::shutdown()
 {
+	// destroy render passes
+	s_renderPasses.clear();
+
 	// shutdown API
 #if defined(MINTY_VULKAN)
 	VulkanRenderer::shutdown();
@@ -40,15 +43,10 @@ void Minty::Renderer::shutdown()
 	s_window = nullptr;
 }
 
-Int Minty::Renderer::start_frame(Ref<RenderTarget> const tempRenderTarget)
+Int Minty::Renderer::start_frame()
 {
-	MINTY_ASSERT_MESSAGE(s_renderTarget.get() != nullptr || tempRenderTarget.get() != nullptr, "Cannot start frame without a RenderTarget.");
-
-	Ref<RenderTarget> target = s_renderTarget.get() != nullptr ? s_renderTarget : tempRenderTarget;
-
-	// start frame
 #if defined(MINTY_VULKAN)
-	return VulkanRenderer::start_frame(s_renderTarget);
+	return VulkanRenderer::start_frame();
 #endif
 }
 
@@ -260,10 +258,54 @@ Ref<Material> Minty::Renderer::get_or_create_default_material(Ref<Texture> const
 	return found->second;
 }
 
-Owner<RenderTarget> Minty::Renderer::create_render_target()
+Ref<RenderPass> Minty::Renderer::create_render_pass(RenderPassBuilder const& builder)
+{
+	Owner<RenderPass> renderPass = RenderPass::create(builder);
+
+	Ref<RenderPass> renderPassRef = renderPass.create_ref();
+
+	s_renderPasses.push_back(std::move(renderPass));
+
+	return renderPassRef;
+}
+
+void Minty::Renderer::destroy_render_pass(Ref<RenderPass> const renderPass)
+{
+	// find the render pass and remove it
+	for (Size i = 0; i < s_renderPasses.size(); i++)
+	{
+		if (s_renderPasses.at(i).get() == renderPass.get())
+		{
+			s_renderPasses.erase(s_renderPasses.begin() + i);
+			break;
+		}
+	}
+}
+
+Ref<RenderTarget> Minty::Renderer::create_render_target(Ref<RenderPass> const& renderPass)
 {
 #if defined(MINTY_VULKAN)
-	return VulkanRenderer::create_render_target();
+	return VulkanRenderer::create_render_target(renderPass);
+#else
+	return Ref<RenderTarget>();
+#endif
+}
+
+Format Minty::Renderer::get_color_format()
+{
+#if defined(MINTY_VULKAN)
+	return static_cast<Format>(VulkanRenderer::get_swapchain_surface_format().format);
+#else
+	return Format::Undefined;
+#endif
+}
+
+Format Minty::Renderer::get_depth_format()
+{
+#if defined(MINTY_VULKAN)
+	return static_cast<Format>(VulkanRenderer::find_depth_format());
+#else
+	return Format::Undefined;
 #endif
 }
 

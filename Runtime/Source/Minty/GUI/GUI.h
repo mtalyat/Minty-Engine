@@ -2,11 +2,12 @@
 
 #include "Minty/Core/Base.h"
 #include "Minty/Core/Direction.h"
-#include "Minty/Input/Key.h"
-#include "Minty/Input/Mouse.h"
-#include "Minty/Serialize/Node.h"
 #include "Minty/GUI/Enums.h"
 #include "Minty/GUI/Theme.h"
+#include "Minty/Input/Key.h"
+#include "Minty/Input/Mouse.h"
+#include "Minty/Render/RenderPass.h"
+#include "Minty/Serialize/Node.h"
 
 namespace Minty
 {
@@ -33,6 +34,9 @@ namespace Minty
 	/// </summary>
 	class GUI
 	{
+    private:
+        static Ref<RenderPass> s_renderPass;
+
 	private:
 		GUI() = default;
 		~GUI() = default;

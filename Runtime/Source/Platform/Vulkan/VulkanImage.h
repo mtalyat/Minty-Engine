@@ -13,15 +13,13 @@ namespace Minty
 		VkImage m_image;
 		VkImageView m_view;
 		VkDeviceMemory m_memory;
-		Format m_format;
 		VkImageLayout m_layout;
 
+		// if true, dispose image resources when done with it
 		Bool m_ownImage;
-
-		UInt m_width;
-		UInt m_height;
+		
+		// size in pixels
 		Size m_size;
-		Bool m_immutable;
 
 	public:
 		VulkanImage(ImageBuilder const& builder);
@@ -32,14 +30,17 @@ namespace Minty
 
 		~VulkanImage();
 
+	public:
+		void resize(UInt const width, UInt const height, Format const format) override;
+
 		void set_pixels(const Byte* const data) override;
 
 		void* get_native() const override { return m_image; }
 
-		UInt get_width() const override { return m_width; }
-
-		UInt get_height() const override { return m_width; }
-
 		VkImageView get_view() const { return m_view; }
+
+	private:
+		// frees all vulkan assets
+		void dispose();
 	};
 }

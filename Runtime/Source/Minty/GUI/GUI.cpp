@@ -7,6 +7,7 @@
 #include "Minty/Window/WindowManager.h"
 #if defined(MINTY_VULKAN)
 #include "Platform/Vulkan/VulkanRenderer.h"
+#include "Platform/Vulkan/VulkanRenderPass.h"
 #endif
 #include <unordered_map>
 
@@ -15,6 +16,8 @@ using namespace Minty;
 #if defined(MINTY_VULKAN)
 static VkDescriptorPool s_imGuiDescriptorPool;
 #endif
+
+Ref<RenderPass> GUI::s_renderPass = nullptr;
 
 #pragma region Helper
 
@@ -149,6 +152,17 @@ static GuiViewport s_mainViewport{};
 
 void Minty::GUI::initialize(GUIBuilder const& builder)
 {
+	// create resources
+	RenderPassBuilder renderPassBuilder{};
+	RenderAttachment colorAttachment{};
+	colorAttachment.type = RenderAttachmentType::Color;
+	colorAttachment.format = Renderer::get_color_format();
+	colorAttachment.loadOperation = RenderAttachmentLoadOperation::Clear;
+	colorAttachment.storeOperation = RenderAttachmentStoreOperation::Store;
+	renderPassBuilder.colorAttachment = &colorAttachment;
+	s_renderPass = Renderer::create_render_pass(renderPassBuilder);
+	Renderer::create_render_target(s_renderPass);
+
 	// create context
 	IMGUI_CHECKVERSION();
 	ImGui::CreateContext();
@@ -208,7 +222,8 @@ void Minty::GUI::initialize(GUIBuilder const& builder)
 	initInfo.ImageCount = MAX_FRAMES_IN_FLIGHT;
 	initInfo.Allocator = nullptr;
 	initInfo.MSAASamples = VK_SAMPLE_COUNT_1_BIT;
-	ImGui_ImplVulkan_Init(&initInfo, VulkanRenderer::get_render_pass());
+	Ref<VulkanRenderPass> vulkanRenderPass = static_cast<Ref<VulkanRenderPass>>(s_renderPass);
+	ImGui_ImplVulkan_Init(&initInfo, vulkanRenderPass->get_render_pass());
 
 	// upload ImGui fonts
 	VkCommandBuffer commandBuffer = VulkanRenderer::begin_command_buffer_single();
@@ -230,12 +245,15 @@ void Minty::GUI::shutdown()
 #if defined(MINTY_WINDOWS)
 	ImGui_ImplGlfw_Shutdown();
 #endif // MINTY_WINDOWS
+
 	ImGui::DestroyContext();
 
 	// shut down rendering resources
 #if defined(MINTY_VULKAN)
 	vkDestroyDescriptorPool(VulkanRenderer::get_device(), s_imGuiDescriptorPool, nullptr);
 #endif // MINTY_VULKAN
+
+	s_renderPass.release();
 }
 
 Int Minty::GUI::start_frame()
@@ -261,7 +279,8 @@ void Minty::GUI::end_frame()
 {
 	ImGui::Render();
 #if defined(MINTY_VULKAN)
-	ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), VulkanRenderer::get_command_buffer());
+	Ref<VulkanRenderPass> vulkanRenderPass = static_cast<Ref<VulkanRenderPass>>(s_renderPass);
+	ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), vulkanRenderPass->get_command_buffer());
 #else
 	MINTY_ERROR("Unknown GUI platform.");
 	return;
