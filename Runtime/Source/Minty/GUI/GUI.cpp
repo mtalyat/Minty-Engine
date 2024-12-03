@@ -17,7 +17,8 @@ using namespace Minty;
 static VkDescriptorPool s_imGuiDescriptorPool;
 #endif
 
-Ref<RenderPass> GUI::s_renderPass = nullptr;
+Owner<RenderPass> GUI::s_renderPass = nullptr;
+Ref<RenderTarget> GUI::s_renderTarget = nullptr;
 
 #pragma region Helper
 
@@ -157,11 +158,13 @@ void Minty::GUI::initialize(GUIBuilder const& builder)
 	RenderAttachment colorAttachment{};
 	colorAttachment.type = RenderAttachmentType::Color;
 	colorAttachment.format = Renderer::get_color_format();
-	colorAttachment.loadOperation = RenderAttachmentLoadOperation::Clear;
+	colorAttachment.loadOperation = RenderAttachmentLoadOperation::Load;
 	colorAttachment.storeOperation = RenderAttachmentStoreOperation::Store;
+	colorAttachment.initialLayout = ImageLayout::ColorAttachmentOptimal;
+	colorAttachment.finalLayout = ImageLayout::PresentSrcKhr;
 	renderPassBuilder.colorAttachment = &colorAttachment;
 	s_renderPass = Renderer::create_render_pass(renderPassBuilder);
-	Renderer::create_render_target(s_renderPass);
+	s_renderTarget = Renderer::create_render_target(s_renderPass);
 
 	// create context
 	IMGUI_CHECKVERSION();
@@ -238,6 +241,10 @@ void Minty::GUI::initialize(GUIBuilder const& builder)
 
 void Minty::GUI::shutdown()
 {
+	// release resources
+	s_renderPass.release();
+	s_renderTarget.release();
+
 	// shut down ImGui
 #if defined(MINTY_VULKAN)
 	ImGui_ImplVulkan_Shutdown();
@@ -280,7 +287,7 @@ void Minty::GUI::end_frame()
 	ImGui::Render();
 #if defined(MINTY_VULKAN)
 	Ref<VulkanRenderPass> vulkanRenderPass = static_cast<Ref<VulkanRenderPass>>(s_renderPass);
-	ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), vulkanRenderPass->get_command_buffer());
+	ImGui_ImplVulkan_RenderDrawData(ImGui::GetDrawData(), VulkanRenderer::get_command_buffer());
 #else
 	MINTY_ERROR("Unknown GUI platform.");
 	return;
@@ -297,6 +304,14 @@ void Minty::GUI::end_frame()
 	MINTY_ERROR("Unknown GUI OS.");
 	return false;
 #endif // MINTY_WINDOWS
+}
+
+void Minty::GUI::start_pass()
+{
+}
+
+void Minty::GUI::end_pass()
+{
 }
 
 Bool Minty::GUI::begin(String const& name, Bool* const open, GuiWindowFlags const flags)

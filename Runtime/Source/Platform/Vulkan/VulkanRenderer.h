@@ -7,6 +7,7 @@
 #include "Minty/Render/Shader.h"
 
 #include "Platform/Vulkan/VulkanImage.h"
+#include "Platform/Vulkan/VulkanRenderPass.h"
 #include "Platform/Vulkan/VulkanRenderTarget.h"
 #include "Platform/Vulkan/VulkanScissor.h"
 #include "Platform/Vulkan/VulkanViewport.h"
@@ -27,6 +28,8 @@ namespace Minty
 		/// </summary>
 		struct Frame
 		{
+			VkCommandBuffer commandBuffer;
+
 			VkSemaphore imageAvailableSemaphore;
 			VkSemaphore renderFinishedSemaphore;
 			VkFence inFlightFence;
@@ -79,7 +82,6 @@ namespace Minty
 		static Ref<VulkanScissor> s_scissor;
 
 		static VkCommandPool s_commandPool;
-		static VkCommandBuffer s_primaryCommandBuffer;
 		
 		static std::array<Frame, MAX_FRAMES_IN_FLIGHT> s_frames;
 		static Size s_currentFrame;
@@ -106,6 +108,12 @@ namespace Minty
 		static int start_frame();
 
 		static void end_frame();
+
+		static void start_render_pass(Ref<VulkanRenderPass> const& renderPass, Ref<VulkanRenderTarget> const& renderTarget);
+
+		static void end_render_pass();
+
+		static void transition_between_render_passes();
 
 		static void draw_vertices(UInt const vertexCount);
 
@@ -144,7 +152,7 @@ namespace Minty
 
 		static QueueFamilyIndices const& get_queue_family_indices() { return s_queueFamilyIndices; }
 
-		static VkCommandBuffer get_command_buffer() { return s_primaryCommandBuffer; }
+		static VkCommandBuffer get_command_buffer() { return s_frames.at(s_currentFrame).commandBuffer; }
 
 	private:
 		static Frame& get_current_frame() { return s_frames.at(s_currentFrame); }
@@ -356,9 +364,9 @@ namespace Minty
 		static void reset_command_buffer(VkCommandBuffer const commandBuffer);
 
 		// submit and presentation
-		static void submit_command_buffers(std::vector<VkCommandBuffer> const& commandBuffers, VkQueue const queue, VkSemaphore const waitSemaphore, VkSemaphore const signalSemaphore, VkFence const inFlightFence);
+		static void submit_command_buffer(VkCommandBuffer const commandBuffer, VkQueue const queue, VkSemaphore const waitSemaphore, VkSemaphore const signalSemaphore, VkFence const inFlightFence);
 
-		static void submit_command_buffers(std::vector<VkCommandBuffer> const& commandBuffers, Frame const& frame, VkQueue const queue);
+		static void submit_command_buffer(VkCommandBuffer const commandBuffer, Frame const& frame, VkQueue const queue);
 
 		static void submit_command_buffer(VkCommandBuffer const commandBuffer, VkQueue const queue);
 
@@ -497,6 +505,8 @@ namespace Minty
 		static VkAttachmentStoreOp attachment_store_to_vulkan(Minty::RenderAttachmentStoreOperation const operation);
 
 		static VkAttachmentDescription attachment_to_vulkan(Minty::RenderAttachment const& attachment);
+
+		static VkImageLayout image_layout_to_vulkan(Minty::ImageLayout const layout);
 
 #pragma endregion
 

@@ -3,6 +3,7 @@
 #include "Minty/Core/Pointer.h"
 #include "Minty/Core/Types.h"
 #include "Minty/Render/Format.h"
+#include "Minty/Render/Image.h"
 
 namespace Minty
 {
@@ -31,5 +32,7 @@ namespace Minty
 		Format format;
 		RenderAttachmentLoadOperation loadOperation = RenderAttachmentLoadOperation::DontCare;
 		RenderAttachmentStoreOperation storeOperation = RenderAttachmentStoreOperation::DontCare;
+		ImageLayout initialLayout = ImageLayout::Undefined;
+		ImageLayout finalLayout = ImageLayout::Undefined;
 	};
 }

@@ -118,23 +118,6 @@ Int Application::run()
 	Size frames = 0;
 	TimePoint fpsTime = now;
 
-	// create render pass and target
-	RenderPassBuilder renderPassBuilder{};
-	RenderAttachment colorAttachment{};
-	colorAttachment.type = RenderAttachmentType::Color;
-	colorAttachment.format = Renderer::get_color_format();
-	colorAttachment.loadOperation = RenderAttachmentLoadOperation::Clear;
-	colorAttachment.storeOperation = RenderAttachmentStoreOperation::Store;
-	renderPassBuilder.colorAttachment = &colorAttachment;
-	RenderAttachment depthAttachment{};
-	depthAttachment.type = RenderAttachmentType::Depth;
-	depthAttachment.format = Renderer::get_depth_format();
-	depthAttachment.loadOperation = RenderAttachmentLoadOperation::Clear;
-	depthAttachment.storeOperation = RenderAttachmentStoreOperation::DontCare;
-	renderPassBuilder.depthAttachment = &depthAttachment;
-	Ref<RenderPass> renderPass = Renderer::create_render_pass(renderPassBuilder);
-	Ref<RenderTarget> target = Renderer::create_render_target(renderPass);
-
 	// get window
 	Ref<Window> window = WindowManager::get_main();
 
@@ -175,13 +158,7 @@ Int Application::run()
 			continue;
 		}
 
-		if (GUI::start_frame())
-		{
-			// TODO: quit on certain exit codes
-			// skip this frame
-			Renderer::end_frame();
-			continue;
-		}
+		Renderer::start_render_pass(Renderer::get_render_pass(), Renderer::get_render_target());
 
 		// update scene
 		m_sceneManager.update(m_time);
@@ -192,7 +169,25 @@ Int Application::run()
 		// update application
 		update(m_time);
 
+		Renderer::end_render_pass();
+
+		Renderer::transition_between_render_passes();
+
+		Renderer::start_render_pass(GUI::get_render_pass(), GUI::get_render_target());
+
+		if (GUI::start_frame())
+		{
+			// TODO: quit on certain exit codes
+			// skip this frame
+			Renderer::end_frame();
+			continue;
+		}
+
+		update_gui(m_time);
+
 		GUI::end_frame();
+
+		Renderer::end_render_pass();
 
 		Renderer::end_frame();
 

@@ -35,7 +35,6 @@ Owner<VulkanImage> VulkanRenderer::s_depthImage = nullptr;
 Ref<VulkanViewport> VulkanRenderer::s_viewport = nullptr;
 Ref<VulkanScissor> VulkanRenderer::s_scissor = nullptr;
 VkCommandPool VulkanRenderer::s_commandPool = VK_NULL_HANDLE;
-VkCommandBuffer VulkanRenderer::s_primaryCommandBuffer = VK_NULL_HANDLE;
 std::array<VulkanRenderer::Frame, MAX_FRAMES_IN_FLIGHT> VulkanRenderer::s_frames = {};
 Size VulkanRenderer::s_currentFrame = 0;
 
@@ -136,6 +135,8 @@ void Minty::VulkanRenderer::shutdown()
 
 void Minty::VulkanRenderer::initialize_frame(Frame& frame)
 {
+	frame.commandBuffer = create_command_buffer();
+
 	// sync objects
 	frame.imageAvailableSemaphore = create_semaphore();
 	frame.renderFinishedSemaphore = create_semaphore();
@@ -144,6 +145,8 @@ void Minty::VulkanRenderer::initialize_frame(Frame& frame)
 
 void Minty::VulkanRenderer::destroy_frame(Frame& frame)
 {
+	destroy_command_buffer(frame.commandBuffer);
+
 	destroy_semaphore(frame.imageAvailableSemaphore);
 	destroy_semaphore(frame.renderFinishedSemaphore);
 	destroy_fence(frame.inFlightFence);
@@ -219,10 +222,16 @@ void Minty::VulkanRenderer::recreate_swapchain()
 	// re-init framebuffers using new images
 	RenderTargetBuilder renderTargetBuilder{};
 	renderTargetBuilder.images = swapchainImageRefs;
-	for (auto const& renderPass : Renderer::get_render_passes())
+	for (auto const& renderTarget : Renderer::get_screen_render_targets())
 	{
-		renderTargetBuilder.renderPass = renderPass.create_ref();
-		renderPass->reinitialize_render_targets(renderTargetBuilder);
+		if (renderTarget == nullptr)
+		{
+			continue;
+		}
+
+		// if not null, reinitialize with new data
+		renderTargetBuilder.renderPass = renderTarget->get_render_pass();
+		renderTarget->reinitialize(renderTargetBuilder);
 	}
 
 	// update window viewport and scissor
@@ -255,33 +264,14 @@ int Minty::VulkanRenderer::start_frame()
 		return 1;
 	}
 
-	// for each render pass: start a command buffer and pass
-	std::vector<Owner<RenderPass>> const& renderPasses = Renderer::get_render_passes();
-	for (auto const& renderPass : renderPasses)
-	{
-		Ref<VulkanRenderPass> vulkanRenderPass = static_cast<Ref<VulkanRenderPass>>(renderPass.create_ref());
-		VkCommandBuffer commandBuffer = vulkanRenderPass->get_command_buffer();
+	// get working command buffer for the current frame
+	VkCommandBuffer commandBuffer = get_command_buffer();
 
-		// clear buffer
-		reset_command_buffer(commandBuffer);
+	// clear buffer
+	reset_command_buffer(commandBuffer);
 
-		// start new buffer
-		begin_command_buffer(commandBuffer);
-
-		// start pass
-		Ref<VulkanRenderTarget> activeTarget = static_cast<Ref<VulkanRenderTarget>>(renderPass->get_active());
-		UInt2 targetSize = activeTarget->get_size();
-		VkRect2D renderArea{ {0, 0}, {targetSize.x, targetSize.y } };
-		Color clearColor = Renderer::get_color();
-		VkClearColorValue clearValue = { { clearColor.rf(), clearColor.gf(), clearColor.bf(), clearColor.af() } };
-		begin_render_pass(commandBuffer, vulkanRenderPass->get_render_pass(), activeTarget->get_framebuffer(s_imageIndex), renderArea, clearValue);
-	}
-
-	// set primary command buffer
-	if (!renderPasses.empty())
-	{
-		s_primaryCommandBuffer = static_cast<Ref<VulkanRenderPass>>(renderPasses.front().create_ref())->get_command_buffer();
-	}
+	// start new buffer
+	begin_command_buffer(commandBuffer);
 
 	return 0;
 }
@@ -289,28 +279,15 @@ int Minty::VulkanRenderer::start_frame()
 void Minty::VulkanRenderer::end_frame()
 {
 	Frame& frame = get_current_frame();
-	std::vector<Owner<RenderPass>> const& renderPasses = Renderer::get_render_passes();
-	std::vector<VkCommandBuffer> commandBuffers;
-	commandBuffers.reserve(renderPasses.size());
 
-	// for each render pass: end pass and command buffer, submit buffer
-	for (auto const& renderPass : renderPasses)
-	{
-		Ref<VulkanRenderPass> vulkanRenderPass = static_cast<Ref<VulkanRenderPass>>(renderPass.create_ref());
-		VkCommandBuffer commandBuffer = vulkanRenderPass->get_command_buffer();
+	// get working command buffer for the current frame
+	VkCommandBuffer commandBuffer = get_command_buffer();
 
-		// end pass
-		end_render_pass(commandBuffer);
+	// end buffer
+	end_command_buffer(commandBuffer);
 
-		// end buffer
-		end_command_buffer(commandBuffer);
-
-		// keep track of command buffer for submission
-		commandBuffers.push_back(commandBuffer);
-	}
-
-	// submit command buffers all at once
-	submit_command_buffers(commandBuffers, frame, s_graphicsQueue);
+	// submit command buffer
+	submit_command_buffer(commandBuffer, frame, s_graphicsQueue);
 
 	// present to the screen
 	VkResult result = present_frame(s_imageIndex, frame.renderFinishedSemaphore);
@@ -325,19 +302,64 @@ void Minty::VulkanRenderer::end_frame()
 	s_currentFrame = (s_currentFrame + 1ull) % MAX_FRAMES_IN_FLIGHT;
 }
 
+void Minty::VulkanRenderer::start_render_pass(Ref<VulkanRenderPass> const& renderPass, Ref<VulkanRenderTarget> const& renderTarget)
+{
+	// start pass
+	UInt2 targetSize = renderTarget->get_size();
+	VkRect2D renderArea{ {0, 0}, {targetSize.x, targetSize.y } };
+	Color clearColor = Renderer::get_color();
+	VkClearColorValue clearValue = { { clearColor.rf(), clearColor.gf(), clearColor.bf(), clearColor.af() } };
+	begin_render_pass(get_command_buffer(), renderPass->get_render_pass(), renderTarget->get_framebuffer(s_imageIndex), renderArea, clearValue);
+}
+
+void Minty::VulkanRenderer::end_render_pass()
+{
+	end_render_pass(get_command_buffer());
+}
+
+void Minty::VulkanRenderer::transition_between_render_passes()
+{
+	Ref<VulkanImage> swapchainImage = s_swapchainImages.at(s_imageIndex).create_ref();
+
+	// set barrier between pass 1 and 2
+	VkImageMemoryBarrier barrier{};
+	barrier.sType = VK_STRUCTURE_TYPE_IMAGE_MEMORY_BARRIER;
+	barrier.srcAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+	barrier.dstAccessMask = VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
+	barrier.oldLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+	barrier.newLayout = VK_IMAGE_LAYOUT_COLOR_ATTACHMENT_OPTIMAL;
+	barrier.srcQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	barrier.dstQueueFamilyIndex = VK_QUEUE_FAMILY_IGNORED;
+	barrier.image = swapchainImage->get_image();
+	barrier.subresourceRange.aspectMask = VK_IMAGE_ASPECT_COLOR_BIT;
+	barrier.subresourceRange.baseMipLevel = 0;
+	barrier.subresourceRange.levelCount = 1;
+	barrier.subresourceRange.baseArrayLayer = 0;
+	barrier.subresourceRange.layerCount = 1;
+
+	vkCmdPipelineBarrier(
+		get_command_buffer(),
+		VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+		VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT,
+		0,
+		0, nullptr,
+		0, nullptr,
+		1, &barrier);
+}
+
 void Minty::VulkanRenderer::draw_vertices(UInt const vertexCount)
 {
-	draw_vertices(s_primaryCommandBuffer, vertexCount);
+	draw_vertices(get_command_buffer(), vertexCount);
 }
 
 void Minty::VulkanRenderer::draw_instances(UInt const instanceCount, UInt const vertexCount)
 {
-	draw_instances(s_primaryCommandBuffer, instanceCount, vertexCount);
+	draw_instances(get_command_buffer(), instanceCount, vertexCount);
 }
 
 void Minty::VulkanRenderer::draw_indices(UInt const indexCount)
 {
-	draw_indices(s_primaryCommandBuffer, indexCount);
+	draw_indices(get_command_buffer(), indexCount);
 }
 
 void Minty::VulkanRenderer::sync()
@@ -1179,7 +1201,7 @@ void Minty::VulkanRenderer::create_depth_resources()
 	depthImageBuilder.tiling = ImageTiling::Optimal;
 	depthImageBuilder.type = ImageType::D2;
 	depthImageBuilder.usage = ImageUsage::DepthStencil;
-	depthImageBuilder.immutable = true;
+	depthImageBuilder.immutable = false;
 
 	s_depthImage = Owner<VulkanImage>(depthImageBuilder);
 }
@@ -1283,33 +1305,16 @@ VkRenderPass Minty::VulkanRenderer::create_render_pass(VkAttachmentDescription c
 	subpass.pColorAttachments = nullptr;
 	subpass.pDepthStencilAttachment = nullptr;
 
-	// subpass dependency
-	VkSubpassDependency dependency{};
-	dependency.srcSubpass = VK_SUBPASS_EXTERNAL;
-	dependency.dstSubpass = 0;
-	dependency.srcStageMask = 0;
-	dependency.srcAccessMask = 0;
-	dependency.dstStageMask = 0;
-	dependency.dstAccessMask = 0;
-
 	// behave differently based on attachments
 	if (colorAttachment)
 	{
 		subpass.colorAttachmentCount = 1;
 		subpass.pColorAttachments = &attachmentRefs[0];
-		
-		dependency.srcStageMask |= VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-		dependency.dstStageMask |= VK_PIPELINE_STAGE_COLOR_ATTACHMENT_OUTPUT_BIT;
-		dependency.dstAccessMask |= VK_ACCESS_COLOR_ATTACHMENT_WRITE_BIT;
 	}
 
 	if (depthAttachment)
 	{
 		subpass.pDepthStencilAttachment = &attachmentRefs[1];
-
-		dependency.srcStageMask |= VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
-		dependency.dstStageMask |= VK_PIPELINE_STAGE_EARLY_FRAGMENT_TESTS_BIT;
-		dependency.dstAccessMask |= VK_ACCESS_DEPTH_STENCIL_ATTACHMENT_WRITE_BIT;
 	}
 
 	VkRenderPassCreateInfo renderPassInfo{};
@@ -1318,8 +1323,8 @@ VkRenderPass Minty::VulkanRenderer::create_render_pass(VkAttachmentDescription c
 	renderPassInfo.pAttachments = attachments.data();
 	renderPassInfo.subpassCount = 1;
 	renderPassInfo.pSubpasses = &subpass;
-	renderPassInfo.dependencyCount = 1;
-	renderPassInfo.pDependencies = &dependency;
+	renderPassInfo.dependencyCount = 0;
+	renderPassInfo.pDependencies = nullptr;
 
 	VK_ASSERT_RESULT_RETURN_OBJECT(VkRenderPass, vkCreateRenderPass(s_device, &renderPassInfo, nullptr, &object), "Failed to create render pass.")
 }
@@ -1440,7 +1445,7 @@ void Minty::VulkanRenderer::reset_command_buffer(VkCommandBuffer const commandBu
 	vkResetCommandBuffer(commandBuffer, 0);
 }
 
-void Minty::VulkanRenderer::submit_command_buffers(std::vector<VkCommandBuffer> const& commandBuffers, VkQueue const queue, VkSemaphore const waitSemaphore, VkSemaphore const signalSemaphore, VkFence const inFlightFence)
+void Minty::VulkanRenderer::submit_command_buffer(VkCommandBuffer const commandBuffer, VkQueue const queue, VkSemaphore const waitSemaphore, VkSemaphore const signalSemaphore, VkFence const inFlightFence)
 {
 	VkSubmitInfo submitInfo{};
 	submitInfo.sType = VK_STRUCTURE_TYPE_SUBMIT_INFO;
@@ -1451,8 +1456,8 @@ void Minty::VulkanRenderer::submit_command_buffers(std::vector<VkCommandBuffer> 
 	submitInfo.pWaitSemaphores = waitSemaphores;
 	submitInfo.pWaitDstStageMask = waitStages;
 
-	submitInfo.commandBufferCount = static_cast<uint32_t>(commandBuffers.size());
-	submitInfo.pCommandBuffers = commandBuffers.data();
+	submitInfo.commandBufferCount = 1;
+	submitInfo.pCommandBuffers = &commandBuffer;
 
 	VkSemaphore signalSemaphores[] = { signalSemaphore };
 	submitInfo.signalSemaphoreCount = 1;
@@ -1461,9 +1466,9 @@ void Minty::VulkanRenderer::submit_command_buffers(std::vector<VkCommandBuffer> 
 	VK_ASSERT_RESULT(vkQueueSubmit(queue, 1, &submitInfo, inFlightFence), "Failed to submit draw command buffer.");
 }
 
-void Minty::VulkanRenderer::submit_command_buffers(std::vector<VkCommandBuffer> const& commandBuffers, Frame const& frame, VkQueue const queue)
+void Minty::VulkanRenderer::submit_command_buffer(VkCommandBuffer const commandBuffer, Frame const& frame, VkQueue const queue)
 {
-	submit_command_buffers(commandBuffers, queue, frame.imageAvailableSemaphore, frame.renderFinishedSemaphore, frame.inFlightFence);
+	submit_command_buffer(commandBuffer, queue, frame.imageAvailableSemaphore, frame.renderFinishedSemaphore, frame.inFlightFence);
 }
 
 void Minty::VulkanRenderer::submit_command_buffer(VkCommandBuffer const commandBuffer, VkQueue const queue)
@@ -1943,20 +1948,13 @@ VkAttachmentDescription Minty::VulkanRenderer::attachment_to_vulkan(Minty::Rende
 	description.storeOp = attachment_store_to_vulkan(attachment.storeOperation);
 	description.stencilLoadOp = VK_ATTACHMENT_LOAD_OP_DONT_CARE;
 	description.stencilStoreOp = VK_ATTACHMENT_STORE_OP_DONT_CARE;
-	description.initialLayout = VK_IMAGE_LAYOUT_UNDEFINED;
-	
-	switch (attachment.type)
-	{
-	case RenderAttachmentType::Color:
-		description.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-		break;
-	case RenderAttachmentType::Depth:
-		description.finalLayout = VK_IMAGE_LAYOUT_DEPTH_STENCIL_ATTACHMENT_OPTIMAL;
-		break;
-	default:
-		description.finalLayout = VK_IMAGE_LAYOUT_PRESENT_SRC_KHR;
-		break;
-	}
+	description.initialLayout = VulkanRenderer::image_layout_to_vulkan(attachment.initialLayout);
+	description.finalLayout = VulkanRenderer::image_layout_to_vulkan(attachment.finalLayout);
 
 	return description;
+}
+
+VkImageLayout Minty::VulkanRenderer::image_layout_to_vulkan(Minty::ImageLayout const layout)
+{
+	return static_cast<VkImageLayout>(layout);
 }

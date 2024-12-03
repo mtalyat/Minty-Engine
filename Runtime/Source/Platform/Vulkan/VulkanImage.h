@@ -37,6 +37,8 @@ namespace Minty
 
 		void* get_native() const override { return m_image; }
 
+		VkImage get_image() const { return m_image; }
+
 		VkImageView get_view() const { return m_view; }
 
 	private:

@@ -7,6 +7,7 @@
 #include "Minty/Input/Key.h"
 #include "Minty/Input/Mouse.h"
 #include "Minty/Render/RenderPass.h"
+#include "Minty/Render/RenderTarget.h"
 #include "Minty/Serialize/Node.h"
 
 namespace Minty
@@ -35,7 +36,8 @@ namespace Minty
 	class GUI
 	{
     private:
-        static Ref<RenderPass> s_renderPass;
+        static Owner<RenderPass> s_renderPass;
+        static Ref<RenderTarget> s_renderTarget;
 
 	private:
 		GUI() = default;
@@ -43,14 +45,24 @@ namespace Minty
 
 	public:
 		static void initialize(GUIBuilder const& builder);
-
 		static void shutdown();
+
+#pragma region Resources
+
+    public:
+        static Ref<RenderPass> get_render_pass() { return s_renderPass.create_ref(); }
+
+        static Ref<RenderTarget> get_render_target() { return s_renderTarget; }
+
+#pragma endregion
 
 #pragma region Rendering
 
         static Int start_frame();
-
         static void end_frame();
+
+        static void start_pass();
+        static void end_pass();
 
 #pragma endregion
 

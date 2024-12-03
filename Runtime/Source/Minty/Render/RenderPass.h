@@ -41,9 +41,9 @@ namespace Minty
 
 		void reinitialize_render_targets(RenderTargetBuilder const& builder);
 
-		void set_active(Ref<RenderTarget> const target) { m_activeTarget = target; }
+		void set_active_target(Ref<RenderTarget> const target) { m_activeTarget = target; }
 
-		Ref<RenderTarget> get_active() { return m_activeTarget; }
+		Ref<RenderTarget> get_active_target() { return m_activeTarget; }
 
 		Bool using_color_attachment() const { return m_useColorAttachment; }
 

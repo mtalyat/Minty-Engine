@@ -121,7 +121,10 @@ void Mintye::EditorApplication::update(Time const& time)
 
 	// check for shortcuts made by user
 	run_shortcuts();
+}
 
+void Mintye::EditorApplication::update_gui(Minty::Time const& time)
+{
 	// draw the GUI
 	draw_dock_space();
 	draw_menu_bar();

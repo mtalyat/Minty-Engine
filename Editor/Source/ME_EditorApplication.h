@@ -71,7 +71,8 @@ namespace Mintye
 		void refresh();
 
 	protected:
-		void update(Minty::Time const& time);
+		void update(Minty::Time const& time) override;
+		void update_gui(Minty::Time const& time) override;
 
 	private:
 		void cwd_application() const;

@@ -46,7 +46,10 @@ namespace Minty
 		static Ref<Window> s_window;
 		static Color s_color;
 
-		static std::vector<Owner<RenderPass>> s_renderPasses;
+		static Owner<RenderPass> s_renderPass;
+		static Ref<RenderTarget> s_renderTarget;
+
+		static std::vector<Ref<RenderTarget>> s_screenTargets;
 
 		static std::unordered_map<MeshType, Ref<Mesh>> s_defaultMeshes;
 		static std::unordered_map <UInt, Ref<Material>> s_defaultMaterials;
@@ -66,6 +69,10 @@ namespace Minty
 		static Int start_frame();
 		static void end_frame();
 
+		static void start_render_pass(Ref<RenderPass> const& renderPass, Ref<RenderTarget> const& renderTarget);
+		static void end_render_pass();
+		static void transition_between_render_passes();
+
 		// sets the currently active camera
 		static void set_camera(Float3 const position, Quaternion const rotation, Camera const& camera);
 
@@ -80,6 +87,17 @@ namespace Minty
 		/// </summary>
 		static void refresh();
 
+#pragma region Create
+
+	public:
+		static Ref<Material> get_or_create_default_material(Ref<Texture> const texture, AssetType const type, Space const space);
+
+		static Owner<RenderPass> create_render_pass(RenderPassBuilder const& builder);
+
+		static Ref<RenderTarget> create_render_target(Ref<RenderPass> const& renderPass);
+
+#pragma endregion
+
 #pragma region Get Set
 
 	public:
@@ -93,17 +111,11 @@ namespace Minty
 		static UInt get_default_material_id(AssetType const type, Space const space);
 
 	public:
-		static Ref<Material> get_or_create_default_material(Ref<Texture> const texture, AssetType const type, Space const space);
+		static Ref<RenderPass> get_render_pass() { return s_renderPass.create_ref(); }
 
-		static Ref<RenderPass> create_render_pass(RenderPassBuilder const& builder);
+		static Ref<RenderTarget> get_render_target() { return s_renderTarget; }
 
-		static void destroy_render_pass(Ref<RenderPass> const renderPass);
-
-		static std::vector<Owner<RenderPass>> const& get_render_passes() { return s_renderPasses; }
-
-		static Ref<RenderPass> get_render_pass() { return s_renderPasses.front().create_ref(); }
-
-		static Ref<RenderTarget> create_render_target(Ref<RenderPass> const& renderPass);
+		static std::vector<Ref<RenderTarget>> const& get_screen_render_targets() { return s_screenTargets; }
 
 		static Ref<Window> get_window() { return s_window; }
 

@@ -11,7 +11,9 @@ using namespace Minty;
 
 Ref<Window> Minty::Renderer::s_window = nullptr;
 Color Minty::Renderer::s_color = Color::black();
-std::vector<Owner<RenderPass>> Renderer::s_renderPasses;
+Owner<RenderPass> Renderer::s_renderPass = nullptr;
+Ref<RenderTarget> Renderer::s_renderTarget = nullptr;
+std::vector<Ref<RenderTarget>> Renderer::s_screenTargets = {};
 std::unordered_map<MeshType, Ref<Mesh>> Minty::Renderer::s_defaultMeshes = {};
 std::unordered_map <UInt, Ref<Material>> Minty::Renderer::s_defaultMaterials = {};
 Ref<Shader> Minty::Renderer::s_boundShader = nullptr;
@@ -28,19 +30,44 @@ void Minty::Renderer::initialize(RendererBuilder const& builder)
 #if defined(MINTY_VULKAN)
 	VulkanRenderer::initialize(builder);
 #endif
+
+	// create render pass and target
+	RenderPassBuilder renderPassBuilder{};
+	RenderAttachment colorAttachment{};
+	colorAttachment.type = RenderAttachmentType::Color;
+	colorAttachment.format = get_color_format();
+	colorAttachment.loadOperation = RenderAttachmentLoadOperation::Clear;
+	colorAttachment.storeOperation = RenderAttachmentStoreOperation::Store;
+	colorAttachment.initialLayout = ImageLayout::Undefined;
+	colorAttachment.finalLayout = ImageLayout::ColorAttachmentOptimal;
+	renderPassBuilder.colorAttachment = &colorAttachment;
+	RenderAttachment depthAttachment{};
+	depthAttachment.type = RenderAttachmentType::Depth;
+	depthAttachment.format = get_depth_format();
+	depthAttachment.loadOperation = RenderAttachmentLoadOperation::Clear;
+	depthAttachment.storeOperation = RenderAttachmentStoreOperation::DontCare;
+	depthAttachment.initialLayout = ImageLayout::Undefined;
+	depthAttachment.finalLayout = ImageLayout::DepthStencilAttachmentOptimal;
+	renderPassBuilder.depthAttachment = &depthAttachment;
+	s_renderPass = create_render_pass(renderPassBuilder);
+	s_renderTarget = create_render_target(s_renderPass.create_ref());
 }
 
 void Minty::Renderer::shutdown()
 {
-	// destroy render passes
-	s_renderPasses.clear();
+	// destroy assets
+	s_renderTarget.release();
+	s_defaultMaterials.clear();
+	s_defaultMeshes.clear();
 
 	// shutdown API
 #if defined(MINTY_VULKAN)
 	VulkanRenderer::shutdown();
 #endif
 
-	s_window = nullptr;
+	// release references
+	s_renderPass.release();
+	s_window.release();
 }
 
 Int Minty::Renderer::start_frame()
@@ -61,6 +88,27 @@ void Minty::Renderer::end_frame()
 	s_boundMesh = nullptr;
 	s_boundMaterial = nullptr;
 	s_boundShader = nullptr;
+}
+
+void Minty::Renderer::start_render_pass(Ref<RenderPass> const& renderPass, Ref<RenderTarget> const& renderTarget)
+{
+#if defined(MINTY_VULKAN)
+	VulkanRenderer::start_render_pass(static_cast<Ref<VulkanRenderPass>>(renderPass), static_cast<Ref<VulkanRenderTarget>>(renderTarget));
+#endif
+}
+
+void Minty::Renderer::end_render_pass()
+{
+#if defined(MINTY_VULKAN)
+	VulkanRenderer::end_render_pass();
+#endif
+}
+
+void Minty::Renderer::transition_between_render_passes()
+{
+#if defined(MINTY_VULKAN)
+	VulkanRenderer::transition_between_render_passes();
+#endif
 }
 
 void Minty::Renderer::set_camera(Float3 const position, Quaternion const rotation, Camera const& camera)
@@ -258,37 +306,25 @@ Ref<Material> Minty::Renderer::get_or_create_default_material(Ref<Texture> const
 	return found->second;
 }
 
-Ref<RenderPass> Minty::Renderer::create_render_pass(RenderPassBuilder const& builder)
+Owner<RenderPass> Minty::Renderer::create_render_pass(RenderPassBuilder const& builder)
 {
 	Owner<RenderPass> renderPass = RenderPass::create(builder);
 
-	Ref<RenderPass> renderPassRef = renderPass.create_ref();
-
-	s_renderPasses.push_back(std::move(renderPass));
-
-	return renderPassRef;
-}
-
-void Minty::Renderer::destroy_render_pass(Ref<RenderPass> const renderPass)
-{
-	// find the render pass and remove it
-	for (Size i = 0; i < s_renderPasses.size(); i++)
-	{
-		if (s_renderPasses.at(i).get() == renderPass.get())
-		{
-			s_renderPasses.erase(s_renderPasses.begin() + i);
-			break;
-		}
-	}
+	return renderPass;
 }
 
 Ref<RenderTarget> Minty::Renderer::create_render_target(Ref<RenderPass> const& renderPass)
 {
+	Ref<RenderTarget> renderTarget;
 #if defined(MINTY_VULKAN)
-	return VulkanRenderer::create_render_target(renderPass);
+	renderTarget = VulkanRenderer::create_render_target(renderPass);
 #else
 	return Ref<RenderTarget>();
 #endif
+
+	s_screenTargets.push_back(renderTarget);
+
+	return renderTarget;
 }
 
 Format Minty::Renderer::get_color_format()
