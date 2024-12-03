@@ -70,6 +70,9 @@ File* Minty::AssetManager::open(Path const& path)
 
 Bool Minty::AssetManager::open_reader(Path const& path, Container*& container, Reader*& reader)
 {
+	MINTY_ASSERT_MESSAGE(container == nullptr, "Expecting a null Container in open_reader().");
+	MINTY_ASSERT_MESSAGE(reader == nullptr, "Expecting a null Reader in open_reader().");
+
 	if (!exists(path))
 	{
 		// return false if it does not exist at all
@@ -96,6 +99,9 @@ Bool Minty::AssetManager::open_reader(Path const& path, Container*& container, R
 
 void Minty::AssetManager::close_reader(Container*& container, Reader*& reader)
 {
+	MINTY_ASSERT_MESSAGE(container != nullptr, "Expecting a non-null Container in close_reader().");
+	MINTY_ASSERT_MESSAGE(reader != nullptr, "Expecting a non-null Reader in close_reader().");
+
 	delete reader;
 	reader = nullptr;
 	delete container;
@@ -468,62 +474,63 @@ Ref<Animation> Minty::AssetManager::load_animation(Path const& path)
 
 	Container* container;
 	Reader* reader;
-	open_reader(path, container, reader);
-
-	reader->read("length", builder.length);
-	reader->read("loops", builder.loops);
-	reader->read("entities", builder.entities);
-	reader->read("components", builder.components);
-	reader->read("variables", builder.variables);
-	reader->read("values", builder.values);
-
-	// custom logic for steps
-	if (reader->indent("steps"))
+	if (open_reader(path, container, reader))
 	{
-		// read each step
-		String timeString;
-		Float time;
-		String stepString;
-		for (Size i = 0; i < reader->size(); i++)
-		{
-			// read time
-			reader->read_name(i, timeString);
-			time = Parse::to_float(timeString);
+		reader->read("length", builder.length);
+		reader->read("loops", builder.loops);
+		reader->read("entities", builder.entities);
+		reader->read("components", builder.components);
+		reader->read("variables", builder.variables);
+		reader->read("values", builder.values);
 
-			// read steps
-			reader->indent(i);
-			std::vector<AnimationStep> steps(reader->size());
-			for (Size j = 0; j < reader->size(); j++)
+		// custom logic for steps
+		if (reader->indent("steps"))
+		{
+			// read each step
+			String timeString;
+			Float time;
+			String stepString;
+			for (Size i = 0; i < reader->size(); i++)
 			{
-				reader->read_name(j, stepString);
-				AnimationStep& step = steps.at(j);
+				// read time
+				reader->read_name(i, timeString);
+				time = Parse::to_float(timeString);
+
+				// read steps
+				reader->indent(i);
+				std::vector<AnimationStep> steps(reader->size());
+				for (Size j = 0; j < reader->size(); j++)
+				{
+					reader->read_name(j, stepString);
+					AnimationStep& step = steps.at(j);
+					step = Animation::parse_step(stepString);
+				}
+				reader->outdent();
+
+				// add to steps
+				builder.steps.emplace(time, std::move(steps));
+			}
+
+			reader->outdent();
+		}
+
+		// custom logic for reset steps
+		if (reader->indent("reset"))
+		{
+			String stepString;
+			builder.resetSteps.resize(reader->size());
+			for (Size i = 0; i < reader->size(); i++)
+			{
+				reader->read_name(i, stepString);
+				AnimationStep& step = builder.resetSteps.at(i);
 				step = Animation::parse_step(stepString);
 			}
+
 			reader->outdent();
-
-			// add to steps
-			builder.steps.emplace(time, std::move(steps));
 		}
 
-		reader->outdent();
+		close_reader(container, reader);
 	}
-
-	// custom logic for reset steps
-	if (reader->indent("reset"))
-	{
-		String stepString;
-		builder.resetSteps.resize(reader->size());
-		for (Size i = 0; i < reader->size(); i++)
-		{
-			reader->read_name(i, stepString);
-			AnimationStep& step = builder.resetSteps.at(i);
-			step = Animation::parse_step(stepString);
-		}
-
-		reader->outdent();
-	}
-
-	close_reader(container, reader);
 
 	return create_existing<Animation>(path, builder);
 }
@@ -538,12 +545,13 @@ Ref<Animator> Minty::AssetManager::load_animator(Path const& path)
 	Container* container;
 	Reader* reader;
 
-	open_reader(path, container, reader);
+	if (open_reader(path, container, reader))
+	{
+		// basically just read the FSM
+		reader->read("fsm", builder.fsm);
 
-	// basically just read the FSM
-	reader->read("fsm", builder.fsm);
-
-	close_reader(container, reader);
+		close_reader(container, reader);
+	}
 
 	return create_existing<Animator>(path, builder);
 }
@@ -558,27 +566,28 @@ Ref<Font> Minty::AssetManager::load_font(Path const& path)
 
 	Container* container;
 	Reader* reader;
-	open_reader(path, container, reader);
-
-	reader->read("Name", builder.name);
-
-	// read variants
-	std::vector<UUID> variantIds;
-	if (reader->read("Variants", variantIds))
+	if (open_reader(path, container, reader))
 	{
-		for (UUID const id : variantIds)
+		reader->read("Name", builder.name);
+
+		// read variants
+		std::vector<UUID> variantIds;
+		if (reader->read("Variants", variantIds))
 		{
-			if (!contains(id))
+			for (UUID const id : variantIds)
 			{
-				MINTY_ERROR_FORMAT("Unable to find FontVariant with id \"{}\".", to_string(id));
-				continue;
+				if (!contains(id))
+				{
+					MINTY_ERROR_FORMAT("Unable to find FontVariant with id \"{}\".", to_string(id));
+					continue;
+				}
+
+				builder.variants.push_back(get<FontVariant>(id));
 			}
-
-			builder.variants.push_back(get<FontVariant>(id));
 		}
-	}
 
-	close_reader(container, reader);
+		close_reader(container, reader);
+	}
 
 	return create_existing<Font>(path, builder);
 }
@@ -1043,176 +1052,178 @@ Ref<Shader> Minty::AssetManager::load_shader(Path const& path)
 {
 	MINTY_ASSERT_ASSET_PATH(path);
 
-	Container* container;
-	Reader* reader;
-	open_reader(path, container, reader);
-
 	ShaderBuilder builder{};
 	builder.id = read_id(path);
 
-	// config
-	reader->read("PrimitiveTopology", builder.primitiveTopology);
-	reader->read("PolygonMode", builder.polygonMode);
-	reader->read("CullMode", builder.cullMode);
-	reader->read("FrontFace", builder.frontFace);
-	reader->read("LineWidth", builder.lineWidth);
-
-	// inputs (uniform, push, etc)
-	if (reader->indent("Inputs"))
+	Container* container;
+	Reader* reader;
+	if (open_reader(path, container, reader))
 	{
-		// for push constants only
-		UInt offset = 0;
 
-		builder.inputs.resize(reader->size());
-		for (Size i = 0; i < reader->size(); i++)
+		// config
+		reader->read("PrimitiveTopology", builder.primitiveTopology);
+		reader->read("PolygonMode", builder.polygonMode);
+		reader->read("CullMode", builder.cullMode);
+		reader->read("FrontFace", builder.frontFace);
+		reader->read("LineWidth", builder.lineWidth);
+
+		// inputs (uniform, push, etc)
+		if (reader->indent("Inputs"))
 		{
-			ShaderInput& input = builder.inputs.at(i);
+			// for push constants only
+			UInt offset = 0;
 
-			// get name
-			reader->read_name(i, input.name);
-
-			// step in to read values
-			reader->indent(i);
-
-			// get basic data
-			input.name = reader->name();
-			reader->read("Binding", input.binding);
-			reader->read("Stage", input.stage);
-			reader->read("Type", input.type);
-			reader->read("Count", input.count);
-			reader->read("Frequent", input.frequent);
-
-			// set offset if push const
-			if (input.type == ShaderInputType::PushConstant)
+			builder.inputs.resize(reader->size());
+			for (Size i = 0; i < reader->size(); i++)
 			{
-				input.offset = offset;
-			}
+				ShaderInput& input = builder.inputs.at(i);
 
-			// get structure
-			if (reader->indent("Structure"))
-			{
-				// each node follows this format:
-				// name: Type
-				String name = "";
-				Type type = Type::Undefined;
+				// get name
+				reader->read_name(i, input.name);
 
-				for (Size i = 0; i < reader->size(); i++)
+				// step in to read values
+				reader->indent(i);
+
+				// get basic data
+				input.name = reader->name();
+				reader->read("Binding", input.binding);
+				reader->read("Stage", input.stage);
+				reader->read("Type", input.type);
+				reader->read("Count", input.count);
+				reader->read("Frequent", input.frequent);
+
+				// set offset if push const
+				if (input.type == ShaderInputType::PushConstant)
 				{
-					// get name
-					reader->read_name(i, name);
-
-					// get type
-					reader->read(i, type);
-
-					// emplace slot
-					input.cargo.emplace_slot(name, type);
-
-					// add to total size
-					UInt typeSize = static_cast<UInt>(sizeof_type(type));
-					input.size += typeSize;
+					input.offset = offset;
 				}
 
-				// step out of Structure
+				// get structure
+				if (reader->indent("Structure"))
+				{
+					// each node follows this format:
+					// name: Type
+					String name = "";
+					Type type = Type::Undefined;
+
+					for (Size i = 0; i < reader->size(); i++)
+					{
+						// get name
+						reader->read_name(i, name);
+
+						// get type
+						reader->read(i, type);
+
+						// emplace slot
+						input.cargo.emplace_slot(name, type);
+
+						// add to total size
+						UInt typeSize = static_cast<UInt>(sizeof_type(type));
+						input.size += typeSize;
+					}
+
+					// step out of Structure
+					reader->outdent();
+				}
+
+				// adjust offset if push const, so next push is const aligned
+				if (input.type == ShaderInputType::PushConstant)
+				{
+					offset += input.size;
+				}
+
+				// step out of input
 				reader->outdent();
 			}
 
-			// adjust offset if push const, so next push is const aligned
-			if (input.type == ShaderInputType::PushConstant)
-			{
-				offset += input.size;
-			}
-
-			// step out of input
+			// step out of Inputs
 			reader->outdent();
 		}
 
-		// step out of Inputs
-		reader->outdent();
-	}
-
-	// bindings
-	if (reader->indent("Bindings"))
-	{
-		// allot space for each binding
-		builder.vertexInput.bindings.resize(reader->size());
-
-		String name;
-		UInt binding = UINT_MAX;
-		UInt location;
-		for (Size i = 0; i < reader->size(); i++)
+		// bindings
+		if (reader->indent("Bindings"))
 		{
-			ShaderBinding& shaderBinding = builder.vertexInput.bindings.at(i);
+			// allot space for each binding
+			builder.vertexInput.bindings.resize(reader->size());
 
-			// read binding
-			if (!reader->read_name(i, name) || !Parse::try_uint(name, binding))
+			String name;
+			UInt binding = UINT_MAX;
+			UInt location;
+			for (Size i = 0; i < reader->size(); i++)
 			{
-				binding += 1;
-			}
-			shaderBinding.binding = binding;
+				ShaderBinding& shaderBinding = builder.vertexInput.bindings.at(i);
 
-			// read rate
-			reader->read(i, shaderBinding.rate);
-
-			// read attributes
-			reader->indent(i);
-
-			// allot space for each attribute
-			shaderBinding.attributes.resize(reader->size());
-
-			// read each attribute
-			location = UINT_MAX;
-			for (Size j = 0; j < reader->size(); j++)
-			{
-				ShaderAttribute& shaderAttribute = shaderBinding.attributes.at(j);
-
-				// get attribute location
-				if (!reader->read_name(j, name) || !Parse::try_uint(name, location))
+				// read binding
+				if (!reader->read_name(i, name) || !Parse::try_uint(name, binding))
 				{
-					// set location to last location + 1
-					location += 1;
+					binding += 1;
 				}
-				shaderAttribute.location = location;
+				shaderBinding.binding = binding;
 
-				// get attribute type
-				reader->read(j, shaderAttribute.type);
+				// read rate
+				reader->read(i, shaderBinding.rate);
+
+				// read attributes
+				reader->indent(i);
+
+				// allot space for each attribute
+				shaderBinding.attributes.resize(reader->size());
+
+				// read each attribute
+				location = UINT_MAX;
+				for (Size j = 0; j < reader->size(); j++)
+				{
+					ShaderAttribute& shaderAttribute = shaderBinding.attributes.at(j);
+
+					// get attribute location
+					if (!reader->read_name(j, name) || !Parse::try_uint(name, location))
+					{
+						// set location to last location + 1
+						location += 1;
+					}
+					shaderAttribute.location = location;
+
+					// get attribute type
+					reader->read(j, shaderAttribute.type);
+				}
+
+				reader->outdent();
 			}
 
 			reader->outdent();
 		}
 
-		reader->outdent();
-	}
-
-	// modules
-	if (reader->indent("Stages"))
-	{
-		if (!find_dependency<ShaderModule>(path, *reader, "Vertex", builder.vertexShaderModule, true))
+		// modules
+		if (reader->indent("Stages"))
 		{
-			close_reader(container, reader);
-			return Ref<Shader>();
+			if (!find_dependency<ShaderModule>(path, *reader, "Vertex", builder.vertexShaderModule, true))
+			{
+				close_reader(container, reader);
+				return Ref<Shader>();
+			}
+			if (!find_dependency<ShaderModule>(path, *reader, "Fragment", builder.fragmentShaderModule, true))
+			{
+				close_reader(container, reader);
+				return Ref<Shader>();
+			}
+
+			reader->outdent();
 		}
-		if (!find_dependency<ShaderModule>(path, *reader, "Fragment", builder.fragmentShaderModule, true))
+
+		// viewport and scissor
+		if (!find_dependency<Viewport>(path, *reader, "Viewport", builder.viewport, false))
 		{
-			close_reader(container, reader);
-			return Ref<Shader>();
+			// default
+			builder.viewport = Renderer::get_viewport();
+		}
+		if (!find_dependency<Scissor>(path, *reader, "Scissor", builder.scissor, false))
+		{
+			// default
+			builder.scissor = Renderer::get_scissor();
 		}
 
-		reader->outdent();
+		close_reader(container, reader);
 	}
-
-	// viewport and scissor
-	if (!find_dependency<Viewport>(path, *reader, "Viewport", builder.viewport, false))
-	{
-		// default
-		builder.viewport = Renderer::get_viewport();
-	}
-	if (!find_dependency<Scissor>(path, *reader, "Scissor", builder.scissor, false))
-	{
-		// default
-		builder.scissor = Renderer::get_scissor();
-	}
-
-	close_reader(container, reader);
 
 	return create_existing<Shader>(path, builder);
 }
@@ -1237,22 +1248,23 @@ Ref<Sprite> Minty::AssetManager::load_sprite(Path const& path)
 
 	Container* container;
 	Reader* reader;
-	open_reader(path, container, reader);
-
-	if (!find_dependency(path, *reader, "Texture", builder.texture, false))
+	if (open_reader(path, container, reader))
 	{
-		// default
-		builder.texture = get<Texture>(DEFAULT_TEXTURE);
+		if (!find_dependency(path, *reader, "Texture", builder.texture, false))
+		{
+			// default
+			builder.texture = get<Texture>(DEFAULT_TEXTURE);
 
-		MINTY_ASSERT_MESSAGE(builder.texture != nullptr, "Default Texture not loaded.");
+			MINTY_ASSERT_MESSAGE(builder.texture != nullptr, "Default Texture not loaded.");
+		}
+		reader->read("CoordinateMode", builder.coordinateMode);
+		reader->read("Offset", builder.offset);
+		reader->read("Size", builder.size);
+		reader->read("Pivot", builder.pivot);
+		reader->read("PPU", builder.pixelsPerUnit);
+
+		close_reader(container, reader);
 	}
-	reader->read("CoordinateMode", builder.coordinateMode);
-	reader->read("Offset", builder.offset);
-	reader->read("Size", builder.size);
-	reader->read("Pivot", builder.pivot);
-	reader->read("PPU", builder.pixelsPerUnit);
-
-	close_reader(container, reader);
 
 	return create_existing<Sprite>(path, builder);
 }

@@ -23,20 +23,21 @@ Minty::CsScriptAssembly::CsScriptAssembly(ScriptAssemblyBuilder const& builder)
 
 		Container* container;
 		Reader* reader;
-		AssetManager::open_reader(metaPath, container, reader);
-
-		nameToId.reserve(reader->size());
-		String name;
-		UUID id;
-		for (Size i = 0; i < reader->size(); i++)
+		if (AssetManager::open_reader(metaPath, container, reader))
 		{
-			// name is the class name, value is the id
-			reader->read_name(i, name);
-			reader->read(i, id);
-			nameToId.emplace(name, id);
-		}
+			nameToId.reserve(reader->size());
+			String name;
+			UUID id;
+			for (Size i = 0; i < reader->size(); i++)
+			{
+				// name is the class name, value is the id
+				reader->read_name(i, name);
+				reader->read(i, id);
+				nameToId.emplace(name, id);
+			}
 
-		AssetManager::close_reader(container, reader);
+			AssetManager::close_reader(container, reader);
+		}
 	}
 
 	// read file contents
