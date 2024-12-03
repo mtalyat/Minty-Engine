@@ -210,7 +210,7 @@ void Mintye::EditorApplication::open_project()
 {
 	GuiFileDialogBuilder builder{};
 	builder.path = ".";
-	GUI::file_dialog_open("open_project", "Choose project directory...", nullptr, builder);
+	GUI::file_dialog_open("open_project", "Choose project directory...", "", builder);
 }
 
 void Mintye::EditorApplication::open_project_directory() const
