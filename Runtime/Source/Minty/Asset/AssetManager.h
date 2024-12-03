@@ -61,32 +61,63 @@ namespace Minty
 		};
 
 	private:
+		// determines how assets are loaded
 		static AssetMode s_mode;
+		// if true, paths are saved and can be retrieved with get_path()
 		static Bool s_savePaths;
 
+		// reference for all assets, by ID
 		static std::unordered_map<UUID, AssetData> s_assets;
+		// reference for all assets, by type
 		static std::unordered_map<AssetType, std::unordered_set<Ref<Asset>>> s_assetsByType;
 
+		// holds all loaded .wrap data
 		static Wrapper s_wrapper;
 
 	private:
 		AssetManager() = default;
 		~AssetManager() = default;
+		
+#pragma region Core
 
 	public:
+		/// <summary>
+		/// Initializes the AssetManager.
+		/// </summary>
+		/// <param name="builder"></param>
 		static void initialize(AssetManagerBuilder const& builder);
+
+		/// <summary>
+		/// Shuts down the AssetManager.
+		/// </summary>
 		static void shutdown();
+
+#pragma endregion
+
+#pragma region Files
 
 	private:
 		// opens a file at the given path for reading
 		static File* open(Path const& path);
 
 	public:
-		// opens a file and reader at the given path
+		/// <summary>
+		/// Opens a file and reader at the given path.
+		/// </summary>
+		/// <param name="path">The path to the file to open.</param>
+		/// <param name="container">The container to read the data from.</param>
+		/// <param name="reader">The reader to use to read the data.</param>
+		/// <returns></returns>
 		static Bool open_reader(Path const& path, Container*& container, Reader*& reader);
 
-		// deletes all file and reader resources
+		/// <summary>
+		/// Deletes all file and reader resources.
+		/// </summary>
+		/// <param name="container"></param>
+		/// <param name="reader"></param>
 		static void close_reader(Container*& container, Reader*& reader);
+
+#pragma endregion
 
 	public:
 		inline static Wrapper& get_wrapper() { return s_wrapper; }
@@ -171,13 +202,28 @@ namespace Minty
 			return asset;
 		}
 
-		// adds the asset to its corresponding type list
+		/// <summary>
+		/// Adds the asset to its corresponding type list.
+		/// </summary>
+		/// <param name="asset"></param>
 		static void emplace_by_type(Ref<Asset> const asset);
 
-		// removes the asset from its corresponding type list
+		/// <summary>
+		/// Removes the asset from its corresponding type list.
+		/// </summary>
+		/// <param name="asset"></param>
 		static void erase_by_type(Ref<Asset> const asset);
 
-		// checks for a dependency, and gets a ref to it if able
+		/// <summary>
+		/// Checks for a dependency, and gets a ref to it if able.
+		/// </summary>
+		/// <typeparam name="T">The type of Asset to find.</typeparam>
+		/// <param name="path">The path to the file that is being worked on.</param>
+		/// <param name="reader">The reader to the file that is being worked on.</param>
+		/// <param name="name">The name of the data to load from the Reader.</param>
+		/// <param name="asset">A reference to the Asset to load the data into.</param>
+		/// <param name="required">If true, an error is raised if no valid value with the given name is found.</param>
+		/// <returns>True if found and stored into asset.</returns>
 		template<typename T>
 		static Bool find_dependency(Path const& path, Reader& reader, String const& name, Ref<T>& asset, bool required)
 		{
@@ -385,6 +431,8 @@ namespace Minty
 
 #pragma endregion
 
+#pragma region Load Methods
+
 	private:
 		static Ref<Animation> load_animation(Path const& path);
 
@@ -410,6 +458,8 @@ namespace Minty
 
 		static Ref<Sprite> load_sprite(Path const& path);
 
-		static Ref<Texture> load_texture(Path const& path);
+		static Ref<Texture> load_texture(Path const& path);\
+
+#pragma endregion
 	};
 }
