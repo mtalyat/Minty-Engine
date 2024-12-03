@@ -236,9 +236,9 @@ namespace Minty
 
         static void end_menu();
 
-        static Bool menu_item(String const& label, String const& shortcut = "", Bool const selected = false, Bool const enabled = false);
+        static Bool menu_item(String const& label, String const& shortcut = "", Bool const selected = false, Bool const enabled = true);
 
-        static Bool menu_item(String const& label, String const& shortcut, Bool* const selected, Bool const enabled = false);
+        static Bool menu_item(String const& label, String const& shortcut, Bool* const selected, Bool const enabled = true);
 
 #pragma endregion
 
