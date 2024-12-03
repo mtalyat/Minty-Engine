@@ -709,11 +709,11 @@ void Mintye::EditorApplication::draw_menu_bar()
 			{
 				open_project();
 			}
-			if (GUI::menu_item("Save Project", nullptr, nullptr, _project))
+			if (GUI::menu_item("Save Project", "", nullptr, _project))
 			{
 				save_project();
 			}
-			if (GUI::menu_item("Close Project", nullptr, nullptr, _project))
+			if (GUI::menu_item("Close Project", "", nullptr, _project))
 			{
 				close_project();
 			}
@@ -728,7 +728,7 @@ void Mintye::EditorApplication::draw_menu_bar()
 			{
 				save_scene();
 			}
-			if (GUI::menu_item("Close Scene", nullptr, nullptr, _project && _sceneId.valid()))
+			if (GUI::menu_item("Close Scene", "", nullptr, _project && _sceneId.valid()))
 			{
 				close_scene();
 			}
