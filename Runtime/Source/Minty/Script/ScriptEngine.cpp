@@ -59,8 +59,6 @@ Ref<ScriptAssembly> Minty::ScriptEngine::load_assembly(String const& name, Path 
 
 void Minty::ScriptEngine::unload_assembly(String const& name)
 {
-	MINTY_ASSERT_FORMAT(s_assemblies.contains(name), "No assembly with the name \"{}\" is currently loaded.", name);
-
 	// remove from references
 	s_assemblies.erase(name);
 }

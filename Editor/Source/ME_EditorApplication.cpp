@@ -290,7 +290,14 @@ void Mintye::EditorApplication::load_project(Minty::Path const& path)
 
 	// load assemblies
 	Path projectDllPath = get_project_dll_path();
-	ScriptEngine::load_assembly(projectDllPath.stem().string(), projectDllPath);
+	if (AssetManager::exists(projectDllPath))
+	{
+		ScriptEngine::load_assembly(projectDllPath.stem().string(), projectDllPath);
+	}
+	else
+	{
+		MINTY_WARN_FORMAT("No project DLL found at {}.", projectDllPath.generic_string());
+	}
 
 	// load a scene, if any found
 	Path scenePath = project->find_asset(AssetType::Scene);
@@ -771,7 +778,7 @@ void Mintye::EditorApplication::draw_menu_bar()
 			GuiFileDialogBuilder builder{};
 			builder.path = ".";
 			
-			GUI::file_dialog_open("new_project", "Choose directory to create project in...", nullptr, builder);
+			GUI::file_dialog_open("new_project", "Choose directory to create project in...", "", builder);
 
 			GUI::close_current_popup();
 		}

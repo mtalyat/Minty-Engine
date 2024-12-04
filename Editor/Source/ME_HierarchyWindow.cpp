@@ -26,6 +26,7 @@ void Mintye::HierarchyWindow::draw()
 	GUI::set_next_window_size(Float2(400, 800), GuiCondition::FirstUseEver);
 	if (!GUI::begin("Hierarchy") || !scene)
 	{
+		GUI::text("No Scene loaded.");
 		GUI::end();
 		return;
 	}

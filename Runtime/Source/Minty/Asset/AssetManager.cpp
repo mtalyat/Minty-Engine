@@ -70,9 +70,6 @@ File* Minty::AssetManager::open(Path const& path)
 
 Bool Minty::AssetManager::open_reader(Path const& path, Container*& container, Reader*& reader)
 {
-	MINTY_ASSERT_MESSAGE(container == nullptr, "Expecting a null Container in open_reader().");
-	MINTY_ASSERT_MESSAGE(reader == nullptr, "Expecting a null Reader in open_reader().");
-
 	if (!exists(path))
 	{
 		// return false if it does not exist at all
