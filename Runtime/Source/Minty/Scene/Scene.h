@@ -19,7 +19,7 @@ namespace Minty
 	/// Holds a collection of systems and entities that can interact with one another.
 	/// </summary>
 	class Scene :
-		public Asset, public Source<Scene>
+		public Asset, public Source<Scene>, public Serializable
 	{
 	private:
 		struct AssetData
@@ -129,6 +129,10 @@ namespace Minty
 
 	public:
 		AssetType get_type() const override { return AssetType::Scene; }
+
+		void serialize(Writer& writer) const override;
+
+		void deserialize(Reader& reader) override;
 
 	public:
 		static Owner<Scene> create(SceneBuilder const& builder = {});

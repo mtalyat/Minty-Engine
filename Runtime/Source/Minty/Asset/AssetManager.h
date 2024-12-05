@@ -130,6 +130,13 @@ namespace Minty
 		static UUID read_id(Path const& path);
 
 		/// <summary>
+		/// Writes the ID to a meta file to the given Asset Path.
+		/// </summary>
+		/// <param name="path">The Path of the Asset file.</param>
+		/// <param name="id">The ID to write.</param>
+		static Bool write_id(Path const& path, UUID const id);
+
+		/// <summary>
 		/// Checks if an Asset with the given Path exists.
 		/// </summary>
 		/// <param name="path">The path to the Asset file.</param>
@@ -155,6 +162,24 @@ namespace Minty
 			return static_cast<Ref<T>>(load_asset(path));
 		}
 
+		/// <summary>
+		/// Saves an Asset to the disc.
+		/// </summary>
+		/// <param name="path">The path to the Asset file.</param>
+		/// <param name="asset">The Asset to save.</param>
+		static Bool save_asset(Path const& path, Ref<Asset> const& asset);
+
+		/// <summary>
+		/// Saves an Asset to the disc.
+		/// </summary>
+		/// <typeparam name="T">The type of Asset.</typeparam>
+		/// <param name="path">The path to the Asset file.</param>
+		/// <param name="asset">The Asset to save.</param>
+		template<typename T>
+		static Bool save(Path const& path, Ref<T> const& asset)
+		{
+			return save_asset(path, asset);
+		}
 		
 		/// <summary>
 		/// Creates an empty asset of the given type.
@@ -459,6 +484,13 @@ namespace Minty
 		static Ref<Sprite> load_sprite(Path const& path);
 
 		static Ref<Texture> load_texture(Path const& path);\
+
+#pragma endregion
+
+#pragma region Save Methods
+
+	private:
+		static Bool save_scene(Path const& path, Ref<Scene> const& scene);
 
 #pragma endregion
 	};

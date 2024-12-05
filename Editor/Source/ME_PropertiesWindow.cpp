@@ -245,7 +245,7 @@ void Mintye::PropertiesWindow::draw_entity()
 	TextMemoryWriter writer(&container);
 	registry.serialize_entity(writer, _targetEntity);
 	TextMemoryReader reader(&container);
-	Node entityNode = reader.get_current_node();
+	Node entityNode = reader.get_current_node().get_child(0);
 
 	static const Size OFFSET = static_cast<Size>(1 << 10); // 1024 component entries (should be more than enough)
 	Size i = 0;

@@ -29,11 +29,9 @@ namespace Minty
 		return std::to_string(obj);
 	}
 
-	template<>
-	inline String to_string(String const& obj)
-	{
-		return obj;
-	}
+	String to_string(Char const* const obj);
+
+	String to_string(String const& obj);
 
 	String to_string(Float const obj);
 

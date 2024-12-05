@@ -374,6 +374,31 @@ void Minty::Scene::update_registered_indices()
 	}
 }
 
+void Minty::Scene::serialize(Writer& writer) const
+{
+	// get paths to all registered assets
+	std::vector<Path> registeredAssetPaths;
+	registeredAssetPaths.reserve(m_registeredAssets.size());
+	for (auto const& [path, data] : m_registeredAssets)
+	{
+		registeredAssetPaths.push_back(path);
+	}
+
+	// write assts
+	writer.write("Assets", registeredAssetPaths);
+
+	// write systems
+	writer.write("Systems", *mp_systemRegistry);
+	
+	// write entities
+	writer.write("Entities", *mp_entityRegistry);
+}
+
+void Minty::Scene::deserialize(Reader& reader)
+{
+	MINTY_ABORT("Scene deserialize not implemented. Use AssetManager::load_scene().");
+}
+
 Owner<Scene> Minty::Scene::create(SceneBuilder const& builder)
 {
 	return Owner<Scene>(builder);

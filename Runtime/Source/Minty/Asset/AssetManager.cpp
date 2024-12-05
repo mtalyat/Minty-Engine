@@ -126,6 +126,15 @@ UUID Minty::AssetManager::read_id(Path const& path)
 	return UUID();
 }
 
+Bool Minty::AssetManager::write_id(Path const& path, UUID const id)
+{
+	Path metaPath = Asset::get_meta_path(path);
+
+	String text = std::format(": {}", to_string(id));
+
+	return File::write_all_text(metaPath, text);
+}
+
 Bool Minty::AssetManager::exists(Path const& path)
 {
 	switch (s_mode)
@@ -177,6 +186,22 @@ Ref<Asset> Minty::AssetManager::load_asset(Path const& path)
 		MINTY_ERROR_FORMAT("Asset loading not implemented for type: {}", to_string(type));
 		return nullptr;
 	}
+}
+
+Bool Minty::AssetManager::save_asset(Path const& path, Ref<Asset> const& asset)
+{
+	// get the asset type
+	AssetType type = Asset::get_type_from_path(path);
+
+	if (type == AssetType::None) return false;
+
+	switch (type)
+	{
+	case AssetType::Scene:
+		return save_scene(path, static_cast<Ref<Scene>>(asset));
+	}
+
+	return false;
 }
 
 void Minty::AssetManager::emplace_by_type(Ref<Asset> const asset)
@@ -1275,4 +1300,15 @@ Ref<Texture> Minty::AssetManager::load_texture(Path const& path)
 	builder.image = load_image(path);
 
 	return create_existing<Texture>(path, builder);
+}
+
+Bool Minty::AssetManager::save_scene(Path const& path, Ref<Scene> const& scene)
+{
+	MINTY_ASSERT_MESSAGE(scene != nullptr, "Cannot save a null Scene.");
+
+	write_id(path, scene->id());
+
+	PhysicalFile file(path, File::Flags::Write);
+	TextFileWriter writer(&file);
+	scene->serialize(writer);
 }

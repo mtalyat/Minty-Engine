@@ -6,11 +6,22 @@ using namespace Minty;
 void Minty::MeshComponent::serialize(Writer& writer) const
 {
 	writer.write("type", type);
-	if (mesh.get())
+	if (type == MeshType::Custom)
 	{
-		writer.write("mesh", mesh->id());
+		if (mesh == nullptr)
+		{
+			writer.write("mesh", UUID());
+		}
+		else
+		{
+			writer.write("mesh", mesh->id());
+		}
 	}
-	if (material.get())
+	if (material == nullptr)
+	{
+		writer.write("material", UUID());
+	}
+	else
 	{
 		writer.write("material", material->id());
 	}

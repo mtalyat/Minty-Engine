@@ -1312,9 +1312,7 @@ void Minty::EntityRegistry::serialize(Writer& writer) const
 	for (auto [entity, relationship] : this->view<RelationshipComponent>().each())
 	{
 		// serialize entity and its data
-		writer.indent();
 		serialize_entity(writer, entity);
-		writer.outdent();
 	}
 
 	// serialize all without relationship, order does not matter
@@ -1323,9 +1321,7 @@ void Minty::EntityRegistry::serialize(Writer& writer) const
 		// ignore invalid or entities we have already written
 		if (!valid(entity) || all_of<RelationshipComponent>(entity)) continue;
 
-		writer.indent();
 		serialize_entity(writer, entity);
-		writer.outdent();
 	}
 }
 

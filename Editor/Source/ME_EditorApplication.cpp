@@ -373,16 +373,20 @@ void Mintye::EditorApplication::save_scene()
 {
 	// get and serialize scene
 	Ref<Scene> scene = Application::instance().get_scene_manager().get_loaded_scene();
-	MINTY_TODO("save_scene");
 
-	//if (File::write_node(scene->get_path(), node))
-	//{
-	//	log(std::format("Saved scene \"{}\".", scene->get_name()));
-	//}
-	//else
-	//{
-	//	log_error(std::format("Failed to save scene \"{}\".", scene->get_name()));
-	//}
+	MINTY_ASSERT_MESSAGE(scene != nullptr, "Cannot save a null Scene.");
+
+	Path scenePath = AssetManager::get_path(scene->id());
+	String sceneName = AssetManager::get_name(scene->id());
+
+	if (AssetManager::save(scenePath, scene))
+	{
+		log(std::format("Saved scene \"{}\".", sceneName));
+	}
+	else
+	{
+		log_error(std::format("Failed to save scene \"{}\".", sceneName));
+	}
 }
 
 void Mintye::EditorApplication::close_scene()

@@ -3,6 +3,16 @@
 
 using namespace Minty;
 
+String Minty::to_string(Char const* const obj)
+{
+	return String(obj);
+}
+
+String Minty::to_string(String const& obj)
+{
+	return obj;
+}
+
 String Minty::to_string(Float const obj)
 {
 	String string = std::to_string(obj);
