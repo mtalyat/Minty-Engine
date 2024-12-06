@@ -18,7 +18,7 @@ Minty::Scene::Scene(SceneBuilder const& builder)
 	, mp_systemRegistry(new SystemRegistry(*this))
 	, m_loaded()
 	, m_registeredAssets()
-	, m_unloadedAssets()
+	, m_assets()
 	, m_loadedAssets()
 {
 	// register all given asset paths
@@ -40,7 +40,7 @@ Minty::Scene::Scene(Scene&& other) noexcept
 	, mp_systemRegistry(std::move(other.mp_systemRegistry))
 	, m_loaded(std::move(other.m_loaded))
 	, m_registeredAssets(std::move(other.m_registeredAssets))
-	, m_unloadedAssets(std::move(other.m_unloadedAssets))
+	, m_assets(std::move(other.m_assets))
 	, m_loadedAssets(std::move(other.m_loadedAssets))
 {}
 
@@ -52,7 +52,7 @@ Scene& Minty::Scene::operator=(Scene&& other) noexcept
 		mp_systemRegistry = std::move(other.mp_systemRegistry);
 		m_loaded = std::move(other.m_loaded);
 		m_registeredAssets = std::move(other.m_registeredAssets);
-		m_unloadedAssets = std::move(other.m_unloadedAssets);
+		m_assets = std::move(other.m_assets);
 		m_loadedAssets = std::move(other.m_loadedAssets);
 	}
 
@@ -292,11 +292,11 @@ void Minty::Scene::register_asset(Path const& path)
 
 	AssetData data
 	{
-		.index = m_unloadedAssets.size(),
+		.index = m_assets.size(),
 		.id = INVALID_UUID,
 	};
 
-	m_unloadedAssets.push_back(path);
+	m_assets.push_back(path);
 
 	// load asset if needed
 	if (m_loaded)
@@ -329,7 +329,7 @@ void Minty::Scene::unregister_asset(Path const& path)
 		}
 	}
 
-	m_unloadedAssets.erase(m_unloadedAssets.begin() + data.index);
+	m_assets.erase(m_assets.begin() + data.index);
 	m_registeredAssets.erase(path);
 
 	// update indices since an asset was removed in the middle
@@ -344,7 +344,7 @@ Bool Minty::Scene::is_registered(Path const& assetPath)
 void Minty::Scene::load_registered_assets()
 {
 	// load each asset into the engine and save its ID so it can be unloaded later
-	for (auto const& path : m_unloadedAssets)
+	for (auto const& path : m_assets)
 	{
 		Ref<Asset> asset = AssetManager::load_asset(path);
 		if (asset.get())
@@ -379,24 +379,16 @@ void Minty::Scene::unload_registered_assets()
 
 void Minty::Scene::update_registered_indices()
 {
-	for (Size i = 0; i < m_unloadedAssets.size(); i++)
+	for (Size i = 0; i < m_assets.size(); i++)
 	{
-		m_registeredAssets.at(m_unloadedAssets.at(i)).index = i;
+		m_registeredAssets.at(m_assets.at(i)).index = i;
 	}
 }
 
 void Minty::Scene::serialize(Writer& writer) const
 {
-	// get paths to all registered assets
-	std::vector<Path> registeredAssetPaths;
-	registeredAssetPaths.reserve(m_registeredAssets.size());
-	for (auto const& [path, data] : m_registeredAssets)
-	{
-		registeredAssetPaths.push_back(path);
-	}
-
 	// write assts
-	writer.write("Assets", registeredAssetPaths);
+	writer.write("Assets", m_assets);
 
 	// write systems
 	writer.write("Systems", *mp_systemRegistry);

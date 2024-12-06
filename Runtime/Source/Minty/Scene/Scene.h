@@ -33,8 +33,11 @@ namespace Minty
 		SystemRegistry* mp_systemRegistry;
 		Bool m_loaded;
 
+		// map of paths to the information about each registered asset
 		std::unordered_map<Path, AssetData> m_registeredAssets;
-		std::vector<Path> m_unloadedAssets;
+		// ordered list of all assets: this determines the loading order
+		std::vector<Path> m_assets;
+		// set of UUIDs of the assets that have been loaded (used to unload loaded assets)
 		std::unordered_set<UUID> m_loadedAssets;
 
 	public:
