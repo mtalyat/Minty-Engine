@@ -54,7 +54,7 @@ EditorApplication::EditorApplication()
 	builder.logPath = "Log.txt";
 	builder.mode = ApplicationMode::Edit;
 	builder.targetFPS = 60;
-	builder.passes = ApplicationPassFlags::Scene;
+	builder.passes = ApplicationPassFlags::All;
 	builder.assetManagerBuilder.mode = AssetMode::ReadAll;
 	builder.assetManagerBuilder.wraps = { "Default.wrap" };
 	builder.assetManagerBuilder.savePaths = true;
@@ -63,7 +63,7 @@ EditorApplication::EditorApplication()
 	initialize(builder);
 
 	// load gui theme
-	//load_theme();
+	load_theme();
 
 	// load data
 	load_data();
@@ -119,13 +119,13 @@ void Mintye::EditorApplication::update(Time const& time)
 {
 	// update threads
 	_taskFactory.update();
-
-	// check for shortcuts made by user
-	//run_shortcuts();
 }
 
 void Mintye::EditorApplication::update_gui(Minty::Time const& time)
 {
+	// check for shortcuts made by user
+	run_shortcuts();
+
 	// draw the GUI
 	draw_dock_space();
 	draw_menu_bar();
