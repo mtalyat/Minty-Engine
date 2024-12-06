@@ -36,6 +36,7 @@ void Minty::Application::initialize(ApplicationBuilder const& builder)
 	m_info = builder.info;
 	m_mode = builder.mode;
 	mp_logger = new Logger(builder.logPath);
+	m_passFlags = builder.passes;
 
 	// initialize tools
 
@@ -69,8 +70,11 @@ void Minty::Application::initialize(ApplicationBuilder const& builder)
 	rendererBuilder.window = window;
 	Renderer::initialize(rendererBuilder);
 
-	// gui
-	GUI::initialize(builder.guiBuilder);
+	// gui, if it is enabled
+	if (has_pass_flag(ApplicationPassFlags::Gui))
+	{
+		GUI::initialize(builder.guiBuilder);
+	}
 }
 
 void Minty::Application::shutdown()
@@ -78,7 +82,10 @@ void Minty::Application::shutdown()
 	MINTY_ASSERT_MESSAGE(m_initialized, "Cannot shutdown an Application that has not yet been initialized.");
 
 	// shutdown tools
-	GUI::shutdown();
+	if (has_pass_flag(ApplicationPassFlags::Gui))
+	{
+		GUI::shutdown();
+	}
 	AssetManager::shutdown();
 	Renderer::shutdown();
 	Input::shutdown();
@@ -121,11 +128,12 @@ Int Application::run()
 	// get window
 	Ref<Window> window = WindowManager::get_main();
 
+	// TODO: make different loops for each pass combination so it does not have to do all these comparisons every frame
 	while (m_running)
 	{
 		// get current time
 		now = Time::now();
-		
+
 		// sleep if needed
 		Float elapsed = Time::calculate_duration_seconds(end, now);
 		if (elapsed < fpsTargetTime)
@@ -158,36 +166,46 @@ Int Application::run()
 			continue;
 		}
 
-		Renderer::start_render_pass(Renderer::get_render_pass(), Renderer::get_render_target());
-
-		// update scene
-		m_sceneManager.update(m_time);
-
-		// finalize scene
-		m_sceneManager.finalize();
-
-		// update application
-		update(m_time);
-
-		Renderer::end_render_pass();
-
-		Renderer::transition_between_render_passes();
-
-		Renderer::start_render_pass(GUI::get_render_pass(), GUI::get_render_target());
-
-		if (GUI::start_frame())
+		if (has_pass_flag(ApplicationPassFlags::Scene))
 		{
-			// TODO: quit on certain exit codes
-			// skip this frame
-			Renderer::end_frame();
-			continue;
+			Renderer::start_render_pass(Renderer::get_render_pass(), Renderer::get_render_target());
+
+			// update scene
+			m_sceneManager.update(m_time);
+
+			// finalize scene
+			m_sceneManager.finalize();
+
+			// update application
+			update(m_time);
+
+			Renderer::end_render_pass();
 		}
 
-		update_gui(m_time);
+		// if both passes, transition the assets
+		if (has_pass_flag(ApplicationPassFlags::All))
+		{
+			Renderer::transition_between_render_passes();
+		}
 
-		GUI::end_frame();
+		if (has_pass_flag(ApplicationPassFlags::Gui))
+		{
+			Renderer::start_render_pass(GUI::get_render_pass(), GUI::get_render_target());
 
-		Renderer::end_render_pass();
+			if (GUI::start_frame())
+			{
+				// TODO: quit on certain exit codes
+				// skip this frame
+				Renderer::end_frame();
+				continue;
+			}
+
+			update_gui(m_time);
+
+			GUI::end_frame();
+
+			Renderer::end_render_pass();
+		}
 
 		Renderer::end_frame();
 

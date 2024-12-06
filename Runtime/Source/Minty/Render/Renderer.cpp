@@ -2,6 +2,7 @@
 #include "Renderer.h"
 
 #include "Minty/Asset/AssetManager.h"
+#include "Minty/Core/Application.h"
 
 #if defined(MINTY_VULKAN)
 #include "Platform/Vulkan/VulkanRenderer.h"
@@ -32,25 +33,41 @@ void Minty::Renderer::initialize(RendererBuilder const& builder)
 #endif
 
 	// create render pass and target
-	RenderPassBuilder renderPassBuilder{};
-	RenderAttachment colorAttachment{};
-	colorAttachment.type = RenderAttachmentType::Color;
-	colorAttachment.format = get_color_format();
-	colorAttachment.loadOperation = RenderAttachmentLoadOperation::Clear;
-	colorAttachment.storeOperation = RenderAttachmentStoreOperation::Store;
-	colorAttachment.initialLayout = ImageLayout::Undefined;
-	colorAttachment.finalLayout = ImageLayout::ColorAttachmentOptimal;
-	renderPassBuilder.colorAttachment = &colorAttachment;
-	RenderAttachment depthAttachment{};
-	depthAttachment.type = RenderAttachmentType::Depth;
-	depthAttachment.format = get_depth_format();
-	depthAttachment.loadOperation = RenderAttachmentLoadOperation::Clear;
-	depthAttachment.storeOperation = RenderAttachmentStoreOperation::DontCare;
-	depthAttachment.initialLayout = ImageLayout::Undefined;
-	depthAttachment.finalLayout = ImageLayout::DepthStencilAttachmentOptimal;
-	renderPassBuilder.depthAttachment = &depthAttachment;
-	s_renderPass = create_render_pass(renderPassBuilder);
-	s_renderTarget = create_render_target(s_renderPass.create_ref());
+	if (Application::instance().has_pass_flag(ApplicationPassFlags::Scene))
+	{
+		// not the last pass
+		RenderPassBuilder renderPassBuilder{};
+		RenderAttachment colorAttachment{};
+		colorAttachment.type = RenderAttachmentType::Color;
+		colorAttachment.format = get_color_format();
+		colorAttachment.loadOperation = RenderAttachmentLoadOperation::Clear;
+		colorAttachment.storeOperation = RenderAttachmentStoreOperation::Store;
+		colorAttachment.initialLayout = ImageLayout::Undefined;
+		// final layout below
+		renderPassBuilder.colorAttachment = &colorAttachment;
+		RenderAttachment depthAttachment{};
+		depthAttachment.type = RenderAttachmentType::Depth;
+		depthAttachment.format = get_depth_format();
+		depthAttachment.loadOperation = RenderAttachmentLoadOperation::Clear;
+		depthAttachment.storeOperation = RenderAttachmentStoreOperation::DontCare;
+		depthAttachment.initialLayout = ImageLayout::Undefined;
+		depthAttachment.finalLayout = ImageLayout::DepthStencilAttachmentOptimal;
+		renderPassBuilder.depthAttachment = &depthAttachment;
+
+		if (Application::instance().has_pass_flag(ApplicationPassFlags::Gui))
+		{
+			// gui after this
+			colorAttachment.finalLayout = ImageLayout::ColorAttachmentOptimal;
+		}
+		else
+		{
+			// no pass after this
+			colorAttachment.finalLayout = ImageLayout::PresentSrcKhr;
+		}
+
+		s_renderPass = create_render_pass(renderPassBuilder);
+		s_renderTarget = create_render_target(s_renderPass.create_ref());
+	}
 }
 
 void Minty::Renderer::shutdown()

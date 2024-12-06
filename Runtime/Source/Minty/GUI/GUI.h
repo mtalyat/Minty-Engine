@@ -61,9 +61,6 @@ namespace Minty
         static Int start_frame();
         static void end_frame();
 
-        static void start_pass();
-        static void end_pass();
-
 #pragma endregion
 
 #pragma region Core

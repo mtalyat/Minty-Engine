@@ -39,6 +39,15 @@ namespace Minty
 		Edit,
 	};
 
+	enum class ApplicationPassFlags
+	{
+		None = 0,
+		Scene = 1,
+		Gui = 2,
+		All = 3,
+	};
+	MINTY_ENUM_FLAGS_OPERATORS(ApplicationPassFlags);
+
 	/// <summary>
 	/// Holds data to build a new Application.
 	/// </summary>
@@ -48,6 +57,7 @@ namespace Minty
 		String logPath = "log.txt";
 		ApplicationMode mode = ApplicationMode::Normal;
 		UInt targetFPS = 120;
+		ApplicationPassFlags passes = ApplicationPassFlags::All;
 
 		AssetManagerBuilder assetManagerBuilder{};
 		ScriptEngineBuilder scriptEngineBuilder{};
@@ -73,6 +83,8 @@ namespace Minty
 
 		UInt m_targetFPS;
 
+		ApplicationPassFlags m_passFlags;
+
 		ApplicationInfo m_info;
 		ApplicationMode m_mode;
 		Logger* mp_logger;
@@ -86,6 +98,7 @@ namespace Minty
 			, m_minimized(false)
 			, m_time()
 			, m_targetFPS(0)
+			, m_passFlags()
 			, m_info()
 			, m_mode()
 			, mp_logger(nullptr)
@@ -138,6 +151,10 @@ namespace Minty
 		SceneManager& get_scene_manager() { return m_sceneManager; }
 
 		Time const& get_time() const { return m_time; }
+
+		ApplicationPassFlags get_pass_flags() const { return m_passFlags; }
+
+		Bool has_pass_flag(ApplicationPassFlags const flag) const { return (m_passFlags & flag) == flag; }
 
 	public:
 		static Application& instance() { return *sp_instance; }

@@ -1,6 +1,7 @@
 #include "pch.h"
 #include "GUI.h"
 
+#include "Minty/Core/Application.h"
 #include "Minty/Core/Macros.h"
 #include "Minty/Core/Operation.h"
 #include "Minty/Library/ImGUI.h"
@@ -20,7 +21,7 @@ static VkDescriptorPool s_imGuiDescriptorPool;
 Owner<RenderPass> GUI::s_renderPass = nullptr;
 Ref<RenderTarget> GUI::s_renderTarget = nullptr;
 
-#pragma region Helper
+#pragma region Utility
 
 inline static ImVec2 float2_to_imvec2(Float2 const& value) { return ImVec2(value.x, value.y); }
 
@@ -158,11 +159,25 @@ void Minty::GUI::initialize(GUIBuilder const& builder)
 	RenderAttachment colorAttachment{};
 	colorAttachment.type = RenderAttachmentType::Color;
 	colorAttachment.format = Renderer::get_color_format();
-	colorAttachment.loadOperation = RenderAttachmentLoadOperation::Load;
+	// load operation below
 	colorAttachment.storeOperation = RenderAttachmentStoreOperation::Store;
-	colorAttachment.initialLayout = ImageLayout::ColorAttachmentOptimal;
+	// initial layout below
 	colorAttachment.finalLayout = ImageLayout::PresentSrcKhr;
 	renderPassBuilder.colorAttachment = &colorAttachment;
+
+	if (Application::instance().has_pass_flag(ApplicationPassFlags::Scene))
+	{
+		// second pass
+		colorAttachment.loadOperation = RenderAttachmentLoadOperation::Load;
+		colorAttachment.initialLayout = ImageLayout::ColorAttachmentOptimal;
+	}
+	else
+	{
+		// first pass
+		colorAttachment.loadOperation = RenderAttachmentLoadOperation::Clear;
+		colorAttachment.initialLayout = ImageLayout::Undefined;
+	}
+
 	s_renderPass = Renderer::create_render_pass(renderPassBuilder);
 	s_renderTarget = Renderer::create_render_target(s_renderPass);
 
@@ -304,14 +319,6 @@ void Minty::GUI::end_frame()
 	MINTY_ERROR("Unknown GUI OS.");
 	return false;
 #endif // MINTY_WINDOWS
-}
-
-void Minty::GUI::start_pass()
-{
-}
-
-void Minty::GUI::end_pass()
-{
 }
 
 Bool Minty::GUI::begin(String const& name, Bool* const open, GuiWindowFlags const flags)

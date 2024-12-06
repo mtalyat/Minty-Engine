@@ -90,6 +90,17 @@ void Minty::Scene::update(Time const& time)
 		// update systems
 		mp_systemRegistry->update(time);
 	}
+	else
+	{
+		// only update render system, ignore the rest
+		RenderSystem* renderSystem = mp_systemRegistry->find<RenderSystem>();
+
+		if (renderSystem)
+		{
+			// if found, render
+			renderSystem->update(time);
+		}
+	}
 }
 
 void Minty::Scene::sort()
