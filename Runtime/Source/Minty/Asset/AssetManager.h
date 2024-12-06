@@ -283,7 +283,7 @@ namespace Minty
 			// if asset id is valid but asset with id DNE, set to null
 			if (!id.valid() || !contains(id))
 			{
-				Debug::log_error(std::format("Cannot load \"{}\". \"{}\" requires a dependency that has not been loaded yet, with ID {}.", path.generic_string(), name, to_string(id)));
+				Debug::log_error(std::format("Cannot load \"{}\": requires a dependency \"{}\" with ID {} that has not been loaded yet.", path.generic_string(), name, to_string(id)));
 				asset.release();
 				return false;
 			}
