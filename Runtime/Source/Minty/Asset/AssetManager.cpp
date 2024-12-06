@@ -1311,4 +1311,6 @@ Bool Minty::AssetManager::save_scene(Path const& path, Ref<Scene> const& scene)
 	PhysicalFile file(path, File::Flags::Write);
 	TextFileWriter writer(&file);
 	scene->serialize(writer);
+
+	return true;
 }
