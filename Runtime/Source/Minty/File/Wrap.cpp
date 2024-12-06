@@ -48,27 +48,29 @@ Minty::Wrap::Wrap(Path const& path, String const& name, uint32_t const entryCoun
 
 void Minty::Wrap::load(Path const& path)
 {
+    Path absolutePath = std::filesystem::absolute(path);
+
     // check if file exists and is valid
-    if (!std::filesystem::exists(path))
+    if (!std::filesystem::exists(absolutePath))
     {
         // file does not exist
-        MINTY_ERROR_FORMAT("Cannot load \"{}\" Wrap file: file does not exist.", path.string());
+        MINTY_ERROR_FORMAT("Cannot load \"{}\" Wrap file: file does not exist.", absolutePath.generic_string());
         return;
     }
-    else if (!std::filesystem::is_regular_file(path))
+    else if (!std::filesystem::is_regular_file(absolutePath))
     {
         // not a file
-        MINTY_ERROR_FORMAT("Cannot load \"{}\" Wrap file: not a regular file.", path.string());
+        MINTY_ERROR_FORMAT("Cannot load \"{}\" Wrap file: not a regular file.", absolutePath.generic_string());
         return;
     }
-    else if (path.extension() != EXTENSION_WRAP)
+    else if (absolutePath.extension() != EXTENSION_WRAP)
     {
         // not a .wrap file
-        MINTY_ERROR_FORMAT("Cannot load \"{}\" Wrap file: missing .wrap file extension.", path.string());
+        MINTY_ERROR_FORMAT("Cannot load \"{}\" Wrap file: missing .wrap file extension.", absolutePath.generic_string());
         return;
     }
 
-    m_path = path;
+    m_path = absolutePath;
 
     // open the file
     PhysicalFile file(m_path, File::Flags::Read | File::Flags::Binary);
