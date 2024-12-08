@@ -95,8 +95,8 @@ void Minty::RenderSystem::update_3d_meshes()
 		// skip empty meshes
 		if (meshComp.type == MeshType::Empty) continue;
 
-		// skip if no material
-		if (meshComp.material == nullptr) continue;
+		// skip if no material or mesh
+		if (meshComp.material == nullptr || meshComp.mesh == nullptr) continue;
 
 		// get assets
 		material = meshComp.material;
