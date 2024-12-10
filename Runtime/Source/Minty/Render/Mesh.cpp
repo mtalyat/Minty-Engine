@@ -106,7 +106,7 @@ void Minty::Mesh::initialize_quad()
 	builder.vertexCount = static_cast<UInt>(vertices.size() / DEFAULT_VERTEX_SIZE);
 	builder.vertexStride = sizeof(Float) * DEFAULT_VERTEX_SIZE;
 	builder.vertexData = vertices.data();
-	builder.indexCount = static_cast<UInt>(vertices.size());
+	builder.indexCount = static_cast<UInt>(indices.size());
 	builder.indexStride = sizeof(UShort);
 	builder.indexData = indices.data();
 
@@ -202,7 +202,7 @@ void Minty::Mesh::initialize_cube()
 	builder.vertexCount = static_cast<UInt>(vertices.size() / DEFAULT_VERTEX_SIZE);
 	builder.vertexStride = sizeof(Float) * DEFAULT_VERTEX_SIZE;
 	builder.vertexData = vertices.data();
-	builder.indexCount = static_cast<UInt>(vertices.size());
+	builder.indexCount = static_cast<UInt>(indices.size());
 	builder.indexStride = sizeof(UShort);
 	builder.indexData = indices.data();
 
@@ -293,7 +293,7 @@ void Minty::Mesh::initialize_pyramid()
 	builder.vertexCount = static_cast<UInt>(vertices.size() / DEFAULT_VERTEX_SIZE);
 	builder.vertexStride = sizeof(Float) * DEFAULT_VERTEX_SIZE;
 	builder.vertexData = vertices.data();
-	builder.indexCount = static_cast<UInt>(vertices.size());
+	builder.indexCount = static_cast<UInt>(indices.size());
 	builder.indexStride = sizeof(UShort);
 	builder.indexData = indices.data();
 
@@ -387,7 +387,8 @@ void Minty::Mesh::initialize_sphere()
 	builder.vertexCount = static_cast<UInt>(vertices.size() / DEFAULT_VERTEX_SIZE);
 	builder.vertexStride = sizeof(Float) * DEFAULT_VERTEX_SIZE;
 	builder.vertexData = vertices.data();
-	builder.indexCount = static_cast<UInt>(vertices.size());
+	builder.indexCount = static_cast<UInt>(indices.size());
+	builder.indexCount = static_cast<UInt>(indices.size());
 	builder.indexStride = sizeof(UShort);
 	builder.indexData = indices.data();
 
@@ -539,7 +540,7 @@ void Minty::Mesh::initialize_cylinder()
 	builder.vertexCount = static_cast<UInt>(vertices.size() / DEFAULT_VERTEX_SIZE);
 	builder.vertexStride = sizeof(Float) * DEFAULT_VERTEX_SIZE;
 	builder.vertexData = vertices.data();
-	builder.indexCount = static_cast<UInt>(vertices.size());
+	builder.indexCount = static_cast<UInt>(indices.size());
 	builder.indexStride = sizeof(UShort);
 	builder.indexData = indices.data();
 

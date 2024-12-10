@@ -54,6 +54,15 @@ namespace Minty
 	constexpr Size INVALID_UUID = 0;
 	constexpr UInt INVALID_HANDLE = UINT_MAX;
 
+	// size of vertex
+	constexpr Size DEFAULT_VERTEX_UNIT_COUNT = 8;
+	constexpr Size DEFAULT_VERTEX_UNIT_SIZE = sizeof(Float);
+	constexpr Size DEFAULT_VERTEX_SIZE = DEFAULT_VERTEX_UNIT_COUNT * DEFAULT_VERTEX_UNIT_SIZE;
+	// size of indices
+	constexpr Size DEFAULT_INDEX_UNIT_COUNT = 1;
+	constexpr Size DEFAULT_INDEX_UNIT_SIZE = sizeof(UShort);
+	constexpr Size DEFAULT_INDEX_SIZE = DEFAULT_INDEX_UNIT_COUNT * DEFAULT_INDEX_UNIT_SIZE;
+
 	// TODO: update with correct IDs
 	constexpr Size DEFAULT_SPRITE_SHADER = 0xdef000000000000b;
 	constexpr Size DEFAULT_SPRITE_MATERIAL_TEMPLATE = 0xdef000000000000f;

@@ -475,6 +475,10 @@ namespace Minty
 
 		static Ref<MaterialTemplate> load_material_template(Path const& path);
 
+		static Ref<Mesh> load_mesh(Path const& path);
+
+		static Ref<Mesh> load_mesh_obj(Path const& path);
+
 		static Ref<Scene> load_scene(Path const& path);
 
 		static Ref<Shader> load_shader(Path const& path);

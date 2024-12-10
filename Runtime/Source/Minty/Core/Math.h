@@ -400,3 +400,38 @@ namespace Minty
 	void matrix4_set_rotation(Matrix4& value, Quaternion const position);
 	void matrix4_set_scale(Matrix4& value, Float3 const position);
 }
+
+template<>
+struct std::hash<Minty::Int2>
+{
+	size_t operator()(const Minty::Int2& key) const
+	{
+		return (
+			(hash<int>()(key.x)
+				^ (hash<int>()(key.y) << 1)) >> 1);
+	}
+};
+
+template<>
+struct std::hash<Minty::Int3>
+{
+	size_t operator()(const Minty::Int3& key) const
+	{
+		return (
+			(hash<int>()(key.x)
+				^ (hash<int>()(key.y) << 1)) >> 1)
+			^ (hash<int>()(key.z) << 1);
+	}
+};
+
+template<>
+struct std::hash<Minty::Int4>
+{
+	size_t operator()(const Minty::Int4& key) const
+	{
+		return (
+			(hash<int>()(key.x)
+				^ (hash<int>()(key.y) << 1)) >> 1)
+			^ (hash<int>()(key.z) << 1) ^ (hash<int>()(key.w) << 2);
+	}
+};

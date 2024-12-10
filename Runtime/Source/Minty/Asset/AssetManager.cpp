@@ -168,6 +168,8 @@ Ref<Asset> Minty::AssetManager::load_asset(Path const& path)
 		return load_material(path);
 	case AssetType::MaterialTemplate:
 		return load_material_template(path);
+	case AssetType::Mesh:
+		return load_mesh(path);
 	case AssetType::Font:
 		return load_font(path);
 	case AssetType::FontVariant:
@@ -1011,6 +1013,150 @@ Ref<MaterialTemplate> Minty::AssetManager::load_material_template(Path const& pa
 	}
 
 	return create_existing<MaterialTemplate>(path, builder);
+}
+
+Ref<Mesh> Minty::AssetManager::load_mesh(Path const& path)
+{
+	MINTY_ASSERT_ASSET_PATH(path);
+
+	String extension = path.extension().string();
+
+	// determine how to load the file
+	if (extension == ".obj")
+	{
+		return load_mesh_obj(path);
+	}
+	else
+	{
+		// extension not supported
+		MINTY_ERROR_FORMAT("Cannot load Mesh from file type \"{}\".", extension);
+		return nullptr;
+	}
+}
+
+Ref<Mesh> Minty::AssetManager::load_mesh_obj(Path const& path)
+{
+	MeshBuilder builder{};
+	builder.id = read_id(path);
+
+	std::vector<String> lines = read_file_lines(path);
+
+	std::vector<Float3> positions;
+	std::vector<Float2> coords;
+	std::vector<Float3> normals;
+
+	std::unordered_map<Int3, UShort> faces;
+	std::vector<Float> vertices;
+	UShort vertexCount = 0;
+	std::vector<UShort> indices;
+
+	std::istringstream ss;
+	String token;
+
+	Float3 position;
+	Float2 coord;
+	Float3 normal;
+
+	for (auto const& line : lines)
+	{
+		ss = std::istringstream(line);
+		ss >> token;
+		if (token == "v")
+		{
+			// position
+			ss >> position.x >> position.y >> position.z;
+			position.y = -position.y; // flip Y
+			positions.push_back(position);
+		}
+		else if (token == "vt")
+		{
+			// coord
+			ss >> coord.x >> coord.y;
+			coord.y = -coord.y; // flip y
+			coords.push_back(coord);
+		}
+		else if (token == "vn")
+		{
+			// normal
+			ss >> normal.x >> normal.y >> normal.z;
+			normal.y = -normal.y;
+			normals.push_back(normal);
+		}
+		else if (token == "f")
+		{
+			// face
+			// get pairs
+			for (size_t i = 0; i < 3; i++)
+			{
+				String set;
+				ss >> set;
+
+				std::istringstream setss(set);
+				Int3 faceIndices = Int3();
+
+				// subtract 1, since all indices are 1 indexed apparently
+				if (std::getline(setss, token, '/'))
+				{
+					faceIndices.x = Parse::to_int(token) - 1;
+
+					if (std::getline(setss, token, '/'))
+					{
+						faceIndices.y = Parse::to_int(token) - 1;
+
+						if (std::getline(setss, token, '/'))
+						{
+							faceIndices.z = Parse::to_int(token) - 1;
+						}
+					}
+				}
+
+				// if combo exists, add that index
+				auto found = faces.find(faceIndices);
+				if (found == faces.end())
+				{
+					// vertex does not exist yet
+					UShort index = vertexCount;
+					position = positions.at(faceIndices.x);
+					coord = coords.at(faceIndices.y);
+					normal = normals.at(faceIndices.z);
+
+					// create vertex
+					vertices.push_back(position.x);
+					vertices.push_back(position.y);
+					vertices.push_back(position.z);
+					vertices.push_back(normal.x);
+					vertices.push_back(normal.y);
+					vertices.push_back(normal.z);
+					vertices.push_back(coord.x);
+					vertices.push_back(coord.y);
+					indices.push_back(index);
+
+					// add for reference
+					faces.emplace(faceIndices, index);
+
+					// increment count
+					vertexCount += 1;
+				}
+				else
+				{
+					// vertex already exists
+					UShort index = found->second;
+					indices.push_back(index);
+				}
+			}
+		}
+	}
+
+	// all vertices and indices populated: complete builder
+	builder.vertexCount = static_cast<UInt>(vertexCount);
+	builder.vertexData = vertices.data();
+	builder.vertexStride = DEFAULT_VERTEX_SIZE;
+	builder.indexCount = static_cast<UInt>(indices.size() / DEFAULT_INDEX_UNIT_COUNT);
+	builder.indexData = indices.data();
+	builder.indexStride = DEFAULT_INDEX_SIZE;
+
+	// create the mesh
+	return create_existing<Mesh>(path, builder);
 }
 
 Ref<Scene> Minty::AssetManager::load_scene(Path const& path)
