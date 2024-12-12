@@ -1082,3 +1082,85 @@ Bool Minty::Parse::try_space(String const& string, Space& value)
 	value = to_space(string);
 	return value != Space();
 }
+
+Filter Minty::Parse::to_filter(String const& string)
+{
+	if (string == "Undefined") return Filter::Undefined;
+	if (string == "Nearest") return Filter::Nearest;
+	if (string == "Linear") return Filter::Linear;
+
+	return Filter();
+}
+
+Bool Minty::Parse::try_filter(String const& string, Filter& value)
+{
+	value = to_filter(string);
+	return value != Filter();
+}
+
+BufferUsage Minty::Parse::to_buffer_usage(String const& string)
+{
+	if (string == "Undefined") return BufferUsage::Undefined;
+	if (string == "Transfer") return BufferUsage::Transfer;
+	if (string == "Vertex") return BufferUsage::Vertex;
+	if (string == "Index") return BufferUsage::Index;
+	if (string == "Uniform") return BufferUsage::Uniform;
+
+	return BufferUsage();
+}
+
+Bool Minty::Parse::try_buffer_usage(String const& string, BufferUsage& value)
+{
+	value = to_buffer_usage(string);
+	return value != BufferUsage();
+}
+
+ImageType Minty::Parse::to_image_type(String const& string)
+{
+	if (string == "D1") return ImageType::D1;
+	if (string == "D2") return ImageType::D2;
+	if (string == "D3") return ImageType::D3;
+
+	return ImageType();
+}
+
+Bool Minty::Parse::try_image_type(String const& string, ImageType& value)
+{
+	value = to_image_type(string);
+	return value != ImageType();
+}
+
+ImageUsage Minty::Parse::to_image_usage(String const& string)
+{
+	if (string == "Undefined") return ImageUsage::Undefined;
+	if (string == "Sampled") return ImageUsage::Sampled;
+	if (string == "Storage") return ImageUsage::Storage;
+	if (string == "Color") return ImageUsage::Color;
+	if (string == "DepthStencil") return ImageUsage::DepthStencil;
+
+	return ImageUsage();
+}
+
+Bool Minty::Parse::try_image_usage(String const& string, ImageUsage& value)
+{
+	value = to_image_usage(string);
+	return value != ImageUsage();
+}
+
+ImageAddressMode Minty::Parse::to_image_address_mode(String const& string)
+{
+	if (string == "Undefined") return ImageAddressMode::Undefined;
+	if (string == "Repeat") return ImageAddressMode::Repeat;
+	if (string == "MirroredRepeat") return ImageAddressMode::MirroredRepeat;
+	if (string == "ClampToEdge") return ImageAddressMode::ClampToEdge;
+	if (string == "ClampToBorder") return ImageAddressMode::ClampToBorder;
+	if (string == "MirroredClampToEdge") return ImageAddressMode::MirroredClampToEdge;
+
+	return ImageAddressMode();
+}
+
+Bool Minty::Parse::try_image_address_mode(String const& string, ImageAddressMode& value)
+{
+	value = to_image_address_mode(string);
+	return value != ImageAddressMode();
+}

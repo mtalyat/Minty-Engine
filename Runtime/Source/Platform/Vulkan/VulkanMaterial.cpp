@@ -53,7 +53,7 @@ Minty::VulkanMaterial::VulkanMaterial(MaterialBuilder const& builder)
 				BufferBuilder bufferBuilder{};
 				bufferBuilder.frequent = descriptor.frequent;
 				bufferBuilder.size = descriptor.size;
-				bufferBuilder.usage = BufferUsage::UNIFORM;
+				bufferBuilder.usage = BufferUsage::Uniform;
 				bufferBuilder.data = nullptr;
 				frame.buffers.push_back(Owner<VulkanBuffer>(bufferBuilder));
 			}

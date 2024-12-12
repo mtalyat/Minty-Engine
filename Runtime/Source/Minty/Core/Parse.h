@@ -8,8 +8,9 @@
 #include "Minty/Core/UUID.h"
 #include "Minty/FSM/Conditional.h"
 #include "Minty/Render/CoordinateMode.h"
-#include "Minty/Render/Perspective.h"
+#include "Minty/Render/Enums.h"
 #include "Minty/Render/Mesh.h"
+#include "Minty/Render/Perspective.h"
 #include "Minty/Render/Shader.h"
 #include "Minty/Render/Space.h"
 #include "Minty/UI/AnchorMode.h"
@@ -730,5 +731,80 @@ namespace Minty::Parse
 	inline Bool parse_try(String const& string, Space& value)
 	{
 		return try_space(string, value);
+	}
+
+	Filter to_filter(String const& string);
+	Bool try_filter(String const& string, Filter& value);
+
+	template<>
+	inline void parse_to(String const& string, Filter& value)
+	{
+		value = to_filter(string);
+	}
+
+	template<>
+	inline Bool parse_try(String const& string, Filter& value)
+	{
+		return try_filter(string, value);
+	}
+
+	BufferUsage to_buffer_usage(String const& string);
+	Bool try_buffer_usage(String const& string, BufferUsage& value);
+
+	template<>
+	inline void parse_to(String const& string, BufferUsage& value)
+	{
+		value = to_buffer_usage(string);
+	}
+
+	template<>
+	inline Bool parse_try(String const& string, BufferUsage& value)
+	{
+		return try_buffer_usage(string, value);
+	}
+
+	ImageType to_image_type(String const& string);
+	Bool try_image_type(String const& string, ImageType& value);
+
+	template<>
+	inline void parse_to(String const& string, ImageType& value)
+	{
+		value = to_image_type(string);
+	}
+
+	template<>
+	inline Bool parse_try(String const& string, ImageType& value)
+	{
+		return try_image_type(string, value);
+	}
+
+	ImageUsage to_image_usage(String const& string);
+	Bool try_image_usage(String const& string, ImageUsage& value);
+
+	template<>
+	inline void parse_to(String const& string, ImageUsage& value)
+	{
+		value = to_image_usage(string);
+	}
+
+	template<>
+	inline Bool parse_try(String const& string, ImageUsage& value)
+	{
+		return try_image_usage(string, value);
+	}
+
+	ImageAddressMode to_image_address_mode(String const& string);
+	Bool try_image_address_mode(String const& string, ImageAddressMode& value);
+
+	template<>
+	inline void parse_to(String const& string, ImageAddressMode& value)
+	{
+		value = to_image_address_mode(string);
+	}
+
+	template<>
+	inline Bool parse_try(String const& string, ImageAddressMode& value)
+	{
+		return try_image_address_mode(string, value);
 	}
 }

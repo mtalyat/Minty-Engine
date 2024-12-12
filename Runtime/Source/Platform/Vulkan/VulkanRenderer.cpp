@@ -1146,9 +1146,8 @@ VkSampler Minty::VulkanRenderer::create_sampler(VkFilter const magFilter, VkFilt
 	VkPhysicalDeviceProperties properties{};
 	vkGetPhysicalDeviceProperties(s_physicalDevice, &properties);
 
-	// defaults: VK_FALSE, 1.0f
-	samplerInfo.anisotropyEnable = VK_TRUE;
-	samplerInfo.maxAnisotropy = properties.limits.maxSamplerAnisotropy;
+	samplerInfo.anisotropyEnable = VK_FALSE;
+	samplerInfo.maxAnisotropy = 1.0f; // properties.limits.maxSamplerAnisotropy;
 
 	// set border color, if clamping
 	samplerInfo.borderColor = borderColor;
@@ -1156,7 +1155,7 @@ VkSampler Minty::VulkanRenderer::create_sampler(VkFilter const magFilter, VkFilt
 	// use pixel coordinates instead of normalized?
 	samplerInfo.unnormalizedCoordinates = !normalizedCoordinates;
 
-	// 
+	// when true, it samples an area instead of a pixel
 	samplerInfo.compareEnable = VK_FALSE;
 	samplerInfo.compareOp = VK_COMPARE_OP_ALWAYS;
 
@@ -1765,7 +1764,6 @@ void Minty::VulkanRenderer::set_memory(VkDeviceMemory const memory, const void* 
 
 VkFormat Minty::VulkanRenderer::format_to_vulkan(const Minty::Format format)
 {
-	// numbers SHOULD be the same
 	return static_cast<VkFormat>(format);
 }
 
@@ -1773,16 +1771,16 @@ VkBufferUsageFlags Minty::VulkanRenderer::buffer_usage_to_vulkan(const Minty::Bu
 {
 	switch (bufferUsage)
 	{
-	case Minty::BufferUsage::TRANSFER:
+	case Minty::BufferUsage::Transfer:
 		return VK_BUFFER_USAGE_TRANSFER_SRC_BIT;
-	case Minty::BufferUsage::VERTEX:
+	case Minty::BufferUsage::Vertex:
 		return VK_BUFFER_USAGE_VERTEX_BUFFER_BIT;
-	case Minty::BufferUsage::INDEX:
+	case Minty::BufferUsage::Index:
 		return VK_BUFFER_USAGE_INDEX_BUFFER_BIT;
-	case Minty::BufferUsage::UNIFORM:
+	case Minty::BufferUsage::Uniform:
 		return VK_BUFFER_USAGE_UNIFORM_BUFFER_BIT;
 	default:
-		MINTY_ABORT("Unknown BufferUsage.");
+		MINTY_ABORT_FORMAT("Cannot convert {} to VkBufferUsageFlags.", to_string(bufferUsage));
 	}
 }
 
@@ -1795,14 +1793,15 @@ VkShaderStageFlags Minty::VulkanRenderer::shader_stage_to_vulkan(const Minty::Sh
 	case Minty::ShaderStage::Fragment:
 		return VK_SHADER_STAGE_FRAGMENT_BIT;
 	default:
-		MINTY_ABORT("Unknown ShaderStage.");
+		MINTY_ABORT_FORMAT("Cannot convert {} to VkShaderStageFlags.", to_string(shaderStage));
 	}
 }
 
 VkDescriptorType Minty::VulkanRenderer::descriptor_type_to_vulkan(const Minty::ShaderInputType type)
 {
-	// numbers SHOULD be the same, offset
-	return static_cast<VkDescriptorType>(static_cast<int>(type) - 1);
+	MINTY_ASSERT_MESSAGE(type != ShaderInputType::Undefined, "Cannot convert Undefined to VkDescriptorType.");
+
+	return static_cast<VkDescriptorType>(static_cast<Int>(type) - 1);
 }
 
 VkFormat Minty::VulkanRenderer::type_to_vulkan(const Minty::Type type)
@@ -1834,7 +1833,7 @@ VkFormat Minty::VulkanRenderer::type_to_vulkan(const Minty::Type type)
 	case Type::UInt4:
 		return VkFormat::VK_FORMAT_R32G32B32A32_UINT;
 	default:
-		MINTY_ABORT_FORMAT("Unable to convert Type \"{}\" to VkFormat.", to_string(type));
+		MINTY_ABORT_FORMAT("Cannot convert Type \"{}\" to VkFormat.", to_string(type));
 	}
 }
 
@@ -1849,23 +1848,29 @@ VkImageType Minty::VulkanRenderer::image_type_to_vulkan(const Minty::ImageType t
 	case Minty::ImageType::D3:
 		return VK_IMAGE_TYPE_3D;
 	default:
-		MINTY_ABORT("Unknown ImageType.");
+		MINTY_ABORT_FORMAT("Cannot convert {} to VkImageType.", to_string(type));
 	}
 }
 
 VkImageTiling Minty::VulkanRenderer::image_tiling_to_vulkan(const Minty::ImageTiling tiling)
 {
-	return static_cast<VkImageTiling>(tiling);
+	MINTY_ASSERT_MESSAGE(tiling != ImageTiling::Undefined, "Cannot convert Undefined to VkImageTiling.");
+
+	return static_cast<VkImageTiling>(static_cast<Int>(tiling) - 1);
 }
 
 VkSamplerAddressMode Minty::VulkanRenderer::address_mode_to_vulkan(const Minty::ImageAddressMode addressMode)
 {
-	return static_cast<VkSamplerAddressMode>(addressMode);
+	MINTY_ASSERT_MESSAGE(addressMode != ImageAddressMode::Undefined, "Cannot convert Undefined to VkSamplerAddressMode.");
+
+	return static_cast<VkSamplerAddressMode>(static_cast<Int>(addressMode) - 1);
 }
 
 VkImageAspectFlags Minty::VulkanRenderer::image_aspect_to_vulkan(const Minty::ImageAspect aspect)
 {
-	return static_cast<VkImageAspectFlags>(aspect);
+	MINTY_ASSERT_MESSAGE(aspect != ImageAspect::Undefined, "Cannot convert Undefined to VkImageAspectFlags.");
+
+	return static_cast<VkImageAspectFlags>(static_cast<Int>(aspect));
 }
 
 VkImageUsageFlags Minty::VulkanRenderer::image_usage_to_vulkan(const Minty::ImageUsage usage)
@@ -1881,50 +1886,40 @@ VkImageUsageFlags Minty::VulkanRenderer::image_usage_to_vulkan(const Minty::Imag
 	case ImageUsage::DepthStencil:
 		return VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
 	default:
-		MINTY_ABORT("Unknown ImageUsage.");
+		MINTY_ABORT_FORMAT("Cannot convert {} to VkImageUsageFlags.", to_string(usage));
 	}
 }
 
 VkPrimitiveTopology Minty::VulkanRenderer::primitive_topology_to_vulkan(const Minty::ShaderPrimitiveTopology topology)
 {
+	MINTY_ASSERT_MESSAGE(topology != ShaderPrimitiveTopology::Undefined, "Cannot convert Undefined to VkPrimitiveTopology.");
+
 	return static_cast<VkPrimitiveTopology>(static_cast<Int>(topology) - 1);
 }
 
 VkCullModeFlags Minty::VulkanRenderer::cull_mode_to_vulkan(const Minty::ShaderCullMode mode)
 {
-	switch (mode)
-	{
-	case ShaderCullMode::None: return VkCullModeFlagBits::VK_CULL_MODE_NONE;
-	case ShaderCullMode::Front: return VkCullModeFlagBits::VK_CULL_MODE_FRONT_BIT;
-	case ShaderCullMode::Back: return VkCullModeFlagBits::VK_CULL_MODE_BACK_BIT;
-	case ShaderCullMode::Both: return VkCullModeFlagBits::VK_CULL_MODE_FRONT_AND_BACK;
-	default: return VkCullModeFlagBits::VK_CULL_MODE_NONE;
-	}
+	return static_cast<VkCullModeFlags>(mode);
 }
 
 VkFrontFace Minty::VulkanRenderer::front_face_to_vulkan(const Minty::ShaderFrontFace frontFace)
 {
-	switch (frontFace)
-	{
-	case ShaderFrontFace::Clockwise: return VkFrontFace::VK_FRONT_FACE_CLOCKWISE;
-	case ShaderFrontFace::CounterClockwise: return VkFrontFace::VK_FRONT_FACE_COUNTER_CLOCKWISE;
-	default: return VkFrontFace::VK_FRONT_FACE_CLOCKWISE;
-	}
+	MINTY_ASSERT_MESSAGE(frontFace != ShaderFrontFace::Undefined, "Cannot convert Undefined to VkFrontFace.");
+
+	return static_cast<VkFrontFace>(static_cast<Int>(frontFace) - 1);
 }
 
 VkPolygonMode Minty::VulkanRenderer::polygon_mode_to_vulkan(const Minty::ShaderPolygonMode mode)
 {
-	switch (mode)
-	{
-	case ShaderPolygonMode::Fill: return VkPolygonMode::VK_POLYGON_MODE_FILL;
-	case ShaderPolygonMode::Line: return VkPolygonMode::VK_POLYGON_MODE_LINE;
-	case ShaderPolygonMode::Point: return VkPolygonMode::VK_POLYGON_MODE_POINT;
-	default: return VkPolygonMode::VK_POLYGON_MODE_FILL;
-	}
+	MINTY_ASSERT_MESSAGE(mode != ShaderPolygonMode::Undefined, "Cannot convert Undefined to VkPolygonMode.");
+
+	return static_cast<VkPolygonMode>(static_cast<Int>(mode) - 1);
 }
 
 VkVertexInputRate Minty::VulkanRenderer::input_rate_to_vulkan(const Minty::ShaderInputRate rate)
 {
+	MINTY_ASSERT_MESSAGE(rate != ShaderInputRate::Undefined, "Cannot convert Undefined to VkVertexInputRate.");
+
 	return static_cast<VkVertexInputRate>(static_cast<Int>(rate) - 1);
 }
 
@@ -1957,4 +1952,11 @@ VkAttachmentDescription Minty::VulkanRenderer::attachment_to_vulkan(Minty::Rende
 VkImageLayout Minty::VulkanRenderer::image_layout_to_vulkan(Minty::ImageLayout const layout)
 {
 	return static_cast<VkImageLayout>(layout);
+}
+
+VkFilter Minty::VulkanRenderer::filter_to_vulkan(Minty::Filter const filter)
+{
+	MINTY_ASSERT_MESSAGE(filter != Filter::Undefined, "Cannot convert Undefined to VkFilter.");
+
+	return static_cast<VkFilter>(static_cast<Int>(filter) - 1);
 }

@@ -5,7 +5,7 @@
 #include "Minty/Data/Cargo.h"
 #include "Minty/Core/Pointer.h"
 #include "Minty/Core/Types.h"
-#include "Minty/Render/Format.h"
+#include "Minty/Render/Enums.h"
 #include "Minty/Render/Scissor.h"
 #include "Minty/Render/ShaderModule.h"
 #include "Minty/Render/Viewport.h"

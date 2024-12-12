@@ -13,7 +13,7 @@
 #include "Minty/Data/StaticContainer.h"
 #include "Minty/FSM/Conditional.h"
 #include "Minty/Render/CoordinateMode.h"
-#include "Minty/Render/Format.h"
+#include "Minty/Render/Enums.h"
 #include "Minty/Render/Mesh.h"
 #include "Minty/Render/Perspective.h"
 #include "Minty/Render/Shader.h"
@@ -118,4 +118,14 @@ namespace Minty
 	String to_string(DynamicContainer const& obj);
 
 	String to_string(StaticContainer const& obj);
+
+	String to_string(Filter const obj);
+
+	String to_string(BufferUsage const obj);
+
+	String to_string(ImageType const obj);
+
+	String to_string(ImageUsage const obj);
+
+	String to_string(ImageAddressMode const obj);
 }

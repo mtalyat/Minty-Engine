@@ -2,14 +2,22 @@
 	ToString.h:
 ====================
 
-template<>
-inline String to_string(Space const& obj)
+String to_string(ImageAddressMode const obj);
+
+====================
+	ToString.cpp
+====================
+
+String Minty::to_string(ImageAddressMode const obj)
 {
-	switch (obj)
+    switch (obj)
 	{
-		case Space::D3: return "D3";
-		case Space::D2: return "D2";
-		case Space::UI: return "UI";
+		case ImageAddressMode::Undefined: return "Undefined";
+		case ImageAddressMode::Repeat: return "Repeat";
+		case ImageAddressMode::MirroredRepeat: return "MirroredRepeat";
+		case ImageAddressMode::ClampToEdge: return "ClampToEdge";
+		case ImageAddressMode::ClampToBorder: return "ClampToBorder";
+		case ImageAddressMode::MirroredClampToEdge: return "MirroredClampToEdge";
 
 		default: return "";
 	}
@@ -19,37 +27,40 @@ inline String to_string(Space const& obj)
 	Parse.h
 ====================
 
-Space to_space(String const& string);
-Bool try_space(String const& string, Space& value);
+ImageAddressMode to_image_address_mode(String const& string);
+Bool try_image_address_mode(String const& string, ImageAddressMode& value);
 
 template<>
-inline void parse_to(String const& string, Space& value)
+inline void parse_to(String const& string, ImageAddressMode& value)
 {
-    value = to_space(string);
+    value = to_image_address_mode(string);
 }
 
 template<>
-inline Bool parse_try(String const& string, Space& value)
+inline Bool parse_try(String const& string, ImageAddressMode& value)
 {
-    return try_space(string, value);
+    return try_image_address_mode(string, value);
 }
 
 ====================
 	Parse.cpp
 ====================
 
-Space Minty::Parse::to_space(String const& string)
+ImageAddressMode Minty::Parse::to_image_address_mode(String const& string)
 {
-	if (string == "D3") return Space::D3;
-	if (string == "D2") return Space::D2;
-	if (string == "UI") return Space::UI;
+	if (string == "Undefined") return ImageAddressMode::Undefined;
+	if (string == "Repeat") return ImageAddressMode::Repeat;
+	if (string == "MirroredRepeat") return ImageAddressMode::MirroredRepeat;
+	if (string == "ClampToEdge") return ImageAddressMode::ClampToEdge;
+	if (string == "ClampToBorder") return ImageAddressMode::ClampToBorder;
+	if (string == "MirroredClampToEdge") return ImageAddressMode::MirroredClampToEdge;
 
-	return Space();
+	return ImageAddressMode();
 }
 
-Bool Minty::Parse::try_space(String const& string, Space& value)
+Bool Minty::Parse::try_image_address_mode(String const& string, ImageAddressMode& value)
 {
-	value = to_space(string);
-	return value != Space();
+	value = to_image_address_mode(string);
+	return value != ImageAddressMode();
 }
 

@@ -1445,6 +1445,19 @@ Ref<Texture> Minty::AssetManager::load_texture(Path const& path)
 	builder.id = read_id(path);
 	builder.image = load_image(path);
 
+	Path metaPath = Asset::get_meta_path(path);
+	Container* container;
+	Reader* reader;
+	if (open_reader(metaPath, container, reader))
+	{
+		// read texture data
+		reader->read("Filter", builder.filter);
+		reader->read("AddressMode", builder.addressMode);
+		reader->read("NormalizedCoordinates", builder.normalizedCoordinates);
+
+		close_reader(container, reader);
+	}
+
 	return create_existing<Texture>(path, builder);
 }
 

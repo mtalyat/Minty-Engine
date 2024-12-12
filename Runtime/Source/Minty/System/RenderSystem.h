@@ -29,7 +29,7 @@ namespace Minty
 		RenderSystem(Scene& scene)
 			: System::System("Render", scene)
 			, m_camera(NULL_ENTITY)
-			, m_instanceCargo(BufferUsage::VERTEX)
+			, m_instanceCargo(BufferUsage::Vertex)
 			, m_3dSpriteGroupId(m_instanceCargo.create_group())
 			, m_uiSpriteGroupId(m_instanceCargo.create_group())
 		{}

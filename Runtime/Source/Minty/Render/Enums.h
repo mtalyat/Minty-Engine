@@ -2,8 +2,122 @@
 
 namespace Minty
 {
-	enum class Format
+    enum class BufferUsage
+    {
+        Undefined = 0,
+        Transfer = 1,
+        Vertex = 2,
+        Index = 3,
+        Uniform = 4
+    };
+
+	/// <summary>
+	/// The amount of dimensions on the image.
+	/// </summary>
+	enum class ImageType
 	{
+		D1 = 0,
+		D2 = 1,
+		D3 = 2,
+	};
+
+	/// <summary>
+	/// The format for how pixels are read.
+	/// </summary>
+	enum class ImagePixelFormat
+	{
+		/// <summary>
+		/// No format.
+		/// </summary>
+		None = 0,
+		/// <summary>
+		/// Gray channel only.
+		/// </summary>
+		Gray = 1,
+		/// <summary>
+		/// Gray and alpha channels.
+		/// </summary>
+		GrayAlpha = 2,
+		/// <summary>
+		/// Red, green and blue channels.
+		/// </summary>
+		RedGreenBlue = 3,
+		/// <summary>
+		/// Red, green, blue and alpha channels.
+		/// </summary>
+		RedGreenBlueAlpha = 4,
+	};
+
+	enum class ImageTiling
+	{
+        Undefined = 0,
+		Optimal,
+		Linear,
+	};
+
+	enum class ImageAspect
+	{
+		Undefined = 0,
+		Color,
+		Depth
+	};
+
+	enum class ImageAddressMode
+	{
+        Undefined = 0,
+		Repeat,
+		MirroredRepeat,
+		ClampToEdge,
+		ClampToBorder,
+		MirroredClampToEdge,
+	};
+
+	enum class ImageUsage
+	{
+        Undefined,
+		Sampled,
+		Storage,
+		Color,
+		DepthStencil
+	};
+
+	enum class ImageLayout
+	{
+		Undefined = 0,
+		General = 1,
+		ColorAttachmentOptimal = 2,
+		DepthStencilAttachmentOptimal = 3,
+		DepthStencilReadOnlyOptimal = 4,
+		ShaderReadOnlyOptimal = 5,
+		TransferSrcOptimal = 6,
+		TransferDstOptimal = 7,
+		Preinitialized = 8,
+		DepthReadOnlyStencilAttachmentOptimal = 1000117000,
+		DepthAttachmentStencilReadOnlyOptimal = 1000117001,
+		DepthAttachmentOptimal = 1000241000,
+		DepthReadOnlyOptimal = 1000241001,
+		StencilAttachmentOptimal = 1000241002,
+		StencilReadOnlyOptimal = 1000241003,
+		ReadOnlyOptimal = 1000314000,
+		AttachmentOptimal = 1000314001,
+		PresentSrcKhr = 1000001002,
+		VideoDecodeDstKhr = 1000024000,
+		VideoDecodeSrcKhr = 1000024001,
+		VideoDecodeDpbKhr = 1000024002,
+		SharedPresentKhr = 1000111000,
+		FragmentDensityMapOptimalExt = 1000218000,
+		FragmentShadingRateAttachmentOptimalKhr = 1000164003,
+	};
+
+	enum class Filter
+	{
+		Undefined = 0,
+		Nearest = 1,
+		Linear = 2,
+	};
+
+    enum class Format
+    {
         Undefined = 0,
         R4G4_UNORM_PACK8 = 1,
         R4G4B4A4_UNORM_PACK16 = 2,
@@ -126,5 +240,5 @@ namespace Minty
         R64G64B64A64_UINT = 119,
         R64G64B64A64_SINT = 120,
         R64G64B64A64_SFLOAT = 121
-	};
+    };
 }

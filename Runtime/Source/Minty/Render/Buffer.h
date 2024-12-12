@@ -2,18 +2,10 @@
 
 #include "Minty/Core/Pointer.h"
 #include "Minty/Core/Types.h"
+#include "Minty/Render/Enums.h"
 
 namespace Minty
 {
-	enum class BufferUsage
-	{
-		UNDEFINED = 0,
-		TRANSFER = 1,
-		VERTEX = 2,
-		INDEX = 3,
-		UNIFORM = 4
-	};
-
 	struct BufferBuilder
 	{
 		BufferUsage usage;

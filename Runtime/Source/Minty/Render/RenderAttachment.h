@@ -2,7 +2,7 @@
 
 #include "Minty/Core/Pointer.h"
 #include "Minty/Core/Types.h"
-#include "Minty/Render/Format.h"
+#include "Minty/Render/Enums.h"
 #include "Minty/Render/Image.h"
 
 namespace Minty

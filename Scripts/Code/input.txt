@@ -1,6 +1,6 @@
-	enum class ShaderInputRate
-	{
-		Undefined,
-		Vertex,
-		Instance
-	};
+enum class Filter
+{
+	Undefined,
+	Nearest,
+	Linear,
+};

@@ -56,7 +56,7 @@ void Minty::Mesh::initialize_custom(MeshBuilder const& builder)
 	BufferBuilder vertexBufferBuilder{};
 	vertexBufferBuilder.data = builder.vertexData;
 	vertexBufferBuilder.size = builder.vertexCount * builder.vertexStride;
-	vertexBufferBuilder.usage = BufferUsage::VERTEX;
+	vertexBufferBuilder.usage = BufferUsage::Vertex;
 	m_vertexBuffer = Buffer::create(vertexBufferBuilder);
 
 	m_indexData = ConstantContainer(builder.indexData, builder.indexCount * builder.indexStride);
@@ -66,7 +66,7 @@ void Minty::Mesh::initialize_custom(MeshBuilder const& builder)
 	BufferBuilder indexBufferBuilder{};
 	indexBufferBuilder.data = builder.indexData;
 	indexBufferBuilder.size = builder.indexCount * builder.indexStride;
-	indexBufferBuilder.usage = BufferUsage::INDEX;
+	indexBufferBuilder.usage = BufferUsage::Index;
 	m_indexBuffer = Buffer::create(indexBufferBuilder);
 }
 

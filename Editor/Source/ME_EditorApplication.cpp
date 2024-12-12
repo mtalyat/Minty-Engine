@@ -59,7 +59,7 @@ EditorApplication::EditorApplication()
 	builder.assetManagerBuilder.wraps = { "Default.wrap" };
 	builder.assetManagerBuilder.savePaths = true;
 	builder.rendererBuilder.clearColor = Color::black();
-	builder.rendererBuilder.targetSurfaceFormat = Format::B8G8R8A8_UNORM;
+	builder.rendererBuilder.targetSurfaceFormat = Format::R8G8B8A8_SRGB;
 	initialize(builder);
 
 	// load gui theme

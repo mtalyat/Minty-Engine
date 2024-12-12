@@ -273,10 +273,10 @@
     <ClInclude Include="Minty\Render\BufferContainer.h" />
     <ClInclude Include="Minty\Render\Camera.h" />
     <ClInclude Include="Minty\Render\CoordinateMode.h" />
+    <ClInclude Include="Minty\Render\Enums.h" />
     <ClInclude Include="Minty\Render\Font.h" />
     <ClInclude Include="Minty\Render\FontChar.h" />
     <ClInclude Include="Minty\Render\FontVariant.h" />
-    <ClInclude Include="Minty\Render\Format.h" />
     <ClInclude Include="Minty\Render\Image.h" />
     <ClInclude Include="Minty\Render\Material.h" />
     <ClInclude Include="Minty\Render\MaterialTemplate.h" />

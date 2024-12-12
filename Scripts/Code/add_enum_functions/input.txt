@@ -1,6 +1,9 @@
-	enum class Space
+	enum class ImageAddressMode
 	{
-		D3,
-		D2,
-		UI
+        Undefined = 0,
+		Repeat,
+		MirroredRepeat,
+		ClampToEdge,
+		ClampToBorder,
+		MirroredClampToEdge,
 	};

@@ -1,6 +1,7 @@
 #pragma once
 #include "Minty/Asset/Asset.h"
 
+#include "Minty/Render/Enums.h"
 #include "Minty/Render/Image.h"
 
 namespace Minty
@@ -9,6 +10,9 @@ namespace Minty
 	{
 		UUID id = {};
 		Owner<Image> image;
+		Filter filter = Filter::Undefined;
+		ImageAddressMode addressMode = ImageAddressMode::Undefined;
+		Bool normalizedCoordinates = true;
 	};
 
 	class Texture

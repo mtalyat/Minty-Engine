@@ -622,3 +622,70 @@ String Minty::to_string(StaticContainer const& obj)
 {
 	return to_string(static_cast<Container const&>(obj));
 }
+
+String Minty::to_string(Filter const obj)
+{
+	switch (obj)
+	{
+	case Filter::Undefined: return "Undefined";
+	case Filter::Nearest: return "Nearest";
+	case Filter::Linear: return "Linear";
+
+	default: return "";
+	}
+}
+
+String Minty::to_string(BufferUsage const obj)
+{
+	switch (obj)
+	{
+	case BufferUsage::Undefined: return "Undefined";
+	case BufferUsage::Transfer: return "Transfer";
+	case BufferUsage::Vertex: return "Vertex";
+	case BufferUsage::Index: return "Index";
+	case BufferUsage::Uniform: return "Uniform";
+
+	default: return "";
+	}
+}
+
+String Minty::to_string(ImageType const obj)
+{
+	switch (obj)
+	{
+	case ImageType::D1: return "D1";
+	case ImageType::D2: return "D2";
+	case ImageType::D3: return "D3";
+
+	default: return "";
+	}
+}
+
+String Minty::to_string(ImageUsage const obj)
+{
+	switch (obj)
+	{
+	case ImageUsage::Undefined: return "Undefined";
+	case ImageUsage::Sampled: return "Sampled";
+	case ImageUsage::Storage: return "Storage";
+	case ImageUsage::Color: return "Color";
+	case ImageUsage::DepthStencil: return "DepthStencil";
+
+	default: return "";
+	}
+}
+
+String Minty::to_string(ImageAddressMode const obj)
+{
+	switch (obj)
+	{
+	case ImageAddressMode::Undefined: return "Undefined";
+	case ImageAddressMode::Repeat: return "Repeat";
+	case ImageAddressMode::MirroredRepeat: return "MirroredRepeat";
+	case ImageAddressMode::ClampToEdge: return "ClampToEdge";
+	case ImageAddressMode::ClampToBorder: return "ClampToBorder";
+	case ImageAddressMode::MirroredClampToEdge: return "MirroredClampToEdge";
+
+	default: return "";
+	}
+}

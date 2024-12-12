@@ -99,7 +99,7 @@ void Minty::VulkanImage::set_pixels(const Byte* const data)
 	BufferBuilder bufferBuilder{};
 	bufferBuilder.data = data;
 	bufferBuilder.size = m_size;
-	bufferBuilder.usage = BufferUsage::TRANSFER;
+	bufferBuilder.usage = BufferUsage::Transfer;
 	bufferBuilder.frequent = false;
 	Owner<Buffer> stagingBuffer = Buffer::create(bufferBuilder);
 

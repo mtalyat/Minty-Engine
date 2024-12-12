@@ -3,6 +3,7 @@
 
 #include "Minty/Core/ApplicationInfo.h"
 #include "Minty/Library/Vulkan.h"
+#include "Minty/Render/Enums.h"
 #include "Minty/Render/RenderAttachment.h"
 #include "Minty/Render/Shader.h"
 
@@ -283,7 +284,7 @@ namespace Minty
 #pragma region Sampler
 
 	public:
-		static VkSampler create_sampler(VkFilter const magFilter = VK_FILTER_LINEAR, VkFilter const minFilter = VK_FILTER_LINEAR, VkSamplerAddressMode const addressMode = VK_SAMPLER_ADDRESS_MODE_REPEAT, VkBorderColor const borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK, Bool const normalizedCoordinates = true);
+		static VkSampler create_sampler(VkFilter const magFilter = VK_FILTER_NEAREST, VkFilter const minFilter = VK_FILTER_NEAREST, VkSamplerAddressMode const addressMode = VK_SAMPLER_ADDRESS_MODE_REPEAT, VkBorderColor const borderColor = VK_BORDER_COLOR_INT_OPAQUE_BLACK, Bool const normalizedCoordinates = true);
 
 		static void destroy_sampler(VkSampler const sampler);
 
@@ -507,6 +508,8 @@ namespace Minty
 		static VkAttachmentDescription attachment_to_vulkan(Minty::RenderAttachment const& attachment);
 
 		static VkImageLayout image_layout_to_vulkan(Minty::ImageLayout const layout);
+
+		static VkFilter filter_to_vulkan(Minty::Filter const filter);
 
 #pragma endregion
 

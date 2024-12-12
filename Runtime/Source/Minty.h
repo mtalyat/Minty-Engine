@@ -89,7 +89,7 @@
 // RENDER
 #include "Minty/Render/Buffer.h"
 #include "Minty/Render/Camera.h"
-#include "Minty/Render/Format.h"
+#include "Minty/Render/Enums.h"
 #include "Minty/Render/Image.h"
 #include "Minty/Render/Material.h"
 #include "Minty/Render/MaterialTemplate.h"

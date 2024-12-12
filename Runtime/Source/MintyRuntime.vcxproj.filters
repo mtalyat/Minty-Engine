@@ -261,9 +261,6 @@
     <ClInclude Include="Minty\Render\Shader.h">
       <Filter>Header Files\Minty\Render</Filter>
     </ClInclude>
-    <ClInclude Include="Minty\Render\Format.h">
-      <Filter>Header Files\Minty\Render</Filter>
-    </ClInclude>
     <ClInclude Include="Platform\Vulkan\VulkanShader.h">
       <Filter>Header Files\Platform\Vulkan</Filter>
     </ClInclude>
@@ -637,6 +634,9 @@
       <Filter>Header Files\Minty\Render</Filter>
     </ClInclude>
     <ClInclude Include="Minty\Render\RenderAttachment.h">
+      <Filter>Header Files\Minty\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Render\Enums.h">
       <Filter>Header Files\Minty\Render</Filter>
     </ClInclude>
   </ItemGroup>

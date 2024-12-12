@@ -43,11 +43,7 @@ def add_enum(lines):
     output += header('ToString.h:')
     output += f'''String to_string({name} const obj);
 
-template<>
-inline String to_string({name} const& obj)
-{{
-    return to_string(obj);
-}}'''
+'''
     
     output += header('ToString.cpp')
     temp = loop_with_values(f'\t\tcase {name}::{{0}}: return "{{0}}";\n')
@@ -58,7 +54,9 @@ inline String to_string({name} const& obj)
 {temp}
 		default: return "";
 	}}
-}}'''
+}}
+
+'''
     
     #   Parse
     output += header('Parse.h')
