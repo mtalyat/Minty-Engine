@@ -12,12 +12,12 @@ using namespace Mintye;
 
 Mintye::PropertiesWindow::PropertiesWindow(EditorApplication& application)
 	: EditorWindow(application)
-	, _targetMode(TargetMode::None)
-	, _targetIsBuiltIn(false)
-	, _targetId(INVALID_UUID)
-	, _targetEntity(NULL_ENTITY)
-	, _targetPath()
-	, _texts()
+	, m_targetMode(TargetMode::None)
+	, m_targetIsBuiltIn(false)
+	, m_targetId(INVALID_UUID)
+	, m_targetEntity(NULL_ENTITY)
+	, m_targetPath()
+	, m_texts()
 {}
 
 void Mintye::PropertiesWindow::draw()
@@ -30,7 +30,7 @@ void Mintye::PropertiesWindow::draw()
 	}
 
 	// draw based on target mode
-	switch (_targetMode)
+	switch (m_targetMode)
 	{
 	case TargetMode::None:
 		draw_none();
@@ -42,7 +42,7 @@ void Mintye::PropertiesWindow::draw()
 		draw_asset();
 		break;
 	default:
-		GUI::text(std::format("Error: Unknown target mode: {}", static_cast<int>(_targetMode)).c_str());
+		GUI::text(std::format("Error: Unknown target mode: {}", static_cast<int>(m_targetMode)).c_str());
 		break;
 	}
 
@@ -55,7 +55,7 @@ void Mintye::PropertiesWindow::reset()
 
 void Mintye::PropertiesWindow::refresh()
 {
-	Path path = _targetPath;
+	Path path = m_targetPath;
 	set_target(path);
 }
 
@@ -64,8 +64,8 @@ void Mintye::PropertiesWindow::set_scene(Minty::Ref<Minty::Scene> const scene)
 	if (get_scene() != scene)
 	{
 		// new scene
-		_targetMode = TargetMode::None;
-		_targetEntity = NULL_ENTITY;
+		m_targetMode = TargetMode::None;
+		m_targetEntity = NULL_ENTITY;
 	}
 
 	EditorWindow::set_scene(scene);
@@ -183,18 +183,18 @@ void Mintye::PropertiesWindow::draw_entity()
 	GUI::text("Entity:");
 
 	// name
-	String text = registry.get_name(_targetEntity);
+	String text = registry.get_name(m_targetEntity);
 	Size size = std::min(INPUT_SIZE, text.size() + 1);
 	memcpy(inputBuffer, text.c_str(), size);
 	inputBuffer[size - 1] = '\0';
 
 	if (GUI::input_text("Name", inputBuffer, INPUT_SIZE))
 	{
-		registry.set_name(_targetEntity, inputBuffer);
+		registry.set_name(m_targetEntity, inputBuffer);
 	}
 
 	// id
-	String idText = to_string(_targetId);
+	String idText = to_string(m_targetId);
 	GUI::push_style_color(GuiColorID::Text, Color(0.65f, 0.65f, 0.65f, 1.0f));
 	if (GUI::button(idText.c_str()))
 	{
@@ -204,30 +204,30 @@ void Mintye::PropertiesWindow::draw_entity()
 	GUI::pop_style_color();
 
 	// enabled
-	bool enabled = registry.get_enabled(_targetEntity);
+	bool enabled = registry.get_enabled(m_targetEntity);
 	if (GUI::checkbox("Enabled", enabled))
 	{
-		registry.set_enabled(_targetEntity, enabled);
+		registry.set_enabled(m_targetEntity, enabled);
 	}
 
 	GUI::same_line();
 
 	// renderable (visible)
-	bool visible = registry.get_renderable(_targetEntity);
+	bool visible = registry.get_renderable(m_targetEntity);
 	if (GUI::checkbox("Visible", visible))
 	{
-		registry.set_renderable(_targetEntity, visible);
+		registry.set_renderable(m_targetEntity, visible);
 	}
 
 	// tag
-	text = registry.get_tag(_targetEntity);
+	text = registry.get_tag(m_targetEntity);
 	size = std::min(INPUT_SIZE, text.size() + 1);
 	memcpy(inputBuffer, text.c_str(), size);
 	inputBuffer[size - 1] = '\0';
 
 	if (GUI::input_text("Tag", inputBuffer, INPUT_SIZE))
 	{
-		registry.set_tag(_targetEntity, inputBuffer);
+		registry.set_tag(m_targetEntity, inputBuffer);
 	}
 
 	GUI::separator();
@@ -243,7 +243,7 @@ void Mintye::PropertiesWindow::draw_entity()
 	// TODO: use TextNodeWriter
 	DynamicContainer container;
 	TextMemoryWriter writer(&container);
-	registry.serialize_entity(writer, _targetEntity);
+	registry.serialize_entity(writer, m_targetEntity);
 	TextMemoryReader reader(&container);
 	Node entityNode = reader.get_current_node().get_child(0);
 
@@ -319,9 +319,9 @@ void Mintye::PropertiesWindow::draw_entity()
 			}
 
 			// place onto the object
-			if (!registry.emplace_by_name(popupBuffer, _targetEntity))
+			if (!registry.emplace_by_name(popupBuffer, m_targetEntity))
 			{
-				get_application().log_error(std::format("Failed to add component \"{}\" to Entity \"{}\".", popupBuffer, registry.get_name(_targetEntity)));
+				get_application().log_error(std::format("Failed to add component \"{}\" to Entity \"{}\".", popupBuffer, registry.get_name(m_targetEntity)));
 			}
 
 			memset(popupBuffer, 0, sizeof(popupBuffer));
@@ -352,11 +352,11 @@ void Mintye::PropertiesWindow::draw_component(Minty::Node& node, Size const i, M
 	if (input_node(node, true, static_cast<uint32_t>(i)))
 	{
 		// component changed, update it in the registy
-		Component* component = registry.get_by_name(node.get_name(), _targetEntity);
+		Component* component = registry.get_by_name(node.get_name(), m_targetEntity);
 		EntitySerializationData data
 		{
 			.scene = get_scene().get(),
-			.entity = _targetEntity,
+			.entity = m_targetEntity,
 		};
 		TextNodeReader reader(node);
 		reader.push_data(&data);
@@ -365,7 +365,7 @@ void Mintye::PropertiesWindow::draw_component(Minty::Node& node, Size const i, M
 		// if certain component was updated, dirty the entity, update, continue
 		if (dirtyableComponentNames.contains(node.get_name()))
 		{
-			registry.dirty(_targetEntity);
+			registry.dirty(m_targetEntity);
 			scene->finalize();
 		}
 	}
@@ -374,7 +374,7 @@ void Mintye::PropertiesWindow::draw_component(Minty::Node& node, Size const i, M
 	if (node.get_name() == "Relationship")
 	{
 		// only if relationship has a parent
-		RelationshipComponent* relationship = static_cast<RelationshipComponent*>(registry.get_by_name(node.get_name(), _targetEntity));
+		RelationshipComponent* relationship = static_cast<RelationshipComponent*>(registry.get_by_name(node.get_name(), m_targetEntity));
 
 		if (relationship && relationship->parent != NULL_ENTITY)
 		{
@@ -385,7 +385,7 @@ void Mintye::PropertiesWindow::draw_component(Minty::Node& node, Size const i, M
 
 			if (GUI::button(std::format("Move Up##{}", i).c_str()))
 			{
-				registry.move_to_previous(_targetEntity);
+				registry.move_to_previous(m_targetEntity);
 				HierarchyWindow* hierarchy = get_application().find_editor_window<HierarchyWindow>("Hierarchy");
 				if (hierarchy) hierarchy->refresh();
 			}
@@ -398,7 +398,7 @@ void Mintye::PropertiesWindow::draw_component(Minty::Node& node, Size const i, M
 
 			if (GUI::button(std::format("Move Down##{}", i).c_str()))
 			{
-				registry.move_to_next(_targetEntity);
+				registry.move_to_next(m_targetEntity);
 				HierarchyWindow* hierarchy = get_application().find_editor_window<HierarchyWindow>("Hierarchy");
 				if (hierarchy) hierarchy->refresh();
 			}
@@ -411,7 +411,7 @@ void Mintye::PropertiesWindow::draw_component(Minty::Node& node, Size const i, M
 
 			if (GUI::button(std::format("Move to First##{}", i).c_str()))
 			{
-				registry.move_to_first(_targetEntity);
+				registry.move_to_first(m_targetEntity);
 				HierarchyWindow* hierarchy = get_application().find_editor_window<HierarchyWindow>("Hierarchy");
 				if (hierarchy) hierarchy->refresh();
 			}
@@ -424,7 +424,7 @@ void Mintye::PropertiesWindow::draw_component(Minty::Node& node, Size const i, M
 
 			if (GUI::button(std::format("Move to Last##{}", i).c_str()))
 			{
-				registry.move_to_last(_targetEntity);
+				registry.move_to_last(m_targetEntity);
 				HierarchyWindow* hierarchy = get_application().find_editor_window<HierarchyWindow>("Hierarchy");
 				if (hierarchy) hierarchy->refresh();
 			}
@@ -436,7 +436,7 @@ void Mintye::PropertiesWindow::draw_component(Minty::Node& node, Size const i, M
 	// actions
 	if (GUI::button(std::format("Remove##{}", i).c_str()))
 	{
-		registry.erase_by_name(node.get_name(), _targetEntity);
+		registry.erase_by_name(node.get_name(), m_targetEntity);
 	}
 
 	GUI::end_group_box(Float2(width, 0.0f), Float2(xMargin, yMargin));
@@ -447,17 +447,17 @@ void Mintye::PropertiesWindow::draw_asset()
 	// TODO: do differently for specific asset types
 
 	// print name
-	GUI::text(_targetPath.stem().string().c_str());
+	GUI::text(m_targetPath.stem().string().c_str());
 
 	GUI::separator();
 
 	// button ID to copy it
-	if (GUI::button(to_string(_targetId).c_str()))
+	if (GUI::button(to_string(m_targetId).c_str()))
 	{
-		Operation::set_clipboard_text(to_string(_targetId).c_str());
+		Operation::set_clipboard_text(to_string(m_targetId).c_str());
 	}
 
-	if (!_targetIsBuiltIn)
+	if (!m_targetIsBuiltIn)
 	{
 		GUI::separator();
 
@@ -475,7 +475,7 @@ void Mintye::PropertiesWindow::draw_asset()
 		// button to open the file
 		if (GUI::button("Open File"))
 		{
-			Operation::open(get_project()->get_base_path() / _targetPath);
+			Operation::open(get_project()->get_base_path() / m_targetPath);
 		}
 
 		GUI::same_line();
@@ -483,7 +483,7 @@ void Mintye::PropertiesWindow::draw_asset()
 		// button to open the meta file
 		if (GUI::button("Open Meta"))
 		{
-			Operation::open(get_project()->get_base_path() / Asset::get_meta_path(_targetPath));
+			Operation::open(get_project()->get_base_path() / Asset::get_meta_path(m_targetPath));
 		}
 
 		GUI::same_line();
@@ -491,7 +491,7 @@ void Mintye::PropertiesWindow::draw_asset()
 		// button to open the directory
 		if (GUI::button("Open Folder"))
 		{
-			Operation::open_directory(get_project()->get_base_path() / _targetPath);
+			Operation::open_directory(get_project()->get_base_path() / m_targetPath);
 		}
 
 		// gap
@@ -501,8 +501,8 @@ void Mintye::PropertiesWindow::draw_asset()
 		if (GUI::button("Delete File"))
 		{
 			// delete file and its corresponding .meta file
-			std::filesystem::remove(get_project()->get_base_path() / _targetPath);
-			std::filesystem::remove(get_project()->get_base_path() / Asset::get_meta_path(_targetPath));
+			std::filesystem::remove(get_project()->get_base_path() / m_targetPath);
+			std::filesystem::remove(get_project()->get_base_path() / Asset::get_meta_path(m_targetPath));
 
 			clear_target();
 
@@ -513,7 +513,7 @@ void Mintye::PropertiesWindow::draw_asset()
 	}
 
 	// show all texts
-	for (auto const& text : _texts)
+	for (auto const& text : m_texts)
 	{
 		GUI::separator();
 
@@ -523,14 +523,14 @@ void Mintye::PropertiesWindow::draw_asset()
 
 void Mintye::PropertiesWindow::clear_target()
 {
-	_targetMode = TargetMode::None;
-	_targetIsBuiltIn = false;
-	_targetId = INVALID_UUID;
+	m_targetMode = TargetMode::None;
+	m_targetIsBuiltIn = false;
+	m_targetId = INVALID_UUID;
 
-	_targetEntity = NULL_ENTITY;
-	_targetPath = "";
+	m_targetEntity = NULL_ENTITY;
+	m_targetPath = "";
 
-	_texts.clear();
+	m_texts.clear();
 }
 
 void Mintye::PropertiesWindow::set_target(Minty::Entity const entity)
@@ -539,10 +539,10 @@ void Mintye::PropertiesWindow::set_target(Minty::Entity const entity)
 
 	if (entity != NULL_ENTITY)
 	{
-		_targetMode = TargetMode::Entity;
-		_targetEntity = entity;
+		m_targetMode = TargetMode::Entity;
+		m_targetEntity = entity;
 		EntityRegistry& registry = get_scene()->get_entity_registry();
-		_targetId = registry.get_id(entity);
+		m_targetId = registry.get_id(entity);
 	}
 }
 
@@ -552,19 +552,19 @@ void Mintye::PropertiesWindow::set_target(Minty::Path const& path)
 
 	if (AssetManager::exists(path))
 	{
-		_targetMode = TargetMode::Asset;
-		_targetIsBuiltIn = path.string().starts_with("BuiltIn");
-		_targetPath = path;
+		m_targetMode = TargetMode::Asset;
+		m_targetIsBuiltIn = path.string().starts_with("BuiltIn");
+		m_targetPath = path;
 
-		_targetId = AssetManager::read_id(path);
+		m_targetId = AssetManager::read_id(path);
 
 		// add file itself to be drawn, if it is readable
 		AssetType type = Asset::get_type_from_path(path);
 		if (AssetUtility::is_plain_text(type))
 		{
-			_texts.push_back(AssetManager::read_file(path));
+			m_texts.push_back(AssetManager::read_file(path));
 		}
 
-		_texts.push_back(AssetManager::read_file(Asset::get_meta_path(path)));
+		m_texts.push_back(AssetManager::read_file(Asset::get_meta_path(path)));
 	}
 }

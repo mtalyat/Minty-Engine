@@ -7,9 +7,9 @@ namespace Mintye
 		: public EditorWindow
 	{
 	private:
-		std::vector<Minty::String> _registeredSystems;
-		Minty::Entity _selected;
-		Minty::Entity _clicked;
+		std::vector<Minty::String> m_registeredSystems;
+		Minty::Entity m_selected;
+		Minty::Entity m_clicked;
 
 	public:
 		HierarchyWindow(EditorApplication& application);

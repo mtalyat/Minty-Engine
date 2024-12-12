@@ -26,10 +26,10 @@ namespace Mintye
 		};
 
 	private:
-		Minty::Path _directory;
-		OnChangeFunc _action;
-		std::unordered_map<Minty::Path, FileData> _files;
-		std::unordered_set<Minty::Path> _changed;
+		Minty::Path m_directory;
+		OnChangeFunc m_action;
+		std::unordered_map<Minty::Path, FileData> m_files;
+		std::unordered_set<Minty::Path> m_changed;
 
 	public:
 		FileWatcher(Minty::Path const& directory, OnChangeFunc const& action);

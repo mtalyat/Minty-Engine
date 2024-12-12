@@ -11,9 +11,9 @@ Mintye::ConsoleWindow::ConsoleWindow(EditorApplication& application)
 	, showNormal(true)
 	, showWarnings(true)
 	, showErrors(true)
-	, _filter()
-	, _maxLines(16384)
-	, _lines()
+	, m_filter()
+	, m_maxLines(16384)
+	, m_lines()
 {
 	// create editor commands
 	_editorCommands.emplace("clear", [this]() {
@@ -64,9 +64,9 @@ void Mintye::ConsoleWindow::draw()
 	{
 		GUI::push_style_variable(GuiStyleID::ItemSpacing, Float2(4, 1));
 
-		_linesLock.lock();
+		m_linesLock.lock();
 
-		for (Line const& line : _lines)
+		for (Line const& line : m_lines)
 		{
 			//// check if pass filter
 			//if (!_filter.PassFilter(line.text.c_str()))
@@ -91,7 +91,7 @@ void Mintye::ConsoleWindow::draw()
 			}
 		}
 
-		_linesLock.unlock();
+		m_linesLock.unlock();
 
 		if (_scrollToBottom || (_autoScroll && ImGui::GetScrollY() >= ImGui::GetScrollMaxY()))
 		{
@@ -151,7 +151,7 @@ void Mintye::ConsoleWindow::refresh()
 
 void Mintye::ConsoleWindow::clear()
 {
-	_lines.clear();
+	m_lines.clear();
 }
 
 void Mintye::ConsoleWindow::run_command(std::string const& command, bool const wait)
@@ -172,42 +172,42 @@ void Mintye::ConsoleWindow::run_command(std::string const& command, bool const w
 void Mintye::ConsoleWindow::run_commands(std::vector<std::string> const& commands, bool const wait)
 {
 	// lock and add to queue
-	_commandsLock.lock();
-	_commandsQueue.push(commands);
+	m_commandsLock.lock();
+	m_commandsQueue.push(commands);
 
 	// if not executing, start executing
-	if (!_commandsThreadRunning)
+	if (!m_commandsThreadRunning)
 	{
-		_commandsThreadRunning = true;
+		m_commandsThreadRunning = true;
 		std::thread thread(&ConsoleWindow::execute_commands, this);
-		_commandsLock.unlock();
+		m_commandsLock.unlock();
 		if(wait) thread.join();
 		else thread.detach();
 	}
 	else
 	{
-		_commandsLock.unlock();
+		m_commandsLock.unlock();
 	}
 }
 
 bool Mintye::ConsoleWindow::is_command_running() const
 {
-	return _commandsThreadRunning;
+	return m_commandsThreadRunning;
 }
 
 void Mintye::ConsoleWindow::log(std::string const& text, Minty::Console::Color const color)
 {
-	_linesLock.lock();
+	m_linesLock.lock();
 
-	if (static_cast<int>(_lines.size()) >= _maxLines)
+	if (static_cast<int>(m_lines.size()) >= m_maxLines)
 	{
 		// pop oldest off stack...
-		_lines.pop_front();
+		m_lines.pop_front();
 	}
 
-	_lines.push_back(Line(text, color));
+	m_lines.push_back(Line(text, color));
 
-	_linesLock.unlock();
+	m_linesLock.unlock();
 }
 
 void Mintye::ConsoleWindow::log_important(std::string const& text)
@@ -232,7 +232,7 @@ void Mintye::ConsoleWindow::log_error(std::string const& text)
 
 void Mintye::ConsoleWindow::set_max_lines(int const count)
 {
-	_maxLines = count;
+	m_maxLines = count;
 }
 
 Size Mintye::ConsoleWindow::execute_command(std::string const& command)
@@ -299,15 +299,15 @@ void Mintye::ConsoleWindow::execute_commands()
 {
 	Size queueSize = 0;
 
-	_commandsLock.lock();
-	queueSize = _commandsQueue.size();
+	m_commandsLock.lock();
+	queueSize = m_commandsQueue.size();
 
 	while (queueSize)
 	{
 		// get command(s)
-		std::vector<std::string> commands = _commandsQueue.front();
-		_commandsQueue.pop();
-		_commandsLock.unlock();
+		std::vector<std::string> commands = m_commandsQueue.front();
+		m_commandsQueue.pop();
+		m_commandsLock.unlock();
 
 		// execute the command(s)
 		Size errorCount = 0;
@@ -327,13 +327,13 @@ void Mintye::ConsoleWindow::execute_commands()
 		}
 
 		// get new count
-		_commandsLock.lock();
-		queueSize = _commandsQueue.size();
+		m_commandsLock.lock();
+		queueSize = m_commandsQueue.size();
 	}
 
 	// all done
-	_commandsThreadRunning = false;
-	_commandsLock.unlock();
+	m_commandsThreadRunning = false;
+	m_commandsLock.unlock();
 }
 
 Mintye::ConsoleWindow::Line::Line(std::string const& text, Color color)

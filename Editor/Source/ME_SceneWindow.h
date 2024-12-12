@@ -9,14 +9,14 @@ namespace Mintye
 		: public EditorWindow
 	{
 	private:
-		Minty::Float3 _cameraPosition;
-		Minty::Float3 _cameraOrientation;
-		Minty::Quaternion _cameraRotation;
-		Minty::Camera _camera;
+		Minty::Float3 m_cameraPosition;
+		Minty::Float3 m_cameraOrientation;
+		Minty::Quaternion m_cameraRotation;
+		Minty::Camera m_camera;
 
-		bool _isMouseMoving;
-		bool _isMouseRotating;
-		Minty::Float2 _mouseDragPos;
+		bool m_isMouseMoving;
+		bool m_isMouseRotating;
+		Minty::Float2 m_mouseDragPos;
 
 	public:
 		SceneWindow(EditorApplication& application);

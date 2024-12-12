@@ -4,33 +4,33 @@ using namespace Minty;
 using namespace Mintye;
 
 Mintye::BuildInfo::BuildInfo()
-	: _buildFlags(BuildFlags::All)
-	, _release()
+	: m_buildFlags(BuildFlags::All)
+	, m_release()
 {}
 
 bool Mintye::BuildInfo::get_flag(BuildFlags const flag) const
 {
-	return (_buildFlags & flag) != BuildFlags::None;
+	return (m_buildFlags & flag) != BuildFlags::None;
 }
 
 void Mintye::BuildInfo::set_flag(BuildFlags const flag)
 {
-	_buildFlags = _buildFlags | flag;
+	m_buildFlags = m_buildFlags | flag;
 }
 
 void Mintye::BuildInfo::clear_flags()
 {
-	_buildFlags = BuildFlags::None;
+	m_buildFlags = BuildFlags::None;
 }
 
 void Mintye::BuildInfo::set_config(bool const release)
 {
-	_release = release;
+	m_release = release;
 }
 
 String const Mintye::BuildInfo::get_config_name() const
 {
-	return _release ? "Release" : "Debug";
+	return m_release ? "Release" : "Debug";
 }
 
 BuildInfo::BuildFlags Mintye::operator|(BuildInfo::BuildFlags const left, BuildInfo::BuildFlags const right)

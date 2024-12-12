@@ -10,12 +10,12 @@ constexpr static float MOUSE_ROTATE_SENSITIVITY = 0.1f;
 
 Mintye::SceneWindow::SceneWindow(EditorApplication& application)
 	: EditorWindow(application)
-	, _cameraPosition()
-	, _cameraRotation()
-	, _camera()
-	, _isMouseMoving()
-	, _isMouseRotating()
-	, _mouseDragPos()
+	, m_cameraPosition()
+	, m_cameraRotation()
+	, m_camera()
+	, m_isMouseMoving()
+	, m_isMouseRotating()
+	, m_mouseDragPos()
 {}
 
 void Mintye::SceneWindow::draw()
@@ -27,7 +27,7 @@ void Mintye::SceneWindow::draw()
 		return;
 	}
 
-	Renderer::set_camera(_cameraPosition, _cameraRotation, _camera);
+	Renderer::set_camera(m_cameraPosition, m_cameraRotation, m_camera);
 
 	// for now, move the render location to fake a scene window
 	Float2 windowPos = GUI::get_window_position();
@@ -47,58 +47,58 @@ void Mintye::SceneWindow::draw()
 	// get input
 	if (GUI::is_window_hovered())
 	{
-		if (!_isMouseMoving && !_isMouseRotating && GUI::is_mouse_down(MouseButton::Middle))
+		if (!m_isMouseMoving && !m_isMouseRotating && GUI::is_mouse_down(MouseButton::Middle))
 		{
 			// first down
-			_isMouseMoving = true;
-			_mouseDragPos = GUI::get_mouse_position();
+			m_isMouseMoving = true;
+			m_mouseDragPos = GUI::get_mouse_position();
 		}
 
-		if (!_isMouseMoving && !_isMouseRotating && GUI::is_mouse_down(MouseButton::Right))
+		if (!m_isMouseMoving && !m_isMouseRotating && GUI::is_mouse_down(MouseButton::Right))
 		{
-			_isMouseRotating = true;
-			_mouseDragPos = GUI::get_mouse_position();
+			m_isMouseRotating = true;
+			m_mouseDragPos = GUI::get_mouse_position();
 		}
 
-		if (_isMouseMoving)
+		if (m_isMouseMoving)
 		{
 			// move
 			Float2 mousePos = GUI::get_mouse_position();
 
-			_cameraPosition += -1.0f * MOUSE_MOVE_SENSITIVITY * (right(_cameraRotation) * (mousePos.x - _mouseDragPos.x));
-			_cameraPosition += 1.0f * MOUSE_MOVE_SENSITIVITY * (up(_cameraRotation) * (mousePos.y - _mouseDragPos.y));
+			m_cameraPosition += -1.0f * MOUSE_MOVE_SENSITIVITY * (right(m_cameraRotation) * (mousePos.x - m_mouseDragPos.x));
+			m_cameraPosition += 1.0f * MOUSE_MOVE_SENSITIVITY * (up(m_cameraRotation) * (mousePos.y - m_mouseDragPos.y));
 
-			_mouseDragPos = mousePos;
+			m_mouseDragPos = mousePos;
 		}
 
-		if (_isMouseRotating)
+		if (m_isMouseRotating)
 		{
 			// yaw is Y, pitch is X
 
 			Float2 mousePos = GUI::get_mouse_position();
 
-			_cameraOrientation += MOUSE_ROTATE_SENSITIVITY * Float3(-(mousePos.y - _mouseDragPos.y), (mousePos.x - _mouseDragPos.x), 0.0f);
-			_cameraOrientation.x = Math::clamp(_cameraOrientation.x, -90.0f + 0.1f, 90.0f - 0.1f);
+			m_cameraOrientation += MOUSE_ROTATE_SENSITIVITY * Float3(-(mousePos.y - m_mouseDragPos.y), (mousePos.x - m_mouseDragPos.x), 0.0f);
+			m_cameraOrientation.x = Math::clamp(m_cameraOrientation.x, -90.0f + 0.1f, 90.0f - 0.1f);
 
-			_mouseDragPos = mousePos;
+			m_mouseDragPos = mousePos;
 
 			// set yaw and pitch back
-			_cameraRotation = from_euler(_cameraOrientation);
+			m_cameraRotation = from_euler(m_cameraOrientation);
 		}
 
-		_cameraPosition += forward(_cameraRotation) * GUI::get_mouse_wheel();
+		m_cameraPosition += forward(m_cameraRotation) * GUI::get_mouse_wheel();
 	}
 
-	if (_isMouseMoving && !GUI::is_mouse_down(MouseButton::Middle))
+	if (m_isMouseMoving && !GUI::is_mouse_down(MouseButton::Middle))
 	{
 		// stop moving
-		_isMouseMoving = false;
+		m_isMouseMoving = false;
 	}
 
-	if (_isMouseRotating && !GUI::is_mouse_down(MouseButton::Right))
+	if (m_isMouseRotating && !GUI::is_mouse_down(MouseButton::Right))
 	{
 		// stop rotating
-		_isMouseRotating = false;
+		m_isMouseRotating = false;
 	}
 
 	GUI::end();
@@ -119,6 +119,6 @@ void Mintye::SceneWindow::focus(Minty::Entity const entity)
 
 	if (TransformComponent* transformComponent = registry.try_get<TransformComponent>(entity))
 	{
-		_cameraPosition = transformComponent->get_global_position() - forward(_cameraRotation) * transformComponent->get_global_scale().z;
+		m_cameraPosition = transformComponent->get_global_position() - forward(m_cameraRotation) * transformComponent->get_global_scale().z;
 	}
 }

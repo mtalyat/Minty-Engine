@@ -3,13 +3,13 @@
 using namespace Minty;
 using namespace Mintye;
 
-std::unordered_map<String, MetaClass> MetaDatabase::_classes = std::unordered_map<String, MetaClass>();
+std::unordered_map<String, MetaClass> MetaDatabase::m_classes = std::unordered_map<String, MetaClass>();
 
 Type Mintye::MetaClass::get(String const& member) const
 {
-	auto found = _members.find(member);
+	auto found = m_members.find(member);
 
-	if (found == _members.end())
+	if (found == m_members.end())
 	{
 		return Type::Undefined;
 	}
@@ -26,14 +26,14 @@ void Mintye::MetaDatabase::initialize()
 
 void Mintye::MetaDatabase::shutdown()
 {
-	_classes.clear();
+	m_classes.clear();
 }
 
 Type Mintye::MetaDatabase::get(String const& name, String const& member)
 {
-	auto found = _classes.find(name);
+	auto found = m_classes.find(name);
 
-	if (found == _classes.end()) return Type::Undefined;
+	if (found == m_classes.end()) return Type::Undefined;
 
 	return found->second.get(member);
 }

@@ -15,14 +15,14 @@ namespace Mintye
 		};
 
 	private:
-		TargetMode _targetMode;
+		TargetMode m_targetMode;
 
-		bool _targetIsBuiltIn;
-		Minty::UUID _targetId;
-		Minty::Entity _targetEntity;
-		Minty::Path _targetPath;
+		bool m_targetIsBuiltIn;
+		Minty::UUID m_targetId;
+		Minty::Entity m_targetEntity;
+		Minty::Path m_targetPath;
 
-		std::vector<Minty::String> _texts;
+		std::vector<Minty::String> m_texts;
 	public:
 		PropertiesWindow(EditorApplication& application);
 

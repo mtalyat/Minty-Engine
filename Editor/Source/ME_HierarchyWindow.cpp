@@ -14,9 +14,9 @@ using namespace Minty;
 
 Mintye::HierarchyWindow::HierarchyWindow(EditorApplication& application)
 	: EditorWindow(application)
-	, _registeredSystems()
-	, _selected(NULL_ENTITY)
-	, _clicked(NULL_ENTITY)
+	, m_registeredSystems()
+	, m_selected(NULL_ENTITY)
+	, m_clicked(NULL_ENTITY)
 {}
 
 void Mintye::HierarchyWindow::draw()
@@ -96,7 +96,7 @@ void Mintye::HierarchyWindow::draw()
 		// on left click, select
 		// print with indent
 		String name = std::format("{}##entity{}", String((familyStack.size() - 1) << 1, ' ').append(entityRegistry.get_name_safe(entity)), i);
-		if (GUI::selectable(name.c_str(), entity == _selected))
+		if (GUI::selectable(name.c_str(), entity == m_selected))
 		{
 			set_selected(entity);
 		}
@@ -121,7 +121,7 @@ void Mintye::HierarchyWindow::draw()
 
 		// on left click, select
 		String name = std::format("{}##entity{}", entityRegistry.get_name_safe(entity), i);
-		if (GUI::selectable(name.c_str(), entity == _selected))
+		if (GUI::selectable(name.c_str(), entity == m_selected))
 		{
 			set_selected(entity);
 		}
@@ -155,8 +155,8 @@ void Mintye::HierarchyWindow::draw()
 
 void Mintye::HierarchyWindow::reset()
 {
-	_selected = NULL_ENTITY;
-	_clicked = NULL_ENTITY;
+	m_selected = NULL_ENTITY;
+	m_clicked = NULL_ENTITY;
 }
 
 void Mintye::HierarchyWindow::refresh()
@@ -168,7 +168,7 @@ void Mintye::HierarchyWindow::set_project(Project* const project)
 {
 	EditorWindow::set_project(project);
 
-	_registeredSystems = SystemRegistry::get_registered_systems();
+	m_registeredSystems = SystemRegistry::get_registered_systems();
 }
 
 void Mintye::HierarchyWindow::set_scene(Minty::Ref<Minty::Scene> const scene)
@@ -176,7 +176,7 @@ void Mintye::HierarchyWindow::set_scene(Minty::Ref<Minty::Scene> const scene)
 	if (get_scene() != scene)
 	{
 		// new scene
-		_selected = NULL_ENTITY;
+		m_selected = NULL_ENTITY;
 	}
 
 	EditorWindow::set_scene(scene);
@@ -233,12 +233,12 @@ Minty::Entity Mintye::HierarchyWindow::paste_entity()
 
 void Mintye::HierarchyWindow::destroy_entity(Minty::Entity const entity)
 {
-	if (entity == _clicked)
+	if (entity == m_clicked)
 	{
 		set_clicked(NULL_ENTITY);
 	}
 
-	if (entity == _selected)
+	if (entity == m_selected)
 	{
 		set_selected(NULL_ENTITY);
 	}
@@ -271,7 +271,7 @@ void Mintye::HierarchyWindow::focus_entity(Minty::Entity const entity)
 
 void Mintye::HierarchyWindow::set_clicked(Minty::Entity const entity)
 {
-	_clicked = entity;
+	m_clicked = entity;
 }
 
 void Mintye::HierarchyWindow::set_selected(Minty::Entity const entity)
@@ -281,26 +281,26 @@ void Mintye::HierarchyWindow::set_selected(Minty::Entity const entity)
 	{
 		properties->set_target(entity);
 	}
-	_selected = entity;
+	m_selected = entity;
 }
 
 void Mintye::HierarchyWindow::draw_popup()
 {
 	EntityRegistry& registry = get_scene()->get_entity_registry();
 
-	if (GUI::menu_item("Cut", "", false, _clicked != NULL_ENTITY))
+	if (GUI::menu_item("Cut", "", false, m_clicked != NULL_ENTITY))
 	{
 		// copy entity to clipboard
-		copy_entity(_clicked);
+		copy_entity(m_clicked);
 
 		// delete entity
-		destroy_entity(_clicked);
+		destroy_entity(m_clicked);
 
 		return;
 	}
-	if (GUI::menu_item("Copy", "", false, _clicked != NULL_ENTITY))
+	if (GUI::menu_item("Copy", "", false, m_clicked != NULL_ENTITY))
 	{
-		copy_entity(_clicked);
+		copy_entity(m_clicked);
 
 		return;
 	}
@@ -310,7 +310,7 @@ void Mintye::HierarchyWindow::draw_popup()
 		Entity entity = paste_entity();
 
 		// set to same parent as clicked
-		Entity parent = registry.get_parent(_clicked);
+		Entity parent = registry.get_parent(m_clicked);
 		registry.set_parent(entity, parent);
 
 		// select
@@ -318,12 +318,12 @@ void Mintye::HierarchyWindow::draw_popup()
 
 		return;
 	}
-	if (GUI::menu_item("Paste as child", "", false, clipboardText.starts_with("Minty Entity") && _clicked != NULL_ENTITY))
+	if (GUI::menu_item("Paste as child", "", false, clipboardText.starts_with("Minty Entity") && m_clicked != NULL_ENTITY))
 	{
 		Entity entity = paste_entity();
 
 		// set parent as clicked
-		registry.set_parent(entity, _clicked);
+		registry.set_parent(entity, m_clicked);
 
 		// select
 		set_selected(entity);
@@ -333,9 +333,9 @@ void Mintye::HierarchyWindow::draw_popup()
 
 	GUI::separator();
 
-	if (GUI::menu_item("Focus", "", false, _clicked != NULL_ENTITY))
+	if (GUI::menu_item("Focus", "", false, m_clicked != NULL_ENTITY))
 	{
-		focus_entity(_clicked);
+		focus_entity(m_clicked);
 
 		return;
 	}
@@ -343,15 +343,15 @@ void Mintye::HierarchyWindow::draw_popup()
 	{
 		return;
 	}
-	if (GUI::menu_item("Duplicate", "", false, _clicked != NULL_ENTITY))
+	if (GUI::menu_item("Duplicate", "", false, m_clicked != NULL_ENTITY))
 	{
-		set_selected(clone_entity(_clicked));
+		set_selected(clone_entity(m_clicked));
 
 		return;
 	}
-	if (GUI::menu_item("Delete", "", false, _clicked != NULL_ENTITY))
+	if (GUI::menu_item("Delete", "", false, m_clicked != NULL_ENTITY))
 	{
-		destroy_entity(_clicked);
+		destroy_entity(m_clicked);
 
 		return;
 	}
@@ -366,9 +366,9 @@ void Mintye::HierarchyWindow::draw_popup()
 		get_scene()->sort();
 
 		// set parent as clicked, if there was one
-		if (_clicked != NULL_ENTITY)
+		if (m_clicked != NULL_ENTITY)
 		{
-			registry.set_parent(newEntity, _clicked);
+			registry.set_parent(newEntity, m_clicked);
 		}
 
 		return;
@@ -385,20 +385,20 @@ void Mintye::HierarchyWindow::run_shortcuts()
 		if (GUI::is_key_modifier_pressed(KeyModifiers::Control))
 		{
 			// must have something selected
-			if (_selected != NULL_ENTITY)
+			if (m_selected != NULL_ENTITY)
 			{
 				if (GUI::is_key_pressed(Key::X)) // cut
 				{
-					copy_entity(_selected);
-					destroy_entity(_selected);
+					copy_entity(m_selected);
+					destroy_entity(m_selected);
 				}
 				if (GUI::is_key_pressed(Key::C)) // copy
 				{
-					copy_entity(_selected);
+					copy_entity(m_selected);
 				}
 				if (GUI::is_key_pressed(Key::D)) // duplicate
 				{
-					Entity entity = clone_entity(_selected);
+					Entity entity = clone_entity(m_selected);
 					set_selected(entity);
 				}
 			}
@@ -406,22 +406,22 @@ void Mintye::HierarchyWindow::run_shortcuts()
 			if (GUI::is_key_pressed(Key::V)) // paste
 			{
 				Entity entity = paste_entity();
-				registry.set_parent(entity, registry.get_parent(_selected));
+				registry.set_parent(entity, registry.get_parent(m_selected));
 				set_selected(entity);
 			}
 		}
 
 		// no ctrl
 
-		if (_selected != NULL_ENTITY)
+		if (m_selected != NULL_ENTITY)
 		{
 			if (GUI::is_key_pressed(Key::Delete)) // delete
 			{
-				destroy_entity(_selected);
+				destroy_entity(m_selected);
 			}
 			if (GUI::is_key_pressed(Key::F)) // delete
 			{
-				focus_entity(_selected);
+				focus_entity(m_selected);
 			}
 		}
 	}

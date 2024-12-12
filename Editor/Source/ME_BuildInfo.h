@@ -47,9 +47,9 @@ namespace Mintye
 		friend BuildFlags operator &(BuildFlags const left, BuildFlags const right);
 
 	private:
-		BuildFlags _buildFlags;
+		BuildFlags m_buildFlags;
 
-		bool _release;
+		bool m_release;
 
 	public:
 		BuildInfo();
@@ -68,8 +68,8 @@ namespace Mintye
 
 		void set_config(bool const release);
 
-		bool is_release() const { return _release; }
-		bool is_debug() const { return !_release; }
+		bool is_release() const { return m_release; }
+		bool is_debug() const { return !m_release; }
 
 		Minty::String const get_config_name() const;
 

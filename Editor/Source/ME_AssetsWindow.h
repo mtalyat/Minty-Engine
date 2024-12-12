@@ -17,10 +17,10 @@ namespace Mintye
 		};
 
 	private:
-		Minty::Path _path;
+		Minty::Path m_path;
 
-		std::vector<Minty::Path> _directories;
-		std::vector<FileData> _files;
+		std::vector<Minty::Path> m_directories;
+		std::vector<FileData> m_files;
 
 	public:
 		AssetsWindow(EditorApplication& application);

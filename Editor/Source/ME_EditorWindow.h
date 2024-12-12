@@ -10,9 +10,9 @@ namespace Mintye
 	class EditorWindow
 	{
 	private:
-		EditorApplication* _application;
-		Project* _project;
-		Minty::Ref<Minty::Scene> _scene;
+		EditorApplication* mp_application;
+		Project* mp_project;
+		Minty::Ref<Minty::Scene> m_scene;
 
 	public:
 		EditorWindow(EditorApplication& application);

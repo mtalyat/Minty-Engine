@@ -4,20 +4,20 @@ using namespace Minty;
 using namespace Mintye;
 
 Mintye::FileWatcher::FileWatcher(Minty::Path const& directory, OnChangeFunc const& action)
-	: _directory(directory)
-	, _action(action)
+	: m_directory(directory)
+	, m_action(action)
 {}
 
 void Mintye::FileWatcher::update()
 {
 	// check for deletions
-	auto it = _files.begin();
-	while (it != _files.end())
+	auto it = m_files.begin();
+	while (it != m_files.end())
 	{
 		if (!std::filesystem::exists(it->first))
 		{
-			_action(it->first, FileStatus::Deleted);
-			it = _files.erase(it);
+			m_action(it->first, FileStatus::Deleted);
+			it = m_files.erase(it);
 		}
 		else
 		{
@@ -26,24 +26,24 @@ void Mintye::FileWatcher::update()
 	}
 
 	// check for creations/modifications
-	for (auto const& entry : std::filesystem::recursive_directory_iterator(_directory))
+	for (auto const& entry : std::filesystem::recursive_directory_iterator(m_directory))
 	{
 		Path path = std::filesystem::absolute(entry.path());
 
 		auto lastWriteTime = std::filesystem::last_write_time(path);
 
-		if (!_files.contains(path))
+		if (!m_files.contains(path))
 		{
-			_files.emplace(path, FileData
+			m_files.emplace(path, FileData
 				{
 					.lastModification = lastWriteTime
 				});
-			_action(path, FileStatus::Created);
+			m_action(path, FileStatus::Created);
 		}
-		else if(_files.at(path).lastModification != lastWriteTime)
+		else if(m_files.at(path).lastModification != lastWriteTime)
 		{
-			_files.at(path).lastModification = lastWriteTime;
-			_action(path, FileStatus::Modified);
+			m_files.at(path).lastModification = lastWriteTime;
+			m_action(path, FileStatus::Modified);
 		}
 	}
 }

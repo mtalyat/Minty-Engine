@@ -46,22 +46,22 @@ namespace Mintye
 	private:
 		constexpr static char const* NAME = "Minty Editor";
 	private:
-		EditorApplicationData _data;
-		BuildInfo _buildInfo;
+		EditorApplicationData m_data;
+		BuildInfo m_buildInfo;
 
 		// info needed for a loaded project:
-		Project* _project;
-		FileWatcher* _watcher;
-		Minty::UUID _sceneId;
+		Project* mp_project;
+		FileWatcher* mp_watcher;
+		Minty::UUID m_sceneId;
 
 		// starting working directory
-		Minty::Path _cwd;
+		Minty::Path m_cwd;
 
 		// editor windows to be drawn
-		std::unordered_map<Minty::String, EditorWindow*> _editorWindows;
+		std::unordered_map<Minty::String, EditorWindow*> m_editorWindows;
 
 		// tasks being ran (such as building)
-		Minty::TaskFactory<void> _taskFactory;
+		Minty::TaskFactory<void> m_taskFactory;
 	public:
 		EditorApplication();
 
@@ -278,9 +278,9 @@ namespace Mintye
 	template<typename T>
 	T* EditorApplication::find_editor_window(Minty::String const& name)
 	{
-		auto found = _editorWindows.find(name);
+		auto found = m_editorWindows.find(name);
 
-		if (found == _editorWindows.end())
+		if (found == m_editorWindows.end())
 		{
 			// none with that name
 			MINTY_ERROR_FORMAT("No editor window with the message \"{}\" exists.", name);

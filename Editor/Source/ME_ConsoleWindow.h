@@ -30,15 +30,15 @@ namespace Mintye
 		// commands that are handled by the editor
 		std::unordered_map <Minty::String, std::function<void()>> _editorCommands;
 
-		Minty::String _filter;
+		Minty::String m_filter;
 
-		int _maxLines;
-		std::deque<Line> _lines;
-		std::mutex _linesLock;
+		int m_maxLines;
+		std::deque<Line> m_lines;
+		std::mutex m_linesLock;
 
-		std::queue<std::vector<std::string>> _commandsQueue;
-		std::mutex _commandsLock;
-		bool _commandsThreadRunning;
+		std::queue<std::vector<std::string>> m_commandsQueue;
+		std::mutex m_commandsLock;
+		bool m_commandsThreadRunning;
 	public:
 		ConsoleWindow(EditorApplication& application);
 

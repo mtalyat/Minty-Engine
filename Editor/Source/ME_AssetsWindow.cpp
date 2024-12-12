@@ -11,9 +11,9 @@ namespace fs = std::filesystem;
 
 Mintye::AssetsWindow::AssetsWindow(EditorApplication& application)
 	: EditorWindow(application)
-	, _path()
-	, _directories()
-	, _files()
+	, m_path()
+	, m_directories()
+	, m_files()
 {
 	// go to base folder
 	set_path("");
@@ -48,7 +48,7 @@ void Mintye::AssetsWindow::draw()
 
 	GUI::same_line();
 
-	bool inBuiltInDirectory = _path.string().starts_with("BuiltIn");
+	bool inBuiltInDirectory = m_path.string().starts_with("BuiltIn");
 
 	static bool popupOpen = false;
 
@@ -76,7 +76,7 @@ void Mintye::AssetsWindow::draw()
 		if (GUI::button("Create") || GUI::is_key_pressed(Key::Enter))
 		{
 			// create new file in the currently selected folder, if it does not exist
-			Path path = get_project()->get_base_path() / _path / newAssetName;
+			Path path = get_project()->get_base_path() / m_path / newAssetName;
 
 			if (!AssetManager::exists(path))
 			{
@@ -125,7 +125,7 @@ void Mintye::AssetsWindow::draw()
 		if (GUI::button("Create") || GUI::is_key_pressed(Key::Enter))
 		{
 			// create new file in the currently selected folder, if it does not exist
-			Path path = get_project()->get_base_path() / _path / newDirectoryName;
+			Path path = get_project()->get_base_path() / m_path / newDirectoryName;
 
 			// creating new directory
 			get_application().create_directory(path);
@@ -150,7 +150,7 @@ void Mintye::AssetsWindow::draw()
 	if (!inBuiltInDirectory && GUI::button("Open Folder"))
 	{
 		// open the assets folder
-		Operation::open(project->get_base_path() / _path);
+		Operation::open(project->get_base_path() / m_path);
 	}
 
 	GUI::separator();
@@ -161,12 +161,12 @@ void Mintye::AssetsWindow::draw()
 
 	// draw a list of buttons with their paths
 	// always draw back
-	if (!_path.empty())
+	if (!m_path.empty())
 	{
 		if (GUI::button_left("../", itemSize))
 		{
 			// go back
-			if (!_path.has_parent_path())
+			if (!m_path.has_parent_path())
 			{
 				// go back to Assets
 				set_path("");
@@ -174,20 +174,20 @@ void Mintye::AssetsWindow::draw()
 			else
 			{
 				// go to previous folder
-				set_path(_path.parent_path());
+				set_path(m_path.parent_path());
 			}
 		}
 		GUI::dummy(spacing);
 	}
 
 	// draw directories
-	for (auto const& path : _directories)
+	for (auto const& path : m_directories)
 	{
 		// if clicked, move to new directory
 		if (GUI::button_left(path.string().append("/").c_str(), itemSize))
 		{
 			// move to new folder
-			set_path(_path / path);
+			set_path(m_path / path);
 			break;
 		}
 
@@ -197,7 +197,7 @@ void Mintye::AssetsWindow::draw()
 	Ref<Scene> scene = get_scene();
 
 	// draw files
-	for (auto const& fileData : _files)
+	for (auto const& fileData : m_files)
 	{
 		String name = fileData.path.string();
 
@@ -218,13 +218,13 @@ void Mintye::AssetsWindow::draw()
 		{
 			EditorApplication& app = get_application();
 
-			if (_path.string().starts_with("BuiltIn"))
+			if (m_path.string().starts_with("BuiltIn"))
 			{
-				app.open_asset(_path / fileData.path);
+				app.open_asset(m_path / fileData.path);
 			}
 			else
 			{
-				app.open_asset(project->get_base_path() / _path / fileData.path);
+				app.open_asset(project->get_base_path() / m_path / fileData.path);
 			}
 		}
 
@@ -314,17 +314,17 @@ void Mintye::AssetsWindow::reset()
 void Mintye::AssetsWindow::refresh()
 {
 	// re-populate the editor files
-	set_path(_path);
+	set_path(m_path);
 }
 
 void Mintye::AssetsWindow::set_path(Minty::Path const& path)
 {
 	// set the new path
-	_path = path;
+	m_path = path;
 
 	// clear old data
-	_directories.clear();
-	_files.clear();
+	m_directories.clear();
+	m_files.clear();
 
 	Project* project = get_project();
 
@@ -332,10 +332,10 @@ void Mintye::AssetsWindow::set_path(Minty::Path const& path)
 	if (!project) return;
 
 	// if empty path, just do the base asset location options
-	if (_path.empty())
+	if (m_path.empty())
 	{
-		_directories.push_back("Assets");
-		_directories.push_back("BuiltIn");
+		m_directories.push_back("Assets");
+		m_directories.push_back("BuiltIn");
 
 		return;
 	}
@@ -349,7 +349,7 @@ void Mintye::AssetsWindow::set_path(Minty::Path const& path)
 	};
 
 	// if BuiltIn, grab from AssetManager
-	if (_path.string().starts_with("BuiltIn"))
+	if (m_path.string().starts_with("BuiltIn"))
 	{
 		// TODO: filter out directories and such
 
@@ -367,7 +367,7 @@ void Mintye::AssetsWindow::set_path(Minty::Path const& path)
 				if (Asset::get_type_from_path(entry.path) == AssetType::Meta) continue;
 
 				// for now, add directly
-				_files.push_back(FileData
+				m_files.push_back(FileData
 					{
 						.path = entry.path,
 						.canIncludeInScene = !cannotIncludeToScene.contains(Asset::get_type_from_path(entry.path)),
@@ -380,10 +380,10 @@ void Mintye::AssetsWindow::set_path(Minty::Path const& path)
 	}
 
 	// if Assets, grab from disk
-	if (_path.string().starts_with("Assets"))
+	if (m_path.string().starts_with("Assets"))
 	{
 		// real path
-		Path fullPath = project->get_base_path() / _path;
+		Path fullPath = project->get_base_path() / m_path;
 
 		// update directories and paths
 		for (auto const& entry : fs::directory_iterator(fullPath))
@@ -391,12 +391,12 @@ void Mintye::AssetsWindow::set_path(Minty::Path const& path)
 			// ignore hidden directories (such as .vscode)
 			if (fs::is_directory(entry.status()) && !fullPath.stem().string().starts_with("."))
 			{
-				_directories.push_back(entry.path().stem());
+				m_directories.push_back(entry.path().stem());
 			}
 			// add all regular files that aren't meta
 			else if (fs::is_regular_file(entry.status()) && Asset::get_type_from_path(entry.path()) != AssetType::Meta)
 			{
-				_files.push_back(FileData{
+				m_files.push_back(FileData{
 					.path = entry.path().filename(),
 					.canIncludeInScene = !cannotIncludeToScene.contains(Asset::get_type_from_path(entry.path())),
 					.includedInScene = scene.get() && scene->is_registered(get_path(entry.path()).lexically_relative(project->get_base_path())),
@@ -410,5 +410,5 @@ void Mintye::AssetsWindow::set_path(Minty::Path const& path)
 
 Minty::Path Mintye::AssetsWindow::get_path(Minty::Path const& path) const
 {
-	return get_project()->get_base_path() / _path / path;
+	return get_project()->get_base_path() / m_path / path;
 }
