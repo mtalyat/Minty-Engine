@@ -3,6 +3,7 @@
 #include "ME_EditorApplication.h"
 #include "ME_Project.h"
 #include "ME_ConsoleWindow.h"
+#include "ME_Constants.h"
 #include <filesystem>
 
 using namespace Minty;
@@ -218,7 +219,7 @@ void Mintye::AssetsWindow::draw()
 		{
 			EditorApplication& app = get_application();
 
-			if (m_path.string().starts_with("BuiltIn"))
+			if (m_path.string().starts_with(BUILT_IN_DIRECTORY_NAME))
 			{
 				app.open_asset(m_path / fileData.path);
 			}
@@ -335,7 +336,7 @@ void Mintye::AssetsWindow::set_path(Minty::Path const& path)
 	if (m_path.empty())
 	{
 		m_directories.push_back("Assets");
-		m_directories.push_back("BuiltIn");
+		m_directories.push_back(BUILT_IN_DIRECTORY_NAME);
 
 		return;
 	}
@@ -349,7 +350,7 @@ void Mintye::AssetsWindow::set_path(Minty::Path const& path)
 	};
 
 	// if BuiltIn, grab from AssetManager
-	if (m_path.string().starts_with("BuiltIn"))
+	if (m_path.string().starts_with(BUILT_IN_DIRECTORY_NAME))
 	{
 		// TODO: filter out directories and such
 
