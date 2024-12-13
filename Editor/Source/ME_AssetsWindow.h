@@ -11,7 +11,7 @@ namespace Mintye
 	private:
 		struct FileData
 		{
-			Minty::Path path;
+			Minty::String name;
 			bool canIncludeInScene;
 			bool includedInScene;
 		};

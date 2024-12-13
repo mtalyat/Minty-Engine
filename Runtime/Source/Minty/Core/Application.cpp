@@ -345,7 +345,7 @@ Bool Minty::Application::load_initial_scene()
 	AssetManager::close_reader(container, reader);
 
 	// if scene was given, make sure it exists
-	MINTY_ASSERT_FORMAT(AssetManager::exists(scenePath), "No initial Scene found at path \"{}\".", scenePath.generic_string());
+	MINTY_ASSERT_FORMAT(AssetManager::exists(scenePath), "No initial Scene found at name \"{}\".", scenePath.generic_string());
 
 	// load the scene
 	m_sceneManager.load(scenePath);

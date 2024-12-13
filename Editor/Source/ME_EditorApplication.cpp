@@ -237,7 +237,7 @@ void Mintye::EditorApplication::load_project(Minty::Path const& path)
 	if (!std::filesystem::exists(path))
 	{
 		ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console");
-		console->log_error(std::format("Cannot load project with path \"{}\". It does not exist.", path.string()));
+		console->log_error(std::format("Cannot load project with name \"{}\". It does not exist.", path.string()));
 		return;
 	}
 

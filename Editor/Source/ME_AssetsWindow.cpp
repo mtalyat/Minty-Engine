@@ -200,7 +200,7 @@ void Mintye::AssetsWindow::draw()
 	// draw files
 	for (auto const& fileData : m_files)
 	{
-		String name = fileData.path.string();
+		String name = fileData.name;
 
 		if (scene.get() && fileData.canIncludeInScene)
 		{
@@ -221,11 +221,11 @@ void Mintye::AssetsWindow::draw()
 
 			if (m_path.string().starts_with(BUILT_IN_DIRECTORY_NAME))
 			{
-				app.open_asset(m_path / fileData.path);
+				app.open_asset(m_path / fileData.name);
 			}
 			else
 			{
-				app.open_asset(project->get_base_path() / m_path / fileData.path);
+				app.open_asset(project->get_base_path() / m_path / fileData.name);
 			}
 		}
 
@@ -234,7 +234,7 @@ void Mintye::AssetsWindow::draw()
 		{
 			// inverse selection
 
-			Path projectPath = get_path(fileData.path).lexically_relative(project->get_base_path());
+			Path projectPath = get_path(fileData.name).lexically_relative(project->get_base_path());
 
 			if (scene->is_registered(projectPath))
 			{
@@ -254,7 +254,8 @@ void Mintye::AssetsWindow::draw()
 				{
 					// no dependencies, and not loaded, so just unregister it
 					scene->unregister_asset(projectPath);
-				} else
+				}
+				else
 				{
 					// get dependents
 					std::vector<Ref<Asset>> dependentAssets = AssetManager::get_dependents(asset);
@@ -335,8 +336,17 @@ void Mintye::AssetsWindow::set_path(Minty::Path const& path)
 	// if empty path, just do the base asset location options
 	if (m_path.empty())
 	{
+		// add Assets directory first always
 		m_directories.push_back("Assets");
-		m_directories.push_back(BUILT_IN_DIRECTORY_NAME);
+
+		// add wraps
+		Wrapper const& wrapper = AssetManager::get_wrapper();
+		for (Size i = 0; i < wrapper.get_wrap_count(); i++)
+		{
+			Wrap const& wrap = wrapper.get_wrap(i);
+
+			m_directories.push_back(*Path(wrap.get_base_path()).begin());
+		}
 
 		return;
 	}
@@ -349,38 +359,8 @@ void Mintye::AssetsWindow::set_path(Minty::Path const& path)
 		AssetType::Script
 	};
 
-	// if BuiltIn, grab from AssetManager
-	if (m_path.string().starts_with(BUILT_IN_DIRECTORY_NAME))
-	{
-		// TODO: filter out directories and such
-
-		Wrapper const& wrapper = AssetManager::get_wrapper();
-
-		for (Size i = 0; i < wrapper.get_wrap_count(); i++)
-		{
-			Wrap const& wrap = wrapper.get_wrap(i);
-
-			for (Size j = 0; j < wrap.get_entry_count(); j++)
-			{
-				Wrap::Entry const& entry = wrap.get_entry(j);
-
-				// ignore meta
-				if (Asset::get_type_from_path(entry.path) == AssetType::Meta) continue;
-
-				// for now, add directly
-				m_files.push_back(FileData
-					{
-						.path = entry.path,
-						.canIncludeInScene = !cannotIncludeToScene.contains(Asset::get_type_from_path(entry.path)),
-						.includedInScene = scene.get() && scene->is_registered(Path(wrap.get_base_path()) / entry.path),
-					});
-			}
-		}
-
-		return;
-	}
-
 	// if Assets, grab from disk
+	// if not Assets, load from Wrap files
 	if (m_path.string().starts_with("Assets"))
 	{
 		// real path
@@ -398,14 +378,83 @@ void Mintye::AssetsWindow::set_path(Minty::Path const& path)
 			else if (fs::is_regular_file(entry.status()) && Asset::get_type_from_path(entry.path()) != AssetType::Meta)
 			{
 				m_files.push_back(FileData{
-					.path = entry.path().filename(),
+					.name = entry.path().filename().generic_string(),
 					.canIncludeInScene = !cannotIncludeToScene.contains(Asset::get_type_from_path(entry.path())),
 					.includedInScene = scene.get() && scene->is_registered(get_path(entry.path()).lexically_relative(project->get_base_path())),
 					});
 			}
 		}
+	}
+	else
+	{
+		std::unordered_set<String> usedDirectories;
 
-		return;
+		// wrap path
+		Wrapper const& wrapper = AssetManager::get_wrapper();
+
+		for (Size i = 0; i < wrapper.get_wrap_count(); i++)
+		{
+			Wrap const& wrap = wrapper.get_wrap(i);
+
+			for (Size j = 0; j < wrap.get_entry_count(); j++)
+			{
+				Wrap::Entry const& entry = wrap.get_entry(j);
+
+				// ignore meta
+				if (Asset::get_type_from_path(entry.path) == AssetType::Meta) continue;
+
+				// get full path
+				Path fullPath = Path(wrap.get_base_path()) / Path(entry.path);
+
+				// get path relative to "cwd"
+				std::error_code ec;
+				Path const& relativePath = std::filesystem::relative(fullPath, m_path, ec);
+				if (ec.value())
+				{
+					// cannot get path?
+					MINTY_ERROR_FORMAT("Failed to get relative name from \"{}\" to \"{}\".", fullPath.generic_string(), m_path.generic_string());
+					continue;
+				}
+
+				String relativePathString = relativePath.generic_string();
+
+				// ignore the initial ../ if in the base directory
+				if (relativePathString.starts_with("../"))
+				{
+					continue;
+				}
+
+				// if the first element is a directory: add a directory (if it does not already exist)
+				// if the first element is a file, add the file
+
+				Size index = relativePathString.find("/");
+				if (index == String::npos)
+				{
+					// file
+
+					// for now, add directly
+					m_files.push_back(FileData
+						{
+							.name = relativePathString,
+							.canIncludeInScene = !cannotIncludeToScene.contains(Asset::get_type_from_path(fullPath)),
+							.includedInScene = scene.get() && scene->is_registered(fullPath),
+						});
+				}
+				else
+				{
+					// directory
+					relativePathString = relativePathString.substr(0, index);
+
+					// ignore if already added
+					if (!usedDirectories.contains(relativePathString))
+					{
+						usedDirectories.emplace(relativePathString);
+
+						m_directories.push_back(relativePathString);
+					}
+				}
+			}
+		}
 	}
 }
 
