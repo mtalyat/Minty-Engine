@@ -437,9 +437,6 @@ void Mintye::EditorApplication::unload_scene()
 {
 	if (m_sceneId != INVALID_UUID)
 	{
-		// sync with the renderer first, so we can free up resources
-		Renderer::sync();
-
 		SceneManager& sceneManager = Application::instance().get_scene_manager();
 		sceneManager.unload();
 		set_scene(INVALID_UUID);

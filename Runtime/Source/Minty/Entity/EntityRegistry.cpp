@@ -678,6 +678,13 @@ void Minty::EntityRegistry::destroy_immediate(Entity const entity, Bool const in
 		// trigger events
 		destroy_trigger_events(entity, loaded);
 
+		// destroy script
+		UUID id = get_id(entity);
+		if (id.valid())
+		{
+			ScriptEngine::destroy_object(id);
+		}
+
 		// remove from lookups
 		remove_from_lookup(entity);
 
@@ -716,6 +723,13 @@ void Minty::EntityRegistry::destroy_immediate(Entity const entity, Bool const in
 		// trigger events
 		destroy_trigger_events(e, loaded);
 
+		// destroy script
+		UUID id = get_id(entity);
+		if (id.valid())
+		{
+			ScriptEngine::destroy_object(id);
+		}
+
 		// remove from lookups
 		remove_from_lookup(e);
 
@@ -735,6 +749,13 @@ void Minty::EntityRegistry::destroy_queued()
 	{
 		// call events
 		destroy_trigger_events(entity, loaded);
+
+		// destroy script
+		UUID id = get_id(entity);
+		if (id.valid())
+		{
+			ScriptEngine::destroy_object(id);
+		}
 
 		// remove from UUID lookup
 		remove_from_lookup(entity);
@@ -772,20 +793,16 @@ void Minty::EntityRegistry::destroy_trigger_events(Entity const entity, Bool con
 
 void Minty::EntityRegistry::clear()
 {
-	// call OnDestroy on any scripts
-	for (auto [entity, script, ondestroy] : view<ScriptComponent const, ScriptOnDestroyComponent const>().each())
+	// destroy the entities
+	for (auto const& entity : storage<Entity>())
 	{
-		ondestroy.invoke();
+		destroy_immediate(entity, false);
 	}
-
-	// destroy them all
 	entt::registry::clear();
 
-	// clear the lookup list
+	// clear the lookup list and other data
 	m_idToEntity.clear();
 	m_entityToId.clear();
-
-	// clear tags
 	m_tags.clear();
 }
 
