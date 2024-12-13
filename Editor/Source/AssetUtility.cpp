@@ -17,6 +17,8 @@ Minty::Bool Mintye::AssetUtility::is_plain_text(Minty::AssetType const type)
 		AssetType::Scene,
 		AssetType::Animation,
 		AssetType::Animator,
+		AssetType::Font,
+		AssetType::FontVariant,
 	};
 
 	return readables.contains(type);
