@@ -941,7 +941,7 @@ Bool Minty::AssetManager::load_values(Reader& reader, std::unordered_map<String,
 			{
 				// read ID, then get asset ref, copy pointer to container
 				Ref<Asset> asset{};
-				if (!find_dependency(path, reader, valueName, asset, true))
+				if (find_dependency(path, reader, valueName, asset, true))
 				{
 					return false;
 				}
@@ -974,7 +974,7 @@ Ref<Material> Minty::AssetManager::load_material(Path const& path)
 	Reader* reader;
 	if (open_reader(path, container, reader))
 	{
-		if (!find_dependency<MaterialTemplate>(path, *reader, "Template", builder.materialTemplate, true))
+		if (find_dependency<MaterialTemplate>(path, *reader, "Template", builder.materialTemplate, true))
 		{
 			close_reader(container, reader);
 			return Ref<Material>();
@@ -1008,7 +1008,7 @@ Ref<MaterialTemplate> Minty::AssetManager::load_material_template(Path const& pa
 	Reader* reader;
 	if (open_reader(path, container, reader))
 	{
-		if (!find_dependency<Shader>(path, *reader, "Shader", builder.shader, true))
+		if (find_dependency<Shader>(path, *reader, "Shader", builder.shader, true))
 		{
 			close_reader(container, reader);
 			return Ref<MaterialTemplate>();
@@ -1380,12 +1380,12 @@ Ref<Shader> Minty::AssetManager::load_shader(Path const& path)
 		// modules
 		if (reader->indent("Stages"))
 		{
-			if (!find_dependency<ShaderModule>(path, *reader, "Vertex", builder.vertexShaderModule, true))
+			if (find_dependency<ShaderModule>(path, *reader, "Vertex", builder.vertexShaderModule, true))
 			{
 				close_reader(container, reader);
 				return Ref<Shader>();
 			}
-			if (!find_dependency<ShaderModule>(path, *reader, "Fragment", builder.fragmentShaderModule, true))
+			if (find_dependency<ShaderModule>(path, *reader, "Fragment", builder.fragmentShaderModule, true))
 			{
 				close_reader(container, reader);
 				return Ref<Shader>();
@@ -1395,12 +1395,12 @@ Ref<Shader> Minty::AssetManager::load_shader(Path const& path)
 		}
 
 		// viewport and scissor
-		if (!find_dependency<Viewport>(path, *reader, "Viewport", builder.viewport, false))
+		if (find_dependency<Viewport>(path, *reader, "Viewport", builder.viewport, false))
 		{
 			// default
 			builder.viewport = Renderer::get_viewport();
 		}
-		if (!find_dependency<Scissor>(path, *reader, "Scissor", builder.scissor, false))
+		if (find_dependency<Scissor>(path, *reader, "Scissor", builder.scissor, false))
 		{
 			// default
 			builder.scissor = Renderer::get_scissor();
@@ -1434,12 +1434,16 @@ Ref<Sprite> Minty::AssetManager::load_sprite(Path const& path)
 	Reader* reader;
 	if (open_reader(path, container, reader))
 	{
-		if (!find_dependency(path, *reader, "Texture", builder.texture, false))
+		if (int result = find_dependency(path, *reader, "Texture", builder.texture, false))
 		{
-			// default
-			builder.texture = get<Texture>(DEFAULT_TEXTURE);
+			// default, if not fatal error
+			if (result < 0)
+			{
+				close_reader(container, reader);
+				return Ref<Sprite>();
+			}
 
-			MINTY_ASSERT_MESSAGE(builder.texture != nullptr, "Default Texture not loaded.");
+			builder.texture = get<Texture>(DEFAULT_TEXTURE);
 		}
 		reader->read("CoordinateMode", builder.coordinateMode);
 		reader->read("Offset", builder.offset);

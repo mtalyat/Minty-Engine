@@ -219,13 +219,13 @@ void Mintye::AssetsWindow::draw()
 		{
 			EditorApplication& app = get_application();
 
-			if (m_path.string().starts_with(BUILT_IN_DIRECTORY_NAME))
+			if (m_path.string().starts_with("Assets"))
 			{
-				app.open_asset(m_path / fileData.name);
+				app.open_asset(project->get_base_path() / m_path / fileData.name);
 			}
 			else
 			{
-				app.open_asset(project->get_base_path() / m_path / fileData.name);
+				app.open_asset(m_path / fileData.name);
 			}
 		}
 
@@ -294,7 +294,11 @@ void Mintye::AssetsWindow::draw()
 			}
 			else
 			{
-				scene->register_asset(projectPath);
+				if (!scene->register_asset(projectPath))
+				{
+					EditorApplication& editor = static_cast<EditorApplication&>(Application::instance());
+					editor.log_error(std::format("Failed to register asset at path: \"{}\"", projectPath.generic_string()));
+				}
 			}
 
 			// refresh

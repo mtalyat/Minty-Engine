@@ -273,7 +273,7 @@ namespace Minty
 		/// <param name="required">If true, an error is raised if no valid value with the given name is found.</param>
 		/// <returns>True if found and stored into asset.</returns>
 		template<typename T>
-		static Bool find_dependency(Path const& path, Reader& reader, String const& name, Ref<T>& asset, bool required)
+		static Int find_dependency(Path const& path, Reader& reader, String const& name, Ref<T>& asset, bool required)
 		{
 			UUID id{};
 
@@ -286,7 +286,7 @@ namespace Minty
 				}
 
 				asset.release();
-				return false;
+				return 1;
 			}
 
 			// something read
@@ -300,7 +300,7 @@ namespace Minty
 				}
 
 				asset.release();
-				return false;
+				return 2;
 			}
 
 			// if asset id is valid but asset with id DNE, set to null
@@ -308,12 +308,12 @@ namespace Minty
 			{
 				Debug::log_error(std::format("Cannot load \"{}\": requires a dependency \"{}\" with ID {} that has not been loaded yet.", path.generic_string(), name, to_string(id)));
 				asset.release();
-				return false;
+				return -1;
 			}
 
 			// load asset
 			asset = get<T>(id);
-			return true;
+			return 0;
 		}
 
 	public:

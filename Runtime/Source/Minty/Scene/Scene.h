@@ -115,7 +115,7 @@ namespace Minty
 #pragma region Asset Loading
 
 	public:
-		void register_asset(Path const& path);
+		Bool register_asset(Path const& path);
 
 		void unregister_asset(Path const& path);
 

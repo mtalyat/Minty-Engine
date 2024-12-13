@@ -286,7 +286,7 @@ void Minty::Scene::finalize()
 	mp_entityRegistry->destroy_queued();
 }
 
-void Minty::Scene::register_asset(Path const& path)
+Bool Minty::Scene::register_asset(Path const& path)
 {
 	MINTY_ASSERT_FORMAT(!m_registeredAssets.contains(path), "Asset already registered: \"{}\".", path.generic_string());
 
@@ -296,21 +296,26 @@ void Minty::Scene::register_asset(Path const& path)
 		.id = INVALID_UUID,
 	};
 
-	m_assets.push_back(path);
-
 	// load asset if needed
 	if (m_loaded)
 	{
 		Ref<Asset> asset = AssetManager::load_asset(path);
 
-		if (asset.get())
+		if (asset == nullptr)
 		{
-			m_loadedAssets.emplace(asset->id());
-			data.id = asset->id();
+			// did not load the asset: do not register
+			return false;
 		}
+
+		m_loadedAssets.emplace(asset->id());
+		data.id = asset->id();
 	}
 
+	m_assets.push_back(path);
+
 	m_registeredAssets.emplace(path, data);
+
+	return true;
 }
 
 void Minty::Scene::unregister_asset(Path const& path)
