@@ -124,8 +124,8 @@ namespace Minty
 
 	protected:
 		// runs every update loop
-		virtual void update(Time const& time) {}
-		virtual void update_gui(Time const& time) {}
+		virtual Int update(Time const& time) { return 0; }
+		virtual Int update_gui(Time const& time) { return 0; }
 
 	private:
 		Bool on_window_close(WindowCloseEvent& event);

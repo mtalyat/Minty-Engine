@@ -209,6 +209,16 @@ Int Application::run()
 
 		Renderer::end_frame();
 
+		// unload assets that are marked for delayed unloading
+		if (AssetManager::ready_to_collect())
+		{
+			// wait until frame is done rendering
+			Renderer::sync();
+
+			// destroy asset
+			AssetManager::collect();
+		}
+
 		frames++;
 	}
 

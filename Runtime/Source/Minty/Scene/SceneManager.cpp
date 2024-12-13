@@ -31,7 +31,8 @@ void Minty::SceneManager::unload()
 	if (m_loadedScene == nullptr) return;
 
 	m_loadedScene->unload();
-	AssetManager::unload(m_loadedScene->id());
+	AssetManager::destroy(m_loadedScene->id());
+	//AssetManager::unload(m_loadedScene->id());
 	m_loadedScene = nullptr;
 	
 	// no longer working scene

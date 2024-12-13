@@ -115,22 +115,28 @@ void Mintye::EditorApplication::refresh()
 	}
 }
 
-void Mintye::EditorApplication::update(Time const& time)
+Minty::Int Mintye::EditorApplication::update(Time const& time)
 {
 	// update threads
 	m_taskFactory.update();
+
+	return 0;
 }
 
-void Mintye::EditorApplication::update_gui(Minty::Time const& time)
+Int Mintye::EditorApplication::update_gui(Minty::Time const& time)
 {
 	// check for shortcuts made by user
 	run_shortcuts();
 
+	int returnCode = 0;
+
 	// draw the GUI
 	draw_dock_space();
-	draw_menu_bar();
+	returnCode |= draw_menu_bar();
 	draw_commands();
 	draw_editor_windows();
+
+	return returnCode;
 }
 
 void Mintye::EditorApplication::cwd_application() const
@@ -686,12 +692,13 @@ void Mintye::EditorApplication::draw_dock_space()
 	GUI::end();
 }
 
-void Mintye::EditorApplication::draw_menu_bar()
+Int Mintye::EditorApplication::draw_menu_bar()
 {
 	// dumb work around: cannot open a popup in a menu bar
 	// https://github.com/ocornut/imgui/issues/331
 
 	bool createNewProject = false;
+	int returnCode = 0;
 
 	if (GUI::begin_main_menu_bar())
 	{
@@ -743,6 +750,7 @@ void Mintye::EditorApplication::draw_menu_bar()
 			if (GUI::menu_item("Close Scene", "", nullptr, mp_project && m_sceneId.valid()))
 			{
 				close_scene();
+				returnCode = 1;
 			}
 
 			GUI::separator();
@@ -753,7 +761,7 @@ void Mintye::EditorApplication::draw_menu_bar()
 				close();
 				GUI::end_menu();
 				GUI::end_main_menu_bar();
-				return;
+				return 0;
 			}
 
 			GUI::end_menu();
@@ -843,6 +851,8 @@ void Mintye::EditorApplication::draw_menu_bar()
 		// close
 		GUI::file_dialog_close();
 	}
+
+	return returnCode;
 }
 
 void EditorApplication::draw_commands()

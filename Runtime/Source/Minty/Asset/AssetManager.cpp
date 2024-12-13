@@ -26,6 +26,7 @@ AssetMode Minty::AssetManager::s_mode = {};
 Bool Minty::AssetManager::s_savePaths = false;
 std::unordered_map<UUID, AssetManager::AssetData> Minty::AssetManager::s_assets = {};
 std::unordered_map<AssetType, std::unordered_set<Ref<Asset>>> Minty::AssetManager::s_assetsByType = {};
+std::vector<UUID> Minty::AssetManager::s_destructionQueue = {};
 Wrapper Minty::AssetManager::s_wrapper = {};
 
 void Minty::AssetManager::initialize(AssetManagerBuilder const& builder)
@@ -103,6 +104,21 @@ void Minty::AssetManager::close_reader(Container*& container, Reader*& reader)
 	reader = nullptr;
 	delete container;
 	container = nullptr;
+}
+
+void Minty::AssetManager::destroy(UUID const id)
+{
+	s_destructionQueue.push_back(id);
+}
+
+void Minty::AssetManager::collect()
+{
+	for (UUID const id : s_destructionQueue)
+	{
+		unload(id);
+	}
+
+	s_destructionQueue.clear();
 }
 
 UUID Minty::AssetManager::read_id(Path const& path)

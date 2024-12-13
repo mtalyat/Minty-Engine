@@ -71,8 +71,8 @@ namespace Mintye
 		void refresh();
 
 	protected:
-		void update(Minty::Time const& time) override;
-		void update_gui(Minty::Time const& time) override;
+		Minty::Int update(Minty::Time const& time) override;
+		Minty::Int update_gui(Minty::Time const& time) override;
 
 	private:
 		void cwd_application() const;
@@ -104,7 +104,7 @@ namespace Mintye
 	private:
 		void draw_dock_space();
 
-		void draw_menu_bar();
+		Minty::Int draw_menu_bar();
 
 		void draw_commands();
 

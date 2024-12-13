@@ -70,6 +70,8 @@ namespace Minty
 		static std::unordered_map<UUID, AssetData> s_assets;
 		// reference for all assets, by type
 		static std::unordered_map<AssetType, std::unordered_set<Ref<Asset>>> s_assetsByType;
+		// list of assets to be destroyed at the end of the frame
+		static std::vector<UUID> s_destructionQueue;
 
 		// holds all loaded .wrap data
 		static Wrapper s_wrapper;
@@ -116,6 +118,27 @@ namespace Minty
 		/// <param name="container"></param>
 		/// <param name="reader"></param>
 		static void close_reader(Container*& container, Reader*& reader);
+
+#pragma endregion
+
+#pragma region Destruction Queue
+
+	public:
+		/// <summary>
+		/// Marks the Asset with the given ID for destruction.
+		/// </summary>
+		/// <param name="id"></param>
+		static void destroy(UUID const id);
+
+		/// <summary>
+		/// Determines if this AssetManager is able to collect Assets. If false, there are no Assets to collect.
+		/// </summary>
+		static inline Bool ready_to_collect() { return !s_destructionQueue.empty(); }
+
+		/// <summary>
+		/// Destroys all of the Assets marked for destruction.
+		/// </summary>
+		static void collect();
 
 #pragma endregion
 
