@@ -33,5 +33,7 @@ namespace Minty
 		static String from_mono_string(MonoString* string);
 
 		static MonoString* to_mono_string(String const& string);
+
+		static Bool check_equal(MonoClass* const left, MonoClass* const right);
 	};
 }

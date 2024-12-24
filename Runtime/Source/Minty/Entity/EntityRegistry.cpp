@@ -986,12 +986,38 @@ void Minty::EntityRegistry::set_tag(Entity const entity, String const& tag)
 
 Component* Minty::EntityRegistry::emplace_by_name(String const& name, Entity const entity)
 {
-	MINTY_ASSERT_FORMAT(s_components.contains(name), "Cannot emplace Component \"{}\". It has not been registered with the EntityRegistry.", name);
-
 	Ref<ScriptClass> script = ScriptEngine::find_class(name);
 
+	// if a base component with no script, do that directly
+	if (s_components.contains(name))
+	{
+		// pass in the appropriate script if able
+		return s_components.at(name).emplace(*this, entity, script);
+	}
+
+	// if raw name not in there and no script, the component DNE
+	MINTY_ASSERT_FORMAT(script != nullptr, "No Component found with the name \"{}\".", name);
+
+	String fullName = script->get_full_name();
+
+	MINTY_ASSERT_FORMAT(s_components.contains(fullName), "Cannot emplace Component with the name \"{}\". It has not been registered.", name);
+
 	// add by Component name emplace func
-	return s_components.at(name).emplace(*this, entity, script);
+	return s_components.at(fullName).emplace(*this, entity, script);
+}
+
+Bool Minty::EntityRegistry::exists(String const& name)
+{
+	// base component check
+	if (s_components.contains(name))
+	{
+		return true;
+	}
+
+	// script check
+	Ref<ScriptClass> script = ScriptEngine::find_class(name);
+
+	return script != nullptr;
 }
 
 Component* Minty::EntityRegistry::get_by_name(String const& name, Entity const entity)

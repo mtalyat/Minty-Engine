@@ -4,6 +4,7 @@
 #include "Minty/Asset/Asset.h"
 #include "Minty/Asset/AssetManager.h"
 #include "Minty/Component/AllComponents.h"
+#include "Minty/Core/Application.h"
 #include "Minty/Core/Math.h"
 #include "Minty/Core/Pack.h"
 #include "Minty/Data/BatchFactory.h"
@@ -15,23 +16,27 @@ using namespace Minty;
 
 void Minty::RenderSystem::update(Time const& time)
 {
-	// do nothing if no camera
-	if (m_camera == NULL_ENTITY)
+	if (Application::instance().get_mode() != ApplicationMode::Edit)
 	{
-		MINTY_WARN("There is no Camera to render to.");
-		return;
+		// do nothing if no camera
+		if (m_camera == NULL_ENTITY)
+		{
+			MINTY_WARN("There is no Camera to render to.");
+			return;
+		}
+
+		// get camera transform
+		EntityRegistry& entityRegistry = get_entity_registry();
+
+		if (!entityRegistry.all_of<CameraComponent>(m_camera))
+		{
+			MINTY_WARN("The Camera entity has no Camera component.");
+			return;
+		}
+
+		update_camera();
 	}
-
-	// get camera transform
-	EntityRegistry& entityRegistry = get_entity_registry();
-
-	if (!entityRegistry.all_of<CameraComponent>(m_camera))
-	{
-		MINTY_WARN("The Camera entity has no Camera component.");
-		return;
-	}
-
-	update_camera();
+	
 	update_3d();
 	// update 2d goes here
 	update_ui();

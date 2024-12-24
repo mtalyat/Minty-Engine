@@ -28,6 +28,7 @@ namespace Minty
 		Bool m_referenceOnly;
 
 		std::unordered_map<String, Owner<ScriptClass>> m_classesName;
+		std::unordered_map<String, Owner<ScriptClass>> m_classesNick;
 		std::unordered_map<UUID, Owner<ScriptClass>> m_classesId;
 
 	public:
@@ -35,6 +36,7 @@ namespace Minty
 			: m_path(builder.path)
 			, m_referenceOnly(builder.referenceOnly)
 			, m_classesName()
+			, m_classesNick()
 			, m_classesId()
 		{}
 
@@ -58,6 +60,15 @@ namespace Minty
 		Ref<ScriptClass> get_class(UUID const id) const;
 
 		virtual std::unordered_set<String> get_dependencies() const = 0;
+
+	public:
+		std::unordered_map<UUID, Owner<ScriptClass>>::iterator begin() { return m_classesId.begin(); }
+
+		std::unordered_map<UUID, Owner<ScriptClass>>::iterator end() { return m_classesId.end(); }
+
+		std::unordered_map<UUID, Owner<ScriptClass>>::const_iterator cbegin() const { return m_classesId.cbegin(); }
+
+		std::unordered_map<UUID, Owner<ScriptClass>>::const_iterator cend() const { return m_classesId.cend(); }
 
 	public:
 		static Owner<ScriptAssembly> create(ScriptAssemblyBuilder const& builder);

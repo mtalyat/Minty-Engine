@@ -145,3 +145,38 @@ MonoString* Minty::CsScriptEngine::to_mono_string(String const& string)
 {
 	return mono_string_new(sp_appDomain, string.c_str());
 }
+
+Bool Minty::CsScriptEngine::check_equal(MonoClass* const left, MonoClass* const right)
+{
+	// cannot be equal if one null
+	if (left == nullptr || right == nullptr)
+	{
+		// equal if both null
+		return left == right;
+	}
+
+	// compare with names
+	// TODO: faster approach
+	String leftName = std::format("{}.{}", mono_class_get_namespace(left), mono_class_get_name(left));
+	String rightName = std::format("{}.{}", mono_class_get_namespace(right), mono_class_get_name(right));
+
+	return leftName == rightName;
+
+	//// cannot be equal if different assemblies
+	//if (mono_class_get_image(left) != mono_class_get_image(right))
+	//{
+	//	return false;
+	//}
+
+	//MonoType* leftType = mono_class_get_type(left);
+	//MonoType* rightType = mono_class_get_type(right);
+
+	//// cannot be equal if different types
+	//if (mono_type_get_type(leftType) != mono_type_get_type(rightType))
+	//{
+	//	return false;
+	//}
+
+	//// all match
+	//return true;
+}

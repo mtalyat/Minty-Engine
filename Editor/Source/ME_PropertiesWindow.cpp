@@ -267,8 +267,21 @@ void Mintye::PropertiesWindow::draw_entity()
 		if (node.get_name() == "Script")
 		{
 			// treat each script as a component
-			for (auto childNode : node.get_children())
+			for (auto&& childNode : node.get_children())
 			{
+				// get the node name as an id
+				UUID id = Parse::to_uuid(childNode.get_name());
+
+				// get the Script with that ID
+				Ref<ScriptClass> childNodeClass = ScriptEngine::find_class(id);
+
+				// should have gotten a class from that ID
+				MINTY_ASSERT_FORMAT(childNodeClass != nullptr, "Cannot find a class with the ID \"{}\".", to_string(id));
+
+				// use class's full name
+				String childNodeClassName = childNodeClass->get_class_name();
+				childNode.set_name(childNodeClassName);
+
 				// treat as normal component
 				draw_component(childNode, i, scene, registry);
 
@@ -303,11 +316,14 @@ void Mintye::PropertiesWindow::draw_entity()
 
 		if (GUI::button("Done") || GUI::is_key_pressed(Key::Enter))
 		{
+			// get name
+			String name = popupBuffer;
+
 			// check for Script asset
 			// ensure it is loaded
 			Project* project = get_project();
 
-			Path assetPath = project->find_asset(popupBuffer, AssetType::Script);
+			Path assetPath = project->find_asset(name, AssetType::Script);
 			
 			// register it with scene if needed
 			if (!assetPath.empty())
@@ -319,9 +335,9 @@ void Mintye::PropertiesWindow::draw_entity()
 			}
 
 			// place onto the object
-			if (!registry.emplace_by_name(popupBuffer, m_targetEntity))
+			if (!registry.emplace_by_name(name, m_targetEntity))
 			{
-				get_application().log_error(std::format("Failed to add component \"{}\" to Entity \"{}\".", popupBuffer, registry.get_name(m_targetEntity)));
+				get_application().log_error(std::format("Failed to add component \"{}\" to Entity \"{}\".", name, registry.get_name(m_targetEntity)));
 			}
 
 			memset(popupBuffer, 0, sizeof(popupBuffer));
@@ -441,7 +457,7 @@ void Mintye::PropertiesWindow::draw_component(Minty::Node& node, Size const i, M
 
 	GUI::end_group_box(Float2(width, 0.0f), Float2(xMargin, yMargin));
 }
-#include "Minty/Library/ImGUI.h"
+
 void Mintye::PropertiesWindow::draw_asset()
 {
 	// TODO: do differently for specific asset types
@@ -517,7 +533,7 @@ void Mintye::PropertiesWindow::draw_asset()
 	{
 		GUI::separator();
 
-		ImGui::TextWrapped(text.c_str());
+		GUI::text_wrapped(text.c_str());
 	}
 }
 

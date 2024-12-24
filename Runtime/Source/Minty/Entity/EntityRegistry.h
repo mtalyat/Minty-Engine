@@ -266,6 +266,13 @@ namespace Minty
 		/// <returns>A pointer to the newly emplaced Component, or null if an error occured.</returns>
 		Component* emplace_by_name(String const& name, Entity const entity);
 
+		/// <summary>
+		/// Checks if a Component or Script exists with the given name.
+		/// </summary>
+		/// <param name="name"></param>
+		/// <returns></returns>
+		Bool exists(String const& name);
+
 		template<typename T>
 		void try_emplace(Entity const entity)
 		{

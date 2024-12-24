@@ -89,7 +89,7 @@ EditorApplication::EditorApplication()
 }
 
 Mintye::EditorApplication::~EditorApplication()
-{	
+{
 	unload_project();
 
 	save_data();
@@ -787,7 +787,7 @@ Int Mintye::EditorApplication::draw_menu_bar()
 		{
 			GuiFileDialogBuilder builder{};
 			builder.path = ".";
-			
+
 			GUI::file_dialog_open("new_project", "Choose directory to create project in...", "", builder);
 
 			GUI::close_current_popup();
@@ -1079,7 +1079,7 @@ void Mintye::EditorApplication::copy_files()
 
 	// get all dependencies
 	std::unordered_set<String> dependencies;
-	
+
 	Ref<ScriptAssembly> assembly = ScriptEngine::get_assembly(mp_project->get_name());
 	if (assembly.get())
 	{
@@ -1110,7 +1110,7 @@ void Mintye::EditorApplication::copy_files()
 	{
 		MINTY_WARN("Engine assembly not found on build.");
 	}
-	
+
 	// copy all dependencies
 	Operation::copy_some(m_cwd / "mono", Path(targetDir) / "mono", dependencies);
 
@@ -1407,14 +1407,8 @@ void Mintye::EditorApplication::generate_assembly()
 		<< "    <Reference Include=\"System.Xml\" />" << std::endl
 		<< "  </ItemGroup>" << std::endl
 		<< "  <ItemGroup>" << std::endl;
-	//<< "    <Compile Include=\"..\Assets\Scripts\CameraController.cs\" />" << std::endl
-	//<< "    <Compile Include=\"..\Assets\Scripts\Link.cs\" />" << std::endl
-	//<< "    <Compile Include=\"..\Assets\Scripts\PlayerController.cs\" />" << std::endl
-	//<< "    <Compile Include=\"..\Assets\Scripts\Session.cs\" />" << std::endl
-	//<< "    <Compile Include=\"..\Assets\Scripts\TestScript.cs\" />" << std::endl
-	//<< "    <Compile Include=\"Properties\AssemblyInfo.cs\" />" << std::endl
 
-// write all c# file paths
+	// write all c# file paths
 	for (auto const& path : mp_project->find_assets(AssetType::Script))
 	{
 		file << "    <Compile Include=\"..\\" << path.string() << "\" />" << std::endl;
@@ -1424,6 +1418,30 @@ void Mintye::EditorApplication::generate_assembly()
 		<< "  </ItemGroup>" << std::endl
 		<< "  <Import Project=\"$(MSBuildToolsPath)\\Microsoft.CSharp.targets\" />" << std::endl
 		<< "</Project>" << std::endl;
+
+	file.close();
+
+	path = (Path(mp_project->get_assembly_path()) / std::format("{}.dll.meta", mp_project->get_name())).string();
+
+	// write <project>.dll.meta
+	file = std::ofstream(path, std::ios::trunc);
+
+	// if not open, error
+	if (!file.is_open())
+	{
+		MINTY_ERROR_FORMAT("Could not open assembly meta file: {}", path);
+		return;
+	}
+
+	// write each name with each ID
+	Path projectDllPath = get_project_dll_path();
+	String projectDllName = projectDllPath.stem().string();
+	Ref<ScriptAssembly> assembly = ScriptEngine::get_assembly(projectDllName);
+
+	for (auto const& [id, scriptClass] : *assembly)
+	{
+		file << scriptClass->get_full_name() << ": " << to_string(id) << std::endl;
+	}
 
 	file.close();
 }
@@ -1557,12 +1575,14 @@ void EditorApplication::build_project()
 			console->log_important("\tbuilding assembly...");
 
 			String assemblyPath = mp_project->get_assembly_path().generic_string();
+			String assemblyName = mp_project->get_assembly_path().stem().generic_string();
 			String configName = m_buildInfo.get_config_name();
 
 			console->run_commands({
 				// build C# assembly
 				// https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-build
-				"cd " + assemblyPath + " && dotnet build -c " + configName + " /p:Platform=x64"
+				"cd " + assemblyPath + " && dotnet build -c " + configName + " /p:Platform=x64",
+				"cd " + assemblyPath + " && copy " + assemblyName + ".dll.meta bin/" + configName + "/"
 				}, true);
 			});
 	}

@@ -48,7 +48,7 @@ void Minty::ScriptComponent::deserialize(Reader& reader)
 		if (!id.valid())
 		{
 			// get class with the name
-			scriptClass = ScriptEngine::find_class(MINTY_NAME_SCRIPT_NAMESPACE, idString);
+			scriptClass = ScriptEngine::find_class(idString);
 		}
 		else
 		{

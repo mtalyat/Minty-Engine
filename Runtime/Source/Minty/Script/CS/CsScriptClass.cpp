@@ -2,6 +2,7 @@
 #include "CsScriptClass.h"
 
 #include "Minty/Script/CS/CsScriptAssembly.h"
+#include "Minty/Script/CS/CsScriptEngine.h"
 #include "Minty/Script/CS/CsScriptMethod.h"
 
 using namespace Minty;
@@ -29,9 +30,9 @@ Bool Minty::CsScriptClass::is_derived_from(Ref<ScriptClass> const klass) const
 {
 	MonoClass* current = mp_class;
 
-	void* target = klass->get_native();
+	MonoClass* target = static_cast<MonoClass*>(klass->get_native());
 
-	while (current != nullptr && current != target)
+	while (current != nullptr && !CsScriptEngine::check_equal(current, target))
 	{
 		current = mono_class_get_parent(current);
 	}
