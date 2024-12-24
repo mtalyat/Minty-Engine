@@ -50,6 +50,7 @@ namespace Mintye
 		BuildInfo m_buildInfo;
 
 		// info needed for a loaded project:
+		Minty::Path m_projectPath;
 		Project* mp_project;
 		FileWatcher* mp_watcher;
 		Minty::UUID m_sceneId;

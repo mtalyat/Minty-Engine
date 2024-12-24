@@ -41,6 +41,7 @@ EditorApplication::EditorApplication()
 	: Application()
 	, m_data()
 	, m_buildInfo()
+	, m_projectPath()
 	, mp_project()
 	, mp_watcher()
 	, m_sceneId(INVALID_UUID)
@@ -125,6 +126,13 @@ Minty::Int Mintye::EditorApplication::update(Time const& time)
 
 Int Mintye::EditorApplication::update_gui(Minty::Time const& time)
 {
+	// load project if able
+	if (!mp_project && !m_projectPath.empty())
+	{
+		load_project(m_projectPath);
+		m_projectPath = Path();
+	}
+
 	// check for shortcuts made by user
 	run_shortcuts();
 
@@ -361,11 +369,12 @@ Minty::Path Mintye::EditorApplication::get_project_dll_path() const
 
 void Mintye::EditorApplication::reload_project()
 {
+	// do nothing if no project loaded
 	if (!mp_project) return;
 
-	Path path = mp_project->get_base_path();
+	// automatically reload in update
+	m_projectPath = mp_project->get_base_path();
 	unload_project();
-	load_project(path);
 }
 
 void Mintye::EditorApplication::open_scene()
