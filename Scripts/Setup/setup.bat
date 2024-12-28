@@ -12,7 +12,7 @@ copy %DEFAULT_USER_PATH% %~dp0..\..\Runtime\Test\MintyRuntimeTest.vcxproj.user
 copy %DEFAULT_USER_PATH% %~dp0..\..\Editor\Source\MintyEditor.vcxproj.user
 
 echo Creating environment variable.
-setx MINTY_PATH %~dp0..\..\ /m
+setx MINTY_PATH %~dp0..\..\
 
 echo Building projects.
 set SETUP_BUILD_PATH=%~dp0\setup_build.bat
