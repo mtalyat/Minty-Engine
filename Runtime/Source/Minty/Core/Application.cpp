@@ -47,7 +47,7 @@ void Minty::Application::initialize(ApplicationBuilder const& builder)
 	ScriptEngine::initialize(builder.scriptEngineBuilder);
 
 	// load Minty assembly
-	ScriptEngine::load_assembly(MINTY_NAME_ENGINE, "Lib/MintyEngine.dll", builder.mode == ApplicationMode::Edit);
+	ScriptEngine::load_assembly(MINTY_NAME_ENGINE, "MintyEngine.dll", builder.mode == ApplicationMode::Edit);
 
 	// glue everything together
 	Linker::link();

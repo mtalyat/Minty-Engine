@@ -11,6 +11,5 @@
 int main(int argc, char const* argv[])
 {
 	Mintye::EditorApplication app;
-	app.run();
-	return 0;
+	return app.run();
 }

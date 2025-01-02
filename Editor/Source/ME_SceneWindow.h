@@ -28,6 +28,19 @@ namespace Mintye
 		void refresh() override;
 
 	public:
+		Minty::Float3 const& get_camera_position() const { return m_cameraPosition; }
+
+		Minty::Float3 const& get_camera_oreintation() const { return m_cameraOrientation; }
+
+		Minty::Camera const& get_camera() const { return m_camera; }
+
+		void set_camera_position(Minty::Float3 const& position) { m_cameraPosition = position; }
+
+		void set_camera_orientation(Minty::Float3 const& orientation) { m_cameraOrientation = orientation; }
+
+		void set_camera(Minty::Camera const& camera) { m_camera = camera; }
+
+	public:
 		void focus(Minty::Entity const entity);
 	};
 }

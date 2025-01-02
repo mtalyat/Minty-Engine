@@ -11,6 +11,9 @@ namespace Mintye
 	class Project;
 	class EditorWindow;
 
+	/// <summary>
+	/// Holds data for the Editor.
+	/// </summary>
 	class EditorApplicationData
 		: public Minty::Serializable
 	{
@@ -38,6 +41,48 @@ namespace Mintye
 	};
 
 	/// <summary>
+	/// Holds Editor data for a Scene within a Project within the Editor.
+	/// </summary>
+	class EditorSceneData
+		: public Minty::Serializable
+	{
+	private:
+		Minty::Float3 m_cameraPosition;
+		Minty::Float3 m_cameraOrientation;
+		Minty::Camera m_camera;
+
+	public:
+		EditorSceneData()
+			: m_cameraPosition()
+			, m_cameraOrientation()
+			, m_camera()
+		{}
+
+	public:
+		void serialize(Minty::Writer& writer) const override;
+		void deserialize(Minty::Reader& reader) override;
+	};
+
+	/// <summary>
+	/// Holds Editor data for a Project within the editor. Found in <project_path>/Editor/editor.minty.
+	/// </summary>
+	class EditorProjectData
+		: public Minty::Serializable
+	{
+	private:
+		std::unordered_map<Minty::Path, EditorSceneData> m_sceneData;
+
+	public:
+		EditorProjectData()
+			: m_sceneData()
+		{}
+
+	public:
+		void serialize(Minty::Writer& writer) const override;
+		void deserialize(Minty::Reader& reader) override;
+	};
+
+	/// <summary>
 	/// Holds data and runs the game engine application.
 	/// </summary>
 	class EditorApplication
@@ -52,6 +97,7 @@ namespace Mintye
 		// info needed for a loaded project:
 		Minty::Path m_projectPath;
 		Project* mp_project;
+		EditorProjectData* mp_projectData;
 		FileWatcher* mp_watcher;
 		Minty::UUID m_sceneId;
 
@@ -140,9 +186,11 @@ namespace Mintye
 
 		void create_new_project(Minty::String const& name, Minty::Path const& path);
 
+		void reload_project();
+
 		Minty::Path get_project_dll_path() const;
 
-		void reload_project();
+		Minty::Path get_project_editor_path() const;
 
 #pragma endregion
 

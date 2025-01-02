@@ -40,7 +40,7 @@ void Minty::ScriptEngine::shutdown()
 Ref<ScriptAssembly> Minty::ScriptEngine::load_assembly(String const& name, Path const& path, Bool const referenceOnly)
 {
 	MINTY_ASSERT_FORMAT(!s_assemblies.contains(name), "Already loaded a ScriptAssembly with the name \"{}\".", name);
-	MINTY_ASSERT_FORMAT(AssetManager::exists(path), "The given path to load the assembly does not exist: \"{}\"", path.generic_string());
+	MINTY_ASSERT_FORMAT(std::filesystem::exists(path), "The given path to load the assembly does not exist: \"{}\"", std::filesystem::absolute(path).generic_string());
 
 	// load from disk
 	ScriptAssemblyBuilder builder{};

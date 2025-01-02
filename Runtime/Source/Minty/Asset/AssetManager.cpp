@@ -22,7 +22,6 @@ using namespace Minty;
 MINTY_ASSERT_FORMAT(exists(path), "Asset path does not exist: \"{}\"", (path).generic_string()); \
 MINTY_ASSERT_FORMAT(exists(Asset::get_meta_path(path)), "Asset meta path does not exist: \"{}\"", Asset::get_meta_path(path).generic_string());
 
-AssetMode Minty::AssetManager::s_mode = {};
 Bool Minty::AssetManager::s_savePaths = false;
 std::unordered_map<UUID, AssetManager::AssetData> Minty::AssetManager::s_assets = {};
 std::unordered_map<AssetType, std::unordered_set<Ref<Asset>>> Minty::AssetManager::s_assetsByType = {};
@@ -32,7 +31,6 @@ Wrapper Minty::AssetManager::s_wrapper = {};
 void Minty::AssetManager::initialize(AssetManagerBuilder const& builder)
 {
 	// set values
-	s_mode = builder.mode;
 	s_assets = {};
 	s_assetsByType = {};
 	s_wrapper = {};
@@ -54,13 +52,12 @@ File* Minty::AssetManager::open(Path const& path)
 {
 	File* file = nullptr;
 
-	if (s_mode == AssetMode::ReadFiles || (s_mode == AssetMode::ReadAll && std::filesystem::exists(path)))
+	if (std::filesystem::exists(path))
 	{
 		file = new PhysicalFile();
 		file->open(path, File::Flags::Read);
 	}
-
-	if (s_mode == AssetMode::ReadWraps || (s_mode == AssetMode::ReadAll && s_wrapper.contains(path)))
+	else if (s_wrapper.contains(path))
 	{
 		file = new VirtualFile();
 		s_wrapper.open(path, *static_cast<VirtualFile*>(file));
@@ -153,17 +150,7 @@ Bool Minty::AssetManager::write_id(Path const& path, UUID const id)
 
 Bool Minty::AssetManager::exists(Path const& path)
 {
-	switch (s_mode)
-	{
-	case AssetMode::ReadFiles:
-		return std::filesystem::exists(path);
-	case AssetMode::ReadWraps:
-		return s_wrapper.contains(path);
-	case AssetMode::ReadAll:
-		return s_wrapper.contains(path) || std::filesystem::exists(path);
-	default:
-		MINTY_ABORT("Unrecognized AssetMode.");
-	}
+	return s_wrapper.contains(path) || std::filesystem::exists(path);
 }
 
 Ref<Asset> Minty::AssetManager::load_asset(Path const& path)
@@ -454,23 +441,13 @@ String Minty::AssetManager::read_file(Path const& path)
 
 std::vector<Char> Minty::AssetManager::read_file_chars(Path const& path)
 {
-	switch (s_mode)
+	if (std::filesystem::exists(path))
 	{
-	case AssetMode::ReadFiles:
 		return File::read_all_chars(path);
-	case AssetMode::ReadWraps:
+	}
+	else
+	{
 		return s_wrapper.read(path);
-	case AssetMode::ReadAll:
-		if (std::filesystem::exists(path))
-		{
-			return File::read_all_chars(path);
-		}
-		else
-		{
-			return s_wrapper.read(path);
-		}
-	default:
-		MINTY_ABORT("Unrecognized AssetMode.");
 	}
 }
 

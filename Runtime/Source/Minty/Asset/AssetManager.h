@@ -23,26 +23,10 @@
 
 namespace Minty
 {
-	/// <summary>
-	/// Controls how Assets are loaded.
-	/// </summary>
-	enum class AssetMode
-	{
-		// reads from file system
-		ReadFiles = 0b0001,
-		// reads from wrap files
-		ReadWraps = 0b0010,
-		// reads from file system, or wrapper if dne on file system
-		ReadAll = 0b0011,
-	};
-
 	struct AssetManagerBuilder
 	{
-		// determine where to read asset files from
-		AssetMode mode = AssetMode::ReadWraps;
-
 		// wrap files to read in
-		std::vector<Path> wraps = {};
+		std::vector<Path> wraps = { "Default.wrap", "Game.wrap", "Assets.wrap" };
 		
 		// should paths be saved in memory, or ignored
 		Bool savePaths = false;
@@ -61,8 +45,6 @@ namespace Minty
 		};
 
 	private:
-		// determines how assets are loaded
-		static AssetMode s_mode;
 		// if true, paths are saved and can be retrieved with get_path()
 		static Bool s_savePaths;
 

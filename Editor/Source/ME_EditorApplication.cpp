@@ -43,6 +43,7 @@ EditorApplication::EditorApplication()
 	, m_buildInfo()
 	, m_projectPath()
 	, mp_project()
+	, mp_projectData()
 	, mp_watcher()
 	, m_sceneId(INVALID_UUID)
 	, m_cwd(std::filesystem::current_path())
@@ -56,7 +57,6 @@ EditorApplication::EditorApplication()
 	builder.mode = ApplicationMode::Edit;
 	builder.targetFPS = 60;
 	builder.passes = ApplicationPassFlags::All;
-	builder.assetManagerBuilder.mode = AssetMode::ReadAll;
 	builder.assetManagerBuilder.wraps = { "Default.wrap" };
 	builder.assetManagerBuilder.savePaths = true;
 	builder.rendererBuilder.clearColor = Color::black();
@@ -314,6 +314,19 @@ void Mintye::EditorApplication::load_project(Minty::Path const& path)
 		MINTY_WARN_FORMAT("No project DLL found at {}.", projectDllPath.generic_string());
 	}
 
+	// load project data
+	mp_projectData = new EditorProjectData();
+	{
+		Container* container;
+		Reader* reader;
+		if (AssetManager::open_reader(get_project_editor_path(), container, reader))
+		{
+			mp_projectData->deserialize(*reader);
+
+			AssetManager::close_reader(container, reader);
+		}
+	}
+
 	// load a scene, if any found
 	Path scenePath = project->find_asset(AssetType::Scene);
 	if (!scenePath.empty())
@@ -334,6 +347,9 @@ void Mintye::EditorApplication::unload_project()
 	if (mp_project)
 	{
 		ScriptEngine::unload_assembly(mp_project->get_name());
+
+		delete mp_projectData;
+		mp_projectData = nullptr;
 
 		delete mp_project;
 		set_project(nullptr);
@@ -365,6 +381,13 @@ Minty::Path Mintye::EditorApplication::get_project_dll_path() const
 	MINTY_ASSERT(mp_project);
 
 	return Path(std::format("{}/bin/{}/{}.dll", ASSEMBLY_DIRECTORY_NAME, m_buildInfo.get_config_name(), mp_project->get_name()));
+}
+
+Minty::Path Mintye::EditorApplication::get_project_editor_path() const
+{
+	MINTY_ASSERT(mp_project);
+
+	return Path("Editor/editor.minty");
 }
 
 void Mintye::EditorApplication::reload_project()
@@ -986,11 +1009,11 @@ void EditorApplication::generate_cmake()
 		"set_property(TARGET ${PROJECT_NAME} PROPERTY INTERPROCEDURAL_OPTIMIZATION_RELEASE TRUE)" << std::endl <<
 		"set_property(TARGET ${PROJECT_NAME} PROPERTY MSVC_RUNTIME_LIBRARY \"MultiThreaded$<$<CONFIG:Debug>:Debug>\")" << std::endl <<
 		// include the runtime dir
-		"target_include_directories(${PROJECT_NAME} PRIVATE " << stringMintyPath << "/Runtime PRIVATE " << stringMintyPath << "/Libraries PUBLIC ${VULKAN_INCLUDE_DIRS})" << std::endl <<
+		"target_include_directories(${PROJECT_NAME} PRIVATE " << stringMintyPath << "/Runtime/Source PRIVATE " << stringMintyPath << "/Libraries/glm/include PRIVATE " << stringMintyPath << "/Libraries/entt/include PUBLIC ${VULKAN_INCLUDE_DIRS})" << std::endl <<
 		// include and link Vulkan
 		"include_directories(${Vulkan_INCLUDE_DIRS})" << std::endl <<
 		// target and link the MintyRuntime.lib
-		"target_link_libraries(${PROJECT_NAME} " << stringMintyPath << "/Runtime/x64/" << m_buildInfo.get_config_name() << "/MintyRuntime.lib)" << std::endl <<
+		"target_link_libraries(${PROJECT_NAME} " << stringMintyPath << "/Runtime/Source/x64/" << m_buildInfo.get_config_name() << "/MintyRuntime.lib)" << std::endl <<
 		// target and link the vulkan libs
 		"target_link_libraries(${PROJECT_NAME} ${Vulkan_LIBRARIES})";
 
@@ -1037,6 +1060,7 @@ void EditorApplication::generate_main()
 	}
 
 	file <<
+		"\tapp.initialize(Minty::ApplicationBuilder{});\n" <<
 		"\tapp.run();" << std::endl;
 
 	if (m_buildInfo.is_debug())
@@ -1258,6 +1282,7 @@ void Mintye::EditorApplication::generate_directories(Path const& basePath) const
 	generate_directory(basePath / ASSETS_DIRECTORY_NAME);
 	generate_directory(basePath / BUILD_DIRECTORY_NAME);
 	generate_directory(basePath / ASSEMBLY_DIRECTORY_NAME);
+	generate_directory(basePath / EDITOR_DIRECTORY_NAME);
 
 	generate_directory(basePath / BUILD_DIRECTORY_NAME / m_buildInfo.get_config_name());
 	//generate_directory(basePath / BUILD_DIRECTORY_NAME / "Release");
@@ -1683,4 +1708,45 @@ void Mintye::EditorApplicationData::serialize(Minty::Writer& writer) const
 void Mintye::EditorApplicationData::deserialize(Minty::Reader& reader)
 {
 	reader.read("recentProjects", _recentProjects);
+}
+
+void Mintye::EditorProjectData::serialize(Minty::Writer& writer) const
+{
+
+}
+
+void Mintye::EditorProjectData::deserialize(Minty::Reader& reader)
+{
+	if (reader.indent("Scenes"))
+	{
+		for (Size i = 0; i < reader.size(); i++)
+		{
+			// get scene path
+			String name;
+			reader.read_name(i, name);
+			Path scenePath = Path(name);
+
+			// read scene data
+			EditorSceneData sceneData{};
+			reader.indent(i);
+			sceneData.deserialize(reader);
+			reader.outdent();
+
+			// record data
+			m_sceneData[scenePath] = sceneData;
+		}
+
+		reader.outdent();
+	}
+}
+
+void Mintye::EditorSceneData::serialize(Minty::Writer& writer) const
+{
+}
+
+void Mintye::EditorSceneData::deserialize(Minty::Reader& reader)
+{
+	reader.read("cameraPosition", m_cameraPosition);
+	reader.read("cameraOrientation", m_cameraOrientation);
+	reader.read("camera", m_camera);
 }

@@ -11,6 +11,7 @@ constexpr static float MOUSE_ROTATE_SENSITIVITY = 0.1f;
 Mintye::SceneWindow::SceneWindow(EditorApplication& application)
 	: EditorWindow(application)
 	, m_cameraPosition()
+	, m_cameraOrientation()
 	, m_cameraRotation()
 	, m_camera()
 	, m_isMouseMoving()
@@ -110,6 +111,7 @@ void Mintye::SceneWindow::reset()
 
 void Mintye::SceneWindow::refresh()
 {
+	
 }
 
 void Mintye::SceneWindow::focus(Minty::Entity const entity)
