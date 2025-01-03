@@ -46,6 +46,10 @@ void Minty::SceneManager::update(Time const time)
 	{
 		m_loadedScene->update(time);
 	}
+	else
+	{
+		MINTY_WARN("No scene loaded.");
+	}
 }
 
 void Minty::SceneManager::fixed_update(Time const time)

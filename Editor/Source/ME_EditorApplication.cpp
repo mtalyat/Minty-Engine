@@ -317,13 +317,12 @@ void Mintye::EditorApplication::load_project(Minty::Path const& path)
 	// load project data
 	mp_projectData = new EditorProjectData();
 	{
-		Container* container;
 		Reader* reader;
-		if (AssetManager::open_reader(get_project_editor_path(), container, reader))
+		if (AssetManager::open_reader(get_project_editor_path(), reader))
 		{
 			mp_projectData->deserialize(*reader);
 
-			AssetManager::close_reader(container, reader);
+			AssetManager::close_reader(reader);
 		}
 	}
 
@@ -1123,6 +1122,9 @@ void Mintye::EditorApplication::copy_files()
 		log_info("\tProject assembly");
 		String source = std::format("{}/bin/{}/{}.dll", mp_project->get_assembly_path().generic_string(), configName, projectName);
 		Operation::copy(source, targetDir);
+		// Project DLL meta
+		String meta = Asset::get_meta_path(source).generic_string();
+		Operation::copy(meta, targetDir);
 	}
 	else
 	{
@@ -1299,46 +1301,34 @@ void Mintye::EditorApplication::generate_application_data()
 	}
 
 	// get path to file
-	Path path = mp_project->get_build_path() / String("game").append(EXTENSION_APPLICATION_DATA);
+	Path path = mp_project->get_build_path() / DEFAULT_APPDATA;
 
 	// open file to overwrite
 	std::ofstream file(path, std::ios::trunc);
 
 	// if not open, error
-	if (!file.is_open())
+	Writer* writer;
+	if (!AssetManager::open_writer(path, writer))
 	{
 		MINTY_ERROR_FORMAT("Could not open game application data file: {}", path.string());
 		return;
 	}
 
-	// TODO: use Writer, save the node
-
-	// write contents
-	file <<
-		"scenes" << std::endl;
-
-	// write all scenes
+	// initial scene
+	// TODO: be able to specify the initial scene manually for each project
 	std::set<Path> scenes = mp_project->find_assets(AssetType::Scene);
-	for (Path const& scenePath : scenes)
-	{
-		file << "\t- " << scenePath.string() << std::endl;
-	}
+	Path initialScene = *scenes.begin();
 
-	file <<
-		"assemblies" << std::endl;
+	writer->write("InitialScene", initialScene);
+	writer->write("Assemblies", std::vector<String>{
+		mp_project->get_name() + ".dll"
+	});
+	writer->write("Wraps", std::vector<String>{
+		"Default.wrap",
+		"Assets.wrap"
+	});
 
-	// assemblies copied by cmake
-	std::vector<String> assemblies =
-	{
-		std::format("{}.dll", mp_project->get_name()),
-	};
-
-	for (auto const& str : assemblies)
-	{
-		file << "\t- " << str << std::endl;
-	}
-
-	file.close();
+	AssetManager::close_writer(writer);
 }
 
 void Mintye::EditorApplication::generate_wraps()
@@ -1351,17 +1341,17 @@ void Mintye::EditorApplication::generate_wraps()
 	// compile all game files/assets into two wrap files
 
 	// game data
-	Wrap gameWrap(output / String("game").append(EXTENSION_WRAP), "Game", 1);
-	String appFileName = String("game").append(EXTENSION_APPLICATION_DATA);
+	Wrap gameWrap(output / DEFAULT_WRAP, "Game", 1);
+	String appFileName = DEFAULT_APPDATA;
 	Path appPath = mp_project->get_build_path() / appFileName;
 	gameWrap.emplace(appPath, appFileName);
 
 	// game assets
-	Wrap assetWrap(output / String("assets").append(EXTENSION_WRAP), ASSETS_DIRECTORY_NAME, static_cast<uint32_t>(mp_project->get_asset_count()), ASSETS_DIRECTORY_NAME);
+	Wrap assetWrap(output / String("Assets").append(EXTENSION_WRAP), ASSETS_DIRECTORY_NAME, static_cast<uint32_t>(mp_project->get_asset_count()), ASSETS_DIRECTORY_NAME);
 	mp_project->wrap_assets(assetWrap);
 
 	// built in assets
-	std::filesystem::copy("default.wrap", output / "default.wrap");
+	std::filesystem::copy("Default.wrap", output / "Default.wrap");
 }
 
 void Mintye::EditorApplication::generate_assembly()

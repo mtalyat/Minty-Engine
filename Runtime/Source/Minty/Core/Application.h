@@ -48,12 +48,23 @@ namespace Minty
 	};
 	MINTY_ENUM_FLAGS_OPERATORS(ApplicationPassFlags);
 
+	struct ApplicationData
+	{
+		// first scene to load
+		Path initialScene = "";
+		// additional assemblies to load (other than MintyEngine.dll)
+		std::vector<Path> assemblies = {};
+		// additional wraps to load (other than Game.wrap)
+		std::vector<Path> wraps = {};
+	};
+
 	/// <summary>
 	/// Holds data to build a new Application.
 	/// </summary>
 	struct ApplicationBuilder
 	{
 		ApplicationInfo info = { "Minty Application", MINTY_MAKE_VERSION(1, 0, 0) };
+		ApplicationData data = {};
 		String logPath = "log.txt";
 		ApplicationMode mode = ApplicationMode::Normal;
 		UInt targetFPS = 120;
@@ -86,6 +97,7 @@ namespace Minty
 		ApplicationPassFlags m_passFlags;
 
 		ApplicationInfo m_info;
+		ApplicationData m_data;
 		ApplicationMode m_mode;
 		Logger* mp_logger;
 
@@ -100,6 +112,7 @@ namespace Minty
 			, m_targetFPS(0)
 			, m_passFlags()
 			, m_info()
+			, m_data()
 			, m_mode()
 			, mp_logger(nullptr)
 			, m_sceneManager()
@@ -136,6 +149,10 @@ namespace Minty
 #pragma region Loading
 
 	private:
+		// loads the default application data
+		Bool load_data();
+
+		// loads the initial scene from the app data, if there is one
 		Bool load_initial_scene();
 
 #pragma endregion

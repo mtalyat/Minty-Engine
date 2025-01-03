@@ -51,6 +51,9 @@ namespace Minty
 	constexpr Char const* EXTENSION_META = ".meta";
 	constexpr Char const* EXTENSION_WRAP = ".wrap";
 
+	constexpr Char const* DEFAULT_WRAP = "Game.wrap";
+	constexpr Char const* DEFAULT_APPDATA = "Game.appdata";
+
 	constexpr Size INVALID_UUID = 0;
 	constexpr UInt INVALID_HANDLE = UINT_MAX;
 

@@ -80,6 +80,10 @@ void Minty::RenderSystem::update_camera()
 			update_camera(camera, temp);
 		}
 	}
+	else
+	{
+		MINTY_ERROR("Invalid Camera.");
+	}
 }
 
 void Minty::RenderSystem::update_3d_meshes()

@@ -34,6 +34,7 @@ void Minty::Application::initialize(ApplicationBuilder const& builder)
 	MINTY_ASSERT_MESSAGE(builder.targetFPS > 0, "Application target FPS must be above zero.");
 	m_targetFPS = builder.targetFPS;
 	m_info = builder.info;
+	m_data = builder.data;
 	m_mode = builder.mode;
 	mp_logger = new Logger(builder.logPath);
 	m_passFlags = builder.passes;
@@ -51,6 +52,9 @@ void Minty::Application::initialize(ApplicationBuilder const& builder)
 
 	// glue everything together
 	Linker::link();
+
+	// load game data
+	load_data();
 
 	// input
 	Input::initialize(builder.inputBuilder);
@@ -322,33 +326,61 @@ void Minty::Application::on_event(Event& event)
 	}
 }
 
+Bool Minty::Application::load_data()
+{
+	// load Game.wrap
+	AssetManager::load_wrap(DEFAULT_WRAP);
+
+	// read Game.appdata
+	Reader* reader;
+	if (!AssetManager::open_reader(DEFAULT_APPDATA, reader))
+	{
+		// could not open app data
+		return false;
+	}
+
+	reader->read("InitialScene", m_data.initialScene);
+	reader->read("Assemblies", m_data.assemblies);
+	reader->read("Wraps", m_data.wraps);
+
+	// load the other assemblies
+	for (Path const& assemblyPath : m_data.assemblies)
+	{
+		String assemblyName = assemblyPath.stem().string();
+		Ref<ScriptAssembly> assembly = ScriptEngine::load_assembly(assemblyName, assemblyPath);
+		if (assembly == nullptr)
+		{
+			MINTY_ERROR_FORMAT("Failed to load assembly at path \"{}\".", assemblyPath.generic_string());
+		}
+	}
+
+	// load the other wraps
+	for (Path const& wrapPath : m_data.wraps)
+	{
+		if (!AssetManager::load_wrap(wrapPath))
+		{
+			MINTY_ERROR_FORMAT("Failed to load wrap at path \"{}\".", wrapPath.generic_string());
+		}
+	}
+
+	AssetManager::close_reader(reader);
+
+	return true;
+}
+
 Bool Minty::Application::load_initial_scene()
 {
-	// load the initial scene
-	Container* container;
-	Reader* reader;
-	if (!AssetManager::open_reader("game.appdata", container, reader))
+	if (m_data.initialScene.empty())
 	{
-		// failed to open game.appdata
-		MINTY_WARN("Failed to open game.appdata.");
+		// no scene specified
 		return false;
 	}
-
-	Path scenePath;
-	if (!reader->read("InitialScene", scenePath))
-	{
-		// no initial scene given
-		AssetManager::close_reader(container, reader);
-		return false;
-	}
-
-	AssetManager::close_reader(container, reader);
 
 	// if scene was given, make sure it exists
-	MINTY_ASSERT_FORMAT(AssetManager::exists(scenePath), "No initial Scene found at name \"{}\".", scenePath.generic_string());
+	MINTY_ASSERT_FORMAT(AssetManager::exists(m_data.initialScene), "No initial Scene found at path \"{}\".", m_data.initialScene.generic_string());
 
 	// load the scene
-	m_sceneManager.load(scenePath);
+	m_sceneManager.load(m_data.initialScene);
 
 	return true;
 }

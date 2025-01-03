@@ -21,9 +21,8 @@ Minty::CsScriptAssembly::CsScriptAssembly(ScriptAssemblyBuilder const& builder)
 	{
 		Path metaPath = Asset::get_meta_path(builder.path);
 
-		Container* container;
 		Reader* reader;
-		if (AssetManager::open_reader(metaPath, container, reader))
+		if (AssetManager::open_reader(metaPath, reader))
 		{
 			nameToId.reserve(reader->size());
 			String name;
@@ -36,7 +35,7 @@ Minty::CsScriptAssembly::CsScriptAssembly(ScriptAssemblyBuilder const& builder)
 				nameToId.emplace(name, id);
 			}
 
-			AssetManager::close_reader(container, reader);
+			AssetManager::close_reader(reader);
 		}
 	}
 

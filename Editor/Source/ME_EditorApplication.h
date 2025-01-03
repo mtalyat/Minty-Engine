@@ -113,7 +113,7 @@ namespace Mintye
 		EditorApplication();
 
 		~EditorApplication();
-
+		 
 	public:
 		void refresh();
 

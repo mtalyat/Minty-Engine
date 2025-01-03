@@ -57,6 +57,9 @@ namespace Minty
 #pragma endregion
 
 	public:
+		virtual void* source() const = 0;
+
+	public:
 		virtual void indent() = 0;
 		void indent(String const& name) { write(name); indent(); }
 		virtual void outdent() = 0;
@@ -434,6 +437,9 @@ namespace Minty
 
 	class WriterStorageBehavior
 	{
+	public:
+		virtual void* get_source() const = 0;
+
 	protected:
 		virtual void write_data(const void* const data, Size const size) = 0;
 	};
@@ -476,6 +482,9 @@ namespace Minty
 
 		virtual ~FileWriterBehavior() = default;
 
+	public:
+		void* get_source() const override { return mp_file; }
+
 	protected:
 		void write_data(const void* const data, Size const size) override;
 	};
@@ -492,6 +501,9 @@ namespace Minty
 		{}
 
 		virtual ~MemoryWriterBehavior() = default;
+
+	public:
+		void* get_source() const override { return mp_data; }
 
 	protected:
 		void write_data(const void* const data, Size const size) override;
@@ -565,6 +577,12 @@ namespace Minty
 		{}
 
 		virtual ~WriterImplementation() = default;
+
+	public:
+		void* source() const override
+		{
+			return this->get_source();
+		}
 
 #pragma region Formatting
 

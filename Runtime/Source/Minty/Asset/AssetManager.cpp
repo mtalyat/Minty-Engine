@@ -48,6 +48,18 @@ void Minty::AssetManager::shutdown()
 	unload_all();
 }
 
+Bool Minty::AssetManager::load_wrap(Path const& path)
+{
+	if (!exists(path))
+	{
+		return false;
+	}
+
+	s_wrapper.emplace(path);
+
+	return true;
+}
+
 File* Minty::AssetManager::open(Path const& path)
 {
 	File* file = nullptr;
@@ -66,7 +78,7 @@ File* Minty::AssetManager::open(Path const& path)
 	return file;
 }
 
-Bool Minty::AssetManager::open_reader(Path const& path, Container*& container, Reader*& reader)
+Bool Minty::AssetManager::open_reader(Path const& path, Reader*& reader)
 {
 	if (!exists(path))
 	{
@@ -77,6 +89,7 @@ Bool Minty::AssetManager::open_reader(Path const& path, Container*& container, R
 	std::vector<Char> data = read_file_chars(path);
 
 	// create empty, or populate if not empty
+	ConstantContainer* container;
 	if (data.empty())
 	{
 		container = new ConstantContainer();
@@ -92,15 +105,46 @@ Bool Minty::AssetManager::open_reader(Path const& path, Container*& container, R
 	return true;
 }
 
-void Minty::AssetManager::close_reader(Container*& container, Reader*& reader)
+void Minty::AssetManager::close_reader(Reader*& reader)
 {
-	MINTY_ASSERT_MESSAGE(container != nullptr, "Expecting a non-null Container in close_reader().");
-	MINTY_ASSERT_MESSAGE(reader != nullptr, "Expecting a non-null Reader in close_reader().");
+	MINTY_ASSERT_MESSAGE(reader != nullptr, "Expecting a non-null Reader.");
 
+	if (void* source = reader->source())
+	{
+		delete source;
+	}
 	delete reader;
 	reader = nullptr;
-	delete container;
-	container = nullptr;
+}
+
+Bool Minty::AssetManager::open_writer(Path const& path, Writer*& writer)
+{
+	Path parentPath = path.parent_path();
+	if (!parentPath.empty() && !std::filesystem::exists(parentPath))
+	{
+		// cannot write to path
+		return false;
+	}
+
+	File* file = new PhysicalFile(path, File::Flags::Write);
+	writer = new TextFileWriter(file);
+
+	return true;
+}
+
+void Minty::AssetManager::close_writer(Writer*& writer)
+{
+	MINTY_ASSERT_MESSAGE(writer != nullptr, "Expecting a non-null Reader.");
+
+	if (void* source = writer->source())
+	{
+		// flush file before deleting it
+		File* file = static_cast<File*>(source);
+		file->flush();
+		delete file;
+	}
+	delete writer;
+	writer = nullptr;
 }
 
 void Minty::AssetManager::destroy(UUID const id)
@@ -122,14 +166,13 @@ UUID Minty::AssetManager::read_id(Path const& path)
 {
 	Path metaPath = Asset::get_meta_path(path);
 
-	Container* container = nullptr;
 	Reader* reader = nullptr;
-	if (open_reader(metaPath, container, reader))
+	if (open_reader(metaPath, reader))
 	{
 		Node const& root = reader->get_current_node();
 		String rootDataString = root.get_data_as_string();
 		UUID id = Parse::to_uuid(rootDataString);
-		close_reader(container, reader);
+		close_reader(reader);
 
 		// able to read
 		return id;
@@ -489,9 +532,8 @@ Ref<Animation> Minty::AssetManager::load_animation(Path const& path)
 	AnimationBuilder builder{};
 	builder.id = read_id(path);
 
-	Container* container;
 	Reader* reader;
-	if (open_reader(path, container, reader))
+	if (open_reader(path, reader))
 	{
 		reader->read("length", builder.length);
 		reader->read("loops", builder.loops);
@@ -546,7 +588,7 @@ Ref<Animation> Minty::AssetManager::load_animation(Path const& path)
 			reader->outdent();
 		}
 
-		close_reader(container, reader);
+		close_reader(reader);
 	}
 
 	return create_existing<Animation>(path, builder);
@@ -559,15 +601,14 @@ Ref<Animator> Minty::AssetManager::load_animator(Path const& path)
 	AnimatorBuilder builder{};
 	builder.id = read_id(path);
 
-	Container* container;
 	Reader* reader;
 
-	if (open_reader(path, container, reader))
+	if (open_reader(path, reader))
 	{
 		// basically just read the FSM
 		reader->read("fsm", builder.fsm);
 
-		close_reader(container, reader);
+		close_reader(reader);
 	}
 
 	return create_existing<Animator>(path, builder);
@@ -581,9 +622,8 @@ Ref<Font> Minty::AssetManager::load_font(Path const& path)
 	FontBuilder builder{};
 	builder.id = read_id(path);
 
-	Container* container;
 	Reader* reader;
-	if (open_reader(path, container, reader))
+	if (open_reader(path, reader))
 	{
 		reader->read("Name", builder.name);
 
@@ -603,7 +643,7 @@ Ref<Font> Minty::AssetManager::load_font(Path const& path)
 			}
 		}
 
-		close_reader(container, reader);
+		close_reader(reader);
 	}
 
 	return create_existing<Font>(path, builder);
@@ -618,16 +658,15 @@ Ref<FontVariant> Minty::AssetManager::load_font_variant(Path const& path)
 	// open meta as normal file
 	Path metaPath = Asset::get_meta_path(path);
 
-	Container* container = nullptr;
 	Reader* reader = nullptr;
-	if (open_reader(metaPath, container, reader))
+	if (open_reader(metaPath, reader))
 	{
 		// read ID
 		Node const& root = reader->get_current_node();
 		String rootDataString = root.get_data_as_string();
 		builder.id = Parse::to_uuid(rootDataString);
 
-		close_reader(container, reader);
+		close_reader(reader);
 	}
 
 	// read fnt file
@@ -947,13 +986,12 @@ Ref<Material> Minty::AssetManager::load_material(Path const& path)
 	MaterialBuilder builder{};
 	builder.id = read_id(path);
 
-	Container* container;
 	Reader* reader;
-	if (open_reader(path, container, reader))
+	if (open_reader(path, reader))
 	{
 		if (find_dependency<MaterialTemplate>(path, *reader, "Template", builder.materialTemplate, true))
 		{
-			close_reader(container, reader);
+			close_reader(reader);
 			return Ref<Material>();
 		}
 
@@ -961,14 +999,14 @@ Ref<Material> Minty::AssetManager::load_material(Path const& path)
 		{
 			if (!load_values(*reader, builder.values, builder.materialTemplate->get_shader(), path))
 			{
-				close_reader(container, reader);
+				close_reader(reader);
 				return Ref<Material>();
 			}
 
 			reader->outdent();
 		}
 
-		close_reader(container, reader);
+		close_reader(reader);
 	}
 
 	return create_existing<Material>(path, builder);
@@ -981,13 +1019,12 @@ Ref<MaterialTemplate> Minty::AssetManager::load_material_template(Path const& pa
 	MaterialTemplateBuilder builder{};
 	builder.id = read_id(path);
 
-	Container* container;
 	Reader* reader;
-	if (open_reader(path, container, reader))
+	if (open_reader(path, reader))
 	{
 		if (find_dependency<Shader>(path, *reader, "Shader", builder.shader, true))
 		{
-			close_reader(container, reader);
+			close_reader(reader);
 			return Ref<MaterialTemplate>();
 		}
 
@@ -995,14 +1032,14 @@ Ref<MaterialTemplate> Minty::AssetManager::load_material_template(Path const& pa
 		{
 			if (!load_values(*reader, builder.values, builder.shader, path))
 			{
-				close_reader(container, reader);
+				close_reader(reader);
 				return Ref<MaterialTemplate>();
 			}
 
 			reader->outdent();
 		}
 
-		close_reader(container, reader);
+		close_reader(reader);
 	}
 
 	return create_existing<MaterialTemplate>(path, builder);
@@ -1159,9 +1196,8 @@ Ref<Scene> Minty::AssetManager::load_scene(Path const& path)
 	SceneBuilder builder{};
 	builder.id = read_id(path);
 
-	Container* container;
 	Reader* reader;
-	if (open_reader(path, container, reader))
+	if (open_reader(path, reader))
 	{
 		if (!reader->read("Assets", builder.assets))
 		{
@@ -1197,7 +1233,7 @@ Ref<Scene> Minty::AssetManager::load_scene(Path const& path)
 			MINTY_ABORT("Scene missing \"Entities\".");
 		}
 
-		close_reader(container, reader);
+		close_reader(reader);
 
 		// no longer working with the scene
 		Application::instance().get_scene_manager().pop_working_scene();
@@ -1216,9 +1252,8 @@ Ref<Shader> Minty::AssetManager::load_shader(Path const& path)
 	ShaderBuilder builder{};
 	builder.id = read_id(path);
 
-	Container* container;
 	Reader* reader;
-	if (open_reader(path, container, reader))
+	if (open_reader(path, reader))
 	{
 
 		// config
@@ -1359,12 +1394,12 @@ Ref<Shader> Minty::AssetManager::load_shader(Path const& path)
 		{
 			if (find_dependency<ShaderModule>(path, *reader, "Vertex", builder.vertexShaderModule, true))
 			{
-				close_reader(container, reader);
+				close_reader(reader);
 				return Ref<Shader>();
 			}
 			if (find_dependency<ShaderModule>(path, *reader, "Fragment", builder.fragmentShaderModule, true))
 			{
-				close_reader(container, reader);
+				close_reader(reader);
 				return Ref<Shader>();
 			}
 
@@ -1383,7 +1418,7 @@ Ref<Shader> Minty::AssetManager::load_shader(Path const& path)
 			builder.scissor = Renderer::get_scissor();
 		}
 
-		close_reader(container, reader);
+		close_reader(reader);
 	}
 
 	return create_existing<Shader>(path, builder);
@@ -1407,16 +1442,15 @@ Ref<Sprite> Minty::AssetManager::load_sprite(Path const& path)
 	SpriteBuilder builder{};
 	builder.id = read_id(path);
 
-	Container* container;
 	Reader* reader;
-	if (open_reader(path, container, reader))
+	if (open_reader(path, reader))
 	{
 		if (int result = find_dependency(path, *reader, "Texture", builder.texture, false))
 		{
 			// default, if not fatal error
 			if (result < 0)
 			{
-				close_reader(container, reader);
+				close_reader(reader);
 				return Ref<Sprite>();
 			}
 
@@ -1428,7 +1462,7 @@ Ref<Sprite> Minty::AssetManager::load_sprite(Path const& path)
 		reader->read("Pivot", builder.pivot);
 		reader->read("PPU", builder.pixelsPerUnit);
 
-		close_reader(container, reader);
+		close_reader(reader);
 	}
 
 	return create_existing<Sprite>(path, builder);
@@ -1443,16 +1477,15 @@ Ref<Texture> Minty::AssetManager::load_texture(Path const& path)
 	builder.image = load_image(path);
 
 	Path metaPath = Asset::get_meta_path(path);
-	Container* container;
 	Reader* reader;
-	if (open_reader(metaPath, container, reader))
+	if (open_reader(metaPath, reader))
 	{
 		// read texture data
 		reader->read("Filter", builder.filter);
 		reader->read("AddressMode", builder.addressMode);
 		reader->read("NormalizedCoordinates", builder.normalizedCoordinates);
 
-		close_reader(container, reader);
+		close_reader(reader);
 	}
 
 	return create_existing<Texture>(path, builder);

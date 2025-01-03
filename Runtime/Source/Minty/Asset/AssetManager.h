@@ -26,7 +26,7 @@ namespace Minty
 	struct AssetManagerBuilder
 	{
 		// wrap files to read in
-		std::vector<Path> wraps = { "Default.wrap", "Game.wrap", "Assets.wrap" };
+		std::vector<Path> wraps = { "Game.wrap" };
 		
 		// should paths be saved in memory, or ignored
 		Bool savePaths = false;
@@ -78,6 +78,13 @@ namespace Minty
 
 #pragma endregion
 
+#pragma region Wrap
+
+	public:
+		static Bool load_wrap(Path const& path);
+
+#pragma endregion
+
 #pragma region Files
 
 	private:
@@ -92,14 +99,30 @@ namespace Minty
 		/// <param name="container">The container to read the data from.</param>
 		/// <param name="reader">The reader to use to read the data.</param>
 		/// <returns></returns>
-		static Bool open_reader(Path const& path, Container*& container, Reader*& reader);
+		static Bool open_reader(Path const& path, Reader*& reader);
 
 		/// <summary>
-		/// Deletes all file and reader resources.
+		/// Deletes all container and reader resources.
 		/// </summary>
 		/// <param name="container"></param>
 		/// <param name="reader"></param>
-		static void close_reader(Container*& container, Reader*& reader);
+		static void close_reader(Reader*& reader);
+
+		/// <summary>
+		/// Opens a file and writer at the given path.
+		/// </summary>
+		/// <param name="path">The path to the file to open.</param>
+		/// <param name="container">The container to write the data to.</param>
+		/// <param name="writer">The writer to use to read the data.</param>
+		/// <returns></returns>
+		static Bool open_writer(Path const& path, Writer*& writer);
+
+		/// <summary>
+		/// Deletes all container and writer resources.
+		/// </summary>
+		/// <param name="container"></param>
+		/// <param name="reader"></param>
+		static void close_writer(Writer*& writer);
 
 #pragma endregion
 

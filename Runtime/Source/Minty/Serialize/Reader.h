@@ -59,6 +59,9 @@ namespace Minty
 #pragma endregion
 
 	public:
+		virtual void* source() const = 0;
+
+	public:
 		virtual Bool indent(Size const index) = 0;
 		virtual Bool indent(String const& name) = 0;
 		virtual void outdent() = 0;
@@ -806,6 +809,9 @@ namespace Minty
 
 	class ReaderStorageBehavior
 	{
+	public:
+		virtual void* get_source() const = 0;
+
 	protected:
 		virtual void read_data(void* const data, Size const size) = 0;
 
@@ -825,6 +831,9 @@ namespace Minty
 
 		virtual ~NodeReaderBehavior()
 		{}
+
+	public:
+		void* get_source() const override { return nullptr; }
 
 	protected:
 		void read_data(void* const data, Size const size) override {}
@@ -848,6 +857,9 @@ namespace Minty
 
 		virtual ~FileReaderBehavior() = default;
 
+	public:
+		void* get_source() const override { return mp_file; }
+
 	protected:
 		void read_data(void* const data, Size const size) override;
 
@@ -868,6 +880,9 @@ namespace Minty
 		{}
 
 		virtual ~MemoryReaderBehavior() = default;
+
+	public:
+		void* get_source() const override { return mp_data; }
 
 	protected:
 		void read_data(void* const data, Size const size) override;
@@ -966,6 +981,12 @@ namespace Minty
 		virtual ~ReaderImplementation()
 		{
 			delete mp_node;
+		}
+
+	public:
+		void* source() const override
+		{
+			return this->get_source();
 		}
 
 #pragma region Formatting
