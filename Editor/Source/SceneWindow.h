@@ -1,7 +1,7 @@
 #pragma once
-#include "ME_EditorWindow.h"
+#include "EditorWindow.h"
 
-#include "ME_Minty.h"
+#include "Base.h"
 
 namespace Mintye
 {

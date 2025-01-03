@@ -1,15 +1,15 @@
-#include "ME_EditorApplication.h"
+#include "EditorApplication.h"
 
-#include "ME_Constants.h"
-#include "ME_Project.h"
-#include "ME_BuildInfo.h"
+#include "Constants.h"
+#include "Project.h"
+#include "BuildInfo.h"
 
-#include "ME_ConsoleWindow.h"
-#include "ME_HierarchyWindow.h"
-#include "ME_SceneWindow.h"
-#include "ME_GameWindow.h"
-#include "ME_PropertiesWindow.h"
-#include "ME_AssetsWindow.h"
+#include "ConsoleWindow.h"
+#include "HierarchyWindow.h"
+#include "SceneWindow.h"
+#include "GameWindow.h"
+#include "PropertiesWindow.h"
+#include "AssetsWindow.h"
 #include "Meta.h"
 
 #include <iostream>

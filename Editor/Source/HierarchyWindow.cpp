@@ -1,8 +1,8 @@
-#include "ME_HierarchyWindow.h"
+#include "HierarchyWindow.h"
 
-#include "ME_EditorApplication.h"
-#include "ME_PropertiesWindow.h"
-#include "ME_SceneWindow.h"
+#include "EditorApplication.h"
+#include "PropertiesWindow.h"
+#include "SceneWindow.h"
 
 
 

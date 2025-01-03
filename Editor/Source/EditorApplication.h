@@ -1,8 +1,8 @@
 #pragma once
-#include "ME_Minty.h"
+#include "Base.h"
 
-#include "ME_BuildInfo.h"
-#include "ME_FileWatcher.h"
+#include "BuildInfo.h"
+#include "FileWatcher.h"
 #include <unordered_map>
 #include <vector>
 

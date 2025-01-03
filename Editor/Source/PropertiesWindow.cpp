@@ -1,9 +1,9 @@
-#include "ME_PropertiesWindow.h"
+#include "PropertiesWindow.h"
 
-#include "ME_EditorApplication.h"
-#include "ME_ConsoleWindow.h"
-#include "ME_HierarchyWindow.h"
-#include "ME_Project.h"
+#include "EditorApplication.h"
+#include "ConsoleWindow.h"
+#include "HierarchyWindow.h"
+#include "Project.h"
 #include "AssetUtility.h"
 #include "Meta.h"
 

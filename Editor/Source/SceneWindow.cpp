@@ -1,6 +1,6 @@
-#include "ME_SceneWindow.h"
+#include "SceneWindow.h"
 
-#include "ME_EditorApplication.h"
+#include "EditorApplication.h"
 
 using namespace Minty;
 using namespace Mintye;

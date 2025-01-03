@@ -24,37 +24,37 @@
     <ClCompile Include="Program.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ME_EditorApplication.cpp">
+    <ClCompile Include="EditorApplication.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ME_ConsoleWindow.cpp">
+    <ClCompile Include="ConsoleWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ME_Project.cpp">
+    <ClCompile Include="Project.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ME_BuildInfo.cpp">
+    <ClCompile Include="BuildInfo.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ME_EditorWindow.cpp">
+    <ClCompile Include="EditorWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ME_HierarchyWindow.cpp">
+    <ClCompile Include="HierarchyWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ME_SceneWindow.cpp">
+    <ClCompile Include="SceneWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ME_GameWindow.cpp">
+    <ClCompile Include="GameWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ME_AssetsWindow.cpp">
+    <ClCompile Include="AssetsWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ME_PropertiesWindow.cpp">
+    <ClCompile Include="PropertiesWindow.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="ME_FileWatcher.cpp">
+    <ClCompile Include="FileWatcher.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Meta.cpp">
@@ -65,43 +65,43 @@
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ME_EditorApplication.h">
+    <ClInclude Include="EditorApplication.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ME_Project.h">
+    <ClInclude Include="Project.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ME_BuildInfo.h">
+    <ClInclude Include="BuildInfo.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ME_Constants.h">
+    <ClInclude Include="Constants.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ME_Minty.h">
+    <ClInclude Include="Base.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="ME_AssetsWindow.h">
+    <ClInclude Include="AssetsWindow.h">
       <Filter>Header Files\Windows</Filter>
     </ClInclude>
-    <ClInclude Include="ME_ConsoleWindow.h">
+    <ClInclude Include="ConsoleWindow.h">
       <Filter>Header Files\Windows</Filter>
     </ClInclude>
-    <ClInclude Include="ME_EditorWindow.h">
+    <ClInclude Include="EditorWindow.h">
       <Filter>Header Files\Windows</Filter>
     </ClInclude>
-    <ClInclude Include="ME_HierarchyWindow.h">
+    <ClInclude Include="HierarchyWindow.h">
       <Filter>Header Files\Windows</Filter>
     </ClInclude>
-    <ClInclude Include="ME_GameWindow.h">
+    <ClInclude Include="GameWindow.h">
       <Filter>Header Files\Windows</Filter>
     </ClInclude>
-    <ClInclude Include="ME_PropertiesWindow.h">
+    <ClInclude Include="PropertiesWindow.h">
       <Filter>Header Files\Windows</Filter>
     </ClInclude>
-    <ClInclude Include="ME_SceneWindow.h">
+    <ClInclude Include="SceneWindow.h">
       <Filter>Header Files\Windows</Filter>
     </ClInclude>
-    <ClInclude Include="ME_FileWatcher.h">
+    <ClInclude Include="FileWatcher.h">
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">

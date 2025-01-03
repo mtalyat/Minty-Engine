@@ -225,35 +225,35 @@ echo Copy runtime dlls
   <ItemGroup>
     <ClCompile Include="AssetUtility.cpp" />
     <ClCompile Include="Meta.cpp" />
-    <ClCompile Include="ME_EditorApplication.cpp" />
-    <ClCompile Include="ME_AssetsWindow.cpp" />
-    <ClCompile Include="ME_BuildInfo.cpp" />
-    <ClCompile Include="ME_ConsoleWindow.cpp" />
-    <ClCompile Include="ME_EditorWindow.cpp" />
-    <ClCompile Include="ME_FileWatcher.cpp" />
-    <ClCompile Include="ME_GameWindow.cpp" />
-    <ClCompile Include="ME_HierarchyWindow.cpp" />
-    <ClCompile Include="ME_Project.cpp" />
-    <ClCompile Include="ME_PropertiesWindow.cpp" />
-    <ClCompile Include="ME_SceneWindow.cpp" />
+    <ClCompile Include="EditorApplication.cpp" />
+    <ClCompile Include="AssetsWindow.cpp" />
+    <ClCompile Include="BuildInfo.cpp" />
+    <ClCompile Include="ConsoleWindow.cpp" />
+    <ClCompile Include="EditorWindow.cpp" />
+    <ClCompile Include="FileWatcher.cpp" />
+    <ClCompile Include="GameWindow.cpp" />
+    <ClCompile Include="HierarchyWindow.cpp" />
+    <ClCompile Include="Project.cpp" />
+    <ClCompile Include="PropertiesWindow.cpp" />
+    <ClCompile Include="SceneWindow.cpp" />
     <ClCompile Include="Program.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AssetUtility.h" />
     <ClInclude Include="Meta.h" />
-    <ClInclude Include="ME_EditorApplication.h" />
-    <ClInclude Include="ME_AssetsWindow.h" />
-    <ClInclude Include="ME_BuildInfo.h" />
-    <ClInclude Include="ME_ConsoleWindow.h" />
-    <ClInclude Include="ME_Constants.h" />
-    <ClInclude Include="ME_EditorWindow.h" />
-    <ClInclude Include="ME_FileWatcher.h" />
-    <ClInclude Include="ME_GameWindow.h" />
-    <ClInclude Include="ME_HierarchyWindow.h" />
-    <ClInclude Include="ME_Minty.h" />
-    <ClInclude Include="ME_Project.h" />
-    <ClInclude Include="ME_PropertiesWindow.h" />
-    <ClInclude Include="ME_SceneWindow.h" />
+    <ClInclude Include="EditorApplication.h" />
+    <ClInclude Include="AssetsWindow.h" />
+    <ClInclude Include="BuildInfo.h" />
+    <ClInclude Include="ConsoleWindow.h" />
+    <ClInclude Include="Constants.h" />
+    <ClInclude Include="EditorWindow.h" />
+    <ClInclude Include="FileWatcher.h" />
+    <ClInclude Include="GameWindow.h" />
+    <ClInclude Include="HierarchyWindow.h" />
+    <ClInclude Include="Base.h" />
+    <ClInclude Include="Project.h" />
+    <ClInclude Include="PropertiesWindow.h" />
+    <ClInclude Include="SceneWindow.h" />
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>

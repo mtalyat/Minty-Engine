@@ -1,7 +1,7 @@
 #include "pch.h"
-#include "ME_Project.h"
+#include "Project.h"
 
-#include "ME_Constants.h"
+#include "Constants.h"
 #include <vector>
 
 using namespace Minty;

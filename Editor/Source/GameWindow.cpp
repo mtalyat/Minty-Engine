@@ -1,4 +1,4 @@
-#include "ME_GameWindow.h"
+#include "GameWindow.h"
 
 using namespace Minty;
 

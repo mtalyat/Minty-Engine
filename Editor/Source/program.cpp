@@ -4,7 +4,7 @@
 
 ***********************/
 
-#include "ME_EditorApplication.h"
+#include "EditorApplication.h"
 #include <exception>	// for exception catching
 #include <iostream>		// for cout, endl, etc.
 

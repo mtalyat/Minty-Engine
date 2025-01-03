@@ -1,4 +1,4 @@
-#include "ME_BuildInfo.h"
+#include "BuildInfo.h"
 
 using namespace Minty;
 using namespace Mintye;

@@ -1,9 +1,9 @@
-#include "ME_AssetsWindow.h"
+#include "AssetsWindow.h"
 
-#include "ME_EditorApplication.h"
-#include "ME_Project.h"
-#include "ME_ConsoleWindow.h"
-#include "ME_Constants.h"
+#include "EditorApplication.h"
+#include "Project.h"
+#include "ConsoleWindow.h"
+#include "Constants.h"
 #include <filesystem>
 
 using namespace Minty;
