@@ -991,6 +991,12 @@ Bool Minty::Parse::try_color(String const& string, Color& value)
 			text = text.substr(1, text.size() - 1);
 		}
 
+		if (text.length() != 6 && text.length() != 8)
+		{
+			// must be 6 or 8 characters
+			return false;
+		}
+
 		if (!Encoding::is_base16(text))
 		{
 			return false;
