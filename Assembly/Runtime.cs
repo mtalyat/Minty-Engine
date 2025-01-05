@@ -104,5 +104,19 @@ namespace MintyEngine
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void SceneManager_Load(string path);
 
         #endregion
+
+        #region Image
+
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static ulong Image_Create(Format format, ImageType type, ImageTiling tiling, ImageAspect aspect, ImageUsage usage, uint width, uint height, bool immutable);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static uint Image_GetWidth(ulong id);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static uint Image_GetHeight(ulong id);
+
+        #endregion
+
+        #region Texture
+
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static ulong Texture_Create(ulong imageId, Filter filter, ImageAddressMode addressMode, bool normalizedCoordinates);
+
+        #endregion
     }
 }
