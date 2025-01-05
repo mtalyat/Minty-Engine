@@ -62,6 +62,7 @@
     <Compile Include="ImageTiling.cs" />
     <Compile Include="ImageType.cs" />
     <Compile Include="ImageUsage.cs" />
+    <Compile Include="GameObject.cs" />
     <Compile Include="Input.cs" />
     <Compile Include="Math.cs" />
     <Compile Include="Object.cs" />

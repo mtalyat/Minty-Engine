@@ -1,0 +1,7 @@
+Clone repo
+Install Vulkan SDK
+Set MINTY_PATH to dev path
+Build:
+1. Runtime
+2. Assembly
+3. Test

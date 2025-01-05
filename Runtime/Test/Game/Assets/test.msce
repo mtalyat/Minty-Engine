@@ -1,0 +1,175 @@
+Assets
+	- "Defaults/Texture/defaultTexture.png"
+	- "Defaults/Texture/defaultTextureIcon.png"
+	- "Defaults/Texture/defaultTextureMint.png"
+	- "Defaults/ShaderModule/defaultModule.frag.spv"
+	- "Defaults/ShaderModule/defaultModule.vert.spv"
+	- "Defaults/Shader/defaultShader.msha"
+	- "Defaults/MaterialTemplate/defaultMaterialTemplate.mmtp"
+	- "Defaults/Material/defaultMaterial.mmat"
+	- "Defaults/ShaderModule/defaultSpriteModule.frag.spv"
+	- "Defaults/ShaderModule/defaultSpriteModule.vert.spv"
+	- "Defaults/Shader/defaultSpriteShader.msha"
+	- "Defaults/MaterialTemplate/defaultSpriteMaterialTemplate.mmtp"
+	- "Defaults/ShaderModule/defaultUiModule.vert.spv"
+	- "Defaults/ShaderModule/defaultUiModule.frag.spv"
+	- "Defaults/Shader/defaultUiShader.msha"
+	- "Defaults/MaterialTemplate/defaultUiMaterialTemplate.mmtp"
+	- "Defaults/Sprite/defaultSprite.mspr"
+	- "Defaults/Sprite/defaultSpriteIcon.mspr"
+	- "Defaults/Sprite/defaultSpriteMint.mspr"
+	- "Defaults/Font/Default/defaultFont_0.png"
+	- "Defaults/ShaderModule/defaultTextModule.vert.spv"
+	- "Defaults/ShaderModule/defaultTextModule.frag.spv"
+	- "Defaults/Shader/defaultTextShader.msha"
+	- "Defaults/MaterialTemplate/defaultTextMaterialTemplate.mmtp"
+	- "Defaults/Font/Default/defaultFont.fnt"
+	- "Defaults/Font/Default/defaultFont.mfnt"
+Systems
+	Render
+Entities
+	Camera
+		Transform
+			position: (5, 5, -10)
+			rotation: (0, 0, 0)
+			scale: (1, 1, 1)
+		Camera
+			color: Black
+		Enabled
+	Canvas: 6fc41b54e9ade453
+		Canvas
+			resolution: (1920, 1080)
+		Enabled
+		Renderable
+		UITransform
+			anchor: All
+	Text Test
+		UITransform
+			anchor: TopLeft
+			x: 200
+			y: 200
+			width: 3000
+			height: 4000
+		Text
+			text: Minty Time!
+			color: White
+			font: def0000000000015
+			fontSize: 32
+			bold: false
+			italic: false
+		Relationship
+			parent: 6fc41b54e9ade453
+		Enabled
+		Renderable
+	UI TopLeft
+		UITransform
+			anchor: TopLeft
+			x: 0
+			y: 0
+			width: 200
+			height: 200
+		Sprite:
+			sprite: def0000000000001
+			color: White
+		Relationship
+			parent: 6fc41b54e9ade453
+		Enabled
+		Renderable
+	UI TopRight
+		UITransform
+			anchor: TopRight
+			x: -200
+			y: 0
+			width: 200
+			height: 200
+		Sprite:
+			sprite: def000000000001a
+			color: White
+		Relationship
+			parent: 6fc41b54e9ade453
+		Enabled
+		Renderable
+	UI BottomRight
+		UITransform
+			anchor: BottomRight
+			x: -200
+			y: -200
+			width: 200
+			height: 200
+		Sprite:
+			sprite: def000000000001a
+			color: White
+		Relationship
+			parent: 6fc41b54e9ade453
+		Enabled
+		Renderable
+	UI BottomLeft
+		UITransform
+			anchor: BottomLeft
+			x: 0
+			y: -200
+			width: 200
+			height: 200
+		Sprite:
+			sprite: def000000000001a
+			color: White
+		Relationship
+			parent: 6fc41b54e9ade453
+		Enabled
+		Renderable
+	UI Top
+		UITransform
+			anchor: Top
+			left: 200
+			right: 200
+			y: 0
+			height: 200
+		Sprite:
+			sprite: def000000000001a
+			color: White
+		Relationship
+			parent: 6fc41b54e9ade453
+		Enabled
+		Renderable
+	UI Bottom
+		UITransform
+			anchor: Bottom
+			left: 200
+			right: 200
+			y: -200
+			height: 200
+		Sprite:
+			sprite: def000000000001a
+			color: White
+		Relationship
+			parent: 6fc41b54e9ade453
+		Enabled
+		Renderable
+	UI Left
+		UITransform
+			anchor: Left
+			x: 0
+			width: 200
+			top: 200
+			bottom: 200
+		Sprite:
+			sprite: def000000000001a
+			color: White
+		Relationship
+			parent: 6fc41b54e9ade453
+		Enabled
+		Renderable
+	UI Right
+		UITransform
+			anchor: Right
+			x: -200
+			width: 200
+			top: 200
+			bottom: 200
+		Sprite:
+			sprite: def000000000001a
+			color: White
+		Relationship
+			parent: 6fc41b54e9ade453
+		Enabled
+		Renderable
