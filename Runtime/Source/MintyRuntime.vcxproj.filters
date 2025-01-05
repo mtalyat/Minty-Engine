@@ -1,0 +1,1092 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Header Files">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Header Files\Minty">
+      <UniqueIdentifier>{82303f6a-e008-48c1-bef9-cabdc0f4f659}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Minty\Input">
+      <UniqueIdentifier>{86a77ddb-689b-4f4a-ac2a-05d7e31b08e7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Minty\Core">
+      <UniqueIdentifier>{f46fa0a1-e7dc-4688-b6d1-ec81be787299}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Minty\Debug">
+      <UniqueIdentifier>{2603bda2-6885-45e1-8567-edf92672a11e}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Minty\File">
+      <UniqueIdentifier>{17451e22-3521-4e26-8edb-e1fbcb399ee4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Minty\Library">
+      <UniqueIdentifier>{feccd6a3-9b2a-4943-8291-120bfc85fff7}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Platform">
+      <UniqueIdentifier>{15b9f9c8-c527-4718-a541-64cc92b181f2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Platform\Windows">
+      <UniqueIdentifier>{bc5a1d18-20bd-41ad-b98b-c625866c3221}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Platform\Vulkan">
+      <UniqueIdentifier>{ac4c093f-8407-49ef-b48f-a3ba250e0155}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Minty\Render">
+      <UniqueIdentifier>{4a5425dd-aa32-47e3-9c40-507027124f87}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Minty\Serialize">
+      <UniqueIdentifier>{027c089a-9087-489d-98b2-dd15ef7d7bf2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Minty\Asset">
+      <UniqueIdentifier>{88b1a4bb-fb2e-43ae-b81f-4ff05a21b3af}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Minty\Scene">
+      <UniqueIdentifier>{0ebb8d7d-be84-4105-9211-d9be8a53b200}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Minty\Entity">
+      <UniqueIdentifier>{b4e8155e-d50f-48c5-bbbb-a5e8a13c0e56}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Minty\Component">
+      <UniqueIdentifier>{4a8152fe-9dc7-4341-b2f0-c4855f7619b4}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Minty\System">
+      <UniqueIdentifier>{f23c9143-76e3-4f7b-a3ba-0be75133ba43}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Minty\Animation">
+      <UniqueIdentifier>{7bd64cbc-1660-42c0-af67-8120a5e80876}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Minty\Audio">
+      <UniqueIdentifier>{784f5c88-c66a-4d70-a8ba-1880c7610b30}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Minty\UI">
+      <UniqueIdentifier>{3cac2b5f-0cc0-4aaf-bc0f-062a7b993786}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Minty\Script">
+      <UniqueIdentifier>{0bb2b76e-29af-4c57-95bf-2f3310c701b8}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Minty\Script\CS">
+      <UniqueIdentifier>{36a6bcda-2fe0-4348-87c7-01c4b4c427a9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Minty\FSM">
+      <UniqueIdentifier>{64167ab9-498b-4d65-b960-442fa777e4f5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Minty\Data">
+      <UniqueIdentifier>{3d770cbf-87f5-452e-84ad-6215cb3468cc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Minty\Audio\SoLoud">
+      <UniqueIdentifier>{697cc2b5-8cbe-4b33-8848-2ec335786136}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Minty\Window">
+      <UniqueIdentifier>{005cd715-b37e-4c43-8238-7fa23036a161}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Minty\Thread">
+      <UniqueIdentifier>{d5aa14b3-1e06-4f4e-83c1-6efc773c209b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Header Files\Minty\GUI">
+      <UniqueIdentifier>{97336ed9-c394-43b3-9b34-6ef84cf7e060}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="framework.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="pch.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Core\Base.h">
+      <Filter>Header Files\Minty\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Debug\Logger.h">
+      <Filter>Header Files\Minty\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\File\File.h">
+      <Filter>Header Files\Minty\File</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Core\String.h">
+      <Filter>Header Files\Minty\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Core\Path.h">
+      <Filter>Header Files\Minty\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Core\Types.h">
+      <Filter>Header Files\Minty\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Core\Pointer.h">
+      <Filter>Header Files\Minty\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Core\Application.h">
+      <Filter>Header Files\Minty\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Core\Macros.h">
+      <Filter>Header Files\Minty\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Debug\Debug.h">
+      <Filter>Header Files\Minty\Debug</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Core\Console.h">
+      <Filter>Header Files\Minty\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\File\PhysicalFile.h">
+      <Filter>Header Files\Minty\File</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Core\Time.h">
+      <Filter>Header Files\Minty\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Core\UUID.h">
+      <Filter>Header Files\Minty\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Core\Encoding.h">
+      <Filter>Header Files\Minty\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Core\Parse.h">
+      <Filter>Header Files\Minty\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Core\Math.h">
+      <Filter>Header Files\Minty\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Library\GLM.h">
+      <Filter>Header Files\Minty\Library</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Library\GLFW.h">
+      <Filter>Header Files\Minty\Library</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Library\EnTT.h">
+      <Filter>Header Files\Minty\Library</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Library\Vulkan.h">
+      <Filter>Header Files\Minty\Library</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Core\Constants.h">
+      <Filter>Header Files\Minty\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Core\Event.h">
+      <Filter>Header Files\Minty\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Input\Key.h">
+      <Filter>Header Files\Minty\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Input\Mouse.h">
+      <Filter>Header Files\Minty\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Input\Gamepad.h">
+      <Filter>Header Files\Minty\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\Windows\WindowsWindow.h">
+      <Filter>Header Files\Platform\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Library\Stb.h">
+      <Filter>Header Files\Minty\Library</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Core\ApplicationInfo.h">
+      <Filter>Header Files\Minty\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\Vulkan\VulkanRenderer.h">
+      <Filter>Header Files\Platform\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Render\Image.h">
+      <Filter>Header Files\Minty\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\Vulkan\VulkanImage.h">
+      <Filter>Header Files\Platform\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Serialize\Node.h">
+      <Filter>Header Files\Minty\Serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Asset\Asset.h">
+      <Filter>Header Files\Minty\Asset</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Asset\AssetManager.h">
+      <Filter>Header Files\Minty\Asset</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\File\Wrap.h">
+      <Filter>Header Files\Minty\File</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\File\VirtualFile.h">
+      <Filter>Header Files\Minty\File</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Core\Compression.h">
+      <Filter>Header Files\Minty\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\File\Wrapper.h">
+      <Filter>Header Files\Minty\File</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Render\ShaderModule.h">
+      <Filter>Header Files\Minty\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\Vulkan\VulkanShaderModule.h">
+      <Filter>Header Files\Platform\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Render\Viewport.h">
+      <Filter>Header Files\Minty\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Render\Renderer.h">
+      <Filter>Header Files\Minty\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Render\Surface.h">
+      <Filter>Header Files\Minty\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\Vulkan\VulkanSurface.h">
+      <Filter>Header Files\Platform\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Render\Scissor.h">
+      <Filter>Header Files\Minty\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\Vulkan\VulkanScissor.h">
+      <Filter>Header Files\Platform\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\Vulkan\VulkanViewport.h">
+      <Filter>Header Files\Platform\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Render\RenderTarget.h">
+      <Filter>Header Files\Minty\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\Vulkan\VulkanRenderTarget.h">
+      <Filter>Header Files\Platform\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Core\Color.h">
+      <Filter>Header Files\Minty\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Render\Shader.h">
+      <Filter>Header Files\Minty\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\Vulkan\VulkanShader.h">
+      <Filter>Header Files\Platform\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Render\Buffer.h">
+      <Filter>Header Files\Minty\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\Vulkan\VulkanBuffer.h">
+      <Filter>Header Files\Platform\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Render\Mesh.h">
+      <Filter>Header Files\Minty\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\Vulkan\VulkanMesh.h">
+      <Filter>Header Files\Platform\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Core\Pack.h">
+      <Filter>Header Files\Minty\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Render\Texture.h">
+      <Filter>Header Files\Minty\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\Vulkan\VulkanTexture.h">
+      <Filter>Header Files\Platform\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Scene\Scene.h">
+      <Filter>Header Files\Minty\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Entity\Entity.h">
+      <Filter>Header Files\Minty\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Entity\EntityRegistry.h">
+      <Filter>Header Files\Minty\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Scene\SceneObject.h">
+      <Filter>Header Files\Minty\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Component\Component.h">
+      <Filter>Header Files\Minty\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Serialize\Writer.h">
+      <Filter>Header Files\Minty\Serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\System\System.h">
+      <Filter>Header Files\Minty\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\System\SystemRegistry.h">
+      <Filter>Header Files\Minty\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Core\ToString.h">
+      <Filter>Header Files\Minty\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\System\RenderSystem.h">
+      <Filter>Header Files\Minty\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Serialize\Reader.h">
+      <Filter>Header Files\Minty\Serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Render\Material.h">
+      <Filter>Header Files\Minty\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Render\MaterialTemplate.h">
+      <Filter>Header Files\Minty\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Core\Type.h">
+      <Filter>Header Files\Minty\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Core\Operation.h">
+      <Filter>Header Files\Minty\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Serialize\Serializable.h">
+      <Filter>Header Files\Minty\Serialize</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Script\ScriptEngine.h">
+      <Filter>Header Files\Minty\Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Script\CS\CsScriptEngine.h">
+      <Filter>Header Files\Minty\Script\CS</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Library\Mono.h">
+      <Filter>Header Files\Minty\Library</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Script\CS\CS.h">
+      <Filter>Header Files\Minty\Script\CS</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Script\ScriptAssembly.h">
+      <Filter>Header Files\Minty\Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Script\ScriptClass.h">
+      <Filter>Header Files\Minty\Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Script\ScriptObject.h">
+      <Filter>Header Files\Minty\Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Script\ScriptArguments.h">
+      <Filter>Header Files\Minty\Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Script\CS\CsScriptAssembly.h">
+      <Filter>Header Files\Minty\Script\CS</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Script\CS\CsScriptClass.h">
+      <Filter>Header Files\Minty\Script\CS</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Script\CS\CsScriptObject.h">
+      <Filter>Header Files\Minty\Script\CS</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\UI\AnchorMode.h">
+      <Filter>Header Files\Minty\UI</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Entity\EntitySerializationData.h">
+      <Filter>Header Files\Minty\Entity</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Render\Sprite.h">
+      <Filter>Header Files\Minty\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Component\ScriptObjectComponent.h">
+      <Filter>Header Files\Minty\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Component\DestroyComponent.h">
+      <Filter>Header Files\Minty\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Component\DirtyComponent.h">
+      <Filter>Header Files\Minty\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Component\EnabledComponent.h">
+      <Filter>Header Files\Minty\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Component\NameComponent.h">
+      <Filter>Header Files\Minty\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Component\RelationshipComponent.h">
+      <Filter>Header Files\Minty\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Component\RenderableComponent.h">
+      <Filter>Header Files\Minty\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Component\TagComponent.h">
+      <Filter>Header Files\Minty\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Component\TransformComponent.h">
+      <Filter>Header Files\Minty\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Component\MeshComponent.h">
+      <Filter>Header Files\Minty\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Component\SpriteComponent.h">
+      <Filter>Header Files\Minty\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Component\ScriptComponent.h">
+      <Filter>Header Files\Minty\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Component\ScriptEventComponent.h">
+      <Filter>Header Files\Minty\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Component\CanvasComponent.h">
+      <Filter>Header Files\Minty\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Component\UITransformComponent.h">
+      <Filter>Header Files\Minty\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Component\AllComponents.h">
+      <Filter>Header Files\Minty\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Core\Linker.h">
+      <Filter>Header Files\Minty\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\System\AllSystems.h">
+      <Filter>Header Files\Minty\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Core\ArgumentParser.h">
+      <Filter>Header Files\Minty\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Core\Stopwatch.h">
+      <Filter>Header Files\Minty\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Scene\SceneManager.h">
+      <Filter>Header Files\Minty\Scene</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Component\CameraComponent.h">
+      <Filter>Header Files\Minty\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Render\Camera.h">
+      <Filter>Header Files\Minty\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Render\Perspective.h">
+      <Filter>Header Files\Minty\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Script\Accessibility.h">
+      <Filter>Header Files\Minty\Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Script\ScriptField.h">
+      <Filter>Header Files\Minty\Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Script\ScriptProperty.h">
+      <Filter>Header Files\Minty\Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Script\ScriptMethod.h">
+      <Filter>Header Files\Minty\Script</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Script\CS\CsScriptField.h">
+      <Filter>Header Files\Minty\Script\CS</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Script\CS\CsScriptProperty.h">
+      <Filter>Header Files\Minty\Script\CS</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Script\CS\CsScriptMethod.h">
+      <Filter>Header Files\Minty\Script\CS</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\System\ScriptSystem.h">
+      <Filter>Header Files\Minty\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Script\CS\CsLinker.h">
+      <Filter>Header Files\Minty\Script\CS</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\System\AnimationSystem.h">
+      <Filter>Header Files\Minty\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Animation\Animation.h">
+      <Filter>Header Files\Minty\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Animation\Animator.h">
+      <Filter>Header Files\Minty\Animation</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\FSM\Conditional.h">
+      <Filter>Header Files\Minty\FSM</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\FSM\FiniteStateMachine.h">
+      <Filter>Header Files\Minty\FSM</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Component\AnimatorComponent.h">
+      <Filter>Header Files\Minty\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Data\DynamicContainer.h">
+      <Filter>Header Files\Minty\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Data\List.h">
+      <Filter>Header Files\Minty\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Data\Lookup.h">
+      <Filter>Header Files\Minty\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Data\Register.h">
+      <Filter>Header Files\Minty\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Data\StaticContainer.h">
+      <Filter>Header Files\Minty\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Data\Array.h">
+      <Filter>Header Files\Minty\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Data\Cargo.h">
+      <Filter>Header Files\Minty\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Data\ConstantContainer.h">
+      <Filter>Header Files\Minty\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Data\Container.h">
+      <Filter>Header Files\Minty\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Data\Variable.h">
+      <Filter>Header Files\Minty\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\Vulkan\VulkanMaterial.h">
+      <Filter>Header Files\Platform\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Audio\AudioClip.h">
+      <Filter>Header Files\Minty\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Audio\SoLoud\SoLoudAudioClip.h">
+      <Filter>Header Files\Minty\Audio\SoLoud</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Audio\SoLoud\SoLoud.h">
+      <Filter>Header Files\Minty\Audio\SoLoud</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Library\SoLoud.h">
+      <Filter>Header Files\Minty\Library</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Audio\AudioEngine.h">
+      <Filter>Header Files\Minty\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Audio\SoLoud\SoLoudAudioEngine.h">
+      <Filter>Header Files\Minty\Audio\SoLoud</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Audio\AudioListener.h">
+      <Filter>Header Files\Minty\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Audio\AudioSource.h">
+      <Filter>Header Files\Minty\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Audio\Attenuation.h">
+      <Filter>Header Files\Minty\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Component\AudioListenerComponent.h">
+      <Filter>Header Files\Minty\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Component\AudioSourceComponent.h">
+      <Filter>Header Files\Minty\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\System\AudioSystem.h">
+      <Filter>Header Files\Minty\System</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Input\Input.h">
+      <Filter>Header Files\Minty\Input</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Core\Rect.h">
+      <Filter>Header Files\Minty\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\Windows\WindowsWindowManager.h">
+      <Filter>Header Files\Platform\Windows</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Window\WindowManager.h">
+      <Filter>Header Files\Minty\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Window\Window.h">
+      <Filter>Header Files\Minty\Window</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Data\BaseContainer.h">
+      <Filter>Header Files\Minty\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Render\BufferContainer.h">
+      <Filter>Header Files\Minty\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Render\CoordinateMode.h">
+      <Filter>Header Files\Minty\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Component\TextComponent.h">
+      <Filter>Header Files\Minty\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Render\Font.h">
+      <Filter>Header Files\Minty\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Render\FontChar.h">
+      <Filter>Header Files\Minty\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Render\FontVariant.h">
+      <Filter>Header Files\Minty\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Data\Batch.h">
+      <Filter>Header Files\Minty\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Data\BatchFactory.h">
+      <Filter>Header Files\Minty\Data</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Render\Space.h">
+      <Filter>Header Files\Minty\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Render\BufferCargo.h">
+      <Filter>Header Files\Minty\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Thread\Task.h">
+      <Filter>Header Files\Minty\Thread</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Library\ImGUI.h">
+      <Filter>Header Files\Minty\Library</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\GUI\GUI.h">
+      <Filter>Header Files\Minty\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\GUI\Theme.h">
+      <Filter>Header Files\Minty\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\GUI\Enums.h">
+      <Filter>Header Files\Minty\GUI</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Core\Direction.h">
+      <Filter>Header Files\Minty\Core</Filter>
+    </ClInclude>
+    <ClInclude Include="Platform\Vulkan\VulkanRenderPass.h">
+      <Filter>Header Files\Platform\Vulkan</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Render\RenderPass.h">
+      <Filter>Header Files\Minty\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Render\RenderAttachment.h">
+      <Filter>Header Files\Minty\Render</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Render\Enums.h">
+      <Filter>Header Files\Minty\Render</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="pch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Core\Application.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Core\Console.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\File\PhysicalFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\File\File.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Core\Time.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Core\UUID.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Core\Encoding.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Core\Parse.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Core\String.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Core\Math.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\Windows\WindowsWindow.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\Vulkan\VulkanRenderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\Vulkan\VulkanImage.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\File\VirtualFile.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Core\Compression.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\File\Wrap.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\File\Wrapper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Asset\AssetManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Asset\Asset.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\Vulkan\VulkanShaderModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Render\ShaderModule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Render\Renderer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Render\Surface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\Vulkan\VulkanSurface.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Render\Scissor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\Vulkan\VulkanScissor.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Render\Viewport.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\Vulkan\VulkanViewport.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Render\RenderTarget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\Vulkan\VulkanRenderTarget.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Core\Color.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Render\Shader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\Vulkan\VulkanShader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Render\Buffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\Vulkan\VulkanBuffer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Render\Mesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\Vulkan\VulkanMesh.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Render\Texture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Render\Image.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\Vulkan\VulkanTexture.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Scene\Scene.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Entity\EntityRegistry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Serialize\Writer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\System\SystemRegistry.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\System\RenderSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Serialize\Reader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Serialize\Node.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Render\Material.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Render\MaterialTemplate.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Core\Type.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Core\Operation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Script\CS\CsScriptEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Script\ScriptEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Script\ScriptAssembly.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Script\CS\CsScriptAssembly.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Script\ScriptClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Script\CS\CsScriptClass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Script\ScriptObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Script\CS\CsScriptObject.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\UI\AnchorMode.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Render\Sprite.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Component\ScriptEventComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Core\Linker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Core\ArgumentParser.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Core\Stopwatch.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Scene\SceneManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Render\Camera.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Component\CameraComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Component\ScriptComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Script\CS\CsScriptField.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Script\CS\CsScriptProperty.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Script\CS\CsScriptMethod.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\System\ScriptSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Script\CS\CsLinker.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\FSM\FiniteStateMachine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Animation\Animator.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Animation\Animation.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\System\AnimationSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Component\AnimatorComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Data\StaticContainer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Data\Cargo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Data\ConstantContainer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Data\DynamicContainer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Component\RelationshipComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\Vulkan\VulkanMaterial.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Audio\AudioClip.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Audio\SoLoud\SoLoudAudioClip.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Audio\AudioEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Audio\SoLoud\SoLoudAudioEngine.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Component\AudioSourceComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\System\AudioSystem.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\soloud\include\stb_vorbis.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_wavstream.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_wav.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_thread.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_queue.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_miniaudio.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_misc.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_filter.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_file.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_fft_lut.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_fft.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_fader.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_core_voiceops.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_core_setters.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_core_voicegroup.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_core_filterops.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_core_getters.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_core_basicops.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_core_faderops.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_core_3d.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_bus.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud_audiosource.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\soloud\include\soloud.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\soloud\include\dr_impl.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Input\Input.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\Windows\WindowsWindowManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Window\Window.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Window\WindowManager.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Debug\Debug.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Debug\Logger.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Data\BaseContainer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Data\Container.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Render\BufferContainer.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Component\SpriteComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Render\FontVariant.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Render\Font.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Component\TextComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Component\UITransformComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Component\CanvasComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Render\BufferCargo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Core\ToString.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Component\MeshComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Component\NameComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Component\TagComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Component\TransformComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\imgui\include\imgui_draw.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\imgui\include\imgui_impl_glfw.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\imgui\include\imgui_demo.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\imgui\include\imgui.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\imgui\include\imgui_widgets.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\imgui\include\imgui_tables.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\imgui\include\imgui_stdlib.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\imgui\include\imgui_impl_vulkan.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Libraries\imguifiledialog\include\ImGuiFileDialog.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\GUI\GUI.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Platform\Vulkan\VulkanRenderPass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Render\RenderPass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

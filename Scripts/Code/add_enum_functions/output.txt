@@ -1,0 +1,66 @@
+====================
+	ToString.h:
+====================
+
+String to_string(ImageAddressMode const obj);
+
+====================
+	ToString.cpp
+====================
+
+String Minty::to_string(ImageAddressMode const obj)
+{
+    switch (obj)
+	{
+		case ImageAddressMode::Undefined: return "Undefined";
+		case ImageAddressMode::Repeat: return "Repeat";
+		case ImageAddressMode::MirroredRepeat: return "MirroredRepeat";
+		case ImageAddressMode::ClampToEdge: return "ClampToEdge";
+		case ImageAddressMode::ClampToBorder: return "ClampToBorder";
+		case ImageAddressMode::MirroredClampToEdge: return "MirroredClampToEdge";
+
+		default: return "";
+	}
+}
+
+====================
+	Parse.h
+====================
+
+ImageAddressMode to_image_address_mode(String const& string);
+Bool try_image_address_mode(String const& string, ImageAddressMode& value);
+
+template<>
+inline void parse_to(String const& string, ImageAddressMode& value)
+{
+    value = to_image_address_mode(string);
+}
+
+template<>
+inline Bool parse_try(String const& string, ImageAddressMode& value)
+{
+    return try_image_address_mode(string, value);
+}
+
+====================
+	Parse.cpp
+====================
+
+ImageAddressMode Minty::Parse::to_image_address_mode(String const& string)
+{
+	if (string == "Undefined") return ImageAddressMode::Undefined;
+	if (string == "Repeat") return ImageAddressMode::Repeat;
+	if (string == "MirroredRepeat") return ImageAddressMode::MirroredRepeat;
+	if (string == "ClampToEdge") return ImageAddressMode::ClampToEdge;
+	if (string == "ClampToBorder") return ImageAddressMode::ClampToBorder;
+	if (string == "MirroredClampToEdge") return ImageAddressMode::MirroredClampToEdge;
+
+	return ImageAddressMode();
+}
+
+Bool Minty::Parse::try_image_address_mode(String const& string, ImageAddressMode& value)
+{
+	value = to_image_address_mode(string);
+	return value != ImageAddressMode();
+}
+

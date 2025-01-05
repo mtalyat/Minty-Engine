@@ -2079,8 +2079,8 @@ namespace SoLoud
 	void interlace_samples_s16_mono(const float *aSourceBuffer, short *aDestBuffer, unsigned int aSamples)
 	{
 		const __m128 scale = _mm_set1_ps(0x7fff);
-		const unsigned int blockSize = 16;
-		const unsigned int numBlocks = aSamples / blockSize;
+		unsigned int const blockSize = 16;
+		unsigned int const numBlocks = aSamples / blockSize;
 		SOLOUD_ASSERT((aSamples % blockSize) == 0);
 
 		for (unsigned int i = 0; i < numBlocks; ++i)
@@ -2105,7 +2105,7 @@ namespace SoLoud
 
 		_mm_empty();
 
-		const unsigned int offset = blockSize * numBlocks;
+		unsigned int const offset = blockSize * numBlocks;
 		for (unsigned int i = offset; i < aSamples; ++i)
 		{
 			aDestBuffer[i] = static_cast<short>(aSourceBuffer[i] * 0x7fff);
@@ -2115,8 +2115,8 @@ namespace SoLoud
 	void interlace_samples_s16_stereo(const float *aSourceBuffer, short *aDestBuffer, unsigned int aSamples)
 	{
 		const __m128 scale = _mm_set1_ps(0x7fff);
-		const unsigned int blockSize = 8u;
-		const unsigned int numBlocks = aSamples / blockSize;
+		unsigned int const blockSize = 8u;
+		unsigned int const numBlocks = aSamples / blockSize;
 		SOLOUD_ASSERT((aSamples % blockSize) == 0);
 
 		for (unsigned int i = 0; i < numBlocks; ++i)
@@ -2146,7 +2146,7 @@ namespace SoLoud
 
 		_mm_empty();
 
-		const unsigned int offset = blockSize * numBlocks;
+		unsigned int const offset = blockSize * numBlocks;
 		for (unsigned int i = offset; i < aSamples; ++i)
 		{
 			aDestBuffer[2 * i + 0] = static_cast<short>(aSourceBuffer[i] * 0x7fff);

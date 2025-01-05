@@ -1,0 +1,7 @@
+Shader: def000000000000c
+Values
+    canvas
+        width: 1920
+        height: 1080
+    texture
+        texSampler: def0000000000013

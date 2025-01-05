@@ -1,0 +1,10 @@
+EnTT
+FreeType
+GLFW
+GLM
+Mono
+OpenCV
+STB
+TesseractData
+VulkanSDK
+ZLIB

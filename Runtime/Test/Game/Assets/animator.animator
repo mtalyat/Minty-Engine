@@ -1,0 +1,38 @@
+fsm
+    scope
+        move: 0
+        flicker: 0
+    states
+        idle: 1b19ad67ab84b5e6
+            value
+                value: UUID 923eed2b7407acf1
+                transitions
+                    -
+                        state: da6d66382cb35612
+                        conditions
+                            - move != 0
+                    -
+                        state: 380fee2f9acedbaf
+                        conditions
+                            - flicker != 0
+        moving: da6d66382cb35612
+            value
+                value: UUID 6b94ffa6f8694d71
+                transitions
+                    -
+                        state: 1b19ad67ab84b5e6
+                        conditions
+                            - move == 0
+                    -
+                        state: flicker
+                        conditions
+                            - flicker != 0
+        flicker: 380fee2f9acedbaf
+            value
+                value: UUID b3d99ce55af7007f
+                transitions
+                    -
+                        state: 1b19ad67ab84b5e6
+                        conditions
+                            - flicker == 0
+    start: da6d66382cb35612

@@ -1,0 +1,36 @@
+Inputs
+    push
+        Type: PushConstant
+        Stage: Vertex
+        Structure
+            position: Float4
+            color: Float4
+    canvas
+        Type: UniformBuffer
+        Stage: Vertex
+        Set: 0
+        Binding: 0
+        Frequent: true
+        Structure
+            width: Int
+            height: Int
+    texture
+        Type: CombinedImageSampler
+        Stage: Fragment
+        Set: 0
+        Binding: 1
+        Frequent: false
+        Structure
+            texSampler: Asset
+PrimitiveTopology: TriangleList
+PolygonMode: Fill
+CullMode: None
+FrontFace: Clockwise
+LineWidth: 1
+Bindings
+    0: Vertex
+        0: Float2
+        1: Float2
+Stages
+    Vertex: def0000000000007
+    Fragment: def0000000000006

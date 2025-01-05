@@ -304,7 +304,7 @@ namespace SoLoud
 		return res;
 	}
 
-	result Wav::loadMem(const unsigned char *aMem, unsigned int aLength, bool aCopy, bool aTakeOwnership)
+	result Wav::loadMem(unsigned const char *aMem, unsigned int aLength, bool aCopy, bool aTakeOwnership)
 	{
 		if (aMem == NULL || aLength == 0)
 			return INVALID_PARAMETER;
