@@ -1,0 +1,5 @@
+Update this with any old IDs that have been depricated:
+defaultSpriteMaterial: def0000000000016
+
+Update this with the next fresh ID to be used:
+def000000000001b

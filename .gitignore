@@ -73,7 +73,7 @@ StyleCopReport.xml
 *_p.c
 *_h.h
 *.ilk
-*.meta
+# *.meta
 *.obj
 *.iobj
 *.pch
@@ -397,10 +397,18 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 
-# Management folder
-Management/
-
 # Minty Engine
 /Editor/mono/
-/Editor/Log.txt
-Editor/Source/Log.txt
+!Runtime/Source/Minty/[Dd]ebug/
+!Libraries/mono/lib/Debug/
+!Libraries/mono/lib/Release/
+
+# Ignore any log files
+Log.txt
+*.log
+
+# Wrap
+*.wrap
+
+# VSCode
+.vscode

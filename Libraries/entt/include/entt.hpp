@@ -1,4 +1,4 @@
-#include "Minty/Tools/M_Debug.h"
+#include "Minty/Debug/Debug.h"
 
 // CUSTOM MODIFICATIONS
 // define a custom assert macro to override the default one so we can see the message

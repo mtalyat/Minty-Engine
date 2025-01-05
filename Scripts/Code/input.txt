@@ -1,0 +1,6 @@
+enum class Filter
+{
+	Undefined,
+	Nearest,
+	Linear,
+};

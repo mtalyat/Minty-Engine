@@ -1,0 +1,39 @@
+Assets
+	- "Assets/blake.jpg"
+	- "Assets/devin-smirk.png"
+	- "Assets/devin-laugh.png"
+	- "Assets/devin-flabbergasted.png"
+	- "Assets/devin-grin.png"
+	- "Assets/vert.spv"
+	- "Assets/frag.spv"
+	- "Assets/test.shader"
+	- "Assets/test.materialtemplate"
+	- "Assets/devin-smirk.material"
+	- "Assets/devin-laugh.material"
+	- "Assets/devin-flabbergasted.material"
+	- "Assets/devin-grin.material"
+	- "Assets/moving.animation"
+	- "Assets/animatorSimple.animator"
+Systems
+	Render
+	Script
+	Animation
+Entities
+	Camera
+		Transform
+			position: (0, 0, 0)
+			scale: (1, 1, 1)
+		Camera
+			color: Black
+		Enabled
+	Origin: 66bac7821a8bdf33
+		Transform
+			position: (0, 0, 2.5)
+			rotation: (0, 45, 0)
+		Animator
+			animator: 4cf16e3203af386a
+		Mesh
+			type: Cube
+			material: 
+		Enabled
+		Renderable

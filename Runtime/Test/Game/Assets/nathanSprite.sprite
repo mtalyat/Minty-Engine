@@ -1,0 +1,12 @@
+texture: 7d6999846025c08e
+coordinateMode: NORMALIZED
+ppu: 1024
+min
+    x: 0
+    y: 0
+max
+    x: 1
+    y: 1
+pivot
+    x: 0.5
+    y: 0.5
