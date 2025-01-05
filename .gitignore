@@ -403,3 +403,4 @@ Management/
 # Minty Engine
 /Editor/mono/
 /Editor/Log.txt
+Editor/Source/Log.txt
