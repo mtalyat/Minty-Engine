@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using UUID = System.UInt64;
+
 namespace MintyEngine
 {
     /// <summary>
@@ -15,6 +17,12 @@ namespace MintyEngine
         {
             get => Runtime.Entity_GetName(ID);
             set => Runtime.Entity_SetName(ID, value);
+        }
+
+        public uint Layer
+        {
+            get => Runtime.Entity_GetLayer(ID);
+            set => Runtime.Entity_SetLayer(ID, value);
         }
 
         public string Tag
@@ -39,6 +47,10 @@ namespace MintyEngine
         {
             get => Runtime.Entity_GetChildCount(ID);
         }
+
+        internal Entity(UUID id)
+            : base(id)
+        { }
 
         #region Component
 
@@ -106,9 +118,22 @@ namespace MintyEngine
 
         #endregion
 
+        #region Utility
+
         public override string ToString()
         {
             return $"{Name} {ID:X}";
         }
+
+        #endregion
+
+        #region Entity
+
+        internal static Entity Find(UUID id)
+        {
+            return Runtime.Entity_Find(id) as Entity;
+        }
+
+        #endregion
     }
 }

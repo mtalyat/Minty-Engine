@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Minty/Core/String.h"
+#include "Minty/Core/ToString.h"
 #include "Minty/Core/Type.h"
 #include "Minty/Core/UUID.h"
 #include <unordered_map>
@@ -36,6 +37,9 @@ namespace Minty
 	public:
 		void emplace(UUID const id, String const& name, T const& value)
 		{
+			MINTY_ASSERT_FORMAT(!m_ids.contains(id), "Cannot emplace ID of \"{}\" into the Lookup. The ID already exists.", to_string(id));
+ 			MINTY_ASSERT_FORMAT(!m_names.contains(name), "Cannot emplace name of \"{}\" into the Lookup. The name already exists.", name);
+
 			Size index = m_values.size();
 			m_ids.emplace(id, index);
 			m_names.emplace(name, index);

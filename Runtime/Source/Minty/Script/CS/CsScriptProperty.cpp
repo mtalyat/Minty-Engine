@@ -44,6 +44,36 @@ void Minty::CsScriptProperty::get(void** const value) const
 	}
 }
 
+Accessibility Minty::CsScriptProperty::get_accessibility_get() const
+{
+	MonoMethod* getter = mono_property_get_get_method(mp_property);
+
+	if (!getter)
+	{
+		return Accessibility::None;
+	}
+
+	return CsScriptEngine::get_method_accessibility(getter);
+}
+
+Accessibility Minty::CsScriptProperty::get_accessibility_set() const
+{
+	MonoMethod* setter = mono_property_get_set_method(mp_property);
+
+	if (!setter)
+	{
+		return Accessibility::None;
+	}
+
+	return CsScriptEngine::get_method_accessibility(setter);
+}
+
+Bool Minty::CsScriptProperty::is_static() const
+{
+	uint32_t flags = mono_property_get_flags(mp_property);
+	return static_cast<Bool>(flags & MONO_METHOD_ATTR_STATIC);
+}
+
 Type Minty::CsScriptProperty::get_type() const
 {
 	MonoMethod* getterMethod = mono_property_get_get_method(mp_property);

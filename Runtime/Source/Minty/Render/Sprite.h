@@ -64,7 +64,7 @@ namespace Minty
 		inline Float4 get_uv() const { return Float4(m_offset, m_size); }
 
 	public:
-		AssetType get_type() const override { return AssetType::Sprite; }
+		AssetType get_asset_type() const override { return AssetType::Sprite; }
 
 	private:
 		Float2 get_coords(Float2 const raw) const;

@@ -185,7 +185,7 @@ uint32_t Minty::Wrap::emplace_entry(Entry& newEntry)
     }
 
     // cannot fit
-    MINTY_ERROR("Cannot emplace entry to Wrap file. Entry count surpassed.");
+    MINTY_ERROR_FORMAT("Cannot emplace entry to Wrap file. Entry count surpassed ({}).", m_entries.size());
 
     return -1;
 }

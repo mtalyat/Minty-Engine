@@ -128,6 +128,12 @@ void Minty::Renderer::transition_between_render_passes()
 #endif
 }
 
+void Minty::Renderer::skip_render_pass(Ref<RenderPass> const& renderPass, Ref<RenderTarget> const& renderTarget)
+{
+	start_render_pass(renderPass, renderTarget);
+	end_render_pass();
+}
+
 void Minty::Renderer::set_camera(Float3 const position, Quaternion const rotation, Camera const& camera)
 {
 	set_color(camera.get_color());
@@ -308,7 +314,7 @@ Ref<Material> Minty::Renderer::get_or_create_default_material(Ref<Texture> const
 		// set texture
 		Cargo cargo{};
 		Texture const* spriteTexturePtr = texture.get();
-		cargo.emplace("texture", Type::Asset, &spriteTexturePtr);
+		cargo.emplace("texture", Type::Object, &spriteTexturePtr);
 		builder.values.emplace("texture", std::move(cargo));
 
 		Ref<Material> material = AssetManager::create<Material>(builder);

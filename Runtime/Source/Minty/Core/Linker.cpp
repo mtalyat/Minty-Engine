@@ -28,6 +28,7 @@ void Minty::Linker::link()
 	register_component<CameraComponent>(MINTY_NAME_ENGINE, "Camera", true);
 	register_component<CanvasComponent>(MINTY_NAME_ENGINE, "Canvas", true);
 	register_component<EnabledComponent>(MINTY_NAME_ENGINE, "Enabled", false);
+	register_component<LayerComponent>(MINTY_NAME_ENGINE, "Layer", false);
 	register_component<MeshComponent>(MINTY_NAME_ENGINE, "Mesh", true);
 	register_component<NameComponent>(MINTY_NAME_ENGINE, "Name", true);
 	register_component<RelationshipComponent>(MINTY_NAME_ENGINE, "Relationship", true);

@@ -1,5 +1,5 @@
 #pragma once
-#include "Minty/Component/Component.h"
+#include "Minty/Component/ScriptObjectComponent.h"
 
 namespace Minty
 {
@@ -7,6 +7,6 @@ namespace Minty
 	/// Holds data for an Entity that can hear audio in the Scene.
 	/// </summary>
 	struct AudioListenerComponent
-		: public Component
-	{};
+		: public ScriptObjectComponent
+	{ };
 }

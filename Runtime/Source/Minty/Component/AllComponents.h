@@ -10,6 +10,7 @@
 #include "DestroyComponent.h"
 #include "DirtyComponent.h"
 #include "EnabledComponent.h"
+#include "LayerComponent.h"
 #include "MeshComponent.h"
 #include "NameComponent.h"
 #include "RelationshipComponent.h"

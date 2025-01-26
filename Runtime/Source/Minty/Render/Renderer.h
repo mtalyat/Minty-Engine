@@ -73,6 +73,11 @@ namespace Minty
 		static void end_render_pass();
 		static void transition_between_render_passes();
 
+		// skips the render pass and draws nothing
+		static void skip_render_pass(Ref<RenderPass> const& renderPass, Ref<RenderTarget> const& renderTarget);
+		// skips the scene render pass
+		static void skip();
+
 		// sets the currently active camera
 		static void set_camera(Float3 const position, Quaternion const rotation, Camera const& camera);
 

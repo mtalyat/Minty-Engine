@@ -34,7 +34,7 @@ namespace Minty
 		virtual ~AudioClip() = default;
 
 	public:
-		AssetType get_type() const override { return AssetType::AudioClip; }
+		AssetType get_asset_type() const override { return AssetType::AudioClip; }
 
 	public:
 		virtual void* get_native() const = 0;

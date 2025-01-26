@@ -128,7 +128,11 @@ Type Minty::CsScriptEngine::to_type(MonoType* const type)
 		return Type::Double;
 	case MONO_TYPE_STRING:
 		return Type::String;
+	//case MONO_TYPE_OBJECT:
+	case MONO_TYPE_CLASS:
+		return Type::Object;
 	default:
+		MINTY_ERROR_FORMAT("Unknown Mono type: {}", static_cast<Int>(typeEnum));
 		return Type::Undefined;
 	}
 }
@@ -179,4 +183,137 @@ Bool Minty::CsScriptEngine::check_equal(MonoClass* const left, MonoClass* const 
 
 	//// all match
 	//return true;
+}
+
+UUID Minty::CsScriptEngine::get_uuid(MonoObject* const object)
+{
+	// no ID if null
+	if (object == nullptr)
+	{
+		return UUID();
+	}
+
+	MonoClass* klass = mono_object_get_class(object);
+
+	// no ID if no class (somehow)
+	if (klass == nullptr)
+	{
+		return UUID();
+	}
+
+	// if no ID field, no ID
+	MonoClassField* field = mono_class_get_field_from_name(klass, "ID");
+
+	if (field == nullptr)
+	{
+		return UUID();
+	}
+
+	// ID found: retrieve the value
+	UUID_t rawId;
+	mono_field_get_value(object, field, &rawId);
+
+	return rawId;
+}
+
+UUID Minty::CsScriptEngine::get_entity_uuid(MonoObject* const object)
+{
+	// no ID if null
+	if (object == nullptr)
+	{
+		return UUID();
+	}
+
+	MonoClass* klass = mono_object_get_class(object);
+
+	// no ID if no class (somehow)
+	if (klass == nullptr)
+	{
+		return UUID();
+	}
+
+	// check for _entity
+	MonoClassField* field = mono_class_get_field_from_name(klass, "_entity");
+
+	if (field != nullptr)
+	{
+		// entity found: get UUID field from the entity
+		MonoObject* entityObject = nullptr;
+		mono_field_get_value(object, field, &entityObject);
+
+		MonoClass* entityClass = mono_object_get_class(entityObject);
+		MINTY_ASSERT(entityClass != nullptr);
+		field = mono_class_get_field_from_name(entityClass, "ID");
+		MINTY_ASSERT(field != nullptr);
+	}
+	else
+	{
+		// check for ID directly
+		field = mono_class_get_field_from_name(klass, "ID");
+	}
+
+	// if no field, no ID
+	if (field == nullptr)
+	{
+		return INVALID_UUID;
+	}
+
+	UUID_t rawId;
+	mono_field_get_value(object, field, &rawId);
+	return rawId;
+}
+
+Accessibility Minty::CsScriptEngine::get_field_accessibility(MonoClassField* const field)
+{
+	uint32_t flags = mono_field_get_flags(field);
+
+	if ((flags & MONO_FIELD_ATTR_PUBLIC) == MONO_FIELD_ATTR_PUBLIC)
+	{
+		return Accessibility::Public;
+	}
+	else if ((flags & MONO_FIELD_ATTR_PRIVATE) == MONO_FIELD_ATTR_PRIVATE)
+	{
+		return Accessibility::Private;
+	}
+	else if ((flags & MONO_FIELD_ATTR_FAMILY) == MONO_FIELD_ATTR_FAMILY)
+	{
+		return Accessibility::Protected;
+	}
+	else if ((flags & MONO_FIELD_ATTR_ASSEMBLY) == MONO_FIELD_ATTR_ASSEMBLY)
+	{
+		return Accessibility::Internal;
+	}
+	else if ((flags & MONO_FIELD_ATTR_FAM_AND_ASSEM) == MONO_FIELD_ATTR_FAM_AND_ASSEM)
+	{
+		return Accessibility::Protected | Accessibility::Internal;
+	}
+
+	return Accessibility::None;
+}
+
+Accessibility Minty::CsScriptEngine::get_method_accessibility(MonoMethod* const method)
+{
+	uint32_t flags = mono_method_get_flags(method, nullptr);
+	if ((flags & MONO_METHOD_ATTR_PUBLIC) == MONO_METHOD_ATTR_PUBLIC)
+	{
+		return Accessibility::Public;
+	}
+	else if ((flags & MONO_METHOD_ATTR_PRIVATE) == MONO_METHOD_ATTR_PRIVATE)
+	{
+		return Accessibility::Private;
+	}
+	else if ((flags & MONO_METHOD_ATTR_FAMILY) == MONO_METHOD_ATTR_FAMILY)
+	{
+		return Accessibility::Protected;
+	}
+	else if ((flags & MONO_METHOD_ATTR_ASSEM) == MONO_METHOD_ATTR_ASSEM)
+	{
+		return Accessibility::Internal;
+	}
+	else if ((flags & MONO_METHOD_ATTR_FAM_AND_ASSEM) == MONO_METHOD_ATTR_FAM_AND_ASSEM)
+	{
+		return Accessibility::Protected | Accessibility::Internal;
+	}
+
+	return Accessibility::None;
 }

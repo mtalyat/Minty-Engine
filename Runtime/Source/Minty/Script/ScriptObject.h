@@ -29,10 +29,9 @@ namespace Minty
 	private:
 		Ref<ScriptClass> m_class;
 
-		// caches
-		std::unordered_map<String, Owner<ScriptMethod>> m_methods;
 		std::unordered_map<String, Owner<ScriptField>> m_fields;
 		std::unordered_map<String, Owner<ScriptProperty>> m_properties;
+		std::unordered_map<String, Owner<ScriptMethod>> m_methods;
 
 	public:
 		ScriptObject(ScriptObjectBuilder const& builder);
@@ -45,15 +44,15 @@ namespace Minty
 
 		Ref<ScriptClass> get_class() const { return m_class; }
 
-		Ref<ScriptField> get_field(String const& name);
+		Ref<ScriptField> get_field(String const& name) const;
 
 		std::vector<Ref<ScriptField>> get_fields() const;
 
-		Ref<ScriptProperty> get_property(String const& name);
+		Ref<ScriptProperty> get_property(String const& name) const;
 
 		std::vector<Ref<ScriptProperty>> get_properties() const;
 
-		Ref<ScriptMethod> get_method(String const& name, Int const parameterCount);
+		Ref<ScriptMethod> get_method(String const& name, Int const parameterCount) const;
 
 		std::vector<Ref<ScriptMethod>> get_methods() const;
 
@@ -73,12 +72,16 @@ namespace Minty
 
 		void get_property(String const& name, void** const value);
 
+	public:
+		void set_id(UUID const id) override;
+
+	public:
+		void populate();
+
 	protected:
-		virtual Owner<ScriptField> create_field(String const& name) = 0;
-
-		virtual Owner<ScriptProperty> create_property(String const& name) = 0;
-
-		virtual Owner<ScriptMethod> create_method(String const& name, Int const parameterCount) = 0;
+		virtual void populate_fields(std::vector<Owner<ScriptField>>& fields) = 0;
+		virtual void populate_properties(std::vector<Owner<ScriptProperty>>& fields) = 0;
+		virtual void populate_methods(std::vector<Owner<ScriptMethod>>& methods) = 0;
 
 	public:
 		void serialize(Writer& writer) const override;

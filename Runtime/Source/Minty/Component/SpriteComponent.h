@@ -1,5 +1,5 @@
 #pragma once
-#include "Minty/Component/Component.h"
+#include "Minty/Component/ScriptObjectComponent.h"
 
 #include "Minty/Asset/AssetManager.h"
 #include "Minty/Core/Color.h"
@@ -14,7 +14,7 @@ namespace Minty
 	/// Holds a Sprite for this Entity.
 	/// </summary>
 	struct SpriteComponent
-		: public Component
+		: public ScriptObjectComponent
 	{
 		/// <summary>
 		/// A reference to the Sprite.

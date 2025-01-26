@@ -55,7 +55,7 @@ namespace Minty
 		}
 
 	public:
-		AssetType get_type() const override { return AssetType::Viewport; }
+		AssetType get_asset_type() const override { return AssetType::Viewport; }
 
 	public:
 		static Owner<Viewport> create(ViewportBuilder const& builder = {});

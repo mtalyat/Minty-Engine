@@ -4,6 +4,7 @@
 #include "Minty/Core/Color.h"
 #include "Minty/Render/Perspective.h"
 #include "Minty/Serialize/Serializable.h"
+#include "Minty/Render/RenderTarget.h"
 
 namespace Minty
 {
@@ -16,6 +17,8 @@ namespace Minty
 		Color color = Color::black();
 		Float aspectRatio = 16.0f / 9.0f;
 		Float size = 5.0f;
+		Layer layer = LAYER_ALL;
+		Ref<RenderTarget> renderTarget = nullptr;
 	};
 
 	class Camera
@@ -29,6 +32,8 @@ namespace Minty
 		Color m_color;
 		Float m_aspectRatio;
 		Float m_size;
+		Layer m_layer;
+		Ref<RenderTarget> m_renderTarget;
 
 	public:
 		Camera(CameraBuilder const& builder = {});
@@ -50,6 +55,12 @@ namespace Minty
 
 		Float get_size() const { return m_size; }
 
+		Layer get_layer_mask() const { return m_layer; }
+
+		Ref<RenderTarget>& get_render_target() { return m_renderTarget; }
+
+		Ref<RenderTarget> const& get_render_target() const { return m_renderTarget; }
+
 #pragma endregion
 
 #pragma region Set
@@ -68,6 +79,10 @@ namespace Minty
 		void set_aspect_ratio(Float const aspectRatio) { m_aspectRatio = aspectRatio; }
 
 		void set_size(Float const size) { m_size = size; }
+
+		void set_layer_mask(Layer const mask) { m_layer = mask; }
+
+		void set_render_target(Ref<RenderTarget> const& renderTarget) { m_renderTarget = renderTarget; }
 
 #pragma endregion
 

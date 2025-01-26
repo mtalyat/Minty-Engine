@@ -6,6 +6,7 @@
 #include "Minty/Debug/Logger.h"
 #include "Minty/GUI/GUI.h"
 #include "Minty/Input/Input.h"
+#include "Minty/Layer/LayerManager.h"
 #include "Minty/Render/Renderer.h"
 #include "Minty/Scene/SceneManager.h"
 #include "Minty/Script/ScriptEngine.h"
@@ -103,6 +104,8 @@ namespace Minty
 
 		SceneManager m_sceneManager;
 		std::vector<Ref<Scene>> m_workingScenes;
+
+		LayerManager m_layerManager;
 	public:
 		Application()
 			: m_initialized(false)
@@ -117,6 +120,7 @@ namespace Minty
 			, mp_logger(nullptr)
 			, m_sceneManager()
 			, m_workingScenes()
+			, m_layerManager()
 		{}
 
 		~Application()
@@ -148,9 +152,25 @@ namespace Minty
 
 #pragma region Loading
 
+	protected:
+		// removes all config settings
+		Bool clear_config();
+
+		// loads a config file from the given path
+		Bool load_config(Path const& path);
+
 	private:
 		// loads the default application data
 		Bool load_data();
+
+		// loads the game.wrap file: important application files
+		Bool load_game_wrap();
+
+		// loads the game.appdata file: initial data (wraps, dlls, etc.)
+		Bool load_game_appdata();
+
+		// loads the config.appdata file: initial config (engine data, layers, etc.)
+		Bool load_game_config();
 
 		// loads the initial scene from the app data, if there is one
 		Bool load_initial_scene();
@@ -166,6 +186,8 @@ namespace Minty
 		Logger& get_logger() const { return *mp_logger; }
 
 		SceneManager& get_scene_manager() { return m_sceneManager; }
+
+		LayerManager& get_layer_manager() { return m_layerManager; }
 
 		Time const& get_time() const { return m_time; }
 

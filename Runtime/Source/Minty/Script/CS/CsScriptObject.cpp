@@ -81,71 +81,80 @@ Minty::CsScriptObject::~CsScriptObject()
 	mono_gchandle_free(m_gcHandle);
 }
 
-Owner<ScriptField> Minty::CsScriptObject::create_field(String const& name)
+void Minty::CsScriptObject::populate_fields(std::vector<Owner<ScriptField>>& fields)
 {
+	fields.clear();
+
 	Ref<ScriptClass> scriptClass = get_class();
 	MonoClass* klass = static_cast<MonoClass*>(scriptClass->get_native());
 
 	ScriptFieldBuilder builder{};
 	builder.object = create_ref();
 
-	MonoClassField* field;
+	void* iter = nullptr;
+	MonoClassField* field = nullptr; 
+
 	while (klass != nullptr)
 	{
-		if(field = mono_class_get_field_from_name(klass, name.c_str()))
+		iter = nullptr;
+		while ((field = mono_class_get_fields(klass, &iter)) != nullptr)
 		{
-			return Owner<CsScriptField>(builder, field);
+			fields.push_back(Owner<CsScriptField>(builder, field));
 		}
 
 		// check inherited values as well
 		klass = mono_class_get_parent(klass);
 	}
-
-	return {};
 }
 
-Owner<ScriptProperty> Minty::CsScriptObject::create_property(String const& name)
+void Minty::CsScriptObject::populate_properties(std::vector<Owner<ScriptProperty>>& properties)
 {
+	properties.clear();
+
 	Ref<ScriptClass> scriptClass = get_class();
 	MonoClass* klass = static_cast<MonoClass*>(scriptClass->get_native());
 
 	ScriptPropertyBuilder builder{};
 	builder.object = create_ref();
 
-	MonoProperty* prop;
+	void* iter = nullptr;
+	MonoProperty* prop = nullptr;
+
 	while (klass != nullptr)
 	{
-		if (prop = mono_class_get_property_from_name(klass, name.c_str()))
+		iter = nullptr;
+		while ((prop = mono_class_get_properties(klass, &iter)) != nullptr)
 		{
-			return Owner<CsScriptProperty>(builder, prop);
+			properties.push_back(Owner<CsScriptProperty>(builder, prop));
 		}
 
 		// check inherited values as well
 		klass = mono_class_get_parent(klass);
 	}
-
-	return {};
 }
 
-Owner<ScriptMethod> Minty::CsScriptObject::create_method(String const& name, Int const parameterCount)
+void Minty::CsScriptObject::populate_methods(std::vector<Owner<ScriptMethod>>& methods)
 {
+	methods.clear();
+
 	Ref<ScriptClass> scriptClass = get_class();
 	MonoClass* klass = static_cast<MonoClass*>(scriptClass->get_native());
 
 	ScriptMethodBuilder builder{};
 	builder.object = create_ref();
 
-	MonoMethod* method;
+	void* iter = nullptr;
+	MonoMethod* method = nullptr;
+
 	while (klass != nullptr)
 	{
-		if (method = mono_class_get_method_from_name(klass, name.c_str(), parameterCount))
+		iter = nullptr;
+		while ((method = mono_class_get_methods(klass, &iter)) != nullptr)
 		{
-			return Owner<CsScriptMethod>(builder, method);
+			methods.push_back(Owner<CsScriptMethod>(builder, method));
 		}
 
 		// check inherited values as well
 		klass = mono_class_get_parent(klass);
 	}
-
-	return {};
 }

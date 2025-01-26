@@ -241,4 +241,6 @@ namespace Minty
         R64G64B64A64_SINT = 120,
         R64G64B64A64_SFLOAT = 121
     };
+
+    constexpr Format DEFAULT_FORMAT = Format::R8G8B8A8_SRGB;
 }

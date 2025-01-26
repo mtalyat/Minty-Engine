@@ -264,7 +264,7 @@ Size Minty::sizeof_type(Type const type)
 		return sizeof(Matrix4);
 	case Type::Quaternion:
 		return sizeof(Quaternion);
-	case Type::Asset:
+	case Type::Object:
 		return sizeof(void*);
 	case Type::UUID:
 		return sizeof(UUID);

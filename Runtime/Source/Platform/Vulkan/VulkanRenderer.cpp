@@ -221,6 +221,7 @@ void Minty::VulkanRenderer::recreate_swapchain()
 
 	// re-init framebuffers using new images
 	RenderTargetBuilder renderTargetBuilder{};
+	renderTargetBuilder.id = UUID::create();
 	renderTargetBuilder.images = swapchainImageRefs;
 	for (auto const& renderTarget : Renderer::get_screen_render_targets())
 	{
@@ -381,6 +382,7 @@ Ref<RenderTarget> Minty::VulkanRenderer::create_render_target(Ref<RenderPass> co
 	}
 
 	RenderTargetBuilder builder{};
+	builder.id = UUID::create();
 	builder.renderPass = renderPass;
 	builder.images = swapchainImageRefs;
 
@@ -1886,7 +1888,7 @@ VkImageUsageFlags Minty::VulkanRenderer::image_usage_to_vulkan(const Minty::Imag
 	case ImageUsage::DepthStencil:
 		return VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
 	default:
-		MINTY_ABORT_FORMAT("Cannot convert {} to VkImageUsageFlags.", to_string(usage));
+		MINTY_ABORT_FORMAT("Cannot convert {} to VkImageUsageFlags.", to_string(static_cast<int>(usage)));
 	}
 }
 

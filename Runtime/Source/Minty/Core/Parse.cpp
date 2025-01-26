@@ -605,7 +605,7 @@ Type Minty::Parse::to_type(String const& string)
 	if (string == "Matrix3") return Type::Matrix3;
 	if (string == "Matrix4") return Type::Matrix4;
 	if (string == "Quaternion") return Type::Quaternion;
-	if (string == "Asset") return Type::Asset;
+	if (string == "Object") return Type::Object;
 	if (string == "Undefined") return Type::Undefined;
 
 	return Type();
@@ -1169,4 +1169,34 @@ Bool Minty::Parse::try_image_address_mode(String const& string, ImageAddressMode
 {
 	value = to_image_address_mode(string);
 	return value != ImageAddressMode();
+}
+
+ImageTiling Minty::Parse::to_image_tiling(String const& string)
+{
+	if (string == "Undefined") return ImageTiling::Undefined;
+	if (string == "Optimal") return ImageTiling::Optimal;
+	if (string == "Linear") return ImageTiling::Linear;
+
+	return ImageTiling();
+}
+
+Bool Minty::Parse::try_image_tiling(String const& string, ImageTiling& value)
+{
+	value = to_image_tiling(string);
+	return value != ImageTiling();
+}
+
+ImageAspect Minty::Parse::to_image_aspect(String const& string)
+{
+	if (string == "Undefined") return ImageAspect::Undefined;
+	if (string == "Color") return ImageAspect::Color;
+	if (string == "Depth") return ImageAspect::Depth;
+
+	return ImageAspect();
+}
+
+Bool Minty::Parse::try_image_aspect(String const& string, ImageAspect& value)
+{
+	value = to_image_aspect(string);
+	return value != ImageAspect();
 }

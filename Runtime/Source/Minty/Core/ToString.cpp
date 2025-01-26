@@ -104,7 +104,7 @@ String Minty::to_string(Type const obj)
 	case Type::Matrix3: return "Matrix3";
 	case Type::Matrix4: return "Matrix4";
 	case Type::Quaternion: return "Quaternion";
-	case Type::Asset: return "Asset";
+	case Type::Object: return "Object";
 	case Type::Undefined: return "Undefined";
 
 	default: return "";
@@ -685,6 +685,30 @@ String Minty::to_string(ImageAddressMode const obj)
 	case ImageAddressMode::ClampToEdge: return "ClampToEdge";
 	case ImageAddressMode::ClampToBorder: return "ClampToBorder";
 	case ImageAddressMode::MirroredClampToEdge: return "MirroredClampToEdge";
+
+	default: return "";
+	}
+}
+
+String Minty::to_string(ImageTiling const obj)
+{
+	switch (obj)
+	{
+	case ImageTiling::Undefined: return "Undefined";
+	case ImageTiling::Optimal: return "Optimal";
+	case ImageTiling::Linear: return "Linear";
+
+	default: return "";
+	}
+}
+
+String Minty::to_string(ImageAspect const obj)
+{
+	switch (obj)
+	{
+	case ImageAspect::Undefined: return "Undefined";
+	case ImageAspect::Color: return "Color";
+	case ImageAspect::Depth: return "Depth";
 
 	default: return "";
 	}

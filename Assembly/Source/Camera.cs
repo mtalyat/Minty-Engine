@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using UUID = System.UInt64;
+
 namespace MintyEngine
 {
     public enum Perspective : int
@@ -44,7 +46,14 @@ namespace MintyEngine
             set => Runtime.Camera_SetColor(Entity.ID, value.ToInt());
         }
 
-        internal Camera()
+        public RenderTarget RenderTarget
+        {
+            get => new RenderTarget(Runtime.Camera_GetRenderTarget(Entity.ID));
+            set => Runtime.Camera_SetRenderTarget(Entity.ID, value.ID);
+        }
+
+        internal Camera(UUID id)
+            : base(id)
         { }
 
         public static void SetMain(Camera camera) => Runtime.Camera_SetMain(camera.Entity.ID);

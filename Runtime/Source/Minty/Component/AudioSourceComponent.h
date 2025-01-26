@@ -1,5 +1,5 @@
 #pragma once
-#include "Minty/Component/Component.h"
+#include "Minty/Component/ScriptObjectComponent.h"
 
 #include "Minty/Audio/AudioClip.h"
 
@@ -11,7 +11,7 @@ namespace Minty
 	/// Holds data for an Entity that can emit audio within the Scene.
 	/// </summary>
 	struct AudioSourceComponent
-		: public Component
+		: public ScriptObjectComponent
 	{
 		/// <summary>
 		/// The clip to be played.

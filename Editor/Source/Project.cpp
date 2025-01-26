@@ -32,6 +32,11 @@ Path Project::get_build_path() const
 	return (m_base / BUILD_DIRECTORY_NAME);
 }
 
+Minty::Path Mintye::Project::get_minty_path() const
+{
+	return (m_base / MINTY_DIRECTORY_NAME);
+}
+
 Minty::Path Mintye::Project::get_assembly_path() const
 {
 	return (m_base / ASSEMBLY_DIRECTORY_NAME);

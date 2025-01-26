@@ -16,6 +16,10 @@ namespace Minty
 
 		String get_name() const override;
 
+		Accessibility get_accessibility() const override;
+
+		Bool is_static() const override;
+
 		void invoke() const override;
 
 		void invoke(void** const argv, Size const argc) const override;

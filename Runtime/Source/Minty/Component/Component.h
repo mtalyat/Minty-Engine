@@ -7,7 +7,7 @@ namespace Minty
 	/// <summary>
 	/// Base class for all components.
 	/// </summary>
-	struct Component 
+	struct Component
 		: public Serializable
 	{
 		virtual void serialize(Writer& writer) const override {}

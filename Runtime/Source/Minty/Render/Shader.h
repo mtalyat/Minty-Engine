@@ -196,7 +196,7 @@ namespace Minty
 		void unregister_material(Material& material);
 
 	public:
-		AssetType get_type() const override { return AssetType::Shader; }
+		AssetType get_asset_type() const override { return AssetType::Shader; }
 
 	public:
 		static Owner<Shader> create(ShaderBuilder const& builder = {});

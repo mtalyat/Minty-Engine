@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Text;
 using System.Threading.Tasks;
+
+using UUID = System.UInt64;
 
 namespace MintyEngine
 {
@@ -14,16 +17,28 @@ namespace MintyEngine
         /// <summary>
         /// The UUID of this Object.
         /// </summary>
-        internal readonly ulong ID;
+        internal readonly UUID ID;
 
-        protected GameObject()
-        {
-            ID = 0;
-        }
-
-        internal GameObject(ulong id)
+        internal GameObject(UUID id)
         {
             ID = id;
+        }
+
+        public override bool Equals(object obj)
+        {
+            GameObject other = obj as GameObject;
+
+            if (other == null)
+            {
+                return false;
+            }
+
+            return other.ID == ID;
+        }
+
+        public override int GetHashCode()
+        {
+            return ID.GetHashCode();
         }
     }
 }

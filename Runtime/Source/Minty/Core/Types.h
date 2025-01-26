@@ -37,4 +37,6 @@ namespace Minty
 	using TypeInfo = std::type_info;
 
 	using Handle = unsigned int;
+
+	using Layer = unsigned int;
 }

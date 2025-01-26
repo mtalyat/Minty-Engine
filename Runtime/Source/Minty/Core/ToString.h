@@ -128,4 +128,8 @@ namespace Minty
 	String to_string(ImageUsage const obj);
 
 	String to_string(ImageAddressMode const obj);
+
+	String to_string(ImageTiling const obj);
+
+	String to_string(ImageAspect const obj);
 }

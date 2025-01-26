@@ -7,6 +7,8 @@
 
 namespace Minty
 {
+	using UUID_t = Size;
+
 	/// <summary>
 	/// A Universally Unique IDentifier.
 	/// Generates a random number to use as a unique ID for each asset/entity.
@@ -18,7 +20,7 @@ namespace Minty
 	class UUID
 	{
 	private:
-		Size m_uuid;
+		UUID_t m_uuid;
 
 	public:
 		/// <summary>
@@ -30,7 +32,7 @@ namespace Minty
 		/// Creates a new UUID with the given value.
 		/// </summary>
 		/// <param name="uuid"></param>
-		UUID(Size const uuid)
+		UUID(UUID_t const uuid)
 			: m_uuid(uuid) {}
 
 		Bool valid() const
@@ -43,11 +45,11 @@ namespace Minty
 			return m_uuid;
 		}
 
-		operator Size() const { return m_uuid; }
+		operator UUID_t() const { return m_uuid; }
 		Bool operator==(UUID const other) const;
 		Bool operator!=(UUID const other) const;
-		Bool operator==(Size const other) const;
-		Bool operator!=(Size const other) const;
+		Bool operator==(UUID_t const other) const;
+		Bool operator!=(UUID_t const other) const;
 
 		friend std::ostream& operator<<(std::ostream& stream, UUID const& object);
 		friend std::istream& operator>>(std::istream& stream, UUID& object);
@@ -63,7 +65,7 @@ namespace std
 	{
 		Minty::Size operator()(Minty::UUID const& uuid) const
 		{
-			return hash<Minty::ULong>()(static_cast<Minty::ULong>(uuid));
+			return hash<Minty::Size>()(static_cast<Minty::Size>(uuid));
 		}
 	};
 }

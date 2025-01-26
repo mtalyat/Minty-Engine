@@ -68,7 +68,7 @@ namespace Minty
 			return m_fsm;
 		}
 
-		AssetType get_type() const override { return AssetType::Animator; }
+		AssetType get_asset_type() const override { return AssetType::Animator; }
 
 		static Owner<Animator> create(AnimatorBuilder const& builder = {}) { return Owner<Animator>(builder); }
 	};

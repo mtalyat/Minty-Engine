@@ -37,7 +37,7 @@ namespace Minty
 		Matrix3,
 		Matrix4,
 		Quaternion,
-		Asset,
+		Object,
 		UUID,
 	};
 

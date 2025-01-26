@@ -18,10 +18,12 @@ namespace Minty
 		// scene that is active, eg. receiving update, etc. events
 		Ref<Scene> m_loadedScene;
 		std::vector<Ref<Scene>> m_workingScenes;
+		Bool m_noSceneWarningShown;
 	public:
 		SceneManager()
 			: m_loadedScene(nullptr)
 			, m_workingScenes()
+			, m_noSceneWarningShown(false)
 		{}
 		~SceneManager() = default;
 
@@ -50,6 +52,11 @@ namespace Minty
 		/// Finalizes updating the active Scene.
 		/// </summary>
 		void finalize();
+
+		/// <summary>
+		/// Draws the Scene.
+		/// </summary>
+		void draw();
 
 		Ref<Scene> get_working_scene() const;
 

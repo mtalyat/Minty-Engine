@@ -139,6 +139,43 @@ Bool Minty::EntityRegistry::get_renderable(Entity const entity) const
 	return all_of<RenderableComponent>(entity);
 }
 
+void Minty::EntityRegistry::set_layer(Entity const entity, Layer const layer)
+{
+	if (!all_of<LayerComponent>(entity))
+	{
+		LayerComponent& layerComp = emplace<LayerComponent>(entity);
+		layerComp.layer = layer;
+	}
+	else
+	{
+		LayerComponent& layerComp = get<LayerComponent>(entity);
+		layerComp.layer = layer;
+	}
+}
+
+Layer Minty::EntityRegistry::get_layer(Entity const entity)
+{
+	if (!all_of<LayerComponent>(entity))
+	{
+		return LAYER_DEFAULT;
+	}
+
+	LayerComponent const& layerComp = get<LayerComponent>(entity);
+	return layerComp.layer;
+}
+
+Bool Minty::EntityRegistry::is_in_layer_mask(Entity const entity, Layer const mask)
+{
+	if (!all_of<LayerComponent>(entity))
+	{
+		return (mask & LAYER_DEFAULT) == LAYER_DEFAULT;
+	}
+
+	LayerComponent const& layerComp = get<LayerComponent>(entity);
+	Layer layer = layerComp.layer;
+	return (mask & layer) == layer;
+}
+
 void Minty::EntityRegistry::dirty(Entity const entity)
 {
 	if (!all_of<DirtyComponent>(entity))
@@ -1138,7 +1175,7 @@ std::vector<Entity> Minty::EntityRegistry::get_dependents(Ref<Asset> const asset
 	std::vector<Entity> result;
 
 	// get type
-	AssetType type = asset->get_type();
+	AssetType type = asset->get_asset_type();
 
 	// check based on the type
 	// some types inherently have no dependents
@@ -1237,10 +1274,9 @@ void Minty::EntityRegistry::register_script(Ref<ScriptClass> const script)
 
 			// get entity object
 			UUID entityId = registry.get_id(entity);
-			Ref<ScriptObject> entityObject = ScriptEngine::get_or_create_object_entity(entityId);
 
 			// add a script object to it
-			Ref<ScriptObject> scriptObject = ScriptEngine::create_object_component(entityObject, script);
+			Ref<ScriptObject> scriptObject = ScriptEngine::create_object_component(entityId, script);
 			component->scriptObjects.emplace(scriptId, script->get_full_name(), scriptObject);
 
 			if (Application::instance().get_mode() == ApplicationMode::Normal)
@@ -1325,9 +1361,9 @@ void Minty::EntityRegistry::register_script(Ref<ScriptClass> const script)
 			// TODO: erase the scripts component if needed (including each on script event component)
 
 			// destroy the script object, if there is one
-			if (ScriptEngine::contains_object(component->id))
+			if (ScriptEngine::contains_object(component->get_id()))
 			{
-				ScriptEngine::destroy_object(component->id);
+				ScriptEngine::destroy_object(component->get_id());
 			}
 		},
 	};

@@ -1,5 +1,5 @@
 #pragma once
-#include "Component.h"
+#include "Minty/Component/ScriptObjectComponent.h"
 
 #include "Minty/Animation/Animator.h"
 #include "Minty/Animation/Animation.h"
@@ -10,7 +10,7 @@ namespace Minty
 	/// Holds data for an animator within the Scene.
 	/// </summary>
 	struct AnimatorComponent
-		: public Component
+		: public ScriptObjectComponent
 	{
 		/// <summary>
 		/// Handles controlling animation flow.

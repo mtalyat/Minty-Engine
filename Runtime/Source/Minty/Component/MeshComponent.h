@@ -1,5 +1,5 @@
 #pragma once
-#include "Minty/Component/Component.h"
+#include "Minty/Component/ScriptObjectComponent.h"
 
 #include "Minty/Asset/AssetManager.h"
 #include "Minty/Core/Pointer.h"
@@ -13,7 +13,7 @@ namespace Minty
 	/// Holds the Mesh for an Entity.
 	/// </summary>
 	struct MeshComponent
-		: public Component
+		: public ScriptObjectComponent
 	{
 		/// <summary>
 		/// The type of mesh.

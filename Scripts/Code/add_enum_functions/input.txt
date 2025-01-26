@@ -1,9 +1,6 @@
-	enum class ImageAddressMode
+	enum class ImageAspect
 	{
-        Undefined = 0,
-		Repeat,
-		MirroredRepeat,
-		ClampToEdge,
-		ClampToBorder,
-		MirroredClampToEdge,
+		Undefined = 0,
+		Color,
+		Depth
 	};

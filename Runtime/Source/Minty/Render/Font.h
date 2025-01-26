@@ -45,7 +45,7 @@ namespace Minty
 		ULong create_font_id(UInt const size, Bool const bold, Bool const italic) const { return size | (static_cast<Int>(bold) << sizeof(UInt)) | (static_cast<Int>(bold) << (sizeof(UInt) + 1)); }
 
 	public:
-		AssetType get_type() const override { return AssetType::Font; }
+		AssetType get_asset_type() const override { return AssetType::Font; }
 
 	public:
 		static Owner<Font> create(FontBuilder const& builder);

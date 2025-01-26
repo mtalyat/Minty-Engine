@@ -20,6 +20,12 @@ namespace Minty
 
 		void get(void* const value) const override;
 
+		Accessibility get_accessibility() const override;
+
+		Bool is_static() const override;
+
 		Type get_type() const override;
+
+		String get_type_full_name() const override;
 	};
 }

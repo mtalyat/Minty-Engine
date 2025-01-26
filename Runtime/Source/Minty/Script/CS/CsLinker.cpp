@@ -36,7 +36,7 @@ static EntityRegistry& util_get_entity_registry()
 	return util_get_scene().get_entity_registry();
 }
 
-static Window& util_get_window(UUID const id)
+static Window& util_get_window(UUID_t const id)
 {
 	Ref<Window> window = WindowManager::get_window(id);
 	MINTY_ASSERT(window != nullptr);
@@ -50,7 +50,7 @@ static Window& util_get_main_window()
 	return *window.get();
 }
 
-static Entity util_get_entity(UUID id)
+static Entity util_get_entity(UUID_t id)
 {
 	EntityRegistry& registry = util_get_entity_registry();
 
@@ -60,9 +60,9 @@ static Entity util_get_entity(UUID id)
 	return entity;
 }
 
-static CameraComponent& util_get_camera_component(UUID id)
+static CameraComponent& util_get_camera_component(UUID_t id)
 {
-	MINTY_ASSERT(id.valid());
+	MINTY_ASSERT(id);
 
 	EntityRegistry& registry = util_get_entity_registry();
 
@@ -75,9 +75,9 @@ static CameraComponent& util_get_camera_component(UUID id)
 	return *component;
 }
 
-static TransformComponent& util_get_transform_component(UUID id, bool setDirty)
+static TransformComponent& util_get_transform_component(UUID_t id, bool setDirty)
 {
-	MINTY_ASSERT(id.valid());
+	MINTY_ASSERT(id);
 
 	EntityRegistry& registry = util_get_entity_registry();
 
@@ -98,19 +98,266 @@ static TransformComponent& util_get_transform_component(UUID id, bool setDirty)
 
 #pragma endregion
 
-#pragma region Time
+#pragma region Components
 
-static float time_get_total()
+#pragma region Camera
+
+static Int camera_get_perspective(UUID_t id)
 {
-	return Application::instance().get_time().total;
+	CameraComponent& camera = util_get_camera_component(id);
+
+	return static_cast<Int>(camera.camera.get_perspective());
 }
 
-static float time_get_elapsed()
+static void camera_set_perspective(UUID_t id, Int value)
 {
-	return Application::instance().get_time().elapsed;
+	CameraComponent& camera = util_get_camera_component(id);
+
+	camera.camera.set_perspective(static_cast<Perspective>(value));
+}
+
+static float camera_get_fov(UUID_t id)
+{
+	CameraComponent& camera = util_get_camera_component(id);
+
+	return camera.camera.get_fov();
+}
+
+static void camera_set_fov(UUID_t id, float value)
+{
+	CameraComponent& camera = util_get_camera_component(id);
+
+	camera.camera.set_fov(value);
+}
+
+static float camera_get_near(UUID_t id)
+{
+	CameraComponent& camera = util_get_camera_component(id);
+
+	return camera.camera.get_near();
+}
+
+static void camera_set_near(UUID_t id, float value)
+{
+	CameraComponent& camera = util_get_camera_component(id);
+
+	camera.camera.set_near(value);
+}
+
+static float camera_get_far(UUID_t id)
+{
+	CameraComponent& camera = util_get_camera_component(id);
+
+	return camera.camera.get_far();
+}
+
+static void camera_set_far(UUID_t id, float value)
+{
+	CameraComponent& camera = util_get_camera_component(id);
+
+	camera.camera.set_far(value);
+}
+
+static MonoObject* camera_get_main()
+{
+	Scene& scene = util_get_scene();
+	EntityRegistry& registry = scene.get_entity_registry();
+
+	// set main in render system
+	RenderSystem* renderSystem = scene.get_system_registry().find<RenderSystem>();
+	MINTY_ASSERT(renderSystem != nullptr);
+
+	Entity entity = renderSystem->get_main_camera();
+
+	if (entity == NULL_ENTITY)
+	{
+		return nullptr;
+	}
+
+	UUID id = registry.get_id(entity);
+
+	if (!registry.all_of<CameraComponent>(entity))
+	{
+		return nullptr;
+	}
+
+	CameraComponent& camera = registry.get<CameraComponent>(entity);
+
+	Ref<ScriptClass> scriptClass = ScriptEngine::find_class("MintyEngine.Camera");
+
+	MINTY_ASSERT(scriptClass);
+
+	UUID entityId = registry.get_id(entity);
+	Ref<ScriptObject> componentObject = ScriptEngine::get_or_create_object_component(camera.get_id(), entityId, scriptClass);
+	return static_cast<MonoObject*>(componentObject->get_native());
+}
+
+static void camera_set_main(UUID_t id)
+{
+	MINTY_ASSERT(id);
+
+	Scene& scene = util_get_scene();
+	EntityRegistry& registry = scene.get_entity_registry();
+
+	Entity entity = registry.find_by_id(id);
+	MINTY_ASSERT(entity != NULL_ENTITY);
+	MINTY_ASSERT(registry.all_of<CameraComponent>(entity));
+
+	// set main in render system
+	RenderSystem* renderSystem = scene.get_system_registry().find<RenderSystem>();
+	MINTY_ASSERT(renderSystem != nullptr);
+
+	renderSystem->set_main_camera(entity);
+}
+
+static Int camera_get_color(UUID_t id)
+{
+	CameraComponent& camera = util_get_camera_component(id);
+
+	return static_cast<Int>(camera.camera.get_color());
+}
+
+static void camera_set_color(UUID_t id, Int value)
+{
+	CameraComponent& camera = util_get_camera_component(id);
+
+	camera.camera.set_color(Color(value));
+}
+
+static void camera_set_render_target(UUID_t id, UUID_t renderTargetID)
+{
+	CameraComponent& camera = util_get_camera_component(id);
+
+	Ref<RenderTarget> renderTarget = AssetManager::get<RenderTarget>(renderTargetID);
+
+	camera.camera.set_render_target(renderTarget);
+}
+
+static UUID_t camera_get_render_target(UUID_t id)
+{
+	CameraComponent& camera = util_get_camera_component(id);
+
+	Ref<RenderTarget> renderTarget = camera.camera.get_render_target();
+
+	return renderTarget->id();
 }
 
 #pragma endregion
+
+#pragma region Transform
+
+static void transform_get_local_position(UUID_t id, Float3* position)
+{
+	TransformComponent& component = util_get_transform_component(id, false);
+
+	*position = component.localPosition;
+}
+
+static void transform_set_local_position(UUID_t id, Float3* position)
+{
+	TransformComponent& component = util_get_transform_component(id, true);
+
+	component.localPosition = *position;
+}
+
+static void transform_get_local_rotation(UUID_t id, Float4* rotation)
+{
+	TransformComponent& component = util_get_transform_component(id, false);
+
+	*rotation = Float4(component.localRotation.x, component.localRotation.y, component.localRotation.z, component.localRotation.w);
+}
+
+static void transform_set_local_rotation(UUID_t id, Float4* rotation)
+{
+	TransformComponent& component = util_get_transform_component(id, true);
+
+	component.localRotation = Quaternion(rotation->w, rotation->x, rotation->y, rotation->z);
+}
+
+static void transform_get_local_scale(UUID_t id, Float3* scale)
+{
+	TransformComponent& component = util_get_transform_component(id, false);
+
+	*scale = component.localScale;
+}
+
+static void transform_set_local_scale(UUID_t id, Float3* scale)
+{
+	TransformComponent& component = util_get_transform_component(id, true);
+
+	component.localScale = *scale;
+}
+
+static void transform_get_global_position(UUID_t id, Float3* position)
+{
+	TransformComponent& component = util_get_transform_component(id, false);
+
+	*position = component.get_global_position();
+}
+
+//static void transform_set_global_position(UUID_t id, Float3* position)
+//{
+//	TransformComponent& component = util_get_transform_component(id, true);
+//
+//	component.localPosition = *position;
+//}
+
+static void transform_get_global_rotation(UUID_t id, Float4* rotation)
+{
+	TransformComponent& component = util_get_transform_component(id, false);
+
+	Quaternion rot = component.get_global_rotation();
+
+	*rotation = Float4(rot.x, rot.y, rot.z, rot.w);
+}
+
+//static void transform_set_global_rotation(UUID_t id, Float4* rotation)
+//{
+//	TransformComponent& component = util_get_transform_component(id, true);
+//
+//	component.localRotation = Quaternion(rotation->w, rotation->x, rotation->y, rotation->z);
+//}
+
+static void transform_get_global_scale(UUID_t id, Float3* scale)
+{
+	TransformComponent& component = util_get_transform_component(id, false);
+
+	*scale = component.get_global_scale();
+}
+
+//static void transform_set_global_scale(UUID_t id, Float3* scale)
+//{
+//	TransformComponent& component = util_get_transform_component(id, true);
+//
+//	component.localScale = *scale;
+//}
+
+static void transform_get_right(UUID_t id, Float3* direction)
+{
+	TransformComponent& component = util_get_transform_component(id, false);
+
+	*direction = component.get_right();
+}
+
+static void transform_get_up(UUID_t id, Float3* direction)
+{
+	TransformComponent& component = util_get_transform_component(id, false);
+
+	*direction = component.get_up();
+}
+
+static void transform_get_forward(UUID_t id, Float3* direction)
+{
+	TransformComponent& component = util_get_transform_component(id, false);
+
+	*direction = component.get_forward();
+}
+
+#pragma endregion
+
+#pragma endregion
+
+#pragma region Core
 
 #pragma region Console
 
@@ -136,6 +383,24 @@ static void console_error(MonoString* string)
 
 #pragma endregion
 
+#pragma region Time
+
+static float time_get_total()
+{
+	return Application::instance().get_time().total;
+}
+
+static float time_get_elapsed()
+{
+	return Application::instance().get_time().elapsed;
+}
+
+#pragma endregion
+
+#pragma endregion
+
+#pragma region Input
+
 #pragma region Cursor
 
 static CursorMode cursor_get_mode()
@@ -150,9 +415,13 @@ static void cursor_set_mode(CursorMode mode)
 
 #pragma endregion
 
+#pragma endregion
+
 #pragma region Object
 
-static void object_destroy_entity(UUID id)
+#pragma region Object
+
+static void object_destroy_entity(UUID_t id)
 {
 	EntityRegistry& registry = util_get_entity_registry();
 
@@ -162,7 +431,7 @@ static void object_destroy_entity(UUID id)
 	registry.destroy(entity);
 }
 
-static void object_destroy_immediate_entity(UUID id)
+static void object_destroy_immediate_entity(UUID_t id)
 {
 	EntityRegistry& registry = util_get_entity_registry();
 
@@ -174,9 +443,29 @@ static void object_destroy_immediate_entity(UUID id)
 
 #pragma endregion
 
-#pragma region Entity
+#pragma region Entity\
 
-static MonoString* entity_get_name(UUID id)
+static MonoObject* entity_find(UUID_t id)
+{
+	// ID of 0 is null always
+	if (!id)
+	{
+		return nullptr;
+	}
+
+	UUID uuid = id;
+
+	// get the entity
+	EntityRegistry& registry = util_get_entity_registry();
+	Entity entity = registry.find_by_id(uuid);
+
+	// get its object
+	Ref<ScriptObject> scriptObject = ScriptEngine::get_or_create_object_entity(uuid);
+
+	return static_cast<MonoObject*>(scriptObject->get_native());
+}
+
+static MonoString* entity_get_name(UUID_t id)
 {
 	if (!id) return CsScriptEngine::to_mono_string("");
 
@@ -193,7 +482,7 @@ static MonoString* entity_get_name(UUID id)
 	return CsScriptEngine::to_mono_string(name);
 }
 
-static void entity_set_name(UUID id, MonoString* string)
+static void entity_set_name(UUID_t id, MonoString* string)
 {
 	if (!id) return;
 
@@ -208,7 +497,7 @@ static void entity_set_name(UUID id, MonoString* string)
 	registry.set_name(entity, name);
 }
 
-static MonoString* entity_get_tag(UUID id)
+static MonoString* entity_get_tag(UUID_t id)
 {
 	if (!id) return CsScriptEngine::to_mono_string("");
 
@@ -225,7 +514,7 @@ static MonoString* entity_get_tag(UUID id)
 	return CsScriptEngine::to_mono_string(name);
 }
 
-static void entity_set_tag(UUID id, MonoString* string)
+static void entity_set_tag(UUID_t id, MonoString* string)
 {
 	if (!id) return;
 
@@ -240,9 +529,37 @@ static void entity_set_tag(UUID id, MonoString* string)
 	registry.set_tag(entity, name);
 }
 
-static void entity_set_enabled(UUID id, bool enabled)
+static Layer entity_get_layer(UUID_t id)
 {
-	MINTY_ASSERT(id.valid());
+	if (!id) return LAYER_NONE;
+
+	EntityRegistry& registry = util_get_entity_registry();
+
+	// get the entity
+	Entity entity = registry.find_by_id(id);
+	MINTY_ASSERT(entity != NULL_ENTITY);
+
+	// get the layer
+	return registry.get_layer(entity);
+}
+
+static void entity_set_layer(UUID_t id, Layer layer)
+{
+	if (!id) return;
+
+	EntityRegistry& registry = util_get_entity_registry();
+
+	// get the entity
+	Entity entity = registry.find_by_id(id);
+	MINTY_ASSERT(entity != NULL_ENTITY);
+
+	// set the layer
+	registry.set_layer(entity, layer);
+}
+
+static void entity_set_enabled(UUID_t id, bool enabled)
+{
+	MINTY_ASSERT(id);
 
 	EntityRegistry& registry = util_get_entity_registry();
 
@@ -260,9 +577,9 @@ static void entity_set_enabled(UUID id, bool enabled)
 	}
 }
 
-static bool entity_get_enabled(UUID id)
+static bool entity_get_enabled(UUID_t id)
 {
-	MINTY_ASSERT(id.valid());
+	MINTY_ASSERT(id);
 
 	EntityRegistry& registry = util_get_entity_registry();
 
@@ -273,9 +590,9 @@ static bool entity_get_enabled(UUID id)
 	return registry.all_of<EnabledComponent>(entity);
 }
 
-static MonoObject* entity_add_component(UUID id, MonoReflectionType* reflectionType)
+static MonoObject* entity_add_component(UUID_t id, MonoReflectionType* reflectionType)
 {
-	MINTY_ASSERT(id.valid());
+	MINTY_ASSERT(id);
 
 	EntityRegistry& registry = util_get_entity_registry();
 
@@ -303,14 +620,14 @@ static MonoObject* entity_add_component(UUID id, MonoReflectionType* reflectionT
 	}
 
 	// create a new object for this component, if needed
-	Ref<ScriptObject> entityObject = ScriptEngine::get_or_create_object_entity(registry.get_id(entity));
-	Ref<ScriptObject> componentObject = ScriptEngine::get_or_create_object_component(component->id, entityObject, scriptClass);
+	UUID entityId = registry.get_id(entity);
+	Ref<ScriptObject> componentObject = ScriptEngine::get_or_create_object_component(component->get_id(), entityId, scriptClass);
 	return static_cast<MonoObject*>(componentObject->get_native());
 }
 
-static MonoObject* entity_get_component(UUID id, MonoReflectionType* reflectionType)
+static MonoObject* entity_get_component(UUID_t id, MonoReflectionType* reflectionType)
 {
-	MINTY_ASSERT(id.valid());
+	MINTY_ASSERT(id);
 
 	EntityRegistry& registry = util_get_entity_registry();
 
@@ -329,8 +646,15 @@ static MonoObject* entity_get_component(UUID id, MonoReflectionType* reflectionT
 	}
 	Ref<ScriptClass> scriptClass = found->second;
 
+	// if MintyEngine, remove from name
+	String scriptClassName = scriptClass->get_full_name();
+	if (scriptClassName.starts_with("MintyEngine."))
+	{
+		scriptClassName = scriptClassName.substr(12, scriptClassName.length() - 12);
+	}
+
 	// get the component by name
-	ScriptObjectComponent* component = static_cast<ScriptObjectComponent*>(registry.get_by_name(scriptClass->get_full_name(), entity));
+	ScriptObjectComponent* component = static_cast<ScriptObjectComponent*>(registry.get_by_name(scriptClassName, entity));
 
 	// if null, return null
 	if (!component)
@@ -339,14 +663,14 @@ static MonoObject* entity_get_component(UUID id, MonoReflectionType* reflectionT
 	}
 
 	// create a new object for this component
-	Ref<ScriptObject> entityObject = ScriptEngine::get_or_create_object_entity(registry.get_id(entity));
-	Ref<ScriptObject> componentObject = ScriptEngine::get_or_create_object_component(component->id, entityObject, scriptClass);
+	UUID entityId = registry.get_id(entity);
+	Ref<ScriptObject> componentObject = ScriptEngine::get_or_create_object_component(component->get_id(), entityId, scriptClass);
 	return static_cast<MonoObject*>(componentObject->get_native());
 }
 
-static void entity_remove_component(UUID id, MonoReflectionType* reflectionType)
+static void entity_remove_component(UUID_t id, MonoReflectionType* reflectionType)
 {
-	MINTY_ASSERT(id.valid());
+	MINTY_ASSERT(id);
 
 	EntityRegistry& registry = util_get_entity_registry();
 
@@ -369,9 +693,9 @@ static void entity_remove_component(UUID id, MonoReflectionType* reflectionType)
 	registry.destroy(entity, scriptClass->get_full_name());
 }
 
-static MonoObject* entity_get_parent(UUID id)
+static MonoObject* entity_get_parent(UUID_t id)
 {
-	MINTY_ASSERT(id.valid());
+	MINTY_ASSERT(id);
 
 	EntityRegistry& registry = util_get_entity_registry();
 
@@ -390,9 +714,9 @@ static MonoObject* entity_get_parent(UUID id)
 	return static_cast<MonoObject*>(ScriptEngine::get_or_create_object_entity(parentId)->get_native());
 }
 
-static void entity_set_parent(UUID id, UUID parentId)
+static void entity_set_parent(UUID_t id, UUID_t parentId)
 {
-	MINTY_ASSERT(id.valid());
+	MINTY_ASSERT(id);
 
 	EntityRegistry& registry = util_get_entity_registry();
 
@@ -407,9 +731,9 @@ static void entity_set_parent(UUID id, UUID parentId)
 	registry.set_parent(entity, parentEntity);
 }
 
-static Int entity_get_child_count(UUID id)
+static Int entity_get_child_count(UUID_t id)
 {
-	MINTY_ASSERT(id.valid());
+	MINTY_ASSERT(id);
 
 	EntityRegistry& registry = util_get_entity_registry();
 
@@ -424,9 +748,9 @@ static Int entity_get_child_count(UUID id)
 	return static_cast<Int>(childCount);
 }
 
-static MonoObject* entity_get_child(UUID id, Int index)
+static MonoObject* entity_get_child(UUID_t id, Int index)
 {
-	MINTY_ASSERT(id.valid());
+	MINTY_ASSERT(id);
 
 	EntityRegistry& registry = util_get_entity_registry();
 
@@ -444,9 +768,9 @@ static MonoObject* entity_get_child(UUID id, Int index)
 	return static_cast<MonoObject*>(ScriptEngine::get_or_create_object_entity(childId)->get_native());
 }
 
-static MonoObject* entity_clone(UUID id)
+static MonoObject* entity_clone(UUID_t id)
 {
-	MINTY_ASSERT(id.valid());
+	MINTY_ASSERT(id);
 
 	EntityRegistry& registry = util_get_entity_registry();
 
@@ -467,300 +791,55 @@ static MonoObject* entity_clone(UUID id)
 
 #pragma endregion
 
-#pragma region Window
+#pragma endregion
 
-static MonoObject* window_get(UUID id)
-{
-	return static_cast<MonoObject*>(ScriptEngine::get_object(id)->get_native());
-}
+#pragma region Render
 
-static MonoObject* window_get_main()
-{
-	return static_cast<MonoObject*>(window_get(util_get_main_window().id()));
-}
+#pragma region Image
 
-static MonoString* window_get_title(UUID id)
+static UUID_t image_create(Int format, Int type, Int tiling, Int aspect, Int usage, UInt width, UInt height, Bool immutable)
 {
-	return CsScriptEngine::to_mono_string(util_get_window(id).get_title());
-}
+	ImageBuilder builder{};
+	builder.id = UUID::create();
+	builder.format = static_cast<Format>(format);
+	builder.type = static_cast<ImageType>(type);
+	builder.tiling = static_cast<ImageTiling>(tiling);
+	builder.aspect = static_cast<ImageAspect>(aspect);
+	builder.usage = static_cast<ImageUsage>(usage);
+	builder.width = width;
+	builder.height = height;
+	builder.immutable = immutable;
 
-static void window_set_title(UUID id, MonoString* string)
-{
-	util_get_window(id).set_title(CsScriptEngine::from_mono_string(string));
-}
+	MINTY_LOG_FORMAT("Image(format={}({}), type={}({}), tiling={}({}), aspect={}({}), usage={}({}), width={}, height={}, immutable={})",
+		format, to_string(builder.format), type, to_string(builder.type), tiling, to_string(builder.tiling), aspect, to_string(builder.aspect), usage, to_string(builder.usage), width, height, immutable);
 
-static void window_set_icon(UUID id, MonoString* string)
-{
-	util_get_window(id).set_icon(CsScriptEngine::from_mono_string(string));
-}
+	Owner<Image> image = Image::create(builder);
 
-static bool window_is_open(UUID id)
-{
-	return util_get_window(id).is_open();
-}
+	AssetManager::emplace(image);
 
-static void window_close(UUID id)
-{
-	util_get_window(id).close();
-}
+	MINTY_LOG_FORMAT("Created image with {} width and {} height, with ID: {}.", width, height, builder.id.data());
 
-static void window_maximize(UUID id)
-{
-	util_get_window(id).maximize();
-}
-
-static void window_minimize(UUID id)
-{
-	util_get_window(id).minimize();
-}
-
-static void window_restore(UUID id)
-{
-	util_get_window(id).restore();
+	return static_cast<unsigned long>(image->id().data());
 }
 
 #pragma endregion
 
-#pragma region Components
+#pragma region Shader
 
-#pragma region Camera
-
-static Int camera_get_perspective(UUID id)
+static UUID_t shader_create(MonoString* path)
 {
-	CameraComponent& camera = util_get_camera_component(id);
+	String pathString = CsScriptEngine::from_mono_string(path);
 
-	return static_cast<Int>(camera.camera.get_perspective());
-}
+	Ref<Shader> shader = AssetManager::load<Shader>(pathString);
 
-static void camera_set_perspective(UUID id, Int value)
-{
-	CameraComponent& camera = util_get_camera_component(id);
-
-	camera.camera.set_perspective(static_cast<Perspective>(value));
-}
-
-static float camera_get_fov(UUID id)
-{
-	CameraComponent& camera = util_get_camera_component(id);
-
-	return camera.camera.get_fov();
-}
-
-static void camera_set_fov(UUID id, float value)
-{
-	CameraComponent& camera = util_get_camera_component(id);
-
-	camera.camera.set_fov(value);
-}
-
-static float camera_get_near(UUID id)
-{
-	CameraComponent& camera = util_get_camera_component(id);
-
-	return camera.camera.get_near();
-}
-
-static void camera_set_near(UUID id, float value)
-{
-	CameraComponent& camera = util_get_camera_component(id);
-
-	camera.camera.set_near(value);
-}
-
-static float camera_get_far(UUID id)
-{
-	CameraComponent& camera = util_get_camera_component(id);
-
-	return camera.camera.get_far();
-}
-
-static void camera_set_far(UUID id, float value)
-{
-	CameraComponent& camera = util_get_camera_component(id);
-
-	camera.camera.set_far(value);
-}
-
-static MonoObject* camera_get_main()
-{
-	Scene& scene = util_get_scene();
-	EntityRegistry& registry = scene.get_entity_registry();
-
-	// set main in render system
-	RenderSystem* renderSystem = scene.get_system_registry().find<RenderSystem>();
-	MINTY_ASSERT(renderSystem != nullptr);
-
-	Entity entity = renderSystem->get_camera();
-
-	if (entity == NULL_ENTITY)
-	{
-		return nullptr;
-	}
-
-	UUID id = registry.get_id(entity);
-
-	if (!registry.all_of<CameraComponent>(entity))
-	{
-		return nullptr;
-	}
-
-	CameraComponent& camera = registry.get<CameraComponent>(entity);
-
-	Ref<ScriptClass> scriptClass = ScriptEngine::find_class("MintyEngine.Camera");
-
-	MINTY_ASSERT(scriptClass);
-
-	Ref<ScriptObject> entityObject = ScriptEngine::get_or_create_object_entity(registry.get_id(entity));
-	Ref<ScriptObject> componentObject = ScriptEngine::get_or_create_object_component(camera.id, entityObject, scriptClass);
-	return static_cast<MonoObject*>(componentObject->get_native());
-}
-
-static void camera_set_main(UUID id)
-{
-	MINTY_ASSERT(id.valid());
-
-	Scene& scene = util_get_scene();
-	EntityRegistry& registry = scene.get_entity_registry();
-
-	Entity entity = registry.find_by_id(id);
-	MINTY_ASSERT(entity != NULL_ENTITY);
-	MINTY_ASSERT(registry.all_of<CameraComponent>(entity));
-
-	// set main in render system
-	RenderSystem* renderSystem = scene.get_system_registry().find<RenderSystem>();
-	MINTY_ASSERT(renderSystem != nullptr);
-
-	renderSystem->set_camera(entity);
-}
-
-static Int camera_get_color(UUID id)
-{
-	CameraComponent& camera = util_get_camera_component(id);
-
-	return static_cast<Int>(camera.camera.get_color());
-}
-
-static void camera_set_color(UUID id, Int value)
-{
-	CameraComponent& camera = util_get_camera_component(id);
-
-	camera.camera.set_color(Color(value));
-}
-
-#pragma endregion
-
-#pragma region Transform
-
-static void transform_get_local_position(UUID id, Float3* position)
-{
-	TransformComponent& component = util_get_transform_component(id, false);
-
-	*position = component.localPosition;
-}
-
-static void transform_set_local_position(UUID id, Float3* position)
-{
-	TransformComponent& component = util_get_transform_component(id, true);
-
-	component.localPosition = *position;
-}
-
-static void transform_get_local_rotation(UUID id, Float4* rotation)
-{
-	TransformComponent& component = util_get_transform_component(id, false);
-
-	*rotation = Float4(component.localRotation.x, component.localRotation.y, component.localRotation.z, component.localRotation.w);
-}
-
-static void transform_set_local_rotation(UUID id, Float4* rotation)
-{
-	TransformComponent& component = util_get_transform_component(id, true);
-
-	component.localRotation = Quaternion(rotation->w, rotation->x, rotation->y, rotation->z);
-}
-
-static void transform_get_local_scale(UUID id, Float3* scale)
-{
-	TransformComponent& component = util_get_transform_component(id, false);
-
-	*scale = component.localScale;
-}
-
-static void transform_set_local_scale(UUID id, Float3* scale)
-{
-	TransformComponent& component = util_get_transform_component(id, true);
-
-	component.localScale = *scale;
-}
-
-static void transform_get_global_position(UUID id, Float3* position)
-{
-	TransformComponent& component = util_get_transform_component(id, false);
-
-	*position = component.get_global_position();
-}
-
-//static void transform_set_global_position(UUID id, Float3* position)
-//{
-//	TransformComponent& component = util_get_transform_component(id, true);
-//
-//	component.localPosition = *position;
-//}
-
-static void transform_get_global_rotation(UUID id, Float4* rotation)
-{
-	TransformComponent& component = util_get_transform_component(id, false);
-
-	Quaternion rot = component.get_global_rotation();
-
-	*rotation = Float4(rot.x, rot.y, rot.z, rot.w);
-}
-
-//static void transform_set_global_rotation(UUID id, Float4* rotation)
-//{
-//	TransformComponent& component = util_get_transform_component(id, true);
-//
-//	component.localRotation = Quaternion(rotation->w, rotation->x, rotation->y, rotation->z);
-//}
-
-static void transform_get_global_scale(UUID id, Float3* scale)
-{
-	TransformComponent& component = util_get_transform_component(id, false);
-
-	*scale = component.get_global_scale();
-}
-
-//static void transform_set_global_scale(UUID id, Float3* scale)
-//{
-//	TransformComponent& component = util_get_transform_component(id, true);
-//
-//	component.localScale = *scale;
-//}
-
-static void transform_get_right(UUID id, Float3* direction)
-{
-	TransformComponent& component = util_get_transform_component(id, false);
-
-	*direction = component.get_right();
-}
-
-static void transform_get_up(UUID id, Float3* direction)
-{
-	TransformComponent& component = util_get_transform_component(id, false);
-
-	*direction = component.get_up();
-}
-
-static void transform_get_forward(UUID id, Float3* direction)
-{
-	TransformComponent& component = util_get_transform_component(id, false);
-
-	*direction = component.get_forward();
+	return shader->id();
 }
 
 #pragma endregion
 
 #pragma endregion
+
+#pragma region Scene
 
 #pragma region SceneManager
 
@@ -789,60 +868,69 @@ static void scene_manager_load(MonoString* string)
 
 #pragma endregion
 
-void Minty::CsLinker::link()
-{
-
-	// link all the functions
-#pragma region Time
-	ADD_INTERNAL_CALL("Time_GetTotalTime", time_get_total);
-	ADD_INTERNAL_CALL("Time_GetElapsedTime", time_get_elapsed);
-#pragma endregion
-
-#pragma region Console
-	ADD_INTERNAL_CALL("Console_Log", console_log);
-	ADD_INTERNAL_CALL("Console_LogColor", console_log_color);
-	ADD_INTERNAL_CALL("Console_Warn", console_warn);
-	ADD_INTERNAL_CALL("Console_Error", console_error);
-#pragma endregion
-
-#pragma region Cursor
-	ADD_INTERNAL_CALL("Cursor_GetMode", cursor_get_mode);
-	ADD_INTERNAL_CALL("Cursor_SetMode", cursor_set_mode);
-#pragma endregion
-
-#pragma region Object
-	ADD_INTERNAL_CALL("Object_DestroyEntity", object_destroy_entity);
-	ADD_INTERNAL_CALL("Object_DestroyImmediateEntity", object_destroy_immediate_entity);
-#pragma endregion
-
-#pragma region Entity
-	ADD_INTERNAL_CALL("Entity_GetName", entity_get_name);
-	ADD_INTERNAL_CALL("Entity_SetName", entity_set_name);
-	ADD_INTERNAL_CALL("Entity_GetTag", entity_get_tag);
-	ADD_INTERNAL_CALL("Entity_SetTag", entity_set_tag);
-	ADD_INTERNAL_CALL("Entity_GetEnabled", entity_get_enabled);
-	ADD_INTERNAL_CALL("Entity_SetEnabled", entity_set_enabled);
-	ADD_INTERNAL_CALL("Entity_AddComponent", entity_add_component);
-	ADD_INTERNAL_CALL("Entity_GetComponent", entity_get_component);
-	ADD_INTERNAL_CALL("Entity_RemoveComponent", entity_remove_component);
-	ADD_INTERNAL_CALL("Entity_GetParent", entity_get_parent);
-	ADD_INTERNAL_CALL("Entity_SetParent", entity_set_parent);
-	ADD_INTERNAL_CALL("Entity_GetChildCount", entity_get_child_count);
-	ADD_INTERNAL_CALL("Entity_GetChild", entity_get_child);
-	ADD_INTERNAL_CALL("Entity_Clone", entity_clone);
 #pragma endregion
 
 #pragma region Window
-	ADD_INTERNAL_CALL("Window_GetMain", window_get_main);
-	ADD_INTERNAL_CALL("Window_GetTitle", window_get_title);
-	ADD_INTERNAL_CALL("Window_SetTitle", window_set_title);
-	ADD_INTERNAL_CALL("Window_SetIcon", window_set_icon);
-	ADD_INTERNAL_CALL("Window_IsOpen", window_is_open);
-	ADD_INTERNAL_CALL("Window_Close", window_close);
-	ADD_INTERNAL_CALL("Window_Maximize", window_maximize);
-	ADD_INTERNAL_CALL("Window_Minimize", window_minimize);
-	ADD_INTERNAL_CALL("Window_Restore", window_restore);
+
+#pragma region Window
+
+static MonoObject* window_get(UUID_t id)
+{
+	return static_cast<MonoObject*>(ScriptEngine::get_object(id)->get_native());
+}
+
+static MonoObject* window_get_main()
+{
+	return static_cast<MonoObject*>(window_get(util_get_main_window().id()));
+}
+
+static MonoString* window_get_title(UUID_t id)
+{
+	return CsScriptEngine::to_mono_string(util_get_window(id).get_title());
+}
+
+static void window_set_title(UUID_t id, MonoString* string)
+{
+	util_get_window(id).set_title(CsScriptEngine::from_mono_string(string));
+}
+
+static void window_set_icon(UUID_t id, MonoString* string)
+{
+	util_get_window(id).set_icon(CsScriptEngine::from_mono_string(string));
+}
+
+static bool window_is_open(UUID_t id)
+{
+	return util_get_window(id).is_open();
+}
+
+static void window_close(UUID_t id)
+{
+	util_get_window(id).close();
+}
+
+static void window_maximize(UUID_t id)
+{
+	util_get_window(id).maximize();
+}
+
+static void window_minimize(UUID_t id)
+{
+	util_get_window(id).minimize();
+}
+
+static void window_restore(UUID_t id)
+{
+	util_get_window(id).restore();
+}
+
 #pragma endregion
+
+#pragma endregion
+
+void Minty::CsLinker::link()
+{
+	// link all the functions
 
 #pragma region Components
 
@@ -881,8 +969,90 @@ void Minty::CsLinker::link()
 
 #pragma endregion
 
+#pragma region Core
+
+#pragma region Time
+	ADD_INTERNAL_CALL("Time_GetTotalTime", time_get_total);
+	ADD_INTERNAL_CALL("Time_GetElapsedTime", time_get_elapsed);
+#pragma endregion
+
+#pragma region Console
+	ADD_INTERNAL_CALL("Console_Log", console_log);
+	ADD_INTERNAL_CALL("Console_LogColor", console_log_color);
+	ADD_INTERNAL_CALL("Console_Warn", console_warn);
+	ADD_INTERNAL_CALL("Console_Error", console_error);
+#pragma endregion
+
+#pragma endregion
+
+#pragma region Input
+
+#pragma region Cursor
+	ADD_INTERNAL_CALL("Cursor_GetMode", cursor_get_mode);
+	ADD_INTERNAL_CALL("Cursor_SetMode", cursor_set_mode);
+#pragma endregion
+
+#pragma endregion
+
+#pragma region Object
+
+#pragma region Entity
+	ADD_INTERNAL_CALL("Entity_Find", entity_find);
+	ADD_INTERNAL_CALL("Entity_GetName", entity_get_name);
+	ADD_INTERNAL_CALL("Entity_SetName", entity_set_name);
+	ADD_INTERNAL_CALL("Entity_GetTag", entity_get_tag);
+	ADD_INTERNAL_CALL("Entity_SetTag", entity_set_tag);
+	ADD_INTERNAL_CALL("Entity_GetLayer", entity_get_layer);
+	ADD_INTERNAL_CALL("Entity_SetLayer", entity_set_layer);
+	ADD_INTERNAL_CALL("Entity_GetEnabled", entity_get_enabled);
+	ADD_INTERNAL_CALL("Entity_SetEnabled", entity_set_enabled);
+	ADD_INTERNAL_CALL("Entity_AddComponent", entity_add_component);
+	ADD_INTERNAL_CALL("Entity_GetComponent", entity_get_component);
+	ADD_INTERNAL_CALL("Entity_RemoveComponent", entity_remove_component);
+	ADD_INTERNAL_CALL("Entity_GetParent", entity_get_parent);
+	ADD_INTERNAL_CALL("Entity_SetParent", entity_set_parent);
+	ADD_INTERNAL_CALL("Entity_GetChildCount", entity_get_child_count);
+	ADD_INTERNAL_CALL("Entity_GetChild", entity_get_child);
+	ADD_INTERNAL_CALL("Entity_Clone", entity_clone);
+#pragma endregion
+
+#pragma region Object
+	ADD_INTERNAL_CALL("Object_DestroyEntity", object_destroy_entity);
+	ADD_INTERNAL_CALL("Object_DestroyImmediateEntity", object_destroy_immediate_entity);
+#pragma endregion
+
+#pragma endregion
+
+#pragma region Render
+
+#pragma region Image
+	ADD_INTERNAL_CALL("Image_Create", image_create);
+#pragma endregion
+
+#pragma endregion
+
+#pragma region Scene
+
 #pragma region SceneManager
 	ADD_INTERNAL_CALL("SceneManager_Load", scene_manager_load);
+#pragma endregion
+
+#pragma endregion
+
+#pragma region Window
+
+#pragma region Window
+	ADD_INTERNAL_CALL("Window_GetMain", window_get_main);
+	ADD_INTERNAL_CALL("Window_GetTitle", window_get_title);
+	ADD_INTERNAL_CALL("Window_SetTitle", window_set_title);
+	ADD_INTERNAL_CALL("Window_SetIcon", window_set_icon);
+	ADD_INTERNAL_CALL("Window_IsOpen", window_is_open);
+	ADD_INTERNAL_CALL("Window_Close", window_close);
+	ADD_INTERNAL_CALL("Window_Maximize", window_maximize);
+	ADD_INTERNAL_CALL("Window_Minimize", window_minimize);
+	ADD_INTERNAL_CALL("Window_Restore", window_restore);
+#pragma endregion
+
 #pragma endregion
 
 #undef ADD_INTERNAL_CALL

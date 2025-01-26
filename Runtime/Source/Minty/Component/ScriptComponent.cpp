@@ -63,12 +63,8 @@ void Minty::ScriptComponent::deserialize(Reader& reader)
 		// create object
 		component = entityRegistry.emplace_by_name(name, data->entity);
 		scriptObject = static_cast<ScriptObject*>(component);
-		//scriptObject = ScriptEngine::create_object(UUID::create(), scriptClass);
 
 		// read data
 		reader.read(i, *scriptObject);
-
-		// save
-		scriptObjects.emplace(id, name, scriptObject->create_ref());
 	}
 }

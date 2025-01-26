@@ -105,7 +105,7 @@ namespace Minty
 		void initialize_cylinder();
 
 	public:
-		AssetType get_type() const override { return AssetType::Mesh; }
+		AssetType get_asset_type() const override { return AssetType::Mesh; }
 
 	public:
 		static Owner<Mesh> create(MeshBuilder const& builder = {});

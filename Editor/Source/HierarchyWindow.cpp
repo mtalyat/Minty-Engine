@@ -222,7 +222,7 @@ Minty::Entity Mintye::HierarchyWindow::paste_entity()
 
 	// create container from clipboard text
 	StaticContainer container(text.size() + 1);
-	container.set(text.data(), text.size());
+	container.set_at(text.data(), text.size() * sizeof(Char), 0);
 	Char eol = '\0';
 	container.set_at(&eol, sizeof(Char), text.size());
 
@@ -274,12 +274,12 @@ void Mintye::HierarchyWindow::set_clicked(Minty::Entity const entity)
 	m_clicked = entity;
 }
 
-void Mintye::HierarchyWindow::set_selected(Minty::Entity const entity)
+void Mintye::HierarchyWindow::set_selected(Minty::Entity const entity, bool const isNew)
 {
 	// when selected, send Entity to properties window
 	if (PropertiesWindow* properties = get_application().find_editor_window<PropertiesWindow>("Properties"))
 	{
-		properties->set_target(entity);
+		properties->set_target(entity, isNew);
 	}
 	m_selected = entity;
 }
@@ -362,7 +362,7 @@ void Mintye::HierarchyWindow::draw_popup()
 	{
 		// create and select
 		Entity newEntity = create_entity();
-		set_selected(newEntity);
+		set_selected(newEntity, true);
 		get_scene()->sort();
 
 		// set parent as clicked, if there was one

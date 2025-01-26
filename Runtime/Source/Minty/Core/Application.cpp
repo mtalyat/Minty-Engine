@@ -54,7 +54,10 @@ void Minty::Application::initialize(ApplicationBuilder const& builder)
 	Linker::link();
 
 	// load game data
-	load_data();
+	if (!load_data())
+	{
+		MINTY_ERROR("Failed to load data.");
+	}
 
 	// input
 	Input::initialize(builder.inputBuilder);
@@ -170,20 +173,19 @@ Int Application::run()
 			continue;
 		}
 
+		// update scene
+		m_sceneManager.update(m_time);
+
+		// finalize scene
+		m_sceneManager.finalize();
+
+		// update application
+		update(m_time);
+
 		if (has_pass_flag(ApplicationPassFlags::Scene))
 		{
-			Renderer::start_render_pass(Renderer::get_render_pass(), Renderer::get_render_target());
-
-			// update scene
-			m_sceneManager.update(m_time);
-
-			// finalize scene
-			m_sceneManager.finalize();
-
-			// update application
-			update(m_time);
-
-			Renderer::end_render_pass();
+			// draw scene
+			m_sceneManager.draw();
 		}
 
 		// if both passes, transition the assets
@@ -329,11 +331,67 @@ void Minty::Application::on_event(Event& event)
 Bool Minty::Application::load_data()
 {
 	// load Game.wrap
-	AssetManager::load_wrap(DEFAULT_WRAP);
+	if (!load_game_wrap())
+	{
+		MINTY_ERROR("Failed to load game wrap.");
+		return false;
+	}
 
+	// load appdata
+	if (!load_game_appdata())
+	{
+		MINTY_ERROR("Failed to load game application data.");
+		return false;
+	}
+
+	// load config
+	if (!load_game_config())
+	{
+		MINTY_ERROR("Failed to load game config data.");
+		return false;
+	}
+
+	return true;
+}
+
+Bool Minty::Application::clear_config()
+{
+	m_layerManager.clear();
+
+	return true;
+}
+
+Bool Minty::Application::load_config(Path const& path)
+{
+	Reader* reader;
+	if (!AssetManager::open_reader(path, reader))
+	{
+		// could not open app data
+		return false;
+	}
+
+	// load layers
+	if (reader->indent("Layers"))
+	{
+		m_layerManager.deserialize(*reader);
+
+		reader->outdent();
+	}
+
+	AssetManager::close_reader(reader);
+	return true;
+}
+
+Bool Minty::Application::load_game_wrap()
+{
+	return AssetManager::load_wrap(DEFAULT_GAME_WRAP);
+}
+
+Bool Minty::Application::load_game_appdata()
+{
 	// read Game.appdata
 	Reader* reader;
-	if (!AssetManager::open_reader(DEFAULT_APPDATA, reader))
+	if (!AssetManager::open_reader(DEFAULT_GAME_APPDATA, reader))
 	{
 		// could not open app data
 		return false;
@@ -351,6 +409,7 @@ Bool Minty::Application::load_data()
 		if (assembly == nullptr)
 		{
 			MINTY_ERROR_FORMAT("Failed to load assembly at path \"{}\".", assemblyPath.generic_string());
+			return false;
 		}
 	}
 
@@ -360,12 +419,17 @@ Bool Minty::Application::load_data()
 		if (!AssetManager::load_wrap(wrapPath))
 		{
 			MINTY_ERROR_FORMAT("Failed to load wrap at path \"{}\".", wrapPath.generic_string());
+			return false;
 		}
 	}
 
 	AssetManager::close_reader(reader);
-
 	return true;
+}
+
+Bool Minty::Application::load_game_config()
+{
+	return load_config(DEFAULT_GAME_CONFIG);
 }
 
 Bool Minty::Application::load_initial_scene()

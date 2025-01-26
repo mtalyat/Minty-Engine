@@ -112,6 +112,11 @@ namespace Minty
 		/// </summary>
 		void finalize();
 
+		/// <summary>
+		/// Draw this Scene.
+		/// </summary>
+		void draw();
+
 #pragma region Asset Loading
 
 	public:
@@ -131,7 +136,7 @@ namespace Minty
 #pragma endregion
 
 	public:
-		AssetType get_type() const override { return AssetType::Scene; }
+		AssetType get_asset_type() const override { return AssetType::Scene; }
 
 		void serialize(Writer& writer) const override;
 

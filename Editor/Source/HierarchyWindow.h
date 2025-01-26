@@ -39,7 +39,7 @@ namespace Mintye
 
 		void set_clicked(Minty::Entity const entity);
 
-		void set_selected(Minty::Entity const entity);
+		void set_selected(Minty::Entity const entity, bool const newEntity = false);
 
 		void draw_popup();
 

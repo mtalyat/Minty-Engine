@@ -717,8 +717,10 @@ Bool Minty::Reader::read(Size const index, void* const data, Type const type) co
 		return read_double(index, *static_cast<Double* const>(data));
 	case Type::String:
 		return read_string(index, *static_cast<String* const>(data));
+	case Type::UUID:
+		return read_uuid(index, *static_cast<UUID* const>(data));
 	default:
-		MINTY_ABORT("Cannot write type.");
+		MINTY_ABORT_FORMAT("Cannot read type \"{}\".", to_string(type));
 	}
 }
 
@@ -776,6 +778,8 @@ Bool Minty::Reader::read(String const& name, void* const data, Type const type) 
 		return read_double(name, *static_cast<Double* const>(data));
 	case Type::String:
 		return read_string(name, *static_cast<String* const>(data));
+	case Type::UUID:
+		return read_uuid(name, *static_cast<UUID* const>(data));
 	default:
 		MINTY_ABORT_FORMAT("Cannot read type \"{}\".", to_string(type));
 	}

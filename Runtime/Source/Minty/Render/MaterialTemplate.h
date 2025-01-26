@@ -32,7 +32,7 @@ namespace Minty
 		virtual ~MaterialTemplate() = default;
 
 	public:
-		AssetType get_type() const override { return AssetType::MaterialTemplate; }
+		AssetType get_asset_type() const override { return AssetType::MaterialTemplate; }
 
 		Ref<Shader> get_shader() const { return m_shader; }
 

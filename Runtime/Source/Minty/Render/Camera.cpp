@@ -13,6 +13,7 @@ Minty::Camera::Camera(CameraBuilder const& builder)
 	, m_color(builder.color)
 	, m_aspectRatio(builder.aspectRatio)
 	, m_size(builder.size)
+	, m_layer(builder.layer)
 {}
 
 void Minty::Camera::serialize(Writer& writer) const
@@ -24,6 +25,7 @@ void Minty::Camera::serialize(Writer& writer) const
 	writer.write("color", m_color);
 	writer.write("aspectRatio", m_aspectRatio);
 	writer.write("size", m_size);
+	writer.write("layerMask", m_layer);
 }
 
 void Minty::Camera::deserialize(Reader& reader)
@@ -39,4 +41,5 @@ void Minty::Camera::deserialize(Reader& reader)
 	reader.read("color", m_color);
 	reader.read("aspectRatio", m_aspectRatio);
 	reader.read("size", m_size);
+	reader.read("layerMask", m_layer);
 }

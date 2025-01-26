@@ -75,7 +75,7 @@ namespace Minty
 		static Int compact_kerning(Int const left, Int const right) { return ((left & 0xffff) << 16) | (right & 0xffff); }
 
 	public:
-		AssetType get_type() const override { return AssetType::FontVariant; }
+		AssetType get_asset_type() const override { return AssetType::FontVariant; }
 
 	public:
 		static Owner<FontVariant> create(FontVariantBuilder const& builder);

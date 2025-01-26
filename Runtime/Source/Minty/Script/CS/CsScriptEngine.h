@@ -35,5 +35,13 @@ namespace Minty
 		static MonoString* to_mono_string(String const& string);
 
 		static Bool check_equal(MonoClass* const left, MonoClass* const right);
+
+		static UUID get_uuid(MonoObject* const object);
+
+		static UUID get_entity_uuid(MonoObject* const object);
+
+		static Accessibility get_field_accessibility(MonoClassField* const field);
+
+		static Accessibility get_method_accessibility(MonoMethod* const method);
 	};
 }

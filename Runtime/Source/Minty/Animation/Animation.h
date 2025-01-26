@@ -238,7 +238,7 @@ namespace Minty
 		void reset(Entity const thisEntity, Scene& scene) const;
 
 	public:
-		AssetType get_type() const override { return AssetType::Animation; }
+		AssetType get_asset_type() const override { return AssetType::Animation; }
 
 	public:
 		static AnimationStep parse_step(String const& string);

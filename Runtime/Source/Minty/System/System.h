@@ -68,6 +68,11 @@ namespace Minty
 		virtual void finalize() {}
 
 		/// <summary>
+		/// Does frame drawing work on the System.
+		/// </summary>
+		virtual void draw() {}
+
+		/// <summary>
 		/// Does one fixed frame of work on the System.
 		/// </summary>
 		virtual void fixed_update(Time const time) {}

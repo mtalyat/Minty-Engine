@@ -189,6 +189,7 @@
     <ClInclude Include="Minty\Component\DestroyComponent.h" />
     <ClInclude Include="Minty\Component\DirtyComponent.h" />
     <ClInclude Include="Minty\Component\EnabledComponent.h" />
+    <ClInclude Include="Minty\Component\LayerComponent.h" />
     <ClInclude Include="Minty\Component\MeshComponent.h" />
     <ClInclude Include="Minty\Component\NameComponent.h" />
     <ClInclude Include="Minty\Component\RelationshipComponent.h" />
@@ -260,6 +261,7 @@
     <ClInclude Include="Minty\Input\Input.h" />
     <ClInclude Include="Minty\Input\Key.h" />
     <ClInclude Include="Minty\Input\Mouse.h" />
+    <ClInclude Include="Minty\Layer\LayerManager.h" />
     <ClInclude Include="Minty\Library\EnTT.h" />
     <ClInclude Include="Minty\Library\GLFW.h" />
     <ClInclude Include="Minty\Library\GLM.h" />
@@ -393,6 +395,7 @@
     <ClCompile Include="Minty\Component\AudioSourceComponent.cpp" />
     <ClCompile Include="Minty\Component\CameraComponent.cpp" />
     <ClCompile Include="Minty\Component\CanvasComponent.cpp" />
+    <ClCompile Include="Minty\Component\LayerComponent.cpp" />
     <ClCompile Include="Minty\Component\MeshComponent.cpp" />
     <ClCompile Include="Minty\Component\NameComponent.cpp" />
     <ClCompile Include="Minty\Component\RelationshipComponent.cpp" />
@@ -436,6 +439,7 @@
     <ClCompile Include="Minty\FSM\FiniteStateMachine.cpp" />
     <ClCompile Include="Minty\GUI\GUI.cpp" />
     <ClCompile Include="Minty\Input\Input.cpp" />
+    <ClCompile Include="Minty\Layer\LayerManager.cpp" />
     <ClCompile Include="Minty\Render\Buffer.cpp" />
     <ClCompile Include="Minty\Render\BufferCargo.cpp" />
     <ClCompile Include="Minty\Render\BufferContainer.cpp" />

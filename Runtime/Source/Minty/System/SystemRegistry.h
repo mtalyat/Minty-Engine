@@ -113,6 +113,11 @@ namespace Minty
 		void finalize();
 
 		/// <summary>
+		/// Runs the draw method on each System within this SystemRegistry.
+		/// </summary>
+		void draw();
+
+		/// <summary>
 		/// Runs the fixedUpdate method on each System within this SystemRegistry.
 		/// </summary>
 		void fixed_update(Time const time);

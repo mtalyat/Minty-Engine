@@ -6,15 +6,12 @@ using System.Threading.Tasks;
 
 namespace MintyEngine
 {
-    public class Asset
+    public class ShaderModule : Asset
     {
-        private ulong _id;
-
-        public ulong ID => _id;
-
-        internal Asset(ulong id)
+        public ShaderModule(string path)
+            : base(Runtime.ShaderModule_Create(path))
         {
-            _id = id;
+
         }
     }
 }

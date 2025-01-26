@@ -2,22 +2,19 @@
 	ToString.h:
 ====================
 
-String to_string(ImageAddressMode const obj);
+String to_string(ImageAspect const obj);
 
 ====================
 	ToString.cpp
 ====================
 
-String Minty::to_string(ImageAddressMode const obj)
+String Minty::to_string(ImageAspect const obj)
 {
     switch (obj)
 	{
-		case ImageAddressMode::Undefined: return "Undefined";
-		case ImageAddressMode::Repeat: return "Repeat";
-		case ImageAddressMode::MirroredRepeat: return "MirroredRepeat";
-		case ImageAddressMode::ClampToEdge: return "ClampToEdge";
-		case ImageAddressMode::ClampToBorder: return "ClampToBorder";
-		case ImageAddressMode::MirroredClampToEdge: return "MirroredClampToEdge";
+		case ImageAspect::Undefined: return "Undefined";
+		case ImageAspect::Color: return "Color";
+		case ImageAspect::Depth: return "Depth";
 
 		default: return "";
 	}
@@ -27,40 +24,37 @@ String Minty::to_string(ImageAddressMode const obj)
 	Parse.h
 ====================
 
-ImageAddressMode to_image_address_mode(String const& string);
-Bool try_image_address_mode(String const& string, ImageAddressMode& value);
+ImageAspect to_image_aspect(String const& string);
+Bool try_image_aspect(String const& string, ImageAspect& value);
 
 template<>
-inline void parse_to(String const& string, ImageAddressMode& value)
+inline void parse_to(String const& string, ImageAspect& value)
 {
-    value = to_image_address_mode(string);
+    value = to_image_aspect(string);
 }
 
 template<>
-inline Bool parse_try(String const& string, ImageAddressMode& value)
+inline Bool parse_try(String const& string, ImageAspect& value)
 {
-    return try_image_address_mode(string, value);
+    return try_image_aspect(string, value);
 }
 
 ====================
 	Parse.cpp
 ====================
 
-ImageAddressMode Minty::Parse::to_image_address_mode(String const& string)
+ImageAspect Minty::Parse::to_image_aspect(String const& string)
 {
-	if (string == "Undefined") return ImageAddressMode::Undefined;
-	if (string == "Repeat") return ImageAddressMode::Repeat;
-	if (string == "MirroredRepeat") return ImageAddressMode::MirroredRepeat;
-	if (string == "ClampToEdge") return ImageAddressMode::ClampToEdge;
-	if (string == "ClampToBorder") return ImageAddressMode::ClampToBorder;
-	if (string == "MirroredClampToEdge") return ImageAddressMode::MirroredClampToEdge;
+	if (string == "Undefined") return ImageAspect::Undefined;
+	if (string == "Color") return ImageAspect::Color;
+	if (string == "Depth") return ImageAspect::Depth;
 
-	return ImageAddressMode();
+	return ImageAspect();
 }
 
-Bool Minty::Parse::try_image_address_mode(String const& string, ImageAddressMode& value)
+Bool Minty::Parse::try_image_aspect(String const& string, ImageAspect& value)
 {
-	value = to_image_address_mode(string);
-	return value != ImageAddressMode();
+	value = to_image_aspect(string);
+	return value != ImageAspect();
 }
 

@@ -807,4 +807,34 @@ namespace Minty::Parse
 	{
 		return try_image_address_mode(string, value);
 	}
+
+	ImageTiling to_image_tiling(String const& string);
+	Bool try_image_tiling(String const& string, ImageTiling& value);
+
+	template<>
+	inline void parse_to(String const& string, ImageTiling& value)
+	{
+		value = to_image_tiling(string);
+	}
+
+	template<>
+	inline Bool parse_try(String const& string, ImageTiling& value)
+	{
+		return try_image_tiling(string, value);
+	}
+
+	ImageAspect to_image_aspect(String const& string);
+	Bool try_image_aspect(String const& string, ImageAspect& value);
+
+	template<>
+	inline void parse_to(String const& string, ImageAspect& value)
+	{
+		value = to_image_aspect(string);
+	}
+
+	template<>
+	inline Bool parse_try(String const& string, ImageAspect& value)
+	{
+		return try_image_aspect(string, value);
+	}
 }

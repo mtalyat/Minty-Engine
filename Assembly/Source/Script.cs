@@ -4,6 +4,8 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
+using UUID = System.UInt64;
+
 namespace MintyEngine
 {
     /// <summary>
@@ -11,6 +13,8 @@ namespace MintyEngine
     /// </summary>
     public class Script : Component
     {
-
+        public Script()
+            : base(0)
+        { }
     }
 }

@@ -62,6 +62,10 @@ namespace Minty
 
 		static Ref<ScriptObject> get_object(UUID const id);
 
+		static UUID get_uuid(void* const nativeObject);
+
+		static UUID get_entity_uuid(void* const nativeObject);
+
 		static Ref<ScriptObject> get_or_create_object(UUID const id, Ref<ScriptClass> const scriptClass);
 
 		static Ref<ScriptObject> get_or_create_object(UUID const id, Ref<ScriptClass> const scriptClass, ScriptArguments& scriptArguments);
@@ -70,9 +74,13 @@ namespace Minty
 
 		static Ref<ScriptObject> get_or_create_object_entity(UUID const id);
 
-		static Ref<ScriptObject> create_object_component(Ref<ScriptObject> const entityObject, Ref<ScriptClass> const scriptClass);
+		static Ref<ScriptObject> create_object_component(UUID const entityId, Ref<ScriptClass> const scriptClass);
 
-		static Ref<ScriptObject> get_or_create_object_component(UUID const id, Ref<ScriptObject> const entityObject, Ref<ScriptClass> const scriptClass);
+		static Ref<ScriptObject> get_or_create_object_component(UUID const id, UUID const entityId, Ref<ScriptClass> const scriptClass);
+
+		static Ref<ScriptObject> create_object_asset(UUID const id, Ref<ScriptClass> const& scriptClass);
+
+		static Ref<ScriptObject> get_or_create_object_asset(UUID const id, Ref<ScriptClass> const& scriptClass);
 
 		static Bool contains_object(UUID const id);
 

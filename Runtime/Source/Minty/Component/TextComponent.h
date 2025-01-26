@@ -1,5 +1,5 @@
 #pragma once
-#include "Minty/Component/Component.h"
+#include "Minty/Component/ScriptObjectComponent.h"
 
 #include "Minty/Render/Font.h"
 
@@ -9,7 +9,7 @@ namespace Minty
 	/// Holds Text data for an Entity.
 	/// </summary>
 	struct TextComponent
-		: public Component
+		: public ScriptObjectComponent
 	{
 		/// <summary>
 		/// The text to render.

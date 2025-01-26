@@ -18,6 +18,7 @@ namespace Mintye
 		TargetMode m_targetMode;
 
 		bool m_targetIsBuiltIn;
+		bool m_targetIsNew;
 		Minty::UUID m_targetId;
 		Minty::Entity m_targetEntity;
 		Minty::Path m_targetPath;
@@ -61,13 +62,13 @@ namespace Mintye
 		/// Sets the target to show on the window.
 		/// </summary>
 		/// <param name="entity"></param>
-		void set_target(Minty::Entity const entity);
+		void set_target(Minty::Entity const entity, bool const newTarget = false);
 
 		/// <summary>
 		/// Sets the target to show on the window.
 		/// </summary>
 		/// <param name="asset"></param>
-		void set_target(Minty::Path const& path);
+		void set_target(Minty::Path const& path, bool const newTarget = false);
 
 #pragma endregion
 	};

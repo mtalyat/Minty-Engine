@@ -18,9 +18,9 @@
 
 using namespace Minty;
 
-#define MINTY_ASSERT_ASSET_PATH(path) MINTY_ASSERT_MESSAGE(!(path).empty(), "Asset path is empty."); \
-MINTY_ASSERT_FORMAT(exists(path), "Asset path does not exist: \"{}\"", (path).generic_string()); \
-MINTY_ASSERT_FORMAT(exists(Asset::get_meta_path(path)), "Asset meta path does not exist: \"{}\"", Asset::get_meta_path(path).generic_string());
+#define MINTY_ASSERT_ASSET_PATH(path) MINTY_ASSERT_MESSAGE(!(path).empty(), "Object path is empty."); \
+MINTY_ASSERT_FORMAT(exists(path), "Object path does not exist: \"{}\"", (path).generic_string()); \
+MINTY_ASSERT_FORMAT(exists(Asset::get_meta_path(path)), "Object meta path does not exist: \"{}\"", Asset::get_meta_path(path).generic_string());
 
 Bool Minty::AssetManager::s_savePaths = false;
 std::unordered_map<UUID, AssetManager::AssetData> Minty::AssetManager::s_assets = {};
@@ -231,7 +231,7 @@ Ref<Asset> Minty::AssetManager::load_asset(Path const& path)
 	case AssetType::Texture:
 		return load_texture(path);
 	default:
-		MINTY_ERROR_FORMAT("Asset loading not implemented for type: {}", to_string(type));
+		MINTY_ERROR_FORMAT("Object loading not implemented for type: {}", to_string(type));
 		return nullptr;
 	}
 }
@@ -254,7 +254,7 @@ Bool Minty::AssetManager::save_asset(Path const& path, Ref<Asset> const& asset)
 
 void Minty::AssetManager::emplace_by_type(Ref<Asset> const asset)
 {
-	AssetType type = asset->get_type();
+	AssetType type = asset->get_asset_type();
 
 	auto found = s_assetsByType.find(type);
 
@@ -273,7 +273,7 @@ void Minty::AssetManager::emplace_by_type(Ref<Asset> const asset)
 
 void Minty::AssetManager::erase_by_type(Ref<Asset> const asset)
 {
-	AssetType type = asset->get_type();
+	AssetType type = asset->get_asset_type();
 
 	auto found = s_assetsByType.find(type);
 
@@ -327,11 +327,16 @@ void Minty::AssetManager::unload_all()
 	s_assetsByType.clear();
 }
 
-void Minty::AssetManager::emplace(Path const& path, Owner<Asset> const asset)
+void Minty::AssetManager::emplace(Owner<Asset> const& asset)
+{
+	emplace(Path(), asset);
+}
+
+void Minty::AssetManager::emplace(Path const& path, Owner<Asset> const& asset)
 {
 	MINTY_ASSERT_MESSAGE(asset.get() != nullptr, "Cannot emplace a null asset into the AssetManager.");
 	MINTY_ASSERT_FORMAT(!s_assets.contains(asset->id()), "An asset with the ID {} already exists and is loaded.", to_string(asset->id()));
-	MINTY_ASSERT_MESSAGE(asset->id().valid(), "Found invalid asset ID when attempting to emplace Asset into the AssetManager.");
+	MINTY_ASSERT_MESSAGE(asset->id().valid(), "Found invalid asset ID when attempting to emplace Object into the AssetManager.");
 
 	AssetData assetData{};
 	assetData.asset = asset;
@@ -401,7 +406,7 @@ std::vector<Ref<Asset>> Minty::AssetManager::get_dependents(Ref<Asset> const ass
 	std::vector<Ref<Asset>> result;
 
 	// get type
-	AssetType type = asset->get_type();
+	AssetType type = asset->get_asset_type();
 
 	// check based on the type
 	// some types inherently have no dependents
@@ -846,7 +851,7 @@ Bool Minty::AssetManager::load_values(Reader& reader, std::unordered_map<String,
 	{
 		reader.read_name(i, inputName);
 
-		MINTY_ASSERT_FORMAT(shader->has_input(inputName), "Shader does not have an input with the name \"{}\". Shader: \"{}\". Asset: \"{}\".", inputName, get_path(shader->id()).generic_string(), path.generic_string());
+		MINTY_ASSERT_FORMAT(shader->has_input(inputName), "Shader does not have an input with the name \"{}\". Shader: \"{}\". Object: \"{}\".", inputName, get_path(shader->id()).generic_string(), path.generic_string());
 
 		// reference input from shader settings, to ensure this matches shader
 		ShaderInput const& input = shader->get_input(inputName);
@@ -953,7 +958,7 @@ Bool Minty::AssetManager::load_values(Reader& reader, std::unordered_map<String,
 			case Type::Quaternion:
 				reader.read_to_container<Quaternion>(j, slot.container);
 				break;
-			case Type::Asset:
+			case Type::Object:
 			{
 				// read ID, then get asset ref, copy pointer to container
 				Ref<Asset> asset{};

@@ -79,7 +79,7 @@ void Minty::Scene::load()
 	// select camera if needed
 	if (RenderSystem* renderSystem = mp_systemRegistry->find<RenderSystem>())
 	{
-		renderSystem->set_camera(mp_entityRegistry->find_by_type<CameraComponent>());
+		renderSystem->set_main_camera(mp_entityRegistry->find_by_type<CameraComponent>());
 	}
 }
 
@@ -286,9 +286,14 @@ void Minty::Scene::finalize()
 	mp_entityRegistry->destroy_queued();
 }
 
+void Minty::Scene::draw()
+{
+	mp_systemRegistry->draw();
+}
+
 Bool Minty::Scene::register_asset(Path const& path)
 {
-	MINTY_ASSERT_FORMAT(!m_registeredAssets.contains(path), "Asset already registered: \"{}\".", path.generic_string());
+	MINTY_ASSERT_FORMAT(!m_registeredAssets.contains(path), "Object already registered: \"{}\".", path.generic_string());
 
 	AssetData data
 	{
@@ -361,7 +366,7 @@ void Minty::Scene::load_registered_assets()
 		}
 		else
 		{
-			MINTY_ERROR_FORMAT("Failed to load Asset registered with Scene at \"{}\".", path.generic_string());
+			MINTY_ERROR_FORMAT("Failed to load Object registered with Scene at \"{}\".", path.generic_string());
 		}
 	}
 }

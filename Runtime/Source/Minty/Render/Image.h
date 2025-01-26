@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Minty/Asset/Asset.h"
 #include "Minty/Core/Pointer.h"
 #include "Minty/Render/Enums.h"
 #include "Minty/Render/Enums.h"
@@ -8,6 +9,7 @@ namespace Minty
 {
 	struct ImageBuilder
 	{
+		UUID id = INVALID_UUID;
 		Format format = Format::R8G8B8A8_SRGB;
 		ImageType type = ImageType::D2;
 		ImageTiling tiling = ImageTiling::Optimal;
@@ -23,6 +25,7 @@ namespace Minty
 	/// Represents an image on the GPU.
 	/// </summary>
 	class Image
+		: public Asset
 	{
 	protected:
 		Format m_format;
@@ -64,6 +67,9 @@ namespace Minty
 		inline UInt get_height() const { return m_height; }
 
 		inline Bool is_immutable() const { return m_immutable; }
+
+	public:
+		AssetType get_asset_type() const override { return AssetType::Image; }
 
 	public:
 		static Owner<Image> create(ImageBuilder const& builder = {});

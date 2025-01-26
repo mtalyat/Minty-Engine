@@ -14,7 +14,7 @@ Inputs
         Binding: 1
         Frequent: false
         Structure
-            texSampler: Asset
+            texSampler: Object
 PrimitiveTopology: TriangleList
 PolygonMode: Fill
 CullMode: None

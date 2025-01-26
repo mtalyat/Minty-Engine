@@ -45,10 +45,12 @@ void Minty::SceneManager::update(Time const time)
 	if (m_loadedScene != nullptr)
 	{
 		m_loadedScene->update(time);
+		m_noSceneWarningShown = false;
 	}
-	else
+	else if(!m_noSceneWarningShown)
 	{
 		MINTY_WARN("No scene loaded.");
+		m_noSceneWarningShown = true;
 	}
 }
 
@@ -67,6 +69,20 @@ void Minty::SceneManager::finalize()
 	if (m_loadedScene != nullptr)
 	{
 		m_loadedScene->finalize();
+	}
+}
+
+void Minty::SceneManager::draw()
+{
+	if (m_loadedScene != nullptr)
+	{
+		// draw loaded scene
+		m_loadedScene->draw();
+	}
+	else
+	{
+		// draw nothing
+		Renderer::skip_render_pass(Renderer::get_render_pass(), Renderer::get_render_target());
 	}
 }
 

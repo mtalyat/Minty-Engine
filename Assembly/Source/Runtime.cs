@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Runtime.CompilerServices;
 
+using UUID = System.UInt64;
+
 namespace MintyEngine
 {
     /// <summary>
@@ -9,6 +11,47 @@ namespace MintyEngine
     public static class Runtime
     {
         // [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Class_Function();
+
+        #region Components
+
+        #region Camera
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static int Camera_GetPerspective(UUID id);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Camera_SetPerspective(UUID id, int perspective);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static float Camera_GetFov(UUID id);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Camera_SetFov(UUID id, float perspective);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static float Camera_GetNear(UUID id);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Camera_SetNear(UUID id, float perspective);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static float Camera_GetFar(UUID id);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Camera_SetFar(UUID id, float perspective);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static object Camera_GetMain();
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Camera_SetMain(UUID id);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Camera_SetColor(UUID id, int color);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static int Camera_GetColor(UUID id);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Camera_SetRenderTarget(UUID id, UUID renderTarget);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static UUID Camera_GetRenderTarget(UUID id);
+        #endregion
+
+        #region Transform
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_GetLocalPosition(UUID id, out Vector3 position);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_SetLocalPosition(UUID id, in Vector3 position);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_GetLocalRotation(UUID id, out Vector4 position);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_SetLocalRotation(UUID id, in Vector4 position);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_GetLocalScale(UUID id, out Vector3 position);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_SetLocalScale(UUID id, in Vector3 position);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_GetGlobalPosition(UUID id, out Vector3 position);
+        //[MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_SetGlobalPosition(UUID id, in Vector3 position);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_GetGlobalRotation(UUID id, out Vector4 position);
+        //[MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_SetGlobalRotation(UUID id, in Vector4 position);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_GetGlobalScale(UUID id, out Vector3 position);
+        //[MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_SetGlobalScale(UUID id, in Vector3 position);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_GetRight(UUID id, out Vector3 position);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_GetUp(UUID id, out Vector3 position);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_GetForward(UUID id, out Vector3 position);
+        #endregion
+
+        #endregion
+
+        #region Core
 
         #region Time
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static float Time_GetTotalTime();
@@ -22,99 +65,125 @@ namespace MintyEngine
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Console_Error(string message);
         #endregion
 
+        #endregion
+
+        #region Input
+
         #region Cursor
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static CursorMode Cursor_GetMode();
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Cursor_SetMode(CursorMode mode);
         #endregion
 
-        #region Object
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Object_DestroyEntity(ulong id);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Object_DestroyImmediateEntity(ulong id);
         #endregion
+
+        #region Object
 
         #region Entity
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static string Entity_GetName(ulong id);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Entity_SetName(ulong id, string name);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static string Entity_GetTag(ulong id);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Entity_SetTag(ulong id, string tag);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static bool Entity_GetEnabled(ulong id);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Entity_SetEnabled(ulong id, bool enabled);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static object Entity_AddComponent(ulong id, Type type);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static object Entity_GetComponent(ulong id, Type type);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static bool Entity_RemoveComponent(ulong id, Type type);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static object Entity_GetParent(ulong id);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Entity_SetParent(ulong id, ulong parentId);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static int Entity_GetChildCount(ulong id);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static object Entity_GetChild(ulong id, int index);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static object Entity_Clone(ulong id);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static object Entity_Find(UUID id);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static string Entity_GetName(UUID id);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Entity_SetName(UUID id, string name);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static string Entity_GetTag(UUID id);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Entity_SetTag(UUID id, string tag);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static uint Entity_GetLayer(UUID id);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Entity_SetLayer(UUID id, uint layer);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static bool Entity_GetEnabled(UUID id);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Entity_SetEnabled(UUID id, bool enabled);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static object Entity_AddComponent(UUID id, Type type);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static object Entity_GetComponent(UUID id, Type type);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static bool Entity_RemoveComponent(UUID id, Type type);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static object Entity_GetParent(UUID id);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Entity_SetParent(UUID id, UUID parentId);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static int Entity_GetChildCount(UUID id);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static object Entity_GetChild(UUID id, int index);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static object Entity_Clone(UUID id);
         #endregion
 
-        #region Window
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static object Window_GetMain();
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static string Window_GetTitle(ulong id);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Window_SetTitle(ulong id, string title);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Window_SetIcon(ulong id, string path);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static bool Window_IsOpen(ulong id);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Window_Close(ulong id);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Window_Maximize(ulong id);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Window_Minimize(ulong id);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Window_Restore(ulong id);
-        #endregion
-
-        #region Components
-
-        #region Camera
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static int Camera_GetPerspective(ulong id);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Camera_SetPerspective(ulong id, int perspective);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static float Camera_GetFov(ulong id);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Camera_SetFov(ulong id, float perspective);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static float Camera_GetNear(ulong id);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Camera_SetNear(ulong id, float perspective);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static float Camera_GetFar(ulong id);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Camera_SetFar(ulong id, float perspective);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static object Camera_GetMain();
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Camera_SetMain(ulong id);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Camera_SetColor(ulong id, int color);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static int Camera_GetColor(ulong id);
-        #endregion
-
-        #region Transform
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_GetLocalPosition(ulong id, out Vector3 position);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_SetLocalPosition(ulong id, in Vector3 position);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_GetLocalRotation(ulong id, out Vector4 position);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_SetLocalRotation(ulong id, in Vector4 position);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_GetLocalScale(ulong id, out Vector3 position);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_SetLocalScale(ulong id, in Vector3 position);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_GetGlobalPosition(ulong id, out Vector3 position);
-        //[MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_SetGlobalPosition(ulong id, in Vector3 position);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_GetGlobalRotation(ulong id, out Vector4 position);
-        //[MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_SetGlobalRotation(ulong id, in Vector4 position);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_GetGlobalScale(ulong id, out Vector3 position);
-        //[MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_SetGlobalScale(ulong id, in Vector3 position);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_GetRight(ulong id, out Vector3 position);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_GetUp(ulong id, out Vector3 position);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_GetForward(ulong id, out Vector3 position);
+        #region Object
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Object_DestroyEntity(UUID id);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Object_DestroyImmediateEntity(UUID id);
         #endregion
 
         #endregion
 
-        #region SceneManager
-
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void SceneManager_Load(string path);
-
-        #endregion
+        #region Render
 
         #region Image
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static UUID Image_Create(int format, int type, int tiling, int aspect, int usage, uint width, uint height, bool immutable);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static UUID Image_CreateBasic(uint width, uint height);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static uint Image_GetWidth(UUID id);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static uint Image_GetHeight(UUID id);
+        #endregion
 
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static ulong Image_Create(Format format, ImageType type, ImageTiling tiling, ImageAspect aspect, ImageUsage usage, uint width, uint height, bool immutable);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static uint Image_GetWidth(ulong id);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static uint Image_GetHeight(ulong id);
+        #region Material
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static UUID Material_Create(string path);
+        #endregion
 
+        #region MaterialTemplate
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static UUID MaterialTemplate_Create(string path);
+        #endregion
+
+        #region Renderer
+
+        #endregion
+
+        //#region RenderPass
+        //[MethodImpl(MethodImplOptions.InternalCall)] internal extern static UUID RenderPass_Create();
+        //[MethodImpl(MethodImplOptions.InternalCall)] internal extern static bool RenderPass_UpdateAttachment(UUID id, int type, int format, int loadOp, int storeOp, int initialLayout, int finalLayout);
+        //[MethodImpl(MethodImplOptions.InternalCall)] internal extern static bool RenderPass_Apply(UUID id);
+        //#endregion
+
+        #region RenderTarget
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static UUID RenderTarget_Create(bool framebuffer);
+        #endregion
+
+        #region Shader
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static UUID Shader_Create(string path);
+        #endregion
+
+        #region ShaderModule
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static UUID ShaderModule_Create(string path);
+        #endregion
+
+        #region Scissor
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static UUID Scissor_Create(float x, float y, float width, float height);
+        #endregion
+
+        #region Screen
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static uint Screen_GetWidth();
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static uint Screen_GetHeight();
         #endregion
 
         #region Texture
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static UUID Texture_Create(UUID imageId, Filter filter, ImageAddressMode addressMode, bool normalizedCoordinates);
+        #endregion
 
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static ulong Texture_Create(ulong imageId, Filter filter, ImageAddressMode addressMode, bool normalizedCoordinates);
+        #region Viewport
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static UUID Viewport_Create(float x, float y, float width, float height, float minDepth, float maxDepth);
+        #endregion
+
+        #endregion
+
+        #region Scene
+
+        #region SceneManager
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void SceneManager_Load(string path);
+        #endregion
+
+        #endregion
+
+        #region Window
+
+        #region Window
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static object Window_GetMain();
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static string Window_GetTitle(UUID id);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Window_SetTitle(UUID id, string title);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Window_SetIcon(UUID id, string path);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static bool Window_IsOpen(UUID id);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Window_Close(UUID id);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Window_Maximize(UUID id);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Window_Minimize(UUID id);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Window_Restore(UUID id);
+        #endregion
 
         #endregion
     }

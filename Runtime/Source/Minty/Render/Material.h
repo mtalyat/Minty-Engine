@@ -30,7 +30,7 @@ namespace Minty
 		virtual ~Material();
 
 	public:
-		AssetType get_type() const override { return AssetType::Material; }
+		AssetType get_asset_type() const override { return AssetType::Material; }
 
 		// binds this Material so it can be drawn with
 		virtual void on_bind() = 0;

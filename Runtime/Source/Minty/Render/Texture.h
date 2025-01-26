@@ -38,7 +38,7 @@ namespace Minty
 		UInt get_height() const { return m_image->get_height(); }
 
 	public:
-		AssetType get_type() const override { return AssetType::Texture; }
+		AssetType get_asset_type() const override { return AssetType::Texture; }
 
 	public:
 		static Owner<Texture> create(TextureBuilder const& builder = {});

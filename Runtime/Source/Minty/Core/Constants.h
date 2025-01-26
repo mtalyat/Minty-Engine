@@ -51,8 +51,9 @@ namespace Minty
 	constexpr Char const* EXTENSION_META = ".meta";
 	constexpr Char const* EXTENSION_WRAP = ".wrap";
 
-	constexpr Char const* DEFAULT_WRAP = "Game.wrap";
-	constexpr Char const* DEFAULT_APPDATA = "Game.appdata";
+	constexpr Char const* DEFAULT_GAME_WRAP = "Game.wrap";
+	constexpr Char const* DEFAULT_GAME_APPDATA = "Game.appdata";
+	constexpr Char const* DEFAULT_GAME_CONFIG = "Config.appdata";
 
 	constexpr Size INVALID_UUID = 0;
 	constexpr UInt INVALID_HANDLE = UINT_MAX;
@@ -72,4 +73,9 @@ namespace Minty
 	constexpr Size DEFAULT_TEXT_MATERIAL_TEMPLATE = 0xdef0000000000010;
 	constexpr Size DEFAULT_UI_MATERIAL_TEMPLATE = 0xdef0000000000011;
 	constexpr Size DEFAULT_TEXTURE = 0xdef0000000000000;
+
+	constexpr Layer LAYER_ALL = ~0;
+	constexpr Layer LAYER_NONE = 0;
+	constexpr Layer LAYER_DEFAULT = 1;
+	constexpr Layer LAYER_COUNT = sizeof(Layer) * 8;
 }

@@ -332,13 +332,19 @@ namespace Minty
 		/// Unloads all Assets from this AssetManager.
 		/// </summary>
 		static void unload_all();
+
+		/// <summary>
+		/// Adds an Asset into this AssetManager, with no path.
+		/// </summary>
+		/// <param name="asset">The Asset to add.</param>
+		static void emplace(Owner<Asset> const& asset);
 		
 		/// <summary>
 		/// Adds an Asset into this AssetManager.
 		/// </summary>
 		/// <param name="path">The path of the Asset.</param>
 		/// <param name="asset">The Asset to add.</param>
-		static void emplace(Path const& path, Owner<Asset> const asset);
+		static void emplace(Path const& path, Owner<Asset> const& asset);
 
 		/// <summary>
 		/// Removes an Asset from this AssetManager.

@@ -23,7 +23,10 @@ namespace Minty
 		Animator,
 		Viewport,
 		Scissor,
+		Image,
 		Texture,
+		RenderPass,
+		RenderTarget,
 		ShaderCode,
 		ShaderModule,
 		Shader,
@@ -76,7 +79,7 @@ namespace Minty
 		/// Gets the AssetType that corresponds to this Asset.
 		/// </summary>
 		/// <returns></returns>
-		virtual AssetType get_type() const = 0;
+		virtual AssetType get_asset_type() const = 0;
 
 		/// <summary>
 		/// Gets the AssetType based on the extension in the given Path.

@@ -8,7 +8,8 @@
 using namespace Minty;
 
 Minty::Image::Image(ImageBuilder const& builder)
-	: m_format(builder.format)
+	: Asset(builder.id)
+	, m_format(builder.format)
 	, m_type(builder.type)
 	, m_tiling(builder.tiling)
 	, m_aspect(builder.aspect)

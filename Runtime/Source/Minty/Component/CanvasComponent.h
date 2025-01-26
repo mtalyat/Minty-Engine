@@ -1,5 +1,5 @@
 #pragma once
-#include "Minty/Component/Component.h"
+#include "Minty/Component/ScriptObjectComponent.h"
 
 #include "Minty/Core/Math.h"
 #include "Minty/Core/Rect.h"
@@ -7,7 +7,7 @@
 namespace Minty
 {
 	struct CanvasComponent
-		: public Component
+		: public ScriptObjectComponent
 	{
 		/// <summary>
 		/// The simulated resolution that the children of this Canvas use to position themselves with.

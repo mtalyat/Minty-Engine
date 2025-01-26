@@ -21,11 +21,9 @@ namespace Minty
 		~CsScriptObject();
 
 	protected:
-		Owner<ScriptField> create_field(String const& name) override;
-
-		Owner<ScriptProperty> create_property(String const& name) override;
-
-		Owner<ScriptMethod> create_method(String const& name, Int const parameterCount) override;
+		void populate_fields(std::vector<Owner<ScriptField>>& fields) override;
+		void populate_properties(std::vector<Owner<ScriptProperty>>& fields) override;
+		void populate_methods(std::vector<Owner<ScriptMethod>>& methods) override;
 
 	public:
 		void* get_native() const override { return mp_object; }

@@ -84,6 +84,12 @@ namespace Minty
 
 		Bool get_renderable(Entity const entity) const;
 
+		void set_layer(Entity const entity, Layer const layer);
+
+		Layer get_layer(Entity const entity);
+
+		Bool is_in_layer_mask(Entity const entity, Layer const layer);
+
 		void dirty(Entity const entity);
 
 	private:

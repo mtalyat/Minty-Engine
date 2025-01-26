@@ -6,8 +6,9 @@ using System.Threading.Tasks;
 
 namespace MintyEngine
 {
-    public class RenderTarget
+    public enum RenderAttachmentType
     {
-
+        Color,
+        Depth
     }
 }

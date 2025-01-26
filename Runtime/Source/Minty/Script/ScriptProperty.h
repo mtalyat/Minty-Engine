@@ -2,6 +2,7 @@
 
 #include "Minty/Core/Pointer.h"
 #include "Minty/Core/Type.h"
+#include "Minty/Script/Accessibility.h"
 
 namespace Minty
 {
@@ -33,6 +34,12 @@ namespace Minty
 		virtual void set(void** const value) const = 0;
 
 		virtual void get(void** const value) const = 0;
+
+		virtual Accessibility get_accessibility_get() const = 0;
+
+		virtual Accessibility get_accessibility_set() const = 0;
+
+		virtual Bool is_static() const = 0;
 
 		virtual Type get_type() const = 0;
 	};

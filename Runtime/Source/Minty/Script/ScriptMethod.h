@@ -2,6 +2,7 @@
 
 #include "Minty/Core/Pointer.h"
 #include "Minty/Core/Type.h"
+#include "Minty/Script/Accessibility.h"
 
 namespace Minty
 {
@@ -29,6 +30,10 @@ namespace Minty
 		Ref<ScriptObject> get_object() const { return m_object; }
 
 		virtual String get_name() const = 0;
+
+		virtual Accessibility get_accessibility() const = 0;
+
+		virtual Bool is_static() const = 0;
 
 		/// <summary>
 		/// Invokes the method with no arguments and no return value.

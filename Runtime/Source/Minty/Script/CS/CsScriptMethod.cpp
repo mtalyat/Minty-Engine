@@ -17,6 +17,17 @@ String Minty::CsScriptMethod::get_name() const
 	return String(mono_method_get_name(mp_method));
 }
 
+Accessibility Minty::CsScriptMethod::get_accessibility() const
+{
+	return CsScriptEngine::get_method_accessibility(mp_method);
+}
+
+Bool Minty::CsScriptMethod::is_static() const
+{
+	uint32_t flags = mono_method_get_flags(mp_method, nullptr);
+	return static_cast<Bool>(flags & MONO_METHOD_ATTR_STATIC);
+}
+
 void Minty::CsScriptMethod::invoke() const
 {
 	Ref<ScriptObject> scriptObject = get_object();

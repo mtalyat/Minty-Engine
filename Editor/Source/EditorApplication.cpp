@@ -86,7 +86,9 @@ EditorApplication::EditorApplication()
 	window->set_icon("Icon.png");
 	window->maximize();
 
+#if NDEBUG
 	load_most_recent_project();
+#endif // NDEBUG
 }
 
 Mintye::EditorApplication::~EditorApplication()
@@ -305,8 +307,12 @@ void Mintye::EditorApplication::load_project(Minty::Path const& path)
 
 	// load assemblies
 	Path projectDllPath = get_project_dll_path();
-	if (AssetManager::exists(projectDllPath))
+	if (AssetManager::exists(projectDllPath)) 
 	{
+		// if the DLL exists, copy its meta file into the directory
+		Operation::copy(std::format("{}/Assembly.txt", ASSEMBLY_DIRECTORY_NAME), std::format("{}/{}.dll.meta", projectDllPath.parent_path().generic_string(), project->get_name()));
+
+		// load the assembly from there
 		ScriptEngine::load_assembly(projectDllPath.stem().string(), projectDllPath);
 	}
 	else
@@ -324,6 +330,12 @@ void Mintye::EditorApplication::load_project(Minty::Path const& path)
 
 			AssetManager::close_reader(reader);
 		}
+	}
+
+	// load config for project
+	if (!load_config(mp_project->get_minty_path() / DEFAULT_GAME_CONFIG))
+	{
+		MINTY_ERROR("Failed to load project config.");
 	}
 
 	// load a scene, if any found
@@ -355,6 +367,8 @@ void Mintye::EditorApplication::unload_project()
 
 		refresh();
 	}
+
+	clear_config();
 
 	delete mp_watcher;
 	mp_watcher = nullptr;
@@ -1301,7 +1315,7 @@ void Mintye::EditorApplication::generate_application_data()
 	}
 
 	// get path to file
-	Path path = mp_project->get_build_path() / DEFAULT_APPDATA;
+	Path path = mp_project->get_minty_path() / DEFAULT_GAME_APPDATA;
 
 	// open file to overwrite
 	std::ofstream file(path, std::ios::trunc);
@@ -1333,18 +1347,30 @@ void Mintye::EditorApplication::generate_application_data()
 
 void Mintye::EditorApplication::generate_wraps()
 {
-	// TODO: split into multile wrap files if needed
-
 	Path output = mp_project->get_build_path() / m_buildInfo.get_config_name();
 
-	// for now:
-	// compile all game files/assets into two wrap files
-
 	// game data
-	Wrap gameWrap(output / DEFAULT_WRAP, "Game", 1);
-	String appFileName = DEFAULT_APPDATA;
-	Path appPath = mp_project->get_build_path() / appFileName;
-	gameWrap.emplace(appPath, appFileName);
+	// add any files within the Minty directory
+	Path mintyPath = mp_project->get_minty_path();
+	std::vector<Path> gameWrapFiles;
+	for (auto const& entry : std::filesystem::directory_iterator(mintyPath))
+	{
+		Path const& entryPath = entry.path();
+
+		if (std::filesystem::is_regular_file(entry.status()))
+		{
+			// get file name
+			gameWrapFiles.push_back(entryPath);
+		}
+	}
+
+	Wrap gameWrap(output / DEFAULT_GAME_WRAP, "Game", static_cast<uint32_t>(gameWrapFiles.size()));
+	for (Path const& filePath : gameWrapFiles)
+	{
+		Path fileName = filePath.filename();
+
+		gameWrap.emplace(filePath, fileName);
+	}
 
 	// game assets
 	Wrap assetWrap(output / String("Assets").append(EXTENSION_WRAP), ASSETS_DIRECTORY_NAME, static_cast<uint32_t>(mp_project->get_asset_count()), ASSETS_DIRECTORY_NAME);
@@ -1445,7 +1471,7 @@ void Mintye::EditorApplication::generate_assembly()
 
 	file.close();
 
-	path = (Path(mp_project->get_assembly_path()) / std::format("{}.dll.meta", mp_project->get_name())).string();
+	path = (Path(mp_project->get_assembly_path()) / "Assembly.txt").string();
 
 	// write <project>.dll.meta
 	file = std::ofstream(path, std::ios::trunc);

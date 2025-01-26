@@ -20,12 +20,12 @@ Bool Minty::UUID::operator!=(UUID const other) const
 	return m_uuid != other.m_uuid;
 }
 
-Bool Minty::UUID::operator==(Size const other) const
+Bool Minty::UUID::operator==(UUID_t const other) const
 {
 	return m_uuid == other;
 }
 
-Bool Minty::UUID::operator!=(Size const other) const
+Bool Minty::UUID::operator!=(UUID_t const other) const
 {
 	return m_uuid != other;
 }

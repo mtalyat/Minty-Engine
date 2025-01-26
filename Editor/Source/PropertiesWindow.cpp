@@ -188,6 +188,13 @@ void Mintye::PropertiesWindow::draw_entity()
 	memcpy(inputBuffer, text.c_str(), size);
 	inputBuffer[size - 1] = '\0';
 
+	// if new, focus on this text box
+	if (m_targetIsNew || GUI::is_key_pressed(Key::F2))
+	{
+		m_targetIsNew = false;
+		GUI::set_keyboard_focus_here();
+	}
+
 	if (GUI::input_text("Name", inputBuffer, INPUT_SIZE))
 	{
 		registry.set_name(m_targetEntity, inputBuffer);
@@ -219,6 +226,24 @@ void Mintye::PropertiesWindow::draw_entity()
 		registry.set_renderable(m_targetEntity, visible);
 	}
 
+	// layer
+	Layer layer = registry.get_layer(m_targetEntity);
+	LayerManager const& layerManager = Application::instance().get_layer_manager();
+	text = layerManager.get_name(layer);
+	size = std::min(INPUT_SIZE, text.size() + 1);
+	memcpy(inputBuffer, text.c_str(), size);
+	inputBuffer[size - 1] = '\0';
+
+	if (GUI::input_text("Layer", inputBuffer, INPUT_SIZE))
+	{
+		// if a valid layer, set it
+		layer = layerManager.get_layer(inputBuffer);
+		if (layer != LAYER_NONE)
+		{
+			registry.set_layer(m_targetEntity, layer);
+		}
+	}
+
 	// tag
 	text = registry.get_tag(m_targetEntity);
 	size = std::min(INPUT_SIZE, text.size() + 1);
@@ -234,7 +259,7 @@ void Mintye::PropertiesWindow::draw_entity()
 
 	// these will be ignored in the general components list below,
 	// since they are already drawn above
-	static std::unordered_set<String> ignoreComponentNames = { "Name", "Tag", "Enabled", "Renderable"};
+	static std::unordered_set<String> ignoreComponentNames = { "Name", "Tag", "Enabled", "Renderable", "Layer" };
 
 	//		Components
 
@@ -279,7 +304,7 @@ void Mintye::PropertiesWindow::draw_entity()
 				MINTY_ASSERT_FORMAT(childNodeClass != nullptr, "Cannot find a class with the ID \"{}\".", to_string(id));
 
 				// use class's full name
-				String childNodeClassName = childNodeClass->get_class_name();
+				String childNodeClassName = childNodeClass->get_full_name();
 				childNode.set_name(childNodeClassName);
 
 				// treat as normal component
@@ -549,7 +574,7 @@ void Mintye::PropertiesWindow::clear_target()
 	m_texts.clear();
 }
 
-void Mintye::PropertiesWindow::set_target(Minty::Entity const entity)
+void Mintye::PropertiesWindow::set_target(Minty::Entity const entity, bool const newTarget)
 {
 	clear_target();
 
@@ -559,10 +584,11 @@ void Mintye::PropertiesWindow::set_target(Minty::Entity const entity)
 		m_targetEntity = entity;
 		EntityRegistry& registry = get_scene()->get_entity_registry();
 		m_targetId = registry.get_id(entity);
+		m_targetIsNew = newTarget;
 	}
 }
 
-void Mintye::PropertiesWindow::set_target(Minty::Path const& path)
+void Mintye::PropertiesWindow::set_target(Minty::Path const& path, bool const newTarget)
 {
 	clear_target();
 
@@ -570,6 +596,7 @@ void Mintye::PropertiesWindow::set_target(Minty::Path const& path)
 	{
 		m_targetMode = TargetMode::Asset;
 		m_targetIsBuiltIn = path.string().starts_with("BuiltIn");
+		m_targetIsNew = newTarget;
 		m_targetPath = path;
 
 		m_targetId = AssetManager::read_id(path);

@@ -14,34 +14,6 @@
 
 using namespace Minty;
 
-void Minty::RenderSystem::update(Time const& time)
-{
-	if (Application::instance().get_mode() != ApplicationMode::Edit)
-	{
-		// do nothing if no camera
-		if (m_camera == NULL_ENTITY)
-		{
-			MINTY_WARN("There is no Camera to render to.");
-			return;
-		}
-
-		// get camera transform
-		EntityRegistry& entityRegistry = get_entity_registry();
-
-		if (!entityRegistry.all_of<CameraComponent>(m_camera))
-		{
-			MINTY_WARN("The Camera entity has no Camera component.");
-			return;
-		}
-
-		update_camera();
-	}
-	
-	update_3d();
-	// update 2d goes here
-	update_ui();
-}
-
 void Minty::RenderSystem::finalize()
 {
 	EntityRegistry& entityRegistry = get_entity_registry();
@@ -53,40 +25,79 @@ void Minty::RenderSystem::finalize()
 	}
 }
 
-void Minty::RenderSystem::update_camera(CameraComponent const& camera, TransformComponent const& transform)
+void Minty::RenderSystem::draw()
 {
-	Renderer::set_camera(transform.get_global_position(), transform.get_global_rotation(), camera.camera);
-}
-
-void Minty::RenderSystem::update_camera()
-{
-	// get camera transform
-	EntityRegistry& entityRegistry = get_entity_registry();
-
-	// update camera in renderer if it is enabled
-	if (entityRegistry.all_of<EnabledComponent>(m_camera))
+	// draw for each enabled camera
+	if (Application::instance().get_mode() == ApplicationMode::Edit)
 	{
-		CameraComponent const& camera = entityRegistry.get<CameraComponent>(m_camera);
-		TransformComponent const* transformComponent = entityRegistry.try_get<TransformComponent>(m_camera);
+		// draw from editor camera
+		Renderer::start_render_pass(Renderer::get_render_pass(), Renderer::get_render_target());
 
-		if (transformComponent)
-		{
-			update_camera(camera, *transformComponent);
-		}
-		else
-		{
-			// fake an empty transform component
-			TransformComponent temp = TransformComponent::create_empty();
-			update_camera(camera, temp);
-		}
+		// assume camera data has already been set
+		
+		// draw scene
+		draw_scene();
+
+		Renderer::end_render_pass();
 	}
 	else
 	{
-		MINTY_ERROR("Invalid Camera.");
+		// draw from cameras
+		EntityRegistry& entityRegistry = get_entity_registry();
+
+		bool drawn = false;
+
+		for (auto const& [entity, camera, enabled] : entityRegistry.view<CameraComponent, EnabledComponent const>().each())
+		{
+			Ref<RenderTarget> renderTarget = camera.camera.get_render_target();
+
+			// if no render target, use default render target
+			if (renderTarget == nullptr)
+			{
+				renderTarget = Renderer::get_render_target();
+			}
+
+			// start render pass
+			Renderer::start_render_pass(Renderer::get_render_pass(), renderTarget);
+
+			// set camera orientation data
+			TransformComponent const* transformComponent = entityRegistry.try_get<TransformComponent>(entity);
+			if (transformComponent)
+			{
+				// use transform component
+				update_camera(camera, *transformComponent);
+			}
+			else
+			{
+				// fake an empty transform component at origin
+				TransformComponent temp = TransformComponent::create_empty();
+				update_camera(camera, temp);
+			}
+
+			// draw scene
+			draw_scene();
+
+			Renderer::end_render_pass();
+
+			drawn = true;
+		}
+
+		// show warning if nothing drawn
+		if (!drawn)
+		{
+			MINTY_WARN("There is no Camera to render to.");
+			return;
+		}
 	}
 }
 
-void Minty::RenderSystem::update_3d_meshes()
+void Minty::RenderSystem::update_camera(CameraComponent const& camera, TransformComponent const& transform)
+{
+	Renderer::set_camera(transform.get_global_position(), transform.get_global_rotation(), camera.camera);
+	m_layerMask = camera.camera.get_layer_mask();
+}
+
+void Minty::RenderSystem::draw_3d_meshes()
 {
 	// get camera transform
 	EntityRegistry& entityRegistry = get_entity_registry();
@@ -102,10 +113,22 @@ void Minty::RenderSystem::update_3d_meshes()
 	for (auto&& [entity, meshComp, renderable, enabled] : entityRegistry.view<MeshComponent, RenderableComponent const, EnabledComponent const>().each())
 	{
 		// skip empty meshes
-		if (meshComp.type == MeshType::Empty) continue;
+		if (meshComp.type == MeshType::Empty)
+		{
+			continue;
+		}
 
 		// skip if no material or mesh
-		if (meshComp.material == nullptr || meshComp.mesh == nullptr) continue;
+		if (meshComp.material == nullptr || meshComp.mesh == nullptr)
+		{
+			continue;
+		}
+
+		// skip if not part of camera layer mask
+		if (!entityRegistry.is_in_layer_mask(entity, m_layerMask))
+		{
+			continue;
+		}
 
 		// get assets
 		material = meshComp.material;
@@ -141,7 +164,7 @@ void Minty::RenderSystem::update_3d_meshes()
 	}
 }
 
-void Minty::RenderSystem::update_3d_sprites()
+void Minty::RenderSystem::draw_3d_sprites()
 {
 	// get camera transform
 	EntityRegistry& entityRegistry = get_entity_registry();
@@ -172,6 +195,12 @@ void Minty::RenderSystem::update_3d_sprites()
 
 			// skip if no sprite to draw
 			if (sprite == nullptr)
+			{
+				continue;
+			}
+
+			// skip if not part of camera layer mask
+			if (!entityRegistry.is_in_layer_mask(entity, m_layerMask))
 			{
 				continue;
 			}
@@ -231,13 +260,13 @@ void Minty::RenderSystem::update_3d_sprites()
 	}
 }
 
-void Minty::RenderSystem::update_3d()
+void Minty::RenderSystem::draw_3d()
 {
-	update_3d_meshes();
-	update_3d_sprites();
+	draw_3d_meshes();
+	draw_3d_sprites();
 }
 
-void Minty::RenderSystem::update_ui_sprites()
+void Minty::RenderSystem::draw_ui_sprites()
 {
 	EntityRegistry& entityRegistry = get_entity_registry();
 
@@ -247,6 +276,12 @@ void Minty::RenderSystem::update_ui_sprites()
 
 	for (auto const& [entity, ui, renderable, enabled, spriteComp] : entityRegistry.view<UITransformComponent const, RenderableComponent const, EnabledComponent const, SpriteComponent const>().each())
 	{
+		// skip if not part of camera layer mask
+		if (!entityRegistry.is_in_layer_mask(entity, m_layerMask))
+		{
+			continue;
+		}
+
 		material = Renderer::get_or_create_default_material(spriteComp.sprite->get_texture(), AssetType::Sprite, Space::UI);
 
 		MINTY_ASSERT(material != nullptr);
@@ -305,7 +340,7 @@ void Minty::RenderSystem::update_ui_sprites()
 	}
 }
 
-void Minty::RenderSystem::update_ui_text()
+void Minty::RenderSystem::draw_ui_text()
 {
 	EntityRegistry& entityRegistry = get_entity_registry();
 
@@ -321,6 +356,12 @@ void Minty::RenderSystem::update_ui_text()
 	{
 		// skip if null font or no mesh
 		if (textComp.font == nullptr || textComp.fontVariant == nullptr || textComp.mesh == nullptr)
+		{
+			continue;
+		}
+
+		// skip if not part of camera layer mask
+		if (!entityRegistry.is_in_layer_mask(entity, m_layerMask))
 		{
 			continue;
 		}
@@ -349,7 +390,7 @@ void Minty::RenderSystem::update_ui_text()
 	}
 }
 
-void Minty::RenderSystem::update_ui()
+void Minty::RenderSystem::draw_ui()
 {
 	EntityRegistry& entityRegistry = get_entity_registry();
 
@@ -359,6 +400,13 @@ void Minty::RenderSystem::update_ui()
 			return left.z < right.z;
 		});
 
-	update_ui_sprites();
-	update_ui_text();
+	draw_ui_sprites();
+	draw_ui_text();
+}
+
+void Minty::RenderSystem::draw_scene()
+{
+	draw_3d();
+	// draw_2d(); goes here
+	draw_ui();
 }

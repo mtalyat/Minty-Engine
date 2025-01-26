@@ -76,6 +76,12 @@ namespace Mintye
 		Minty::Path get_build_path() const;
 
 		/// <summary>
+		/// Gets the Minty folder path for this project.
+		/// </summary>
+		/// <returns></returns>
+		Minty::Path get_minty_path() const;
+
+		/// <summary>
 		/// Gets the Assembly folder path for this project.
 		/// </summary>
 		/// <returns></returns>

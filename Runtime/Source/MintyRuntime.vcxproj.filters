@@ -94,6 +94,9 @@
     <Filter Include="Header Files\Minty\GUI">
       <UniqueIdentifier>{97336ed9-c394-43b3-9b34-6ef84cf7e060}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Minty\Layer">
+      <UniqueIdentifier>{ad6ea339-482b-4bb8-a5e8-0e06e87003d5}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="framework.h">
@@ -639,6 +642,12 @@
     <ClInclude Include="Minty\Render\Enums.h">
       <Filter>Header Files\Minty\Render</Filter>
     </ClInclude>
+    <ClInclude Include="Minty\Component\LayerComponent.h">
+      <Filter>Header Files\Minty\Component</Filter>
+    </ClInclude>
+    <ClInclude Include="Minty\Layer\LayerManager.h">
+      <Filter>Header Files\Minty\Layer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="pch.cpp">
@@ -1086,6 +1095,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="Minty\Render\RenderPass.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Component\LayerComponent.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Minty\Layer\LayerManager.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>

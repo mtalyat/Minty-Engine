@@ -24,7 +24,7 @@ namespace Minty
 
 		virtual ~ShaderModule() = default;
 
-		AssetType get_type() const override { return AssetType::ShaderModule; }
+		AssetType get_asset_type() const override { return AssetType::ShaderModule; }
 
 		virtual void* get_native() const = 0;
 

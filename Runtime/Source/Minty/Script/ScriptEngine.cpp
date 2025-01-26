@@ -128,9 +128,12 @@ Ref<ScriptClass> Minty::ScriptEngine::find_class(UUID const id)
 
 Ref<ScriptObject> Minty::ScriptEngine::create_object(UUID const id, Ref<ScriptClass> const scriptClass)
 {
-	MINTY_ASSERT(!s_objects.contains(id));
+	MINTY_ASSERT_MESSAGE(id.valid(), "Cannot create a ScriptObject with an invalid ID.");
+
+	MINTY_ASSERT_FORMAT(!s_objects.contains(id), "ScriptObject already created with ID: {}.", to_string(id));
 
 	ScriptObjectBuilder builder{};
+	builder.id = id;
 	builder.klass = scriptClass;
 
 	Owner<ScriptObject> object = ScriptObject::create(builder);
@@ -141,9 +144,12 @@ Ref<ScriptObject> Minty::ScriptEngine::create_object(UUID const id, Ref<ScriptCl
 
 Ref<ScriptObject> Minty::ScriptEngine::create_object(UUID const id, Ref<ScriptClass> const scriptClass, ScriptArguments& args)
 {
+	MINTY_ASSERT_MESSAGE(id.valid(), "Cannot create a ScriptObject with an invalid ID.");
+
 	MINTY_ASSERT(!s_objects.contains(id));
 
 	ScriptObjectBuilder builder{};
+	builder.id = id;
 	builder.klass = scriptClass;
 
 	Owner<ScriptObject> object = ScriptObject::create(builder, args);
@@ -156,12 +162,22 @@ Ref<ScriptObject> Minty::ScriptEngine::get_object(UUID const id)
 {
 	auto found = s_objects.find(id);
 
-	if (found != s_objects.end())
+	if (found == s_objects.end())
 	{
-		return found->second.create_ref();
+		return Ref<ScriptObject>();
 	}
 
-	return Ref<ScriptObject>();
+	return found->second.create_ref();
+}
+
+UUID Minty::ScriptEngine::get_uuid(void* const nativeObject)
+{
+	return CsScriptEngine::get_uuid(static_cast<MonoObject* const>(nativeObject));
+}
+
+UUID Minty::ScriptEngine::get_entity_uuid(void* const nativeObject)
+{
+	return CsScriptEngine::get_entity_uuid(static_cast<MonoObject* const>(nativeObject));
 }
 
 Ref<ScriptObject> Minty::ScriptEngine::get_or_create_object(UUID const id, Ref<ScriptClass> const scriptClass)
@@ -216,10 +232,10 @@ Ref<ScriptObject> Minty::ScriptEngine::get_or_create_object_entity(UUID const id
 	return found->second;
 }
 
-Ref<ScriptObject> Minty::ScriptEngine::create_object_component(Ref<ScriptObject> const entityObject, Ref<ScriptClass> const scriptClass)
+Ref<ScriptObject> Minty::ScriptEngine::create_object_component(UUID const entityId, Ref<ScriptClass> const scriptClass)
 {
 	// check if entity valid
-	MINTY_ASSERT_MESSAGE(entityObject != nullptr, "Cannot create a Component ScriptObject when the given Entity ScriptObject is null.");
+	MINTY_ASSERT_MESSAGE(entityId.valid(), "Cannot create a Component ScriptObject when the given Entity ID is invalid.");
 	// check if script valid
 	MINTY_ASSERT_MESSAGE(scriptClass != nullptr, "Cannot create a Component ScriptObject when the given class ScriptObject is null.");
 
@@ -235,22 +251,59 @@ Ref<ScriptObject> Minty::ScriptEngine::create_object_component(Ref<ScriptObject>
 	MINTY_ASSERT_FORMAT(scriptClass->is_derived_from(componentClass), "Cannot create a Component ScriptObject when \"{}\" does not derive from \"{}\".", scriptClass->get_full_name(), componentClass->get_full_name());
 
 	UUID componentId = UUID::create();
-	Ref<ScriptObject> object = create_object(componentId, scriptClass);
+	ScriptArguments args({ &componentId });
+	Ref<ScriptObject> object = create_object(componentId, scriptClass, args);
 
 	// set entity property
+	Ref<ScriptObject> entityObject = get_or_create_object_entity(entityId);
 	void* entityObjectObject = entityObject->get_native();
-	object->set_property("Entity", &entityObjectObject);
+	object->set_field("_entity", entityObjectObject);
 
 	return object;
 }
 
-Ref<ScriptObject> Minty::ScriptEngine::get_or_create_object_component(UUID const id, Ref<ScriptObject> const entityObject, Ref<ScriptClass> const scriptClass)
+Ref<ScriptObject> Minty::ScriptEngine::get_or_create_object_component(UUID const id, UUID const entityId, Ref<ScriptClass> const scriptClass)
 {
 	auto found = s_objects.find(id);
 
 	if (found == s_objects.end())
 	{
-		return create_object_component(entityObject, scriptClass);
+		return create_object_component(entityId, scriptClass);
+	}
+
+	return found->second;
+}
+
+Ref<ScriptObject> Minty::ScriptEngine::create_object_asset(UUID const id, Ref<ScriptClass> const& scriptClass)
+{
+	MINTY_ASSERT_MESSAGE(id.valid(), "Cannot create an Asset ScriptObject with an invalid ID.");
+	MINTY_ASSERT_MESSAGE(scriptClass != nullptr, "Cannot create an Asset ScriptObject with a null ScriptClass.");
+
+	// get engine assembly
+	Ref<ScriptAssembly> engineAssembly = get_assembly(MINTY_NAME_ENGINE);
+	MINTY_ASSERT_MESSAGE(engineAssembly != nullptr, "Cannot create an Asset ScriptObject when the Minty engine assembly has not been loaded.");
+
+	// get Asset class
+	Ref<ScriptClass> assetClass = engineAssembly->get_class(get_full_name(MINTY_NAME_ENGINE, "Asset"));
+	MINTY_ASSERT(assetClass != nullptr);
+
+	// check if given class is derived from component
+	MINTY_ASSERT_FORMAT(scriptClass->is_derived_from(assetClass), "Cannot create an Asset ScriptObject when \"{}\" does not derive from \"{}\".", scriptClass->get_full_name(), assetClass->get_full_name());
+
+	UUID assetId = id;
+	ScriptArguments args({ &assetId });
+	Ref<ScriptObject> object = create_object(id, scriptClass, args);
+
+	return object;
+}
+
+Ref<ScriptObject> Minty::ScriptEngine::get_or_create_object_asset(UUID const id, Ref<ScriptClass> const& scriptClass)
+{
+	auto found = s_objects.find(id);
+
+	if (found == s_objects.end())
+	{
+		return create_object_asset(id, scriptClass);
 	}
 
 	return found->second;

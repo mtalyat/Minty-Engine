@@ -52,7 +52,7 @@ namespace Minty
 		}
 
 	public:
-		AssetType get_type() const override { return AssetType::Scissor; }
+		AssetType get_asset_type() const override { return AssetType::Scissor; }
 
 	public:
 		static Owner<Scissor> create(ScissorBuilder const& builder = {});

@@ -1,5 +1,5 @@
 #pragma once
-#include "Minty/Component/Component.h"
+#include "Minty/Component/ScriptObjectComponent.h"
 
 #include "Minty/Core/Rect.h"
 #include "Minty/Entity/Entity.h"
@@ -11,7 +11,7 @@ namespace Minty
 	/// Holds UI space transform data for an Entity.
 	/// </summary>
 	struct UITransformComponent
-		: public Component
+		: public ScriptObjectComponent
 	{
 		Entity canvas;
 

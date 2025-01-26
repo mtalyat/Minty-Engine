@@ -23,7 +23,7 @@ namespace MintyEngine
 
         public static void Destroy(Component component)
         {
-            Runtime.Entity_RemoveComponent(component.Entity.ID, component.GetType());
+            Runtime.Entity_RemoveComponent(component.ID, component.GetType());
         }
     }
 }

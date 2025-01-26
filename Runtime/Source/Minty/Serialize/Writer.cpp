@@ -313,6 +313,8 @@ void Minty::Writer::write(String const& name, const void* const data, Type const
         return write_double(name, *static_cast<Double const* const>(data));
     case Type::String:
         return write_string(name, *static_cast<String const* const>(data));
+    case Type::UUID:
+        return write_uuid(name, *static_cast<UUID const* const>(data));
     default:
         MINTY_ABORT_FORMAT("Cannot write type \"{}\".", to_string(type));
     }
