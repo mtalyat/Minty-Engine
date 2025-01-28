@@ -273,6 +273,13 @@ namespace Minty
 		Component* emplace_by_name(String const& name, Entity const entity);
 
 		/// <summary>
+		/// Checks if a Component or Script with the given name has been registered to this EntityRegistry.
+		/// </summary>
+		/// <param name="name">The name of the Component or Script.</param>
+		/// <returns>True if registered and able to be emplaced, otherwise false.</returns>
+		Bool contains_component_with_name(String const& name) const;
+
+		/// <summary>
 		/// Checks if a Component or Script exists with the given name.
 		/// </summary>
 		/// <param name="name"></param>

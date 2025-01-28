@@ -1043,6 +1043,12 @@ Component* Minty::EntityRegistry::emplace_by_name(String const& name, Entity con
 	return s_components.at(fullName).emplace(*this, entity, script);
 }
 
+Bool Minty::EntityRegistry::contains_component_with_name(String const& name) const
+{
+	Ref<ScriptClass> script = ScriptEngine::find_class(name);
+	return script != nullptr || s_components.contains(name); // component exists if script found or if base component found
+}
+
 Bool Minty::EntityRegistry::exists(String const& name)
 {
 	// base component check

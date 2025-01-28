@@ -339,30 +339,43 @@ void Mintye::PropertiesWindow::draw_entity()
 		GUI::set_keyboard_focus_here();
 		GUI::input_text("##addComponentText", popupBuffer, INPUT_SIZE);
 
+		// get name
+		String name = popupBuffer;
+
+		// show warning text, if necessary
+		if (!name.empty() && !registry.contains_component_with_name(name))
+		{
+			GUI::push_style_color(GuiColorID::Text, Color::red());
+			String warningText = std::format("\"{}\" does not exist.", name);
+			GUI::text(warningText);
+			GUI::pop_style_color();
+		}
+
 		if (GUI::button("Done") || GUI::is_key_pressed(Key::Enter))
 		{
-			// get name
-			String name = popupBuffer;
-
-			// check for Script asset
-			// ensure it is loaded
-			Project* project = get_project();
-
-			Path assetPath = project->find_asset(name, AssetType::Script);
-			
-			// register it with scene if needed
-			if (!assetPath.empty())
+			// check if it exists with the given name
+			if (registry.contains_component_with_name(name))
 			{
-				if (!scene->is_registered(assetPath))
+				// check for Script asset
+				// ensure it is loaded
+				Project* project = get_project();
+
+				Path assetPath = project->find_asset(name, AssetType::Script);
+
+				// register it with scene if needed
+				if (!assetPath.empty())
 				{
-					scene->register_asset(assetPath);
+					if (!scene->is_registered(assetPath))
+					{
+						scene->register_asset(assetPath);
+					}
 				}
-			}
 
-			// place onto the object
-			if (!registry.emplace_by_name(name, m_targetEntity))
-			{
-				get_application().log_error(std::format("Failed to add component \"{}\" to Entity \"{}\".", name, registry.get_name(m_targetEntity)));
+				// place onto the object
+				if (!registry.emplace_by_name(name, m_targetEntity))
+				{
+					get_application().log_error(std::format("Failed to add component \"{}\" to Entity \"{}\".", name, registry.get_name(m_targetEntity)));
+				}
 			}
 
 			memset(popupBuffer, 0, sizeof(popupBuffer));

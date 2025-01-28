@@ -310,7 +310,7 @@ void Mintye::EditorApplication::load_project(Minty::Path const& path)
 	if (AssetManager::exists(projectDllPath)) 
 	{
 		// if the DLL exists, copy its meta file into the directory
-		Operation::copy(std::format("{}/Assembly.txt", ASSEMBLY_DIRECTORY_NAME), std::format("{}/{}.dll.meta", projectDllPath.parent_path().generic_string(), project->get_name()));
+		Operation::copy(std::format("{}/Assembly.txt", ASSEMBLY_DIRECTORY_NAME), std::format("{}/{}.dll.metaSourcePath", projectDllPath.parent_path().generic_string(), project->get_name()));
 
 		// load the assembly from there
 		ScriptEngine::load_assembly(projectDllPath.stem().string(), projectDllPath);
@@ -1134,11 +1134,14 @@ void Mintye::EditorApplication::copy_files()
 
 		// Project DLL
 		log_info("\tProject assembly");
-		String source = std::format("{}/bin/{}/{}.dll", mp_project->get_assembly_path().generic_string(), configName, projectName);
+		String assemblyPathString = mp_project->get_assembly_path().generic_string();
+		String source = std::format("{}/bin/{}/{}.dll", assemblyPathString, configName, projectName);
 		Operation::copy(source, targetDir);
 		// Project DLL meta
-		String meta = Asset::get_meta_path(source).generic_string();
-		Operation::copy(meta, targetDir);
+		//String meta = Asset::get_meta_path(source).generic_string();
+		String metaSourcePath = std::format("{}/Assembly.txt", assemblyPathString);
+		String metaDestinationPath = std::format("{}/{}.dll.meta", targetDir, projectName);
+		Operation::copy(metaSourcePath, metaDestinationPath);
 	}
 	else
 	{
@@ -1504,7 +1507,7 @@ void Mintye::EditorApplication::generate_assembly()
 	// if not open, error
 	if (!file.is_open())
 	{
-		MINTY_ERROR_FORMAT("Could not open assembly meta file: {}", path);
+		MINTY_ERROR_FORMAT("Could not open assembly metaSourcePath file: {}", path);
 		return;
 	}
 
@@ -1665,7 +1668,7 @@ void EditorApplication::build_project()
 				// build C# assembly
 				// https://learn.microsoft.com/en-us/dotnet/core/tools/dotnet-build
 				"cd " + assemblyPath + " && dotnet build -c " + configName + " /p:Platform=x64",
-				"cd " + assemblyPath + " && copy " + assemblyName + ".dll.meta bin/" + configName + "/"
+				"cd " + assemblyPath + " && copy " + assemblyName + ".dll.metaSourcePath bin/" + configName + "/"
 				}, true);
 			});
 	}
