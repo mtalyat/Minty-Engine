@@ -130,6 +130,20 @@ namespace Mintye
 		/// <returns></returns>
 		Minty::Path find_asset(Minty::String const& name, Minty::AssetType const assetType) const;
 
+	private:
+		/// <summary>
+		/// Gets a collection of all assets within this Project.
+		/// </summary>
+		/// <returns></returns>
+		std::vector<Minty::Path> get_assets() const;
+
+		/// <summary>
+		/// Creates a meta file for the Asset at the given Path if no meta file exists already.
+		/// </summary>
+		/// <param name="path"></param>
+		void ensure_meta_file(Minty::Path const& path) const;
+
+	public:
 		/// <summary>
 		/// Searches the disk for all files and updates their internal states.
 		/// </summary>

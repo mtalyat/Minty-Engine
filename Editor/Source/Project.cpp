@@ -138,6 +138,47 @@ Minty::Path Mintye::Project::find_asset(Minty::String const& name, AssetType con
 	return Path();
 }
 
+std::vector<Path> Mintye::Project::get_assets() const
+{
+	std::vector<Path> paths;
+
+	// get total size
+	Size size = 0;
+	for (auto const& [path, list] : m_files)
+	{
+		size += list.size();
+	}
+
+	// make space
+	paths.reserve(size);
+
+	// put all paths into this big list
+	for (auto const& [path, list] : m_files)
+	{
+		paths.insert(paths.end(), list.begin(), list.end());
+	}
+
+	return paths;
+}
+
+void Mintye::Project::ensure_meta_file(Minty::Path const& path) const
+{
+	Path metaPath = Asset::get_meta_path(path);
+	if (std::filesystem::exists(metaPath))
+	{
+		// already exists
+		return;
+	}
+
+	// new meta file
+	
+	// create a new meta with a random ID, the rest can be populated later
+	// (ID is the most important for asset loading)
+	UUID id = UUID::create();
+	String text = std::format(": {}", to_string(id));
+	File::write_all_text(metaPath, text);
+}
+
 void Project::refresh()
 {
 	if (!std::filesystem::exists(m_base.string()))
@@ -154,9 +195,8 @@ void Project::refresh()
 		return;
 	}
 
-	// clear old data
-	m_fileCount = 0;
-	m_files.clear();
+	Size fileCount = 0;
+	std::unordered_map<Minty::Path, std::vector<Minty::Path>> files{};
 
 	// list of directories to collect from
 	std::vector<Path> directoriesToCollect;
@@ -194,12 +234,12 @@ void Project::refresh()
 
 				// if header exists in files, add to that list
 				// otherwise add to new list
-				auto found = m_files.find(extension);
-				if (found == m_files.end())
+				auto found = files.find(extension);
+				if (found == files.end())
 				{
 					// new list
-					m_files.emplace(extension, std::vector<Path>());
-					m_files.at(extension).push_back(relativePath);
+					files.emplace(extension, std::vector<Path>());
+					files.at(extension).push_back(relativePath);
 				}
 				else
 				{
@@ -208,19 +248,19 @@ void Project::refresh()
 				}
 
 				// if the file needs a meta, create one with a new ID quick
-				if (extension != EXTENSION_META && !std::filesystem::exists(Asset::get_meta_path(path)))
+				if (extension != EXTENSION_META)
 				{
-					// create a new meta with a random ID, the rest can be populated later
-					// (ID is the most important for asset loading)
-					UUID id = UUID::create();
-					String text = std::format(": {}", to_string(id));
-					File::write_all_text(Asset::get_meta_path(path), text);
+					ensure_meta_file(path);
 				}
 
-				m_fileCount++;
+				fileCount++;
 			}
 		}
 	}
+
+	// copy over old data
+	m_fileCount = fileCount;
+	m_files = files;
 }
 
 Size Mintye::Project::get_asset_count() const

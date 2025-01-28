@@ -264,11 +264,15 @@ namespace Mintye
 #pragma region Files
 
 	private:
+		void refresh_assets();
+
 		void generate_directory(Minty::Path const& path) const;
 
 		void generate_directories(Minty::Path const& basePath) const;
 
 		void generate_application_data();
+
+		void build_shaders();
 
 		void generate_wraps();
 

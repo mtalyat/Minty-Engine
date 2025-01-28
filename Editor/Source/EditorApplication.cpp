@@ -1345,6 +1345,31 @@ void Mintye::EditorApplication::generate_application_data()
 	AssetManager::close_writer(writer);
 }
 
+void Mintye::EditorApplication::refresh_assets()
+{
+	// ensure copy of collection of asset paths is up to date
+	MINTY_ASSERT(mp_project);
+	mp_project->refresh();
+}
+
+void Mintye::EditorApplication::build_shaders()
+{
+	// build all vert, frag, glsl shaders within the assets
+	ConsoleWindow* console = find_editor_window<ConsoleWindow>("Console");
+	MINTY_ASSERT(console);
+
+	MINTY_ASSERT(mp_project);
+	std::set<Path> paths = mp_project->find_assets({ ".vert", ".frag", ".glsl" });
+
+	for (auto const& path : paths)
+	{
+		// build the shader
+		String pathString = path.string();
+		String command = std::format("glslc {} -o {}.spv", pathString, pathString);
+		Int result = system(command.c_str());
+	}
+}
+
 void Mintye::EditorApplication::generate_wraps()
 {
 	Path output = mp_project->get_build_path() / m_buildInfo.get_config_name();
@@ -1556,6 +1581,10 @@ void EditorApplication::build_project()
 	// generate directories before all else
 	generate_directories(mp_project->get_base_path());
 
+	// refresh the collection of files
+	console->log_important("\trefreshing assets...");
+	refresh_assets();
+
 	TaskGroup<void>* taskGroup = m_taskFactory.create("build", [this, console] {
 		// done building, remove flags
 		m_buildInfo.clear_flags();
@@ -1597,6 +1626,10 @@ void EditorApplication::build_project()
 	if (m_buildInfo.get_flag(BuildInfo::BuildFlags::Assets))
 	{
 		taskGroup->create([this, console] {
+			console->log_important("\tbuilding shaders...");
+
+			build_shaders();
+
 			console->log_important("\tgenerating wrap files...");
 
 			generate_wraps();
