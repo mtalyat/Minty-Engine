@@ -67,6 +67,9 @@
     <Compile Include="Material.cs" />
     <Compile Include="MaterialTemplate.cs" />
     <Compile Include="Math.cs" />
+    <Compile Include="Mesh.cs" />
+    <Compile Include="MeshRenderer.cs" />
+    <Compile Include="MeshType.cs" />
     <Compile Include="Type.cs" />
     <Compile Include="Object.cs" />
     <Compile Include="Quaternion.cs" />

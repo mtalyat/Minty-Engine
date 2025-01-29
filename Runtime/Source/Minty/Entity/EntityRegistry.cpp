@@ -1412,7 +1412,13 @@ void Minty::EntityRegistry::serialize(Writer& writer) const
 
 void Minty::EntityRegistry::deserialize(Reader& reader)
 {
-	// read each entity
+	// read each entity only
+	for (Size i = 0; i < reader.size(); i++)
+	{
+		deserialize_entity_only(reader, i);
+	}
+
+	// read each entity with components
 	for (Size i = 0; i < reader.size(); i++)
 	{
 		deserialize_entity(reader, i);
@@ -1482,6 +1488,27 @@ void Minty::EntityRegistry::serialize_entity(Writer& writer, Entity const entity
 	writer.pop_data();
 }
 
+Entity Minty::EntityRegistry::deserialize_entity_only(Reader& reader, Size const index)
+{
+	String name;
+	reader.read_name(index, name);
+	String value;
+	reader.read(index, value);
+
+	UUID id;
+
+	// convert value to ID, or generate a new one if needed
+	if (!Parse::try_uuid(value, id))
+	{
+		value = "";
+
+		// generate a new ID
+		id = UUID::create();
+	}
+
+	return create(name, id);
+}
+
 Entity Minty::EntityRegistry::deserialize_entity(Reader& reader, Size const index)
 {
 	String name; 
@@ -1495,19 +1522,17 @@ Entity Minty::EntityRegistry::deserialize_entity(Reader& reader, Size const inde
 	UUID id;
 
 	// convert value to ID, or generate a new one if needed
-	if (!Parse::try_uuid(value, id))
+	if (!Parse::try_uuid(value, id) || !id.valid())
 	{
-		value = "";
-
-		// generate a new ID
-		id = UUID::create();
+		MINTY_ABORT_FORMAT("Entity \"{}\" is missing its required ID value.", name);
 	}
 
-	// create entity in registry
-	Entity entity = create(name, id);
-
-	// create it again for scripting
-	ScriptEngine::create_object_entity(id);
+	// create entity in registry, if it does not exist
+	Entity entity = find_by_id(id);
+	if (entity == NULL_ENTITY)
+	{
+		entity = create(name, id);
+	}
 
 	// set user data
 	EntitySerializationData data{};

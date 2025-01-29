@@ -393,6 +393,7 @@ namespace Minty
 		void deserialize(Reader& reader) override;
 
 		void serialize_entity(Writer& writer, Entity const entity, UUID const idOverride = INVALID_UUID) const;
+		Entity deserialize_entity_only(Reader& reader, Size const index = 0);
 		Entity deserialize_entity(Reader& reader, Size const index = 0);
 
 	private:
