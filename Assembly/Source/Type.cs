@@ -49,14 +49,10 @@ namespace MintyEngine
 	{
 		internal static Type ToMintyType(this System.Type type)
 		{
-			// TODO: finish this for all Types above
+			// TODO: finish this for all Types above, don't forget the C++ side
 			if (type == null)
 			{
 				return Type.Undefined;
-			}
-			else if (type == typeof(bool))
-			{
-				return Type.Bool;
 			}
 			else if (type == typeof(int))
 			{

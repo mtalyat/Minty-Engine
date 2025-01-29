@@ -28,9 +28,20 @@ namespace MintyEngine
         /// </summary>
         /// <param name="name">The name of the Shader input.</param>
         /// <param name="value">The value of the Shader input.</param>
-        public void SetInput<T>(string name, T t) where T : struct
+        public void Set<T>(string name, T t)
         {
-            Runtime.Material_SetInput(ID, name, (int)typeof(T).ToMintyType(), t.ToString());
+            System.Type type = t.GetType();
+            if (t is Asset asset)
+            {
+                Runtime.Material_Set(ID, name, (int)Type.Object, asset.ID.ToString());
+            } else if(type.IsValueType)
+            {
+                Runtime.Material_Set(ID, name, (int)typeof(T).ToMintyType(), t.ToString());
+            }
+            else
+            {
+                Debug.Error($"Material.Set({name}, {t}) failed. Invalid Type.");
+            }            
         }
     }
 }

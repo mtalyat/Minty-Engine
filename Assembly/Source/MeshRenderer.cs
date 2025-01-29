@@ -12,20 +12,20 @@ namespace MintyEngine
     {
         public MeshType Type
         {
-            get => (MeshType)Runtime.MeshRenderer_GetType(ID);
-            set => Runtime.MeshRenderer_SetType(ID, (int)value);
+            get => (MeshType)Runtime.MeshRenderer_GetType(Entity.ID);
+            set => Runtime.MeshRenderer_SetType(Entity.ID, (int)value);
         }
 
         public Mesh Mesh
         {
-            get => Runtime.MeshRenderer_GetMesh(ID) as Mesh;
-            set => Runtime.MeshRenderer_SetMesh(ID, value.ID);
+            get => Runtime.MeshRenderer_GetMesh(Entity.ID) as Mesh;
+            set => Runtime.MeshRenderer_SetMesh(Entity.ID, value.ID);
         }
 
         public Material Material
         {
-            get => Runtime.MeshRenderer_GetMaterial(ID) as Material;
-            set => Runtime.MeshRenderer_SetMaterial(ID, value.ID);
+            get => Runtime.MeshRenderer_GetMaterial(Entity.ID) as Material;
+            set => Runtime.MeshRenderer_SetMaterial(Entity.ID, value.ID);
         }
 
         internal MeshRenderer(UUID id)

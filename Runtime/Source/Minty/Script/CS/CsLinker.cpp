@@ -927,6 +927,63 @@ static UUID_t image_create(Int format, Int type, Int tiling, Int aspect, Int usa
 
 #pragma endregion
 
+#pragma region Material
+
+static UUID_t material_create(MonoString* path)
+{
+	String pathString = CsScriptEngine::from_mono_string(path);
+	Path pathPath = pathString;
+
+	Ref<Material> material = AssetManager::load<Material>(pathPath);
+	return material->id().data();
+}
+
+static MonoObject* material_get_template(UUID_t id)
+{
+	Ref<Material> material = AssetManager::get<Material>(id);
+
+	Ref<MaterialTemplate> materialTemplate = material->get_template();
+
+	if (materialTemplate == nullptr)
+	{
+		return nullptr;
+	}
+
+	return util_get_mono_asset(materialTemplate->id(), "MaterialTemplate");
+}
+
+static void material_set(UUID_t id, MonoString* name, int type, MonoString* value)
+{
+	Ref<Material> material = AssetManager::get<Material>(id);
+	String nameString = CsScriptEngine::from_mono_string(name);
+	Type typeType = static_cast<Type>(type);
+	String valueString = CsScriptEngine::from_mono_string(value);
+
+	switch (typeType)
+	{
+	case Type::Int:
+	{
+		Int temp = Parse::to_int(valueString);
+		material->set_input(nameString, &temp);
+		break;
+	}
+	case Type::Object:
+	{
+		UUID_t temp = static_cast<UUID_t>(Parse::to_size(valueString));
+		Ref<Texture> texture = AssetManager::get<Texture>(temp);
+		MINTY_ASSERT_FORMAT(texture != nullptr, "No Texture found with the ID {}.", to_string(UUID(temp)));
+		void* rawTexture = texture.get();
+		material->set_input(nameString, &rawTexture);
+		break;
+	}
+	default:
+		MINTY_ABORT_FORMAT("Unable to set Material input with value of type {}.", to_string(typeType));
+		break;
+	}
+}
+
+#pragma endregion
+
 #pragma region Shader
 
 static UUID_t shader_create(MonoString* path)
@@ -1139,6 +1196,12 @@ void Minty::CsLinker::link()
 
 #pragma region Image
 	ADD_INTERNAL_CALL("Image_Create", image_create);
+#pragma endregion
+
+#pragma region Material
+	ADD_INTERNAL_CALL("Material_Create", material_create);
+	ADD_INTERNAL_CALL("Material_GetTemplate", material_get_template);
+	ADD_INTERNAL_CALL("Material_Set", material_set);
 #pragma endregion
 
 #pragma endregion

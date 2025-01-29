@@ -126,7 +126,7 @@ namespace MintyEngine
         #region Material
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static UUID Material_Create(string path);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static object Material_GetTemplate(UUID id);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Material_SetInput(UUID id, string name, int type, string value);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Material_Set(UUID id, string name, int type, string value);
         #endregion
 
         #region MaterialTemplate

@@ -7,7 +7,7 @@
 
 namespace Minty
 {
-	using UUID_t = Size;
+	using UUID_t = uint64_t;
 
 	/// <summary>
 	/// A Universally Unique IDentifier.
