@@ -29,12 +29,12 @@ void Minty::Linker::link()
 	register_component<CanvasComponent>(MINTY_NAME_ENGINE, "Canvas", true);
 	register_component<EnabledComponent>(MINTY_NAME_ENGINE, "Enabled", false);
 	register_component<LayerComponent>(MINTY_NAME_ENGINE, "Layer", false);
-	register_component<MeshComponent>(MINTY_NAME_ENGINE, "Mesh", true);
+	register_component<MeshComponent>(MINTY_NAME_ENGINE, "MeshRenderer", true);
 	register_component<NameComponent>(MINTY_NAME_ENGINE, "Name", true);
 	register_component<RelationshipComponent>(MINTY_NAME_ENGINE, "Relationship", true);
 	register_component<RenderableComponent>(MINTY_NAME_ENGINE, "Renderable", true);
 	register_component<ScriptComponent>(MINTY_NAME_ENGINE, "Script", true);
-	register_component<SpriteComponent>(MINTY_NAME_ENGINE, "Sprite", true);
+	register_component<SpriteComponent>(MINTY_NAME_ENGINE, "SpriteRenderer", true);
 	register_component<TextComponent>(MINTY_NAME_ENGINE, "Text", true);
 	register_component<TagComponent>(MINTY_NAME_ENGINE, "Tag", true);
 	register_component<TransformComponent>(MINTY_NAME_ENGINE, "Transform", true);

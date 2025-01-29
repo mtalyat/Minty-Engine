@@ -14,37 +14,37 @@ namespace MintyEngine
         {
             get
             {
-                Runtime.Transform_GetLocalPosition(ID, out Vector3 position);
+                Runtime.Transform_GetLocalPosition(Entity.ID, out Vector3 position);
                 return position;
             }
-            set => Runtime.Transform_SetLocalPosition(ID, value);
+            set => Runtime.Transform_SetLocalPosition(Entity.ID, value);
         }
 
         public Quaternion LocalRotation
         {
             get
             {
-                Runtime.Transform_GetLocalRotation(ID, out Vector4 rotation);
+                Runtime.Transform_GetLocalRotation(Entity.ID, out Vector4 rotation);
                 return new Quaternion(rotation.X, rotation.Y, rotation.Z, rotation.W);
             }
-            set => Runtime.Transform_SetLocalRotation(ID, new Vector4(value.X, value.Y, value.Z, value.W));
+            set => Runtime.Transform_SetLocalRotation(Entity.ID, new Vector4(value.X, value.Y, value.Z, value.W));
         }
 
         public Vector3 LocalScale
         {
             get
             {
-                Runtime.Transform_GetLocalScale(ID, out Vector3 scale);
+                Runtime.Transform_GetLocalScale(Entity.ID, out Vector3 scale);
                 return scale;
             }
-            set => Runtime.Transform_SetLocalScale(ID, value);
+            set => Runtime.Transform_SetLocalScale(Entity.ID, value);
         }
 
         public Vector3 GlobalPosition
         {
             get
             {
-                Runtime.Transform_GetGlobalPosition(ID, out Vector3 position);
+                Runtime.Transform_GetGlobalPosition(Entity.ID, out Vector3 position);
                 return position;
             }
         }
@@ -53,7 +53,7 @@ namespace MintyEngine
         {
             get
             {
-                Runtime.Transform_GetGlobalRotation(ID, out Vector4 rotation);
+                Runtime.Transform_GetGlobalRotation(Entity.ID, out Vector4 rotation);
                 return new Quaternion(rotation.X, rotation.Y, rotation.Z, rotation.W);
             }
         }
@@ -62,7 +62,7 @@ namespace MintyEngine
         {
             get
             {
-                Runtime.Transform_GetGlobalScale(ID, out Vector3 scale);
+                Runtime.Transform_GetGlobalScale(Entity.ID, out Vector3 scale);
                 return scale;
             }
         }
@@ -71,7 +71,7 @@ namespace MintyEngine
         {
             get
             {
-                Runtime.Transform_GetRight(ID, out Vector3 right);
+                Runtime.Transform_GetRight(Entity.ID, out Vector3 right);
                 return right;
             }
         }
@@ -80,7 +80,7 @@ namespace MintyEngine
         {
             get
             {
-                Runtime.Transform_GetUp(ID, out Vector3 up);
+                Runtime.Transform_GetUp(Entity.ID, out Vector3 up);
                 return up;
             }
         }
@@ -89,7 +89,7 @@ namespace MintyEngine
         {
             get
             {
-                Runtime.Transform_GetForward(ID, out Vector3 forward);
+                Runtime.Transform_GetForward(Entity.ID, out Vector3 forward);
                 return forward;
             }
         }

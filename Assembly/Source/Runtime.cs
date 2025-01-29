@@ -31,6 +31,15 @@ namespace MintyEngine
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static UUID Camera_GetRenderTarget(UUID id);
         #endregion
 
+        #region MeshRenderer
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static int MeshRenderer_GetType(UUID id);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void MeshRenderer_SetType(UUID id, int type);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static object MeshRenderer_GetMesh(UUID id);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void MeshRenderer_SetMesh(UUID id, UUID meshId);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static object MeshRenderer_GetMaterial(UUID id);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void MeshRenderer_SetMaterial(UUID id, UUID materialId);
+        #endregion
+
         #region Transform
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_GetLocalPosition(UUID id, out Vector3 position);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Transform_SetLocalPosition(UUID id, in Vector3 position);
@@ -88,9 +97,9 @@ namespace MintyEngine
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Entity_SetLayer(UUID id, uint layer);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static bool Entity_GetEnabled(UUID id);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Entity_SetEnabled(UUID id, bool enabled);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static object Entity_AddComponent(UUID id, Type type);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static object Entity_GetComponent(UUID id, Type type);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static bool Entity_RemoveComponent(UUID id, Type type);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static object Entity_AddComponent(UUID id, System.Type type);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static object Entity_GetComponent(UUID id, System.Type type);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static bool Entity_RemoveComponent(UUID id, System.Type type);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static object Entity_GetParent(UUID id);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Entity_SetParent(UUID id, UUID parentId);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static int Entity_GetChildCount(UUID id);
@@ -116,10 +125,18 @@ namespace MintyEngine
 
         #region Material
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static UUID Material_Create(string path);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static object Material_GetTemplate(UUID id);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Material_SetInput(UUID id, string name, int type, string value);
         #endregion
 
         #region MaterialTemplate
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static UUID MaterialTemplate_Create(string path);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static object MaterialTemplate_GetShader(UUID id);
+        #endregion
+
+        #region Mesh
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static UUID Mesh_Create(string path);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static UUID Mesh_CreateFromType(int type);
         #endregion
 
         #region Renderer
@@ -138,6 +155,11 @@ namespace MintyEngine
 
         #region Shader
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static UUID Shader_Create(string path);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static object Shader_GetViewport(UUID id);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Shader_SetViewport(UUID id, UUID viewportId);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static object Shader_GetScissor(UUID id);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Shader_SetScissor(UUID id, UUID scissorId);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static bool Shader_HasInput(UUID id, string name);
         #endregion
 
         #region ShaderModule

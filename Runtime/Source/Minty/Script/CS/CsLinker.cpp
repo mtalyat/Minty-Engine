@@ -60,7 +60,7 @@ static Entity util_get_entity(UUID_t id)
 	return entity;
 }
 
-static CameraComponent& util_get_camera_component(UUID_t id)
+static CameraComponent& util_get_camera_component(UUID_t const id)
 {
 	MINTY_ASSERT(id);
 
@@ -75,7 +75,22 @@ static CameraComponent& util_get_camera_component(UUID_t id)
 	return *component;
 }
 
-static TransformComponent& util_get_transform_component(UUID_t id, bool setDirty)
+static MeshComponent& util_get_mesh_component(UUID_t const id)
+{
+	MINTY_ASSERT(id);
+
+	EntityRegistry& registry = util_get_entity_registry();
+
+	Entity entity = registry.find_by_id(id);
+	MINTY_ASSERT(entity != NULL_ENTITY);
+
+	MeshComponent* component = registry.try_get<MeshComponent>(entity);
+	MINTY_ASSERT(component != nullptr);
+
+	return *component;
+}
+
+static TransformComponent& util_get_transform_component(UUID_t const id, bool setDirty)
 {
 	MINTY_ASSERT(id);
 
@@ -94,6 +109,34 @@ static TransformComponent& util_get_transform_component(UUID_t id, bool setDirty
 	MINTY_ASSERT(component != nullptr);
 
 	return *component;
+}
+
+static MonoObject* util_get_mono_object(UUID const id)
+{
+	Ref<ScriptObject> scriptObject = ScriptEngine::get_object(id);
+
+	if (scriptObject == nullptr)
+	{
+		return nullptr;
+	}
+
+	return static_cast<MonoObject*>(scriptObject->get_native());
+}
+
+static MonoObject* util_get_mono_asset(UUID const id, String const& classFullName)
+{
+	Ref<ScriptClass> scriptClass = ScriptEngine::find_class(classFullName);
+
+	MINTY_ASSERT(scriptClass != nullptr);
+
+	Ref<ScriptObject> scriptObject = ScriptEngine::get_or_create_object_asset(id, scriptClass);
+
+	if (scriptObject == nullptr)
+	{
+		return nullptr;
+	}
+
+	return static_cast<MonoObject*>(scriptObject->get_native());
 }
 
 #pragma endregion
@@ -240,6 +283,66 @@ static UUID_t camera_get_render_target(UUID_t id)
 	Ref<RenderTarget> renderTarget = camera.camera.get_render_target();
 
 	return renderTarget->id();
+}
+
+#pragma endregion
+
+#pragma region MeshRenderer
+
+static int mesh_renderer_get_type(UUID_t id)
+{
+	MeshComponent& component = util_get_mesh_component(id);
+
+	return static_cast<int>(component.type);
+}
+
+static void mesh_renderer_set_type(UUID_t id, int type)
+{
+	MeshComponent& component = util_get_mesh_component(id);
+
+	component.type = static_cast<MeshType>(type);
+}
+
+static MonoObject* mesh_renderer_get_mesh(UUID_t id)
+{
+	MeshComponent& component = util_get_mesh_component(id);
+
+	Ref<Mesh> mesh = component.mesh;
+
+	if (mesh == nullptr)
+	{
+		return nullptr;
+	}
+
+	return util_get_mono_asset(mesh->id(), "Mesh");
+}
+
+static void mesh_renderer_set_mesh(UUID_t id, UUID_t meshId)
+{
+	MeshComponent& component = util_get_mesh_component(id);
+
+	component.mesh = AssetManager::get<Mesh>(meshId);
+}
+
+static MonoObject* mesh_renderer_get_material(UUID_t id)
+{
+	MeshComponent& component = util_get_mesh_component(id);
+
+	Ref<Material> material = component.material;
+
+	if (material == nullptr)
+	{
+		return nullptr;
+	}
+
+	return util_get_mono_asset(material->id(), "Material");
+}
+
+static void mesh_renderer_set_material(UUID_t id, UUID_t materialId)
+{
+	MeshComponent& component = util_get_mesh_component(id);
+
+	component.material = AssetManager::get<Material>(materialId);
 }
 
 #pragma endregion
@@ -443,7 +546,7 @@ static void object_destroy_immediate_entity(UUID_t id)
 
 #pragma endregion
 
-#pragma region Entity\
+#pragma region Entity
 
 static MonoObject* entity_find(UUID_t id)
 {
@@ -947,6 +1050,15 @@ void Minty::CsLinker::link()
 	ADD_INTERNAL_CALL("Camera_SetMain", camera_set_main);
 	ADD_INTERNAL_CALL("Camera_GetColor", camera_get_color);
 	ADD_INTERNAL_CALL("Camera_SetColor", camera_set_color);
+#pragma endregion
+
+#pragma region MeshRenderer
+	ADD_INTERNAL_CALL("MeshRenderer_GetType", mesh_renderer_get_type);
+	ADD_INTERNAL_CALL("MeshRenderer_SetType", mesh_renderer_set_type);
+	ADD_INTERNAL_CALL("MeshRenderer_GetMesh", mesh_renderer_get_mesh);
+	ADD_INTERNAL_CALL("MeshRenderer_SetMesh", mesh_renderer_set_mesh);
+	ADD_INTERNAL_CALL("MeshRenderer_GetMaterial", mesh_renderer_get_material);
+	ADD_INTERNAL_CALL("MeshRenderer_SetMaterial", mesh_renderer_set_material);
 #pragma endregion
 
 #pragma region Transform

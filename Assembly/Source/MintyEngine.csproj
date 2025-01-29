@@ -64,7 +64,10 @@
     <Compile Include="ImageUsage.cs" />
     <Compile Include="GameObject.cs" />
     <Compile Include="Input.cs" />
+    <Compile Include="Material.cs" />
+    <Compile Include="MaterialTemplate.cs" />
     <Compile Include="Math.cs" />
+    <Compile Include="Type.cs" />
     <Compile Include="Object.cs" />
     <Compile Include="Quaternion.cs" />
     <Compile Include="Random.cs" />
