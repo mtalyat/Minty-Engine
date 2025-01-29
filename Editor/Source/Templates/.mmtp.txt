@@ -1,0 +1,4 @@
+Shader: def000000000000a
+Values
+    texture
+        texSampler: def0000000000000
