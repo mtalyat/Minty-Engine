@@ -20,7 +20,7 @@ namespace MintyEngine
         { }
 
         public Material(string path)
-            : base(Runtime.Material_Create(path))
+            : base(Runtime.Material_Load(path))
         { }
 
         /// <summary>
@@ -31,7 +31,11 @@ namespace MintyEngine
         public void Set<T>(string name, T t)
         {
             System.Type type = t.GetType();
-            if (t is Asset asset)
+            if(type.IsArray)
+            {
+                Debug.Error("Cannot use Material.Set() for an array. Try Material.SetArray().");
+                return;
+            } else if (t is Asset asset)
             {
                 Runtime.Material_Set(ID, name, (int)Type.Object, asset.ID.ToString());
             } else if(type.IsValueType)
@@ -40,8 +44,35 @@ namespace MintyEngine
             }
             else
             {
-                Debug.Error($"Material.Set({name}, {t}) failed. Invalid Type.");
-            }            
+                Debug.Error($"Material.Set({name}, {t}) failed. Invalid Type ({type.FullName}).");
+            }
+        }
+
+        public void SetArray<T>(string name, T[] ts)
+        {
+            if(ts == null)
+            {
+                Debug.Error("Cannot set to null within Material.SetArray(). Try an empty array.");
+                return;
+            }
+
+            System.Type type = typeof(T);
+            if (type.IsSubclassOf(typeof(Asset)))
+            {
+                UUID[] ids = ts.Select(t => (t as Asset).ID).ToArray();
+                string idsString = string.Join(",", ids);
+                Runtime.Material_Set(ID, name, (int)Type.Object, idsString);
+            }
+            else if (type.IsValueType)
+            {
+                string valuesString = string.Join(",", ts);
+                Runtime.Material_Set(ID, name, (int)typeof(T).ToMintyType(), valuesString);
+            }
+            else
+            {
+                string valuesString = string.Join(",", ts);
+                Debug.Error($"Material.SetArray({name}, {valuesString}) failed. Invalid Type ({type.FullName}).");
+            }
         }
     }
 }

@@ -145,20 +145,14 @@ namespace Minty
 		template<typename T>
 		Bool read_to_container(Size const index, Container& container)
 		{
-			container.resize(sizeof(T));
-
-			MINTY_ASSERT_MESSAGE(container.size() >= sizeof(T), "Cannot read to container. It is too small.");
-
-			return read(index, *static_cast<T*>(container.data()));
+			container.resize(container.size() + sizeof(T));
+			return read(index, *static_cast<T*>(static_cast<void*>(static_cast<Byte*>(container.data()) + sizeof(T))));
 		}
 		template<typename T>
 		Bool read_to_container(String const& name, Container& container)
 		{
-			container.resize(sizeof(T));
-
-			MINTY_ASSERT_MESSAGE(container.size() >= sizeof(T), "Cannot read to container. It is too small.");
-
-			return read(name, *static_cast<T*>(container.data()));
+			container.resize(container.size() + sizeof(T));
+			return read(name, *static_cast<T*>(static_cast<void*>(static_cast<Byte*>(container.data()) + sizeof(T))));
 		}
 
 	public:

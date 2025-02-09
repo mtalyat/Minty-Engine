@@ -29,7 +29,11 @@ namespace Minty
 		std::vector<Path> wraps = { "Game.wrap" };
 		
 		// should paths be saved in memory, or ignored
+#ifdef MINTY_DEBUG
+		Bool savePaths = true;
+#else
 		Bool savePaths = false;
+#endif
 	};
 
 	/// <summary>
@@ -295,7 +299,19 @@ namespace Minty
 			}
 
 			// something read
-			
+			if (Int result = check_dependency(id, path, name, required))
+			{
+				asset.release();
+				return result;
+			}
+
+			// load asset
+			asset = get<T>(id);
+			return 0;
+		}
+
+		static Int check_dependency(UUID const id, Path const& path, String const& name, Bool const required)
+		{
 			// if invalid id (0), set to null
 			if (!id.valid())
 			{
@@ -304,7 +320,6 @@ namespace Minty
 					Debug::log_error(std::format("Cannot load \"{}\". \"{}\"'s ID was invalid.", path.generic_string(), name));
 				}
 
-				asset.release();
 				return 2;
 			}
 
@@ -312,12 +327,9 @@ namespace Minty
 			if (!id.valid() || !contains(id))
 			{
 				Debug::log_error(std::format("Cannot load \"{}\": requires a dependency \"{}\" with ID {} that has not been loaded yet.", path.generic_string(), name, to_string(id)));
-				asset.release();
 				return -1;
 			}
 
-			// load asset
-			asset = get<T>(id);
 			return 0;
 		}
 
@@ -327,6 +339,8 @@ namespace Minty
 		/// </summary>
 		/// <param name="id">The ID of the asset.</param>
 		static void unload(UUID const id);
+
+		static void unload(Ref<Asset> const& asset) { unload(asset->id()); }
 
 		/// <summary>
 		/// Unloads all Assets from this AssetManager.
@@ -501,7 +515,7 @@ namespace Minty
 
 		static Ref<FontVariant> load_font_variant(Path const& path);
 
-		static Owner<Image> load_image(Path const& path);
+		static Ref<Image> load_image(Path const& path);
 
 		static Bool load_values(Reader& reader, std::unordered_map<String, Cargo>& values, Ref<Shader> const shader, Path const& path);
 

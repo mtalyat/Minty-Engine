@@ -2,8 +2,8 @@
 
 #include "Minty/Core/Macros.h"
 #include "Minty/Core/Math.h"
-#include "Minty/Data/ConstantContainer.h"
 #include "Minty/Data/DynamicContainer.h"
+#include "Minty/Data/StaticContainer.h"
 
 namespace Minty
 {
@@ -15,7 +15,7 @@ namespace Minty
 		{
 			String name;
 			Type type;
-			ConstantContainer container;
+			StaticContainer container;
 		};
 
 	private:
@@ -27,11 +27,11 @@ namespace Minty
 		{}
 
 	public:
-		void emplace_slot(String const& name, Type const type)
+		void emplace_slot(String const& name, Type const type, Size const count = 1)
 		{
 			MINTY_ASSERT_FORMAT(!m_slots.contains(name), "Cannot add slot name \"{}\" to Cargo: name already exists.", name);
 
-			m_slots.emplace(name, Slot{ name, type, ConstantContainer(sizeof_type(type)) });
+			m_slots.emplace(name, Slot{ name, type, StaticContainer(sizeof_type(type) * count) });
 		}
 
 		void set(String const& name, void const* const data, Size const size)
@@ -48,13 +48,14 @@ namespace Minty
 		void emplace(String const& name, Type const type, void const* const data, Size const size = -1)
 		{
 			// add slot and set values
-			emplace_slot(name, type);
 			if (size == -1)
 			{
+				emplace_slot(name, type, 1);
 				set(name, data, sizeof_type(type));
 			}
 			else
 			{
+				emplace_slot(name, type, size / sizeof_type(type));
 				set(name, data, size);
 			}
 		}

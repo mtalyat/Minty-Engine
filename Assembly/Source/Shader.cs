@@ -27,7 +27,7 @@ namespace MintyEngine
         { }
 
         public Shader(string path)
-            : base(Runtime.Shader_Create(path))
+            : base(Runtime.Shader_Load(path))
         { }
 
         /// <summary>

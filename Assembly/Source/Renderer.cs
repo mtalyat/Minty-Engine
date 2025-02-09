@@ -8,6 +8,7 @@ namespace MintyEngine
 {
     public static class Renderer
     {
-
+        // copied from C++
+        public const int MAX_FRAMES_PER_FLIGHT = 2;
     }
 }

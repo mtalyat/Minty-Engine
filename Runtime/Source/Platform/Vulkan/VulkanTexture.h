@@ -17,7 +17,7 @@ namespace Minty
 		~VulkanTexture();
 
 	public:
-		VkImageView get_view() const { return static_cast<Ref<VulkanImage>>(get_image())->get_view(); }
+		VkImageView get_view() const;
 
 		VkSampler get_sampler() const { return m_sampler; }
 	};

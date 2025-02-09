@@ -27,6 +27,16 @@ void Minty::RenderSystem::finalize()
 
 void Minty::RenderSystem::draw()
 {
+	// update global constants provided by the engine
+	Int frameIndex = static_cast<Int>(Renderer::get_current_frame_index());
+	for (Ref<Shader> const& shader : AssetManager::get_by_type<Shader>())
+	{
+		if (shader->has_input("index"))
+		{
+			shader->set_global_input("index", &frameIndex);
+		}
+	}
+
 	// draw for each enabled camera
 	if (Application::instance().get_mode() == ApplicationMode::Edit)
 	{

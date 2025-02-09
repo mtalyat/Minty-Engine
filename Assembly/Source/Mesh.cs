@@ -15,7 +15,7 @@ namespace MintyEngine
         { }
 
         public Mesh(string path)
-            : base(Runtime.Mesh_Create(path))
+            : base(Runtime.Mesh_Load(path))
         { }
 
         public Mesh(MeshType type)

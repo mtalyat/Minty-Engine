@@ -66,7 +66,6 @@ namespace Minty
 	{
 		ApplicationInfo info = { "Minty Application", MINTY_MAKE_VERSION(1, 0, 0) };
 		ApplicationData data = {};
-		String logPath = "log.txt";
 		ApplicationMode mode = ApplicationMode::Normal;
 		UInt targetFPS = 120;
 		ApplicationPassFlags passes = ApplicationPassFlags::All;
@@ -100,7 +99,6 @@ namespace Minty
 		ApplicationInfo m_info;
 		ApplicationData m_data;
 		ApplicationMode m_mode;
-		Logger* mp_logger;
 
 		SceneManager m_sceneManager;
 		std::vector<Ref<Scene>> m_workingScenes;
@@ -117,7 +115,6 @@ namespace Minty
 			, m_info()
 			, m_data()
 			, m_mode()
-			, mp_logger(nullptr)
 			, m_sceneManager()
 			, m_workingScenes()
 			, m_layerManager()
@@ -182,8 +179,6 @@ namespace Minty
 		ApplicationInfo const& get_info() const { return m_info; }
 
 		ApplicationMode get_mode() const { return m_mode; }
-
-		Logger& get_logger() const { return *mp_logger; }
 
 		SceneManager& get_scene_manager() { return m_sceneManager; }
 

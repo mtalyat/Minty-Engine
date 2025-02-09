@@ -14,8 +14,12 @@ namespace MintyEngine
             : base(id)
         { }
 
+        public Texture(string path)
+            : base(Runtime.Texture_Load(path))
+        { }
+
         public Texture(Image image, Filter filter, ImageAddressMode addressMode, bool normalizedCoordinates)
-            : base(Runtime.Texture_Create(image.ID, filter, addressMode, normalizedCoordinates))
+            : base(Runtime.Texture_Create(image.ID, (int)filter, (int)addressMode, normalizedCoordinates))
         { }
     }
 }

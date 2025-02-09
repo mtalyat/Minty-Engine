@@ -12,7 +12,7 @@ using namespace Minty;
 
 Ref<Window> Minty::Renderer::s_window = nullptr;
 Color Minty::Renderer::s_color = Color::black();
-Owner<RenderPass> Renderer::s_renderPass = nullptr;
+Ref<RenderPass> Renderer::s_renderPass = nullptr;
 Ref<RenderTarget> Renderer::s_renderTarget = nullptr;
 std::vector<Ref<RenderTarget>> Renderer::s_screenTargets = {};
 std::unordered_map<MeshType, Ref<Mesh>> Minty::Renderer::s_defaultMeshes = {};
@@ -66,7 +66,7 @@ void Minty::Renderer::initialize(RendererBuilder const& builder)
 		}
 
 		s_renderPass = create_render_pass(renderPassBuilder);
-		s_renderTarget = create_render_target(s_renderPass.create_ref());
+		s_renderTarget = create_render_target(s_renderPass);
 	}
 }
 
@@ -173,9 +173,12 @@ void Minty::Renderer::set_camera(Float3 const position, Quaternion const rotatio
 	Matrix4 transformMatrix = proj * view;
 
 	// update all materials that have a camera
-	for (auto const& material : AssetManager::get_by_type<Material>())
+	for (auto const& shader : AssetManager::get_by_type<Shader>())
 	{
-		material->try_set_input("camera", &transformMatrix);
+		if (shader->has_input("camera"))
+		{
+			shader->set_global_input("camera", &transformMatrix);
+		}
 	}
 }
 
@@ -329,11 +332,9 @@ Ref<Material> Minty::Renderer::get_or_create_default_material(Ref<Texture> const
 	return found->second;
 }
 
-Owner<RenderPass> Minty::Renderer::create_render_pass(RenderPassBuilder const& builder)
+Ref<RenderPass> Minty::Renderer::create_render_pass(RenderPassBuilder const& builder)
 {
-	Owner<RenderPass> renderPass = RenderPass::create(builder);
-
-	return renderPass;
+	return AssetManager::create<RenderPass>(builder);
 }
 
 Ref<RenderTarget> Minty::Renderer::create_render_target(Ref<RenderPass> const& renderPass)
@@ -365,6 +366,25 @@ Format Minty::Renderer::get_depth_format()
 	return static_cast<Format>(VulkanRenderer::find_depth_format());
 #else
 	return Format::Undefined;
+#endif
+}
+
+UInt2 Minty::Renderer::get_screen_size()
+{
+#if defined(MINTY_VULKAN)
+	VkExtent2D extent = VulkanRenderer::get_swapchain_extent();
+	return UInt2(extent.width, extent.height);
+#else
+	return UInt2();
+#endif
+}
+
+Size Minty::Renderer::get_current_frame_index()
+{
+#if defined(MINTY_VULKAN)
+	return VulkanRenderer::get_current_frame_index();
+#else
+	return 0;
 #endif
 }
 

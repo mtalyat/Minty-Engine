@@ -16,9 +16,7 @@ namespace MintyEngine
 
         private RenderTarget(bool framebuffer)
             : base(Runtime.RenderTarget_Create(framebuffer))
-        {
-
-        }
+        { }
 
         public static RenderTarget CreateScreenRenderTarget()
         {
@@ -28,6 +26,11 @@ namespace MintyEngine
         public static RenderTarget CreateTextureRenderTarget()
         {
             return new RenderTarget(false);
+        }
+
+        public Image GetImage(int frameIndex)
+        {
+            return Runtime.RenderTarget_GetImage(ID, frameIndex) as Image;
         }
     }
 }

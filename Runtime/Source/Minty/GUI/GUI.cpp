@@ -18,7 +18,7 @@ using namespace Minty;
 static VkDescriptorPool s_imGuiDescriptorPool;
 #endif
 
-Owner<RenderPass> GUI::s_renderPass = nullptr;
+Ref<RenderPass> GUI::s_renderPass = nullptr;
 Ref<RenderTarget> GUI::s_renderTarget = nullptr;
 
 #pragma region Utility

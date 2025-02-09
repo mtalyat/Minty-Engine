@@ -9,7 +9,7 @@ namespace MintyEngine
     public class ShaderModule : Asset
     {
         public ShaderModule(string path)
-            : base(Runtime.ShaderModule_Create(path))
+            : base(Runtime.ShaderModule_Load(path))
         {
 
         }

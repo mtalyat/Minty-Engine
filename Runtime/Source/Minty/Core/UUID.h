@@ -40,7 +40,7 @@ namespace Minty
 			return m_uuid > 0;
 		}
 
-		Size data() const
+		UUID_t data() const
 		{
 			return m_uuid;
 		}

@@ -42,7 +42,7 @@ Minty::VulkanMaterial::VulkanMaterial(MaterialBuilder const& builder)
 		MINTY_ASSERT_MESSAGE(descriptor.count != 0, "Cannot create a Descriptor with a count of 0.");
 		MINTY_ASSERT_MESSAGE(!descriptor.name.empty(), "Cannot create a Descriptor with no name.");
 
-		// create uniform buffers
+		// create uniform buffers for the descriptor
 		if (descriptor.size > 0)
 		{
 			// create one buffer for each frame in flight
@@ -52,80 +52,81 @@ Minty::VulkanMaterial::VulkanMaterial(MaterialBuilder const& builder)
 				Frame& frame = m_frames.at(j);
 				BufferBuilder bufferBuilder{};
 				bufferBuilder.frequent = descriptor.frequent;
-				bufferBuilder.size = descriptor.size;
+				bufferBuilder.size = descriptor.size * descriptor.count;
+				MINTY_ASSERT_FORMAT(bufferBuilder.size > 0, "Material Buffer size is zero. Descriptor size: {}, descriptor count: {}.", descriptor.size, descriptor.count);
 				bufferBuilder.usage = BufferUsage::Uniform;
 				bufferBuilder.data = nullptr;
 				frame.buffers.push_back(Owner<VulkanBuffer>(bufferBuilder));
 			}
 		}
+	}
 
-		// allocate descriptor sets for each frame
-		std::vector<VkDescriptorSetLayout> descriptorSetLayouts(MAX_FRAMES_IN_FLIGHT, shader->get_descriptor_set_layout());
-		VkDescriptorSetAllocateInfo descriptorSetAllocInfo{};
-		descriptorSetAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
-		descriptorSetAllocInfo.descriptorPool = shader->get_descriptor_pool(1);
-		descriptorSetAllocInfo.descriptorSetCount = static_cast<uint32_t>(descriptorSetLayouts.size());
-		descriptorSetAllocInfo.pSetLayouts = descriptorSetLayouts.data();
+	// allocate descriptor sets for each frame
+	std::vector<VkDescriptorSetLayout> descriptorSetLayouts(MAX_FRAMES_IN_FLIGHT, shader->get_descriptor_set_layout());
+	VkDescriptorSetAllocateInfo descriptorSetAllocInfo{};
+	descriptorSetAllocInfo.sType = VK_STRUCTURE_TYPE_DESCRIPTOR_SET_ALLOCATE_INFO;
+	descriptorSetAllocInfo.descriptorPool = shader->get_descriptor_pool(1);
+	descriptorSetAllocInfo.descriptorSetCount = static_cast<uint32_t>(descriptorSetLayouts.size());
+	descriptorSetAllocInfo.pSetLayouts = descriptorSetLayouts.data();
 
-		std::vector<VkDescriptorSet> descriptorSets(MAX_FRAMES_IN_FLIGHT);
-		if (vkAllocateDescriptorSets(VulkanRenderer::get_device(), &descriptorSetAllocInfo, descriptorSets.data()) != VK_SUCCESS) {
-			throw std::runtime_error("Failed to allocate descriptor sets.");
-		}
+	std::vector<VkDescriptorSet> descriptorSets(MAX_FRAMES_IN_FLIGHT);
+	if (vkAllocateDescriptorSets(VulkanRenderer::get_device(), &descriptorSetAllocInfo, descriptorSets.data()) != VK_SUCCESS) {
+		throw std::runtime_error("Failed to allocate descriptor sets.");
+	}
 
-		// distribute to frames
-		for (Size i = 0; i < m_frames.size(); i++)
+	// distribute to frames
+	for (Size i = 0; i < m_frames.size(); i++)
+	{
+		m_frames[i].descriptorSet = descriptorSets.at(i);
+	}
+
+	// write all the inputs to the descriptor set
+	for (Frame& frame : m_frames)
+	{
+		std::vector<VkDescriptorBufferInfo> bufferInfos;
+		std::vector<VkDescriptorImageInfo> imageInfos;
+		bufferInfos.reserve(descriptors.size());
+		imageInfos.reserve(descriptors.size());
+
+		std::vector<VkWriteDescriptorSet> descriptorWrites;
+		descriptorWrites.reserve(descriptors.size());
+
+		// create buffers
+		for (ShaderInput const& descriptor : descriptors)
 		{
-			m_frames[i].descriptorSet = descriptorSets.at(i);
-		}
-
-		// write all the inputs to the descriptor set
-		for (Frame& frame : m_frames)
-		{
-			std::vector<VkDescriptorBufferInfo> bufferInfos;
-			std::vector<VkDescriptorImageInfo> imageInfos;
-			bufferInfos.reserve(descriptors.size());
-			imageInfos.reserve(descriptors.size());
-
-			std::vector<VkWriteDescriptorSet> descriptorWrites;
-			descriptorWrites.reserve(descriptors.size());
-
-			// create buffers
-			for (ShaderInput const& descriptor : descriptors)
+			switch (descriptor.type)
 			{
-				switch (descriptor.type)
-				{
-				case ShaderInputType::UniformBuffer:
-				case ShaderInputType::StorageBuffer:
-				{
-					VkWriteDescriptorSet descriptorWrite{};
-					descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
-					descriptorWrite.dstSet = frame.descriptorSet;
-					descriptorWrite.dstBinding = descriptor.binding;
-					descriptorWrite.dstArrayElement = 0; // if an array
+			case ShaderInputType::UniformBuffer:
+			case ShaderInputType::StorageBuffer:
+			{
+				VkWriteDescriptorSet descriptorWrite{};
+				descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
+				descriptorWrite.dstSet = frame.descriptorSet;
+				descriptorWrite.dstBinding = descriptor.binding;
+				descriptorWrite.dstArrayElement = 0; // if an array
 
-					descriptorWrite.descriptorType = VulkanRenderer::descriptor_type_to_vulkan(descriptor.type);
-					descriptorWrite.descriptorCount = 1; // how many to update
+				descriptorWrite.descriptorType = VulkanRenderer::descriptor_type_to_vulkan(descriptor.type);
+				descriptorWrite.descriptorCount = 1; // how many to update
 
-					// buffer
-					Ref<VulkanBuffer> vulkanBuffer = frame.buffers.at(shader->get_descriptor_buffer_index(descriptor.name));
+				// buffer
+				Ref<VulkanBuffer> vulkanBuffer = frame.buffers.at(shader->get_descriptor_buffer_index(descriptor.name));
 
-					VkDescriptorBufferInfo bufferInfo{};
-					bufferInfo.buffer = static_cast<VkBuffer>(vulkanBuffer->get_native());
-					bufferInfo.offset = 0;
-					bufferInfo.range = VK_WHOLE_SIZE;
+				VkDescriptorBufferInfo bufferInfo{};
+				bufferInfo.buffer = static_cast<VkBuffer>(vulkanBuffer->get_native());
+				bufferInfo.offset = 0;
+				bufferInfo.range = VK_WHOLE_SIZE;
 
-					bufferInfos.push_back(bufferInfo);
-					descriptorWrite.pBufferInfo = &bufferInfos.back();
+				bufferInfos.push_back(bufferInfo);
+				descriptorWrite.pBufferInfo = &bufferInfos.back();
 
-					descriptorWrites.push_back(descriptorWrite);
+				descriptorWrites.push_back(descriptorWrite);
 
-				}
-				break;
-				}
 			}
-
-			vkUpdateDescriptorSets(VulkanRenderer::get_device(), static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
+			break;
+			}
 		}
+
+		vkUpdateDescriptorSets(VulkanRenderer::get_device(), static_cast<uint32_t>(descriptorWrites.size()), descriptorWrites.data(), 0, nullptr);
 	}
 
 	// set initial values
@@ -203,31 +204,65 @@ void Minty::VulkanMaterial::set_input(String const& name, void const* const data
 	break;
 	case ShaderInputType::CombinedImageSampler:
 	{
+		MINTY_LOG("1");
+		std::vector<VkDescriptorImageInfo> imageInfos;
 		// write to all the inputs
 		for (Frame& frame : m_frames)
 		{
-			VkDescriptorImageInfo imageInfo{};
+			MINTY_LOG("1.1");
+			// make space for the image infos
+			imageInfos.clear();
+			imageInfos.reserve(input.count);
+			MINTY_LOG("1.2");
 
 			// set write info
 			VkWriteDescriptorSet descriptorWrite{};
 			descriptorWrite.sType = VK_STRUCTURE_TYPE_WRITE_DESCRIPTOR_SET;
 			descriptorWrite.dstSet = frame.descriptorSet;
 			descriptorWrite.dstBinding = input.binding;
-			descriptorWrite.dstArrayElement = 0; // if an array
+			descriptorWrite.dstArrayElement = 0; // if an array, if not at beginning
 			descriptorWrite.descriptorType = VulkanRenderer::descriptor_type_to_vulkan(input.type);
-			descriptorWrite.descriptorCount = 1; // how many to update
+			descriptorWrite.descriptorCount = input.count;
+			MINTY_LOG("1.3");
 
 			// get the texture
-			VulkanTexture const* vulkanTexture = *static_cast<VulkanTexture const* const*>(data);
+			VulkanTexture const* const* vulkanTextures = static_cast<VulkanTexture const* const*>(data);
+			MINTY_LOG("1.4");
 
-			// create image info from the texture
-			imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
-			imageInfo.imageView = vulkanTexture->get_view();
-			imageInfo.sampler = vulkanTexture->get_sampler();
-			descriptorWrite.pImageInfo = &imageInfo;
+			// create image info from the texture(s)
+			VulkanTexture const* vulkanTexture;
+			for (UInt i = 0; i < input.count; i++)
+			{
+				MINTY_LOG("1.4.1");
+				vulkanTexture = *vulkanTextures;
+				MINTY_ASSERT_FORMAT(vulkanTexture != nullptr, "Cannot Set CombinedImageSampler: Image {} is null.", i);
+				MINTY_ASSERT_FORMAT(AssetManager::contains(vulkanTexture->id()), "Cannot Set CombinedImageSampler: ID does not belong to a loaded Asset.", to_string(vulkanTexture->id()));
 
+				MINTY_LOG("1.4.2");
+				imageInfos.push_back(VkDescriptorImageInfo());
+				VkDescriptorImageInfo& imageInfo = imageInfos.back();
+
+				MINTY_LOG("1.4.3");
+				imageInfo.imageLayout = VK_IMAGE_LAYOUT_SHADER_READ_ONLY_OPTIMAL;
+				MINTY_LOG("1.4.3.1");
+				imageInfo.imageView = vulkanTexture->get_view();
+				MINTY_LOG("1.4.3.2");
+				imageInfo.sampler = vulkanTexture->get_sampler();
+				MINTY_LOG("1.4.3.3");
+
+				MINTY_LOG("1.4.4");
+				vulkanTextures++;
+			}
+
+			MINTY_LOG("1.5");
+			descriptorWrite.pImageInfo = &imageInfos.front();
+
+
+			MINTY_LOG("1.6");
 			// push updates
 			vkUpdateDescriptorSets(VulkanRenderer::get_device(), 1, &descriptorWrite, 0, nullptr);
+
+			MINTY_LOG("1.7");
 		}
 	}
 	break;

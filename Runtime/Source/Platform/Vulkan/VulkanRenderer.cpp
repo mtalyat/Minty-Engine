@@ -30,8 +30,8 @@ VkSurfaceFormatKHR VulkanRenderer::s_swapchainSurfaceFormat = {};
 VkExtent2D VulkanRenderer::s_swapchainExtent = {};
 VkSwapchainKHR VulkanRenderer::s_swapchain = VK_NULL_HANDLE;
 uint32_t VulkanRenderer::s_imageIndex = 0;
-std::vector<Owner<VulkanImage>> VulkanRenderer::s_swapchainImages = {};
-Owner<VulkanImage> VulkanRenderer::s_depthImage = nullptr;
+std::vector<Ref<Image>> VulkanRenderer::s_swapchainImages = {};
+Ref<VulkanImage> VulkanRenderer::s_depthImage = nullptr;
 Ref<VulkanViewport> VulkanRenderer::s_viewport = nullptr;
 Ref<VulkanScissor> VulkanRenderer::s_scissor = nullptr;
 VkCommandPool VulkanRenderer::s_commandPool = VK_NULL_HANDLE;
@@ -115,11 +115,7 @@ void Minty::VulkanRenderer::shutdown()
 	// destroy depth stencil
 	destroy_depth_resources();
 
-	// destroy images
-	s_swapchainImages.clear();
-
-	// destroy swapchain
-	destroy_swapchain();
+	destroy_swapchain_resources();
 
 	destroy_command_pool();
 
@@ -169,11 +165,7 @@ void Minty::VulkanRenderer::recreate_swapchain()
 	// destroy old swapchain, if able
 	if (s_swapchain != VK_NULL_HANDLE)
 	{
-		// destroy images
-		s_swapchainImages.clear();
-
-		// destroy swapchain
-		destroy_swapchain();
+		destroy_swapchain_resources();
 	}
 
 	// create swapchain and images
@@ -195,8 +187,6 @@ void Minty::VulkanRenderer::recreate_swapchain()
 	// create images from swapchain
 	std::vector<VkImage> swapchainImages = get_swapchain_images();
 	s_swapchainImages.reserve(swapchainImages.size());
-	std::vector<Ref<Image>> swapchainImageRefs;
-	swapchainImageRefs.reserve(swapchainImages.size());
 	ImageBuilder swapchainImageBuilder{};
 	swapchainImageBuilder.width = s_swapchainExtent.width;
 	swapchainImageBuilder.height = s_swapchainExtent.height;
@@ -205,8 +195,8 @@ void Minty::VulkanRenderer::recreate_swapchain()
 	for (Size i = 0; i < swapchainImages.size(); i++)
 	{
 		Owner<VulkanImage> image = Owner<VulkanImage>(swapchainImageBuilder, swapchainImages.at(i));
-		s_swapchainImages.push_back(image);
-		swapchainImageRefs.push_back(image.create_ref());
+		AssetManager::emplace(Path(), image);
+		s_swapchainImages.push_back(image.create_ref());
 	}
 
 	// recreate depth resources
@@ -222,7 +212,7 @@ void Minty::VulkanRenderer::recreate_swapchain()
 	// re-init framebuffers using new images
 	RenderTargetBuilder renderTargetBuilder{};
 	renderTargetBuilder.id = UUID::create();
-	renderTargetBuilder.images = swapchainImageRefs;
+	renderTargetBuilder.images = s_swapchainImages;
 	for (auto const& renderTarget : Renderer::get_screen_render_targets())
 	{
 		if (renderTarget == nullptr)
@@ -320,7 +310,7 @@ void Minty::VulkanRenderer::end_render_pass()
 
 void Minty::VulkanRenderer::transition_between_render_passes()
 {
-	Ref<VulkanImage> swapchainImage = s_swapchainImages.at(s_imageIndex).create_ref();
+	Ref<VulkanImage> swapchainImage = s_swapchainImages.at(s_imageIndex);
 
 	// set barrier between pass 1 and 2
 	VkImageMemoryBarrier barrier{};
@@ -375,16 +365,10 @@ void Minty::VulkanRenderer::refresh()
 
 Ref<RenderTarget> Minty::VulkanRenderer::create_render_target(Ref<RenderPass> const& renderPass)
 {
-	std::vector<Ref<Image>> swapchainImageRefs(s_swapchainImages.size());
-	for (Size i = 0; i < swapchainImageRefs.size(); i++)
-	{
-		swapchainImageRefs[i] = s_swapchainImages.at(i).create_ref();
-	}
-
 	RenderTargetBuilder builder{};
 	builder.id = UUID::create();
 	builder.renderPass = renderPass;
-	builder.images = swapchainImageRefs;
+	builder.images = s_swapchainImages;
 
 	return renderPass->create_render_target(builder);
 }
@@ -950,6 +934,19 @@ void Minty::VulkanRenderer::destroy_swapchain()
 	s_swapchain = VK_NULL_HANDLE;
 }
 
+void Minty::VulkanRenderer::destroy_swapchain_resources()
+{
+	// destroy images
+	for (Ref<Image> const& image : s_swapchainImages)
+	{
+		AssetManager::unload(image);
+	}
+	s_swapchainImages.clear();
+
+	// destroy swapchain
+	destroy_swapchain();
+}
+
 std::vector<VkImage> Minty::VulkanRenderer::get_swapchain_images()
 {
 	std::vector<VkImage> images;
@@ -1204,12 +1201,14 @@ void Minty::VulkanRenderer::create_depth_resources()
 	depthImageBuilder.usage = ImageUsage::DepthStencil;
 	depthImageBuilder.immutable = false;
 
-	s_depthImage = Owner<VulkanImage>(depthImageBuilder);
+	Owner<VulkanImage> depthImage = Owner<VulkanImage>(depthImageBuilder);
+	AssetManager::emplace(depthImage);
+	s_depthImage = depthImage.create_ref();
 }
 
 void Minty::VulkanRenderer::destroy_depth_resources()
 {
-	s_depthImage.release();
+	AssetManager::unload(s_depthImage->id());
 }
 
 void Minty::VulkanRenderer::recreate_depth_resources()
@@ -1877,19 +1876,31 @@ VkImageAspectFlags Minty::VulkanRenderer::image_aspect_to_vulkan(const Minty::Im
 
 VkImageUsageFlags Minty::VulkanRenderer::image_usage_to_vulkan(const Minty::ImageUsage usage)
 {
-	switch (usage)
+	VkImageUsageFlags flags = 0;
+
+	if ((usage & ImageUsage::Sampled) == ImageUsage::Sampled)
 	{
-	case ImageUsage::Sampled:
-		return VK_IMAGE_USAGE_SAMPLED_BIT;
-	case ImageUsage::Storage:
-		return VK_IMAGE_USAGE_STORAGE_BIT;
-	case ImageUsage::Color:
-		return VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
-	case ImageUsage::DepthStencil:
-		return VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
-	default:
+		flags |= VK_IMAGE_USAGE_SAMPLED_BIT;
+	}
+	if ((usage & ImageUsage::Storage) == ImageUsage::Storage)
+	{
+		flags |= VK_IMAGE_USAGE_STORAGE_BIT;
+	}
+	if ((usage & ImageUsage::Color) == ImageUsage::Color)
+	{
+		flags |= VK_IMAGE_USAGE_COLOR_ATTACHMENT_BIT;
+	}
+	if ((usage & ImageUsage::DepthStencil) == ImageUsage::DepthStencil)
+	{
+		flags |= VK_IMAGE_USAGE_DEPTH_STENCIL_ATTACHMENT_BIT;
+	}
+
+	if (flags == 0)
+	{
 		MINTY_ABORT_FORMAT("Cannot convert {} to VkImageUsageFlags.", to_string(static_cast<int>(usage)));
 	}
+
+	return flags;
 }
 
 VkPrimitiveTopology Minty::VulkanRenderer::primitive_topology_to_vulkan(const Minty::ShaderPrimitiveTopology topology)

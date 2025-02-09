@@ -303,9 +303,11 @@ Ref<ScriptObject> Minty::ScriptEngine::get_or_create_object_asset(UUID const id,
 
 	if (found == s_objects.end())
 	{
+		Debug::log(std::format("Creating new asset with ID {} for class: {}", to_string(id), scriptClass->get_full_name()));
 		return create_object_asset(id, scriptClass);
 	}
 
+	Debug::log(std::format("Using old asset with ID {} for class: {}", to_string(id), scriptClass->get_full_name()));
 	return found->second;
 }
 

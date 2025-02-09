@@ -77,8 +77,8 @@ namespace Minty
 		static VkSwapchainKHR s_swapchain;
 		static uint32_t s_imageIndex;
 
-		static std::vector<Owner<VulkanImage>> s_swapchainImages;
-		static Owner<VulkanImage> s_depthImage;
+		static std::vector<Ref<Image>> s_swapchainImages;
+		static Ref<VulkanImage> s_depthImage;
 		static Ref<VulkanViewport> s_viewport;
 		static Ref<VulkanScissor> s_scissor;
 
@@ -154,7 +154,6 @@ namespace Minty
 		static QueueFamilyIndices const& get_queue_family_indices() { return s_queueFamilyIndices; }
 
 		static VkCommandBuffer get_command_buffer() { return s_frames.at(s_currentFrame).commandBuffer; }
-
 	private:
 		static Frame& get_current_frame() { return s_frames.at(s_currentFrame); }
 
@@ -241,6 +240,8 @@ namespace Minty
 		static void create_swapchain(VkSurfaceFormatKHR const surfaceFormat, VkExtent2D const extent, VkPresentModeKHR const presentMode);
 
 		static void destroy_swapchain();
+
+		static void destroy_swapchain_resources();
 
 		static std::vector<VkImage> get_swapchain_images();
 

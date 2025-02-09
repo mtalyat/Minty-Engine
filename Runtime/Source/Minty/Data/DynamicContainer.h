@@ -3,7 +3,9 @@
 
 namespace Minty
 {
-	// a dynamic container of bytes
+	/// <summary>
+	/// A Container of bytes with a dynamic capacity and size.
+	/// </summary>
 	class DynamicContainer
 		: public BaseContainer
 	{

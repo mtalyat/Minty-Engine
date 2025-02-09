@@ -24,11 +24,13 @@ namespace Minty
 	{
 	private:
 		Ref<RenderPass> m_renderPass;
+		std::vector<Ref<Image>> m_images;
 
 	protected:
 		RenderTarget(RenderTargetBuilder const& builder)
 			: Asset(builder.id)
 			, m_renderPass(builder.renderPass)
+			, m_images(builder.images)
 		{}
 
 	public:
@@ -37,6 +39,8 @@ namespace Minty
 
 	public:
 		Ref<RenderPass> get_render_pass() const { return m_renderPass; }
+
+		std::vector<Ref<Image>> const& get_images() const { return m_images; }
 
 		virtual void reinitialize(RenderTargetBuilder const& builder) = 0;
 

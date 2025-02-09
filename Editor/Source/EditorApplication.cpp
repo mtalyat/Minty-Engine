@@ -53,7 +53,6 @@ EditorApplication::EditorApplication()
 	ApplicationBuilder builder{};
 	builder.info.name = "Minty Editor";
 	builder.info.version = MINTY_MAKE_VERSION(1, 0, 0);
-	builder.logPath = "Log.txt";
 	builder.mode = ApplicationMode::Edit;
 	builder.targetFPS = 60;
 	builder.passes = ApplicationPassFlags::All;
@@ -304,6 +303,9 @@ void Mintye::EditorApplication::load_project(Minty::Path const& path)
 	// set new types
 	set_project(project);
 	cwd_project();
+
+	// build shaders, so they are up to date when they are loaded
+	build_shaders();
 
 	// load assemblies
 	Path projectDllPath = get_project_dll_path();

@@ -20,7 +20,7 @@ namespace MintyEngine
         { }
 
         public MaterialTemplate(string path)
-            : base(Runtime.MaterialTemplate_Create(path))
+            : base(Runtime.MaterialTemplate_Load(path))
         { }
     }
 }

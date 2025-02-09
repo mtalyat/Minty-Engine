@@ -48,7 +48,7 @@ namespace MintyEngine
 
         public RenderTarget RenderTarget
         {
-            get => new RenderTarget(Runtime.Camera_GetRenderTarget(Entity.ID));
+            get => Runtime.Camera_GetRenderTarget(Entity.ID) as RenderTarget;
             set => Runtime.Camera_SetRenderTarget(Entity.ID, value.ID);
         }
 

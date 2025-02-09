@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Minty/Asset/Asset.h"
 #include "Minty/Core/Pointer.h"
 #include "Minty/Core/Types.h"
 #include "Minty/Render/RenderAttachment.h"
@@ -11,28 +12,31 @@ namespace Minty
 
 	struct RenderPassBuilder
 	{
+		UUID id = INVALID_UUID;
 		RenderAttachment const* colorAttachment = nullptr;
 		RenderAttachment const* depthAttachment = nullptr;
 	};
 
 	class RenderPass
+		: public Asset
 	{
 	private:
-		std::vector<Owner<RenderTarget>> m_targets;
+		std::vector<Ref<RenderTarget>> m_targets;
 		Ref<RenderTarget> m_activeTarget;
 		Bool m_useColorAttachment;
 		Bool m_useDepthAttachment;
 
 	protected:
 		RenderPass(RenderPassBuilder const& builder)
-			: m_targets()
+			: Asset(builder.id)
+			, m_targets()
 			, m_activeTarget(nullptr)
 			, m_useColorAttachment(static_cast<Bool>(builder.colorAttachment))
 			, m_useDepthAttachment(static_cast<Bool>(builder.depthAttachment))
 		{}
 
 	public:
-		virtual ~RenderPass() {}
+		virtual ~RenderPass();
 
 	public:
 		Ref<RenderTarget> create_render_target(RenderTargetBuilder const& builder);
@@ -50,6 +54,9 @@ namespace Minty
 		Bool using_depth_attachment() const { return m_useDepthAttachment; }
 
 		virtual void* get_native() const = 0;
+
+	public:
+		AssetType get_asset_type() const override { return AssetType::RenderPass; }
 
 	public:
 		static Owner<RenderPass> create(RenderPassBuilder const& builder);

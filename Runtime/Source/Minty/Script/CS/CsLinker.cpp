@@ -276,13 +276,21 @@ static void camera_set_render_target(UUID_t id, UUID_t renderTargetID)
 	camera.camera.set_render_target(renderTarget);
 }
 
-static UUID_t camera_get_render_target(UUID_t id)
+static MonoObject* camera_get_render_target(UUID_t id)
 {
 	CameraComponent& camera = util_get_camera_component(id);
 
 	Ref<RenderTarget> renderTarget = camera.camera.get_render_target();
 
-	return renderTarget->id();
+	// if null, use default render target
+	if (renderTarget == nullptr)
+	{
+		renderTarget = Renderer::get_render_target();
+	}
+
+	MINTY_ASSERT_MESSAGE(renderTarget != nullptr, "Default RenderTarget null.");
+
+	return util_get_mono_asset(renderTarget->id(), "RenderTarget");
 }
 
 #pragma endregion
@@ -466,22 +474,26 @@ static void transform_get_forward(UUID_t id, Float3* direction)
 
 static void console_log(MonoString* string)
 {
-	Console::log(CsScriptEngine::from_mono_string(string));
+	String text = CsScriptEngine::from_mono_string(string);
+	Debug::log(text);
 }
 
 static void console_log_color(MonoString* string, Int color)
 {
-	Console::log_color(CsScriptEngine::from_mono_string(string), static_cast<Console::Color>(color));
+	String text = CsScriptEngine::from_mono_string(string);
+	Debug::log_color(text, static_cast<Console::Color>(color));
 }
 
 static void console_warn(MonoString* string)
 {
-	Console::warn(CsScriptEngine::from_mono_string(string));
+	String text = CsScriptEngine::from_mono_string(string);
+	Debug::log_warning(text);
 }
 
 static void console_error(MonoString* string)
 {
-	Console::error(CsScriptEngine::from_mono_string(string));
+	String text = CsScriptEngine::from_mono_string(string);
+	Debug::log_error(text);
 }
 
 #pragma endregion
@@ -900,6 +912,11 @@ static MonoObject* entity_clone(UUID_t id)
 
 #pragma region Image
 
+static UUID_t image_load(MonoString* path)
+{
+	return 0;
+}
+
 static UUID_t image_create(Int format, Int type, Int tiling, Int aspect, Int usage, UInt width, UInt height, Bool immutable)
 {
 	ImageBuilder builder{};
@@ -929,7 +946,7 @@ static UUID_t image_create(Int format, Int type, Int tiling, Int aspect, Int usa
 
 #pragma region Material
 
-static UUID_t material_create(MonoString* path)
+static UUID_t material_load(MonoString* path)
 {
 	String pathString = CsScriptEngine::from_mono_string(path);
 	Path pathPath = pathString;
@@ -958,22 +975,38 @@ static void material_set(UUID_t id, MonoString* name, int type, MonoString* valu
 	String nameString = CsScriptEngine::from_mono_string(name);
 	Type typeType = static_cast<Type>(type);
 	String valueString = CsScriptEngine::from_mono_string(value);
+	// TODO: check for escape characters
+	std::vector<String> valueStrings = split(valueString, ',');
+
+	MINTY_LOG_FORMAT("{}: {} {} -> {}", to_string(UUID(id)), to_string(typeType), nameString, valueString);
 
 	switch (typeType)
 	{
 	case Type::Int:
 	{
-		Int temp = Parse::to_int(valueString);
-		material->set_input(nameString, &temp);
+		std::vector<Int> values;
+		for (String const& str : valueStrings)
+		{
+			values.push_back(Parse::to_int(str));
+		}
+		material->set_input(nameString, values.data());
 		break;
 	}
 	case Type::Object:
 	{
-		UUID_t temp = static_cast<UUID_t>(Parse::to_size(valueString));
-		Ref<Texture> texture = AssetManager::get<Texture>(temp);
-		MINTY_ASSERT_FORMAT(texture != nullptr, "No Texture found with the ID {}.", to_string(UUID(temp)));
-		void* rawTexture = texture.get();
-		material->set_input(nameString, &rawTexture);
+		std::vector<void*> values;
+		for (String const& str : valueStrings)
+		{
+			UUID_t temp = static_cast<UUID_t>(Parse::to_size(str));
+			MINTY_LOG_FORMAT("Getting texture with ID {}.", to_string(UUID(temp)));
+			Ref<Texture> texture = AssetManager::get<Texture>(temp);
+			MINTY_ASSERT_FORMAT(texture != nullptr, "No Texture found with the ID {}.", to_string(UUID(temp)));
+			void* rawTexture = texture.get();
+			values.push_back(rawTexture);
+		}
+		
+		MINTY_LOG("Setting input.");
+		material->set_input(nameString, values.data());
 		break;
 	}
 	default:
@@ -984,15 +1017,109 @@ static void material_set(UUID_t id, MonoString* name, int type, MonoString* valu
 
 #pragma endregion
 
+#pragma region RenderTarget
+
+static UUID_t render_target_create(bool framebuffer)
+{
+	// if framebuffer, use those images
+	// if not, use custom images
+	Ref<RenderPass> renderPass = Renderer::get_render_pass();
+	Ref<RenderTarget> renderTarget;
+	if (framebuffer)
+	{
+		// renders to the screen
+		renderTarget = Renderer::create_render_target(renderPass);
+	}
+	else
+	{
+		UInt2 screenSize = Renderer::get_screen_size();
+
+		// renders to image(s), that are the same size as the screen
+		RenderTargetBuilder builder{};
+		builder.id = UUID::create();
+		builder.renderPass = Renderer::get_render_pass();
+
+		ImageBuilder imageBuilder{};
+		imageBuilder.width = screenSize.x;
+		imageBuilder.height = screenSize.y;
+		imageBuilder.aspect = ImageAspect::Color;
+		imageBuilder.format = Renderer::get_color_format();
+		imageBuilder.immutable = true;
+		imageBuilder.tiling = ImageTiling::Optimal;
+		imageBuilder.type = ImageType::D2;
+		imageBuilder.usage = ImageUsage::Color | ImageUsage::Sampled;
+
+		Ref<Image> image;
+		for (Size i = 0; i < MAX_FRAMES_IN_FLIGHT; i++)
+		{
+			imageBuilder.id = UUID::create();
+			image = AssetManager::create<Image>(imageBuilder);
+			builder.images.push_back(image);
+		}
+
+		renderTarget = renderPass->create_render_target(builder);
+	}
+
+	// return the ID
+	return renderTarget->id().data();
+}
+
+static MonoObject* render_target_get_image(UUID_t id, int index)
+{
+	// get the render target
+	Ref<RenderTarget> renderTarget = AssetManager::get<RenderTarget>(id);
+	MINTY_ASSERT_FORMAT(renderTarget != nullptr, "No RenderTarget with ID of {}.", to_string(UUID(id)));
+
+	auto const& images = renderTarget->get_images();
+	MINTY_ASSERT_FORMAT(index >= 0 && index < images.size(), "Index out of range [0, {}).", images.size());
+
+	Ref<Image> image = images.at(index);
+
+	if (image == nullptr)
+	{
+		return nullptr;
+	}
+
+	return util_get_mono_asset(image->id(), "Image");
+}
+
+#pragma endregion
+
 #pragma region Shader
 
-static UUID_t shader_create(MonoString* path)
+static UUID_t shader_load(MonoString* path)
 {
 	String pathString = CsScriptEngine::from_mono_string(path);
 
 	Ref<Shader> shader = AssetManager::load<Shader>(pathString);
 
 	return shader->id();
+}
+
+#pragma endregion
+
+#pragma region Texture
+
+static UUID_t texture_load(MonoString* path)
+{
+	String pathString = CsScriptEngine::from_mono_string(path);
+	Path pathPath = pathString;
+	Ref<Texture> texture = AssetManager::load<Texture>(pathPath);
+	return texture->id();
+}
+
+static UUID_t texture_create(UUID_t imageId, int filter, int addressMode, bool normalizedCoordinates)
+{
+	TextureBuilder builder{};
+	builder.id = UUID::create();
+	builder.addressMode = static_cast<ImageAddressMode>(addressMode);
+	builder.filter = static_cast<Filter>(filter);
+	builder.image = AssetManager::get<Image>(imageId);
+	MINTY_ASSERT_FORMAT(builder.image != nullptr, "Failed to get Image with ID: {} when creating Texture.", to_string(UUID(imageId)));
+	builder.normalizedCoordinates = normalizedCoordinates;
+
+	Ref<Texture> texture = AssetManager::create<Texture>(builder);
+	return texture->id();
 }
 
 #pragma endregion
@@ -1107,6 +1234,8 @@ void Minty::CsLinker::link()
 	ADD_INTERNAL_CALL("Camera_SetMain", camera_set_main);
 	ADD_INTERNAL_CALL("Camera_GetColor", camera_get_color);
 	ADD_INTERNAL_CALL("Camera_SetColor", camera_set_color);
+	ADD_INTERNAL_CALL("Camera_GetRenderTarget", camera_get_render_target);
+	ADD_INTERNAL_CALL("Camera_SetRenderTarget", camera_set_render_target);
 #pragma endregion
 
 #pragma region MeshRenderer
@@ -1195,13 +1324,24 @@ void Minty::CsLinker::link()
 #pragma region Render
 
 #pragma region Image
+	ADD_INTERNAL_CALL("Image_Load", image_load);
 	ADD_INTERNAL_CALL("Image_Create", image_create);
 #pragma endregion
 
 #pragma region Material
-	ADD_INTERNAL_CALL("Material_Create", material_create);
+	ADD_INTERNAL_CALL("Material_Load", material_load);
 	ADD_INTERNAL_CALL("Material_GetTemplate", material_get_template);
 	ADD_INTERNAL_CALL("Material_Set", material_set);
+#pragma endregion
+
+#pragma region RenderTarget
+	ADD_INTERNAL_CALL("RenderTarget_Create", render_target_create);
+	ADD_INTERNAL_CALL("RenderTarget_GetImage", render_target_get_image);
+#pragma endregion
+
+#pragma region Texture
+	ADD_INTERNAL_CALL("Texture_Load", texture_load);
+	ADD_INTERNAL_CALL("Texture_Create", texture_create);
 #pragma endregion
 
 #pragma endregion

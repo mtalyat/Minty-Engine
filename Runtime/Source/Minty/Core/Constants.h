@@ -78,4 +78,6 @@ namespace Minty
 	constexpr Layer LAYER_NONE = 0;
 	constexpr Layer LAYER_DEFAULT = 1;
 	constexpr Layer LAYER_COUNT = sizeof(Layer) * 8;
+
+	constexpr Char const* DEFAULT_DEBUG_LOG_PATH = "Log.txt";
 }

@@ -36,7 +36,7 @@ namespace Minty
 	class GUI
 	{
     private:
-        static Owner<RenderPass> s_renderPass;
+        static Ref<RenderPass> s_renderPass;
         static Ref<RenderTarget> s_renderTarget;
 
 	private:
@@ -50,7 +50,7 @@ namespace Minty
 #pragma region Resources
 
     public:
-        static Ref<RenderPass> get_render_pass() { return s_renderPass.create_ref(); }
+        static Ref<RenderPass> get_render_pass() { return s_renderPass; }
 
         static Ref<RenderTarget> get_render_target() { return s_renderTarget; }
 

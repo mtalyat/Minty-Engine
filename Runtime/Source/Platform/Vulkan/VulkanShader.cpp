@@ -322,21 +322,14 @@ Minty::VulkanShader::VulkanShader(ShaderBuilder const& builder)
 	// push constants
 	std::vector<VkPushConstantRange> pushConstantRanges;
 	pushConstantRanges.reserve(pushConstants.size());
-
+	for (ShaderInput const& descriptor : pushConstants)
 	{
-		uint32_t offset = 0;
-		for (ShaderInput const& descriptor : pushConstants)
-		{
-			// create range for this push constant
-			VkPushConstantRange pushConstantRange{};
-			pushConstantRange.offset = offset;
-			pushConstantRange.size = static_cast<uint32_t>(descriptor.size);
-			pushConstantRange.stageFlags = VulkanRenderer::shader_stage_to_vulkan(descriptor.stage);
-			pushConstantRanges.push_back(pushConstantRange);
-
-			// increment the offset for the rest of these
-			offset += static_cast<uint32_t>(descriptor.size);
-		}
+		// create range for this push constant
+		VkPushConstantRange pushConstantRange{};
+		pushConstantRange.offset = descriptor.offset;
+		pushConstantRange.size = static_cast<uint32_t>(descriptor.size);
+		pushConstantRange.stageFlags = VulkanRenderer::shader_stage_to_vulkan(descriptor.stage);
+		pushConstantRanges.push_back(pushConstantRange);
 	}
 
 	// layout

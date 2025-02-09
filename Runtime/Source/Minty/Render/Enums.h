@@ -74,12 +74,14 @@ namespace Minty
 
 	enum class ImageUsage
 	{
-        Undefined,
-		Sampled,
-		Storage,
-		Color,
-		DepthStencil
+        Undefined = 0,
+		Sampled = 1,
+		Storage = 2,
+		Color = 4,
+		DepthStencil = 8
 	};
+
+    MINTY_ENUM_FLAGS_OPERATORS(ImageUsage)
 
 	enum class ImageLayout
 	{

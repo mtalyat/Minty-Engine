@@ -3,7 +3,9 @@
 
 namespace Minty
 {
-	// a container of bytes
+	/// <summary>
+	/// A collection of bytes.
+	/// </summary>
 	class BaseContainer
 		: public Container
 	{

@@ -1,17 +1,23 @@
 #include "pch.h"
 #include "RenderPass.h"
 
-#include "Platform/Vulkan/VulkanRenderPass.h"
+#include "Minty/Asset/AssetManager.h"
 #include "Minty/Render/RenderTarget.h"
 #include "Platform/Vulkan/VulkanRenderer.h"
+#include "Platform/Vulkan/VulkanRenderPass.h"
 
 using namespace Minty;
 
+Minty::RenderPass::~RenderPass()
+{
+    // TODO: destroy resources?
+}
+
 Ref<RenderTarget> Minty::RenderPass::create_render_target(RenderTargetBuilder const& builder)
 {
-    m_targets.push_back(RenderTarget::create(builder));
+    m_targets.push_back(AssetManager::create<RenderTarget>(builder));
 
-    Ref<RenderTarget> renderTarget = m_targets.back().create_ref();
+    Ref<RenderTarget> renderTarget = m_targets.back();
 
     if (m_activeTarget == nullptr)
     {

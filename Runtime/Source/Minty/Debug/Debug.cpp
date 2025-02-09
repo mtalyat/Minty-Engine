@@ -1,7 +1,7 @@
 #include "pch.h"
 #include "Debug.h"
 
-#include "Minty/Core/Console.h"
+#include "Minty/Core/Application.h"
 #include "Minty/Debug/Logger.h"
 
 #ifdef MINTY_WINDOWS
@@ -14,36 +14,42 @@
 
 using namespace Minty;
 
-static Logger _logger("Log.txt", true);
+static Logger s_logger(DEFAULT_DEBUG_LOG_PATH, true);
 
 void Minty::Debug::log(String const& text)
 {
     Console::log(text);
-    _logger.log(text);
+    s_logger.log(text);
+}
+
+void Minty::Debug::log_color(String const& text, Console::Color const color)
+{
+    Console::log_color(text, color);
+    s_logger.log(text);
 }
 
 void Minty::Debug::log_warning(String const& text)
 {
     Console::warn(text);
-    _logger.log_warning(text);
+    s_logger.log_warning(text);
 }
 
 void Minty::Debug::log_error(String const& text)
 {
     Console::error(text);
-    _logger.log_error(text);
+    s_logger.log_error(text);
 }
 
 void Minty::Debug::log_info(String const& text)
 {
     Console::info(text);
-    _logger.log_info(text);
+    s_logger.log_info(text);
 }
 
 void Minty::Debug::log_todo(String const& text)
 {
     Console::todo(text);
-    _logger.log_todo(text);
+    s_logger.log_todo(text);
 }
 
 void Minty::Debug::log_stack_trace()

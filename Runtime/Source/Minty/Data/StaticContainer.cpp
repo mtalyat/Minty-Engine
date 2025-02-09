@@ -9,30 +9,39 @@ using namespace Minty;
 Bool Minty::StaticContainer::resize(Size const newSize)
 {
 	// do nothing if already that size
-	if (newSize == m_size) return false;
+	if (newSize == m_size)
+	{
+		return false;
+	}
 
-	// capacity and size always match
-	Byte* newData = new Byte[newSize];
+	// do nothing if goes over capacity
+	if (newSize > m_capacity)
+	{
+		return false;
+	}
 
-	// copy over data
-	Size size = Math::min(m_size, newSize);
-	memcpy(newData, mp_data, size);
-
-	// delete old data
-	delete[] mp_data;
-
-	// assign new data and info
-	mp_data = newData;
+	// set size
 	m_size = newSize;
-	m_capacity = newSize;
 
 	return true;
 }
 
 Bool Minty::StaticContainer::append(void const* const data, Size const size)
 {
-	// cannot append to a static container
-	return false;
+	// can append to a static container, as long as the capacity allows for it
+	if (m_size + size > m_capacity)
+	{
+		return false;
+	}
+
+	// save index to insert data at
+	Size index = m_size;
+
+	// increase size
+	m_size += size;
+
+	// set the data
+	set_at(data, size, index);
 }
 
 Bool Minty::StaticContainer::reserve(Size const newCapacity)

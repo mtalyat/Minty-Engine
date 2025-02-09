@@ -9,7 +9,7 @@ namespace Minty
 	struct TextureBuilder
 	{
 		UUID id = {};
-		Owner<Image> image;
+		Ref<Image> image;
 		Filter filter = Filter::Undefined;
 		ImageAddressMode addressMode = ImageAddressMode::Undefined;
 		Bool normalizedCoordinates = true;
@@ -19,7 +19,7 @@ namespace Minty
 		: public Asset
 	{
 	private:
-		Owner<Image> m_image;
+		Ref<Image> m_image;
 
 	protected:
 		Texture(TextureBuilder const& builder)
@@ -31,7 +31,7 @@ namespace Minty
 		virtual ~Texture() = default;
 
 	public:
-		Ref<Image> get_image() const { return m_image.create_ref(); }
+		Ref<Image> get_image() const { return m_image; }
 
 		UInt get_width() const { return m_image->get_width(); }
 

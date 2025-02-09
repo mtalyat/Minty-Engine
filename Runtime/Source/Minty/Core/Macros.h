@@ -44,7 +44,9 @@ inline type operator|=(type& left, type const right) { left = left | right; retu
 inline type operator&(type const left, type const right) { return static_cast<type>(static_cast<Size>(left) & static_cast<Size>(right)); } \
 inline type operator&=(type& left, type const right) { left = left & right; return left; } \
 inline type operator~(type const value) { return static_cast<type>(~static_cast<Size>(value)); } \
-inline Bool operator!(type const value) { return static_cast<Size>(value) == 0; }
+inline Bool operator!(type const value) { return static_cast<Size>(value) == 0; } \
+inline Bool operator<(type const left, type const right) { return static_cast<Size>(left) < static_cast<Size>(right); } \
+inline Bool operator>(type const left, type const right) { return static_cast<Size>(left) > static_cast<Size>(right); }
 
 #define MINTY_DEBUG_INFO(message) std::format("[{}][{}()][line {}] -> {}", Minty::Path(__FILE__).filename().string(), __func__, __LINE__, message)
 

@@ -25,10 +25,10 @@ namespace MintyEngine
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Camera_SetFar(UUID id, float perspective);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static object Camera_GetMain();
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Camera_SetMain(UUID id);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Camera_SetColor(UUID id, int color);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static int Camera_GetColor(UUID id);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Camera_SetColor(UUID id, int color);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static object Camera_GetRenderTarget(UUID id);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Camera_SetRenderTarget(UUID id, UUID renderTarget);
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static UUID Camera_GetRenderTarget(UUID id);
         #endregion
 
         #region MeshRenderer
@@ -117,6 +117,7 @@ namespace MintyEngine
         #region Render
 
         #region Image
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static UUID Image_Load(string path);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static UUID Image_Create(int format, int type, int tiling, int aspect, int usage, uint width, uint height, bool immutable);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static UUID Image_CreateBasic(uint width, uint height);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static uint Image_GetWidth(UUID id);
@@ -124,18 +125,18 @@ namespace MintyEngine
         #endregion
 
         #region Material
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static UUID Material_Create(string path);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static UUID Material_Load(string path);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static object Material_GetTemplate(UUID id);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Material_Set(UUID id, string name, int type, string value);
         #endregion
 
         #region MaterialTemplate
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static UUID MaterialTemplate_Create(string path);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static UUID MaterialTemplate_Load(string path);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static object MaterialTemplate_GetShader(UUID id);
         #endregion
 
         #region Mesh
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static UUID Mesh_Create(string path);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static UUID Mesh_Load(string path);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static UUID Mesh_CreateFromType(int type);
         #endregion
 
@@ -151,10 +152,11 @@ namespace MintyEngine
 
         #region RenderTarget
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static UUID RenderTarget_Create(bool framebuffer);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static object RenderTarget_GetImage(UUID id, int index);
         #endregion
 
         #region Shader
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static UUID Shader_Create(string path);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static UUID Shader_Load(string path);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static object Shader_GetViewport(UUID id);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static void Shader_SetViewport(UUID id, UUID viewportId);
         [MethodImpl(MethodImplOptions.InternalCall)] internal extern static object Shader_GetScissor(UUID id);
@@ -163,7 +165,7 @@ namespace MintyEngine
         #endregion
 
         #region ShaderModule
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static UUID ShaderModule_Create(string path);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static UUID ShaderModule_Load(string path);
         #endregion
 
         #region Scissor
@@ -176,7 +178,8 @@ namespace MintyEngine
         #endregion
 
         #region Texture
-        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static UUID Texture_Create(UUID imageId, Filter filter, ImageAddressMode addressMode, bool normalizedCoordinates);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static UUID Texture_Load(string path);
+        [MethodImpl(MethodImplOptions.InternalCall)] internal extern static UUID Texture_Create(UUID imageId, int filter, int addressMode, bool normalizedCoordinates);
         #endregion
 
         #region Viewport

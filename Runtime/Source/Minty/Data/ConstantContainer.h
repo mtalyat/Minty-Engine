@@ -4,7 +4,7 @@
 namespace Minty
 {
 	/// <summary>
-	/// A ConstantContainer is a container with a fixed size.
+	/// A Container with a fixed capacity and size.
 	/// </summary>
 	class ConstantContainer
 		: public BaseContainer

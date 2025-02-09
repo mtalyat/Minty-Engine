@@ -811,7 +811,7 @@ Ref<FontVariant> Minty::AssetManager::load_font_variant(Path const& path)
 	return create_existing<FontVariant>(path, builder);
 }
 
-Owner<Image> Minty::AssetManager::load_image(Path const& path)
+Ref<Image> Minty::AssetManager::load_image(Path const& path)
 {
 	MINTY_ASSERT_ASSET_PATH(path);
 
@@ -839,7 +839,7 @@ Owner<Image> Minty::AssetManager::load_image(Path const& path)
 	// free stb pixels
 	stbi_image_free(rawPixels);
 
-	return Image::create(builder);
+	return create_existing<Image>(path, builder);
 }
 
 Bool Minty::AssetManager::load_values(Reader& reader, std::unordered_map<String, Cargo>& values, Ref<Shader> const shader, Path const& path)
@@ -862,6 +862,8 @@ Bool Minty::AssetManager::load_values(Reader& reader, std::unordered_map<String,
 
 		reader.indent(i);
 
+		std::unordered_set<String> usedNames;
+
 		for (Size j = 0; j < reader.size(); j++)
 		{
 			reader.read_name(j, valueName);
@@ -869,6 +871,14 @@ Bool Minty::AssetManager::load_values(Reader& reader, std::unordered_map<String,
 			MINTY_ASSERT_FORMAT(cargo.contains(valueName), "Shader does not have a value with the name \"{}\" for the input \"{}\".", valueName, inputName);
 
 			Cargo::Slot& slot = cargo.at(valueName);
+
+			// if not used yet, clear its value
+			if (!usedNames.contains(valueName))
+			{
+				usedNames.emplace(valueName);
+
+				slot.container.clear();
+			}
 
 			// if pointer: get asset
 			// if not: read directly
@@ -960,14 +970,46 @@ Bool Minty::AssetManager::load_values(Reader& reader, std::unordered_map<String,
 				break;
 			case Type::Object:
 			{
-				// read ID, then get asset ref, copy pointer to container
-				Ref<Asset> asset{};
-				if (find_dependency(path, reader, valueName, asset, true))
+				// read ID(s), then get asset ref, copy pointer to container
+				if (reader.indent(j))
 				{
-					return false;
+					Ref<Asset> asset{};
+					Asset* assetPtr;
+					if (reader.size() > 0)
+					{
+						// has children, so use those
+
+						UUID id{};
+						for (Size k = 0; k < reader.size(); k++)
+						{
+							reader.read(k, id);
+
+							if (check_dependency(id, path, valueName, true))
+							{
+								break;
+							}
+
+							asset = AssetManager::get_asset(id);
+							assetPtr = asset.get();
+							slot.container.append(&assetPtr, sizeof(assetPtr));
+						}
+
+						reader.outdent();
+					}
+					else
+					{
+						reader.outdent();
+
+						// no children, so use the value
+						if (find_dependency(path, reader, valueName, asset, true))
+						{
+							return false;
+						}
+						assetPtr = asset.get();
+						slot.container.append(&assetPtr, sizeof(assetPtr));
+					}
 				}
-				Asset* assetPtr = asset.get();
-				slot.container.set(&assetPtr, sizeof(assetPtr));
+
 				break;
 			}
 			case Type::UUID:
@@ -1296,6 +1338,13 @@ Ref<Shader> Minty::AssetManager::load_shader(Path const& path)
 				// set offset if push const
 				if (input.type == ShaderInputType::PushConstant)
 				{
+					if (input.stage == ShaderStage::Undefined)
+					{
+						input.stage = ShaderStage::Vertex;
+					}
+
+					MINTY_ASSERT_FORMAT(input.stage == ShaderStage::Vertex, "PushConstants can only be part of the Vertex ShaderModule. Push Constant: {}.", input.name);
+
 					input.offset = offset;
 				}
 
@@ -1316,7 +1365,7 @@ Ref<Shader> Minty::AssetManager::load_shader(Path const& path)
 						reader->read(i, type);
 
 						// emplace slot
-						input.cargo.emplace_slot(name, type);
+						input.cargo.emplace_slot(name, type, input.count);
 
 						// add to total size
 						UInt typeSize = static_cast<UInt>(sizeof_type(type));

@@ -46,7 +46,7 @@ namespace Minty
 		static Ref<Window> s_window;
 		static Color s_color;
 
-		static Owner<RenderPass> s_renderPass;
+		static Ref<RenderPass> s_renderPass;
 		static Ref<RenderTarget> s_renderTarget;
 
 		static std::vector<Ref<RenderTarget>> s_screenTargets;
@@ -75,8 +75,6 @@ namespace Minty
 
 		// skips the render pass and draws nothing
 		static void skip_render_pass(Ref<RenderPass> const& renderPass, Ref<RenderTarget> const& renderTarget);
-		// skips the scene render pass
-		static void skip();
 
 		// sets the currently active camera
 		static void set_camera(Float3 const position, Quaternion const rotation, Camera const& camera);
@@ -97,7 +95,7 @@ namespace Minty
 	public:
 		static Ref<Material> get_or_create_default_material(Ref<Texture> const texture, AssetType const type, Space const space);
 
-		static Owner<RenderPass> create_render_pass(RenderPassBuilder const& builder);
+		static Ref<RenderPass> create_render_pass(RenderPassBuilder const& builder);
 
 		static Ref<RenderTarget> create_render_target(Ref<RenderPass> const& renderPass);
 
@@ -116,7 +114,7 @@ namespace Minty
 		static UInt get_default_material_id(AssetType const type, Space const space);
 
 	public:
-		static Ref<RenderPass> get_render_pass() { return s_renderPass.create_ref(); }
+		static Ref<RenderPass> get_render_pass() { return s_renderPass; }
 
 		static Ref<RenderTarget> get_render_target() { return s_renderTarget; }
 
@@ -131,6 +129,10 @@ namespace Minty
 		static Format get_color_format();
 
 		static Format get_depth_format();
+
+		static UInt2 get_screen_size();
+
+		static Size get_current_frame_index();
 
 #pragma endregion
 

@@ -36,7 +36,6 @@ void Minty::Application::initialize(ApplicationBuilder const& builder)
 	m_info = builder.info;
 	m_data = builder.data;
 	m_mode = builder.mode;
-	mp_logger = new Logger(builder.logPath);
 	m_passFlags = builder.passes;
 
 	// initialize tools
@@ -100,9 +99,6 @@ void Minty::Application::shutdown()
 	ScriptEngine::shutdown();
 
 	// destroy resources
-	delete mp_logger;
-	mp_logger = nullptr;
-
 	MINTY_ASSERT(sp_instance != nullptr);
 	sp_instance = nullptr;
 

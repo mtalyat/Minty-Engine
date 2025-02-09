@@ -19,3 +19,10 @@ Minty::VulkanTexture::~VulkanTexture()
 {
 	VulkanRenderer::destroy_sampler(m_sampler);
 }
+
+VkImageView Minty::VulkanTexture::get_view() const
+{
+	Ref<Image> image = get_image();
+	MINTY_ASSERT_FORMAT(image != nullptr, "Image is null for Texture {}.", to_string(id()));
+	return static_cast<Ref<VulkanImage>>(image)->get_view();
+}
